@@ -1,0 +1,13 @@
+<template>
+  <require from="resources/css/bootstrap.min.css"></require>
+  <require from="./styles.css"></require>
+  <require from="humane-js/themes/flatty.css"></require>
+
+  <nav-bar></nav-bar>
+
+  <loading-indicator loading.bind="router.isNavigating || api.isRequesting"></loading-indicator>
+  <div class="page-host">
+    <router-view></router-view>
+  </div>
+   
+</template>

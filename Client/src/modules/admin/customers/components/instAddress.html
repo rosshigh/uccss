@@ -1,0 +1,81 @@
+<template>
+    <div class="row topMargin">
+        <!-- Row 5 -->
+        <div class="col-lg-6 topMargin">
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Address 1</label>
+                        <input value.bind="people.selectedInstitution.address1" id="editAddress1" class="form-control" placeholder="Address 1" type="text"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Address 2</label>
+                        <input value.bind="people.selectedInstitution.address2" id="editAddress1" class="form-control" placeholder="Address 2" type="text"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>City</label>
+                        <input value.bind="people.selectedInstitution.city" id="editCity" class="form-control" placeholder="City" type="text" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Region</label>
+                        <input value.bind="people.selectedInstitution.region" id="editRegion" class="form-control" placeholder="Region" type="text"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Postal Code</label>
+                        <input value.bind="people.selectedInstitution.postalCode" id="editPostalCode" class="form-control" placeholder="Postal Code"
+                            type="text" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Country</label>
+                        <input value.bind="people.selectedInstitution.country" id="editCountry" class="form-control" placeholder="Country" type="text"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 topMargin">
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>URL</label>
+                        <input value.bind="people.selectedInstitution.url" id="editCountry" class="form-control" placeholder="URL" type="text" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-12">
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <label>Time Zone</label>
+                        <select value.bind="people.selectedInstitution.timeZone" class="form-control">
+                            <option value="">Select an option</option>
+                            <option repeat.for="zone of config.TIMEZONES" value="${zone}">${zone}</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

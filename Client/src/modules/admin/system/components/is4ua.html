@@ -1,0 +1,27 @@
+<template>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="editSapName" class="control-label">SAP Name</label>
+            <select value.two-way="products.selectedProduct.sapProduct" id="editSapName" class="form-control " placeholder="SAP Name">
+                <option value="">Select an option</option>
+                <option repeat.for="name of is4ua.sapProductsArray" value="${name.code}">${name.description}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="editHostedWhere" class="control-label">Hosted</label>
+            <select value.bind="products.selectedProduct.hostWhere" id="editHostedWhere" class="form-control ">
+                <option value="">Select an option</option>
+                <option value="UCC">UCC</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    
+        <div class="form-group">
+            <label for="editUaCurriculum" class="control-label">UA Curriculum</label>
+            <select value.bind="products.selectedProduct.uaCurriculum" id=editUaCurriculum " class="form-control  ">
+                <option value=" ">Select an option</option>
+                <option repeat.for="name of is4ua.uaCurriculumArray " value="${name.code} ">${name.description}</option>
+            </select>
+        </div>
+    </div>
+</template>

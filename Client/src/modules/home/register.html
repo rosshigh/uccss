@@ -1,0 +1,79 @@
+<template>
+  <div class="container topMargin">
+    <div class="panel panel-primary topMargin">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <h3>Create an Account</h3>
+        </div>
+      </div>
+        <div class="topMargin bottomMargin list-group-item leftMargin rightMargin">
+            <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+            <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+        </div>
+      <div class="panel-body">
+        <form role="form" class="form-horizontal">
+          <div class="form-group row">
+            <label for="register_firstName" class="col-sm-2 form-control-label topMargin">First Name</label>
+            <div class="col-sm-10">
+              <input id="register_firstName" type="text" placeholder="First Name"
+                   class="form-control"
+                   value.bind="people.selectedPerson.firstName" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register_middletName" class="col-sm-2 form-control-label topMargin">Middle Name</label>
+            <div class="col-sm-10">
+              <input type="text" placeholder="Middle Name" id="register_middletName"
+                   class="form-control topMargin"
+                   value.bind="people.selectedPerson.middleName" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="register_lastName" class="col-sm-2 form-control-label topMargin">Last Name</label>
+            <div class="col-sm-10">
+              <input id="register_lastName" type="text" placeholder="Last Name"
+                   class="form-control topMargin"
+                   value.bind="people.selectedPerson.lastName" />
+              </div>
+          </div>
+          <div class="form-group row">
+            <label for="register_email" class="col-sm-2 form-control-label topMargin">EMail</label>
+            <div class="col-md-10">
+              <input id="register_email" type="text" placeholder="eMail"
+                   class="form-control topMargin"
+                   value.bind="people.selectedPerson.email"
+                   blur.trigger="checkEmail()"/>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="register_password" class="col-sm-2 form-control-label topMargin">Password</label>
+            <div class="col-md-10">
+              <input id="register_password" type="password" placeholder="Password"
+                   class="form-control topMargin"
+                   value.bind="people.selectedPerson.password" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="register_password_repeat" class="col-sm-2 form-control-label topMargin">Repeat Password</label>
+            <div class="col-md-10">
+              <input id="register_password_repeat" type="password" placeholder="Password"
+                   class="form-control topMargin"
+                   value.bind="password_repeat" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="register_institution" class="col-sm-2 form-control-label topMargin">Institution</label>
+            <div class="col-md-10">
+              <select id="register_institution" value.bind="people.selectedPerson.institutionId" id="iType"
+                    class="form-control topMargin" placeholder="Institution">
+                <option value=""></option>
+                <option repeat.for="institution of people.institutionsArray"
+                        value="${institution._id}">${institution.name}</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>

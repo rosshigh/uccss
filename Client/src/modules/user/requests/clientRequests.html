@@ -1,0 +1,19 @@
+
+<template>
+    <div class="col-lg-2">
+        <div class="list-group">
+            <a  class="${row.isActive ? 'active' : ''} list-group-item"  repeat.for="row of router.navigation" href.bind="row.href" class="list-group-item">
+                <h4 class="list-group-item-heading">${row.title}</h4>
+            </a>
+        </div>
+
+        <div class="topMargin" style="display: none;" id="infoBox"></div>
+        <div class="topMargin" style="display: none;" id="existingRequestInfo"></div>
+    </div>
+
+    <div class="col-lg-10">
+        <router-view></router-view>
+    </div>
+    
+     
+</template>

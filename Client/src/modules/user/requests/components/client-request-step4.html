@@ -1,0 +1,51 @@
+<template>
+
+  <div class="col-md-12" >
+    <div  class="well well-sm col-md-10 col-sm-offset-1" innerhtml.bind="siteInfo.selectMessageByKey('CLIENT_REQUESTS_SUMMARY').content"></div>
+  </div>
+  <div class="form-group col-md-12">
+    <div class="row">
+      <h4 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="col-md-5 topMargin">Course: <b>${requests.selectedRequest.courseId | courseName:people.coursesArray}</b></h4>
+      <h4 show.bind="requests.selectedRequest.courseId == config.SANDBOX_ID" class="col-md-5 topMargin">Course: <b>Faculty Development</b></h4>
+    </div>
+    <div class="row">
+      <h4 class="col-md-5 topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">Undergraduates: <b>${requests.selectedRequest.undergradIds}</b></h4>
+      <h4 class="col-md-5 topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>
+    </div>
+    <div class="row">
+      <h4 class="col-md-5 topMargin">Course Begins: <b>${requests.selectedRequest.startDate}</b></h4>
+      <h4 class="col-md-5 topMargin">Course Ends: <b>${requests.selectedRequest.endDate}</b></h4>
+    </div>
+    <div class="col-md-12"></div>
+    <div class="row" id="productListTable">
+      <table class="table table-striped table-bordered col-md-10 topMargin">
+        <thead>
+        <tr>
+          <th>Requested Product</th>
+          <th>Date Required</th>
+        </tr>
+        <tbody>
+        <tr repeat.for="request of requests.selectedRequest.requestDetails">
+          <td>${request.productId | productName:products.productsArray}</td>
+          <td>
+            <div class="form-group  col-md-8">
+              <input readonly.bind="request._id" type="date" min.bind="minRequiredDate" max.bind="maxRequiredDate" value.bind="request.requiredDate"
+                     class="form-control requiredDates" id="requiredDate-${$index}">
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group" show.bind="comments !== ''">
+          <label >Comments:</label>
+          <div class="textareaDiv topMargin" style="height:100px;" innerhtml.bind="requests.selectedRequest.comments"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>

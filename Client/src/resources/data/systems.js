@@ -1,0 +1,344 @@
+import {inject} from 'aurelia-framework';
+import {DataServices} from './dataServices';
+import {Utils} from '../utils/utils';
+import {AppConfig} from '../../config/appConfig';
+
+@inject(DataServices, Utils, AppConfig)
+export class Systems{
+    newSystem = false;      //Is the selected product a new product
+    editIndex;              //Index of selected product
+
+    constructor(data, utils, config){
+        this.data = data;
+        this.utils = utils;
+        this.config = config;
+    }
+
+    async getData(){
+        try{
+            let serverResponse = await this.data.get(this.data.SYSTEMS_CLIENTS_PRODUCTS);
+            if(!serverResponse.status){
+                this.systemsArrayInternal = serverResponse;
+                this.systemsArray = serverResponse;
+                 for(var i = 0, x = this.systemsArrayInternal.length; i<x; i++){
+                    this.systemsArrayInternal[i].baseIndex = i;
+                }
+            }
+        } catch(error){
+            console.log(error);
+        }
+    }
+
+    async getSystemsArray(refresh, options){
+        if(!this.systemsArray || refresh) {
+            var url = this.data.SYSTEMS_SERVICE;
+            url += options ? options : "";
+             try{
+                let serverResponse = await this.data.get(url);
+                if(!serverResponse.status){
+                    this.systemsArrayInternal = serverResponse;
+                    this.systemsArray = serverResponse;
+                    for(var i = 0, x = this.systemsArrayInternal.length; i<x; i++){
+                        this.systemsArrayInternal[i].baseIndex = i;
+                    }
+                } else {
+                    this.systemsArray = undefined;
+                }
+            } catch(error){
+                console.log(error);
+                this.systemsArray = undefined;
+            }
+        }
+        return this.systemsArray;
+    }
+
+    async getSystem(systemId){
+        let response = this.data.get(this.data.SYSTEMS_SERVICE + "/" + systemId);
+        if(!response.status){
+            this.selectedSystem = response;
+        } else {
+            this.selectedSytem = new Object();
+        }
+    }
+
+    async getClientsArray(systemId){
+         if(!this.clientsArray) {
+             try{
+                var url = this.data.SYSTEM_CLIENTS.replace("SYSTEMID", systemId);
+                let serverResponse = await this.data.getAllObjects(url);
+                if(!serverResponse.status){
+                    this.clientsArrayInternal = serverResponse;
+                    this.clientsArray = serverResponse;
+                    for(var i = 0, x = this.clientsArrayInternal.length; i<x; i++){
+                        this.clientsArrayInternal[i].baseIndex = i;
+                    }
+                } else {
+                    this.clientsArray = undefined;
+                }
+            } catch(error){
+                console.log(error);
+                this.clientsArray = undefined;
+            }
+        }
+        return this.clientsArray;
+    }
+
+    selectSystem(index){
+        if(!index && index != 0) {
+            this.selectedSystem = this.emptySystem();
+            this.newSystem = true;
+        } else {
+            try{
+                this.selectedSystem = this.utils.copyObject(this.systemsArrayInternal[index]);
+                this.newSystem = false;
+                this.editIndex = index;
+            } catch (error){
+                console.log(error);
+                this.selectedSystem = this.emptySystem();
+                this.newSystem = true;
+            }
+
+        }
+    }
+
+    selectSystemBySID(sid){
+         this.selectedSystem = undefined;
+         for(var i = 0, x = this.systemsArrayInternal.length; i<x; i++){
+             if(this.systemsArrayInternal[i].sid === sid){
+                 this.selectedSystem = this.utils.copyObject(this.systemsArrayInternal[i]);
+                 i = x;
+             }
+         }
+         return this.selectedSystem;
+    }
+
+    selectedSystemFromId(id){
+      this.selectedSystem = null;
+      for(var i = 0, x = this.systemsArrayInternal.length; i < x; i++){
+        if(this.systemsArrayInternal[i]._id === id){
+          this.selectedSystem = this.utils.copyObject(this.systemsArrayInternal[i]);
+          break;
+        }
+      };
+    }
+
+    async getSystemsForProduct(productId){
+        let serverResponse = await this.data.getAllObjects(this.data.SYSTEMS_PRODUCTS_SERVICE.replace("PRODUCTID", productId))
+        return serverResponse;
+    }
+
+    emptySystem(){
+        var newSystemObj = {};
+        newSystemObj.sid = "";
+        newSystemObj.active = true;
+        newSystemObj.description = "";
+        newSystemObj.server = "";
+        newSystemObj.instance = "";
+        newSystemObj.its = "";
+        newSystemObj.terms = "";
+        newSystemObj.idsAvailable = 0;
+        newSystemObj.productId = "";
+        this.clientList = [];
+        return newSystemObj;
+    }
+
+    async saveSystem(){
+        if(!this.selectedSystem){
+            return;
+        }
+
+        if(!this.selectedSystem._id){
+            let serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE, "post");
+            if(!serverResponse.status){
+                 this.systemsArrayInternal.push(this.selectedSystem);
+                 this.systemsArray =  this.systemsArrayIntern;al
+            }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE, "put");
+            if(!serverResponse.status){
+                this.systemsArrayInternal[this.systemsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedSystem);
+                this.systemsArray =  this.systemsArrayInternal;
+            }
+            return serverResponse;
+        }
+    }
+
+    async deleteSystem(){
+         let serverResponse = await this.data.deleteObject(this.data.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
+            if (serverResponse.status === 204) {
+                this.systemsArrayInternal.splice(this.editIndex, 1);
+                this.systemsArray = this.systemsArrayInternal;
+                this.editIndex = - 1;
+            }
+            return serverResponse;
+    }
+
+    isDirty(){
+        if(this.selectedSystem){
+            if(this.selectedSystem._id){
+                var obj = this.systemsArray[this.editIndex];
+            } else {
+                var obj = this.emptySystem();
+            }
+            return this.utils.objectsEqual(this.selectedSystem, obj);
+        }
+    }
+
+    async deleteAllClients(){
+        let serverResponse = await this.data.deleteObject(this.data.DELETE_ALL_CLIENTS.replace('SYSTEMID', this.selectedSystem._id));
+        if(serverResponse.status === 204){
+            this.systemsArrayInternal[this.editIndex].clients = [];
+            this.selectedSystem.clients = new Array();
+        } else {
+            this.data.processError(serverResponse, " deleting the clients");
+        }
+        return serverResponse;
+    }
+
+    generateClients(start, end, status){
+        if(!this.selectedSystem){
+            return {error: "No system selected."};
+        }
+
+        this.selectedSystem.clients = this.selectedSystem.clients || new Array();
+        var lastClientIndex = this.selectedSystem.clients.length - 1;
+        if( start > 0 &&  end > 0 && end > start){
+            for(var i = start; i < end; i++){
+                if(this._findClient(i, 0, lastClientIndex) < 0){
+                this.selectedSystem.clients.push({client: i, clientStatus: status, systemId: this.selectedSystem._id,  idsAvailable: this.selectedSystem.idsAvailable})
+                }
+            }
+            return true;
+        } else {
+            return {error: "Enter valid start and end client numbers"}
+        }
+    }
+
+    refreshClients(status){
+         for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
+            this.selectedSystem.clients[i].clientStatus = status;
+            this.selectedSystem.clients[i].idsAvailable = this.selectedSystem.idsAvailable;
+            this.selectedSystem.clients[i].lastIdAllocated = 0;
+            this.selectedSystem.clients[i].assignments = new Array();
+        }
+    }
+
+    _findClient(client, start, end){
+        if(end >= 0){
+            for(var i = start; i<=end; i++ ){
+                if(parseInt(this.selectedSystem.clients[i].client) === client) return i;
+            }
+        }
+        return -1;
+    }
+
+    selectClient(index){
+        if(index != undefined) {
+            this.selectedClient = this.utils.copyObject(this.selectedSystem.clients[index]);
+            this.clientIndex = index;
+        }
+    }
+    
+    selectClientFromID(systemId, clientId){
+      this.selectedClient = null;
+      for(var i = 0, x = this.systemsArrayInternal.length; i < x; i++){
+        if(this.systemsArrayInternal[i]._id === systemId){
+          for(var j = 0; j < this.systemsArrayInternal[i].clients.length; j++){
+              if(this.systemsArrayInternal[i].clients[j]._id === clientId){
+                  this.selectedClient = this.utils.copyObject(this.systemsArrayInternal[i].clients[j]);
+                    break;
+              }
+          }  
+          
+        }
+      }
+    }
+    
+    /*****************************************************************************************************
+     * Find the client in a systems client list and update it, used by client request assignment
+     ****************************************************************************************************/
+    updateClient(client){
+        for(var i = 0, x = this.systemsArrayInternal.length; i < x; i++){
+            if(this.systemsArrayInternal[i]._id === client.systemId){
+                for(var j = 0; j < this.systemsArrayInternal[i].clients.length; j++){
+                    if(this.systemsArrayInternal[i].clients[j]._id === client._id){
+                        this.systemsArrayInternal[i].clients[j] = this.utils.copyObject(client);
+                        break;
+                    }
+                }  
+            }
+        };
+    }
+
+    async saveClients(array){
+      if(array){
+        var obj = {clients: array};
+          var serverResponse = await this.data.saveObject(obj, this.data.CLIENTS_SERVICE + '/multiple', "put");
+        }
+    }
+
+    async saveClient(){
+        var serverResponse = await this.data.saveObject(this.selectedClient, this.data.CLIENTS_SERVICE, "put");
+        if(!serverResponse.status){
+           this.selectedSystem.clients[this.clientIndex] = this.utils.copyObject(this.selectedClient);
+        }
+        return serverResponse;
+    }
+
+    async deleteClient(){
+            if(this.selectedClient._id){
+                if(this._okToDeleteClient(this.selectedClient.clientStatus)){
+                    var response = await this.data.deleteObject(this.data.DELETE_CLIENT.replace('CLIENTID', this.selectedClient._id))
+                    if(!response.status) {
+                        this.selectedSystem.clients.splice(this.clientIndex,1);
+                    }
+                    return response;
+                }
+            }
+            return {status: "500"};
+    }
+
+    _okToDeleteClient(status){
+        for(var i = 0; i<this.config.CLIENT_STATUSES.length; i++){
+            if(this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    filter(filters, sort){
+        var keep;
+        var index = 0;
+       this.systemsArray = this.systemsArrayInternal.filter((item) => {
+            //Assume the item should be eliminated
+            keep = false;
+            //For each filter in filterValues
+            for(var i = 0, x = filters.length; i < x; i++){
+                keep = item[filters[i].property] === filters[i].value;
+                if(!keep) break;
+            }
+        return keep;
+        })
+
+        if(sort){
+            this.sortArray(sort);
+        } else {
+            return this.systemsArray;
+        }
+    }
+
+    sort(propertyName){
+        var propName = sort.propertyName;
+        var sortDirection = sort.direction = "ASC" ? 1 : -1;
+        this.systemsArray = filteredArray
+        .slice(0)
+        .sort((a, b) => {
+            var result = (a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0;
+            return result * sortDirection;
+        });
+        return this.systemsArray;
+    }
+
+}

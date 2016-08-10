@@ -1,0 +1,25 @@
+<template>
+            <div class="col-lg-10 col-offset-lg-1" style="padding:15px;">
+
+            <table id="personTable2" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th style="width:20rem;">Name</th>
+                        <th style="width:15rem;">Phone</th>
+                        <th style="width:20rem;">eMail</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="person of people.peopleInstArray" class="blackText">
+                        <td data-title="name">${person.firstName} ${person.lastName}</td>
+                        <td data-tile="phone">${person.phone}</td>
+                        <td data-title="email">${person.email}</td>
+                        <td data-title="role">${person.roles}</td>
+                        <td data-title="status">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+</template>

@@ -1,0 +1,84 @@
+<template>
+  <!-- Term Select -->
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group leftJustify">
+        <select value.bind="sessionId" class="form-control" change.delegate="changeSession($event)" id="session">
+          <option value="-1">Select a session</option>
+          <option repeat.for="session of sessions.sessionsArray"
+                  value.bind="session._id">Session ${session.session} - ${session.year}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div show.bind="sessionSelected" class="col-sm-12">
+      <div class="form-group">
+        <select value.bind="requestType" change.delegate="changeRequestType($event)" id="requestType" class="form-control">
+          <option value="-1">Choose the Type of The Request</option>
+           <option value="sandboxCourse">${config.SANDBOX_NAME}</option>
+           <option value="regularCourse">Regular Course</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <compose show.bind="regularClient && sessionSelected" view='./Courses.html'></compose>
+
+  <!-- Number of students -->
+  <div class="row"  id="numStudents" show.bind="courseSelected">
+    <div class="col-sm-6">
+      <div class="form-group topMargin">
+        <div class="input-group  col-md-9">
+          <div >
+            <label for="undergraduates" class="leftJustify">Number of Undergraduates</label>
+            <input readonly.bind="existingRequest" id="undergraduates"  type="number" placeholder="Number of Undergraduates"
+                   class="form-control" value.bind="requests.selectedRequest.undergradIds" style="width:343px;"/>
+            <label show.bind="requests.selectedRequest.addUndergraduates > 0">Additional id's requested: ${requests.selectedRequest.addUndergraduates}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="form-group topMargin">
+        <div class="input-group col-md-9">
+          <div  class="form-group">
+            <label for="graduates" class="leftJustify">Number of Graduates</label>
+            <input readonly.bind="existingRequest" id="graduates" type="number" placeholder="Number of Graduates"
+                   class="form-control" value.bind="requests.selectedRequest.graduateIds" style="width:343px;"/>
+            <label show.bind="requests.selectedRequest.addGraduates > 0">Additional id's requested: ${requests.selectedRequest.addGraduates}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Begin and End Date -->
+  <div class="row" show.bind="sandBoxClient || courseSelected">
+      <div class="col-sm-6">
+        <div class="form-group topMargin">
+          <div class="input-group">
+            <div>
+              <label for="beginDate" class="leftJustify">Date the course begins</label>
+              <input readonly.bind="existingRequest" change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate"
+                     class="form-control" id="beginDate" min.bind="minStartDate" max.bind="maxStartDate">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group topMargin">
+          <div class="input-group">
+            <div>
+              <label for="endDate" class="leftJustify">Date the course ends</label>
+              <input readonly.bind="existingRequest" change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate"
+                     max.bind="maxEndDate" min.bind="minEndDate" class="form-control" id="endDate">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</template>

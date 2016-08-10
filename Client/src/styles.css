@@ -1,0 +1,107 @@
+.topMargin {
+    margin-top: 25px;
+}
+
+.bottomMargin {
+    margin-bottom: 25px;
+}
+
+.leftMargin {
+    margin-left: 25px;
+}
+
+.rightMargin {
+  margin-right: 25px;
+}
+
+.smallLeftMargin {
+    margin-left: 10px;
+}
+
+.bigTopMargin {
+    margin-top: 50px;
+}
+
+.smallMarginRight {
+    margin-right: 10px;
+}
+
+.page-host {
+    margin-top: 5rem;
+}
+
+textarea {
+  overflow-y:scroll;
+}
+
+.overFlow {
+    overflow-y:scroll;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.rowSelected{
+  background-color: lightgrey;
+}
+
+.newsTitle {
+  font-size: large;
+  font-weight: bold;
+  border-bottom: thin solid;
+}
+
+.newsUrl{
+  color: blue;
+  float: right;
+}
+
+.centerText{
+  text-align: center;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.smart-timeline{position:relative}
+.smart-timeline-list{list-style:none;margin:0;padding:0}
+.smart-timeline-list:after{content:" ";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}
+.smart-timeline-list li{position:relative;margin:0;padding:15px 0}
+.smart-timeline-list>li:hover{background-color:#f4f4f4}
+.smart-timeline-hover li:hover{background-color:#f9f9f9}
+.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}
+.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}
+.smart-timeline-time{float:left;width:70px;text-align:right}
+.smart-timeline-time>small{font-style:italic}
+.smart-timeline-content{margin-left:123px}
+
+.hover_img a { position:relative; }
+.hover_img a span { position:absolute; display:none; z-index:99; }
+.hover_img a:hover span { display:block; }
+
+.borderTop {
+  border-style: solid;
+  border-top: thin double #ff0000;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  padding-top: 6px;
+}

@@ -1,0 +1,49 @@
+<template>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-4">
+            <div class="form-group topMargin">
+                <select value.bind="typeSelected" change.delegate="typeChanged($event)" id="session" class="form-control">
+                <option value="">Select a Category</option>
+                <option repeat.for="type of downloads.appCatsArray"
+                        value="${type.code}">${type.description}</option>
+                </select>
+            </div>
+            </div>
+        </div>
+
+        <div show.bind="typeSelected != ''" class="col-lg-12 col-sm-12" style='padding:15px;'>
+            <div class='row'>
+                <div class='col-lg-12 bottomMargin'>
+                    <table id="newsTable" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <td colspan='3'>
+                                    <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th >Name </th>
+                                <th>File</th>
+                                <th >Decription</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                                <td data-title="name" class="col-md-2">${item.name}</td>
+                                <td data-title="originalFilename" class="col-md-2">
+                                    <a href="${config.DOWNLOAD_FILE_DOWNLOAD_URL}/${item.file.originalFilename}" target="_blank">${item.file.originalFilename}</a>
+                                </td>
+                                <td data-title="description" class="col-md-8">
+                                    <div>${item.description}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+   </div>
+</template>
