@@ -1,0 +1,5 @@
+{"__v":0,"_id":{"$oid":"57221ccbbe7cc8782832522d"},"code":1,"description":"SAPGUI for Windows"}
+{"__v":0,"_id":{"$oid":"57221cf2be7cc8782832522e"},"code":2,"description":"SAPGUI for Mac"}
+{"__v":0,"_id":{"$oid":"57221d34be7cc8782832522f"},"code":3,"description":"How to Documents"}
+{"__v":0,"_id":{"$oid":"57221d62be7cc87828325230"},"code":4,"description":"SAP Analytic Applications"}
+{"__v":0,"_id":{"$oid":"57221d7cbe7cc87828325232"},"code":6,"description":"Faculty Tutorials"}
