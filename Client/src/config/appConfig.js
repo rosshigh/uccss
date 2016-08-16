@@ -1,11 +1,11 @@
 export class AppConfig {
     //URIs
-    BASE_URL = "http://localhost:5000/api/";
-    FILE_URL = "http://localhost:5000/api/upload";
-    FILE_DOWNLOAD_URL = "http://localhost:5000/uploadedFiles/";
-    HELPTICKET_FILE_DOWNLOAD_URL = "http://localhost:5000/uploadedFiles/helpTickets/";
-    PRODUCT_FILE_DOWNLOAD_URL = "http://localhost:5000/uploadedFiles/productFiles/";
-    DOWNLOAD_FILE_DOWNLOAD_URL = 'http://localhost:5000/uploadedFiles/downloads';
+    BASE_URL = "/api/";
+    FILE_URL = "/api/upload";
+    FILE_DOWNLOAD_URL = "/uploadedFiles";
+    HELPTICKET_FILE_DOWNLOAD_URL = "uploadedFiles/helpTickets";
+    PRODUCT_FILE_DOWNLOAD_URL = "uploadedFiles/productFiles";
+    DOWNLOAD_FILE_DOWNLOAD_URL = 'uploadedFiles/downloads';
 
 
     DATE_FORMAT_TABLE = "MMM Do YYYY"

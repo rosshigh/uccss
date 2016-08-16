@@ -2,11 +2,11 @@
 var authConfig = {
 
   // Our Node API is being served from localhost:3001
-  baseUrl: "http://localhost:5000/api/",
+  baseUrl: "",
   // The API specifies that new users register at the POST api/people enpoint
   signupUrl: 'api/people/register',
   // Logins happen at the POST api/people/login endpoint
-  loginUrl: '/login',
+  loginUrl: 'login',
   // The API serves its tokens with a key of id which differs from
   // aureliauth's standard
   tokenName: 'token',
