@@ -3,6 +3,7 @@ export class AppConfig {
     BASE_URL = "/api/";
     FILE_URL = "/api/upload";
     FILE_DOWNLOAD_URL = "/uploadedFiles";
+    RESOURCE_URL = "/img";
     HELPTICKET_FILE_DOWNLOAD_URL = "uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = "uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = 'uploadedFiles/downloads';

@@ -71,8 +71,8 @@ module.exports = function(app, config) {
       next();
   });
 
-  app.use(jwtCheck.unless({path: ['/dist/assets/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
-  app.use(utils.middleware().unless({path: ['/dist/assets/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js',,'/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
+  app.use(jwtCheck.unless({path: ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
+  app.use(utils.middleware().unless({path: ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js',,'/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
 
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
     controllers.forEach(function (controller) {
