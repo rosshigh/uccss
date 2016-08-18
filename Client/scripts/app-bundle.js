@@ -13982,1012 +13982,6 @@ define('modules/home/components/success-dialog',["exports", "aurelia-dialog"], f
         return SuccessDialog;
     }(), _class.inject = [_aureliaDialog.DialogController], _temp);
 });
-define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Assignments = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            return step("next", value);
-                        }, function (err) {
-                            return step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _appState.AppState, _aureliaDialog.DialogService, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function Assignments(router, config, validation, people, app, dialog, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, Assignments);
-
-            this.requestSelected = false;
-            this.showAddStudentTemplate = false;
-            this.manualMode = false;
-            this.roundTo10 = false;
-            this.showAudit = false;
-            this.lastIDidsRemaining = -1;
-            this.navControl = "requestsNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.config = config;
-            this.validation = validation;
-            this.app = app;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-            this.dialog = dialog;
-        }
-
-        Assignments.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Assignments.prototype.canActivate = function canActivate() {
-            if (!this.app.user._id) this.router.navigate('logout');
-        };
-
-        Assignments.prototype.activate = function activate() {
-            this.getData();
-            this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
-            this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
-            this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
-            this._setUpValidation();
-        };
-
-        Assignments.prototype.getData = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true)]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                            case 3:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function getData() {
-                return _ref.apply(this, arguments);
-            }
-
-            return getData;
-        }();
-
-        Assignments.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 7;
-                                    break;
-                                }
-
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 4;
-                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 4:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.updateArray();
-                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
-                                    this.dataTable.createPageButtons(1);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.displayArray = new Array();
-
-                            case 8:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        Assignments.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.getRequests();
-
-                            case 3:
-                                this.spinnerHTML = "";
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Assignments.prototype.updateArray = function updateArray() {
-            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                this.displayArray = this.requests.requestsDetailsArray;
-                this.baseArray = this.displayArray;
-                for (var i = 0; i < this.baseArray.length; i++) {
-                    this.baseArray[i].originalIndex = i;
-                }
-            } else {
-                this.displayArray = new Array();
-            }
-        };
-
-        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-
-            this.enableButton = false;
-            this.requestSelected = true;
-
-            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-            this.requests.selectRequestDetail(this.editIndex);
-            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-
-            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-            if (!this.products.selectedProduct.systems[0]) {
-                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
-            }
-
-            this.clientRequired();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
-
-        Assignments.prototype.clientRequired = function clientRequired() {
-            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
-            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
-            this.lastFirstID = this.firstID;
-            this.firstAllowableID = this.firstID;
-            this.firstNumericFacID = this.firstID;
-            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
-
-            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
-            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
-            if (this.products.selectedProduct.systems[0]) {
-                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
-            }
-            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
-            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.idBuffer = 0;
-                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-                this.sandBoxOnly = true;
-            } else {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
-                this.sandBoxOnly = false;
-            }
-
-            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
-                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
-                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
-                this.idsRemaining = this.idsRequired;
-                this.existingRequest = false;
-                this.totalIdsAssigned = 0;
-                this.idsAssigned = 0;
-                this.assignmentDetails = new Array();
-            } else {
-                this.existingRequest = true;
-                this.unassignedOnly = false;
-                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
-                this.idsRequired = parseInt(this.numberOfIds);
-                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
-                this.totalIdsAssigned = this.idsAssigned;
-                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
-                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
-                this.findAssignedClients();
-            }
-
-            this.assignmentDetailIndex = -1;
-
-            this.calcLastID();
-        };
-
-        Assignments.prototype.selectClient = function selectClient(index, client, el) {
-            if (this.idsRemaining > 0) {
-                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-
-                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
-
-                this.proposedClient.push(client);
-
-                this.lastFirstID = this.firstID;
-
-                this.calcLastID();
-
-                this.assignmentDetails.push({
-                    staffId: this.app.user._id,
-
-                    client: client.client,
-                    clientId: client._id,
-                    systemId: client.systemId,
-                    firstID: this.firstID,
-                    lastID: this.lastID,
-                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
-                });
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
-                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
-
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-
-                if (this.studentIDTemplates.length) {
-                    this.calcAssignment();
-                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
-                }
-
-                this.clientSelected = true;
-                this.enableButton = true;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.calcLastID = function calcLastID() {
-            if (this.idsRemaining > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            } else {
-                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
-            }
-
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.calcAssignment = function calcAssignment() {
-            this.calcIDRangeFromTemplate();
-            this.calculatePasswords();
-        };
-
-        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-            } else {
-                var selectedStudentIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
-                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
-                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
-                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
-                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
-                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
-            }
-
-            this.calcFacIDRangeFromTemplate();
-        };
-
-        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
-            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-            } else {
-                var selectedFacultyIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
-                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
-                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
-            }
-        };
-
-        Assignments.prototype.getID = function getID(idPrefix, id) {
-            if (idPrefix) {
-                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
-                var prefix = "000".substr(0, len - id.toString().length);
-                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
-            }
-            return "";
-        };
-
-        Assignments.prototype.calculatePasswords = function calculatePasswords() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.assignmentDetails.length > 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
-            }
-            var random;
-            var prefix;
-            var len;
-
-            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                prefix = "9" + "000".substr(0, len - 1);
-                random = Math.floor(Math.random() * parseInt(prefix));
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
-            }
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
-            } else {
-                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                    prefix = "9" + "000".substr(0, len - 1);
-                    random = Math.floor(Math.random() * parseInt(prefix));
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
-                }
-            }
-        };
-
-        Assignments.prototype.firstIDChanged = function firstIDChanged() {
-            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
-            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
-                this.firstID = this.lastFirstID;
-                return;
-            }
-
-            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.calcIDRangeFromTemplate();
-            }
-
-            this.lastFirstID = this.firstID;
-        };
-
-        Assignments.prototype.lastIDChanged = function lastIDChanged() {
-            if (this.lastID > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            }
-
-            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-
-                this.calcIDRangeFromTemplate();
-            } else {
-                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
-            }
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
-            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
-            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
-            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
-            if (this.assignmentDetailIndex == -1) {
-                this.selectedAssignedClient = "";
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            } else {
-                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
-
-                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
-                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
-                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
-                this.oldLastID = this.lastID;
-                this.lastFirstID = this.firstID;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.deleteProposedClient = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
-                var _this = this;
-
-                var cmd;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (this.assignmentDetails[index].assignedDate) {
-                                    cmd = {
-                                        header: "Delete Assignment",
-                                        message: "This will delete the assignment.  Are you sure you want to do that?",
-                                        cancelButton: false,
-                                        okButton: true
-                                    };
-
-
-                                    this.dialog.open({ viewModel: _confirmDialog.ConfirmDialog, model: cmd }).then(function (response) {
-                                        if (!response.wasCancelled) {
-                                            _this.deleteSaved(index);
-                                        }
-                                    });
-                                } else {
-                                    this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                    this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-                                    this.assignmentDetailIndex = -1;
-
-                                    this.assignmentDetails.splice(index, 1);
-                                    this.proposedClient.splice(index, 1);
-                                }
-
-                            case 1:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function deleteProposedClient(_x) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return deleteProposedClient;
-        }();
-
-        Assignments.prototype.deleteSaved = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
-                var i, request, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-
-                                i = 0;
-
-                            case 4:
-                                if (!(i < this.proposedClient[index].assignments.length)) {
-                                    _context5.next = 12;
-                                    break;
-                                }
-
-                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
-                                    _context5.next = 9;
-                                    break;
-                                }
-
-                                this.proposedClient[index].assignments.splice(i, 1);
-                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-                                return _context5.abrupt('break', 12);
-
-                            case 9:
-                                i++;
-                                _context5.next = 4;
-                                break;
-
-                            case 12:
-                                this.systems.updateClient(this.proposedClient[index]);
-                                this.assignmentDetails.splice(index, 1);
-                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
-
-                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-                                this.requestToSave.requestDetailsToSave = new Array();
-                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-                                delete request['requestId'];
-                                this.requestToSave.requestDetailsToSave.push(request);
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context5.next = 25;
-                                return this.requests.saveRequest();
-
-                            case 25:
-                                serverResponse = _context5.sent;
-
-                                if (serverResponse.status) {
-                                    _context5.next = 30;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
-                                _context5.next = 30;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 30:
-                                this.selectedAssignedClient = "";
-
-                            case 31:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteSaved(_x2) {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteSaved;
-        }();
-
-        Assignments.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                if (!this.validation.validate(1, this)) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                if (!this._buildRequest()) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context6.next = 5;
-                                return this.requests.saveRequest();
-
-                            case 5:
-                                serverResponse = _context6.sent;
-
-                                if (serverResponse.status) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
-                                _context6.next = 10;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 10:
-                                this._cleanUp();
-
-                            case 11:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Assignments.prototype._buildRequest = function _buildRequest() {
-            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-                for (var i = 0; i < this.assignmentDetails.length; i++) {
-                    for (var j = 0; j < this.proposedClient.length; j++) {
-                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
-                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
-                            if (this.assignmentDetails[i].assignedDate) {
-                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
-                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
-                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
-                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
-                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
-                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
-                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                        this.systems.updateClient(this.proposedClient[j]);
-                                    }
-                                }
-                            } else {
-                                this.assignmentDetails[i].assignedDate = new Date();
-                                this.requests.selectedRequestDetail.assignedDate = new Date();
-                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
-                                this.proposedClient[i].assignments.push({
-                                    assignment: this.requests.selectedRequestDetail._id,
-                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
-                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                                    firstID: this.assignmentDetails[i].firstID,
-                                    lastID: this.assignmentDetails[i].lastID
-                                });
-                                this.systems.updateClient(this.proposedClient[i]);
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (this.provisionalAssignment) {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
-                } else {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
-                }
-
-                for (var i = 0; i < this.proposedClient.length; i++) {
-                    this.assignmentDetails[i].assignedDate = new Date();
-                    this.assignmentDetails[i].modifiedDate = new Date();
-                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
-                    this.proposedClient[i].assignments.push({
-                        assignment: this.requests.selectedRequestDetail._id,
-                        studentIDRange: this.assignmentDetails[i].studentUserIds,
-                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                        firstID: this.assignmentDetails[i].firstID,
-                        lastID: this.assignmentDetails[i].lastID,
-                        assignedDate: new Date()
-                    });
-                    this.systems.updateClient(this.proposedClient[i]);
-                };
-            }
-
-            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-            this.requestToSave.audit.push({
-                property: 'Assigned',
-                eventDate: new Date(),
-                personId: this.app.user._id
-            });
-            this.requestToSave.requestDetailsToSave = new Array();
-            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
-            delete request['requestId'];
-            this.requestToSave.requestDetailsToSave.push(request);
-
-            return true;
-        };
-
-        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
-            if (!client.assignments || client.assignments.length == 0) return true;
-            var valid = true;
-            var x1 = parseInt(assignment.firstID);
-            var x2 = parseInt(assignment.lastID);
-            for (var i = 0; i < client.assignments.length; i++) {
-                if (this.existingRequest && client.assignments[i].assignment == id) {
-                    continue;
-                } else {
-                    var y1 = parseInt(client.assignments[i].firstID);
-                    var y2 = parseInt(client.assignments[i].lastID);
-                    if (!(x2 < y1 || x1 > y2)) valid = false;
-                }
-            }
-            return valid;
-        };
-
-        Assignments.prototype.back = function back() {
-            this._cleanUp();
-        };
-
-        Assignments.prototype._cleanUp = function _cleanUp() {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-            this.proposedAssignment = new Object();
-            this.parameterIndex = new Object();
-            this.systems.selectSystem();
-            this.selectedAssignedClient = "";
-            this.firstID = 0;
-            this.lastID = 0;
-            this.requestSelected = false;
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.findAssignedClients = function findAssignedClients() {
-            var _this2 = this;
-
-            this.assignmentDetails.forEach(function (item) {
-                _this2.systems.selectClientFromID(item.systemId, item.clientId);
-                _this2.proposedClient.push(_this2.systems.selectedClient);
-            });
-        };
-
-        Assignments.prototype.systemSelected = function systemSelected() {
-            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
-            if (!this.products.selectedProduct.clientRelevant) {
-                this.calcAssignment();
-            }
-        };
-
-        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
-            this.showAddStudentTemplate = true;
-        };
-
-        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
-            this.showAddStudentTemplate = false;
-        };
-
-        Assignments.prototype.saveStudentTemplate = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                _context7.next = 2;
-                                return this.products.saveProduct();
-
-                            case 2:
-                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
-                                this.showAddStudentTemplate = false;
-
-                            case 4:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function saveStudentTemplate() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return saveStudentTemplate;
-        }();
-
-        Assignments.prototype.changeManualMode = function changeManualMode() {
-            localStorage.setItem('manualMode', this.manualMode);
-        };
-
-        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
-            localStorage.setItem('unassignedOnly', this.unassignedOnly);
-        };
-
-        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
-            localStorage.setItem('roundTo10', this.roundTo10);
-        };
-
-        Assignments.prototype.customerAction = function customerAction() {
-            this.message = {
-                customerMessage: ""
-            };
-
-            this.customerMessage = true;
-            (0, _jquery2.default)("#customerMessage").focus();
-        };
-
-        Assignments.prototype.sendCustomerAction = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var msg, productName, serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                msg = (0, _jquery2.default)("#customerMessage").val();
-
-                                if (!msg) {
-                                    _context8.next = 8;
-                                    break;
-                                }
-
-                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
-
-                                this.message = {
-                                    id: this.requests.selectedRequestDetail._id,
-                                    customerMessage: msg,
-                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
-                                    toEmail: this.people.selectedPerson.email,
-                                    product: productName,
-                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
-                                    audit: {
-                                        property: 'Send Message',
-                                        eventDate: new Date(),
-                                        oldValue: this.customerMessageText,
-                                        personId: this.app.user._id
-                                    }
-                                };
-                                _context8.next = 6;
-                                return this.requests.sendCustomerMessage(this.message);
-
-                            case 6:
-                                serverResponse = _context8.sent;
-
-                                if (!serverResponse.status) {
-                                    this.utils.showNotification("The message was sent", "", "", "", "", 5);
-                                    this._cleanUp();
-                                }
-
-                            case 8:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function sendCustomerAction() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return sendCustomerAction;
-        }();
-
-        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.openSettings = function openSettings() {
-            this.showSettings = !this.showSettings;
-            if (this.showSettings) {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-            }
-        };
-
-        Assignments.prototype.saveSettings = function saveSettings() {
-            localStorage.setItem('idBuffer', this.idBuffer);
-            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
-            this.showSettings = false;
-        };
-
-        Assignments.prototype.restoreDefaults = function restoreDefaults() {
-            this.idBuffer = this.config.REGULAR_ID_BUFFER;
-            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
-        };
-
-        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
-            this.facultyDetails = !this.facultyDetails;
-        };
-
-        Assignments.prototype._setUpValidation = function _setUpValidation() {
-            this.validation.addRule(1, "errorRange", { "rule": "required", "message": "Invalid ID range",
-                "valFunction": function valFunction(context) {
-                    var valid = true;
-                    for (var i = 0; i < context.assignmentDetails.length; i++) {
-                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
-                    }
-                    return valid;
-                } });
-        };
-
-        Assignments.prototype.openAudit = function openAudit() {
-            this.showAudit = !this.showAudit;
-        };
-
-        return Assignments;
-    }()) || _class);
-});
 define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment) {
   'use strict';
 
@@ -16474,6 +15468,1012 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     return ViewHelpTickets;
   }()) || _class);
+});
+define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Assignments = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            return step("next", value);
+                        }, function (err) {
+                            return step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _appState.AppState, _aureliaDialog.DialogService, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function Assignments(router, config, validation, people, app, dialog, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, Assignments);
+
+            this.requestSelected = false;
+            this.showAddStudentTemplate = false;
+            this.manualMode = false;
+            this.roundTo10 = false;
+            this.showAudit = false;
+            this.lastIDidsRemaining = -1;
+            this.navControl = "requestsNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.config = config;
+            this.validation = validation;
+            this.app = app;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+            this.dialog = dialog;
+        }
+
+        Assignments.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Assignments.prototype.canActivate = function canActivate() {
+            if (!this.app.user._id) this.router.navigate('logout');
+        };
+
+        Assignments.prototype.activate = function activate() {
+            this.getData();
+            this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
+            this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
+            this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
+            this._setUpValidation();
+        };
+
+        Assignments.prototype.getData = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true)]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                            case 3:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function getData() {
+                return _ref.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        Assignments.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 4:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.updateArray();
+                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+                                    this.dataTable.createPageButtons(1);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.displayArray = new Array();
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        Assignments.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Assignments.prototype.updateArray = function updateArray() {
+            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                this.displayArray = this.requests.requestsDetailsArray;
+                this.baseArray = this.displayArray;
+                for (var i = 0; i < this.baseArray.length; i++) {
+                    this.baseArray[i].originalIndex = i;
+                }
+            } else {
+                this.displayArray = new Array();
+            }
+        };
+
+        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+
+            this.enableButton = false;
+            this.requestSelected = true;
+
+            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+            this.requests.selectRequestDetail(this.editIndex);
+            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+
+            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+            if (!this.products.selectedProduct.systems[0]) {
+                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
+            }
+
+            this.clientRequired();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        Assignments.prototype.clientRequired = function clientRequired() {
+            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
+            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+            this.lastFirstID = this.firstID;
+            this.firstAllowableID = this.firstID;
+            this.firstNumericFacID = this.firstID;
+            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
+
+            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
+            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
+            if (this.products.selectedProduct.systems[0]) {
+                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
+                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
+            }
+            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
+            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.idBuffer = 0;
+                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+                this.sandBoxOnly = true;
+            } else {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
+                this.sandBoxOnly = false;
+            }
+
+            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
+                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
+                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
+                this.idsRemaining = this.idsRequired;
+                this.existingRequest = false;
+                this.totalIdsAssigned = 0;
+                this.idsAssigned = 0;
+                this.assignmentDetails = new Array();
+            } else {
+                this.existingRequest = true;
+                this.unassignedOnly = false;
+                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
+                this.idsRequired = parseInt(this.numberOfIds);
+                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
+                this.totalIdsAssigned = this.idsAssigned;
+                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
+                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
+                this.findAssignedClients();
+            }
+
+            this.assignmentDetailIndex = -1;
+
+            this.calcLastID();
+        };
+
+        Assignments.prototype.selectClient = function selectClient(index, client, el) {
+            if (this.idsRemaining > 0) {
+                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+
+                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
+
+                this.proposedClient.push(client);
+
+                this.lastFirstID = this.firstID;
+
+                this.calcLastID();
+
+                this.assignmentDetails.push({
+                    staffId: this.app.user._id,
+
+                    client: client.client,
+                    clientId: client._id,
+                    systemId: client.systemId,
+                    firstID: this.firstID,
+                    lastID: this.lastID,
+                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
+                });
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
+                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
+
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+
+                if (this.studentIDTemplates.length) {
+                    this.calcAssignment();
+                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
+                }
+
+                this.clientSelected = true;
+                this.enableButton = true;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.calcLastID = function calcLastID() {
+            if (this.idsRemaining > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            } else {
+                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
+            }
+
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.calcAssignment = function calcAssignment() {
+            this.calcIDRangeFromTemplate();
+            this.calculatePasswords();
+        };
+
+        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+            } else {
+                var selectedStudentIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
+                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
+                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
+                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
+                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
+                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
+            }
+
+            this.calcFacIDRangeFromTemplate();
+        };
+
+        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
+            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+            } else {
+                var selectedFacultyIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
+                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
+                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
+            }
+        };
+
+        Assignments.prototype.getID = function getID(idPrefix, id) {
+            if (idPrefix) {
+                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
+                var prefix = "000".substr(0, len - id.toString().length);
+                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
+            }
+            return "";
+        };
+
+        Assignments.prototype.calculatePasswords = function calculatePasswords() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.assignmentDetails.length > 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
+            }
+            var random;
+            var prefix;
+            var len;
+
+            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                prefix = "9" + "000".substr(0, len - 1);
+                random = Math.floor(Math.random() * parseInt(prefix));
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
+            }
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
+            } else {
+                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                    prefix = "9" + "000".substr(0, len - 1);
+                    random = Math.floor(Math.random() * parseInt(prefix));
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
+                }
+            }
+        };
+
+        Assignments.prototype.firstIDChanged = function firstIDChanged() {
+            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
+            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
+                this.firstID = this.lastFirstID;
+                return;
+            }
+
+            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.calcIDRangeFromTemplate();
+            }
+
+            this.lastFirstID = this.firstID;
+        };
+
+        Assignments.prototype.lastIDChanged = function lastIDChanged() {
+            if (this.lastID > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            }
+
+            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+
+                this.calcIDRangeFromTemplate();
+            } else {
+                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
+            }
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
+            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
+            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
+            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
+            if (this.assignmentDetailIndex == -1) {
+                this.selectedAssignedClient = "";
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            } else {
+                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
+
+                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
+                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
+                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
+                this.oldLastID = this.lastID;
+                this.lastFirstID = this.firstID;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.deleteProposedClient = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
+                var _this = this;
+
+                var cmd;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (this.assignmentDetails[index].assignedDate) {
+                                    cmd = {
+                                        header: "Delete Assignment",
+                                        message: "This will delete the assignment.  Are you sure you want to do that?",
+                                        cancelButton: false,
+                                        okButton: true
+                                    };
+
+
+                                    this.dialog.open({ viewModel: _confirmDialog.ConfirmDialog, model: cmd }).then(function (response) {
+                                        if (!response.wasCancelled) {
+                                            _this.deleteSaved(index);
+                                        }
+                                    });
+                                } else {
+                                    this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                    this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+                                    this.assignmentDetailIndex = -1;
+
+                                    this.assignmentDetails.splice(index, 1);
+                                    this.proposedClient.splice(index, 1);
+                                }
+
+                            case 1:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function deleteProposedClient(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return deleteProposedClient;
+        }();
+
+        Assignments.prototype.deleteSaved = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
+                var i, request, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+
+                                i = 0;
+
+                            case 4:
+                                if (!(i < this.proposedClient[index].assignments.length)) {
+                                    _context5.next = 12;
+                                    break;
+                                }
+
+                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
+                                    _context5.next = 9;
+                                    break;
+                                }
+
+                                this.proposedClient[index].assignments.splice(i, 1);
+                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+                                return _context5.abrupt('break', 12);
+
+                            case 9:
+                                i++;
+                                _context5.next = 4;
+                                break;
+
+                            case 12:
+                                this.systems.updateClient(this.proposedClient[index]);
+                                this.assignmentDetails.splice(index, 1);
+                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
+
+                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+                                this.requestToSave.requestDetailsToSave = new Array();
+                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+                                delete request['requestId'];
+                                this.requestToSave.requestDetailsToSave.push(request);
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context5.next = 25;
+                                return this.requests.saveRequest();
+
+                            case 25:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.status) {
+                                    _context5.next = 30;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
+                                _context5.next = 30;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 30:
+                                this.selectedAssignedClient = "";
+
+                            case 31:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteSaved(_x2) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteSaved;
+        }();
+
+        Assignments.prototype.save = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                if (!this._buildRequest()) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context6.next = 5;
+                                return this.requests.saveRequest();
+
+                            case 5:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.status) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
+                                _context6.next = 10;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 10:
+                                this._cleanUp();
+
+                            case 11:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Assignments.prototype._buildRequest = function _buildRequest() {
+            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+                for (var i = 0; i < this.assignmentDetails.length; i++) {
+                    for (var j = 0; j < this.proposedClient.length; j++) {
+                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
+                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
+                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
+                            if (this.assignmentDetails[i].assignedDate) {
+                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
+                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
+                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
+                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
+                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
+                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
+                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                        this.systems.updateClient(this.proposedClient[j]);
+                                    }
+                                }
+                            } else {
+                                this.assignmentDetails[i].assignedDate = new Date();
+                                this.requests.selectedRequestDetail.assignedDate = new Date();
+                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
+                                this.proposedClient[i].assignments.push({
+                                    assignment: this.requests.selectedRequestDetail._id,
+                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
+                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                                    firstID: this.assignmentDetails[i].firstID,
+                                    lastID: this.assignmentDetails[i].lastID
+                                });
+                                this.systems.updateClient(this.proposedClient[i]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (this.provisionalAssignment) {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
+                } else {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
+                }
+
+                for (var i = 0; i < this.proposedClient.length; i++) {
+                    this.assignmentDetails[i].assignedDate = new Date();
+                    this.assignmentDetails[i].modifiedDate = new Date();
+                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
+                    this.proposedClient[i].assignments.push({
+                        assignment: this.requests.selectedRequestDetail._id,
+                        studentIDRange: this.assignmentDetails[i].studentUserIds,
+                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                        firstID: this.assignmentDetails[i].firstID,
+                        lastID: this.assignmentDetails[i].lastID,
+                        assignedDate: new Date()
+                    });
+                    this.systems.updateClient(this.proposedClient[i]);
+                };
+            }
+
+            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+            this.requestToSave.audit.push({
+                property: 'Assigned',
+                eventDate: new Date(),
+                personId: this.app.user._id
+            });
+            this.requestToSave.requestDetailsToSave = new Array();
+            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
+            delete request['requestId'];
+            this.requestToSave.requestDetailsToSave.push(request);
+
+            return true;
+        };
+
+        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
+            if (!client.assignments || client.assignments.length == 0) return true;
+            var valid = true;
+            var x1 = parseInt(assignment.firstID);
+            var x2 = parseInt(assignment.lastID);
+            for (var i = 0; i < client.assignments.length; i++) {
+                if (this.existingRequest && client.assignments[i].assignment == id) {
+                    continue;
+                } else {
+                    var y1 = parseInt(client.assignments[i].firstID);
+                    var y2 = parseInt(client.assignments[i].lastID);
+                    if (!(x2 < y1 || x1 > y2)) valid = false;
+                }
+            }
+            return valid;
+        };
+
+        Assignments.prototype.back = function back() {
+            this._cleanUp();
+        };
+
+        Assignments.prototype._cleanUp = function _cleanUp() {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+            this.proposedAssignment = new Object();
+            this.parameterIndex = new Object();
+            this.systems.selectSystem();
+            this.selectedAssignedClient = "";
+            this.firstID = 0;
+            this.lastID = 0;
+            this.requestSelected = false;
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.findAssignedClients = function findAssignedClients() {
+            var _this2 = this;
+
+            this.assignmentDetails.forEach(function (item) {
+                _this2.systems.selectClientFromID(item.systemId, item.clientId);
+                _this2.proposedClient.push(_this2.systems.selectedClient);
+            });
+        };
+
+        Assignments.prototype.systemSelected = function systemSelected() {
+            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
+            if (!this.products.selectedProduct.clientRelevant) {
+                this.calcAssignment();
+            }
+        };
+
+        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
+            this.showAddStudentTemplate = true;
+        };
+
+        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
+            this.showAddStudentTemplate = false;
+        };
+
+        Assignments.prototype.saveStudentTemplate = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                _context7.next = 2;
+                                return this.products.saveProduct();
+
+                            case 2:
+                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
+                                this.showAddStudentTemplate = false;
+
+                            case 4:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function saveStudentTemplate() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return saveStudentTemplate;
+        }();
+
+        Assignments.prototype.changeManualMode = function changeManualMode() {
+            localStorage.setItem('manualMode', this.manualMode);
+        };
+
+        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
+            localStorage.setItem('unassignedOnly', this.unassignedOnly);
+        };
+
+        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
+            localStorage.setItem('roundTo10', this.roundTo10);
+        };
+
+        Assignments.prototype.customerAction = function customerAction() {
+            this.message = {
+                customerMessage: ""
+            };
+
+            this.customerMessage = true;
+            (0, _jquery2.default)("#customerMessage").focus();
+        };
+
+        Assignments.prototype.sendCustomerAction = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                var msg, productName, serverResponse;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                msg = (0, _jquery2.default)("#customerMessage").val();
+
+                                if (!msg) {
+                                    _context8.next = 8;
+                                    break;
+                                }
+
+                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+
+                                this.message = {
+                                    id: this.requests.selectedRequestDetail._id,
+                                    customerMessage: msg,
+                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                                    toEmail: this.people.selectedPerson.email,
+                                    product: productName,
+                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+                                    audit: {
+                                        property: 'Send Message',
+                                        eventDate: new Date(),
+                                        oldValue: this.customerMessageText,
+                                        personId: this.app.user._id
+                                    }
+                                };
+                                _context8.next = 6;
+                                return this.requests.sendCustomerMessage(this.message);
+
+                            case 6:
+                                serverResponse = _context8.sent;
+
+                                if (!serverResponse.status) {
+                                    this.utils.showNotification("The message was sent", "", "", "", "", 5);
+                                    this._cleanUp();
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function sendCustomerAction() {
+                return _ref8.apply(this, arguments);
+            }
+
+            return sendCustomerAction;
+        }();
+
+        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.openSettings = function openSettings() {
+            this.showSettings = !this.showSettings;
+            if (this.showSettings) {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+            }
+        };
+
+        Assignments.prototype.saveSettings = function saveSettings() {
+            localStorage.setItem('idBuffer', this.idBuffer);
+            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
+            this.showSettings = false;
+        };
+
+        Assignments.prototype.restoreDefaults = function restoreDefaults() {
+            this.idBuffer = this.config.REGULAR_ID_BUFFER;
+            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
+        };
+
+        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
+            this.facultyDetails = !this.facultyDetails;
+        };
+
+        Assignments.prototype._setUpValidation = function _setUpValidation() {
+            this.validation.addRule(1, "errorRange", { "rule": "required", "message": "Invalid ID range",
+                "valFunction": function valFunction(context) {
+                    var valid = true;
+                    for (var i = 0; i < context.assignmentDetails.length; i++) {
+                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
+                    }
+                    return valid;
+                } });
+        };
+
+        Assignments.prototype.openAudit = function openAudit() {
+            this.showAudit = !this.showAudit;
+        };
+
+        return Assignments;
+    }()) || _class);
 });
 define('modules/user/requests/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/data/appState'], function (exports, _aureliaFramework, _aureliaRouter, _appState) {
     'use strict';
@@ -27353,7 +27353,7 @@ define('text!modules/facco/components/requestDetailDetails.html', ['module'], fu
 define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-10 col-lg-offset-1\">\r\n      <div class='row'>\r\n        <table id=\"peopleTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n              <tr>\r\n                  <td colspan='8'>\r\n                      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                  </td>\r\n              </tr>\r\n              <tr>\r\n                  <td colspan='7'>\r\n                      <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                      <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                  </td>\r\n              </tr>\r\n             <tr>\r\n               <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\r\n               <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\r\n               <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\r\n               <th class=\"col-lg-1\">Type</th>\r\n               <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\r\n               <th class=\"col-sm-1\">IDS Requestd</th>\r\n               <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\r\n               <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\r\n             </tr>\r\n           </thead>\r\n           <tbody>\r\n             <tr>\r\n               <th></th>\r\n               <th>\r\n                 <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n               </th>\r\n               <th>\r\n                 <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n               </th>\r\n               <th>\r\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"courseId\">\r\n                   <option value=\"\"></option>\r\n                   <option  value=\"config.SANDBOX_ID\">Sandbox</option>\r\n                   <option  value=\"\">Regular</option>\r\n                 </select>\r\n               </th>\r\n               <th>\r\n                 <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\r\n                   <option value=\"\"></option>\r\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n                 </select>\r\n               </th>\r\n               <th></th>\r\n               <th>\r\n                 <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\r\n                   <option value=\"\"></option>\r\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\r\n                 </select>\r\n               </th>\r\n               <th>\r\n                 <input input.delegate=\"dataTable.filterList($event)\" id=\"requestId.personId\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\r\n               </th>\r\n             </tr>\r\n             <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\r\n               <td data-title=\"requestNo\">${request.requestNo}</td>\r\n               <td data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n               <td data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n               <td data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\r\n               <td data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\r\n               <td data-title=\"ids-requested\">${request.requestId | idsRequested}\r\n               <td data-title=\"product\">${request.productId | productName:products.productsArray}</td>\r\n               <td data-title=\"personId\">${request.requestId.personId | personName:people.peopleArray}</td>\r\n             </tr>\r\n           </tbody>\r\n         </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/facco/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    <span click.delegate=\"customerAction()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n  </div>    \r\n  <div class=\"row leftMargin rightMargin\">\r\n    <div class=\"col-lg-5\" show.bind=\"showRequest\">\r\n        <div class=\"panel panel-primary topMargin\">\r\n        <div class=\"panel-heading\">\r\n            <h3 class=\"panel-title\">${requests.selectedRequestDetail.productId | productName:products.productsArray}</h3>\r\n        </div>\r\n        <div class=\"panel-body\">        \r\n            <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\">\r\n            <table class=\"table table-striped table-hover\">\r\n            <thead>\r\n                <tr>\r\n                <th>System</th>\r\n                <th>Client</th>\r\n                <th>Student IDs</th>\r\n                <th>Student Password</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"assign of requests.selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\r\n                <td>${assign.systemId | lookupSid:systems.systemsArray}</td>\r\n                <td>${assign.client}</td>\r\n                <td>${assign.studentUserIds}</td>\r\n                <td>${assign.studentPassword}</td>\r\n                </tr>\r\n            </tbody>\r\n            </table>\r\n            <h4 class=\"topMargin\"><strong>Faculty IDs</strong></h4>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\r\n            </div>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\r\n            </div>\r\n            <h4 class=\"topMargin\"><strong>System Details</strong></h4>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\r\n            </div>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\r\n            </div>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\r\n            </div>\r\n            <div class=\"form-group\">\r\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\r\n            </div>\r\n            <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\r\n        </div>\r\n        </div>\r\n    </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/facco/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"row\">\r\n      <!-- Session Select -->\r\n      <div class=\"col-lg-4\">\r\n        <div class=\"form-group topMargin leftMargin\">\r\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n              <option value=\"\">Select a session</option>\r\n              <option repeat.for=\"session of sessions.sessionsArray\"\r\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n            </select>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n      <div show.bind=\"displayArray.length > 0\">\r\n        <div class=\"row\">\r\n          <div class=\"col-lg-12\">\r\n            <!-- Request Table -->\r\n            <compose view=\"./requestsTable.html\"></compose>\r\n          </div>\r\n          <!--\r\n          <div class=\"col-lg-6\">\r\n             Request Details\r\n            <compose view=\"./requestDetails.html\"></compose>\r\n          </div>\r\n          -->\r\n      </div>\r\n  </div>\r\n\r\n  <compose view=\"./requestDetailDetails.html\"></compose>\r\n\r\n</template>\r\n"; });
-define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\r\n  <div  style=\"margin-top:20px;\">\r\n    <div class=\"col-md-12\">\r\n      <h2>${heading}</h2>\r\n      <img class=\"col-md-12\" src=\"src/resources/img/DataCenter.jpg\" class=\"homePageImage\" />\r\n      <div class=\"col-md-4 topMargin\"><img src=\"/ucc_logo.jpg\" style=\"height:100px;\"/></div>\r\n      <div class=\"col-md-4 topMargin\"><img src=\"/sap_ua2.PNG\" style=\"height:75px;\"/></div>\r\n      <div class=\"col-md-4 topMargin\"><img src=\"/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\r\n    </div>\r\n  </div>\r\n</template>"; });
+define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\r\n  <div  style=\"margin-top:20px;\">\r\n    <div class=\"col-md-12\">\r\n      <h2>${heading}</h2>\r\n      <img class=\"col-md-12\" src=\"src/resources/img/DataCenter.jpg\" class=\"homePageImage\" />\r\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ucc_logo.jpg\" style=\"height:100px;\"/></div>\r\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/sap_ua2.PNG\" style=\"height:75px;\"/></div>\r\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\r\n    </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/home/components/homePageLinks.html', ['module'], function(module) { module.exports = "<template>\r\n  <div>\r\n    <div class=\"col-md-6 bottomMargin\">\r\n      <a href.bind=item.url target=\"_blank\">${item.title}</a>\r\n      <br>${item.content}\r\n    </div>\r\n  </div>\r\n</template>"; });
 define('text!modules/home/components/newsItem.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"bottomMargin\">\r\n    <span class=\"col-md-12 newsTitle topMargin\">${item.title}</span>\r\n    <span innerhtml.bind=\"item.content\"></span>\r\n    <span class=\"newsUrl\"><a href.bind=\"item.url\" target=\"_blank\">more info...</a></span>\r\n  </div>\r\n</template>"; });
 define('text!modules/home/components/success-dialog.html', ['module'], function(module) { module.exports = "<template>\r\n     <ai-dialog>\r\n\r\n        <ai-dialog-header>\r\n            <h2>${cmd.header}</h2>\r\n        </ai-dialog-header>\r\n\r\n        <ai-dialog-body>\r\n            <p>${cmd.message}</p>\r\n        </ai-dialog-body>\r\n\r\n        <ai-dialog-footer>\r\n            <button show.bind=\"cmd.cancelButton\" click.trigger=\"controller.cancel()\">Cancel</button>\r\n            <button show.bind=\"cmd.okButton\" click.trigger=\"controller.ok()\">Ok</button>\r\n        </ai-dialog-footer>\r\n    </ai-dialog>\r\n</template>"; });
@@ -37268,6 +37268,95 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
+define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) {/**/}
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone,
+		target = arguments[0],
+		i = 1,
+		length = arguments.length,
+		deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[name] = extend(deep, clone, copy);
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						target[name] = copy;
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+});
+
 //! moment.js
 //! version : 2.14.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -41463,95 +41552,6 @@ return jQuery;
     return _moment;
 
 }));
-define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) {/**/}
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone,
-		target = arguments[0],
-		i = 1,
-		length = arguments.length,
-		deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
-
-});
-
 define('text!fuelux/css/fuelux.min.css', ['module'], function(module) { module.exports = "/*!\n * Fuel UX v3.15.6 \n * Copyright 2012-2016 ExactTarget\n * Licensed under the BSD-3-Clause license (https://github.com/ExactTarget/fuelux/blob/master/LICENSE)\n */\n\n@charset \"UTF-8\";.clearfix{*zoom:1}.clearfix:before,.clearfix:after{display:table;content:\"\";line-height:0}.clearfix:after{clear:both}@font-face{font-family:\"fuelux\";src:url(\"../fonts/fuelux.eot\");src:url(\"../fonts/fuelux.eot?#iefix\") format(\"embedded-opentype\"),url(data:font-woff;base64,d09GRk9UVE8AAAUUAAsAAAAABuAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABDRkYgAAABCAAAAegAAAIisWS2RkZGVE0AAALwAAAAGQAAABxvEtzhR0RFRgAAAwwAAAAdAAAAIAA4AARPUy8yAAADLAAAAEoAAABgL7lMbGNtYXAAAAN4AAAAPAAAAUrAGiK3aGVhZAAAA7QAAAAvAAAANgDSVuNoaGVhAAAD5AAAABwAAAAkBCkCA2htdHgAAAQAAAAAGgAAABoHmgL4bWF4cAAABBwAAAAGAAAABgALUABuYW1lAAAEJAAAAN0AAAF3kxoWmXBvc3QAAAUEAAAAEAAAACAAAwABeJw90M9rE0EUB/D30uzusLtuNTqiGIs/+gt6ifVHtgfRHqQHLTYumEsrpSSWRVNozNJc2t6S2K2bBATbS0tLe9jDUlJ6aS85hFT8H6SCFPwTZiCIbpnq6fMe8+Y7j0GIRgERlbdO9r1TBIwAwijvi/D+Ln4tuqqjq3e5erRHhetW7I/r/i90xfN4ndelOHztjgNcjMP3S3HQ41iIgX4WQ6AbrsJN6IUhGIYReApjMA6WM2c/SyQSgnuCYcF9wQPBQ8EjQVJgCkbEvudbA2AZK/gRV9DFVfyEHlaxBhpiJPlk7GX6TebdhxWDDfEb9JbaGezI9Laa74zTOyqTn9O7KosFtFdlg0ymfeE5e0X7VTZaogOqwXz+OOwM/pqbZz2vs+VwyGC/2YXwjsGWf4YBxrdfYZjhMT9M/veQwU7ZHD3MNianstmpyUb28KjROOox+OcrLnV1Nfysy0AQ6YD5Yjpf+jJxLB0Eza2WR0zFruSW5otEq7W2m3v7pJ2SFvKLubJNNPvAaVZa5ET27LXcxjzRkopVS29n9ki7Le0s+ItBmWjHE9KMnXasCjlRAs9f290gWskqpGczJNWWNnfW/WpAtB9Kq9Qs7M+SVErKb+bW7SrRgpmttGcRU64ES35xl2h/Ac9Ys4h4nGNgYGBkAILzccd+gelbXJ9hNABYswg7AAAAeJxjYGRgYOADYgkGEGBiYARCLiBmAfMYAAS4AD0AAAB4nGNgZmJgnMDAysDB6MOYxsDA4A6lvzJIMrQwMDAxsHIywIEAgskQkOaawuDwgOEBJ+OD/w8Y9Bj//v8LFGaEK1AAQkYALokNlwAAeJxjYGBgZoBgGQZGBhBwAfIYwXwWBg0gzQakGRmYGBgecP7/D1LwgAFEKzBC1QMBIxsDgjNCAQBlrAaweJxjYGRgYADiH2cX2sfz23xl4GZiAIHzt7g+w2lmBmbGv4x/gVwOBrA0AFSyC6wAeJxjYGRgYPzLwMCgx8QAAkA2IwMqYAIANwYCMQIAAAACAAADARUBhwGDAQ8AWAADAAMAXACnAAAAAFAAAAsAAHicbY49asNAEIU/2bJMsEmX1JsipYS0BAwuU/gAKdy7WAuDkPDagtzDkD5djpED5AQ5TZ7kKVJ4l9n59vHmB1jyQcJwEjLujSfMeTae8sTROJXn03jGgm/jTPdXziS9k7IcqwaeqOOD8ZRXcuNUnovxjEe+jDPpP+zpCTR632Hfh6ZXfpNUS2rYEfUNdd/sBBs6Ws5jjnIEHJ6CUnmt+N/sqnitsVJ4eSpe1KJrz5su1sH5onRrdx0p8Pkq92Uly82VtpIiJw7jCk7NhrFsQzwdutZVRXm78A9U7zY2AAAAeJxjYGZABowMaAAAAI4ABQ==) format(\"woff\"),url(\"../fonts/fuelux.ttf\") format(\"truetype\"),url(\"../fonts/fuelux.svg#fuelux\") format(\"svg\");font-weight:normal;font-style:normal}.fuelux [class^=\"fueluxicon-\"]:before,.fuelux [class*=\" fueluxicon-\"]:before{font-family:\"fuelux\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fuelux .fueluxicon-loader-full:before{content:\"\\e000\"}.fuelux .fueluxicon-loader-1:before{content:\"\\e001\"}.fuelux .fueluxicon-loader-2:before{content:\"\\e002\"}.fuelux .fueluxicon-loader-3:before{content:\"\\e003\"}.fuelux .fueluxicon-loader-4:before{content:\"\\e004\"}.fuelux .fueluxicon-loader-5:before{content:\"\\e005\"}.fuelux .fueluxicon-loader-6:before{content:\"\\e006\"}.fuelux .fueluxicon-loader-7:before{content:\"\\e007\"}.fuelux .fueluxicon-loader-8:before{content:\"\\e008\"}.fuelux .fueluxicon-bullet:before{content:\"\\e009\"}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline.highlight,.fuelux .checkbox-inline.highlight{left:-8px}.fuelux .radio-inline label,.fuelux .checkbox-inline label{margin-bottom:0}label.fuelux .radio:hover:before,label.fuelux .checkbox:hover:before,label.fuelux .radio-inline:hover:before,label.fuelux .checkbox-inline:hover:before,.input-label.fuelux .radio:hover:before,.input-label.fuelux .checkbox:hover:before,.input-label.fuelux .radio-inline:hover:before,.input-label.fuelux .checkbox-inline:hover:before,.fuelux .radio label:hover:before,.fuelux .checkbox label:hover:before,.fuelux .radio-inline label:hover:before,.fuelux .checkbox-inline label:hover:before,.fuelux .radio .input-label:hover:before,.fuelux .checkbox .input-label:hover:before,.fuelux .radio-inline .input-label:hover:before,.fuelux .checkbox-inline .input-label:hover:before{box-shadow:inset 0 0 2px 1px rgba(91,157,217,0.7),0 0 5px 0 rgba(91,157,217,0.7)}.fuelux .radio label,.fuelux .checkbox label,.fuelux .radio-inline label,.fuelux .checkbox-inline label,.fuelux .radio .input-label,.fuelux .checkbox .input-label,.fuelux .radio-inline .input-label,.fuelux .checkbox-inline .input-label,label.fuelux .radio,label.fuelux .checkbox,label.fuelux .radio-inline,label.fuelux .checkbox-inline{cursor:pointer;font-weight:normal}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only)~label{padding:4px;border-radius:4px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label{background-color:#e6e6e6;opacity:1;z-index:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox input[type=\"radio\"]:not(.sr-only),.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label{padding-left:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label:before{font-family:\"Glyphicons Halflings\";font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;speak:none;border:1px solid #aaaaaa;color:#FFF;font-size:9px;width:14px;height:14px;padding:0;margin-top:0;margin-bottom:-2px;cursor:pointer;display:inline-block;text-align:left;z-index:2;content:\"\"}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label{color:#333333;color:#39b3d7;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9;outline:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before{color:#333333;opacity:.65;cursor:not-allowed !important;outline:none;box-shadow:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio.highlight:before,.fuelux .checkbox.highlight:before,.fuelux .radio-inline.highlight:before,.fuelux .checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label{left:-8px;position:relative}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline:before,.fuelux .checkbox-inline:before{left:0;top:3px}.fuelux .checkbox.multiline,.fuelux .radio.multiline{float:left;margin-left:15px}.fuelux .checkbox.multiline~.control-label,.fuelux .radio.multiline~.control-label{float:left;width:80%;margin-left:10px;text-align:left}.fuelux .checkbox.multiline~.control-label>label,.fuelux .radio.multiline~.control-label>label{font-weight:normal;cursor:pointer}.fuelux .checkbox.highlight+.checkbox.highlight{margin-top:-5px}.fuelux .checkbox.highlight label.checkbox-custom{padding:4px 4px 4px 24px}.fuelux .checkbox.highlight.checked label.checkbox-custom,.fuelux .checkbox.highlight label.checked.checkbox-custom{background:#e6e6e6;border-radius:4px}.fuelux .checkbox input[type=\"checkbox\"]:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:hover+.checkbox-label,.fuelux .checkbox .checkbox-label:hover{color:#999999}.fuelux .checkbox input[type=\"checkbox\"]:disabled:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:disabled:hover+.checkbox-label,.fuelux .checkbox.disabled label:hover{color:inherit}.fuelux .form-horizontal .checkbox-inline{padding-top:0}.fuelux .input-group-addon.checkbox-custom{margin-bottom:0;cursor:pointer;padding-left:24px}.fuelux .input-group-addon.checkbox-custom input[type=checkbox]{position:absolute;margin-left:-24px}.fuelux .input-group-addon.checkbox-custom:before{left:11px;top:9px}.fuelux .checkbox-custom{position:relative}.fuelux .checkbox-custom:before{font-family:\"Glyphicons Halflings\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;border:1px solid #aaaaaa;border-radius:4px;color:#FFF;content:\" \";font-size:9px;height:14px;left:0;padding:1px 0 0 1px;position:absolute;top:3px;width:14px}.fuelux .checkbox-custom:active:before,.fuelux .checkbox-custom:focus:before{color:#5B9DD9;cursor:pointer;box-shadow:inset 0 0 2px 1px #5B9DD9,0 0 5px 0 #5B9DD9}.fuelux .checkbox-custom.highlight:before{left:4px;top:6px}.fuelux .checkbox-custom.checked:before{background:#39b3d7;border-color:#39b3d7;content:\"\\e013\"}.fuelux .checkbox-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.checkbox-inline:before{left:0;top:3px}.fuelux .checkbox-custom.checkbox-inline.highlight{padding:4px 4px 4px 24px;left:-4px}.fuelux .checkbox-custom.checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .checkbox-custom.checkbox-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .checkbox-custom input[type=\"checkbox\"]:focus+.checkbox-label{color:#999999}.fuelux .checkbox-custom input[type=\"checkbox\"]+.checkbox-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.checkbox-custom.checkbox-inline{padding-left:20px}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before{border-radius:4px;z-index:1}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before{color:white;content:\"\\e013\";line-height:1em;padding-left:1px;font-size:8px;padding-top:2px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight{margin-left:-14px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight.checkbox-custom,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight.checkbox-custom{margin-left:0}.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label{left:-4px}.fuelux .radio.highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio.highlight+.radio.highlight{margin-top:-9px}.fuelux .radio.highlight label.radio-custom{left:-8px;padding:4px 4px 4px 24px;border-radius:4px}.fuelux .radio.highlight label.radio-custom:before{left:5px;top:7px}.fuelux .radio.highlight label.radio-custom:after{left:9px;top:11px}.fuelux .radio.highlight.checked label.radio-custom,.fuelux .radio.highlight label.radio-custom.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio input[type=\"radio\"]:focus+.radio-label,.fuelux .radio input[type=\"radio\"]:hover+.radio-label,.fuelux .radio .radio-label:hover{color:#999999}.fuelux .form-horizontal .radio-inline{padding-top:0}.fuelux .input-group-addon.radio-custom.radio-inline:before{left:11px;top:9px}.fuelux .input-group-addon.radio-custom.radio-inline:after{left:15px;top:13px}.fuelux .radio-custom{position:relative}.fuelux .radio-custom .highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio-custom .highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom:after{background:transparent;border-radius:6px;content:\" \";height:6px;left:4px;position:absolute;top:7px;width:6px}.fuelux .radio-custom:before{border:1px solid #aaaaaa;border-radius:14px;content:\" \";height:14px;left:0;position:absolute;top:3px;width:14px}.fuelux .radio-custom.checked:after{background:#FFF}.fuelux .radio-custom.checked:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.disabled:after{cursor:not-allowed}.fuelux .radio-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.radio-inline:after{left:4px;top:7px}.fuelux .radio-custom.radio-inline:before{left:0;top:3px}.fuelux .radio-custom.radio-inline.highlight{left:-3px;padding:4px 4px 4px 24px}.fuelux .radio-custom.radio-inline.highlight:after{left:8px;top:11px}.fuelux .radio-custom.radio-inline.highlight:before{left:4px;top:7px}.fuelux .radio-custom.radio-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom input[type=\"radio\"]:focus+.radio-label{color:#999999}.fuelux .radio-custom input[type=\"radio\"]+.radio-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.radio-custom.radio-inline{padding-left:20px}.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before{border-radius:8px;z-index:1}.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;background:-moz-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-webkit-gradient(radial, center center, 0, center center, 100%, color-stop(0, #FFF), color-stop(40%, #FFF), color-stop(41%, #39b3d7), color-stop(100%, #39b3d7));background:-webkit-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-o-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-ms-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:radial-gradient(ellipse at center, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFF', endColorstr='#39b3d7', GradientType=1)}.fuelux .radio input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:before{outline-color:none;outline-offset:0;outline-style:none;outline-width:0;cursor:default}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:default}.fuelux .combobox.disabled .input-group-btn{cursor:not-allowed}.fuelux .combobox input::-ms-clear{display:none}.fuelux .combobox .dropdown-menu>li.selected>a{color:#262626;text-decoration:none;background-color:#f5f5f5}.fuelux .combobox .dropdown-menu>li>em{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.42857143;color:#333;white-space:nowrap}.fuelux .datepicker-calendar{padding:16px 16px 0;min-height:262px}.fuelux .datepicker-calendar button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-days{height:182px;margin:10px 0 12px;width:100%}.fuelux .datepicker-calendar-days thead{border-bottom:1px solid #cccccc}.fuelux .datepicker-calendar-days tbody:before{color:transparent;content:\"\\200C\";display:block;line-height:3px;visibility:hidden}.fuelux .datepicker-calendar-days td,.fuelux .datepicker-calendar-days th{font-size:14px;height:32px;text-align:center;vertical-align:middle;width:14.29%}.fuelux .datepicker-calendar-days td b,.fuelux .datepicker-calendar-days td button{color:#333333;display:inline-block;font-weight:normal;height:30px;text-decoration:none;width:30px}.fuelux .datepicker-calendar-days td b{line-height:30px}.fuelux .datepicker-calendar-days td span{display:block;border-radius:4px}.fuelux .datepicker-calendar-days td span:hover{background:#f5f5f5;text-decoration:none}.fuelux .datepicker-calendar-days td.current-day span{border:1px solid #333333}.fuelux .datepicker-calendar-days td.last-month,.fuelux .datepicker-calendar-days td.next-month{background:#d5d5d5}.fuelux .datepicker-calendar-days td.last-month.first,.fuelux .datepicker-calendar-days td.next-month.first{border-top-left-radius:4px;border-bottom-left-radius:4px;padding-left:1px}.fuelux .datepicker-calendar-days td.last-month.last,.fuelux .datepicker-calendar-days td.next-month.last{border-top-right-radius:4px;border-bottom-right-radius:4px;padding-right:1px}.fuelux .datepicker-calendar-days td.past b,.fuelux .datepicker-calendar-days td.past button{color:#999999}.fuelux .datepicker-calendar-days td.restricted b,.fuelux .datepicker-calendar-days td.restricted button{cursor:no-drop;position:relative}.fuelux .datepicker-calendar-days td.restricted b:before,.fuelux .datepicker-calendar-days td.restricted button:before{border-top:1px solid #e9322d;bottom:0;content:\" \";display:block;left:5px;position:absolute;right:5px;top:50%}.fuelux .datepicker-calendar-days td.restricted b:hover,.fuelux .datepicker-calendar-days td.restricted button:hover{background:none}.fuelux .datepicker-calendar-days td.selected span{background:#eeeeee}.fuelux .datepicker-calendar-days td.selected span:hover{background:#dddddd}.fuelux .datepicker-calendar-days td.selected b,.fuelux .datepicker-calendar-days td.selected button{color:#878787}.fuelux .datepicker-calendar-days td.selected.current-day{box-shadow:0 0 0 1px #FFF offset}.fuelux .datepicker-calendar-days td.selected.current-day b,.fuelux .datepicker-calendar-days td.selected.current-day button{color:#222222}.fuelux .datepicker-calendar-days td.selected.current-day span:hover b,.fuelux .datepicker-calendar-days td.selected.current-day span:hover button{border-color:#0f5f9f}.fuelux .datepicker-calendar-days th{font-weight:bold;height:22px;vertical-align:top}.fuelux .datepicker-calendar-header{*zoom:1}.fuelux .datepicker-calendar-header:before,.fuelux .datepicker-calendar-header:after{display:table;content:\"\";line-height:0}.fuelux .datepicker-calendar-header:after{clear:both}.fuelux .datepicker-calendar-header button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-header .title{margin:0 auto;text-align:center;display:block;width:174px;color:#222222;font-size:20px;line-height:30px;text-decoration:underline;vertical-align:middle}.fuelux .datepicker-calendar-header .title:hover{color:#0f5f9f;text-decoration:underline}.fuelux .datepicker-calendar-header .title.disabled{cursor:default;pointer-events:none;text-decoration:none}.fuelux .datepicker-calendar-header .title .month{display:inline;margin:0;padding:0}.fuelux .datepicker-calendar-header .title .month span{display:none}.fuelux .datepicker-calendar-header .title .month span.current{display:inline}.fuelux .datepicker-calendar-header .next,.fuelux .datepicker-calendar-header .prev{background:#666666;background-clip:padding-box;border-radius:30px;cursor:pointer;float:left;height:30px;text-align:center;width:30px}.fuelux .datepicker-calendar-header .next span.glyphicon,.fuelux .datepicker-calendar-header .prev span.glyphicon{color:#FFF;font-size:16px;line-height:30px}.fuelux .datepicker-calendar-header .next:hover,.fuelux .datepicker-calendar-header .prev:hover{background:#0f5f9f}.fuelux .datepicker-calendar-header .next{float:right}.fuelux .datepicker-calendar-header .next span.glyphicon{line-height:28px}.fuelux .datepicker-calendar-footer{background:#e6e6e6;background-clip:padding-box;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;height:30px;margin:0 -16px;padding:4px 14px}.fuelux .datepicker-calendar-footer .datepicker-today{color:#333333;font-size:14px;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today:hover{color:#1b75bb;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today.disabled{color:#878787;cursor:default;pointer-events:none}.fuelux .datepicker-calendar-footer .datepicker-today.disabled:hover{color:#878787}.fuelux .datepicker-calendar-wrapper{border:1px solid #757575;min-height:20px;padding:0;width:300px}.fuelux .datepicker-wheels{display:none}.fuelux .datepicker-wheels ul button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-wheels-footer{background:#e6e6e6;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;clear:both}.fuelux .datepicker-wheels-footer .datepicker-wheels-back{display:block;color:#222222;float:left;line-height:22px;border:0;background-color:transparent}.fuelux .datepicker-wheels-footer .datepicker-wheels-back:hover{color:#1b75bb}.fuelux .datepicker-wheels-footer .datepicker-wheels-select{float:right;background-color:transparent;color:#5B9DD9}.fuelux .datepicker-wheels-footer .datepicker-wheels-select:hover{color:#1b75bb}.fuelux .datepicker-wheels-month,.fuelux .datepicker-wheels-year{float:left;width:50%}.fuelux .datepicker-wheels-month ul,.fuelux .datepicker-wheels-year ul{height:217px;list-style-type:none;margin:0;overflow:auto;padding:0;text-align:center}.fuelux .datepicker-wheels-month ul li,.fuelux .datepicker-wheels-year ul li{margin:4px 0}.fuelux .datepicker-wheels-month ul li button,.fuelux .datepicker-wheels-year ul li button{width:100%;text-align:center;color:#454545;display:block;font-size:16px;line-height:24px;text-decoration:none}.fuelux .datepicker-wheels-month ul li button:hover,.fuelux .datepicker-wheels-year ul li button:hover{background:#d9edf7;text-decoration:none}.fuelux .datepicker-wheels-month ul li.selected button,.fuelux .datepicker-wheels-year ul li.selected button{background:#1b75bb;color:#FFF}.fuelux .datepicker-wheels-month ul li.selected button:hover,.fuelux .datepicker-wheels-year ul li.selected button:hover{background:#0f5f9f}.fuelux .datepicker-wheels-month .header,.fuelux .datepicker-wheels-year .header{background:#e6e6e6;background-clip:padding-box;border-bottom:1px solid #cccccc;border-radius:4px 0 0 0;color:#222222;font-size:20px;font-weight:bold;line-height:30px;margin-top:0;margin-bottom:0;text-align:center}.fuelux .datepicker-wheels-month.full,.fuelux .datepicker-wheels-year.full{border-left:0;width:100%}.fuelux .datepicker-wheels-month.full .header,.fuelux .datepicker-wheels-year.full .header{border-radius:4px 4px 0 0}.fuelux .datepicker-wheels-year{border-left:1px solid #cccccc;float:right}.fuelux .datepicker-wheels-year .header{border-radius:0 4px 0 0}.fuelux .datepicker input::-ms-clear{display:none}.fuelux .infinitescroll{overflow-y:auto}.fuelux .infinitescroll .infinitescroll-end{clear:both;font-style:italic;padding:6px;text-align:center}.fuelux .infinitescroll .infinitescroll-load{clear:both;padding:6px}.fuelux .infinitescroll .infinitescroll-load button{padding:5px 12px;width:100%}.fuelux .infinitescroll .infinitescroll-load .loader{font-size:32px;height:32px;margin:0 auto;width:32px}.fuelux .dropUp,.fuelux .dropup{-webkit-box-shadow:0 0 10px rgba(0,0,0,0.2);-moz-box-shadow:0 0 10px rgba(0,0,0,0.2);box-shadow:0 0 10px rgba(0,0,0,0.2)}.fuelux .loader{height:64px;font-size:64px;position:relative;width:64px}.fuelux .loader:after,.fuelux .loader:before{font-family:\"fuelux\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;bottom:0;display:block;left:0;position:absolute;right:0;top:0}.fuelux .loader:before{content:'\\e000';opacity:.33}.fuelux .loader.iefix:before{color:#bbbbbb;opacity:1}.fuelux .loader[data-frame=\"1\"]:after{content:'\\e001'}.fuelux .loader[data-frame=\"2\"]:after{content:'\\e002'}.fuelux .loader[data-frame=\"3\"]:after{content:'\\e003'}.fuelux .loader[data-frame=\"4\"]:after{content:'\\e004'}.fuelux .loader[data-frame=\"5\"]:after{content:'\\e005'}.fuelux .loader[data-frame=\"6\"]:after{content:'\\e006'}.fuelux .loader[data-frame=\"7\"]:after{content:'\\e007'}.fuelux .loader[data-frame=\"8\"]:after{content:'\\e008'}.fuelux .pillbox{border:1px solid #bbbbbb;border-radius:4px;cursor:text;padding:3px}.fuelux .pillbox[data-readonly]{border:1px solid transparent}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap{display:inline-block}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap.truncated{display:none}.fuelux .pillbox[data-readonly].truncate .pillbox-more{display:inline}.fuelux .pillbox[data-readonly] .pill span.glyphicon-close{display:none}.fuelux .pillbox[data-readonly] .pillbox-add-item{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap button.dropdown-toggle{display:none}.fuelux .pillbox.pills-editable .pill-group .pill span{cursor:text}.fuelux .pillbox.pills-editable .pill-group .pill span.glyphicon-close{cursor:pointer}.fuelux .pillbox>.pill-group{margin:0;padding:0;width:100%}.fuelux .pillbox>.pill-group>.pill{margin:2px;cursor:default;float:left;word-break:break-all}.fuelux .pillbox>.pill-group>.pill.pillbox-highlight{outline:1px dotted #999999}.fuelux .pillbox>.pill-group>.pill.truncated{display:none}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit{border:none;color:#333333;font-weight:normal;border-radius:2px}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit:focus{outline:none;border:none}.fuelux .pillbox>.pill-group>.pill .glyphicon-close{cursor:pointer;top:-1px;left:2px}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:before{content:\" \\00d7\"}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:hover{opacity:.4}.fuelux .pillbox .pillbox-input-wrap{position:relative;margin:4px 0 3px 3px;float:left}.fuelux .pillbox .pillbox-input-wrap.editing{border:1px solid #cccccc;border-radius:4px;margin:2px 0 3px 3px}.fuelux .pillbox .pillbox-input-wrap.editing input.pillbox-add-item{border-radius:4px;color:#333333;height:32px}.fuelux .pillbox .pillbox-add-item{border:none;box-shadow:none}.fuelux .pillbox .pillbox-add-item:focus{outline:none;border:none}.fuelux .pillbox .pillbox-more{cursor:pointer;display:none;line-height:30px}.fuelux .pillbox .suggest{max-height:166px;overflow-y:auto}.fuelux .pillbox .suggest>li{white-space:nowrap;cursor:pointer;padding:3px 20px}.fuelux .pillbox .suggest>li.pillbox-suggest-sel{background-color:#eeeeee}.fuelux .pillbox .suggest>li:hover{background-color:#eeeeee}.fuelux .pillbox input::-ms-clear{display:none}.fuelux .placard{display:inline-block;position:relative}.fuelux .placard[data-ellipsis=\"true\"].showing div.placard-field,.fuelux .placard[data-ellipsis=\"true\"].showing input.placard-field{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field::-ms-clear,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field::-ms-clear{display:none}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field[data-textarea]{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] textarea.placard-field[readonly]{overflow:hidden}.fuelux .placard.showing .placard-footer,.fuelux .placard.showing .placard-header,.fuelux .placard.showing .placard-popup{display:block;z-index:1}.fuelux .placard.showing div.placard-field,.fuelux .placard.showing input.placard-field,.fuelux .placard.showing textarea.placard-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .placard div.placard-field,.fuelux .placard input.placard-field,.fuelux .placard textarea.placard-field{resize:none}.fuelux .placard div.placard-field[readonly],.fuelux .placard input.placard-field[readonly],.fuelux .placard textarea.placard-field[readonly]{background:#FFF;cursor:auto}.fuelux .placard div.placard-field[readonly].glass,.fuelux .placard input.placard-field[readonly].glass,.fuelux .placard textarea.placard-field[readonly].glass{background:none}.fuelux .placard div.placard-field[readonly].glass:hover,.fuelux .placard input.placard-field[readonly].glass:hover,.fuelux .placard textarea.placard-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .placard div.placard-field:focus,.fuelux .placard input.placard-field:focus,.fuelux .placard textarea.placard-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .placard div.placard-field{width:168px;overflow:auto}.fuelux .placard div.placard-field[data-textarea]{height:54px}.fuelux .placard-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .placard-footer,.fuelux .placard-header{display:none;left:0;line-height:1;position:absolute;right:0}.fuelux .placard-footer{padding:4px 0 8px 0;text-align:right;top:100%}.fuelux .placard-header{bottom:100%;padding:8px 0 4px 0}.fuelux .placard-header h1,.fuelux .placard-header h2,.fuelux .placard-header h3,.fuelux .placard-header h4,.fuelux .placard-header h5,.fuelux .placard-header h6{margin:0}.fuelux .placard-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;bottom:-8px;box-shadow:0 0 0 1px #FFF inset;display:none;left:-8px;position:absolute;right:-8px;top:-8px}.fuelux .placard .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .placard .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .placard .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .placard .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass[disabled]{cursor:not-allowed}.fuelux .repeater{border:1px solid #dddddd;border-radius:4px}.fuelux .repeater-canvas.scrolling{bottom:0;left:0;overflow-y:auto;position:absolute;right:0;top:0}.fuelux .repeater-header,.fuelux .repeater-footer{background:#fafafa;min-height:50px;padding:8px;*zoom:1}.fuelux .repeater-header:before,.fuelux .repeater-footer:before,.fuelux .repeater-header:after,.fuelux .repeater-footer:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header:after,.fuelux .repeater-footer:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{float:left}.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:right}@media (max-width:625px){.fuelux .repeater-header-left,.fuelux .repeater-footer-left,.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:none;*zoom:1}.fuelux .repeater-header-left:before,.fuelux .repeater-footer-left:before,.fuelux .repeater-header-right:before,.fuelux .repeater-footer-right:before,.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{margin-bottom:8px}}.fuelux .repeater-header{border-bottom:1px solid #dddddd;border-top-right-radius:4px;border-top-left-radius:4px}.fuelux .repeater-footer{border-top:1px solid #dddddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.fuelux .repeater-loader{display:none;left:50%;position:absolute;margin:-32px 0 0 -32px;top:50%}.fuelux .repeater-viewport{min-height:80px;position:relative}.fuelux .repeater-pagination label{font-weight:normal}.fuelux .repeater-pagination .repeater-primaryPaging{display:none;vertical-align:middle;width:116px}.fuelux .repeater-pagination .repeater-primaryPaging.active{display:inline-block}.fuelux .repeater-pagination .repeater-primaryPaging ul.dropdown-menu{min-width:116px}.fuelux .repeater-pagination .repeater-secondaryPaging{display:none;width:82px}.fuelux .repeater-pagination .repeater-secondaryPaging.active{display:inline-block}.fuelux .repeater-search{float:left;width:200px}.fuelux .repeater-title{display:block;float:left;line-height:34px;margin-right:10px}.fuelux .repeater-itemization .selectlist,.fuelux .repeater-filters,.fuelux .repeater-secondaryPaging,.fuelux .repeater-primaryPaging,.fuelux .repeater-next,.fuelux .repeater-prev{margin:auto .3em}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#fff}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-select-checkbox{cursor:not-allowed}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th.sortable,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th .repeater-list-heading.sortable{background:#fafafa;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover.selected td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered.selected td{background:#eee}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered td{background:#fff;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list{bottom:0;left:0;position:absolute;right:0;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list-wrapper{height:100%;overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list{position:relative}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table{margin-bottom:0;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td{border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.sorted{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.truncate{display:inherit}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr:focus{outline:1px dotted #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.empty td{border-bottom:none;font-size:14px;font-style:italic;padding:20px;text-align:center;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid transparent;border-top:none;color:rgba(0,0,0,0);line-height:1.42857;padding:8px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox{width:37px;padding-left:12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox .checkbox-inline:before{top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sorted span.glyphicon{display:block;visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th .actions-hidden{visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check{display:inline-block;height:0;line-height:0;position:relative;vertical-align:top;width:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check span.glyphicon{left:-22px;position:absolute;top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none;color:#333333;line-height:1.42857;margin-left:-9px;padding:8px;position:absolute;top:0;z-index:1;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:-1px}@media screen and (-webkit-min-device-pixel-ratio:0){.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:0}}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted span.glyphicon{display:block;visibility:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-column-wrapper{position:absolute;z-index:2;left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper{position:absolute;top:0;left:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper table{border-right:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen{border-right:1px solid #dddddd;z-index:2;background:#FFF;border-collapse:collapse;table-layout:fixed;float:left}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen th{border-collapse:collapse;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading.shifted{left:-1px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper{position:absolute;z-index:2;right:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions{border-left:1px solid #dddddd;z-index:2;border-collapse:collapse;table-layout:fixed;float:right}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading{background:transparent;border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading th{background:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td{background:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-collapse:collapse;word-wrap:break-word;padding-bottom:5px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group{width:100%;text-align:center}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group .btn,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group .btn{float:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-bottom:1px solid #dddddd;padding-bottom:7px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{padding:8px 0 7px;border-left:1px solid #fafafa;margin-left:-9px;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading .glyphicon{display:inline-block;float:none;margin-top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions .caret{margin-left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-thead-wrapper{position:absolute;top:0;right:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table thead tr th:last-child .repeater-list-heading{border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions{background-color:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr{background-color:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr.empty-heading{border-left:1px solid #fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr th{padding-bottom:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr td{padding-bottom:6px;line-height:1.39}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox{width:37px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox .checkbox{margin:0 4px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tbody tr .body-checkbox{left:4px;top:-3px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader{margin-top:-12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader.noHeader{margin-top:-32px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-viewport{overflow:hidden}.fuelux .repeater[data-viewtype=\"list\"] .actions-wrapper{z-index:10;text-align:right}.fuelux .repeater.disabled .repeater-thumbnail.selectable:hover{background:#fff;cursor:auto}.fuelux .repeater.disabled .repeater-thumbnail.selectable.selected:hover{background:#eeeeee}.fuelux .repeater-thumbnail{border:1px solid #dddddd;color:#666666;float:left;font-size:14px;min-height:110px;min-width:100px;margin:8px 7px;text-align:center}.fuelux .repeater-thumbnail img{display:block;margin-top:10px;margin-bottom:3px}.fuelux .repeater-thumbnail-cont{height:100%;overflow-y:auto;padding:6px;width:100%}.fuelux .repeater-thumbnail-cont.align-center,.fuelux .repeater-thumbnail-cont.align-justify,.fuelux .repeater-thumbnail-cont.align-left,.fuelux .repeater-thumbnail-cont.align-right{position:relative;font-size:.1px}.fuelux .repeater-thumbnail-cont.align-center:after,.fuelux .repeater-thumbnail-cont.align-justify:after,.fuelux .repeater-thumbnail-cont.align-left:after,.fuelux .repeater-thumbnail-cont.align-right:after{display:inline-block;width:100%;content:''}.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-load{display:inline-block;width:100%}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail{display:inline-block;float:none;font-size:14px}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail:after{content:' '}.fuelux .repeater-thumbnail-cont.align-center{text-align:center}.fuelux .repeater-thumbnail-cont.align-justify{text-align:justify}.fuelux .repeater-thumbnail-cont.align-left{text-align:left}.fuelux .repeater-thumbnail-cont.align-right{text-align:right}.fuelux .repeater-thumbnail-cont div.empty{font-size:14px;font-style:italic;padding:14px 10px 20px;text-align:center}.fuelux .repeater-thumbnail-cont .selectable:hover{background:#f5f5f5;cursor:pointer}.fuelux .repeater-thumbnail-cont .selectable.selected{background:#eeeeee}.fuelux .repeater-thumbnail-cont .selectable.selected:hover{background:#dddddd}.fuelux .spinbox{display:inline-block;position:relative}.fuelux .spinbox.digits-3{width:60px}.fuelux .spinbox.disabled .spinbox-buttons{cursor:not-allowed}.fuelux .spinbox .spinbox-input{float:left;padding-bottom:3px;padding:0 25px 0 7px}.fuelux .spinbox .spinbox-input::-ms-clear{display:none}.fuelux .spinbox .btn{position:relative;width:20px;height:13px;padding-top:0;padding-right:9px;padding-left:9px;overflow-y:hidden}.fuelux .spinbox .btn.disabled{cursor:not-allowed}.fuelux .spinbox .spinbox-buttons{position:absolute;height:28px;width:20px;right:2px}.fuelux .spinbox .spinbox-up{padding:0 0 14px 1px;top:2px}.fuelux .spinbox .spinbox-up .glyphicon-chevron-up{position:relative;top:0}.fuelux .spinbox .btn-group>.btn.spinbox-up{border-top-right-radius:4px}.fuelux .spinbox .spinbox-down{padding:0 0 8px 1px;top:2px;height:15px;border-bottom-left-radius:4px}.fuelux .spinbox .spinbox-down .glyphicon-chevron-down{position:relative;left:0;top:0}.fuelux .spinbox input::-ms-clear{display:none}.fuelux .scheduler .row{margin-bottom:10px}.fuelux .scheduler .row.no-margin{margin-bottom:0}.fuelux .scheduler .control-label{min-width:7em}.fuelux .scheduler .inline-form-text{float:left;line-height:27px;margin-top:4px}.fuelux .scheduler .form-group{margin-bottom:0}.fuelux .scheduler .start-datetime .form-group{margin-left:0}.fuelux .scheduler .start-datetime .combobox{max-width:9em}.fuelux .scheduler .start-datetime .combobox .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .start-datetime .dropdown{float:left;margin:0 10px 0 0}.fuelux .scheduler .timezone-container .input-group{max-width:20em}.fuelux .scheduler .timezone-container .dropdown-label{height:18px;white-space:nowrap;max-width:20em;overflow:hidden;text-overflow:ellipsis}.fuelux .scheduler .timezone-container .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-panel{margin-left:0}.fuelux .scheduler .repeat-panel label{font-weight:normal}.fuelux .scheduler .repeat-panel .radio{margin-right:10px}.fuelux .scheduler .repeat-panel .form-group{margin-left:0}.fuelux .scheduler .repeat-interval{margin-left:0;*zoom:1}.fuelux .scheduler .repeat-interval:before,.fuelux .scheduler .repeat-interval:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-interval:after{clear:both}.fuelux .scheduler .repeat-interval .form-group{margin-left:0}.fuelux .scheduler .repeat-interval .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-interval .repeat-every-panel{float:left}.fuelux .scheduler .repeat-interval .repeat-every-panel .repeat-every-pretext{padding:0 10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox{float:left;margin-right:10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox input{margin-bottom:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{clear:both}.fuelux .scheduler .repeat-monthly .repeat-monthly-date .selectlist{margin-left:5px}.fuelux .scheduler .repeat-monthly .repeat-monthly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{clear:both}.fuelux .scheduler .repeat-monthly .month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-date .year-month-day{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-day .repeat-yearly-day-text{margin-left:10px}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:before,.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{clear:both}.fuelux .scheduler .repeat-weekly button:not(.active){background-color:#FFF}.fuelux .scheduler .repeat-weekly .btn-group.disabled{position:relative;opacity:.65}.fuelux .scheduler .repeat-weekly .btn-group.disabled:before{background:transparent;bottom:0;content:\"\";left:0;position:absolute;right:0;top:0;z-index:5}.fuelux .scheduler .selectlist{float:left}.fuelux .scheduler label.radio{float:left;line-height:27px}.fuelux .scheduler label.radio input{margin-top:8px}.fuelux .scheduler .repeat-end .end-after{float:left;display:inline-block;margin-right:10px}.fuelux .scheduler .repeat-end .form-group{margin-left:0}.fuelux .scheduler .repeat-end .end-option-panel{padding-left:10px}.fuelux .scheduler .repeat-end .selectlist{min-width:100%}.fuelux .scheduler .repeat-end .selectlist button,.fuelux .scheduler .repeat-end .selectlist ul{min-width:100%}.fuelux .scheduler input::-ms-clear{display:none}.fuelux .search.disabled .input-group-btn{cursor:not-allowed}.fuelux .search input::-ms-clear{display:none}.fuelux .selectlist.disabled{cursor:not-allowed}.fuelux .selectlist .selected-label{overflow:hidden;min-width:2em}.fuelux .selectlist .dropdown-menu{min-width:inherit;overflow-y:auto}.fuelux .selectlist .btn.dropdown-toggle{text-align:left;padding-right:28px}.fuelux .selectlist .btn.dropdown-toggle .caret{margin:auto;position:absolute;top:0;bottom:0;right:12px}.fuelux .button-sizer,.fuelux .selectlist-sizer{display:inline-block;position:absolute;visibility:hidden;top:0;float:left}.fuelux .button-sizer .selectlist,.fuelux .selectlist-sizer .selectlist{display:block !important}.fuelux .button-sizer .dropdown-menu,.fuelux .selectlist-sizer .dropdown-menu{display:block;min-width:inherit}.fuelux .button-sizer .selected-label,.fuelux .selectlist-sizer .selected-label{width:auto !important}.fuelux .picker{display:inline-block;position:relative}.fuelux .picker[data-ellipsis=\"true\"].showing input.picker-field{overflow:visible;text-overflow:clip;white-space:normal}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field::-ms-clear{display:none}.fuelux .picker[data-ellipsis=\"true\"] textarea.picker-field[readonly]{overflow:hidden}.fuelux .picker.showing .picker-footer,.fuelux .picker.showing .picker-header,.fuelux .picker.showing .picker-popup{display:block;z-index:1}.fuelux .picker.showing input.picker-field,.fuelux .picker.showing textarea.picker-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .picker input.picker-field,.fuelux .picker textarea.picker-field{resize:none}.fuelux .picker input.picker-field[readonly],.fuelux .picker textarea.picker-field[readonly]{background:#FFF;cursor:auto}.fuelux .picker input.picker-field[readonly].glass,.fuelux .picker textarea.picker-field[readonly].glass{background:none}.fuelux .picker input.picker-field[readonly].glass:hover,.fuelux .picker textarea.picker-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .picker input.picker-field:focus,.fuelux .picker textarea.picker-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .picker-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .picker-footer,.fuelux .picker-header{display:none;left:0;line-height:1;right:0}.fuelux .picker-footer{padding:8px 10px 8px 0;text-align:right;bottom:0;position:absolute}.fuelux .picker-header{height:31px;padding:8px 0 0 10px}.fuelux .picker-header h1,.fuelux .picker-header h2,.fuelux .picker-header h3,.fuelux .picker-header h4,.fuelux .picker-header h5,.fuelux .picker-header h6{margin:0}.fuelux .picker-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;box-shadow:0 0 0 1px #FFF inset;display:none;position:absolute;padding-left:6px;padding-right:6px;height:234px;width:350px;margin:4px 0}.fuelux .picker .picker-body.well{background-color:#fff;overflow:scroll;padding:0;height:165px}.fuelux .picker .tree{border:none}.fuelux .picker .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .picker .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .picker .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .picker .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass[disabled]{cursor:not-allowed}.fuelux .tree{border:1px solid #999999;border-radius:4px 4px 4px 4px;padding:10px 15px 0 15px;overflow-x:auto;overflow-y:auto;position:relative;list-style:none}.fuelux .tree *:focus{outline:none}.fuelux .tree button:focus{color:#999999}.fuelux .tree ul{padding-left:0;margin-top:0;margin-bottom:0;list-style:none}.fuelux .tree li{margin:0;margin-top:5px;margin-bottom:5px}.fuelux .tree .tree-loader{margin-left:65px}.fuelux .tree>.tree-loader{margin-left:50px}.fuelux .tree .tree-open>.tree-branch-header .glyphicon-play{transform:rotate(90deg);-ms-transform:rotate(90deg);-webkit-transform:rotate(90deg);position:relative}.fuelux .tree [data-children=false]>.tree-branch-header .icon-caret:before{content:'\\00a0'}.fuelux .tree .tree-branch .tree-branch-header{position:relative;border-radius:6px;white-space:nowrap}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name:hover{color:#999999}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play{font-size:10px;padding-right:5px;padding-left:7px}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play:before{position:relative;top:-2px}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-branch .tree-branch-header label{font-weight:normal;padding-left:3px;margin-bottom:0;cursor:pointer}.fuelux .tree .tree-branch .tree-branch-children{margin-left:14px}.fuelux .tree .tree-branch[haschildren='false'] .icon-caret,.fuelux .tree .tree-branch[data-has-children='false'] .icon-caret{visibility:hidden}.fuelux .tree .tree-item,.fuelux .tree .tree-overflow{white-space:nowrap;position:relative;cursor:pointer;border-radius:6px;margin-left:26px}.fuelux .tree .tree-item .tree-item-name,.fuelux .tree .tree-overflow .tree-item-name,.fuelux .tree .tree-item .tree-overflow-name,.fuelux .tree .tree-overflow .tree-overflow-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-item .tree-overflow-name .tree-label,.fuelux .tree .tree-overflow .tree-overflow-name .tree-label{margin-left:15px;color:#0088cc}.fuelux .tree .tree-item .tree-item-name:hover,.fuelux .tree .tree-overflow .tree-item-name:hover,.fuelux .tree .tree-item .tree-overflow-name:hover,.fuelux .tree .tree-overflow .tree-overflow-name:hover{color:#999999}.fuelux .tree .tree-item.tree-selected .tree-item-name,.fuelux .tree .tree-overflow.tree-selected .tree-item-name{background-color:#eeeeee;color:#333333}.fuelux .tree .tree-item label,.fuelux .tree .tree-overflow label{font-weight:normal;padding-left:7px;margin-bottom:0;cursor:pointer}.fuelux .tree .icon-caret:hover+.tree-branch-name{color:#999999}.fuelux .tree.tree-folder-select .tree-branch .icon-caret{background-color:transparent;border:0}.fuelux .tree.tree-folder-select .tree-branch .icon-caret:hover{cursor:pointer;color:#999999}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name{padding:1px 5px 0 5px;border-radius:6px}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name.tree-selected{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name:hover{background-color:#eeeeee}.fuelux .truncate .tree .tree-branch-header .tree-branch-name,.fuelux .truncate .tree .tree-item .tree-item-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .wizard{*zoom:1;border:1px solid #d4d4d4;border-radius:4px;background-color:#fafafa;position:relative;min-height:48px}.fuelux .wizard:before,.fuelux .wizard:after{display:table;content:\"\";line-height:0}.fuelux .wizard:after{clear:both}.fuelux .wizard.no-steps-container{overflow:hidden}.fuelux .wizard .steps-container{border-radius:4px 4px 0 0;overflow:hidden}.fuelux .wizard>ul.steps,.fuelux .wizard>.steps-container>ul.steps{list-style:none outside none;padding:0;margin:0;width:999999px}.fuelux .wizard>ul.steps.previous-disabled li.complete,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete{cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover{background:#f5f5f5;color:#468847;cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-left-color:#f5f5f5}.fuelux .wizard>ul.steps li,.fuelux .wizard>.steps-container>ul.steps li{float:left;margin:0;padding:0 20px 0 30px;height:46px;line-height:46px;position:relative;background:#eeeeee;color:#999999;font-size:16px;cursor:not-allowed}.fuelux .wizard>ul.steps li .chevron,.fuelux .wizard>.steps-container>ul.steps li .chevron{border:24px solid transparent;border-left:14px solid #d4d4d4;border-right:0;display:block;position:absolute;right:-14px;top:0;z-index:1}.fuelux .wizard>ul.steps li .chevron:before,.fuelux .wizard>.steps-container>ul.steps li .chevron:before{border:24px solid transparent;border-left:14px solid #eeeeee;border-right:0;content:\"\";display:block;position:absolute;right:1px;top:-24px}.fuelux .wizard>ul.steps li.complete,.fuelux .wizard>.steps-container>ul.steps li.complete{background:#f5f5f5;color:#468847}.fuelux .wizard>ul.steps li.complete:hover,.fuelux .wizard>.steps-container>ul.steps li.complete:hover{background:#e2eaee;cursor:pointer}.fuelux .wizard>ul.steps li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete:hover .chevron:before{border-left:14px solid #e2eaee}.fuelux .wizard>ul.steps li.complete .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete .chevron:before{border-left:14px solid #f5f5f5}.fuelux .wizard>ul.steps li.active,.fuelux .wizard>.steps-container>ul.steps li.active{background:#eef7fb;color:#3a87ad;cursor:default}.fuelux .wizard>ul.steps li.active .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.active .chevron:before{border-left:14px solid #eef7fb}.fuelux .wizard>ul.steps li.active .badge,.fuelux .wizard>.steps-container>ul.steps li.active .badge{background-color:#3a87ad}.fuelux .wizard>ul.steps li .badge,.fuelux .wizard>.steps-container>ul.steps li .badge{margin-right:8px}.fuelux .wizard>ul.steps li .badge-success,.fuelux .wizard>.steps-container>ul.steps li .badge-success{background-color:#468847}.fuelux .wizard>ul.steps li:first-child,.fuelux .wizard>.steps-container>ul.steps li:first-child{border-radius:4px 0 0 0;padding-left:20px}.fuelux .wizard.rtl{direction:rtl}.fuelux .wizard.rtl>ul.steps,.fuelux .wizard.rtl>.steps-container>ul.steps{right:0;left:auto;float:right}.fuelux .wizard.rtl>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-right-color:#f5f5f5}.fuelux .wizard.rtl>ul.steps li,.fuelux .wizard.rtl>.steps-container>ul.steps li{float:right}.fuelux .wizard.rtl>ul.steps li .chevron,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron{right:auto;left:-14px;border-right:14px solid #cccccc;border-left:0}.fuelux .wizard.rtl>ul.steps li .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron:before{right:auto;left:1px;border-right:14px solid #eeeeee;border-left:0}.fuelux .wizard.rtl>ul.steps li.active .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.active .chevron:before{border-right:14px solid #eef7fb}.fuelux .wizard.rtl>ul.steps li.complete .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete .chevron:before{border-right:14px solid #f5f5f5}.fuelux .wizard.rtl>ul.steps li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete:hover .chevron:before{border-right:14px solid #e2eaee;border-left:none}.fuelux .wizard.rtl>ul.steps li .badge,.fuelux .wizard.rtl>.steps-container>ul.steps li .badge{margin-left:8px}.fuelux .wizard.rtl>.actions{right:auto;left:0;float:left;border-left:none;border-right:1px solid #d4d4d4;border-radius:4px 0 0 0}.fuelux .wizard.rtl>.actions .btn-prev span{margin-left:5px;margin-right:0}.fuelux .wizard.rtl>.actions .btn-next span{margin-left:0;margin-right:5px}.fuelux .wizard>.actions{z-index:1000;position:absolute;right:0;top:0;line-height:46px;float:right;padding-left:15px;padding-right:15px;vertical-align:middle;background-color:#e6e6e6;border-left:1px solid #d4d4d4;border-radius:0 4px 0 0}.fuelux .wizard>.actions a{line-height:45px;font-size:12px;margin-right:8px}.fuelux .wizard>.actions .btn-prev[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-prev span{margin-right:5px}.fuelux .wizard>.actions .btn-next[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-next span{margin-left:5px}.fuelux .wizard .step-content{border-top:1px solid #cccccc;padding:10px;float:left;width:100%}.fuelux .wizard .step-content .step-pane{display:none}.fuelux .wizard .step-content>.active{display:block}.fuelux .wizard .step-content>.active .btn-group .active{display:inline-block}.fuelux .wizard.complete>.actions .btn-next .glyphicon{display:none}.fuelux .serif{font-family:Georgia,\"Times New Roman\",Times,serif}.fuelux .monospace{font-family:Monaco,Menlo,Consolas,\"Courier New\",monospace}.fuelux .text-sm{font-size:11.9px}.fuelux .text-lg{font-size:17.5px}.fuelux .padding-xs{padding:5px}.fuelux .padding-xs-horizontal{padding:0 5px}.fuelux .padding-xs-vertical{padding:5px 0}.fuelux .padding-xs-top{padding-top:5px}.fuelux .padding-xs-bottom{padding-bottom:5px}.fuelux .padding-xs-left{padding-left:5px}.fuelux .padding-xs-right{padding-right:5px}.fuelux .padding-sm{padding:10px}.fuelux .padding-sm-horizontal{padding:0 10px}.fuelux .padding-sm-vertical{padding:10px 0}.fuelux .padding-sm-top{padding-top:10px}.fuelux .padding-sm-bottom{padding-bottom:10px}.fuelux .padding-sm-left{padding-left:10px}.fuelux .padding-sm-right{padding-right:10px}.fuelux .padding-md{padding:15px}.fuelux .padding-md-horizontal{padding:0 15px}.fuelux .padding-md-vertical{padding:15px 0}.fuelux .padding-md-top{padding-top:15px}.fuelux .padding-md-bottom{padding-bottom:15px}.fuelux .padding-md-left{padding-left:15px}.fuelux .padding-md-right{padding-right:15px}.fuelux .padding-lg{padding:20px}.fuelux .padding-lg-horizontal{padding:0 20px}.fuelux .padding-lg-vertical{padding:20px 0}.fuelux .padding-lg-top{padding-top:20px}.fuelux .padding-lg-bottom{padding-bottom:20px}.fuelux .padding-lg-left{padding-left:20px}.fuelux .padding-lg-right{padding-right:20px}.fuelux .margin-xs{margin:5px}.fuelux .margin-xs-horizontal{margin:0 5px}.fuelux .margin-xs-vertical{margin:5px 0}.fuelux .margin-xs-top{margin-top:5px}.fuelux .margin-xs-bottom{margin-bottom:5px}.fuelux .margin-xs-left{margin-left:5px}.fuelux .margin-xs-right{margin-right:5px}.fuelux .margin-sm{margin:10px}.fuelux .margin-sm-horizontal{margin:0 10px}.fuelux .margin-sm-vertical{margin:10px 0}.fuelux .margin-sm-top{margin-top:10px}.fuelux .margin-sm-bottom{margin-bottom:10px}.fuelux .margin-sm-left{margin-left:10px}.fuelux .margin-sm-right{margin-right:10px}.fuelux .margin-md{margin:15px}.fuelux .margin-md-horizontal{margin:0 15px}.fuelux .margin-md-vertical{margin:15px 0}.fuelux .margin-md-top{margin-top:15px}.fuelux .margin-md-bottom{margin-bottom:15px}.fuelux .margin-md-left{margin-left:15px}.fuelux .margin-md-right{margin-right:15px}.fuelux .margin-lg{margin:20px}.fuelux .margin-lg-horizontal{margin:0 20px}.fuelux .margin-lg-vertical{margin:20px 0}.fuelux .margin-lg-top{margin-top:20px}.fuelux .margin-lg-bottom{margin-bottom:20px}.fuelux .margin-lg-left{margin-left:20px}.fuelux .margin-lg-right{margin-right:20px}.fuelux .data-label{text-transform:uppercase;font-size:10px;margin-bottom:2px;text-shadow:0 1px #FFF;color:#666666}.fuelux .data-value{font-size:14px}.fuelux .section-heading{font-size:16px;color:#333333;margin:0 0 10px;padding:0;text-shadow:0 1px #FFF}.fuelux .truncate{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"; });
 /*!
  * Fuel UX v3.15.6 
