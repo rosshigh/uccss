@@ -13982,6 +13982,1012 @@ define('modules/home/components/success-dialog',["exports", "aurelia-dialog"], f
         return SuccessDialog;
     }(), _class.inject = [_aureliaDialog.DialogController], _temp);
 });
+define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Assignments = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            return step("next", value);
+                        }, function (err) {
+                            return step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _appState.AppState, _aureliaDialog.DialogService, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function Assignments(router, config, validation, people, app, dialog, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, Assignments);
+
+            this.requestSelected = false;
+            this.showAddStudentTemplate = false;
+            this.manualMode = false;
+            this.roundTo10 = false;
+            this.showAudit = false;
+            this.lastIDidsRemaining = -1;
+            this.navControl = "requestsNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.config = config;
+            this.validation = validation;
+            this.app = app;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+            this.dialog = dialog;
+        }
+
+        Assignments.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Assignments.prototype.canActivate = function canActivate() {
+            if (!this.app.user._id) this.router.navigate('logout');
+        };
+
+        Assignments.prototype.activate = function activate() {
+            this.getData();
+            this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
+            this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
+            this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
+            this._setUpValidation();
+        };
+
+        Assignments.prototype.getData = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true)]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                            case 3:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function getData() {
+                return _ref.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        Assignments.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 4:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.updateArray();
+                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+                                    this.dataTable.createPageButtons(1);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.displayArray = new Array();
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        Assignments.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Assignments.prototype.updateArray = function updateArray() {
+            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                this.displayArray = this.requests.requestsDetailsArray;
+                this.baseArray = this.displayArray;
+                for (var i = 0; i < this.baseArray.length; i++) {
+                    this.baseArray[i].originalIndex = i;
+                }
+            } else {
+                this.displayArray = new Array();
+            }
+        };
+
+        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+
+            this.enableButton = false;
+            this.requestSelected = true;
+
+            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+            this.requests.selectRequestDetail(this.editIndex);
+            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+
+            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+            if (!this.products.selectedProduct.systems[0]) {
+                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
+            }
+
+            this.clientRequired();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        Assignments.prototype.clientRequired = function clientRequired() {
+            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
+            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+            this.lastFirstID = this.firstID;
+            this.firstAllowableID = this.firstID;
+            this.firstNumericFacID = this.firstID;
+            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
+
+            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
+            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
+            if (this.products.selectedProduct.systems[0]) {
+                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
+                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
+            }
+            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
+            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.idBuffer = 0;
+                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+                this.sandBoxOnly = true;
+            } else {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
+                this.sandBoxOnly = false;
+            }
+
+            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
+                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
+                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
+                this.idsRemaining = this.idsRequired;
+                this.existingRequest = false;
+                this.totalIdsAssigned = 0;
+                this.idsAssigned = 0;
+                this.assignmentDetails = new Array();
+            } else {
+                this.existingRequest = true;
+                this.unassignedOnly = false;
+                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
+                this.idsRequired = parseInt(this.numberOfIds);
+                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
+                this.totalIdsAssigned = this.idsAssigned;
+                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
+                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
+                this.findAssignedClients();
+            }
+
+            this.assignmentDetailIndex = -1;
+
+            this.calcLastID();
+        };
+
+        Assignments.prototype.selectClient = function selectClient(index, client, el) {
+            if (this.idsRemaining > 0) {
+                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+
+                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
+
+                this.proposedClient.push(client);
+
+                this.lastFirstID = this.firstID;
+
+                this.calcLastID();
+
+                this.assignmentDetails.push({
+                    staffId: this.app.user._id,
+
+                    client: client.client,
+                    clientId: client._id,
+                    systemId: client.systemId,
+                    firstID: this.firstID,
+                    lastID: this.lastID,
+                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
+                });
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
+                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
+
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+
+                if (this.studentIDTemplates.length) {
+                    this.calcAssignment();
+                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
+                }
+
+                this.clientSelected = true;
+                this.enableButton = true;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.calcLastID = function calcLastID() {
+            if (this.idsRemaining > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            } else {
+                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
+            }
+
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.calcAssignment = function calcAssignment() {
+            this.calcIDRangeFromTemplate();
+            this.calculatePasswords();
+        };
+
+        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+            } else {
+                var selectedStudentIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
+                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
+                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
+                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
+                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
+                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
+            }
+
+            this.calcFacIDRangeFromTemplate();
+        };
+
+        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
+            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+            } else {
+                var selectedFacultyIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
+                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
+                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
+            }
+        };
+
+        Assignments.prototype.getID = function getID(idPrefix, id) {
+            if (idPrefix) {
+                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
+                var prefix = "000".substr(0, len - id.toString().length);
+                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
+            }
+            return "";
+        };
+
+        Assignments.prototype.calculatePasswords = function calculatePasswords() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.assignmentDetails.length > 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
+            }
+            var random;
+            var prefix;
+            var len;
+
+            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                prefix = "9" + "000".substr(0, len - 1);
+                random = Math.floor(Math.random() * parseInt(prefix));
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
+            }
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
+            } else {
+                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                    prefix = "9" + "000".substr(0, len - 1);
+                    random = Math.floor(Math.random() * parseInt(prefix));
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
+                }
+            }
+        };
+
+        Assignments.prototype.firstIDChanged = function firstIDChanged() {
+            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
+            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
+                this.firstID = this.lastFirstID;
+                return;
+            }
+
+            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.calcIDRangeFromTemplate();
+            }
+
+            this.lastFirstID = this.firstID;
+        };
+
+        Assignments.prototype.lastIDChanged = function lastIDChanged() {
+            if (this.lastID > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            }
+
+            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+
+                this.calcIDRangeFromTemplate();
+            } else {
+                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
+            }
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
+            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
+            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
+            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
+            if (this.assignmentDetailIndex == -1) {
+                this.selectedAssignedClient = "";
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            } else {
+                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
+
+                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
+                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
+                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
+                this.oldLastID = this.lastID;
+                this.lastFirstID = this.firstID;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.deleteProposedClient = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
+                var _this = this;
+
+                var cmd;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (this.assignmentDetails[index].assignedDate) {
+                                    cmd = {
+                                        header: "Delete Assignment",
+                                        message: "This will delete the assignment.  Are you sure you want to do that?",
+                                        cancelButton: false,
+                                        okButton: true
+                                    };
+
+
+                                    this.dialog.open({ viewModel: _confirmDialog.ConfirmDialog, model: cmd }).then(function (response) {
+                                        if (!response.wasCancelled) {
+                                            _this.deleteSaved(index);
+                                        }
+                                    });
+                                } else {
+                                    this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                    this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+                                    this.assignmentDetailIndex = -1;
+
+                                    this.assignmentDetails.splice(index, 1);
+                                    this.proposedClient.splice(index, 1);
+                                }
+
+                            case 1:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function deleteProposedClient(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return deleteProposedClient;
+        }();
+
+        Assignments.prototype.deleteSaved = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
+                var i, request, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+
+                                i = 0;
+
+                            case 4:
+                                if (!(i < this.proposedClient[index].assignments.length)) {
+                                    _context5.next = 12;
+                                    break;
+                                }
+
+                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
+                                    _context5.next = 9;
+                                    break;
+                                }
+
+                                this.proposedClient[index].assignments.splice(i, 1);
+                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+                                return _context5.abrupt('break', 12);
+
+                            case 9:
+                                i++;
+                                _context5.next = 4;
+                                break;
+
+                            case 12:
+                                this.systems.updateClient(this.proposedClient[index]);
+                                this.assignmentDetails.splice(index, 1);
+                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
+
+                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+                                this.requestToSave.requestDetailsToSave = new Array();
+                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+                                delete request['requestId'];
+                                this.requestToSave.requestDetailsToSave.push(request);
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context5.next = 25;
+                                return this.requests.saveRequest();
+
+                            case 25:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.status) {
+                                    _context5.next = 30;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
+                                _context5.next = 30;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 30:
+                                this.selectedAssignedClient = "";
+
+                            case 31:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteSaved(_x2) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteSaved;
+        }();
+
+        Assignments.prototype.save = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                if (!this._buildRequest()) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context6.next = 5;
+                                return this.requests.saveRequest();
+
+                            case 5:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.status) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
+                                _context6.next = 10;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 10:
+                                this._cleanUp();
+
+                            case 11:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Assignments.prototype._buildRequest = function _buildRequest() {
+            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+                for (var i = 0; i < this.assignmentDetails.length; i++) {
+                    for (var j = 0; j < this.proposedClient.length; j++) {
+                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
+                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
+                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
+                            if (this.assignmentDetails[i].assignedDate) {
+                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
+                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
+                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
+                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
+                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
+                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
+                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                        this.systems.updateClient(this.proposedClient[j]);
+                                    }
+                                }
+                            } else {
+                                this.assignmentDetails[i].assignedDate = new Date();
+                                this.requests.selectedRequestDetail.assignedDate = new Date();
+                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
+                                this.proposedClient[i].assignments.push({
+                                    assignment: this.requests.selectedRequestDetail._id,
+                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
+                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                                    firstID: this.assignmentDetails[i].firstID,
+                                    lastID: this.assignmentDetails[i].lastID
+                                });
+                                this.systems.updateClient(this.proposedClient[i]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (this.provisionalAssignment) {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
+                } else {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
+                }
+
+                for (var i = 0; i < this.proposedClient.length; i++) {
+                    this.assignmentDetails[i].assignedDate = new Date();
+                    this.assignmentDetails[i].modifiedDate = new Date();
+                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
+                    this.proposedClient[i].assignments.push({
+                        assignment: this.requests.selectedRequestDetail._id,
+                        studentIDRange: this.assignmentDetails[i].studentUserIds,
+                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                        firstID: this.assignmentDetails[i].firstID,
+                        lastID: this.assignmentDetails[i].lastID,
+                        assignedDate: new Date()
+                    });
+                    this.systems.updateClient(this.proposedClient[i]);
+                };
+            }
+
+            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+            this.requestToSave.audit.push({
+                property: 'Assigned',
+                eventDate: new Date(),
+                personId: this.app.user._id
+            });
+            this.requestToSave.requestDetailsToSave = new Array();
+            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
+            delete request['requestId'];
+            this.requestToSave.requestDetailsToSave.push(request);
+
+            return true;
+        };
+
+        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
+            if (!client.assignments || client.assignments.length == 0) return true;
+            var valid = true;
+            var x1 = parseInt(assignment.firstID);
+            var x2 = parseInt(assignment.lastID);
+            for (var i = 0; i < client.assignments.length; i++) {
+                if (this.existingRequest && client.assignments[i].assignment == id) {
+                    continue;
+                } else {
+                    var y1 = parseInt(client.assignments[i].firstID);
+                    var y2 = parseInt(client.assignments[i].lastID);
+                    if (!(x2 < y1 || x1 > y2)) valid = false;
+                }
+            }
+            return valid;
+        };
+
+        Assignments.prototype.back = function back() {
+            this._cleanUp();
+        };
+
+        Assignments.prototype._cleanUp = function _cleanUp() {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+            this.proposedAssignment = new Object();
+            this.parameterIndex = new Object();
+            this.systems.selectSystem();
+            this.selectedAssignedClient = "";
+            this.firstID = 0;
+            this.lastID = 0;
+            this.requestSelected = false;
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.findAssignedClients = function findAssignedClients() {
+            var _this2 = this;
+
+            this.assignmentDetails.forEach(function (item) {
+                _this2.systems.selectClientFromID(item.systemId, item.clientId);
+                _this2.proposedClient.push(_this2.systems.selectedClient);
+            });
+        };
+
+        Assignments.prototype.systemSelected = function systemSelected() {
+            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
+            if (!this.products.selectedProduct.clientRelevant) {
+                this.calcAssignment();
+            }
+        };
+
+        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
+            this.showAddStudentTemplate = true;
+        };
+
+        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
+            this.showAddStudentTemplate = false;
+        };
+
+        Assignments.prototype.saveStudentTemplate = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                _context7.next = 2;
+                                return this.products.saveProduct();
+
+                            case 2:
+                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
+                                this.showAddStudentTemplate = false;
+
+                            case 4:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function saveStudentTemplate() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return saveStudentTemplate;
+        }();
+
+        Assignments.prototype.changeManualMode = function changeManualMode() {
+            localStorage.setItem('manualMode', this.manualMode);
+        };
+
+        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
+            localStorage.setItem('unassignedOnly', this.unassignedOnly);
+        };
+
+        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
+            localStorage.setItem('roundTo10', this.roundTo10);
+        };
+
+        Assignments.prototype.customerAction = function customerAction() {
+            this.message = {
+                customerMessage: ""
+            };
+
+            this.customerMessage = true;
+            (0, _jquery2.default)("#customerMessage").focus();
+        };
+
+        Assignments.prototype.sendCustomerAction = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                var msg, productName, serverResponse;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                msg = (0, _jquery2.default)("#customerMessage").val();
+
+                                if (!msg) {
+                                    _context8.next = 8;
+                                    break;
+                                }
+
+                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+
+                                this.message = {
+                                    id: this.requests.selectedRequestDetail._id,
+                                    customerMessage: msg,
+                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                                    toEmail: this.people.selectedPerson.email,
+                                    product: productName,
+                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+                                    audit: {
+                                        property: 'Send Message',
+                                        eventDate: new Date(),
+                                        oldValue: this.customerMessageText,
+                                        personId: this.app.user._id
+                                    }
+                                };
+                                _context8.next = 6;
+                                return this.requests.sendCustomerMessage(this.message);
+
+                            case 6:
+                                serverResponse = _context8.sent;
+
+                                if (!serverResponse.status) {
+                                    this.utils.showNotification("The message was sent", "", "", "", "", 5);
+                                    this._cleanUp();
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function sendCustomerAction() {
+                return _ref8.apply(this, arguments);
+            }
+
+            return sendCustomerAction;
+        }();
+
+        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.openSettings = function openSettings() {
+            this.showSettings = !this.showSettings;
+            if (this.showSettings) {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+            }
+        };
+
+        Assignments.prototype.saveSettings = function saveSettings() {
+            localStorage.setItem('idBuffer', this.idBuffer);
+            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
+            this.showSettings = false;
+        };
+
+        Assignments.prototype.restoreDefaults = function restoreDefaults() {
+            this.idBuffer = this.config.REGULAR_ID_BUFFER;
+            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
+        };
+
+        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
+            this.facultyDetails = !this.facultyDetails;
+        };
+
+        Assignments.prototype._setUpValidation = function _setUpValidation() {
+            this.validation.addRule(1, "errorRange", { "rule": "required", "message": "Invalid ID range",
+                "valFunction": function valFunction(context) {
+                    var valid = true;
+                    for (var i = 0; i < context.assignmentDetails.length; i++) {
+                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
+                    }
+                    return valid;
+                } });
+        };
+
+        Assignments.prototype.openAudit = function openAudit() {
+            this.showAudit = !this.showAudit;
+        };
+
+        return Assignments;
+    }()) || _class);
+});
 define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment) {
   'use strict';
 
@@ -15468,1012 +16474,6 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     return ViewHelpTickets;
   }()) || _class);
-});
-define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-dialog', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/utils/validation', '../../../resources/elements/confirm-dialog', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaDialog, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _appState, _validation, _confirmDialog, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Assignments = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            return step("next", value);
-                        }, function (err) {
-                            return step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _appState.AppState, _aureliaDialog.DialogService, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function Assignments(router, config, validation, people, app, dialog, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, Assignments);
-
-            this.requestSelected = false;
-            this.showAddStudentTemplate = false;
-            this.manualMode = false;
-            this.roundTo10 = false;
-            this.showAudit = false;
-            this.lastIDidsRemaining = -1;
-            this.navControl = "requestsNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.config = config;
-            this.validation = validation;
-            this.app = app;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-            this.dialog = dialog;
-        }
-
-        Assignments.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Assignments.prototype.canActivate = function canActivate() {
-            if (!this.app.user._id) this.router.navigate('logout');
-        };
-
-        Assignments.prototype.activate = function activate() {
-            this.getData();
-            this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
-            this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
-            this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
-            this._setUpValidation();
-        };
-
-        Assignments.prototype.getData = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true)]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                            case 3:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function getData() {
-                return _ref.apply(this, arguments);
-            }
-
-            return getData;
-        }();
-
-        Assignments.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 7;
-                                    break;
-                                }
-
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 4;
-                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 4:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.updateArray();
-                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
-                                    this.dataTable.createPageButtons(1);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.displayArray = new Array();
-
-                            case 8:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        Assignments.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.getRequests();
-
-                            case 3:
-                                this.spinnerHTML = "";
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Assignments.prototype.updateArray = function updateArray() {
-            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                this.displayArray = this.requests.requestsDetailsArray;
-                this.baseArray = this.displayArray;
-                for (var i = 0; i < this.baseArray.length; i++) {
-                    this.baseArray[i].originalIndex = i;
-                }
-            } else {
-                this.displayArray = new Array();
-            }
-        };
-
-        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-
-            this.enableButton = false;
-            this.requestSelected = true;
-
-            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-            this.requests.selectRequestDetail(this.editIndex);
-            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-
-            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-            if (!this.products.selectedProduct.systems[0]) {
-                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
-            }
-
-            this.clientRequired();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
-
-        Assignments.prototype.clientRequired = function clientRequired() {
-            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
-            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
-            this.lastFirstID = this.firstID;
-            this.firstAllowableID = this.firstID;
-            this.firstNumericFacID = this.firstID;
-            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
-
-            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
-            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
-            if (this.products.selectedProduct.systems[0]) {
-                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
-            }
-            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
-            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.idBuffer = 0;
-                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-                this.sandBoxOnly = true;
-            } else {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
-                this.sandBoxOnly = false;
-            }
-
-            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
-                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
-                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
-                this.idsRemaining = this.idsRequired;
-                this.existingRequest = false;
-                this.totalIdsAssigned = 0;
-                this.idsAssigned = 0;
-                this.assignmentDetails = new Array();
-            } else {
-                this.existingRequest = true;
-                this.unassignedOnly = false;
-                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
-                this.idsRequired = parseInt(this.numberOfIds);
-                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
-                this.totalIdsAssigned = this.idsAssigned;
-                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
-                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
-                this.findAssignedClients();
-            }
-
-            this.assignmentDetailIndex = -1;
-
-            this.calcLastID();
-        };
-
-        Assignments.prototype.selectClient = function selectClient(index, client, el) {
-            if (this.idsRemaining > 0) {
-                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-
-                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
-
-                this.proposedClient.push(client);
-
-                this.lastFirstID = this.firstID;
-
-                this.calcLastID();
-
-                this.assignmentDetails.push({
-                    staffId: this.app.user._id,
-
-                    client: client.client,
-                    clientId: client._id,
-                    systemId: client.systemId,
-                    firstID: this.firstID,
-                    lastID: this.lastID,
-                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
-                });
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
-                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
-
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-
-                if (this.studentIDTemplates.length) {
-                    this.calcAssignment();
-                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
-                }
-
-                this.clientSelected = true;
-                this.enableButton = true;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.calcLastID = function calcLastID() {
-            if (this.idsRemaining > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            } else {
-                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
-            }
-
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.calcAssignment = function calcAssignment() {
-            this.calcIDRangeFromTemplate();
-            this.calculatePasswords();
-        };
-
-        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-            } else {
-                var selectedStudentIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
-                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
-                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
-                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
-                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
-                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
-            }
-
-            this.calcFacIDRangeFromTemplate();
-        };
-
-        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
-            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-            } else {
-                var selectedFacultyIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
-                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
-                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
-            }
-        };
-
-        Assignments.prototype.getID = function getID(idPrefix, id) {
-            if (idPrefix) {
-                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
-                var prefix = "000".substr(0, len - id.toString().length);
-                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
-            }
-            return "";
-        };
-
-        Assignments.prototype.calculatePasswords = function calculatePasswords() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.assignmentDetails.length > 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
-            }
-            var random;
-            var prefix;
-            var len;
-
-            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                prefix = "9" + "000".substr(0, len - 1);
-                random = Math.floor(Math.random() * parseInt(prefix));
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
-            }
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
-            } else {
-                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                    prefix = "9" + "000".substr(0, len - 1);
-                    random = Math.floor(Math.random() * parseInt(prefix));
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
-                }
-            }
-        };
-
-        Assignments.prototype.firstIDChanged = function firstIDChanged() {
-            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
-            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
-                this.firstID = this.lastFirstID;
-                return;
-            }
-
-            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.calcIDRangeFromTemplate();
-            }
-
-            this.lastFirstID = this.firstID;
-        };
-
-        Assignments.prototype.lastIDChanged = function lastIDChanged() {
-            if (this.lastID > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            }
-
-            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-
-                this.calcIDRangeFromTemplate();
-            } else {
-                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
-            }
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
-            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
-            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
-            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
-            if (this.assignmentDetailIndex == -1) {
-                this.selectedAssignedClient = "";
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            } else {
-                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
-
-                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
-                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
-                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
-                this.oldLastID = this.lastID;
-                this.lastFirstID = this.firstID;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.deleteProposedClient = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
-                var _this = this;
-
-                var cmd;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (this.assignmentDetails[index].assignedDate) {
-                                    cmd = {
-                                        header: "Delete Assignment",
-                                        message: "This will delete the assignment.  Are you sure you want to do that?",
-                                        cancelButton: false,
-                                        okButton: true
-                                    };
-
-
-                                    this.dialog.open({ viewModel: _confirmDialog.ConfirmDialog, model: cmd }).then(function (response) {
-                                        if (!response.wasCancelled) {
-                                            _this.deleteSaved(index);
-                                        }
-                                    });
-                                } else {
-                                    this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                    this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-                                    this.assignmentDetailIndex = -1;
-
-                                    this.assignmentDetails.splice(index, 1);
-                                    this.proposedClient.splice(index, 1);
-                                }
-
-                            case 1:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function deleteProposedClient(_x) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return deleteProposedClient;
-        }();
-
-        Assignments.prototype.deleteSaved = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
-                var i, request, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-
-                                i = 0;
-
-                            case 4:
-                                if (!(i < this.proposedClient[index].assignments.length)) {
-                                    _context5.next = 12;
-                                    break;
-                                }
-
-                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
-                                    _context5.next = 9;
-                                    break;
-                                }
-
-                                this.proposedClient[index].assignments.splice(i, 1);
-                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-                                return _context5.abrupt('break', 12);
-
-                            case 9:
-                                i++;
-                                _context5.next = 4;
-                                break;
-
-                            case 12:
-                                this.systems.updateClient(this.proposedClient[index]);
-                                this.assignmentDetails.splice(index, 1);
-                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
-
-                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-                                this.requestToSave.requestDetailsToSave = new Array();
-                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-                                delete request['requestId'];
-                                this.requestToSave.requestDetailsToSave.push(request);
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context5.next = 25;
-                                return this.requests.saveRequest();
-
-                            case 25:
-                                serverResponse = _context5.sent;
-
-                                if (serverResponse.status) {
-                                    _context5.next = 30;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
-                                _context5.next = 30;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 30:
-                                this.selectedAssignedClient = "";
-
-                            case 31:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteSaved(_x2) {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteSaved;
-        }();
-
-        Assignments.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                if (!this.validation.validate(1, this)) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                if (!this._buildRequest()) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context6.next = 5;
-                                return this.requests.saveRequest();
-
-                            case 5:
-                                serverResponse = _context6.sent;
-
-                                if (serverResponse.status) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
-                                _context6.next = 10;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 10:
-                                this._cleanUp();
-
-                            case 11:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Assignments.prototype._buildRequest = function _buildRequest() {
-            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-                for (var i = 0; i < this.assignmentDetails.length; i++) {
-                    for (var j = 0; j < this.proposedClient.length; j++) {
-                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
-                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
-                            if (this.assignmentDetails[i].assignedDate) {
-                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
-                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
-                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
-                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
-                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
-                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
-                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                        this.systems.updateClient(this.proposedClient[j]);
-                                    }
-                                }
-                            } else {
-                                this.assignmentDetails[i].assignedDate = new Date();
-                                this.requests.selectedRequestDetail.assignedDate = new Date();
-                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
-                                this.proposedClient[i].assignments.push({
-                                    assignment: this.requests.selectedRequestDetail._id,
-                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
-                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                                    firstID: this.assignmentDetails[i].firstID,
-                                    lastID: this.assignmentDetails[i].lastID
-                                });
-                                this.systems.updateClient(this.proposedClient[i]);
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (this.provisionalAssignment) {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
-                } else {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
-                }
-
-                for (var i = 0; i < this.proposedClient.length; i++) {
-                    this.assignmentDetails[i].assignedDate = new Date();
-                    this.assignmentDetails[i].modifiedDate = new Date();
-                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
-                    this.proposedClient[i].assignments.push({
-                        assignment: this.requests.selectedRequestDetail._id,
-                        studentIDRange: this.assignmentDetails[i].studentUserIds,
-                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                        firstID: this.assignmentDetails[i].firstID,
-                        lastID: this.assignmentDetails[i].lastID,
-                        assignedDate: new Date()
-                    });
-                    this.systems.updateClient(this.proposedClient[i]);
-                };
-            }
-
-            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-            this.requestToSave.audit.push({
-                property: 'Assigned',
-                eventDate: new Date(),
-                personId: this.app.user._id
-            });
-            this.requestToSave.requestDetailsToSave = new Array();
-            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
-            delete request['requestId'];
-            this.requestToSave.requestDetailsToSave.push(request);
-
-            return true;
-        };
-
-        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
-            if (!client.assignments || client.assignments.length == 0) return true;
-            var valid = true;
-            var x1 = parseInt(assignment.firstID);
-            var x2 = parseInt(assignment.lastID);
-            for (var i = 0; i < client.assignments.length; i++) {
-                if (this.existingRequest && client.assignments[i].assignment == id) {
-                    continue;
-                } else {
-                    var y1 = parseInt(client.assignments[i].firstID);
-                    var y2 = parseInt(client.assignments[i].lastID);
-                    if (!(x2 < y1 || x1 > y2)) valid = false;
-                }
-            }
-            return valid;
-        };
-
-        Assignments.prototype.back = function back() {
-            this._cleanUp();
-        };
-
-        Assignments.prototype._cleanUp = function _cleanUp() {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-            this.proposedAssignment = new Object();
-            this.parameterIndex = new Object();
-            this.systems.selectSystem();
-            this.selectedAssignedClient = "";
-            this.firstID = 0;
-            this.lastID = 0;
-            this.requestSelected = false;
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.findAssignedClients = function findAssignedClients() {
-            var _this2 = this;
-
-            this.assignmentDetails.forEach(function (item) {
-                _this2.systems.selectClientFromID(item.systemId, item.clientId);
-                _this2.proposedClient.push(_this2.systems.selectedClient);
-            });
-        };
-
-        Assignments.prototype.systemSelected = function systemSelected() {
-            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
-            if (!this.products.selectedProduct.clientRelevant) {
-                this.calcAssignment();
-            }
-        };
-
-        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
-            this.showAddStudentTemplate = true;
-        };
-
-        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
-            this.showAddStudentTemplate = false;
-        };
-
-        Assignments.prototype.saveStudentTemplate = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                _context7.next = 2;
-                                return this.products.saveProduct();
-
-                            case 2:
-                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
-                                this.showAddStudentTemplate = false;
-
-                            case 4:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function saveStudentTemplate() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return saveStudentTemplate;
-        }();
-
-        Assignments.prototype.changeManualMode = function changeManualMode() {
-            localStorage.setItem('manualMode', this.manualMode);
-        };
-
-        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
-            localStorage.setItem('unassignedOnly', this.unassignedOnly);
-        };
-
-        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
-            localStorage.setItem('roundTo10', this.roundTo10);
-        };
-
-        Assignments.prototype.customerAction = function customerAction() {
-            this.message = {
-                customerMessage: ""
-            };
-
-            this.customerMessage = true;
-            (0, _jquery2.default)("#customerMessage").focus();
-        };
-
-        Assignments.prototype.sendCustomerAction = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var msg, productName, serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                msg = (0, _jquery2.default)("#customerMessage").val();
-
-                                if (!msg) {
-                                    _context8.next = 8;
-                                    break;
-                                }
-
-                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
-
-                                this.message = {
-                                    id: this.requests.selectedRequestDetail._id,
-                                    customerMessage: msg,
-                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
-                                    toEmail: this.people.selectedPerson.email,
-                                    product: productName,
-                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
-                                    audit: {
-                                        property: 'Send Message',
-                                        eventDate: new Date(),
-                                        oldValue: this.customerMessageText,
-                                        personId: this.app.user._id
-                                    }
-                                };
-                                _context8.next = 6;
-                                return this.requests.sendCustomerMessage(this.message);
-
-                            case 6:
-                                serverResponse = _context8.sent;
-
-                                if (!serverResponse.status) {
-                                    this.utils.showNotification("The message was sent", "", "", "", "", 5);
-                                    this._cleanUp();
-                                }
-
-                            case 8:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function sendCustomerAction() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return sendCustomerAction;
-        }();
-
-        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.openSettings = function openSettings() {
-            this.showSettings = !this.showSettings;
-            if (this.showSettings) {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-            }
-        };
-
-        Assignments.prototype.saveSettings = function saveSettings() {
-            localStorage.setItem('idBuffer', this.idBuffer);
-            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
-            this.showSettings = false;
-        };
-
-        Assignments.prototype.restoreDefaults = function restoreDefaults() {
-            this.idBuffer = this.config.REGULAR_ID_BUFFER;
-            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
-        };
-
-        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
-            this.facultyDetails = !this.facultyDetails;
-        };
-
-        Assignments.prototype._setUpValidation = function _setUpValidation() {
-            this.validation.addRule(1, "errorRange", { "rule": "required", "message": "Invalid ID range",
-                "valFunction": function valFunction(context) {
-                    var valid = true;
-                    for (var i = 0; i < context.assignmentDetails.length; i++) {
-                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
-                    }
-                    return valid;
-                } });
-        };
-
-        Assignments.prototype.openAudit = function openAudit() {
-            this.showAudit = !this.showAudit;
-        };
-
-        return Assignments;
-    }()) || _class);
 });
 define('modules/user/requests/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/data/appState'], function (exports, _aureliaFramework, _aureliaRouter, _appState) {
     'use strict';
@@ -27385,7 +27385,7 @@ define('text!modules/admin/customers/components/institutionsTable.html', ['modul
 define('text!modules/admin/customers/components/instPeople.html', ['module'], function(module) { module.exports = "<template>\r\n            <div class=\"col-lg-10 col-offset-lg-1\" style=\"padding:15px;\">\r\n\r\n            <table id=\"personTable2\" class=\"table table-striped table-hover\">\r\n                <thead>\r\n                    <tr>\r\n                        <th style=\"width:20rem;\">Name</th>\r\n                        <th style=\"width:15rem;\">Phone</th>\r\n                        <th style=\"width:20rem;\">eMail</th>\r\n                        <th>Role</th>\r\n                        <th>Status</th>\r\n                    </tr>\r\n                </thead>\r\n                <tbody>\r\n                    <tr repeat.for=\"person of people.peopleInstArray\" class=\"blackText\">\r\n                        <td data-title=\"name\">${person.firstName} ${person.lastName}</td>\r\n                        <td data-tile=\"phone\">${person.phone}</td>\r\n                        <td data-title=\"email\">${person.email}</td>\r\n                        <td data-title=\"role\">${person.roles}</td>\r\n                        <td data-title=\"status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/is4ua.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <!-- Row 4 -->\r\n            <div class=\"col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-lg-12\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Password.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <div class=\"panel panel-default col-md-12\">\r\n            <div class=\"panel-body\">\r\n                <div class=\"bottomMargin\">\r\n                        <div class=\"bottomMargin list-group-item\">\r\n                            <span click.delegate=\"savePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                            <span click.delegate=\"cancelEditPassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        </div>  \r\n                    </div>\r\n                <div class=\"form-group\">\r\n                    <input id=\"newPassword\" type=\"text\" placeholder=\"New Password\"\r\n                        class=\"form-control topMargin\"\r\n                        value.bind=\"newPassword\" />\r\n                </div>\r\n                <!--\r\n                <div class=\"form-group\">\r\n                    <input id=\"password_repeat\" type=\"text\" placeholder=\"Repeat Password\"\r\n                        class=\"form-control topMargin\"\r\n                        value.bind=\"newPassword_repeat\" />\r\n                </div>\r\n                -->\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        \r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                    <!-- Row 1 -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <!-- Row 2 -->\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\r\n                                <div class=\"col-sm-8\">\r\n\r\n                                  <phone-input value.two-way=\"people.selectedPerson.phone\" ></phone-input>\r\n<!--\r\n                                <input value.bind=\"people.selectedPerson.phone\" id=\"editPhone\" class=\"form-control \" placeholder=\"Phone\" type=\"text\" />\r\n-->\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                  <phone-input value.two-way=\"people.selectedPerson.mobile\" ></phone-input>\r\n                                  <!--\r\n                                <input value.bind=\"people.selectedPerson.mobile\" id=\"editMobile\" class=\"form-control \" placeholder=\"Mobile\" type=\"text\" />\r\n                              -->\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <!-- Row 3 -->\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control \" placeholder=\"Gender\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option value=\"F\">Female</option>\r\n                                        <option value=\"M\">Male</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a  class=\"${ $first ? 'active' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n    <div>\r\n</template>\r\n"; });
+define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        \r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                   \r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                     <!-- Row 1 -->\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <!-- Row 2 -->\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <phone-input value.two-way=\"people.selectedPerson.phone\" ></phone-input>\r\n                                    <input value.bind=\"people.selectedPerson.phone\" id=\"editPhone\" class=\"form-control \" placeholder=\"Phone\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <phone-input value.two-way=\"people.selectedPerson.mobile\" ></phone-input>\r\n                                    <input value.bind=\"people.selectedPerson.mobile\" id=\"editMobile\" class=\"form-control \" placeholder=\"Mobile\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <!-- Row 3 -->\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control \" placeholder=\"Gender\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option value=\"F\">Female</option>\r\n                                        <option value=\"M\">Male</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-sm-12 col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a  class=\"${ $first ? 'active' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n    <div>\r\n</template>\r\n"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <table id=\"peopleTable\" class=\"table table-striped table-hover\">\r\n                    <thead>\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                            <th style=\"width:30rem;\">Institution</th>\r\n                            <th style=\"width:15rem;\">Phone</th>\r\n                            <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                            <th>Role</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr>\r\n                            <th>\r\n                                <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\r\n                            </th>\r\n                            <th>\r\n                                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                            </th>\r\n                            <th></th>\r\n                            <th></th>\r\n                            <th>\r\n                                <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\" compare=\"array\">\r\n                            </th>\r\n                            <th>\r\n                                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                            </th>\r\n                        </tr>\r\n                        <tr  click.trigger=\"edit($index, $event)\" repeat.for=\"person of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\r\n                            <td data-title=\"name\">${person.firstName} ${person.lastName}</td>\r\n                            <td data-title=\"insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                            <td data-tile=\"phone\">${person.phone}</td>\r\n                            <td data-title=\"email\">${person.email}</td>\r\n                            <td data-title=\"role\">${person.roles}</td>\r\n                            <td data-title=\"status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                 </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <div class=\"col-sm-12 col-lg-12\">\r\n            <label class=\"control-label col-sm-1\">Roles</label>\r\n        </div>\r\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\r\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\r\n                <input type=\"checkbox\" \r\n                    value.one-way=\"role.role\" id=\"editRoles\"\r\n                    checked.bind=\"people.selectedPerson.roles\">${role.label}\r\n            </label>\r\n        </div>\r\n    </div> <!-- Right side of form -->\r\n</template"; });
 define('text!modules/admin/site/components/downloadForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <form class=\"form-horizontal topMargin\">\r\n\r\n            <!-- Row 1 -->\r\n              <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-6\">\r\n                    <div class=\"form-group\">\r\n                        <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.active\" type=\"checkbox\"> Active\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.helpTicketRelevant\" type=\"checkbox\"> Help Ticket Relevant\r\n                                </label>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"downloads.selectedDownload.type\" class=\"form-control\" id=\"editType\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.code}\">${category.description}</options>\r\n                            </select>\r\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\r\n                            <a class=\"btn btn-link\" disable.bind=\"this.downloads.selectedDownload.type == 0\"  click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <!-- Edit Category -->\r\n            <div class=\"row topMargin col-sm-8 col-sm-offset-2\" show.bind=\"editCat\">\r\n                <div class=\"panel panel-default\">\r\n                    <div class=\"panel-body\">\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input disabled id=\"editCode\" value.bind=\"downloads.selectedCat.code\" type=\"text\" placeholder=\"Code\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input id=\"editCatDescription\" value.bind=\"downloads.selectedCat.description\" type=\"text\" placeholder=\"Description\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\r\n                        <span click.delegate=\"saveCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"cancelEditCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                  <div class=\"form-group\">\r\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"downloads.selectedDownload.file.fileName != undefined\">\r\n                          <a href.bind=\"selectedURL\" innerhtml.bind='downloads.selectedDownload.file.fileName' target='_blank'></a>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                  <div class=\"panel panel-default\">\r\n                      <div class=\"input-group\">\r\n                          <span class=\"input-group-btn\">\r\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                              </span>\r\n                          </span>\r\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n\r\n                </div>\r\n            </div>\r\n        </form>\r\n    </div>\r\n</template>\r\n"; });

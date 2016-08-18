@@ -10,11 +10,12 @@
 
         <div class="topMargin">
             <form class="form-horizontal topMargin">
-                    <!-- Row 1 -->
+                   
                 <div class="row">
                     <div class="col-lg-1">
                         <div style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
                     </div>
+                     <!-- Row 1 -->
                     <div class="col-lg-11">
                         <div class="col-sm-12 col-lg-4">
                             <div class="form-group">
@@ -57,11 +58,8 @@
                             <div class="form-group">
                                 <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone</label>
                                 <div class="col-sm-8">
-
-                                  <phone-input value.two-way="people.selectedPerson.phone" ></phone-input>
-<!--
-                                <input value.bind="people.selectedPerson.phone" id="editPhone" class="form-control " placeholder="Phone" type="text" />
--->
+                                    <phone-input value.two-way="people.selectedPerson.phone" ></phone-input>
+                                    <input value.bind="people.selectedPerson.phone" id="editPhone" class="form-control " placeholder="Phone" type="text" />
                                 </div>
                             </div>
                         </div>
@@ -69,10 +67,8 @@
                             <div class="form-group">
                                 <label for="editMobile" class="col-sm-3 control-label hideOnPhone">Mobile</label>
                                 <div class="col-sm-8">
-                                  <phone-input value.two-way="people.selectedPerson.mobile" ></phone-input>
-                                  <!--
-                                <input value.bind="people.selectedPerson.mobile" id="editMobile" class="form-control " placeholder="Mobile" type="text" />
-                              -->
+                                    <phone-input value.two-way="people.selectedPerson.mobile" ></phone-input>
+                                    <input value.bind="people.selectedPerson.mobile" id="editMobile" class="form-control " placeholder="Mobile" type="text" />
                                 </div>
                             </div>
                         </div>
