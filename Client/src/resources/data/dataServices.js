@@ -5,6 +5,7 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(HttpClient, Utils, AppConfig)
 export class DataServices {
+    isRequesting = false;
 
     constructor(http, utils, config) {
         this.http = http;
@@ -12,49 +13,62 @@ export class DataServices {
         this.config = config;
     }
 
+
     get(url) {
+        this.isRequesting = true;
         return this.http.fetch(url)
             .then(response => {
                 if (response.statusText != 'OK') {
+                    this.isRequesting = false;
                     return response;
                 } else {
+                    this.isRequesting = false;
                     return response.json();
                 }
             })
             .catch(e => {
+                this.isRequesting = false;
                 console.log(e);
                 this.postResult = e.status + '-' + e.statusText;
             });
     }
 
     saveObject(content, url, method) {
+        this.isRequesting = true;
         return this.http.fetch(url, {
             method: method,
             body: JSON.stringify(content)
         })
             .then(response => {
                 if (response.statusText != 'OK') {
+                    this.isRequesting = false;
                     return response;
                 } else {
+                    this.isRequesting = false;
                     return response.json();
                 }
             }).catch(e => {
+                this.isRequesting = false;
                 console.log(e);
                 this.postResult = e.status + '-' + e.statusText;
             });
     }
 
     deleteObject(url) {
+        this.isRequesting = true;
         return this.http.fetch(url, {
             method: 'delete'
         })
             .then(response => {
                 if (response.statusText != 'OK') {
+                    this.isRequesting = false;
                     return response;
                 } else {
+                    this.isRequesting = false;
                     return response.json();
                 }
             }).catch(e => {
+                this.isRequesting = false;
                 console.log(e);
                 this.postResult = e.status + '-' + e.statusText;
             });
@@ -62,7 +76,8 @@ export class DataServices {
 
     upLoadFiles(id, container, files, type, content) {
         let formData = new FormData();
-        var req = new XMLHttpRequest()
+        var req = new XMLHttpRequest();
+        this.isRequesting = true;
 
         for (var i = 0; i < files.length; i++) {
             formData.append("file" + i, files[i]);
@@ -74,9 +89,11 @@ export class DataServices {
         req.onreadystatechange = function () {
             if (this.status == 200 && this.readyState == 4) {
                 that.utils.showNotification("Files uploaded successfuly", "", "", "", "", 5);
+                this.isRequesting = false;
                 return { status: 200 };
             } else {
                 if (this.status === 500) {
+                    this.isRequesting = false;
                     that.processError({ status: this.status }, 'uploading the file' + files.length > 1 ? "s" : "");
                 }
             }
@@ -136,7 +153,7 @@ export class DataServices {
     CLIENTS_SERVICE = 'clients';
     // DELETE_CLIENT = 'clients/CLIENTID';
     // DELETE_ALL_CLIENTS = 'clients/system/SYSTEMID';
-    
+
 
     // //Products Services
     PRODUCTS_SERVICE = 'products';

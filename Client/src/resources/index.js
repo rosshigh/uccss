@@ -5,6 +5,7 @@ export function configure(config) {
     './elements/success-dialog',
     './elements/confirm-dialog',
     './elements/edit-client',
+    './elements/add-systems',
     './value-converters/gravatar-url',
     './value-converters/info-filter',
     './value-converters/date-format',

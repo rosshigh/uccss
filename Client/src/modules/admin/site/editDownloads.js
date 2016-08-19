@@ -81,7 +81,7 @@ export class EditProducts {
         
          this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
 
-        this.selectedURL = this.config.FILE_DOWNLOAD_URL + 'uploadedFiles/downloads/' + this.downloads.selectedDownload.file.fileName;
+        this.selectedURL = this.config.FILE_DOWNLOAD_URL + '/downloads/' + this.downloads.selectedDownload.file.fileName;
 
         //Editing a product
         $("#editName").focus();
@@ -107,11 +107,14 @@ export class EditProducts {
             if (!serverResponse.error) {
                  this.updateArray();
                  this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated", "", "", "", "", 5);
-                 if (this.files && this.files.length > 0) this.downloads.uploadFile(this.files);
+                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                 if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
+                 this.spinnerHTML = "";
             }
             this.downloadSelected = false;
             this.selectedFiles = undefined;
             this.files = undefined;
+            this.selectedFile = "";
         }
     }
 
