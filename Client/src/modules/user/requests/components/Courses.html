@@ -26,7 +26,11 @@
         </table>
 
         <div class="row" show.bind="editCourse">
-            <div class="panel panel-default col-md-12">
+            <div class="panel panel-default col-md-10 col-md-offset-1">
+                <div class="bottomMargin list-group-item leftMargin rightMargin topMargin">
+                    <span click.trigger="saveCourse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                    <span click.trigger="cancelEditCourse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                </div>
                 <div class="panel-body">
                     <div class="form-group">
                         <input id="number" value.bind="people.selectedCourse.number" type="text" placeholder="Course Number"
@@ -37,16 +41,15 @@
                             class="form-control"/>
                     </div>
                     <div class="form-group">
-                        <div class="checkbox">
-                            <label class="pull-left">
-                                <input id="activeProduct" checked.bind="people.selectedCourse.active" type="checkbox"> Active
-                            </label>
+                        <label class="col-sm-3 form-control-label hideOnPhone">Status</label>
+                        <div class="col-sm-8">
+                            <div class="checkbox">
+                                <label class="pull-left">
+                                    <input checked.bind="people.selectedCourse.active" id="activeCheckBox" type="checkbox" data-toggle="checkbox"> Active
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="bottomMargin">
-                    <button type="button" class="btn btn-primary" click.trigger="cancelEditCourse()">Cancel</button>
-                    <button click.trigger="saveCourse()" type="button" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>

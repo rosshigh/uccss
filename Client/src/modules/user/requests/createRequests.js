@@ -65,7 +65,7 @@ export class ViewHelpTickets {
   }
 
   async getRequests(){
-    if( this.sessionId  &&  this.courseId){
+    if( this.sessionId != -1 &&  this.courseId != -1  ){
         this.existingRequest = false;
         await this.requests.getPersonClientRequestsArray(true, '?filter=[and]personId|eq|' + this.app.user._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId);
 
@@ -351,8 +351,8 @@ export class ViewHelpTickets {
         return true;
       }
     });
-    this.validation.addRule(5,"number",{"rule":"required","message":"Enter the course number"});
-    this.validation.addRule(5,"name",{"rule":"required","message":"Enter the course name"});
+    this.validation.addRule(5,"number",{"rule":"required","message":"Enter the course number", "value": "people.selectedCourse.number"});
+    this.validation.addRule(5,"name",{"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"});
   }
 
   _buildRequest(){
@@ -429,7 +429,7 @@ export class ViewHelpTickets {
   }
 
   async saveCourse(){
-        if(this.validation.validate(2, this)){
+        if(this.validation.validate(5, this)){
           if(this.people.selectedPerson._id){
               if(this.people.selectedCourse._id)  this.editCourseIndex = this.baseArray.length;
               this.people.selectedCourse.personId = this.people.selectedPerson._id;
