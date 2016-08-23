@@ -105,7 +105,7 @@ export class ViewHelpTickets {
     } else {
       this.showRequest = false;
     }
-    this.changeBeginDate();
+    // this.changeBeginDate();
     
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
@@ -177,12 +177,12 @@ export class ViewHelpTickets {
 
   changeBeginDate(){
     $("#endDate").attr("min", $("#beginDate").val());
-    this.requests.selectedRequest.endDate = moment.max(moment($("#beginDate").val()), moment($("#endDate").val()));
+    this.requests.selectedRequest.endDate = moment.max(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
   }
 
   changeEndDate(){
     $("#beginDate").attr("max", $("#endDate").val());
-    this.requests.selectedRequest.startDate = moment.min(moment($("#beginDate").val()), moment($("#endDate").val()));
+    this.requests.selectedRequest.startDate = moment.min(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
   }
 
 }
