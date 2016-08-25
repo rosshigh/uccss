@@ -1,6 +1,8 @@
 import environment from './environment';
+import 'whatwg-fetch';
 import config from './config/authConfig';
 import regeneratorRuntime from 'regenerator-runtime';
+
 window.regeneratorRuntime = regeneratorRuntime;
 
 //Configure Bluebird Promises.
