@@ -1,4 +1,4 @@
-define('app',['exports', 'aurelia-framework', 'aurelia-fetch-client', 'aurelia-auth', './resources/data/dataServices', './config/routerConfig', './config/appConfig'], function (exports, _aureliaFramework, _aureliaFetchClient, _aureliaAuth, _dataServices, _routerConfig, _appConfig) {
+define('app',['exports', 'aurelia-framework', 'aurelia-fetch-client', 'aurelia-auth', './resources/data/dataServices', './config/routerConfig', './config/appConfig', 'bootstrap/js/bootstrap.min'], function (exports, _aureliaFramework, _aureliaFetchClient, _aureliaAuth, _dataServices, _routerConfig, _appConfig) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {

@@ -5,6 +5,7 @@ import {DataServices} from './resources/data/dataServices';
 
 import AppRouterConfig from './config/routerConfig';
 import {AppConfig} from './config/appConfig';
+import 'bootstrap/js/bootstrap.min';
 
 @inject(HttpClient, AppRouterConfig, AppConfig, FetchConfig, DataServices)
 export class App {
