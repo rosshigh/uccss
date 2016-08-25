@@ -105,3 +105,9 @@ textarea {
   border-left: none;
   padding-top: 6px;
 }
+
+@media screen and (max-width: 480px) {
+ .hideOnPhone {
+    display: none;
+  }
+}
