@@ -1,13 +1,10 @@
 <template>
     <div class='row'>
         <div class='col-lg-12'>
-            <table id="systemsTable" class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <td colspan='5'>
-                            <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
-                        </td>
-                    </tr>
+            <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+             <div id="no-more-tables">
+            <table id="systemsTable" class="table table-striped table-hover cf">
+                <thead class="cf">
                     <tr>
                         <td colspan=5>
                             <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
@@ -18,9 +15,9 @@
                     <tr>
                         <th style="width:100px;">SID <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
                         <th>Description <span click.trigger="dataTable.sortArray('description')"><i class="fa fa-sort"></i></span></th>
-                        <th>Server <span click.trigger="dataTable.sortArray('server')"><i class="fa fa-sort"></i></span></th>
-                        <th>Instance</th>
-                        <th>Status</th>
+                        <th class="hidden-xs hidden-sm">Server <span click.trigger="dataTable.sortArray('server')"><i class="fa fa-sort"></i></span></th>
+                        <th class="hidden-xs hidden-sm">Instance</th>
+                        <th class="hidden-xs hidden-sm">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,11 +28,11 @@
                         <th>
                             <input input.delegate="dataTable.filterList($event)" id="description" type="text" placeholder="Filter description" class="form-control">
                         </th>
-                        <th>
+                        <th class="hidden-xs hidden-sm">
                             <input input.delegate="dataTable.filterList($event)" id="server" type="text" placeholder="Filter server" class="form-control">
                         </th>
-                        <th></th>
-                        <th>
+                        <th class="hidden-xs hidden-sm"></th>
+                        <th class="hidden-xs hidden-sm">
                             <select md-select change.delegate="dataTable.filterList($event)" class="form-control " id="active" compare="boolean">
                                 <option value=""></option>
                                 <option value=true>Active</option>
@@ -46,12 +43,13 @@
                     <tr click.trigger="edit($index, $event)" repeat.for="system of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
                         <td data-title="Session">${system.sid}</td>
                         <td data-title="StartDate">${system.description}</td>
-                        <td data-title="EndDate">${system.server}</td>
-                        <td data-title="RequestsOpen">${system.instance}</td>
-                        <td data-title="createdDate">${system.active | translateStatus}</td>
+                        <td  class="hidden-xs hidden-sm" data-title="EndDate">${system.server}</td>
+                        <td  class="hidden-xs hidden-sm" data-title="RequestsOpen">${system.instance}</td>
+                        <td  class="hidden-xs hidden-sm" data-title="createdDate">${system.active | translateStatus}</td>
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>    
 </template>

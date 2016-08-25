@@ -1,76 +1,74 @@
 <template>
   <div class="col-lg-10 col-lg-offset-1">
-      <div class='row'>
-        <table id="peopleTable" class="table table-striped table-hover">
-            <thead>
-              <tr>
-                  <td colspan='8'>
-                      <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
-                  </td>
-              </tr>
-              <tr>
-                  <td colspan='7'>
-                      <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                      <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
-                  </td>
-              </tr>
-             <tr>
-               <th class="col-xs-1">No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
-               <th class="col-lg-1">Due <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
-               <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
-               <th class="col-lg-1">Type</th>
-               <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
-               <th class="col-sm-1">IDS Requestd</th>
-               <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
-               <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
-             </tr>
-           </thead>
-           <tbody>
-             <tr>
-               <th></th>
-               <th>
-                 <input change.delegate="dataTable.filterList($event)" id="requiredDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
-               </th>
-               <th>
-                 <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
-               </th>
-               <th>
-                  <select change.delegate="dataTable.filterList($event)" class="form-control " id="courseId">
+    <div class='row'>
+      <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+      <div id="no-more-tables">
+        <table class="table table-striped table-hover cf">
+          <thead class="cf">
+            <tr>
+              <td colspan='7'>
+                <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+              </td>
+            </tr>
+            <tr>
+              <th class="col-xs-1">No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1">Due <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1">Type</th>
+              <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
+              <th class="col-sm-1">IDS Requestd</th>
+              <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('sid')"><i class="fa fa-sort"></i></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>
+                <input change.delegate="dataTable.filterList($event)" id="requiredDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              </th>
+              <th>
+                <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              </th>
+              <th>
+                <select change.delegate="dataTable.filterList($event)" class="form-control " id="courseId">
                    <option value=""></option>
                    <option  value="config.SANDBOX_ID">Sandbox</option>
                    <option  value="">Regular</option>
                  </select>
-               </th>
-               <th>
-                 <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestStatus">
+              </th>
+              <th>
+                <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestStatus">
                    <option value=""></option>
                    <option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
                  </select>
-               </th>
-               <th></th>
-               <th>
-                 <select change.delegate="dataTable.filterList($event)" class="form-control " id="productId" type="id" compare="id">
+              </th>
+              <th></th>
+              <th>
+                <select change.delegate="dataTable.filterList($event)" class="form-control " id="productId" type="id" compare="id">
                    <option value=""></option>
                    <option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
                  </select>
-               </th>
-               <th>
-                 <input input.delegate="dataTable.filterList($event)" id="requestId.personId" type="text" placeholder="Filter Name" class="form-control">
-               </th>
-             </tr>
-             <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
-               <td data-title="requestNo">${request.requestNo}</td>
-               <td data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-               <td data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-               <td data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
-               <td data-title="status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
-               <td data-title="ids-requested">${request.requestId | idsRequested}
-               <td data-title="product">${request.productId | productName:products.productsArray}</td>
-               <td data-title="personId">${request.requestId.personId | personName:people.peopleArray}</td>
-             </tr>
-           </tbody>
-         </table>
+              </th>
+              <th>
+                <input input.delegate="dataTable.filterList($event)" id="requestId.personId" type="text" placeholder="Filter Name" class="form-control">
+              </th>
+            </tr>
+            <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+              <td data-title="Request No">${request.requestNo}</td>
+              <td data-title="Required Date">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+              <td data-title="Date Created">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+              <td data-title="Course">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
+              <td data-title="Status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
+              <td data-title="IDs Requested">${request.requestId | idsRequested}
+                <td data-title="Product">${request.productId | productName:products.productsArray}</td>
+                <td data-title="Person">${request.requestId.personId | personName:people.peopleArray}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
   </div>
 </template>

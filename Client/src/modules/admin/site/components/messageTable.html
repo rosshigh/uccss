@@ -2,52 +2,52 @@
     <div class="col-lg-12 col-sm-12" style='padding:15px;'>
         <div class='row'>
             <div class='col-lg-12 bottomMargin'>
-                <table id="messageTable" class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <td colspan='3'>
-                                <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan='3'>
-                                <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                                <span click.delegate="new()"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="width:250px;">Key <span click.trigger="dataTable.sortArray('key')"><i class="fa fa-sort"></i></span></th>
-                            <th style="width:150px;">Category <span click.trigger="dataTable.sortArray('category')"><i class="fa fa-sort"></i></span></th>
-                            <th style="width:150px;">Description <span click.trigger="dataTable.sortArray('description')"><i class="fa fa-sort"></i></span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>
-                                <select change.delegate="dataTable.filterList($event)" class="form-control " id="category" compare="id">
+                <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+                <div id="no-more-tables">
+                    <table class="table table-striped table-hover cf">
+                        <thead class="cf">
+
+                            <tr>
+                                <td colspan='3'>
+                                    <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                                    <span click.delegate="new()"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                    <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:250px;">Key <span click.trigger="dataTable.sortArray('key')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Category <span click.trigger="dataTable.sortArray('category')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Description <span click.trigger="dataTable.sortArray('description')"><i class="fa fa-sort"></i></span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="category" compare="id">
                                     <option value=""></option>
                                     <option value="${type.type}" repeat.for="type of config.MESSAGE_TYPES">${type.description}</optionp>
                                 </select>
-                            </th>
-                            <th>
-                                <input input.delegate="dataTable.filterList($event)" id="key" type="text" placeholder="Key" class="form-control"/>
-                            </th>
-                            <th>
-                                <input input.delegate="dataTable.filterList($event)" id="description" type="text" placeholder="Description" class="form-control"/>
-                            </th>
-                        </tr>
-                        <tr click.trigger="edit($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
-                            <td data-title="key">${item.key}</td>
-                            <td data-title="category" style="width: 75px">
-                                <div>${item.category}</div>
-                            </td>
-                            <td data-title="description" style="width: 75px">
-                                <div>${item.description}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </th>
+                                <th>
+                                    <input input.delegate="dataTable.filterList($event)" id="key" type="text" placeholder="Key" class="form-control" />
+                                </th>
+                                <th>
+                                    <input input.delegate="dataTable.filterList($event)" id="description" type="text" placeholder="Description" class="form-control"
+                                    />
+                                </th>
+                            </tr>
+                            <tr click.trigger="edit($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                                <td data-title="Key">${item.key}</td>
+                                <td data-title="Category" style="width: 75px">
+                                    <div>${item.category}</div>
+                                </td>
+                                <td data-title="Description" style="width: 75px">
+                                    <div>${item.description}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

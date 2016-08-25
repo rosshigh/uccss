@@ -242,8 +242,9 @@ export class CreateHelpTickets{
                 return item.courseId == this.helpTickets.selectedHelpTicket.courseId;
             })
         
-        //Build an array of the request details and assignments for display
-         this.clientRequestsArray = new Array();
+        if(myArray.length > 0){
+            //Build an array of the request details and assignments for display
+            this.clientRequestsArray = new Array();
             myArray[0].requestDetails.forEach((item) => {
                 //Assignments have already been created
                 if(item.assignments.length > 0){
@@ -264,7 +265,7 @@ export class CreateHelpTickets{
                     })
                 } 
             })
-
+        }
     }
 
     editACourse(index, el){
