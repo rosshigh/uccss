@@ -16,6 +16,7 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
 import {AppState} from '../../../resources/data/appState';
+
 import moment from 'moment';
 import $ from 'jquery';
 

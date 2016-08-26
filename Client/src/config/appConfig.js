@@ -1,6 +1,6 @@
 export class AppConfig {
     //URIs
-    BASE_URL = "/api/";
+    BASE_URL = "/api/"; 
     FILE_URL = "/api/upload";
     FILE_DOWNLOAD_URL = "/uploadedFiles";
     RESOURCE_URL = "/img";
@@ -199,5 +199,8 @@ export class AppConfig {
 
 
     INSTITUTIONS_ACTIVE = '01';
+
+    
+    HOST = location.origin;
     
 }

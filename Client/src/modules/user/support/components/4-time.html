@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <div class="hover_img" repeat.for="file of event.files">
-        <a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
+        <a href="${config.HOST}/${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
            target="_blank"
            innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'"></a>
       </div>

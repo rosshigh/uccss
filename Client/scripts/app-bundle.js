@@ -549,6 +549,7 @@ define('config/appConfig',["exports"], function (exports) {
         this.SANDBOX_CLIENT_CODE = 5;
         this.CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false }, { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false }, { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true }, { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true }, { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];
         this.INSTITUTIONS_ACTIVE = '01';
+        this.HOST = location.origin;
     };
 });
 define('config/authConfig',['exports'], function (exports) {
@@ -3719,6 +3720,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-f
             this.PERSON_COURSES_SERVICE = 'courses/person/PERSONID';
             this.CLIENT_REQUESTS_SERVICES = 'clientRequests';
             this.CLIENT_REQUEST_DETAILS = 'clientRequestsDetails';
+            this.CONFIG_SERVICE = 'config';
 
             this.http = http;
             this.utils = utils;
@@ -9535,7 +9537,7 @@ define('resources/value-converters/file-type',["exports", "aurelia-framework", "
         case "GIF":
         case "PNG":
         case "JPG":
-          html = file + "<span><img src='" + this.config.FILE_DOWNLOAD_URL + type + "/" + number + "/" + file + "' /></span>";
+          html = file + "<span><img src='" + this.config.HOST + this.config.FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
           break;
         default:
           html = file;
@@ -27548,6 +27550,104 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
     return Promise.resolve(instruction);
   }
 });
+define('resources/data/config',['exports', 'aurelia-framework', './dataServices'], function (exports, _aureliaFramework, _dataServices) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Config = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            return step("next", value);
+                        }, function (err) {
+                            return step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Config = exports.Config = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices), _dec(_class = function () {
+        function Config(data) {
+            _classCallCheck(this, Config);
+
+            this.configArray = undefined;
+
+            this.data = data;
+        }
+
+        Config.prototype.activate = function activate() {
+            this.getData();
+        };
+
+        Config.prototype.getData = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (this.configArray) {
+                                    _context.next = 5;
+                                    break;
+                                }
+
+                                _context.next = 3;
+                                return this.data.get(this.data.CONFIG_SERVICE);
+
+                            case 3:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.status) {
+                                    this.configArray = serverResponse;
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function getData() {
+                return _ref.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        return Config;
+    }()) || _class);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"resources/css/bootstrap.min.css\"></require>\r\n  <require from=\"./styles.css\"></require>\r\n  <require from=\"humane-js/themes/flatty.css\"></require>\r\n\r\n  <nav-bar></nav-bar>\r\n\r\n  <loading-indicator loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\r\n\r\n  <div class=\"page-host\">\r\n    <router-view></router-view>\r\n  </div>\r\n   \r\n</template>"; });
 define('text!styles.css', ['module'], function(module) { module.exports = ".topMargin {\r\n    margin-top: 25px;\r\n}\r\n\r\n.bottomMargin {\r\n    margin-bottom: 25px;\r\n}\r\n\r\n.leftMargin {\r\n    margin-left: 25px;\r\n}\r\n\r\n.rightMargin {\r\n  margin-right: 25px;\r\n}\r\n\r\n.smallLeftMargin {\r\n    margin-left: 10px;\r\n}\r\n\r\n.bigTopMargin {\r\n    margin-top: 50px;\r\n}\r\n\r\n.smallMarginRight {\r\n    margin-right: 10px;\r\n}\r\n\r\n.page-host {\r\n    margin-top: 5rem;\r\n}\r\n\r\ntextarea {\r\n  overflow-y:scroll;\r\n}\r\n\r\n.overFlow {\r\n    overflow-y:scroll;\r\n}\r\n\r\n.underline {\r\n    text-decoration: underline;\r\n}\r\n\r\n.rowSelected{\r\n  background-color: lightgrey;\r\n}\r\n\r\n.newsTitle {\r\n  font-size: large;\r\n  font-weight: bold;\r\n  border-bottom: thin solid;\r\n}\r\n\r\n.newsUrl{\r\n  color: blue;\r\n  float: right;\r\n}\r\n\r\n.centerText{\r\n  text-align: center;\r\n}\r\n\r\n.btn-file {\r\n    position: relative;\r\n    overflow: hidden;\r\n}\r\n.btn-file input[type=file] {\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    min-width: 100%;\r\n    min-height: 100%;\r\n    font-size: 100px;\r\n    text-align: right;\r\n    filter: alpha(opacity=0);\r\n    opacity: 0;\r\n    outline: none;\r\n    background: white;\r\n    cursor: inherit;\r\n    display: block;\r\n}\r\n\r\n.smart-timeline{position:relative}\r\n.smart-timeline-list{list-style:none;margin:0;padding:0}\r\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\r\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\r\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\r\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\r\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\r\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\r\n.smart-timeline-time{float:left;width:70px;text-align:right}\r\n.smart-timeline-time>small{font-style:italic}\r\n.smart-timeline-content{margin-left:123px}\r\n\r\n.hover_img a { position:relative; }\r\n.hover_img a span { position:absolute; display:none; z-index:99; }\r\n.hover_img a:hover span { display:block; }\r\n\r\n.borderTop {\r\n  border-style: solid;\r\n  border-top: thin double #ff0000;\r\n  border-bottom: none;\r\n  border-right: none;\r\n  border-left: none;\r\n  padding-top: 6px;\r\n}\r\n\r\n\r\n@media only screen and (max-width: 800px) {\r\n    \r\n    /* Force table to not be like tables anymore */\r\n\t#no-more-tables table, \r\n\t#no-more-tables thead, \r\n\t#no-more-tables tbody, \r\n\t#no-more-tables th, \r\n\t#no-more-tables td, \r\n\t#no-more-tables tr { \r\n\t\tdisplay: block; \r\n\t}\r\n \r\n\t/* Hide table headers (but not display: none;, for accessibility) */\r\n\t#no-more-tables thead tr { \r\n\t\tposition: absolute;\r\n\t\ttop: -9999px;\r\n\t\tleft: -9999px;\r\n\t}\r\n \r\n\t#no-more-tables tr { border: 1px solid #ccc; }\r\n \r\n\t#no-more-tables td { \r\n\t\t/* Behave  like a \"row\" */\r\n\t\tborder: none;\r\n\t\tborder-bottom: 1px solid #eee; \r\n\t\tposition: relative;\r\n\t\tpadding-left: 50%; \r\n\t\twhite-space: normal;\r\n\t\ttext-align:left;\r\n\t}\r\n \r\n\t#no-more-tables td:before { \r\n\t\t/* Now like a table header */\r\n\t\tposition: absolute;\r\n\t\t/* Top/left values mimic padding */\r\n\t\ttop: 6px;\r\n\t\tleft: 6px;\r\n\t\twidth: 45%; \r\n\t\tpadding-right: 10px; \r\n\t\twhite-space: nowrap;\r\n\t\ttext-align:left;\r\n\t\tfont-weight: bold;\r\n\t}\r\n \r\n\t/*\r\n\tLabel the data\r\n\t*/\r\n\t#no-more-tables td:before { content: attr(data-title); }"; });
 define('text!contact-detail.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"panel panel-primary\">\r\n    <div class=\"panel-heading\">\r\n      <h3 class=\"panel-title\">Profile</h3>\r\n    </div>\r\n    <div class=\"panel-body\">\r\n      <form role=\"form\" class=\"form-horizontal\">\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">First Name</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"first name\" class=\"form-control\" value.bind=\"contact.firstName\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Last Name</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"last name\" class=\"form-control\" value.bind=\"contact.lastName\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Email</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"email\" class=\"form-control\" value.bind=\"contact.email\">\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"form-group\">\r\n          <label class=\"col-sm-2 control-label\">Phone Number</label>\r\n          <div class=\"col-sm-10\">\r\n            <input type=\"text\" placeholder=\"phone number\" class=\"form-control\" value.bind=\"contact.phoneNumber\">\r\n          </div>\r\n        </div>\r\n      </form>\r\n    </div>\r\n  </div>\r\n\r\n  <div class=\"button-bar\">\r\n    <button class=\"btn btn-success\" click.delegate=\"save()\" disabled.bind=\"!canSave\">Save</button>\r\n  </div>\r\n</template>"; });
@@ -27679,7 +27779,7 @@ define('text!modules/user/support/components/-time.html', ['module'], function(m
 define('text!modules/user/support/components/1-time.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\r\n\r\n    </div>\r\n    <div class=\"smart-timeline-time\">\r\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n    </div>\r\n    <div class=\"smart-timeline-content borderTop leftJustify\">\r\n    <div class=\"form-group\">\r\n        <p>${event.personId | personName:people.peopleArray}</p>\r\n        <label>Curriculum Title: ${event.content.curriculumTitle}</label>\r\n        <label class=\"col-sm-offset-1\">Exercise Module: ${event.content.exerciseModule}</label>\r\n        <label class=\"col-sm-offset-1\">Page: ${event.content.pageNumber}</label>\r\n        <label class=\"col-sm-offset-1\">User IDs: ${event.content.UserIDsaffected}</label>\r\n        <div class=\"form-group\">\r\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\r\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\r\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\r\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\r\n        </div>\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n           target=\"_blank\"\r\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\r\n      </div>\r\n    </div>\r\n\r\n    </div>\r\n</template>"; });
 define('text!modules/user/support/components/2-time.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\r\n\r\n  </div>\r\n  <div class=\"smart-timeline-time\">\r\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n  </div>\r\n  <div class=\"smart-timeline-content borderTop leftJustify\">\r\n    <div class=\"form-group\">\r\n      <p>${event.personId | personName:people.peopleArray}</p>\r\n      <h4>User Ids: ${event.content.resetPasswordUserIDs}</h4>\r\n      <div class=\"form-group\">\r\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\r\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\r\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\r\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\r\n      </div>\r\n      <div class=\"form-group\">\r\n        <div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n          <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n            target=\"_blank\"\r\n            innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n\r\n  </div>\r\n\r\n</template>\r\n"; });
 define('text!modules/user/support/components/3-time.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\r\n\r\n  </div>\r\n  <div class=\"smart-timeline-time\">\r\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n  </div>\r\n  <div class=\"smart-timeline-content borderTop leftJustify\">\r\n    <div class=\"form-group\">\r\n      <p>${event.personId | personName:people.peopleArray}</p>\r\n      <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>\r\n      <div class=\"row\">\r\n        <div class=\"col-lg-4\" show.bind=\"event.content.osWindows || event.content.osMac\">\r\n          <h4>Operating System</h4>\r\n          <label show.bind=\"event.content.osWindows\">Windows versions: ${event.content.windowsVersion}</label>\r\n          <label show.bind=\"event.content.osWindows32bit\">32-bit</label>\r\n          <label show.bind=\"event.content.osWindows64bit\">64-bit</label>\r\n          <label show.bind=\"event.content.osMac\">Mac versions: ${event.content.macVersion}</label>\r\n        </div>\r\n        <div class=\"col-lg-4\" show.bind=\"event.content.officeInvolved\">\r\n          <h4>Microsoft Office</h4>\r\n          <label show.bind=\"event.content.officeVersion\">Office versions: ${event.content.officeVersion}</label>\r\n        </div>\r\n        <div class=\"col-lg-4\" show.bind=\"event.content.wiredNetwork || event.content.wirelessNetwork || event.content.campusNetwork || event.content.personalNetwork\">\r\n          <h4>Network</h4>\r\n          <label show.bind=\"event.content.wiredNetwork\">Wired</label>\r\n          <label show.bind=\"event.content.wirelessNetwork\">Wireless</label>\r\n          <label show.bind=\"event.content.campusNetwork\">Campus</label>\r\n          <label show.bind=\"event.content.personalNetwork\">Personal/Private Network</label>\r\n        </div>\r\n      </div>\r\n      <div class=\"row\">\r\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\r\n      </div>\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n           target=\"_blank\"\r\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\r\n      </div>\r\n    </div>\r\n   \r\n  </div>\r\n</template>"; });
-define('text!modules/user/support/components/4-time.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\r\n\r\n  </div>\r\n  <div class=\"smart-timeline-time\">\r\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n  </div>\r\n  <div class=\"smart-timeline-content borderTop leftJustify\">\r\n    <div class=\"form-group\">\r\n      <p>${event.personId | personName:people.peopleArray}</p>\r\n\r\n      <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n           target=\"_blank\"\r\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\r\n      </div>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/user/support/components/4-time.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\r\n\r\n  </div>\r\n  <div class=\"smart-timeline-time\">\r\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\r\n  </div>\r\n  <div class=\"smart-timeline-content borderTop leftJustify\">\r\n    <div class=\"form-group\">\r\n      <p>${event.personId | personName:people.peopleArray}</p>\r\n\r\n      <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\r\n        <a href=\"${config.HOST}/${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\r\n           target=\"_blank\"\r\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\r\n      </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/user/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 topMargin\">\r\n        <!-- Help Panel -->\r\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \r\n            show.bind=\"helpTicket.show\"     \r\n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\r\n            \r\n        <!-- Additional Information Panel -->\r\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\r\n            <div class=\"form-group\">\r\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\r\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\">\r\n                <div class=\"input-group\">\r\n                    <span class=\"input-group-btn\">\r\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                        </span>\r\n                    </span>\r\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/user/support/components/Courses.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"topMargin\">\r\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n                <tr>\r\n                    <td colspan='6'>\r\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"editACourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\r\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                    </td>\r\n                </tr>\r\n                <tr>\r\n                    <th style=\"width:20rem;\">Number </th>\r\n                    <th style=\"width:30rem;\">Name</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr id=\"sandBoxRow\" click.delegate=\"selectCourse('a1a1a1a1a1a1a1a1a1a1a1a1')\">\r\n                    <td>${config.SANDBOX_NAME}</td>\r\n                    <td>${config.SANDBOX_NAME}</td>\r\n                </tr>\r\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\r\n                    <td data-title=\"number\">${course.number} </td>\r\n                    <td data-title=\"name\">${course.name}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n\r\n        <div class=\"row\" show.bind=\"courseSelected\">\r\n            <div class=\"panel panel-default col-md-12\">\r\n                <div class=\"panel-body\">\r\n                    <div class=\"form-group\">\r\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\r\n                            class=\"form-control\"/>\r\n                    </div>\r\n                    <div class=\"form-group\">\r\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\r\n                            class=\"form-control\"/>\r\n                    </div>\r\n                    <div class=\"row\">\r\n                        <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\r\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        </div> \r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/user/support/components/help-ticket-1.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\" col-md-12\" id=\"curriculumHelp\">\r\n    <div class=\"form-group\">\r\n      <!--        <label for=\"curriculumTitle\">Enter the curriculum title</label> -->\r\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.curriculumTitle\" class=\"form-control \"\r\n             id=\"curriculumTitle\" placeholder=\"Curriculum Title\">\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <!--         <label for=\"ExerciseModule\">Enter the specfic module</label> -->\r\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.ExerciseModule\" class=\"form-control \"\r\n             id=\"ExerciseModule\" placeholder=\"Exercise/Module\">\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <!--        <label for=\"PageNumber\">Enter the page number</label> -->\r\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.PageNumber\" class=\"form-control \"\r\n             id=\"PageNumber\" placeholder=\"Page Number\">\r\n    </div>\r\n    <div class=\"form-group\">\r\n      <!--        <label for=\"UserIDsaffected\">Enter the user IDs affected</label> -->\r\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.UserIDsaffected\" class=\"form-control \"\r\n             id=\"UserIDsaffected\" placeholder=\"User IDs affected\">\r\n    </div>\r\n  </div>\r\n</template>"; });

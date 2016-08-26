@@ -189,4 +189,6 @@ export class DataServices {
     // CLIENT_REQUESTS_PERSON_SESSION ='clientRequests/person/PERSONID/session/SESSIONID';
     // CLIENT_REQUESTS_SEND_MESSAGE = 'clientRequests/customerAction';
 
+    CONFIG_SERVICE = 'config';
+
 }
