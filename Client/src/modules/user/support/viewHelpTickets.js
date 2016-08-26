@@ -121,7 +121,7 @@ export class ViewHelpTickets {
 
   _createResponse(){
     this.helpTickets.selectedHelpTicketContent.personId = this.app.user._id;
-    this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_RESPONSE_TYPE;
+    this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_OTHER_TYPE;
   }
 
   async saveResponse(){
