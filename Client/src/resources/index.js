@@ -31,6 +31,8 @@ export function configure(config) {
     './value-converters/request-number',
     './value-converters/overlap',
     './value-converters/stat-value',
-    './value-converters/sort-stat'
+    './value-converters/sort-stat',
+    './value-converters/utc-format',
+     './value-converters/check-box'
     ]);
 }

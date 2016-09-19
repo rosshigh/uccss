@@ -8,22 +8,25 @@ import {is4ua} from '../../../resources/data/is4ua';
 import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
 import Validation from '../../../resources/utils/validation';
 import {DialogService} from 'aurelia-dialog';
+import {DocumentsServices} from '../../../resources/data/documents';
 import $ from 'jquery';
 
-@inject(DataTable, Products, Utils, Systems, is4ua, DialogService, Validation, AppConfig)
+@inject(DataTable, Products, Utils, Systems, is4ua, DialogService, Validation, AppConfig, DocumentsServices)
 export class EditProducts {
     productSelected = false;
     filesSelected = "";
     interfaceUpdate = false;
+    showDocumentForm = false;
+    showDocuments = false;
     navControl = "productNavButtons";
     selectedFiles;
     removedFiles = new Array();
     spinnerHTML = "";
 
-    tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}];
+    tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
     tabPath = './';
 
-    constructor(datatable, products, utils, systems, is4ua, dialog, validation, config) {
+    constructor(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
         this.utils = utils;
@@ -32,6 +35,7 @@ export class EditProducts {
         this.is4ua = is4ua;
         this.dialog = dialog;
         this.config = config;
+        this.documents = documents;
         this.validation = validation;
         this._setupValidation();
     }
@@ -48,9 +52,11 @@ export class EditProducts {
       let responses = await Promise.all([
         this.products.getProductsArray(true, '?order=name'),
         this.systems.getSystemsArray(true, '?order=sid'),
-        this.is4ua.loadIs4ua()
+        this.is4ua.loadIs4ua(),
+        this.documents.getDocumentsCategoriesArray()
       ]);
 
+        this.filteredDocumentArray = this.documents.docCatsArray;
         this.updateArray();
         this.dataTable.createPageButtons(1);
     }
@@ -217,6 +223,48 @@ export class EditProducts {
             this.productSelected = false;
         }
 
+    }
+
+    addDocument(index){
+        if(!this.products.selectedProduct.documents) this.products.selectedProduct.documents = new Array();
+        for(var i = 0; i < this.products.selectedProduct.documents.length; i++){
+            if(this.products.selectedProduct.documents[i].fileName == this.documents.selectedDocument.files[index].fileName){
+                return;
+            }
+        }
+        var newDoc = {
+            categoryCode: this.documents.selectedDocument.categoryCode,
+            fileName: this.documents.selectedDocument.files[index].fileName,
+            default: true
+        }
+        this.products.selectedProduct.documents.push(newDoc);
+    }
+
+    chooseDocument(index, event){
+        this.documents.selectDocument(index);
+
+        //Reset the selected row
+        if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        this.selectedRow = $(event.target).closest('tr');
+        this.selectedRow.children().addClass('info')
+        this.showDocumentForm = true;
+    }
+
+    toggleDefault(index){
+        this.products.selectedProduct.documents[index].default = ! this.products.selectedProduct.documents[index].default;
+    }
+
+    removeDocument(index){
+        this.products.selectedProduct.documents.splice(index, 1);
+    }
+
+    async typeChanged(index){
+      if(index >= 0){
+        this.categoryIndex = index;
+        this.documents.selectCategory(index);
+        await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+        this.showDocuments = true;
+      }
     }
 
     _setupValidation(){

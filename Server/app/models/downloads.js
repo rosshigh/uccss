@@ -9,10 +9,6 @@ var CategorySchema = new Schema({
 module.exports = Mongoose.model('AppCategory', CategorySchema);
 
 var DownloadSchema = new Schema({
-
-});
-
-var DownloadSchema = new Schema({
   name: { type: String, require: true },
   description: { type: String },
   type: { type: String },

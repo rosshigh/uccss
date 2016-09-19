@@ -37,12 +37,12 @@ export class EditPeople {
         await this.getData();
     }
 
-    async getData (){
+    async getData (){ 
       let responses = await Promise.all([
-        this.people.getPeopleArray(true, '?order=lastName'),
+        this.people.getPeopleArray(true, '?filter=institutionId|eq|' + this.app.user.institutionId + '&order=lastName'),
         this.is4ua.loadIs4ua(),
       ]);
-        this.people.getInstitutionPeople(this.app.user.institutionId);
+        // this.people.getInstitutionPeople(this.app.user.institutionId);
 
         this. updateArray();
 

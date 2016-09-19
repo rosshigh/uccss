@@ -6,6 +6,7 @@ var express = require('express'),
   ClientRequestDetail = mongoose.model('ClientRequestDetail'),
   Assignment = mongoose.model('Assignment'),
   Course = mongoose.model('Course'),
+  Person = mongoose.model('Person'),
   Promise = require('bluebird');
 
 module.exports = function (app) {
@@ -131,7 +132,30 @@ module.exports = function (app) {
         clientRequest.save(function (err, result) {
           if (err) {
             return next(err);
-          } else {
+          } else {          
+            if(req.query.email == 1){            
+              var id = result._id;
+              var query = Model.findOne({_id: id}).populate('requestDetails').exec(function(err, result){
+                if(err){
+                  return next(err);
+                } else {
+                    Person.findById(result.personId, function(err, person){
+                    if(err){
+                      return next(err);
+                    } else {             
+                      var mailObj = {
+                        email: person.email,
+                        subject: 'Client Request Created',
+                        template: 'client-request-created',
+                        context: result
+                      }
+                      sendMail(mailObj);
+                    }
+                  })
+                }
+              })
+              
+            }
             res.status(200).json(result);
           }
         });

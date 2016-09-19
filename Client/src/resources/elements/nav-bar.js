@@ -1,5 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
+import {BindingEngine} from 'aurelia-framework'; 
 
 import {AuthService} from 'aurelia-auth';
 
@@ -7,18 +8,50 @@ import {People} from '../../resources/data/people';
 import {AppState} from '../../resources/data/appState';
 import {Utils} from '../../resources/utils/utils';
 import {AppConfig} from "../../config/appConfig";
+// import jwtLib from 'jsonwebtoken';
 
 
-@inject(Router, AuthService, People, AppState, Utils, AppConfig)
+@inject(Router, AuthService, People, AppState, Utils, AppConfig, BindingEngine)
 export class NavBar {
 
-    constructor(router, auth, people, app, utils, config) {
+    _isAuthenticated = false;
+    // @bindable router = null;
+    subscription = {};
+    // constructor(auth, bindingEngine) {
+    //     this.auth = auth;
+    //     this.bindingEngine = bindingEngine;
+    //     this._isAuthenticated = this.auth.isAuthenticated();
+    //     this.subscription = bindingEngine.propertyObserver(this, 'isAuthenticated')
+    //         .subscribe((newValue, oldValue) => {
+    //             if (this.isAuthenticated) {
+    //                 this.auth.getMe().then(data => {
+    //                     return this.displayName = data.displayName;
+    //                 });
+    //             }
+    //         });
+    // }
+
+
+    constructor(router, auth, people, app, utils, config, bindingEngine) {
         this.people = people;
         this.app = app;
         this.auth = auth;
         this.utils = utils;
         this.router = router;
         this.config = config;
+        this.bindingEngine = bindingEngine;
+
+        this._isAuthenticated = this.auth.isAuthenticated();
+        this.subscription = bindingEngine.propertyObserver(this, 'isAuthenticated')
+            .subscribe((newValue, oldValue) => {
+                if (!this.auth.isAuthenticated) {
+                    console.log("Logged Out")
+                }
+            });
+    }
+
+    deactivate() {
+        this.subscription.dispose();
     }
 
     login() {

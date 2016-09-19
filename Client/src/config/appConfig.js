@@ -7,6 +7,7 @@ export class AppConfig {
     HELPTICKET_FILE_DOWNLOAD_URL = "uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = "uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = 'uploadedFiles/downloads';
+    DOCUMENT_FILE_DOWNLOAD_URL = 'uploadedFiles/documents';
 
 
     DATE_FORMAT_TABLE = "MMM Do YYYY"

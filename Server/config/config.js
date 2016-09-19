@@ -14,7 +14,8 @@ var config = {
     corsDomain: 'http://localhost:9000',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     uploads: './public/uploadedFiles',
-    smtp: 'sandboxf11fc1f4e8af4498a8db91b3f96e742c.mailgun.org'
+    smtp: 'smtps://rhightower@gmail.com:Kinja1@3@smtp.gmail.com',
+    emailAddress: 'rhightower@gmail.com'
   },
 
   test: {
@@ -24,7 +25,8 @@ var config = {
     },
     port: 5000,
     db: 'mongodb://localhost/uccss-dev',
-    corsDomain: 'http://localhost:9000'
+    corsDomain: 'http://localhost:9000',
+    emailAddress: 'rhightower@gmail.com'
 
   },
 
@@ -34,11 +36,12 @@ var config = {
       name: 'UCCSS'
     },
     port: 80,
-    db: 'mongodb://localhost/uccss-dev',
+    db: 'mongodb://localhost/uccss',
     corsDomain: 'http://localhost:9000',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     uploads: './public/uploadedFiles',
-    smtp: 'sandboxf11fc1f4e8af4498a8db91b3f96e742c.mailgun.org'
+    smtp: 'smtprelay.uwm.edu',
+    emailAddress: 'ucc@uwm.edu'
   }
 };
 

@@ -23,6 +23,7 @@ export default class {
                 { route: 'system',          moduleId: './modules/admin/system/system',          name: 'system',         auth: true },
                 { route: 'customers',       moduleId: './modules/admin/customers/customers',    name: 'customers',      auth: true },
                 { route: 'site',            moduleId: './modules/admin/site/site',              name: 'site',           auth: true },
+                { route: 'documents',       moduleId: './modules/admin/documents/documents',    name: 'documents',      auth: true },
                 { route: 'logout',          moduleId: './modules/home/logout',                  name: 'logout',         auth: true },
                 { route: 'facco',           moduleId: './modules/facco/facco',                  name: 'facco',          auth: true },
                 { route: 'support',         moduleId: './modules/user/support/support',         name: 'support',        auth: true },
@@ -32,7 +33,7 @@ export default class {
                 { route: 'techRq',          moduleId: './modules/tech/requests/assignments',    name: 'techRq',         auth: true }
             ]);
 
-            config.mapUnknownRoutes('logout');
+            config.mapUnknownRoutes('home');
   
         }
         this.router.configure(appRouterConfig);

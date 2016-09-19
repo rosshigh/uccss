@@ -1,7 +1,8 @@
+import {inject} from 'aurelia-framework';
 import {DialogController} from 'aurelia-dialog';
 
+@inject(DialogController)
 export class SuccessDialog {
-    static inject = [DialogController];
     
     constructor(controller){
         this.controller = controller;

@@ -2,7 +2,8 @@ var express = require('express'),
   debug = require('debug')('uccss'),
   router = express.Router(),
   mongoose = require('mongoose'),
-  Model = mongoose.model('HelpTicket')
+  Model = mongoose.model('HelpTicket'),
+  Person = mongoose.model('Person')
   Content = mongoose.model('HelpTicketContent');
 
 module.exports = function (app) {
@@ -91,6 +92,22 @@ module.exports = function (app) {
       if (err) {
         return next(err);
       } else {
+        if(req.query.email == 1){
+          Person.findById(object.personId, function(err, person){
+            if(err){
+              return next(err);
+            } else {             
+              var mailObj = {
+                email: person.email,
+                subject: 'Help Ticket Created',
+                template: 'help-ticket-created',
+                context: object
+              }
+              sendMail(mailObj);
+            }
+          })
+          
+        }
         res.status(200).json(object);
       }
     });

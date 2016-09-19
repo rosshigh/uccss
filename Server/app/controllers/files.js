@@ -7,6 +7,7 @@ var express = require('express'),
   Product = mongoose.model('Product'),
   Download = mongoose.model('Download'),
   HelpTicket = mongoose.model('HelpTicket');
+  Site = mongoose.model('Site');
 
 module.exports = function (app, config) {
   app.use('/', router);
@@ -17,7 +18,10 @@ module.exports = function (app, config) {
         var path = config.uploads + '/productFiles/' + req.params.container;
       } else if(req.params.type === 'download'){
         var path = config.uploads + '/downloads';
-      } else {
+      } else if(req.params.type === 'news'){
+        var path = config.uploads + '/site';
+      }
+      else {
         var path = config.uploads + '/helpTickets/' + req.params.container;
       }
       mkdirp(path, function(err) {
@@ -79,6 +83,28 @@ module.exports = function (app, config) {
               return next(err);
             } else {
               res.status(200).json(download);
+            }
+          });
+        }
+      });
+    }  else if (req.params.type === 'news'){
+      Site.findById(req.params.id, function(err, site){
+        if(err){
+          return next(err);
+        } else {
+          for(var i = 0, x = req.files.length; i<x; i++){
+            var file =  {
+              originalFilename: req.files[i].originalname,
+              fileName: req.files[i].filename,
+              dateUploaded: new Date()
+            };
+            site.file = file;
+          }
+          site.save(function(err, site) {
+            if(err){
+              return next(err);
+            } else {
+              res.status(200).json(site);
             }
           });
         }

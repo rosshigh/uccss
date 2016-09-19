@@ -9,7 +9,7 @@ import {HelpTickets} from '../../resources/data/helpTickets';
 import {ClientRequests} from '../../resources/data/clientRequests';
 
 @inject(Router, Utils, AppConfig, AppState, SiteInfo, Sessions, HelpTickets, ClientRequests)
-export class Home {
+export class User {
 
   constructor(router, utils, config, app, siteinfo, sessions, helpTickets, requests) {
     this.router = router;

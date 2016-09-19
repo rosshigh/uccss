@@ -74,6 +74,34 @@ export class DataServices {
             });
     }
 
+    uploadFiles2(files, url){ 
+        let formData = new FormData();
+        var req = new XMLHttpRequest();
+        this.isRequesting = true;
+
+        for (var i = 0; i < files.length; i++) {
+            formData.append("file" + i, files[i]);
+        }
+        var that = this;
+        // var url = this.config.FILE_URL + "/" + id + "/" + container + "/" + type + (content ? "?content=" + content : "");
+
+        req.open('POST', url);
+        req.onreadystatechange = function () {
+            if (this.status == 200 && this.readyState == 4) {
+                that.utils.showNotification("Files uploaded successfuly");
+                that.isRequesting = false;
+                return { status: 200 };
+            } else {
+                if (this.status === 500) {
+                    that.isRequesting = false;
+                    that.processError({ status: this.status }, 'uploading the file' + files.length > 1 ? "s" : "");
+                }
+            }
+        }
+        req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('aurelia_token'));
+        var response = req.send(formData);
+    }
+
     upLoadFiles(id, container, files, type, content) {
         let formData = new FormData();
         var req = new XMLHttpRequest();
@@ -179,6 +207,8 @@ export class DataServices {
     // //Downloads
     DOWNLOADS_SERVICE = "apps";
     APPLICATION_CATEGORY_SERVICE = "appsCategory";
+    DOCUMENTS_SERVICE = "documents";
+    DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
 
     // //Clientrequests Services
     COURSES_SERVICE = 'courses';
@@ -190,5 +220,8 @@ export class DataServices {
     // CLIENT_REQUESTS_SEND_MESSAGE = 'clientRequests/customerAction';
 
     CONFIG_SERVICE = 'config';
+
+    //File upload 
+    DOCUMENTS_FILE_UPLOAD = 'documents/file';
 
 }

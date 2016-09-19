@@ -4,7 +4,7 @@ var nodemailer = require('nodemailer'),
     handlebars = require('express-handlebars'),
     path = require('path');
 
-var transporter = nodemailer.createTransport('smtps://rhightower@gmail.com:Kinja1@3@smtp.gmail.com');
+var transporter = nodemailer.createTransport(config.smtp);
 var viewEngine = handlebars.create({});
 var options = hbs({
   viewEngine: viewEngine,
@@ -15,9 +15,8 @@ transporter.use('compile', options);
 module.exports = function (app) {
 
   sendMail = function(mailObject){
-
     var mail = {
-      from: 'rhightower@gmail.com',
+      from: config.emailAddress,
       to: mailObject.email,
       subject: mailObject.subject,
       template: mailObject.template,

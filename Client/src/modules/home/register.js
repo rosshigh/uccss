@@ -7,7 +7,7 @@ import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import Validation from '../../resources/utils/validation';
 import {AppConfig} from '../../config/appConfig';
-import {SuccessDialog} from './components/success-dialog';
+import {SuccessDialog} from '../../resources/elements/success-dialog';
 import $ from 'jquery';
 
 @inject(Router, People, Validation, Utils, AppConfig, DialogService)
