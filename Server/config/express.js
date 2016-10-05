@@ -50,6 +50,7 @@ module.exports = function(app, config) {
   app.use(require('compression')());
   app.use(require('response-time')());
 
+  logger.log("Loading models");
   var models = glob.sync(config.root + '/app/models/*.js');
     models.forEach(function (model) {
       require(model);
@@ -70,7 +71,7 @@ module.exports = function(app, config) {
   // var openPaths = ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'];
   // app.use(jwtCheck.unless({path:  openPaths}));
   // app.use(utils.middleware().unless({path: openPaths }));
-
+  logger.log("Loading controllers");
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
     controllers.forEach(function (controller) {
       require(controller)(app, config);
