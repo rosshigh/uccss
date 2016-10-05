@@ -1,55 +1,51 @@
-var debug = require('debug')('uccss');
+var logger = require('./logger');
 var path = require('path');
 var fs = require("fs");
-var jwt = require("express-jwt");
+// var jwt = require("express-jwt");
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var glob = require('glob');
-var cookieParser = require('cookie-parser');
 var cors = require('cors')
 var onFinished = require('on-finished');
 var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
 var utils = require(path.join(__dirname, "utils.js"));
-var unless = require('express-unless');
-var multer = require('multer');
-var autoIncrement = require('mongoose-auto-increment');
+// var unless = require('express-unless');
+
 
 module.exports = function(app, config) {
 
-  debug("Starting application");
+  logger.log("Starting application");
 
   app.use(express.static(config.root + '/public'));
 
   app.use(cors());
 
-  debug("Loading Mongoose functionality");
-  mongoose.set('debug', true);
+  logger.log("Loading Mongoose functionality");
+  // mongoose.set('debug', true);
   mongoose.connect(config.db);
   var db = mongoose.connection;
   db.on('error', function () {
     throw new Error('unable to connect to database at ' + config.db);
   });
   mongoose.connection.once('open', function callback() {
-    debug("Mongoose connected to the database");
+    logger.log("Mongoose connected to the database");
   });
 
-  app.use(function(req, res, next){
-    if(req.query.fields){
-      var fieldArray = req.query.fields.split(",");
-      var fieldList = '';
-      for(var i = 0; i<fieldArray.length; i++){
-          fieldList += fieldArray[i] + " ";
-      }
-      req.fieldList = fieldList.substring(0,fieldList.length-1);
-    }
-    next()
-  });
+  // app.use(function(req, res, next){
+  //   if(req.query.fields){
+  //     var fieldArray = req.query.fields.split(",");
+  //     var fieldList = '';
+  //     for(var i = 0; i<fieldArray.length; i++){
+  //         fieldList += fieldArray[i] + " ";
+  //     }
+  //     req.fieldList = fieldList.substring(0,fieldList.length-1);
+  //   }
+  //   next()
+  // });
 
-  debug("Attaching plugins");
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+  logger.log("Attaching plugins");
+  app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
   app.use(require('compression')());
   app.use(require('response-time')());
@@ -59,20 +55,21 @@ module.exports = function(app, config) {
       require(model);
     });
 
-  var jwtCheck = jwt({
-      secret: config.secret
-  });
-  jwtCheck.unless = unless;
+  // var jwtCheck = jwt({
+  //     secret: config.secret
+  // });
+  // jwtCheck.unless = unless;
 
   app.use(function (req, res, next) {
       onFinished(res, function (err) {
-        debug("[%s] finished request", req.connection.remoteAddress);
+        logger.log("[%s] finished request", req.connection.remoteAddress);
       });
       next();
   });
 
-  app.use(jwtCheck.unless({path: ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
-  app.use(utils.middleware().unless({path: ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js',,'/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'] }));
+  // var openPaths = ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'];
+  // app.use(jwtCheck.unless({path:  openPaths}));
+  // app.use(utils.middleware().unless({path: openPaths }));
 
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
     controllers.forEach(function (controller) {
@@ -90,7 +87,7 @@ module.exports = function(app, config) {
     var errorType = typeof err,
         code = 500,
         msg = { message: "Internal Server Error" };
-        console.log(err);
+        logger.log(err,'error');
 
     switch (err.name) {
         case "UnauthorizedError":
@@ -104,8 +101,8 @@ module.exports = function(app, config) {
         case "BadRequestError":
         case "UnauthorizedAccessError":
         case "NotFoundError":
-          console.log(err.inner);
-          console.log(err.status);
+          logger.log(err.inner,'error');
+          logger.log(err.status,'error');
             code = err.status;
             msg = err.inner;
             break;

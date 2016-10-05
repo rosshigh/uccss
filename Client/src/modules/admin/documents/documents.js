@@ -138,8 +138,6 @@ export class Documents {
         this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
     }
 
-
-
     deleteFile(index){
         var cmd = {
             header : "Delete File",
@@ -187,7 +185,7 @@ export class Documents {
             if (!serverResponse.error) {
                  this.updateArray();
                  this.utils.showNotification("The document was saved");
-             //    this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                  if (this.files && this.files.length > 0) await this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
                  this.spinnerHTML = "";
                  $("#spinner").toggle().toggle();

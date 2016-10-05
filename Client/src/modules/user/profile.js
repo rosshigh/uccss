@@ -24,6 +24,16 @@ export class Profile {
         this.app = app;
         this.dialog = dialog;
         this.validation = validation;
+
+        this.validation.addRule(1,"editFirstName",{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"});
+        this.validation.addRule(1,"editLastName",{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"});
+        // this.validation.addRule(1,"editEmail",{"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"});
+        this.validation.addRule(1,"editInstitution",{"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"});
+        // this.validation.addRule(1,"register_password",{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"});
+        // this.validation.addRule(1,"register_password_repeat",{"rule":"required","message":"Passwords must match",
+        //     "valFunction":function(context){
+        //         return (context.people.selectedPerson.password === context.password_repeat);
+        //     }});
     };
 
     attached(){
@@ -37,7 +47,6 @@ export class Profile {
 
     activate() {
         this.getData();
-        this._setUpValidation();
     }
 
   async getData() {
@@ -51,9 +60,11 @@ export class Profile {
 
   async save() {
     if(this.validation.validate(1,this)) {
-        this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+        if(this.people.selectedPerson.roles.indexOf("PROV") > -1){
+             this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+        }
         let response = await this.people.savePerson()
-        if(!response.status){
+        if(!response.error){
                 var cmd = {
                     header : "Account Updated",
                     message : "Your profile has been updated.",
@@ -62,29 +73,16 @@ export class Profile {
                 };
 
                 this.dialog.open({ viewModel: SuccessDialog, model: cmd}).then(response => {
-                this.router.navigate("home");
+                this.router.navigate("user");
                 });
         } else {
-            this.utils.showNotification("An error occurred updating your profile", "","","","",6);
+            this.utils.showNotification("An error occurred updating your profile");
         }
     }
   };
 
   cancel(){
       this.utils.copyObject(this.users, this.people.selectedPerson);
-  }
-
-  _setUpValidation(){
-    this.validation.addRule(1,"editFirstName",{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"});
-    this.validation.addRule(1,"editLastName",{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"});
-    // this.validation.addRule(1,"editEmail",{"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"});
-    this.validation.addRule(1,"editInstitution",{"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"});
-    // this.validation.addRule(1,"register_password",{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"});
-    // this.validation.addRule(1,"register_password_repeat",{"rule":"required","message":"Passwords must match",
-    //   "valFunction":function(context){
-    //     return (context.people.selectedPerson.password === context.password_repeat);
-    //   }});
-
   }
 
 }

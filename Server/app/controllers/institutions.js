@@ -2,7 +2,10 @@ var express = require('express'),
     debug = require('debug')('uccss'),
   	router = express.Router(),
     mongoose = require('mongoose'),
+    passport = require('passport'),
     Model = mongoose.model('Institution');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });    
 
 module.exports = function (app) {
   app.use('/', router);
@@ -18,7 +21,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/institutions/:id', function(req, res){
+  router.get('/api/institutions/:id', requireAuth, function(req, res){
     Model.findById(req.params.id, function(err, object){
         if (err) {
           res.status(500).json(err);
@@ -28,7 +31,7 @@ module.exports = function (app) {
       });
   });
 
-  router.post('/api/institutions', function(req, res){
+  router.post('/api/institutions', requireAuth, function(req, res){
     var institution =  new Model(req.body);
     institution.save( function ( err, object ){
         if (err) {
@@ -39,7 +42,7 @@ module.exports = function (app) {
       });
   });
 
-  router.put('/api/institutions', function(req, res){
+  router.put('/api/institutions', requireAuth, function(req, res){
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         res.status(500).json(err);
@@ -49,7 +52,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/institutions/:id', function(req, res, next){
+  router.delete('/api/institutions/:id', requireAuth, function(req, res, next){
     debug('Delete institution [%s]', req.params.id);
     Model.remove({ _id: req.params.id }, function(err) {
       if (err) {

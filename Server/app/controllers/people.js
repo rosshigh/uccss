@@ -1,18 +1,23 @@
 var express = require('express'),
-    debug = require('debug')('people'),
   	router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
     path = require('path'),
+    logger = require('../../config/logger'),
+    passportService = require('../../config/passport'),
+    passport = require('passport'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
+
+    var requireAuth = passport.authenticate('jwt', { session: false }),
+        requireLogin = passport.authenticate('local', { session: false });
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/people', function(req, res){
-    debug('Get people');
+  router.get('/api/people', requireAuth,  function(req, res){
+    logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
+    query.exec( function(err, object){
         if (err) {
           res.status(500).json(err);
         } else {
@@ -21,8 +26,8 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/institution/:id', function(req, res){
-    debug('Get people');
+  router.get('/api/people/institution/:id', requireAuth, function(req, res){
+    logger.log('Get people','verbose');
     Model.find({})
       .sort(req.query.order)
       .where('institutionId').eq(req.params.id)
@@ -35,8 +40,8 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/checkEmail', function(req, res){
-    debug('Get person for email =' + req.params.email);
+  router.get('/api/people/checkEmail',  function(req, res){
+    logger.log('Get person for email =' + req.params.email,'verbose');
     var value = req.query.email;
     Model.find({ email : value})
       .exec(function(err, object){
@@ -52,8 +57,8 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/:id', function(req, res, next){
-    debug('Get person [%s]', req.params.id);
+  router.get('/api/people/:id', requireAuth, function(req, res, next){
+    logger.log('Get person [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, object){
         if (err) {
          return next(err);
@@ -63,10 +68,10 @@ module.exports = function (app) {
       });
   });
 
-  router.post('/api/people', function(req, res){
-    debug('Create Person');
+  router.post('/api/people', requireAuth, function(req, res){
+    logger.log('Create Person','verbose');
     var person =  new Model(req.body);
-      person.save( function ( err, object ){
+      person.save(function ( err, object ){
         if (err) {
           res.status(500).json(err);
         } else {
@@ -75,8 +80,8 @@ module.exports = function (app) {
       });
   });
 
-  router.post('/api/people/register', function(req, res, next){
-    debug('Register Person');
+  router.post('/api/people/register',  function(req, res, next){
+    logger.log('Register Person','verbose');
     Model.find({ email : req.body.email}, function(err, person){
       if(err) {
         return next(err);
@@ -95,19 +100,19 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/people', function(req, res){
-    debug('Update Person [%s]', req.body._id);
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
+  router.put('/api/people', requireAuth, function(req, res){
+    logger.log('Update Person [%s]', req.body._id,'verbose');
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
         res.status(500).json(err);
       } else {
-        res.status(200).json(result);
+        res.status(200).json(person);
       }
     })
   });
 
-  router.put('/api/people/password/:id', function(req, res){
-    debug('Update Person password [%s]', req.params.id);
+  router.put('/api/people/password/:id', requireAuth, function(req, res){
+    logger.log('Update Person password [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, result){
       if (err) {
         res.status(500).json(err);
@@ -124,8 +129,8 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/people/:id', function(req, res){
-    debug('Delete person [%s]', req.params.id);
+  router.delete('/api/people/:id', requireAuth, function(req, res){
+    logger.log('Delete person [%s]', req.params.id,'verbose');
     Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {
         res.status(500).json(err);
@@ -134,4 +139,7 @@ module.exports = function (app) {
       }
     })
   });
+
+  router.route('/api/users/login')
+    .post(requireLogin, login);
 };

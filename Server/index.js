@@ -2,18 +2,19 @@ var express = require('express'),
   config = require('./config/config'),
   debug = require('debug')('uccss'),
   fs = require('fs'),
-  path = require('path');
+  path = require('path'),
+  logger = require('./config/logger');
 
 var app = express();
 
 require('./config/express')(app, config);
 
-debug("Creating HTTP server on port: %s", config.port);
+logger.log("Creating HTTP server on port: %s", config.port);
 require('http').createServer(app).listen(config.port, function () {
-    debug("HTTP Server listening on port: %s, in %s mode", config.port, app.get('env'));
+    logger.log("HTTP Server listening on port: %s, in %s mode", config.port, app.get('env'));
 });
 
-debug("Creating HTTPS server on port: %s", config.port);
+logger.log("Creating HTTPS server on port: %s", config.port);
 require('https').createServer({
     key: fs.readFileSync(path.join(__dirname, "keys", "server.key")),
     cert: fs.readFileSync(path.join(__dirname, "keys", "server.crt")),
@@ -21,5 +22,5 @@ require('https').createServer({
     requestCert: true,
     rejectUnauthorized: false
 }, app).listen(config.https_port, function () {
-    debug("HTTPS Server listening on port: %s, in %s mode", config.https_port, app.get('env'));
+    logger.log("HTTPS Server listening on port: %s, in %s mode", config.https_port, app.get('env'));
 });

@@ -79,30 +79,33 @@ export class SiteInfo {
 
         if(!this.selectedItem._id){
             let serverResponse = await this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "post");
-            if(!serverResponse.status){
+            if(!serverResponse.error){
                  this.siteArrayInternal.push(this.selectedItem);
                  this.siteArray = this.siteArrayInternal;
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "put");
-            if(!serverResponse.status){
+            if(!serverResponse.error){
                 this.siteArray[this.editIndex] = this.utils.copyObject(this.selectedItem, this.siteArray[this.editIndex]);
                 this.siteArrayInternal = this.siteArray;
-
             }
             return serverResponse;
         }
     }
     
-    uploadFile(files){
-       this.data.upLoadFiles(this.selectedItem._id, this.utils.toCamelCase(this.selectedItem.title), files, "news")
+    async uploadFile(files){
+       let response = await this.data.upLoadFiles(files, this.data.SITE_SERVICES + '/upload/' + this.selectedItem._id);
+       if(!response.error){
+            this.siteArray[this.editIndex] = this.utils.copyObject(response, this.siteArray[this.editIndex]);
+            this.siteArrayInternal = this.siteArray;
+       }
     }
 
 
     async deleteItem(){
          let serverResponse = await this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedItem._id);
-            if (serverResponse.status === 204) {
+            if (!response.error) {
                 this.siteArrayInternal.splice(this.editIndex, 1);
                 this.siteArray = this.siteArrayInternal;
                 this.editIndex = - 1;
@@ -128,7 +131,7 @@ export class SiteInfo {
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
+                if (!response.error) {
                     this.messageArrayInternal = serverResponse;
                     this.messageArray = this.messageArrayInternal;
                     for (var i = 0, x = this.messageArrayInternal.length; i < x; i++) {
@@ -182,14 +185,14 @@ export class SiteInfo {
 
         if(!this.selectedMessage._id){
             let serverResponse = await this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "post");
-            if(!serverResponse.status){
+            if(!response.error){
                  this.messageArrayInternal.push(this.selectedMessage);
                  this.messageArray = this.messageArrayInternal;
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "put");
-            if(!serverResponse.status){
+            if(!response.error){
                 this.messageArray[this.editMessageIndex] = this.utils.copyObject(this.selectedMessage, this.messageArray[this.editMessageIndex]);
                 this.messageArrayInternal[this.messageArray[this.editMessageIndex].baseIndex] = this.utils.copyObject(this.selectedMessage, this.messageArray[this.messageArrayInternal[this.editMessageIndex].baseIndex]);
 
@@ -210,7 +213,7 @@ export class SiteInfo {
 
     async deleteItem(){
          let serverResponse = await this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedMessage._id);
-            if (serverResponse.status === 204) {
+            if (!response.error) {
                 this.messageArrayInternal.splice(this.editMessageIndex, 1);
                 this.messageArray = this.messageArrayInternal;
                 this.editMessageIndex = - 1;

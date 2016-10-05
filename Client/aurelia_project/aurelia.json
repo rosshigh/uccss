@@ -138,9 +138,19 @@
             "main": "aurelia-i18n"
           },
           {
+            "name": "aurelia-validation",
+            "path": "../node_modules/aurelia-validation/dist/amd",
+            "main": "aurelia-validation"
+          },
+          {
             "name": "aurelia-auth",
             "path": "../node_modules/aurelia-auth/dist/amd",
             "main": "aurelia-auth"
+          },
+          {
+            "name": "aurelia-http-client",
+            "path": "../node_modules/aurelia-http-client/dist/amd",
+            "main": "aurelia-http-client"
           },
           {
             "name": "aurelia-fetch-client",

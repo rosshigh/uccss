@@ -5,13 +5,16 @@ var express = require('express'),
   mongoose = require('mongoose'),
   Model = mongoose.model('Document'),
   Category = mongoose.model('DocCategory'),
+  passport = require('passport'),
   multer = require('multer'),
   mkdirp = require('mkdirp');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/documents', function(req, res, next){
+  router.get('/api/documents', requireAuth, function(req, res, next){
     debug('Get documents');    
     var query = buildQuery(req.query, Model.find())
     query.exec(function(err, object){
@@ -23,7 +26,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.get('/api/documents/:id', function(req, res, next){
+  router.get('/api/documents/:id', requireAuth, function(req, res, next){
     debug('Get application [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -34,7 +37,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.post('/api/documents', function(req, res, next){
+  router.post('/api/documents', requireAuth, function(req, res, next){
     debug('Create Document');
     var document =  new Model(req.body);
     document.save( function ( err, object ){
@@ -46,7 +49,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.put('/api/documents', function(req, res, next){
+  router.put('/api/documents', requireAuth, function(req, res, next){
     debug('Update Document [%s]', req.body._id);
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
@@ -57,7 +60,7 @@ module.exports = function (app, config) {
     })
   });
 
-  router.delete('/api/documents/:id', function(req, res, next){
+  router.delete('/api/documents/:id', requireAuth, function(req, res, next){
     debug('Delete document [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -89,7 +92,7 @@ module.exports = function (app, config) {
   });
 
   //Document Categories
-  router.get('/api/documentCategory', function(req, res, next){
+  router.get('/api/documentCategory', requireAuth, function(req, res, next){
     debug('Get documentsCategory');
     Category.find({})
       .sort(req.query.order)
@@ -102,7 +105,7 @@ module.exports = function (app, config) {
       });
   });
 
-  router.get('/api/documentCategory/:id', function(req, res, next){
+  router.get('/api/documentCategory/:id', requireAuth, function(req, res, next){
     debug('Get application [%s]', req.params.id);
     Category.findById(req.params.id, function(err, object){
       if (err) {
@@ -113,7 +116,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.post('/api/documentCategory', function(req, res, next){
+  router.post('/api/documentCategory', requireAuth, function(req, res, next){
     debug('Create Application');
     var documentsCategory =  new Category(req.body);
     documentsCategory.save( function ( err, object ){
@@ -126,7 +129,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.put('/api/documentCategory', function(req, res, next){
+  router.put('/api/documentCategory', requireAuth, function(req, res, next){
     debug('Update documentsCategory [%s]', req.body._id);
     Category.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
@@ -137,7 +140,7 @@ module.exports = function (app, config) {
     })
   });
 
-  router.delete('/api/documentCategory/:id', function(req, res, next){
+  router.delete('/api/documentCategory/:id', requireAuth, function(req, res, next){
     debug('Delete documentsCategory [%s]', req.params.id);
     Category.remove({ _id: req.params.id }, function(err) {
       if (err) {
@@ -148,7 +151,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.delete('/api/documents/file/:id/:index', function(req, res, next){
+  router.delete('/api/documents/file/:id/:index', requireAuth, function(req, res, next){
     Model.findById(req.params.id, function(err, document){
       if(err){
          return next(err);

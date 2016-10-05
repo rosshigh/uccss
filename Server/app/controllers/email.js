@@ -2,7 +2,10 @@ var nodemailer = require('nodemailer'),
     config = require('../../config/config'),
     hbs = require('nodemailer-express-handlebars'),
     handlebars = require('express-handlebars'),
+    passport = require('passport'),
     path = require('path');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });    
 
 var transporter = nodemailer.createTransport(config.smtp);
 var viewEngine = handlebars.create({});

@@ -73,7 +73,7 @@ export class Downloads {
 
         if (!this.selectedDownload._id) {
             let serverResponse = await this.data.saveObject(this.selectedDownload, this.data.DOWNLOADS_SERVICE, "post");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.selectedDownload = serverResponse;
                 this.appDownloadsInternal.push(this.selectedDownload);
                 this.appDownloadsArray = this.appDownloadsInternal;
@@ -82,7 +82,7 @@ export class Downloads {
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedDownload, this.data.DOWNLOADS_SERVICE, "put");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.appDownloadsArray[this.editDownloadIndex] = this.utils.copyObject(this.selectedDownload, this.appDownloadsArray[this.editDownloadIndex]);
                 this.appDownloadsInternal[this.appDownloadsArray[this.editDownloadIndex].baseIndex] = this.utils.copyObject(this.selectedDownload, this.appDownloadsInternal[this.appDownloadsArray[this.editDownloadIndex].baseIndex]);
             }
@@ -91,13 +91,17 @@ export class Downloads {
 
     }
 
-    uploadFile(files){
-       this.data.upLoadFiles(this.selectedDownload._id, this.utils.toCamelCase(this.selectedDownload.name), files, "download")
+    async uploadFile(files){
+        let response = await this.data.uploadFiles(files, this.data.DOWNLOADS_UPLOADS + "/" + this.selectedDownload._id + '/' + this.selectedDownload.type);
+        if(!response.error){
+            this.appDownloadsArray[this.editDownloadIndex].file = response.file;
+            this.appDownloadsInternal[this.appDownloadsArray[this.editDownloadIndex].baseIndex].file = this.utils.copyObject(this.appDownloadsArray[this.editDownloadIndex].file, this.appDownloadsInternal[this.appDownloadsArray[this.editDownloadIndex].baseIndex]);
+        }
     }
 
     async deleteDownload(){
          let serverResponse = await this.data.deleteObject(this.data.DOWNLOADS_SERVICE + '/' + this.selectedDownload._id);
-            if (serverResponse.status === 204) {
+            if (response.error === 204) {
                 this.appDownloadsInternal.splice(this.editDownloadIndex, 1);
                 this.appDownloadsArray = this.appDownloadsInternal;
                 this.editDownloadIndex = - 1;
@@ -124,7 +128,7 @@ export class Downloads {
             url += options ? options : "";;
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
+                if (!response.error) {
                     this.appCatsArrayInternal = serverResponse;
                     for (var i = 0, x = this.appCatsArrayInternal.length; i < x; i++) {
                         this.appCatsArrayInternal[i].baseIndex = i;
@@ -179,7 +183,7 @@ export class Downloads {
 
         if (!this.selectedCat._id) {
             let serverResponse = await this.data.saveObject(this.selectedCat, this.data.APPLICATION_CATEGORY_SERVICE, "post");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.appCatsArrayInternal.push(serverResponse);
                 this.appCatsArray = this.appCatsArrayInternal
                 this.editCatIndex = this.appCatsArrayInternal.length - 1;
@@ -187,7 +191,7 @@ export class Downloads {
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedCat, this.data.APPLICATION_CATEGORY_SERVICE, "put");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.appCatsArray[this.editCatIndex] = this.utils.copyObject(this.selectedCat, this.appCatsArray[this.editCatIndex]);
                 this.appCatsArrayInternal[this.appCatsArray[this.editCatIndex].baseIndex] = this.utils.copyObject(this.selectedCat, this.appCatsArrayInternal[this.appCatsArray[this.editCatIndex].baseIndex]);
             }
@@ -199,7 +203,7 @@ export class Downloads {
     async deleteCat(){
         if (this.selectedCat._id) {
             let serverResponse = await this.data.deleteObject(this.data.APPLICATION_CATEGORY_SERVICE + '/' + this.selectedCat._id);
-            if (serverResponse.status === 204) {
+            if (!response.error) {
                 this.appCatsArrayInternal.splice(this.editCatIndex, 1);
                 this.appCatsArray = this.appCatsArrayInternal;
                 this.editCatIndex = - 1;
@@ -209,73 +213,4 @@ export class Downloads {
             return {error: "no category selected"}
         }
     }
-
-
-    //     if(this.editIndex >= 0 && this.selectedSession){
-    //         for (var property in this.selectedSession) {
-    //             if (this.selectedSession.hasOwnProperty(property)) {
-    //                 switch(property){
-    //                      case 'startDate':
-    //                     case 'endDate':
-    //                     case 'requestsOpenDate':
-    //                         if(new Date(this.selectedSession[property]).getTime() != new Date(this.sessionsArray[this.editIndex][property]).getTime()){
-    //                             return true;
-    //                         }
-    //                     default:
-    //                         if(this.selectedSession[property] != this.sessionsArray[this.editIndex][property]) {
-    //                             if(!(this.selectedSession[property] === ""  && this.sessionsArray[this.editIndex][property] === undefined)){
-    //                                 return true;
-    //                             }
-    //                         }
-    //                         break;
-
-    //                 }
-
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
-
-
-    // filter() {
-    //     var keep;
-    //     var index = 0;
-    //     var filters = this.filters;
-    //     this.sessionsArray = this.sessionsArrayInternal.filter((item) => {
-    //         //Assume the item should be eliminated
-    //         keep = false;
-    //         //For each filter in filterValues
-    //         for (var i = 0, x = filters.length; i < x; i++) {
-    //             switch (filters[i].compound){
-    //                 case 'or':
-    //                     var values = filters[i].value.split(':');
-    //                     for(var j = 0; j < values.length; j++){
-    //                         keep = keep || item[filters[i].property] === values[j];
-    //                     }
-    //                     break;
-    //                 case 'and':
-    //                 break;
-    //                 default:
-    //             }
-
-    //             if (!keep) break;
-    //         }
-    //         return keep;
-    //     })
-
-    //     if (this.sort && this.sort.length) {
-    //         this.sessionsArray = this.sortArray();
-    //     }
-    // }
-
-    // sortArray() {
-    //     var sortDirection = this.sort[0].direction == "ASC" ? 1 : -1;
-    //     var propName = this.sort[0].property;
-    //     return  this.sessionsArray
-    //         .sort((a, b) => {
-    //             return ((a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0) * sortDirection;
-    //         });
-    // }
-
 }

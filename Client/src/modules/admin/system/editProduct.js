@@ -156,7 +156,7 @@ export class EditProducts {
             if (!serverResponse.error) {
                 this.updateArray();
                 this.utils.showNotification("Product " + this.baseArray[this.editIndex].name + " was updated", "", "", "", "", 5);
-                if (this.files && this.files.length > 0) this.products.uploadFile(this.files);
+                // if (this.files && this.files.length > 0) this.products.uploadFile(this.files);
             }
 
             this. _cleanUp();

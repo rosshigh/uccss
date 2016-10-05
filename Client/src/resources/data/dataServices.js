@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-fetch-client';
+import {HttpClient} from 'aurelia-http-client';
 import {Utils} from '../utils/utils';
 import {AppConfig} from '../../config/appConfig';
 
@@ -11,130 +11,144 @@ export class DataServices {
         this.http = http;
         this.utils = utils;
         this.config = config;
+
+		this.http.configure(x => {
+			x.withBaseUrl(this.config.BASE_URL);
+		});
     }
 
+	activate(){
+		// this.http.configure(x => {
+		// x.withInterceptor({
+		// 	request(message) {
+		// 	return message;
+		// 	},
 
-    get(url) {
+		// 	requestError(error) {
+		// 	throw error;
+		// 	},
+
+		// 	response(message) {
+		// 	return message;
+		// 	},
+
+		// 	responseError(error) {
+		// 	throw error;
+		// 	}
+		// });
+		// });
+	}
+
+	  get(url){
+		this.isRequesting = true;
+		return this.http.createRequest(url)
+		.asGet()
+		.withHeader('Authorization', 'JWT ' + localStorage.getItem('aurelia_token'))
+		.send().then(response => {
+			this.isRequesting = false;
+			if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+
+	}
+
+	saveObject(content, url, method) {
         this.isRequesting = true;
-        return this.http.fetch(url)
-            .then(response => {
-                if (response.statusText != 'OK') {
-                    this.isRequesting = false;
-                    return response;
-                } else {
-                    this.isRequesting = false;
-                    return response.json();
-                }
-            })
-            .catch(e => {
-                this.isRequesting = false;
-                console.log(e);
-                this.postResult = e.status + '-' + e.statusText;
-            });
+		if(method === 'put'){
+ 			return this.http.createRequest(url)
+			 .asPut()
+			 .withHeader('Authorization', 'JWT ' + localStorage.getItem('aurelia_token'))
+			 .withContent(content)
+			 .send().then(response => {
+				 this.isRequesting = false;
+				if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+			
+		} else if(method === 'post'){
+			return this.http.createRequest(url)
+			 .asPost()
+			 .withHeader('Authorization', 'JWT ' + localStorage.getItem('aurelia_token'))
+			 .withContent(content)
+			 .send().then(response => {
+				 this.isRequesting = false;
+				if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+		}
+       
     }
 
-    saveObject(content, url, method) {
+	deleteObject(url){
+		this.isRequesting = true;
+		return this.http.createRequest(url)
+		.asDelete()
+		.withHeader('Authorization', 'JWT ' + localStorage.getItem('aurelia_token'))
+		.send().then(response => {
+				this.isRequesting = false;
+				if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+	}
+
+
+    uploadFiles(files, url){
         this.isRequesting = true;
-        return this.http.fetch(url, {
-            method: method,
-            body: JSON.stringify(content)
-        })
-            .then(response => {
-                if (response.statusText != 'OK') {
-                    this.isRequesting = false;
-                    return response;
-                } else {
-                    this.isRequesting = false;
-                    return response.json();
-                }
-            }).catch(e => {
-                this.isRequesting = false;
-                console.log(e);
-                this.postResult = e.status + '-' + e.statusText;
-            });
+		let formData = new FormData();
+
+		for (var i = 0; i < files.length; i++) {
+			formData.append("file" + i, files[0]);
+		}
+
+		return this.http.createRequest(url)
+			.asPost()
+			.withHeader('Authorization', 'JWT ' + localStorage.getItem('aurelia_token'))
+			.withContent(formData)
+			.skipContentProcessing()
+			.send().then(response => {
+				this.isRequesting = false;
+				if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+
     }
 
-    deleteObject(url) {
-        this.isRequesting = true;
-        return this.http.fetch(url, {
-            method: 'delete'
-        })
-            .then(response => {
-                if (response.statusText != 'OK') {
-                    this.isRequesting = false;
-                    return response;
-                } else {
-                    this.isRequesting = false;
-                    return response.json();
-                }
-            }).catch(e => {
-                this.isRequesting = false;
-                console.log(e);
-                this.postResult = e.status + '-' + e.statusText;
-            });
-    }
-
-    uploadFiles2(files, url){ 
-        let formData = new FormData();
-        var req = new XMLHttpRequest();
-        this.isRequesting = true;
-
-        for (var i = 0; i < files.length; i++) {
-            formData.append("file" + i, files[i]);
-        }
-        var that = this;
-        // var url = this.config.FILE_URL + "/" + id + "/" + container + "/" + type + (content ? "?content=" + content : "");
-
-        req.open('POST', url);
-        req.onreadystatechange = function () {
-            if (this.status == 200 && this.readyState == 4) {
-                that.utils.showNotification("Files uploaded successfuly");
-                that.isRequesting = false;
-                return { status: 200 };
-            } else {
-                if (this.status === 500) {
-                    that.isRequesting = false;
-                    that.processError({ status: this.status }, 'uploading the file' + files.length > 1 ? "s" : "");
-                }
-            }
-        }
-        req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('aurelia_token'));
-        var response = req.send(formData);
-    }
-
-    upLoadFiles(id, container, files, type, content) {
-        let formData = new FormData();
-        var req = new XMLHttpRequest();
-        this.isRequesting = true;
-
-        for (var i = 0; i < files.length; i++) {
-            formData.append("file" + i, files[i]);
-        }
-        var that = this;
-        var url = this.config.FILE_URL + "/" + id + "/" + container + "/" + type + (content ? "?content=" + content : "");
-
-        req.open('POST', url);
-        req.onreadystatechange = function () {
-            if (this.status == 200 && this.readyState == 4) {
-                that.utils.showNotification("Files uploaded successfuly", "", "", "", "", 5);
-                this.isRequesting = false;
-                return { status: 200 };
-            } else {
-                if (this.status === 500) {
-                    this.isRequesting = false;
-                    that.processError({ status: this.status }, 'uploading the file' + files.length > 1 ? "s" : "");
-                }
-            }
-        }
-        req.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('aurelia_token'));
-        var response = req.send(formData);
-    }
-
-    ajaxSuccess() {
-        console.log(this.responseText);
-    }
-
-    processError(obj, message) {
+ processError(obj, message) {
         console.log(obj);
         var msg = (message ? message : "") + " ";
         switch (obj.status) {
@@ -148,7 +162,7 @@ export class DataServices {
                 msg = msg += "The record already exists.";
                 break;
         }
-        this.utils.showNotification(msg, "", "", "", "", 6);
+        this.utils.showNotification(msg);
     }
 
     // //File URLs
@@ -198,6 +212,7 @@ export class DataServices {
     // //Help Tickets
     HELP_TICKET_SERVICES = 'helpTickets';
     HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
+    // HELP_TICKET_UPLOADS = "helpTicket/upload";
     // HELP_TICKET_CURRENT = 'helpTickets/current';
     // HELP_TICKET_UPDATE_OWNER = 'helpTickets/owner/HELPTICKETID';
     // HELP_TICKET_UPDATE_STATUS = 'helpTickets/status/HELPTICKETID';
@@ -209,6 +224,7 @@ export class DataServices {
     APPLICATION_CATEGORY_SERVICE = "appsCategory";
     DOCUMENTS_SERVICE = "documents";
     DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
+    DOWNLOADS_UPLOADS = "downloads/upload";
 
     // //Clientrequests Services
     COURSES_SERVICE = 'courses';

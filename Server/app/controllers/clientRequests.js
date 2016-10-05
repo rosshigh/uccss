@@ -7,12 +7,15 @@ var express = require('express'),
   Assignment = mongoose.model('Assignment'),
   Course = mongoose.model('Course'),
   Person = mongoose.model('Person'),
+  passport = require('passport'),
   Promise = require('bluebird');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/clientRequests', function(req, res, next){
+  router.get('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
@@ -26,7 +29,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clientRequests/person/:id', function(req, res, next){
+  router.get('/api/clientRequests/person/:id', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     Model.find({personId: req.params.id})
       .sort(req.query.order)
@@ -39,7 +42,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clientRequests/person/:id/session/:sessionId', function(req, res, next){
+  router.get('/api/clientRequests/person/:id/session/:sessionId', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     Model.find({personId: req.params.id, sessionId: req.params.sessionId})
       .sort(req.query.order)
@@ -53,7 +56,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clientRequests/person/:personId/session/:sessionId/course/:courseId', function(req, res, next){
+  router.get('/api/clientRequests/person/:personId/session/:sessionId/course/:courseId', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     Model.find({personId: req.params.personId, sessionId: req.params.sessionId, courseId: req.params.courseId })
       .sort(req.query.order)
@@ -67,7 +70,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clientRequests/active', function(req, res, next){
+  router.get('/api/clientRequests/active', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     Model.find({active: true})
       .sort(req.query.order)
@@ -80,7 +83,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clientRequests/:id', function(req, res, next){
+  router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
     debug('Get clientRequest [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -91,7 +94,7 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api/clientRequests/current/count', function(req, res, next){
+  router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
     //query.exec(function(err, object){
@@ -106,7 +109,7 @@ module.exports = function (app) {
       });
   });
 
-  router.post('/api/clientRequests', function(req, res, next){
+  router.post('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Create clientRequest');
     var clientRequest = new Model(req.body);
     var details = new Array();
@@ -162,7 +165,7 @@ module.exports = function (app) {
       });
   });
 
-  router.put('/api/clientRequests', function(req, res, next){
+  router.put('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Update clientRequest [%s]', req.body._id);
     var clientRequest = new Model(req.body);
     var details = new Array();
@@ -195,7 +198,7 @@ module.exports = function (app) {
 
   });
 
-  router.put('/api/clientRequests/customerAction', function(req, res, next){
+  router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){
     if(req.body.customerMessage){
       ClientRequestDetail.findById(req.body.id, function(err, request){
         request.customerMessage = req.body.customerMessage;
@@ -224,7 +227,7 @@ module.exports = function (app) {
     }
   });
 
-  router.delete('/api/clientRequests/:id', function(req, res, next){
+  router.delete('/api/clientRequests/:id', requireAuth, function(req, res, next){
     debug('Delete clientRequest [%s]', req.params.id);
     Model.remove(req.params.id, function(err, result){
       if (err) {
@@ -235,7 +238,7 @@ module.exports = function (app) {
     })
   });
 
-  router.post('/api/clientRequestDetails', function(req, res, next){
+  router.post('/api/clientRequestDetails', requireAuth, function(req, res, next){
     debug('Create clientRequestDeails');
     var clientRequestDetail =  new ClientRequestDetail(req.body);
     clientRequestDetail.save( function ( err, object ){
@@ -247,7 +250,7 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api/clientRequestsDetails', function(req, res, next){
+  router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query.populate('requestId')
@@ -260,7 +263,7 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api.clientRequestsDetails/count',function(req, res, next){
+  router.get('/api.clientRequestsDetails/count', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query.exec(function(err, object){
@@ -272,7 +275,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/clientRequestsDetails', function(req, res, next){
+  router.put('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     var clientRequest = new Model(req.body.requestId);
 
@@ -288,7 +291,7 @@ module.exports = function (app) {
   });
 
   //Courses Routes
-  router.get('/api/courses', function(req, res, next){
+  router.get('/api/courses', requireAuth, function(req, res, next){
     debug('Get courses');
     var query = buildQuery(req.query, Course.find());
     query.populate('requestDetails');
@@ -301,7 +304,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/courses/person/:id', function(req, res, next){
+  router.get('/api/courses/person/:id', requireAuth, function(req, res, next){
     debug('Get courses');
     Course.find({personId: req.params.id})
       .sort(req.query.order)
@@ -314,7 +317,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/courses/active', function(req, res, next){
+  router.get('/api/courses/active', requireAuth, function(req, res, next){
     debug('Get courses');
     Course.find({active: true})
       .sort(req.query.order)
@@ -327,7 +330,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/courses/:id', function(req, res, next){
+  router.get('/api/courses/:id', requireAuth, function(req, res, next){
     debug('Get courses [%s]', req.params.id);
     Course.findById(req.params.id, function(err, object){
       if (err) {
@@ -338,7 +341,7 @@ module.exports = function (app) {
     });
   });
 
-  router.post('/api/courses', function(req, res, next){
+  router.post('/api/courses', requireAuth, function(req, res, next){
     debug('Create courses');
     var clientRequest =  new Course(req.body);
     clientRequest.save( function ( err, object ){
@@ -350,7 +353,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/courses', function(req, res, next){
+  router.put('/api/courses', requireAuth, function(req, res, next){
     debug('Update courses [%s]', req.body._id);
     Course.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
@@ -361,7 +364,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/courses/:id', function(req, res, next){
+  router.delete('/api/courses/:id', requireAuth, function(req, res, next){
     debug('Delete courses [%s]', req.params.id);
     Course.remove(req.params.id, function(err, result){
       if (err) {

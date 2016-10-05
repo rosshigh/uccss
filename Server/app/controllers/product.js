@@ -3,7 +3,12 @@ var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   System = mongoose.model('System'),
-  Model = mongoose.model('Product');
+  passport = require('passport'),
+  Model = mongoose.model('Product'),
+  multer = require('multer'),
+  mkdirp = require('mkdirp');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });
 
 module.exports = function (app) {
   app.use('/', router);
@@ -79,4 +84,47 @@ module.exports = function (app) {
       }
     })
   });
+
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      var path = config.uploads + '/productFiles/' + req.params.container;
+    
+      mkdirp(path, function(err) {
+        if(err){
+          res.status(500).json(err);
+        } else {
+          cb(null, path);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+  });
+  var upload = multer({ storage: storage });
+
+  router.post('/api/products/upload/:id/:container', upload.any(), function(req, res, next){
+      Product.findById(req.params.id, function(err, product){
+        if(err){
+          return next(err);
+        } else {
+          req.containerName = product.name;
+          for(var i = 0, x = req.files.length; i<x; i++){
+            var file =  {
+              originalFilename: req.files[i].originalname,
+              fileName: req.files[i].filename
+            };
+            product.files.push(file);
+          }
+          product.save(function(err, product) {
+            if(err){
+              return next(err);
+            } else {
+              res.status(200).json(product);
+            }
+          });
+        }
+      });
+    });
+
 };

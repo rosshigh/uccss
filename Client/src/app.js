@@ -1,21 +1,19 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-fetch-client';
 import {FetchConfig} from 'aurelia-auth';
-import {DataServices} from './resources/data/dataServices';
 
 import AppRouterConfig from './config/routerConfig';
 import {AppConfig} from './config/appConfig';
 
-@inject(HttpClient, AppRouterConfig, AppConfig, FetchConfig, DataServices)
+@inject(HttpClient, AppRouterConfig, AppConfig, FetchConfig)
 export class App {
   
 
-  constructor(httpClient, appRouterConfig, appConfig, fetchConfig, data){
+  constructor(httpClient, appRouterConfig, appConfig, fetchConfig){
          this.httpClient = httpClient;
          this.appRouterConfig = appRouterConfig;
          this.appConfig = appConfig;
          this.fetchConfig = fetchConfig;
-         this.data = data;
     }
     
 

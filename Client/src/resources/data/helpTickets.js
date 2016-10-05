@@ -182,7 +182,7 @@ export class HelpTickets {
 
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "post");
-            if (!response.status) {
+            if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 this.helpTicketsArrayInternal.push(this.selectedHelpTicket);
                 this.helpTicketsArray = this.helpTicketsArrayInternal;
@@ -192,7 +192,7 @@ export class HelpTickets {
             return response;
         } else {
             var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "put");
-            if (!response.status) {
+            if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
                 this.helpTicketsArray = this.helpTicketsArrayInternal;
@@ -206,7 +206,7 @@ export class HelpTickets {
     async saveHelpTicketResponse(){
         if(this.selectedHelpTicket._id) {
             var response = await this.data.saveObject(this.selectedHelpTicketContent, this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id), "put");
-                if (!response.status) {
+                if (!response.error) {
                     this.selectedHelpTicket.content.push(response);
                     this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
                     this.helpTicketsArray = this.helpTicketsArrayInternal;
@@ -219,7 +219,7 @@ export class HelpTickets {
 
     async sendMail(obj){
         let serverResponse = await this.data.saveObject(obj, this.data.HELP_TICKET_EMAIL.replace('HTID',obj.id), "put");
-        if (!response.status) {
+        if (!serverResponse.error) {
             return response;
         } else {
             return null;
@@ -238,8 +238,13 @@ export class HelpTickets {
         return new Array();
     }
 
-    uploadFile(files,content){
-        this.data.upLoadFiles(this.selectedHelpTicket._id, this.selectedHelpTicket.helpTicketNo, files, 'helpTicket', content);
+    async uploadFile(files,content){
+        let response = await this.data.uploadFiles(files,  this.data.HELP_TICKET_UPLOADS + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+        if(!response.error){
+            this.selectedHelpTicket = this.utils.copyObject(response);
+            this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
+            this.helpTicketsArray = this.helpTicketsArrayInternal;
+        }
     }
 
 }

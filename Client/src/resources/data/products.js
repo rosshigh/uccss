@@ -110,7 +110,7 @@ export class Products {
 
         if(!this.selectedProduct._id){
             let serverResponse = await this.data.saveObject(this.selectedProduct, this.data.PRODUCTS_SERVICE, "post");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.productsArrayInternal.push(this.selectedProduct);
                 this.productsArray.push(this.selectedProduct);
                 this.editIndex = this.productsArrayInternal.length - 1;
@@ -120,7 +120,7 @@ export class Products {
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedProduct, this.data.PRODUCTS_SERVICE, "put");
-            if (!serverResponse.status) {
+            if (!response.error) {
                 this.productsArray[this.editIndex] = this.utils.copyObject(this.selectedProduct, this.productsArray[this.editIndex]);
                 this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedProduct, this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex]);
             } else {
@@ -131,13 +131,17 @@ export class Products {
 
     }
 
-    uploadFile(files){
-        this.data.upLoadFiles(this.selectedProduct._id, this.utils.toCamelCase(this.selectedProduct.name), files, 'product');
-    }
+    // async uploadFile(files){ 
+    //     let response = await this.data.upLoadFiles(files, this.data.PRODUCTS_SERVICE + "/upload/" + this.selectedProduct._id + "/" + this.selectedProduct.name);
+    //     if(!response.error){
+    //         this.productsArray[this.editIndex] = this.utils.copyObject(response, this.productsArray[this.editIndex]);
+    //         this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex] = this.utils.copyObject(response, this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex]);
+    //     }
+    // }
 
     async deleteProduct(){
          let serverResponse = await this.data.deleteObject(this.data.PRODUCTS_SERVICE + '/' + this.selectedProduct._id);
-            if (serverResponse.status === 204) {
+            if (!response.error) {
                 this.productsArrayInternal.splice(this.editIndex, 1);
                 this.productsArray = this.productsArrayInternal;
                 this.editIndex = - 1;

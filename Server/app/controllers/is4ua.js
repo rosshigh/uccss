@@ -7,12 +7,15 @@ var express = require('express'),
   mkdirp = require('mkdirp'),
   Product = mongoose.model('Product'),
   Download = mongoose.model('Download'),
+  passport = require('passport'),
   HelpTicket = mongoose.model('HelpTicket');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/is4ua', function(req, res, next){
+  router.get('/api/is4ua', requireAuth, function(req, res, next){
     debug('Get isua');
     Model.find({}, function(err, object){
         if (err) {
@@ -23,7 +26,7 @@ module.exports = function (app, config) {
       });
   });
 
-  router.post('/api/is4ua', function(req, res){
+  router.post('/api/is4ua', requireAuth, function(req, res){
     debug('Create is4ua');
     var is4ua =  new Model(req.body);
     person.save( function ( err, object ){
@@ -35,7 +38,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.put('/api/is4ua', function(req, res){
+  router.put('/api/is4ua', requireAuth, function(req, res){
     debug('Update is4ua');
     console.log(req.body)
     var is4ua = new Model(req.body);

@@ -33,6 +33,8 @@ export function configure(config) {
     './value-converters/stat-value',
     './value-converters/sort-stat',
     './value-converters/utc-format',
-     './value-converters/check-box'
+     './value-converters/check-box',
+     './value-converters/phone-number',
+     './attributes/masked'
     ]);
 }

@@ -125,12 +125,13 @@ export class ViewHelpTickets {
   }
 
   async saveResponse(){
+    this.helpTickets.uploadFile(this.files,this.helpTickets.selectedHelpTicket._id);
       // if(this.validation.validate(1, this)){
         this. _createResponse();
         let serverResponse = await this.helpTickets.saveHelpTicketResponse();
         if (!serverResponse.status) {
             this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-            if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files,serverResponse._id);
+            if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
         }
         this._cleanUp();
     // }
@@ -138,6 +139,8 @@ export class ViewHelpTickets {
 
   _cleanUp(){
     this.enterResponse = false;
+    this.files = new Array();
+    this.filesSelected = "";
   }
 
   async getCourses(){
@@ -149,6 +152,7 @@ export class ViewHelpTickets {
     let courseResponse = await this.data.getAllObjects(this.data.PERSON_COURSES + id);
     this.courses = courseResponse;
   }
+
 
   changeFiles(){
     var foo = "";

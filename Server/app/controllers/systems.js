@@ -3,12 +3,15 @@ var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   Model = mongoose.model('System'),
+  passport = require('passport'),
   Client = mongoose.model('Client');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/systems', function(req, res, next){
+  router.get('/api/systems', requireAuth, function(req, res, next){
     debug('Get systems');
     var query = buildQuery(req.query, Model.find())
     query.populate({
@@ -27,7 +30,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/systems/clients', function(req, res, next){
+  router.get('/api/systems/clients', requireAuth, function(req, res, next){
     debug('Get systems');
     Model.find({})
       .sort(req.query.order)
@@ -41,7 +44,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/systems/:id', function(req, res, next){
+  router.get('/api/systems/:id', requireAuth, function(req, res, next){
     debug('Get systems [%s]', req.params.id);
     Model.findById(req.params.id)
       .populate('clients')
@@ -54,7 +57,7 @@ module.exports = function (app) {
     });
   });
 
-  router.post('/api/systems', function(req, res, next){
+  router.post('/api/systems', requireAuth, function(req, res, next){
     debug('Create systems');
     var person =  new Model(req.body);
     person.save( function ( err, object ){
@@ -66,7 +69,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/systems/product/:id', function(req, res, next){
+  router.put('/api/systems/product/:id', requireAuth, function(req, res, next){
     debug('Update Systems [%s]', req.params.id);
     Model.findById(req.params.id, function(err, system){
       if(err){
@@ -90,7 +93,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/systems', function(req, res, next){
+  router.put('/api/systems', requireAuth, function(req, res, next){
     debug('Update Systems [%s]', req.body._id);
 
     var system = new Model();
@@ -124,7 +127,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/systems/:id', function(req, res, next){
+  router.delete('/api/systems/:id', requireAuth, function(req, res, next){
     debug('Delete systems [%s]', req.params.id);
     Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {

@@ -3,12 +3,15 @@ var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   System = mongoose.model('System'),
+  passport = require('passport'),
   Model = mongoose.model('Client');
+
+  var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/clients', function(req, res, next){
+  router.get('/api/clients', requireAuth, function(req, res, next){
     debug('Get clients');
     var query = buildQuery(req.query, Model.find());
     query.populate('assignments')
@@ -21,7 +24,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clients/system/:id', function(req, res, next){
+  router.get('/api/clients/system/:id', requireAuth, function(req, res, next){
     debug('Get clients for a system');
     Model.find({systemId: req.params.id})
       .sort(req.query.order)
@@ -34,7 +37,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/clients/:id', function(req, res, next){
+  router.get('/api/clients/:id', requireAuth, function(req, res, next){
     debug('Get clients [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -45,7 +48,7 @@ module.exports = function (app) {
     });
   });
 
-  router.post('/api/clients', function(req, res, next){
+  router.post('/api/clients', requireAuth, function(req, res, next){
     debug('Create clients');
     var person =  new Model(req.body);
     person.save( function ( err, object ){
@@ -57,7 +60,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/clients/multiple', function(req,res,next){
+  router.put('/api/clients/multiple', requireAuth, function(req,res,next){
     var clients = new Array();
     req.body.clients.forEach(function(client, index){
       if(client._id){
@@ -81,7 +84,7 @@ module.exports = function (app) {
 
 });
 
-  router.put('/api/clients', function(req, res, next){
+  router.put('/api/clients', requireAuth, function(req, res, next){
     debug('Update Clients [%s]', req.body._id);
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
@@ -92,7 +95,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/clients/system/:id', function(req, res, next){
+  router.delete('/api/clients/system/:id', requireAuth, function(req, res, next){
     System.findById(req.params.id, function(err, system){
       if (err) {
         return next(err);
@@ -108,14 +111,14 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/clients/:id', function(req, res, next){
+  router.delete('/api/clients/:id', requireAuth, function(req, res, next){
     debug('Delete clients [%s]', req.params.id);
     Model.findById(req.params.id, function(err, result){
       if(err){
         return next(err);
       } else {
         var systemId = result.systemId;
-        Model.remove({_id: req.params.id}, function(err, result){
+        Model.remove({_id: req.params.id}, requireAuth, function(err, result){
           if (err) {
             return next(err);
           } else {

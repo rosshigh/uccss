@@ -4,12 +4,17 @@ var express = require('express'),
   mongoose = require('mongoose'),
   Model = mongoose.model('HelpTicket'),
   Person = mongoose.model('Person')
-  Content = mongoose.model('HelpTicketContent');
+  Content = mongoose.model('HelpTicketContent'),
+  multer = require('multer'),
+  mkdirp = require('mkdirp'),
+  passport = require('passport');
 
-module.exports = function (app) {
+  var requireAuth = passport.authenticate('jwt', { session: false });  
+
+module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/helpTickets', function(req, res, next){
+  router.get('/api/helpTickets', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     var query = buildQuery(req.query, Model.find())
     query.exec(function(err, object){
@@ -21,7 +26,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/helpTickets/current', function(req, res, next){
+  router.get('/api/helpTickets/current',requireAuth,  function(req, res, next){
     debug('Get helpTicket');
     Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
@@ -34,7 +39,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/helpTickets/current/count', function(req, res, next){
+  router.get('/api/helpTickets/current/count', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     //var query = buildQuery(req.query, Model.find({ $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
     //query.exec(function(err, object){
@@ -49,7 +54,7 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api/helpTickets/current/count/:personId', function(req, res, next){
+  router.get('/api/helpTickets/current/count/:personId', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     Model.find( { 'personId': req.params.personId, $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
@@ -62,7 +67,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/helpTickets/count', function(req, res, next){
+  router.get('/api/helpTickets/count', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     var query = buildQuery(req.query, Model.find())
     query.exec(function(err, object){
@@ -74,7 +79,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/helpTickets/:id', function(req, res, next){
+  router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
     debug('Get help ticket [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
@@ -85,7 +90,7 @@ module.exports = function (app) {
     });
   });
 
-  router.post('/api/helpTickets', function(req, res, next){
+  router.post('/api/helpTickets', requireAuth, function(req, res, next){
     debug('Create HelpTicket');
     var helpTicket =  new Model(req.body);
     helpTicket.save( function ( err, object ){
@@ -113,7 +118,7 @@ module.exports = function (app) {
     });
   });
 
-  router.put('/api/helpTickets/content/:id', function(req, res, next){
+  router.put('/api/helpTickets/content/:id', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -132,7 +137,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/helpTickets/owner/:id', function(req, res, next){
+  router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -157,7 +162,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/helpTickets/status/:id', function(req, res, next){
+  router.put('/api/helpTickets/status/:id', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -175,7 +180,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/helpTickets/keywords/:id', function(req, res, next){
+  router.put('/api/helpTickets/keywords/:id', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -193,8 +198,9 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/helpTickets', function(req, res, next){
+  router.put('/api/helpTickets', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
+
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -204,7 +210,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/helpTickets/sendMail/:id', function(req, res, next){
+  router.put('/api/helpTickets/sendMail/:id', requireAuth, function(req, res, next){
     debug('Update HelpTicket [%s]', req.body._id);
     if(req.body.audit){
       Model.findById(req.params.id, function(err, result){
@@ -233,7 +239,7 @@ module.exports = function (app) {
     }
   });
 
-  router.delete('/api/helpTickets/:id', function(req, res, next){
+  router.delete('/api/helpTickets/:id', requireAuth, function(req, res, next){
     debug('Delete session [%s]', req.params.id);
     Model.removeById(req.params.id, function(err, result){
       if (err) {
@@ -243,4 +249,60 @@ module.exports = function (app) {
       }
     })
   });
+
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+
+      var path = config.uploads + '/helpTickets/' + req.params.container;
+     
+      mkdirp(path, function(err) {
+        if(err){
+          res.status(500).json(err);
+        } else {
+          cb(null, path);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + file.originalname.substring(file.originalname.indexOf('.')));
+    }
+  });
+
+  var upload = multer({ storage: storage});
+
+  router.post('/api/helpTicket/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
+      Model.findById(req.params.id, function(err, helpticket){   
+        if(err){
+          return next(err);
+        } else {
+          if(req.params.contentId){
+            var id = req.params.contentId;
+          
+            var content = helpticket.content.id(id);   
+            if(content){
+              for(var i = 0, x = req.files.length; i<x; i++){
+                var file =  {
+                  originalFilename: req.files[i].originalname,
+                  fileName: req.files[i].filename,
+                  dateUploaded: new Date()
+                };
+                content.files.push(file);
+              }
+              helpticket.save(function(err, helpticket) {
+                if(err){
+                  return next(err);
+                } else {
+                  res.status(200).json(helpticket);
+                }
+              });
+            }        
+            
+          } else {
+            res.status(200).json({message: 'file uploaded'});
+          }
+        }
+      });
+
+    });
+
 };
