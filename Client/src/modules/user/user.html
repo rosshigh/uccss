@@ -1,20 +1,33 @@
 <template>
     <div class="row">
-        <div class="col-md-3 col-md-offset-1 bigMarginTop">
+        <div class="col-md-3 bigMarginTop leftMargin">
             <h2 class="underline">Useful Information</h2>
-            <div repeat.for="item of siteinfo.siteArray">
+            <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
                 <compose view="./components/newsItem.html"></compose>
             </div>
+            <h2 class="underline bottomMargin">Useful Links</h2>
+            <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
+                <compose view="./components/homePageLinks.html"></compose>
+            </div>
         </div>
-        <div class="col-md-6 col-md-offset-1 bigMarginTop">
+        <div class="col-md-5 bigMarginTop leftMargin">
             <div class="col-lg-12">
-                <h2 class="underline">Help Tickets</h2>
+                <h2 class="underline"><a href="#/support" style="color: inherit;">Help Tickets</a></h2>
                 <compose view="./components/helpTickets.html"></compose>
             </div>
-             <div class="col-lg-12">
-                <h2 class="underline">Client Requests</h2>
+            <div class="col-lg-12">
+                <h2 class="underline"><a href="#/clientRequests" style="color: inherit;">Client Requests</a></h2>
                 <compose view="./components/clientRequests.html"></compose>
             </div>
+            <div class="col-md-12 hidden-xs hidden-sm">
+                <h2 class="underline">UCC and UA News</h2>
+                <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
+                    <compose view="./components/newsItem.html"></compose>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 bigMarginTop leftMargin">
+            <compose view="./components/uccInformation.html"></compose>
         </div>
     </div>
 </template>

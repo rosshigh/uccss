@@ -1,0 +1,26 @@
+<template>
+	<div>
+		<h2 class="underline">UCC Information</h2>
+		<div class="${item.priority}" repeat.for="item of siteinfo.siteArray | infoFilter:'SYST'">
+			<h3>${item.title}</h3>
+			<span innerhtml="${item.content}"></span>
+			<hr/>
+		</div>
+		<div repeat.for="item of siteinfo.siteArray | infoFilter:'INFO'">
+			<h3>${item.title}</h3>
+			<span innerhtml="${item.content}"></span>
+			<hr/>
+		</div>
+		<div class="bigTopMargin">
+			<h2 class="underline">Sessions</h2>
+			<div class="list-group">
+				<a class="list-group-item" repeat.for="session of sessions.sessionsArray">
+					<h4 class="list-group-item-heading">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>
+					<p class="list-group-item-text">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+				</a>
+			</div>
+		</div>
+	</div>
+</template>
