@@ -19,7 +19,8 @@
                             </tr>
                             <tr>
                                 <th style="width:200px;">Parameter <span click.trigger="dataTable.sortArray('parameter')"><i class="fa fa-sort"></i></span></th>
-                                <th style="width:200px;">Value</th>
+                                <th style="width:300px;">Description</th>
+                                <th style="width:100px;">Value</th>
 								<th style="width:200px;">Date Modified</th>
                             </tr>
                         </thead>
@@ -33,10 +34,9 @@
                             </tr>
                             <tr  repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
                                 <td data-title="Parameter">${item.parameter}</td>
+                                <td data-title="Description">${item.description}</td>
                                 <td data-title="Value"><input readonly.bind="item.readOnly" value.bind="item.value" id="editValue" class="form-control" type="text" /></td>
-                                <td data-title="Modified Date">
-                                    <div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div>
-                                </td>
+                                <td data-title="Modified Date"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>
                             </tr>
                         </tbody>
                     </table>
