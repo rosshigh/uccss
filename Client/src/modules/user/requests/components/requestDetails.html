@@ -39,7 +39,7 @@
                       <div class="input-group">
                         <div>
                           <label for="beginDate" class="leftJustify">Date the course begins</label>
-                          <input change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate"
+                          <input change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate | datePickerDate"
                                 class="form-control" id="beginDate">
                         </div>
                       </div>
@@ -50,7 +50,7 @@
                       <div class="input-group">
                         <div>
                           <label for="endDate" class="leftJustify">Date the course ends</label>
-                          <input change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate"
+                          <input change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate | datePickerDate"
                                 class="form-control" id="endDate">
                         </div>
                       </div>

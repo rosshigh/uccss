@@ -61,7 +61,7 @@ export class ViewHelpTickets {
       await this.requests.getPersonClientRequestsArray(true, '?filter=[and]personId|eq|' + this.app.user._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse);
       if (this.requests.requestsArray.length) this.requests.selectRequest(0);
       this.updateArray();
-      this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+      // this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
       
       this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
       
@@ -105,7 +105,6 @@ export class ViewHelpTickets {
     } else {
       this.showRequest = false;
     }
-    // this.changeBeginDate();
     
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
@@ -117,7 +116,7 @@ export class ViewHelpTickets {
       if(this._buildRequest()){
         let serverResponse = await this.requests.saveRequest();
         if (!serverResponse.status) {
-          this.utils.showNotification("The request was updated", "", "", "", "", 5);
+          this.utils.showNotification("The request was updated");
           this._cleanUp();
         }
       }
@@ -128,9 +127,7 @@ export class ViewHelpTickets {
   _buildRequest(){
     var changes = this.requests.isRequestDirty(this.originalRequest);
     if(changes.length){
-      // this.requests.selectedRequest.requestDetails[this.selectedDetailIndex] = this.requests.setSelectedRequestDetail;
       this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].requestStatus = this.config.UPDATED_REQUEST_CODE;
-      // var that = this;
       var personId = this.app.user._id
       changes.forEach((currentValue) => {
         this.requests.selectedRequest.audit.push({
@@ -140,13 +137,6 @@ export class ViewHelpTickets {
           personId: personId
         })
         
-        // if((currentValue.property == "addUndergraduates" || currentValue.property == "addGraduates") && that.requests.selectedRequest.courseId !== that.config.SANDBOX_ID){
-        //   if(currentValue.property == "addUndergraduates")  that.requests.selectedRequest.studentIdsRequested += parseInt(that.requests.selectedRequest.addUndergraduates);
-
-        //   if(currentValue.property == "addGraduates")  that.requests.selectedRequest.studentIdsRequested += parseInt(that.requests.selectedRequest.addGraduates);
-
-        //   that.requests.selectedRequest.studentIdsRequested -= parseInt(currentValue.oldValue);
-        // }
       });
       
       this.requests.selectedRequest.requestDetailsToSave = new Array();
@@ -172,7 +162,7 @@ export class ViewHelpTickets {
   
   cancel(){
     this.requests.selectRequest(0);
-    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+    // this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
   }
 
   changeBeginDate(){

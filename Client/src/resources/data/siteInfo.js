@@ -38,12 +38,6 @@ export class SiteInfo {
         return this.siteArrayInternal;
     }
 
-    // async getNewsArray(refresh){
-    //     if(!this.newsArrayInternal || refresh){
-    //       await this.getInfoArray(true);
-    //     }
-    // }
-
     selectSiteItem(index){
         if (index === -1) {
             this.selectedItem = this.emptyItem();
@@ -131,7 +125,7 @@ export class SiteInfo {
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!response.error) {
+                if (!serverResponse.error) {
                     this.messageArrayInternal = serverResponse;
                     this.messageArray = this.messageArrayInternal;
                     for (var i = 0, x = this.messageArrayInternal.length; i < x; i++) {

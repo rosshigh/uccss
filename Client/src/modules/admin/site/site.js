@@ -39,15 +39,15 @@ export class Site{
             nav: true,
             name: 'messages',
             title: 'Messages'
+        },
+        {
+            route: 'config',
+            moduleId: './editConfig',
+            auth: true,
+            nav: true,
+            name: 'config',
+            title: 'Config'
         }
-        // ,
-        // {
-        //     route: 'editInfo',
-        //     moduleId: './editInfo',
-        //     auth: true,
-        //     nav: true,
-        //     name: 'editInfo'
-        // }
         ]);
 
         this.router = router;

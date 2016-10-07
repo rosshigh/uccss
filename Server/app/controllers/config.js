@@ -3,15 +3,17 @@ var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  Model = mongoose.model('Config');
+  logger = require('../../config/logger'),
+  Model = mongoose.model('Config'),
+  Promise = require('bluebird');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/config', requireAuth, function(req, res, next){
-    debug('Get config');
+  router.get('/api/config', function(req, res, next){
+    logger.log('Get config','verbose');
     var query = buildQuery(req.query, Model.find());
     query.exec(function(err, object){
         if (err) {
@@ -23,7 +25,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/config/:id', requireAuth, function(req, res, next){
-    debug('Get config for a system');
+    logger.log('Get config for a system','verbose');
     Model.find({systemId: req.params.id})
       .exec(function(err, object){
         if (err) {
@@ -35,7 +37,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/config/:parameter', requireAuth, function(req, res, next){
-    debug('Get config [%s]', req.params.paramter);
+    logger.log('Get config ' + req.params.paramter,'verbose');
     Model.findOne({parameter: req.params.parameter}, function(err, object){
       if (err) {
         return next(err);
@@ -46,7 +48,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/config', requireAuth, function(req, res, next){
-    debug('Create config');
+    logger.log('Create config','verbose');
     var person =  new Model(req.body);
     person.save( function ( err, object ){
       if (err) {
@@ -57,9 +59,34 @@ module.exports = function (app) {
     });
   });
 
+  router.put('/api/config', requireAuth, function(req,res,next){
+    logger.log('Update parameter '+ req.body._id,'verbose');
+    Model.findOneAndUpdate({_id: req.body._id}, req.body,  function(err, parameter){
+      if (err) {
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(parameter);
+      }
+    })
+  });
+
+  router.put('/api/config/saveAll', function(req,res,next){
+    logger.log('Save all parameters','verbose');
+    var tasks = new Array();
+    // var details = new Array();
+    req.body.parameters.forEach(function(item,index){
+      // var obj = new Model(item);
+      // details.push(obj._id)
+      tasks.push(Model.findOneAndUpdate({_id: item._id}, item, {safe:true, new:true}));
+    });
+     Promise.all(tasks)
+     .then(function(results){
+        res.status(200).json(results);
+     })
+  });
 
   router.put('/api/config/:parameter', requireAuth, function(req, res, next){
-    debug('Update Clients [%s]', req.params.parameter);
+    logger.log('Update Clients '+ req.params.parameter,'verbose');
     Model.findOneAndUpdate({parameter: req.params.parameter}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -69,9 +96,8 @@ module.exports = function (app) {
     })
   });
 
-
-   router.delete('/api/config/:parameter', requireAuth, function(req, res){
-    debug('Delete person [%s]', req.params.parameter);
+  router.delete('/api/config/:parameter', requireAuth, function(req, res){
+    logger.log('Delete person '+ req.params.parameter,'verbose');
     Model.remove({ parameter: req.params.parameter }, function(err, result){
       if (err) {
         res.status(500).json(err);

@@ -17,6 +17,7 @@ export class Home {
         this.sessions = sessions;
         this.siteinfo = siteinfo;
         this.config = config;
+        this.config.getConfig(true);
     }
 
     async activate() {

@@ -1,7 +1,11 @@
+import {inject} from 'aurelia-framework';
+import {HttpClient} from 'aurelia-http-client';
+
+@inject(HttpClient)
 export class AppConfig {
     //URIs
     BASE_URL = "/api/"; 
-    FILE_URL = "/api/upload";
+    // FILE_URL = "/api/upload";
     FILE_DOWNLOAD_URL = "/uploadedFiles";
     RESOURCE_URL = "/img";
     HELPTICKET_FILE_DOWNLOAD_URL = "uploadedFiles/helpTickets";
@@ -155,14 +159,14 @@ export class AppConfig {
 
 
     //Client request parameters
-    DEFAULT_FACULTY_IDS = 2;                    //Default number of faculty IDs
-    REQUEST_LIMIT = 7;                          //Maximum products in a request
-    REQUEST_LEEWAY = 5;
-    REGULAR_ID_BUFFER = 5;                      //IDS between assignments in shared clients
-    REGULAR_ID_ALLOWANCE = 5;                   //Additional IDs assigned
-    SANDBOX_ID_BUFFER = 0;                      //IDS between assigned sandbox ranges
-    SHARED_ID_BUFFER = 5;                       //IDS between assigned shared ranges
-    SANDBOX_ID_COUNT = 2;                       //Default ids assigned to sandbox
+    // DEFAULT_FACULTY_IDS = 2;                    //Default number of faculty IDs
+    // REQUEST_LIMIT = 7;                          //Maximum products in a request
+    // REQUEST_LEEWAY = 5;
+    // REGULAR_ID_BUFFER = 5;                      //IDS between assignments in shared clients
+    // REGULAR_ID_ALLOWANCE = 5;                   //Additional IDs assigned
+    // SANDBOX_ID_BUFFER = 0;                      //IDS between assigned sandbox ranges
+    // SHARED_ID_BUFFER = 5;                       //IDS between assigned shared ranges
+    // SANDBOX_ID_COUNT = 2;                       //Default ids assigned to sandbox
     SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
     ID_WILDCARD = "#";                          //Wildcard in id templates
     SANDBOX_NAME = "Sandbox"
@@ -203,5 +207,47 @@ export class AppConfig {
 
     
     HOST = location.origin;
+
+    constructor(http){
+        this.http = http;
+    }
+
+    async getConfig(refresh){
+        if(refresh || !this.configArray){
+            return this.http.createRequest('/config')
+                .asGet()
+                .send().then(response => {
+                    if (!response.isSuccess) {
+                            return response;
+                        } else {
+                            this.configArray = JSON.parse(response.response);
+                            this.setParameters();
+                        }
+                    }).catch(e => {
+                        this.configArray = new Array();
+                        console.log(e);
+                        return  {error: true, code: e.statusCode, message: e.statusText};
+                    });
+            }
+    }
+
+    setParameters(){
+         //Client request parameters
+        this.DEFAULT_FACULTY_IDS = this.getParameter('DEFAULT_FACULTY_IDS');
+        this.REQUEST_LIMIT = this.getParameter('REQUEST_LIMIT');
+        this.REQUEST_LEEWAY = this.getParameter('REQUEST_LEEWAY');
+        this.REGULAR_ID_BUFFER = this.getParameter('REGULAR_ID_BUFFER');
+        this.REGULAR_ID_ALLOWANCE = this.getParameter('REGULAR_ID_ALLOWANCE');
+        this.SANDBOX_ID_BUFFER = this.getParameter('SANDBOX_ID_BUFFER');
+        this.SHARED_ID_BUFFER = this.getParameter('SHARED_ID_BUFFER');
+        this.SANDBOX_ID_COUNT = this.getParameter('SANDBOX_ID_COUNT');
+    }
+
+    getParameter(parameter){
+        for(var i = 0; i < this.configArray.length; i++){
+            if(this.configArray[i].parameter === parameter) return this.configArray[i].value;
+        }
+        return null;
+    }
     
 }

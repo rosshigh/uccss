@@ -71,10 +71,10 @@ export class ViewHelpTickets {
 
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
-            this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+            // this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
             var that = this;
             this.requests.selectedRequest.requestDetails.forEach(function(currentValue){
-               that.utils.formatDateForDatesPicker(currentValue);
+              //  that.utils.formatDateForDatesPicker(currentValue);
             });
             this.existingRequest = true;
             this.updateMessages(false);
@@ -130,7 +130,7 @@ export class ViewHelpTickets {
         //Select a session
         this.sessions.selectSession(el.target.selectedIndex - 1);
         //Format the dates for the date pickers
-        this.utils.formatDateForDatesPicker(this.sessions.selectedSession);
+        // this.utils.formatDateForDatesPicker(this.sessions.selectedSession);
         
         this.setDates();
 
@@ -214,6 +214,7 @@ export class ViewHelpTickets {
     $("#existingRequestInfo").empty().hide();
     $("#infoBox").empty().hide();
     if(!clean) {
+      this.productInfo = new Array();
       if(this.regularClient){
         $("#infoBox").html(this.siteInfo.selectMessageByKey('REGULAR_CLIENT_MESSAGE').content).fadeIn();
       } else if(this.sandBoxClient){

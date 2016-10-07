@@ -18,28 +18,9 @@ export class DataServices {
     }
 
 	activate(){
-		// this.http.configure(x => {
-		// x.withInterceptor({
-		// 	request(message) {
-		// 	return message;
-		// 	},
-
-		// 	requestError(error) {
-		// 	throw error;
-		// 	},
-
-		// 	response(message) {
-		// 	return message;
-		// 	},
-
-		// 	responseError(error) {
-		// 	throw error;
-		// 	}
-		// });
-		// });
 	}
 
-	  get(url){
+    get(url){
 		this.isRequesting = true;
 		return this.http.createRequest(url)
 		.asGet()
