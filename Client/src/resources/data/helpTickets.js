@@ -135,8 +135,8 @@ export class HelpTickets {
             return;
         }
 
-         var response = await this.data.saveObject(obj, this.data.HELP_TICKET_UPDATE_OWNER.replace('HELPTICKETID', this.selectedHelpTicket._id), "put");
-        if (!response.status) {
+         var response = await this.data.saveObject(obj, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
             this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].owner = response.owner;
             this.helpTicketsArray = this.helpTicketsArrayInternal;
         } else {
@@ -150,8 +150,8 @@ export class HelpTickets {
             return;
         }
 
-         var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_UPDATE_STATUS.replace('HELPTICKETID', this.selectedHelpTicket._id), "put");
-        if (!response.status) {
+         var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
             this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].helpTicketStatus = response.helpTicketStatus;
             this.helpTicketsArray = this.helpTicketsArrayInternal;
         } else {
@@ -165,8 +165,8 @@ export class HelpTickets {
             return;
         }
 
-         var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_UPDATE_KEYWORDS.replace('HELPTICKETID', this.selectedHelpTicket._id), "put");
-        if (!response.status) {
+         var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
             this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].keyWords = response.keyWords;
             this.helpTicketsArray = this.helpTicketsArrayInternal;
         } else {

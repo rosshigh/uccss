@@ -174,7 +174,7 @@ export class ViewHelpTickets {
           // if(this.validation.validate(1, this)){
         let serverResponse = await this.helpTickets.updateStatus();
         if (!serverResponse.status) {
-            this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+            this.utils.showNotification("The help ticket was updated");
         }
         this._cleanUp();
     // }
@@ -211,6 +211,8 @@ export class ViewHelpTickets {
 
   _cleanUp(){
     this.enterResponse = false;
+    this.files = new Array();
+    this.filesSelected = "";
   }
 
   /*****************************************************************************************
