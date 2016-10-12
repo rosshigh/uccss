@@ -40,13 +40,13 @@ export class User {
         label: "New"
     },
     {
-        value: this.helpTickets.underReviewHelpTicketsUser || 0,
+        value: this.helpTickets.underReviewHelpTickets || 0,
         color: "#46BFBD",
         highlight: "#5AD3D1",
         label: "Under Review"
     },
     {
-        value: this.helpTickets.customerActionHelpTicketsUser || 0,
+        value: this.helpTickets.customerActionHelpTickets || 0,
         color: "#FDB45C",
         highlight: "#FFC870",
         label: "Customer Action"
@@ -90,7 +90,7 @@ export class User {
       // var currentDate = moment(new Date()).format("MM-DD-YYYY");
       // var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
       let responses = await Promise.all([
-          this.helpTickets.getCurrentCount(this.app.user._id),
+          this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.app.user._id),
           this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id),
           this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
           this.siteinfo.getInfoArray(true, options),  

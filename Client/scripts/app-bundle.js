@@ -2764,12 +2764,12 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                     highlight: "#FF5A5E",
                                     label: "New"
                                 }, {
-                                    value: this.helpTickets.underReviewHelpTicketsUser || 0,
+                                    value: this.helpTickets.underReviewHelpTickets || 0,
                                     color: "#46BFBD",
                                     highlight: "#5AD3D1",
                                     label: "Under Review"
                                 }, {
-                                    value: this.helpTickets.customerActionHelpTicketsUser || 0,
+                                    value: this.helpTickets.customerActionHelpTickets || 0,
                                     color: "#FDB45C",
                                     highlight: "#FFC870",
                                     label: "Customer Action"
@@ -2833,7 +2833,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                             case 8:
                                 _context2.next = 10;
-                                return Promise.all([this.helpTickets.getCurrentCount(this.app.user._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id), this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate'), this.siteinfo.getInfoArray(true, options)]);
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.app.user._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id), this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate'), this.siteinfo.getInfoArray(true, options)]);
 
                             case 10:
                                 _responses = _context2.sent;
@@ -11793,6 +11793,453 @@ define('resources/value-converters/utc-format',['exports', 'moment'], function (
     return UtcFormatValueConverter;
   }();
 });
+define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _appState, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Documents = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            return step("next", value);
+                        }, function (err) {
+                            return step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _appState.AppState, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function Documents(router, datatable, documents, people, utils, config, app, dialog) {
+            _classCallCheck(this, Documents);
+
+            this.navControl = "documentssNavButtons";
+            this.spinnerHTML = "";
+            this.filterValues = new Array();
+            this.typeSelected = "";
+            this.categoryForm = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+
+            this.router = router;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.documents = documents;
+            this.config = config;
+            this.app = app;
+            this.people = people;
+            this.dialog = dialog;
+        }
+
+        Documents.prototype.canActivate = function canActivate() {
+            if (!this.app.user._id) this.router.navigate('logout');
+        };
+
+        Documents.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.getData();
+
+                            case 2:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Documents.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Documents.prototype.getData = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                _context2.next = 2;
+                                return this.documents.getDocumentsCategoriesArray();
+
+                            case 2:
+                                _context2.next = 4;
+                                return this.people.getPeopleArray(true);
+
+                            case 4:
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+
+                                this.updateArray();
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 7:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getData() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        Documents.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.documents.getDocumentsArray(true);
+
+                            case 3:
+                                this.updateArray();
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Documents.prototype.updateArray = function updateArray() {
+            this.displayArray = this.documents.documentsArray ? this.documents.documentsArray : new Array();
+            this.baseArray = this.displayArray;
+
+            for (var i = 0; i < this.baseArray.length; i++) {
+                this.baseArray[i].baseIndex = i;
+            }
+        };
+
+        Documents.prototype.editDocument = function editDocument(index, el) {
+            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+            this.displayIndex = index + parseInt(this.dataTable.startRecord);
+            this.documents.selectDocument(this.editIndex);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        Documents.prototype.filterList = function filterList() {
+            if (this.filter) {
+                var thisFilter = this.filter;
+                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
+                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+                });
+            } else {
+                this.filteredDocumentArray = this.documents.docCatsArray;
+            }
+        };
+
+        Documents.prototype.typeChanged = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context4.next = 7;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context4.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.updateArray();
+                                this.showDocuments = true;
+
+                            case 7:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function typeChanged(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        Documents.prototype.new = function _new() {
+            this.editIndex = "";
+            this.showDocumentForm = true;
+            this.documents.selectDocument();
+        };
+
+        Documents.prototype.back = function back() {
+            this.showDocumentForm = false;
+        };
+
+        Documents.prototype.cancel = function cancel() {
+            this.documents.selectDocument(this.editIndex);
+        };
+
+        Documents.prototype.delete = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                return _context5.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
+                                    if (!response.wasCancelled) {
+                                        _this.deleteDocument();
+                                    }
+                                }));
+
+                            case 1:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function _delete() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return _delete;
+        }();
+
+        Documents.prototype.deleteDocument = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                _context6.next = 2;
+                                return this.documents.deleteDocument();
+
+                            case 2:
+                                serverResponse = _context6.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The document was deleted");
+                                    this.showDocumentForm = false;
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function deleteDocument() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return deleteDocument;
+        }();
+
+        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
+            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
+        };
+
+        Documents.prototype.deleteFile = function deleteFile(index) {
+            var _this2 = this;
+
+            var cmd = {
+                header: "Delete File",
+                message: "Are you sure you want to delete the file?",
+                cancelButton: false,
+                okButton: true
+            };
+
+            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.documents.deleteFile(index);
+                }
+            });
+        };
+
+        Documents.prototype.buildDocument = function buildDocument() {
+            if (!this.documents.selectedDocument._id) {
+                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
+                this.documents.selectedDocument.dateCreated = new Date();
+            }
+            if (this.files && this.files.length > 0) {
+                var version = 1;
+                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
+                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
+                        version++;
+                    }
+                }
+                var newFile = {
+                    personId: this.app.user._id,
+                    originalFilename: this.files[0].name,
+                    fileName: this.files[0].name + " - version " + version,
+                    dateUploaded: new Date(),
+                    active: true,
+                    version: version
+                };
+                this.documents.selectedDocument.files.unshift(newFile);
+            }
+        };
+
+        Documents.prototype.save = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                this.buildDocument();
+                                _context7.next = 3;
+                                return this.documents.saveDocument();
+
+                            case 3:
+                                serverResponse = _context7.sent;
+
+                                if (serverResponse.error) {
+                                    _context7.next = 13;
+                                    break;
+                                }
+
+                                this.updateArray();
+                                this.utils.showNotification("The document was saved");
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+
+                                if (!(this.files && this.files.length > 0)) {
+                                    _context7.next = 11;
+                                    break;
+                                }
+
+                                _context7.next = 11;
+                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
+
+                            case 11:
+                                this.spinnerHTML = "";
+                                (0, _jquery2.default)("#spinner").toggle().toggle();
+
+                            case 13:
+                                this.selectedFiles = undefined;
+                                this.files = undefined;
+                                this.selectedFile = "";
+
+                            case 16:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function save() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Documents.prototype.changeFiles = function changeFiles() {
+            this.selectedFile = this.files[0].name;
+            this.filesSelected = this.documents.selectedDocument ? true : false;
+        };
+
+        Documents.prototype.newCategory = function newCategory() {
+            this.categoryForm = true;
+            this.documents.selectCategory();
+        };
+
+        Documents.prototype.editCategory = function editCategory() {
+            this.categoryForm = true;
+        };
+
+        Documents.prototype.saveCategory = function saveCategory() {
+            var serverResponse = this.documents.saveCategory();
+            if (!serverResponse.status) {
+                this.utils.showNotification("Category Saved");
+                this.categoryForm = false;
+            }
+        };
+
+        Documents.prototype.backCategory = function backCategory() {
+            this.categoryForm = false;
+        };
+
+        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
+            this.documents.selectCategory();
+        };
+
+        return Documents;
+    }()) || _class);
+});
 define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/data/appState'], function (exports, _aureliaFramework, _aureliaRouter, _appState) {
     'use strict';
 
@@ -12813,453 +13260,6 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
         }();
 
         return EditPeople;
-    }()) || _class);
-});
-define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/data/appState', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _appState, _commonDialogs, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Documents = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            return step("next", value);
-                        }, function (err) {
-                            return step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _appState.AppState, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function Documents(router, datatable, documents, people, utils, config, app, dialog) {
-            _classCallCheck(this, Documents);
-
-            this.navControl = "documentssNavButtons";
-            this.spinnerHTML = "";
-            this.filterValues = new Array();
-            this.typeSelected = "";
-            this.categoryForm = false;
-            this.showDocumentForm = false;
-            this.showDocuments = false;
-
-            this.router = router;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.documents = documents;
-            this.config = config;
-            this.app = app;
-            this.people = people;
-            this.dialog = dialog;
-        }
-
-        Documents.prototype.canActivate = function canActivate() {
-            if (!this.app.user._id) this.router.navigate('logout');
-        };
-
-        Documents.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return this.getData();
-
-                            case 2:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        Documents.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Documents.prototype.getData = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                _context2.next = 2;
-                                return this.documents.getDocumentsCategoriesArray();
-
-                            case 2:
-                                _context2.next = 4;
-                                return this.people.getPeopleArray(true);
-
-                            case 4:
-                                this.filteredDocumentArray = this.documents.docCatsArray;
-
-                                this.updateArray();
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 7:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getData() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getData;
-        }();
-
-        Documents.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.documents.getDocumentsArray(true);
-
-                            case 3:
-                                this.updateArray();
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Documents.prototype.updateArray = function updateArray() {
-            this.displayArray = this.documents.documentsArray ? this.documents.documentsArray : new Array();
-            this.baseArray = this.displayArray;
-
-            for (var i = 0; i < this.baseArray.length; i++) {
-                this.baseArray[i].baseIndex = i;
-            }
-        };
-
-        Documents.prototype.editDocument = function editDocument(index, el) {
-            this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-            this.displayIndex = index + parseInt(this.dataTable.startRecord);
-            this.documents.selectDocument(this.editIndex);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showDocumentForm = true;
-        };
-
-        Documents.prototype.filterList = function filterList() {
-            if (this.filter) {
-                var thisFilter = this.filter;
-                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
-                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
-                });
-            } else {
-                this.filteredDocumentArray = this.documents.docCatsArray;
-            }
-        };
-
-        Documents.prototype.typeChanged = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (!(index >= 0)) {
-                                    _context4.next = 7;
-                                    break;
-                                }
-
-                                this.categoryIndex = index;
-                                this.documents.selectCategory(index);
-                                _context4.next = 5;
-                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-
-                            case 5:
-                                this.updateArray();
-                                this.showDocuments = true;
-
-                            case 7:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function typeChanged(_x) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        Documents.prototype.new = function _new() {
-            this.editIndex = "";
-            this.showDocumentForm = true;
-            this.documents.selectDocument();
-        };
-
-        Documents.prototype.back = function back() {
-            this.showDocumentForm = false;
-        };
-
-        Documents.prototype.cancel = function cancel() {
-            this.documents.selectDocument(this.editIndex);
-        };
-
-        Documents.prototype.delete = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var _this = this;
-
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                return _context5.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
-                                    if (!response.wasCancelled) {
-                                        _this.deleteDocument();
-                                    }
-                                }));
-
-                            case 1:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function _delete() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return _delete;
-        }();
-
-        Documents.prototype.deleteDocument = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                _context6.next = 2;
-                                return this.documents.deleteDocument();
-
-                            case 2:
-                                serverResponse = _context6.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("The document was deleted");
-                                    this.showDocumentForm = false;
-                                }
-
-                            case 4:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function deleteDocument() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return deleteDocument;
-        }();
-
-        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
-            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
-        };
-
-        Documents.prototype.deleteFile = function deleteFile(index) {
-            var _this2 = this;
-
-            var cmd = {
-                header: "Delete File",
-                message: "Are you sure you want to delete the file?",
-                cancelButton: false,
-                okButton: true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.documents.deleteFile(index);
-                }
-            });
-        };
-
-        Documents.prototype.buildDocument = function buildDocument() {
-            if (!this.documents.selectedDocument._id) {
-                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
-                this.documents.selectedDocument.dateCreated = new Date();
-            }
-            if (this.files && this.files.length > 0) {
-                var version = 1;
-                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
-                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
-                        version++;
-                    }
-                }
-                var newFile = {
-                    personId: this.app.user._id,
-                    originalFilename: this.files[0].name,
-                    fileName: this.files[0].name + " - version " + version,
-                    dateUploaded: new Date(),
-                    active: true,
-                    version: version
-                };
-                this.documents.selectedDocument.files.unshift(newFile);
-            }
-        };
-
-        Documents.prototype.save = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                this.buildDocument();
-                                _context7.next = 3;
-                                return this.documents.saveDocument();
-
-                            case 3:
-                                serverResponse = _context7.sent;
-
-                                if (serverResponse.error) {
-                                    _context7.next = 13;
-                                    break;
-                                }
-
-                                this.updateArray();
-                                this.utils.showNotification("The document was saved");
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-
-                                if (!(this.files && this.files.length > 0)) {
-                                    _context7.next = 11;
-                                    break;
-                                }
-
-                                _context7.next = 11;
-                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
-
-                            case 11:
-                                this.spinnerHTML = "";
-                                (0, _jquery2.default)("#spinner").toggle().toggle();
-
-                            case 13:
-                                this.selectedFiles = undefined;
-                                this.files = undefined;
-                                this.selectedFile = "";
-
-                            case 16:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function save() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Documents.prototype.changeFiles = function changeFiles() {
-            this.selectedFile = this.files[0].name;
-            this.filesSelected = this.documents.selectedDocument ? true : false;
-        };
-
-        Documents.prototype.newCategory = function newCategory() {
-            this.categoryForm = true;
-            this.documents.selectCategory();
-        };
-
-        Documents.prototype.editCategory = function editCategory() {
-            this.categoryForm = true;
-        };
-
-        Documents.prototype.saveCategory = function saveCategory() {
-            var serverResponse = this.documents.saveCategory();
-            if (!serverResponse.status) {
-                this.utils.showNotification("Category Saved");
-                this.categoryForm = false;
-            }
-        };
-
-        Documents.prototype.backCategory = function backCategory() {
-            this.categoryForm = false;
-        };
-
-        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
-            this.documents.selectCategory();
-        };
-
-        return Documents;
     }()) || _class);
 });
 define('modules/admin/site/editConfig',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/config', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _config, _jquery) {
@@ -29522,13 +29522,13 @@ define('text!no-selection.html', ['module'], function(module) { module.exports =
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/analytics/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/requestsByInstitution.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <!--\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n                -->\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Help Tickets</h1>\n</template>"; });
+define('text!modules/facco/editClients.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/facco/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      \n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/facco/facco.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/home/contact.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Contact</h1>\n<template>"; });
 define('text!modules/home/home.html', ['module'], function(module) { module.exports = "<template>\n    <section class=\"au-animate\">\n        <div class='row topMargin leftMargin'>\n            <div class=\"col-lg-2 bigTopMargin\">\n                <h2 class=\"underline\">UCC Information</h2>\n                 <div class=\"${item.priority}\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\n                    <h3>${item.title}</h3>\n                    <span innerhtml=\"${item.content}\"></span>\n                    <hr/>\n                </div>\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'INFO'\">\n                    <h3>${item.title}</h3>\n                    <span innerhtml=\"${item.content}\"></span>\n                    <hr/>\n                </div>\n                <div class=\"bigTopMargin\">\n                    <h2 class=\"underline\">Sessions</h2>\n                    <div class=\"list-group\">\n                        <a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray\">\n                            <h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\n                            <p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                            <p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                            <p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                        </a>\n                    </div>\n                </div>\n            </div>\n               \n            \n            <div class=\"container bigTopMargin col-lg-10\">\n                <div class=\"col-md-8\">\n                    <compose class=\"hidden-xs hidden-sm\" view=\"./components/homeContent.html\"></compose>\n                   \n                    <div class=\"col-md-12 bigTopMargin hidden-xs hidden-sm\">\n                        <h3 class=\"underline bottomMargin\">Useful Links</h3>\n                        <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\n                            <compose view=\"./components/homePageLinks.html\"></compose>\n                        </div>\n                    </div>\n                \n                </div>\n\n                <div class=\"col-md-4 hidden-xs hidden-sm\">\n                    <h2 class=\"underline\">UCC and UA News</h2>\n                    <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\n                    <compose view=\"./components/newsItem.html\"></compose>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </section>\n</template>"; });
 define('text!modules/home/logout.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Logout</h1>\n</template>"; });
 define('text!modules/home/register.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container topMargin\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <div class=\"panel-title\">\n          <h3>Create an Account</h3>\n        </div>\n      </div>\n        <div class=\"topMargin bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n      <div class=\"panel-body\">\n        <form role=\"form\" class=\"form-horizontal\">\n          <div class=\"form-group row\">\n            <label for=\"register_firstName\" class=\"col-sm-2 form-control-label topMargin\">First Name</label>\n            <div class=\"col-sm-10\">\n              <input id=\"register_firstName\" type=\"text\" placeholder=\"First Name\"\n                   class=\"form-control\"\n                   value.bind=\"people.selectedPerson.firstName\" />\n            </div>\n          </div>\n          <div class=\"form-group\">\n            <label for=\"register_middletName\" class=\"col-sm-2 form-control-label topMargin\">Middle Name</label>\n            <div class=\"col-sm-10\">\n              <input type=\"text\" placeholder=\"Middle Name\" id=\"register_middletName\"\n                   class=\"form-control topMargin\"\n                   value.bind=\"people.selectedPerson.middleName\" />\n            </div>\n          </div>\n          <div class=\"form-group row\">\n            <label for=\"register_lastName\" class=\"col-sm-2 form-control-label topMargin\">Last Name</label>\n            <div class=\"col-sm-10\">\n              <input id=\"register_lastName\" type=\"text\" placeholder=\"Last Name\"\n                   class=\"form-control topMargin\"\n                   value.bind=\"people.selectedPerson.lastName\" />\n              </div>\n          </div>\n          <div class=\"form-group row\">\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">EMail</label>\n            <div class=\"col-md-10\">\n              <input id=\"register_email\" type=\"text\" placeholder=\"eMail\"\n                   class=\"form-control topMargin\"\n                   value.bind=\"people.selectedPerson.email\"\n                   blur.trigger=\"checkEmail()\"/>\n            </div>\n          </div>\n          <div class=\"form-group row\">\n            <label for=\"register_password\" class=\"col-sm-2 form-control-label topMargin\">Password</label>\n            <div class=\"col-md-10\">\n              <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\n                   class=\"form-control topMargin\"\n                   value.bind=\"people.selectedPerson.password\" />\n            </div>\n          </div>\n          <div class=\"form-group row\">\n            <label for=\"register_password_repeat\" class=\"col-sm-2 form-control-label topMargin\">Repeat Password</label>\n            <div class=\"col-md-10\">\n              <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\n                   class=\"form-control topMargin\"\n                   value.bind=\"password_repeat\" />\n            </div>\n          </div>\n          <div class=\"form-group row\">\n            <label for=\"register_institution\" class=\"col-sm-2 form-control-label topMargin\">Institution</label>\n            <div class=\"col-md-10\">\n              <select id=\"register_institution\" value.bind=\"people.selectedPerson.institutionId\" id=\"iType\"\n                    class=\"form-control topMargin\" placeholder=\"Institution\">\n                <option value=\"\"></option>\n                <option repeat.for=\"institution of people.institutionsArray\"\n                        value=\"${institution._id}\">${institution.name}</option>\n              </select>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
-define('text!modules/facco/editClients.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
-define('text!modules/facco/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      \n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
-define('text!modules/facco/facco.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/user/profile.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <div class=\"panel-title\">\n          <h3>User Profile</h3>\n        </div>\n      </div>\n      <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>  \n        <div class=\"topMargin col-sm-12 col-lg-1\">\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n            <div class=\"topMargin\">\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\n            </div>\n        </div>\n    <div class=\"col-sm-12 col-lg-11\">\n        <form class=\"form-horizontal topMargin\">\n          <div class=\"row\">\n            <!-- Row 1 -->\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n          </div>\n\n          <!-- Row 2 -->\n          <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.phone| phoneNumber\" id=\"editPhone\" class=\"form-control input-md\" placeholder=\"Phone\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control input-md\" placeholder=\"Mobile\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\n                            <div class=\"col-sm-8\">\n                            <input disabled value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control input-md\" placeholder=\"Gender\">\n                                    <option value=\"\">Select an option</option>\n                                    <option value=\"F\">Female</option>\n                                    <option value=\"M\">Male</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control input-md\" placeholder=\"Institution\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n           <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"form-group\">\n                        <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"form-group\">\n                        <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control input-md\" placeholder=\"Department\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n          </div> <!-- Row -->\n        </form>\n      </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/user.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"row\">\r\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\r\n            <h2 class=\"underline\">Useful Information</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\r\n                <compose view=\"./components/newsItem.html\"></compose>\r\n            </div>\r\n            <h2 class=\"underline bottomMargin\">Useful Links</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\r\n                <compose view=\"./components/homePageLinks.html\"></compose>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-md-5 bigMarginTop leftMargin\">\r\n            <div class=\"row\"> \r\n            \r\n            </div>\r\n            <div style=\"height:300px;margin-top:30px;\">\r\n                <div class=\"col-lg-5\">\r\n                <!-- <h2 class=\"underline\"><a href=\"#/support\" style=\"color: inherit;\">Help Tickets</a></h2>-->\r\n                    <compose view=\"./components/helpTickets.html\"></compose>\r\n                </div>\r\n                <div class=\"col-lg-6\">\r\n                <!--    <h2 class=\"underline\"><a href=\"#/clientRequests\" style=\"color: inherit;\">Client Requests</a></h2>-->\r\n                    <compose view=\"./components/clientRequests.html\"></compose>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-md-12 hidden-xs hidden-sm\">\r\n                <h2 class=\"underline\">UCC and UA News</h2>\r\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\r\n                    <compose view=\"./components/newsItem.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\r\n            <compose view=\"./components/uccInformation.html\"></compose>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!resources/dialogs/confirm-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <div tabindex=\"-1\" role=\"dialog\">\n        <div class=\"modal-dialog\">\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <button type=\"button\" click.trigger=\"controller.cancel()\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                    <h4 class=\"modal-title\">${header}</h4>\n                </div>\n                <div class=\"modal-body\">\n                   ${message}?\n                </div>\n                <div class=\"modal-footer\">\n                    <button type=\"button\" class=\"btn btn-default\" click.trigger=\"controller.cancel()\">No!</button>\n                    <button type=\"button\" class=\"btn btn-danger\" click.trigger=\"controller.ok()\">Yes</button>\n                </div>\n            </div><!-- /.modal-content  -->\n        </div><!-- /.modal-dialog -->\n    </div><!-- /.modal -->\n</template>"; });
@@ -29541,28 +29541,28 @@ define('text!resources/elements/table-navigation-bar2.html', ['module'], functio
 define('text!modules/admin/customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/site/editConfig.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div  class=\"col-lg-12\">\n                <compose view=\"./components/configTable.html\"></compose>\n            </div> <!-- Table Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/editDownloads.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!downloadSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/downloadTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"downloadSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/downloadForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/editMessages.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!messageItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/messageTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"messageItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/messageForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/editNews.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!newsItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/newsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"newsItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/newsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/site.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
-define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/system/editProduct.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!productSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/productTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"productSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/productForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/editSession.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!sessionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"sessionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/editSystem.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/system.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <th>Institution  <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[0].description} <span click.trigger=\"dataTable.sortArray('1')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[1].description} <span click.trigger=\"dataTable.sortArray('2')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[2].description} <span click.trigger=\"dataTable.sortArray('3')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[3].description} <span click.trigger=\"dataTable.sortArray('4')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[4].description} <span click.trigger=\"dataTable.sortArray('5')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[5].description} <span click.trigger=\"dataTable.sortArray('6')\"><i class=\"fa fa-sort\"></i></span></th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"stat of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                        <td data-title=\"Institution\">${stat.institutionId  | lookupValue:people.institutionsArray:'_id':'name'}</td>\n                        <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    </div>\n</template>"; });
-define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\n  <div  style=\"margin-top:20px;\">\n    <div class=\"col-md-12\">\n      <h2>${heading}</h2>\n    <div class=\"col-md-12 \">\n      <img class=\"col-md-12\" src=\"img/DataCenter.jpg\" class=\"homePageImage\" />\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ucc_logo.jpg\" style=\"height:100px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/sap_ua2.PNG\" style=\"height:75px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/home/components/homePageLinks.html', ['module'], function(module) { module.exports = "<template>\n  <div>\n    <div class=\"col-md-6 bottomMargin\">\n      <a href.bind=item.url target=\"_blank\">${item.title}</a>\n      <br>${item.content}\n    </div>\n  </div>\n</template>"; });
-define('text!modules/home/components/newsItem.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin\">\n    <span class=\"col-md-12 newsTitle topMargin\">${item.title}</span>\n    <span innerhtml.bind=\"item.content\"></span>\n    <span class=\"newsUrl\"><a href.bind=\"item.url\" target=\"_blank\">more info...</a></span>\n  </div>\n</template>"; });
-define('text!modules/home/components/success-dialog.html', ['module'], function(module) { module.exports = "<template>\n     <ai-dialog>\n\n        <ai-dialog-header>\n            <h2>${cmd.header}</h2>\n        </ai-dialog-header>\n\n        <ai-dialog-body>\n            <p>${cmd.message}</p>\n        </ai-dialog-body>\n\n        <ai-dialog-footer>\n            <button show.bind=\"cmd.cancelButton\" click.trigger=\"controller.cancel()\">Cancel</button>\n            <button show.bind=\"cmd.okButton\" click.trigger=\"controller.ok()\">Ok</button>\n        </ai-dialog-footer>\n    </ai-dialog>\n</template>"; });
 define('text!modules/facco/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            </div>  \n\n            <div class=\"topMargin\">\n                <form class=\"form-horizontal topMargin\">\n                     <!-- Row 1 -->\n                    <div class=\"row\">\n                        <div class=\"col-lg-1\">\n                            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n                        </div>\n                        <div class=\"col-lg-10 col-lg-offset-1\">\n                            <div class=\"row topMargin\">\n                                <div class=\"col-lg-6\">\n                                    <h3 innerhtml.bind=\"Name\"></h3>\n                                </div>\n                            \n                                <div class=\"col-lg-6\">\n                                    <div class=\"form-group pull-left\">\n                                        <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n                                        <div class=\"col-sm-8\">\n                                            <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control input-md\" placeholder=\"Status\">\n                                                <option value=\"\">Select an option</option>\n                                                <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\n                                            </select>\n                                        </div>\n                                    </div>\n                                </div>\n                            </div>\n                            \n                            <div class=\"row topMargin\">\n                                <div class=\"col-lg-6\">\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h3>Contact</h3> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4>Phone: <span innerhtml.bind=\"people.selectedPerson.phone\"></span></h4> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4>Mobile: <span innerhtml.bind=\"people.selectedPerson.mobile\"></span></h4> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4>Email: <span innerhtml.bind=\"people.selectedPerson.email\"></span></h4> \n                                    </div>\n                                </div>\n                                 <div class=\"col-lg-6\">\n                                     <div class=\"col-sm-12 col-lg-12\">\n                                        <h3>Address</h3> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4><span innerhtml.bind=\"people.selectedPerson.address1\"></span><h4>\n                                        <h4 if.bind=\"people.selectedPerson.address2\"><span innerhtml.bind=\"people.selectedPerson.address2\"></span><h4>\n                                        <h4><span innerhtml.bind=\"people.selectedPerson.city\"></span> <span innerhtml.bind=\"people.selectedPerson.region\">, <span innerhtml.bind=\"people.selectedPerson.postalCode\"></span></span><h4>\n                                        <h4><span innerhtml.bind=\"people.selectedPerson.country\"></span><h4>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class=\"row topMargin\">\n                                <div class=\"col-lg-6\">\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h3>Area</h3> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4>Specialization: <span innerhtml.bind=\"people.selectedPerson.personSpecialization\"></span></h4> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4>Department: <span innerhtml.bind=\"people.selectedPerson.departmentCategory\"></span></h4> \n                                    </div>\n                                </div>\n                                 <div class=\"col-lg-6\">\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h3>Roles</h3> \n                                    </div>\n                                    <div class=\"col-sm-12 col-lg-12\">\n                                        <h4 innerhtml.bind=\"roles\"></h4> \n                                    </div>\n                                </div>\n                            </div>\n                            \n                            \n                            \n                          \n                            </div>\n                        </div>\n                    </div> <!-- Row -->\n                </form>\n            </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='6'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:15rem;\">Phone</th>\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>Role</th>\n                                <th>Status</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\n                                        compare=\"array\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\n                                </select>\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\n                                <td data-title=\"Phone\">${person.phone}</td>\n                                <td data-title=\"Email\">${person.email}</td>\n                                <td data-title=\"Role\">${person.roles}</td>\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n    <div class='row'>\n      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n      <div id=\"no-more-tables\">\n        <table class=\"table table-striped table-hover cf\">\n          <thead class=\"cf\">\n            <tr>\n              <td colspan='7'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Type</th>\n              <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-sm-1\">IDS Requestd</th>\n              <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <th></th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"courseId\">\n                   <option value=\"\"></option>\n                   <option  value=\"config.SANDBOX_ID\">Sandbox</option>\n                   <option  value=\"\">Regular</option>\n                 </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n              </th>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n                 </select>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event)\" id=\"requestId.personId\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n              </th>\n            </tr>\n            <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n              <td data-title=\"Request No\">${request.requestNo}</td>\n              <td data-title=\"Required Date\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Date Created\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Course\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n              <td data-title=\"Status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n              <td data-title=\"IDs Requested\">${request.requestId | idsRequested}\n                <td data-title=\"Product\">${request.productId | productName:products.productsArray}</td>\n                <td data-title=\"Person\">${request.requestId.personId | personName:people.peopleArray}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
 define('text!modules/facco/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerAction()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>    \n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"col-lg-5\" show.bind=\"showRequest\">\n        <div class=\"panel panel-primary topMargin\">\n        <div class=\"panel-heading\">\n            <h3 class=\"panel-title\">${requests.selectedRequestDetail.productId | productName:products.productsArray}</h3>\n        </div>\n        <div class=\"panel-body\">        \n            <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\">\n            <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                <th>System</th>\n                <th>Client</th>\n                <th>Student IDs</th>\n                <th>Student Password</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"assign of requests.selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\n                <td>${assign.systemId | lookupSid:systems.systemsArray}</td>\n                <td>${assign.client}</td>\n                <td>${assign.studentUserIds}</td>\n                <td>${assign.studentPassword}</td>\n                </tr>\n            </tbody>\n            </table>\n            <h4 class=\"topMargin\"><strong>Faculty IDs</strong></h4>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\n            </div>\n            <h4 class=\"topMargin\"><strong>System Details</strong></h4>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\n            </div>\n            <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\n        </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/facco/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"displayArray.length > 0\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n          <!--\n          <div class=\"col-lg-6\">\n             Request Details\n            <compose view=\"./requestDetails.html\"></compose>\n          </div>\n          -->\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
+define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\n  <div  style=\"margin-top:20px;\">\n    <div class=\"col-md-12\">\n      <h2>${heading}</h2>\n    <div class=\"col-md-12 \">\n      <img class=\"col-md-12\" src=\"img/DataCenter.jpg\" class=\"homePageImage\" />\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ucc_logo.jpg\" style=\"height:100px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/sap_ua2.PNG\" style=\"height:75px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/home/components/homePageLinks.html', ['module'], function(module) { module.exports = "<template>\n  <div>\n    <div class=\"col-md-6 bottomMargin\">\n      <a href.bind=item.url target=\"_blank\">${item.title}</a>\n      <br>${item.content}\n    </div>\n  </div>\n</template>"; });
+define('text!modules/home/components/newsItem.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin\">\n    <span class=\"col-md-12 newsTitle topMargin\">${item.title}</span>\n    <span innerhtml.bind=\"item.content\"></span>\n    <span class=\"newsUrl\"><a href.bind=\"item.url\" target=\"_blank\">more info...</a></span>\n  </div>\n</template>"; });
+define('text!modules/home/components/success-dialog.html', ['module'], function(module) { module.exports = "<template>\n     <ai-dialog>\n\n        <ai-dialog-header>\n            <h2>${cmd.header}</h2>\n        </ai-dialog-header>\n\n        <ai-dialog-body>\n            <p>${cmd.message}</p>\n        </ai-dialog-body>\n\n        <ai-dialog-footer>\n            <button show.bind=\"cmd.cancelButton\" click.trigger=\"controller.cancel()\">Cancel</button>\n            <button show.bind=\"cmd.okButton\" click.trigger=\"controller.ok()\">Ok</button>\n        </ai-dialog-footer>\n    </ai-dialog>\n</template>"; });
 define('text!modules/tech/requests/assignments.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>\n"; });
 define('text!modules/tech/support/archiveHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body --> \n</template>"; });
 define('text!modules/tech/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n            <compose view='./components/Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n            <compose view='./components/Requests.html' show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\"></compose>\n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
@@ -29596,6 +29596,8 @@ define('text!modules/admin/customers/components/Password.html', ['module'], func
 define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"col-lg-12\">\n        \n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>  \n\n        <div class=\"topMargin\">\n            <form class=\"form-horizontal topMargin\">\n                   \n                <div class=\"row\">\n                    <div class=\"col-lg-1\">\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n                    </div>\n                     <!-- Row 1 -->\n                    <div class=\"col-lg-11\">\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\n                                <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\n                                <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\n                                <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n\n                        <!-- Row 2 -->\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n                                <div class=\"col-sm-8\">\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\n                                        <option value=\"\">Select an option</option>\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\n                                    </select>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\n                                <div class=\"col-sm-8\">\n                                    <phone-input value.two-way=\"people.selectedPerson.phone\" ></phone-input>\n                                    <input value.bind=\"people.selectedPerson.phone | phoneNumber\" id=\"editPhone\" class=\"form-control \" placeholder=\"Phone\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\n                                <div class=\"col-sm-8\">\n                                    <phone-input value.two-way=\"people.selectedPerson.mobile\" ></phone-input>\n                                    <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control \" placeholder=\"Mobile\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n\n                        <!-- Row 3 -->\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\n                                <div class=\"col-sm-8\">\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" />\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\n                                <div class=\"col-sm-8\">\n                                    <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control \" placeholder=\"Gender\">\n                                        <option value=\"\">Select an option</option>\n                                        <option value=\"F\">Female</option>\n                                        <option value=\"M\">Male</option>\n                                    </select>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-12 col-lg-4\">\n                            <div class=\"form-group\">\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\n                                <div class=\"col-sm-8\">\n                                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\n                                        <option value=\"\">Select an option</option>\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                    </select>\n                                </div>\n                            </div>\n                        </div>\n\n                    </div>\n                </div>\n\n                <div class=\"row bigTopMargin\">\n                    <div class=\"col-lg-9 col-lg-offset-2\">\n                        <div class=\"row\">\n                            <div class=\"panel panel-default\">\n                                <div class=\"panel-body\">\n                                    <div class=\"col-lg-2\">\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\n                                            <a  class=\"${ $first ? 'active' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\n                                            </a>\n                                        </div>\n                                    </div>\n\n                                    <div class=\"col-lg-10\">\n                                        <div class=\"tab-content\">\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\n                                            </div>\n                                        </div>\n                                    </div>\n\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n\n            </form>\n        </div>\n    <div>\n</template>\n"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\">\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='6'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:30rem;\">Institution</th>\n                                <th style=\"width:15rem;\">Phone</th>\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>Role</th>\n                                <th>Status</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                </select>\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\n                                        compare=\"array\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\n                                </select>\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n                                <td data-tile=\"Phone\">${person.phone}</td>\n                                <td data-title=\"Email\">${person.email}</td>\n                                <td data-title=\"Role\">${person.roles}</td>\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"people.selectedPerson.roles\">${role.label}\n            </label>\n        </div>\n    </div> <!-- Right side of form -->\n</template"; });
+define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <!--\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                        <div class=\"col-sm-3 topMargin\" show.bind=\"documents.selectedDocument.file.fileName != undefined\">\r\n                            <a href.bind=\"selectedURL\" innerhtml.bind='documents.selectedDocument.file.fileName' target='_blank'></a>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/site/components/configForm.html', ['module'], function(module) { module.exports = "<template>\n\t\n</template>"; });
 define('text!modules/admin/site/components/configTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>   \n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:200px;\">Parameter <span click.trigger=\"dataTable.sortArray('parameter')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:300px;\">Description</th>\n                                <th style=\"width:100px;\">Value</th>\n\t\t\t\t\t\t\t\t<th style=\"width:200px;\">Date Modified</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"parameter\" type=\"text\" placeholder=\"Filter Parameter\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"item of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                                <td data-title=\"Parameter\">${item.parameter}</td>\n                                <td data-title=\"Description\">${item.description}</td>\n                                <td data-title=\"Value\"><input readonly.bind=\"item.readOnly\" value.bind=\"item.value\" id=\"editValue\" class=\"form-control\" type=\"text\" /></td>\n                                <td data-title=\"Modified Date\"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/downloadForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>  \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n              <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-6\">\n                    <div class=\"form-group\">\n                        <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n                        <div class=\"col-sm-8\">\n                            <div class=\"checkbox\">\n                                <label class=\"pull-left\">\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.active\" type=\"checkbox\"> Active\n                                </label>\n                            </div>\n                            <div class=\"checkbox\">\n                                <label class=\"pull-left\">\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.helpTicketRelevant\" type=\"checkbox\"> Help Ticket Relevant\n                                </label>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"downloads.selectedDownload.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"downloads.selectedDownload.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"downloads.selectedDownload.type\" class=\"form-control\" id=\"editType\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.code}\">${category.description}</options>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"this.downloads.selectedDownload.type == 0\"  click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- Edit Category -->\n            <div class=\"row topMargin col-sm-8 col-sm-offset-2\" show.bind=\"editCat\">\n                <div class=\"panel panel-default\">\n                    <div class=\"panel-body\">\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-8\">\n                                <input disabled id=\"editCode\" value.bind=\"downloads.selectedCat.code\" type=\"text\" placeholder=\"Code\"\n                                    class=\"form-control\"/>\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-8\">\n                                <input id=\"editCatDescription\" value.bind=\"downloads.selectedCat.description\" type=\"text\" placeholder=\"Description\"\n                                    class=\"form-control\"/>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n                        <span click.delegate=\"saveCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                  <div class=\"form-group\">\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"downloads.selectedDownload.file.fileName != undefined\">\n                          <a href.bind=\"selectedURL\" innerhtml.bind='downloads.selectedDownload.file.fileName' target='_blank'></a>\n                      </div>\n                  </div>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6 col-lg-offset-2\">\n                  <div class=\"panel panel-default\">\n                      <div class=\"input-group\">\n                          <span class=\"input-group-btn\">\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                              </span>\n                          </span>\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\n                      </div>\n                  </div>\n                </div>\n              </div>\n\n                </div>\n            </div>\n        </form>\n    </div>\n</template>\n"; });
@@ -29604,8 +29606,6 @@ define('text!modules/admin/site/components/messageForm.html', ['module'], functi
 define('text!modules/admin/site/components/messageTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n\n                            <tr>\n                                <td colspan='3'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Key <span click.trigger=\"dataTable.sortArray('key')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"key\" type=\"text\" placeholder=\"Key\" class=\"form-control\" />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"description\" type=\"text\" placeholder=\"Description\" class=\"form-control\"\n                                    />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                                <td data-title=\"Key\">${item.key}</td>\n                                <td data-title=\"Category\" style=\"width: 75px\">\n                                    <div>${item.category}</div>\n                                </td>\n                                <td data-title=\"Description\" style=\"width: 75px\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/newsForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.itemType\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\" show.bind=\"siteinfo.selectedItem.itemType == 'SYST'\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editPriority\" class=\"col-sm-2 control-label hideOnPhone\">Priority</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.priority\" class=\"form-control \" id=\"priority\">\n                                <option value=\"\"></option>\n                                <option value=\"INFO\">Information</option>\n                                <option value=\"WARN\">Warning</options>\n                                <option value=\"DANG\">Danger</options>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <textarea value.bind=\"siteinfo.selectedItem.content\" id=\"editContent\" class=\"form-control \" placeholder=\"Content\" rows=\"10\"></textarea>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Category</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.category\" id=\"editCategory\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editUrl\" class=\"col-sm-2 control-label hideOnPhone\"><a href=\"${siteinfo.selectedItem.url}\" target=\"_blank\">URL</a></label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.url\" id=\"editUrl\" class=\"form-control \" placeholder=\"URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCreatedDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Created</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.createdDate | datePickerDate\" id=\"editCreatedDate\" class=\"form-control \" placeholder=\"Date Created\" type=\"date\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editExpireddDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Expires</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.expiredDate | datePickerDate\" id=\"editExpireddDate\" class=\"form-control \" placeholder=\"Date Expires\" type=\"date\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editImageUrl\" class=\"col-sm-2 control-label hideOnPhone\">Image URL</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.image\" id=\"editImageUrl\" class=\"form-control \" placeholder=\"Image URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n             <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editSortOrder\" class=\"col-sm-2 control-label hideOnPhone\">Sort Order</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.sortOrder\" id=\"editSortOrder\" class=\"form-control \" placeholder=\"Sort Order\" type=\"number\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                  <div class=\"form-group\">\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"siteinfo.selectedItem.file.fileName != undefined\">\n                          <a href.bind=\"selectedURL\" innerhtml.bind='siteinfo.selectedItem.file.fileName' target='_blank'></a>\n                      </div>\n                  </div>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6 col-lg-offset-2\">\n                  <div class=\"panel panel-default\">\n                      <div class=\"input-group\">\n                          <span class=\"input-group-btn\">\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                              </span>\n                          </span>\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\n                      </div>\n                  </div>\n                </div>\n              </div>\n        </form>\n    </div>\n</template>\n"; });
 define('text!modules/admin/site/components/newsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <div class=\"checkbox\">\n                                        <label>\n                                        <input checked.bind=\"isChecked\" change.trigger=\"filterOutExpired()\" type=\"checkbox\"> Hide expired entries\n                                    </label>\n                                    </div>\n                                </td>\n                            </tr>\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Title <span click.trigger=\"dataTable.sortArray('title')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Expires <span click.trigger=\"dataTable.sortArray('expiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('itemType')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">URL <span click.trigger=\"dataTable.sortArray('url')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"title\" type=\"text\" placeholder=\"Filter Title\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"expiredDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"itemType\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"url\" type=\"text\" placeholder=\"Filter URL\" class=\"form-control\" />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\n                                <td data-title=\"Title\">${item.title}</td>\n                                <td data-title=\"Date Created\" style=\"width: 75px\">\n                                    <div>${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Date Expired\" style=\"width: 75px\">\n                                    <div>${item.expiredDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Type\">${item.itemType}</td>\n                                <td data-title=\"url\"><a href=\"${item.url}\" target=\"_blank\">${item.url}</a></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <!--\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                        <div class=\"col-sm-3 topMargin\" show.bind=\"documents.selectedDocument.file.fileName != undefined\">\r\n                            <a href.bind=\"selectedURL\" innerhtml.bind='documents.selectedDocument.file.fileName' target='_blank'></a>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of displayArray | pageFilter:dataTable.startRecord:dataTable.take\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/Assignments.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n      <div class=\"col-lg-6\">\n    \n          <div class=\"form-group\">\n            <label for=\"editStudentId\" class=\"control-label hideOnPhone\">Student ID Prefix</label>\n            <input value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" id=\"editStudentId\" class=\"form-control \" placeholder=\"Student ID Prefix\" type=\"text\" />\n          </div>\n          <div class=\"form-group\">\n            <label for=\"editFacultyId\" class=\"control-label\">Faculty ID Prefix</label>\n            <input value.bind=\"products.selectedProduct.defaultFacultyIdPrefix\" id=\"editFacultyId\" class=\"form-control \" placeholder=\"Faculty ID Prefix\" type=\"text\" />\n          </div>\n          <div class=\"form-group \">\n            <label for=\"editIdsAvailable \" class=\"control-label \">Number of IDs</label>\n            <input value.bind=\"products.selectedProduct.idsAvailable \" id=\"editIdsAvailable \" class=\"form-control\" placeholder=\"Number of IDs \" type=\"text \" />\n          </div>\n          <div class=\"form-group \">\n            <label for=\"editFirstUsableID \" class=\"control-label \">First usable ID</label>\n            <input value.bind=\"products.selectedProduct.firstAllowableId \" id=\"editFirstUsableID \" class=\"form-control \" placeholder=\"First Usable ID \" type=\"number \" />\n          </div>\n          <div class=\"form-group\">\n            <label for=\"editProductInfo \" class=\"control-label \">Product Information</label>\n            <textarea class=\"form-control\" id=\"editProductInfo\" value.bind=\"products.selectedProduct.productInfo\" rows=\"10\"></textarea>\n          </div>\n        \n      </div>\n      \n      \n      <div class=\"col-lg-5 col-sm-offset-1\">\n        <div class=\"form-group\">\n            <label for=\"editStudentPassword\" class=\"control-label\">Student Password</label>\n            <input value.bind=\"products.selectedProduct.defaultStudentPassword\" id=\"editStudentPassword\" class=\"form-control \" placeholder=\"Student Password\" type=\"text\" />\n        </div>\n        <div class=\"form-group\">\n            <label for=\"editFacultyPassword\" class=\"control-label\">Faculty Password</label>\n            <input value.bind=\"products.selectedProduct.defaultFacultyPassword\" id=\"editFacultyPassword\" class=\"form-control \" placeholder=\"Faculty Password\" type=\"text\" />\n        </div>\n        <div class=\"form-group\">\n        <label class=\"control-label hideOnPhone\">Clients</label>\n          <div class=\"checkbox\">\n            <label class=\"pull-left\">\n              <input  id=\"clientRelevant\" checked.bind=\"products.selectedProduct.clientRelevant\" type=\"checkbox\"> Required\n            </label>\n          </div>\n        </div>\n        <div class=\"form-group \">\n            <label for=\"editLastUsableID \" class=\"control-label \">Last usable ID</label>\n            <input value.bind=\"products.selectedProduct.lastAllowableId \" id=\"editLastUsableID \" class=\"form-control \" placeholder=\"Last Usable ID \" type=\"number \" />\n        </div>\n        <div class=\"panel panel-default topMargin\">\n          <div class=\"panel-heading\">Product Information Preview</div>\n          <div class=\"panel-body\" innerhtml.bind=\"products.selectedProduct.productInfo\"></div>\n        </div>\n      </div>\n    </div>\n    \n    \n  </div>\n</template>"; });
 define('text!modules/admin/system/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                    <th>Select</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-check\" aria-hidden=\"true\"></i></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });

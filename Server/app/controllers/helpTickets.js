@@ -41,11 +41,12 @@ module.exports = function (app, config) {
 
   router.get('/api/helpTickets/current/count', requireAuth, function(req, res, next){
     debug('Get helpTicket');
+    var query = buildQuery(req.query, Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
     //var query = buildQuery(req.query, Model.find({ $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
     //query.exec(function(err, object){
-    Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
-      .sort(req.query.order)
-      .exec(function(err, object){
+    // Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
+      // .sort(req.query.order)
+      query.exec(function(err, object){
       if (err) {
         return next(err);
       } else {

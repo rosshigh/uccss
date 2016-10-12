@@ -19,8 +19,6 @@ export class HelpTickets {
          if (!this.helpTicketsArray || refresh) {
            var url = this.data.HELP_TICKET_SERVICES;
            url += options ? options : "";
-          //  var url = current ? this.data.HELP_TICKET_CURRENT : this.data.HELP_TICKET_SERVICES;
-          //  var url =  this.utils.buildURL(url, options, fields);
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.status) {
