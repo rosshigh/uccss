@@ -239,7 +239,7 @@ export class HelpTickets {
     }
 
     async uploadFile(files,content){
-        let response = await this.data.uploadFiles(files,  this.data.HELP_TICKET_UPLOADS + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+        let response = await this.data.uploadFiles(files,  this.data.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
         if(!response.error){
             this.selectedHelpTicket = this.utils.copyObject(response);
             this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);

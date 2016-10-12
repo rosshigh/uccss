@@ -270,7 +270,7 @@ module.exports = function (app, config) {
 
   var upload = multer({ storage: storage});
 
-  router.post('/api/helpTicket/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
+  router.post('/api/helpTickets/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);

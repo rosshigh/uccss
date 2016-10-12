@@ -137,7 +137,7 @@ export class ViewHelpTickets {
  *****************************************************************************************/
   _createResponse(){
     this.helpTickets.selectedHelpTicketContent.personId = this.app.user._id;
-    this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_RESPONSE_TYPE;
+    this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_OTHER_TYPE;
   }
 
  /*****************************************************************************************
@@ -160,7 +160,7 @@ export class ViewHelpTickets {
             };
              this.helpTickets.sendMail(obj);
           }
-            this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+            this.utils.showNotification("The help ticket was updated");
             if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files,serverResponse._id);
         }
         this._cleanUp();

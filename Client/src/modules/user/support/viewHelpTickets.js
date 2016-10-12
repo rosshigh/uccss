@@ -126,7 +126,7 @@ export class ViewHelpTickets {
         this. _createResponse();
         let serverResponse = await this.helpTickets.saveHelpTicketResponse();
         if (!serverResponse.status) {
-            this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+            this.utils.showNotification("The help ticket was updated");
             if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
         }
         this._cleanUp();
