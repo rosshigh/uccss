@@ -3,12 +3,11 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {Downloads} from '../../../resources/data/downloads';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 
-@inject(DataTable, Downloads, Utils, DialogService, Validation, AppConfig)
+@inject(DataTable, Downloads, Utils, CommonDialogs, Validation, AppConfig)
 export class EditProducts {
     downloadItemSelected = false;
     editCat = false;
@@ -128,18 +127,15 @@ export class EditProducts {
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Download",
-            message : "Are you sure you want to delete the download?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteDownload();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the download?", 
+            "Delete Download", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.deleteDownload();    
+                }
+            });
     }
 
     async deleteDownload(){
@@ -147,7 +143,7 @@ export class EditProducts {
         let serverResponse = await this.downloads.deleteDownload();
         if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification("Download " + name + " was deleted", "", "", "", "", 5);
+                this.utils.showNotification("Download ${name} was deleted");
         }
         this.downloadSelected = false;
         this.selectedFiles = undefined;
@@ -157,21 +153,17 @@ export class EditProducts {
     back() {
         var change = this.downloads.isDirty(this.originalDownload);
         if(change.length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The item has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                    this.downloadSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The item has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if(!response.wasCancelled){
+                       this.save();
+                    } else {
+                        this.downloadSelected = false;
+                    }    
+                });
         } else {
             this.downloadSelected = false;
         }

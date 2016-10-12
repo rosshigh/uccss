@@ -1,9 +1,9 @@
+
+
 export function configure(config) {
   config.globalResources([
     './elements/loading-indicator',
     './elements/nav-bar',
-    './elements/success-dialog',
-    './elements/confirm-dialog',
     './elements/edit-client',
     './elements/add-systems',
     './value-converters/gravatar-url',
@@ -35,6 +35,7 @@ export function configure(config) {
     './value-converters/utc-format',
      './value-converters/check-box',
      './value-converters/phone-number',
-     './attributes/masked'
+      './charts/chart-data',
+      './charts/doughnut-chart'
     ]);
 }

@@ -15,7 +15,7 @@ export class People {
         this.utils = utils;
     }
 
-    async getPeopleArray(refresh, options) {
+    async getPeopleArray(refresh, options) { 
         if (!this.peopleArray || refresh) {
             var url = this.data.PEOPLE_SERVICE;
             url += options ? options : "";
@@ -152,13 +152,15 @@ export class People {
     }
 
     async deletePerson(){
-         let serverResponse = await this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
-            if (serverResponse.status === 204) {
-                this.peopleArrayInternal.splice(this.editIndex, 1);
-                this.peopleArray = this.peopleArrayInternal;
+        if(this.selectedPerson._id){
+            let serverResponse = await this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
+            if (!serverResponse.error) {
+                this.peopleArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
             }
             return serverResponse;
+        }
+        return null;
     }
 
     updatePassword(obj){

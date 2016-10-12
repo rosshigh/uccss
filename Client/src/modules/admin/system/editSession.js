@@ -5,19 +5,17 @@ import {Sessions} from '../../../resources/data/sessions';
 import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
-import {DialogService} from 'aurelia-dialog';
-import {CompositionTransaction} from 'aurelia-framework';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import moment from 'moment';
 
-@inject(Router, Sessions, Validation, Utils, DataTable, AppConfig, DialogService, CompositionTransaction)
+@inject(Router, Sessions, Validation, Utils, DataTable, AppConfig, CommonDialogs)
 export class EditSessions {
     navControl = "sessionNavButtons";
     sessionSelected = false;
     columnspan = 5;
     spinnerHTML="";
 
-    constructor(router, sessions, validation, utils, datatable, config, dialog, compositionTransaction) {
+    constructor(router, sessions, validation, utils, datatable, config, dialog) {
         this.router = router;
         this.sessions = sessions;
         this.utils = utils;
@@ -26,8 +24,6 @@ export class EditSessions {
         this.dataTable.initialize(this);
         this.config = config;
         this.dialog = dialog;
-        // this.compositionTransaction = compositionTransaction;
-        // this.compositionTransactionNotifier = null;
 
         this._setupValidation();
     };
@@ -138,21 +134,17 @@ export class EditSessions {
 
     back() {
          if (this.sessions.isDirty().length) {
-            var cmd = {
-                header: "Save Changes",
-                message: "The session has been changed. Do you want to save your changes?",
-                cancelButton: false,
-                okButton: true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(response => {
-                if (!response.wasCancelled) {
-                    this.save();
-                } else {
-                   this.sessionSelected = false;
-                }
-            });
-
+             return this.dialog.showMessage(
+                "The session has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                        this.save();
+                    } else {
+                        this.sessionSelected = false;
+                    }
+                });
         } else {
             this.sessionSelected = false;
         }

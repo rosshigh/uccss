@@ -1,16 +1,13 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
+import {CommonDialogs} from '../../resources/dialogs/common-dialogs';
 import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import Validation from '../../resources/utils/validation';
 import {AppConfig} from '../../config/appConfig';
-import {SuccessDialog} from '../../resources/elements/success-dialog';
 import $ from 'jquery';
 
-@inject(Router, People, Validation, Utils, AppConfig, DialogService)
+@inject(Router, People, Validation, Utils, AppConfig, CommonDialogs)
 export class Register {
 
   constructor(router, people, validation, utils, config, dialog) {
@@ -70,24 +67,15 @@ export class Register {
         this.people.selectedPerson.roles.push('PROV');
         let response = await this.people.savePerson('register')
             if(!response.status) {
-                var cmd = {
-                    header : "Account Created",
-                    message : "Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.",
-                    cancelButton : false,
-                    okButton : true
-                };
-
-                this.dialog.open({ viewModel: SuccessDialog, model: cmd}).then(response => {
-                    if (!response.wasCancelled) {
-                        console.log('good - ', response.output);
-                    } else {
-                        console.log('bad');
-                    }
-                    console.log(response.output);
-                    this.router.navigate("home");
-                });
+              return this.dialog.showMessage(
+                  "Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", 
+                  "Account Created", 
+                  ['OK']
+                  ).then(response => {
+                      this.router.navigate("home");
+                  });              
             } else {
-                this.utils.showNotification("An error occurred creating the account", "","","","",6);
+                this.utils.showNotification("An error occurred creating the account");
             }
     }
   };

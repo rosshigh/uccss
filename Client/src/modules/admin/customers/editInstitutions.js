@@ -4,12 +4,11 @@ import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import {is4ua} from '../../../resources/data/is4ua';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 
-@inject(DataTable, AppConfig, People, Utils, is4ua, DialogService, Validation)
+@inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation)
 export class EditPeople {
     institutionSelected = false;
     navControl = "institutionsNavButtons";
@@ -105,18 +104,15 @@ export class EditPeople {
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Institution",
-            message : "Are you sure you want to delete the institution?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteInstitution();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the institution?", 
+            "Delete Institution", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.deleteInstitution();    
+                }
+            });
     }
 
     async deleteInstitution(){
@@ -124,7 +120,7 @@ export class EditPeople {
         let serverResponse = await this.people.deleteInstitution();
         if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification(name + " was deleted", "", "", "", "", 5);
+                this.utils.showNotification(name + " was deleted");
         }
         this.institutionSelected = false;
     }
@@ -135,21 +131,17 @@ export class EditPeople {
 
     back(){
          if(this.people.isInstitutionDirty().length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The institution has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                     this.institutionSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The institution has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if(!response.wasCancelled){
+                        this.save();
+                    } else {
+                        this.institutionSelected = false;
+                    }
+                });
         } else {
              this.institutionSelected = false;
         }

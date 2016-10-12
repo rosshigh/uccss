@@ -11,13 +11,12 @@ import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
-import {DialogService} from 'aurelia-dialog';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import {AppState} from '../../../resources/data/appState';
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, DialogService, People, AppState, ClientRequests, Products, Systems)
+@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, CommonDialogs, People, AppState, ClientRequests, Products, Systems)
 export class CreateHelpTickets{
     showInfoBox = false;
     courseSelected = false;

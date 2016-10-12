@@ -6,11 +6,10 @@ import {Utils} from '../../../resources/utils/utils';
 import {DocumentsServices} from '../../../resources/data/documents';
 import {People} from '../../../resources/data/people';
 import {AppState} from '../../../resources/data/appState';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
-import {DialogService} from 'aurelia-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import $ from 'jquery';
 
-@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, AppState, DialogService)
+@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, AppState, CommonDialogs)
 export class Documents {
     navControl = "documentssNavButtons";
     spinnerHTML = "";
@@ -119,19 +118,23 @@ export class Documents {
     }
 
     async delete(){
-        var cmd = {
-            header : "Delete Document",
-            message : "This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?",
-            cancelButton : false,
-            okButton : true
-        };
+        return this.dialog.showMessage(
+            "This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", 
+            "Delete Document", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                     this.deleteDocument();    
+                }
+            });
+    }
 
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) { 
-                this.documents.deleteDocument();
+    async deleteDocument(){
+        let serverResponse = await this.documents.deleteDocument();
+        if (!serverResponse.error) {
+                this.utils.showNotification("The document was deleted");
                 this.showDocumentForm = false;
-            }
-        });
+        }
     }
 
     toggleFileActive(index){

@@ -1,8 +1,5 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
 import {DataTable} from '../../../resources/utils/dataTable';
 import {HelpTickets} from '../../../resources/data/helpTickets';
 import {Sessions} from '../../../resources/data/sessions';
@@ -13,11 +10,10 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import {AppState} from '../../../resources/data/appState';
 import Validation from '../../../resources/utils/validation';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
 
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, AppState, DialogService, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, AppState, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
 export class ArchiveHelpTickets {
     helpTicketSelected = false;
     enterResponse = false;
@@ -26,7 +22,7 @@ export class ArchiveHelpTickets {
     spinnerHTML = "";
     filterValues = new Array();
 
-  constructor(router, config, validation, people, app, dialog, datatable, utils, helpTickets, sessions, apps, products) {
+  constructor(router, config, validation, people, app, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
     this.config = config;
     this.validation = validation;

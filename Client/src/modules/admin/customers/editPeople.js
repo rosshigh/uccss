@@ -5,12 +5,11 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import {is4ua} from '../../../resources/data/is4ua';
 import {AppState} from '../../../resources/data/appState';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 
-@inject(DataTable, AppConfig, People, Utils, is4ua, DialogService, Validation, AppState)
+@inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation, AppState)
 export class EditPeople {
     personSelected = false;
     showCourses = false;
@@ -105,18 +104,15 @@ export class EditPeople {
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Person",
-            message : "Are you sure you want to delete the person?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deletePerson();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the person?", 
+            "Delete Person", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.deletePerson();    
+                }
+            });
     }
 
     async deletePerson(){
@@ -124,7 +120,7 @@ export class EditPeople {
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification(name + " was deleted", "", "", "", "", 5);
+                this.utils.showNotification(name + " was deleted");
         }
         this.personSelected = false;
     }
@@ -135,21 +131,17 @@ export class EditPeople {
 
     back(){
          if(this.people.isPersonDirty().length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The account has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                     this.personSelected = false;
-                }
-            });
-
+             return this.dialog.showMessage(
+                "The account has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                       this.save();
+                    } else {
+                        this.personSelected = false;
+                    }
+                });
         } else {
              this.personSelected = false;
         }

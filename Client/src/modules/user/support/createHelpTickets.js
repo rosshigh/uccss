@@ -1,8 +1,5 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
 import {Utils} from '../../../resources/utils/utils';
 import {Sessions} from '../../../resources/data/sessions';
 import {Downloads} from '../../../resources/data/downloads';
@@ -14,13 +11,12 @@ import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
 import {AppState} from '../../../resources/data/appState';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, DialogService, People, AppState, ClientRequests, Products, Systems)
+@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig,  People, AppState, ClientRequests, Products, Systems)
 export class CreateHelpTickets{
     showInfoBox = false;
     courseSelected = false;
@@ -31,7 +27,7 @@ export class CreateHelpTickets{
 
     showAdditionalInfo=false;
 
-     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, dialog, people, app, clientRequests, products, systems) {
+     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, app, clientRequests, products, systems) {
         this.router = router;
         this.sessions = sessions;
         this.apps = apps;
@@ -42,7 +38,6 @@ export class CreateHelpTickets{
         this.dataTable = datatable;
         this.dataTable.initialize(this);
         this.config = config;
-        this.dialog = dialog;
         this.app = app;
         this.clientRequests = clientRequests;
         this.products = products;

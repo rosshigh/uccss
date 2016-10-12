@@ -3,26 +3,21 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {Config} from '../../../resources/data/config';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
-import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 
-@inject(DataTable, Config, Utils, DialogService, Validation, AppConfig)
+@inject(DataTable, Config, Utils, AppConfig)
 export class EditConfig {
     parameterSelected = false;
     
     navControl = "configNavButtons";
     spinnerHTML = "";
 
-    constructor(datatable, siteConfig, utils, dialog, validation, config) {
+    constructor(datatable, siteConfig, utils, config) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
         this.utils = utils;
         this.siteConfig = siteConfig;
-        this.dialog = dialog;
         this.config = config;
-        this.validation = validation;
     }
 
     attached(){

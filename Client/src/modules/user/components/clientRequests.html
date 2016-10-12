@@ -1,4 +1,5 @@
 <template>
+    <!--
     <div class="alert alert-success col-md-3 rightMargin">
         <h4>Unassigned</h4> <h2 style="margin-left:80px;">${requests.unassignedRequests}</h2>
     </div>
@@ -8,4 +9,14 @@
     <div class="alert alert-success col-md-3 rightMargin">
         <h4>Customer Action</h4> <h2 style="margin-left:110px;">${requests.customerActionRequests}</h2>
     </div>
+-->
+
+    <div class="detail-container">
+    		<div class="row1x2">
+          <h4>Client Requests</h4>
+    			<doughnut-chart class="column2x2">
+    				<chart-data data.bind="clientRequestsArray"></chart-data>
+    			</doughnut-chart>
+    		</div>
+    	</div>
 </template>

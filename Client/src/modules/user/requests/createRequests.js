@@ -1,8 +1,5 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
 import {DataTable} from '../../../resources/utils/dataTable';
 import {Sessions} from '../../../resources/data/sessions';
 import {Products} from '../../../resources/data/products';
@@ -13,13 +10,13 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import {AppState} from '../../../resources/data/appState';
 import Validation from '../../../resources/utils/validation';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 
 import fuelux from 'fuelux';
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, AppState, DialogService, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo)
+@inject(Router, AppConfig, Validation, People, AppState, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo)
 export class ViewHelpTickets {
   sessionSelected = false;
   courseSelected = false;
@@ -259,31 +256,24 @@ export class ViewHelpTickets {
       if(el.target.id === this.requests.selectedRequest.requestDetails[i].productId){
         if(this.requests.selectedRequest.requestDetails[i]._id){
           if(this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE){
-            var cmd = {
-                header: "Cannot Delete Request",
-                message: "That request has already been assigned and cannot be deleted?",
-                // cancelButton: false,
-                okButton: true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(response => {
-
-            });
+            return this.dialog.showMessage(
+              "That request has already been assigned and cannot be deleted?", 
+              "Cannot Delete Request", 
+              ['Ok']
+              ).then(response => {
+              });
+          
           } else {
-            var cmd = {
-                header: "Delete Request",
-                message: "Are you sure you want to delete that request?",
-                cancelButton: false,
-                okButton: true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(response => {
-                if (!response.wasCancelled) {
+            return this.dialog.showMessage(
+              "Are you sure you want to delete that request?", 
+              "Delete Request", 
+              ['Yes','No']
+              ).then(response => {
+                 if (!response.wasCancelled) {
                      this.requests.selectedRequest.requestDetails.splice(i,1);
                 }
-            });
+              });
           }
-
           break;
         } else {
           this.requests.selectedRequest.requestDetails.splice(i,1);

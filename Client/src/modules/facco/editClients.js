@@ -1,8 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
 
-import {DialogService} from 'aurelia-dialog';
-
 import {DataTable} from '../../resources/utils/dataTable';
 import {Sessions} from '../../resources/data/sessions';
 import {Systems} from '../../resources/data/systems';
@@ -13,12 +11,11 @@ import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import {AppState} from '../../resources/data/appState';
 import Validation from '../../resources/utils/validation';
-import {ConfirmDialog} from '../../resources/elements/confirm-dialog';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, AppState, DialogService, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
+@inject(Router, AppConfig, Validation, People, AppState,  DataTable, Utils, Sessions, Products, Systems, ClientRequests)
 export class EditClients {
     requestSelected = false;
     showAddStudentTemplate = false;
@@ -29,7 +26,7 @@ export class EditClients {
     navControl = "requestsNavButtons";
     spinnerHTML = "";
 
-    constructor(router, config, validation, people, app, dialog, datatable, utils, sessions, products, systems, requests) {
+    constructor(router, config, validation, people, app,  datatable, utils, sessions, products, systems, requests) {
         this.router = router;
         this.config = config;
         this.validation = validation;

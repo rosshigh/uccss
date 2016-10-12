@@ -1,8 +1,5 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
 import {DataTable} from '../../../resources/utils/dataTable';
 import {HelpTickets} from '../../../resources/data/helpTickets';
 import {Sessions} from '../../../resources/data/sessions';
@@ -13,12 +10,12 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import {AppState} from '../../../resources/data/appState';
 import Validation from '../../../resources/utils/validation';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, AppState, DialogService, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, AppState, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
 export class ViewHelpTickets {
     helpTicketSelected = false;
     enterResponse = false;

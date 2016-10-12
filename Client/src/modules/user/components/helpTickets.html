@@ -1,4 +1,5 @@
 <template>
+    <!--
     <div class="alert alert-info col-md-3 rightMargin">
         <h4>New</h4> <h2 style="margin-left:80px;">${helpTickets.newHelpTickets}</h2>
     </div>
@@ -8,4 +9,15 @@
     <div class="alert alert-info col-md-3 rightMargin">
         <h4>Customer Action</h4> <h2 style="margin-left:110px;">${helpTickets.customerActionHelpTickets}</h2>
     </div>
+    -->
+     
+    <div class="detail-container">
+       
+    		<div class="row1x2">
+                <h4>Help Tickets</h4>
+    			<doughnut-chart class="column2x2">
+    				<chart-data data.bind="helpTicketArray"></chart-data>
+    			</doughnut-chart>
+    		</div>
+    	</div>
 </template>

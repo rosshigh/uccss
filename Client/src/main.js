@@ -20,7 +20,6 @@ export function configure(aurelia) {
          baseConfig.configure(config);
     })
     .plugin("aurelia-dialog")
-    .plugin('aurelia-validation')
     .plugin('aurelia-notification', config => {
       config.configure({
         translate: false,  // 'true' needs aurelia-i18n to be configured

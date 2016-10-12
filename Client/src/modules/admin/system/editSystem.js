@@ -1,8 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
-import {DialogService} from 'aurelia-dialog';
-
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import {Utils} from '../../../resources/utils/utils';
 import {Systems} from '../../../resources/data/systems';
 import {Sessions} from '../../../resources/data/sessions';
@@ -11,12 +9,10 @@ import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
-
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, Systems, Products, Validation, Utils, DataTable, AppConfig, DialogService, Sessions)
+@inject(Router, Systems, Products, Validation, Utils, DataTable, AppConfig, CommonDialogs, Sessions)
 export class EditSystem {
     systemSelected = false;
     navControl = "systemNavButtons";
@@ -107,34 +103,28 @@ export class EditSystem {
     }
 
     refreshClients() {
-        var cmd = {
-            header : "Refresh Clients",
-            message : "This will return clients to an initial state.  You must save the system for this to take effect.",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.saveClients = true;
-                this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);
-            }
-        }); 
+        return this.dialog.showMessage(
+            "This will return clients to an initial state.  You must save the system for this to take effect.", 
+            "Refresh Clients", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.saveClients = true;
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);    
+                }
+            });
     }
 
     async deleteClients() {
-         var cmd = {
-            header : "Delete Clients",
-            message : "Are you sure about this, this action cannot be undone?",
-            cancelButton : false,
-            okButton : true
-        };
-        var that = this;
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-               this.deleteAllClients();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure about this, this action cannot be undone?", 
+            "Delete Clients", 
+            ['Yes', 'No']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.deleteAllClients();
+                }
+            });
     }
     
     async deleteAllClients(){
@@ -158,18 +148,15 @@ export class EditSystem {
     }
 
     async deleteClient(){
-          var cmd = {
-            header : "Delete Clients",
-            message : "Are you sure about this, this action cannot be undone?",
-            cancelButton : false,
-            okButton : true
-        };
-        var that = this;
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-               that.deleteC();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure about this, this action cannot be undone?", 
+            "Delete Clients", 
+            ['Yes', 'No']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    that.deleteC();
+                }
+            });
     }
     
     async deleteC(){
@@ -250,21 +237,17 @@ export class EditSystem {
 
     back() {
         if (this.systems.isDirty().length) {
-            var cmd = {
-                header: "Save Changes",
-                message: "The system has been changed. Do you want to save your changes?",
-                cancelButton: false,
-                okButton: true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd }).then(response => {
-                if (!response.wasCancelled) {
-                    this.save();
-                } else {
-                    this.systemSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The system has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                        this.save();
+                    } else {
+                        this.systemSelected = false;
+                    }
+                });
         } else {
             this.systemSelected = false;
         }

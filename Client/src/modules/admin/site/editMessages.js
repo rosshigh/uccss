@@ -3,13 +3,12 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {SiteInfo} from '../../../resources/data/siteInfo';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 import moment from 'moment';
 
-@inject(DataTable, SiteInfo, Utils, DialogService, Validation, AppConfig)
+@inject(DataTable, SiteInfo, Utils, CommonDialogs, Validation, AppConfig)
 export class EditMessages {
     newsItemSelected = false;
     navControl = "newsNavButtons";
@@ -96,32 +95,29 @@ export class EditMessages {
             let serverResponse = await this.siteinfo.saveMessageItem();
             if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification("The message was updated", "", "", "", "", 5);
+                this.utils.showNotification("The message was updated");
             }
             this.messageItemSelected = false;
         }
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Message",
-            message : "Are you sure you want to delete the message?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteMessage();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the message?", 
+            "Delete Message", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                     this.deleteMessage();   
+                }
+            });
     }
 
     async deleteMessage(){
         let serverResponse = await this.siteinfo.deleteMessage();
         if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification("The message was deleted", "", "", "", "", 5);
+                this.utils.showNotification("The message was deleted");
         }
         this.messageItemSelected = false;
     }
@@ -129,21 +125,17 @@ export class EditMessages {
     back() {
         var change = this.siteinfo.isMessageDirty(this.originalMessage);
         if(change.length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The message has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                    this.messageItemSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The message has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                        this.save();
+                    } else {
+                        this.messageItemSelected = false;
+                    }
+                });
         } else {
             this.messageItemSelected = false;
         }

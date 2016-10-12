@@ -5,13 +5,12 @@ import {Utils} from '../../../resources/utils/utils';
 import {Systems} from '../../../resources/data/systems';
 import {Products} from '../../../resources/data/products';
 import {is4ua} from '../../../resources/data/is4ua';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import {DocumentsServices} from '../../../resources/data/documents';
 import $ from 'jquery';
 
-@inject(DataTable, Products, Utils, Systems, is4ua, DialogService, Validation, AppConfig, DocumentsServices)
+@inject(DataTable, Products, Utils, Systems, is4ua, CommonDialogs, Validation, AppConfig, DocumentsServices)
 export class EditProducts {
     productSelected = false;
     filesSelected = "";
@@ -167,18 +166,15 @@ export class EditProducts {
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Product",
-            message : "Are you sure you want to delete the product?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteProduct();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the product?", 
+            "Delete Product", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.deleteProduct();    
+                }
+            });
     }
 
     async deleteProduct(){
@@ -204,21 +200,17 @@ export class EditProducts {
 
     back() {
         if(this.products.isDirty().length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The product has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                    this.productSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The product has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if(!response.wasCancelled){
+                        this.save();
+                    } else {
+                        this.productSelected = false;
+                    }
+                });            
         } else {
             this.productSelected = false;
         }

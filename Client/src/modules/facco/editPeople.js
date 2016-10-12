@@ -1,18 +1,15 @@
 import {inject} from 'aurelia-framework';
-
-import {DialogService} from 'aurelia-dialog';
-
 import {DataTable} from '../../resources/utils/dataTable';
 import {AppConfig} from '../../config/appConfig';
 import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import {is4ua} from '../../resources/data/is4ua';
 import {AppState} from '../../resources/data/appState';
-import {ConfirmDialog} from '../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../resources/dialogs/common-dialogs';
 
 import $ from 'jquery';
 
-@inject(DataTable, AppConfig, People, Utils, is4ua, AppState, DialogService)
+@inject(DataTable, AppConfig, People, Utils, is4ua, AppState, CommonDialogs)
 export class EditPeople {
     personSelected = false;
     navControl = "peopleNavButtons";
@@ -101,21 +98,17 @@ export class EditPeople {
 
     back(){
          if(this.people.isPersonDirty().length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The account has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                     this.personSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The account has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if(!response.wasCancelled){
+                        this.save();
+                    } else {
+                        this.personSelected = false;
+                    }
+                });
         } else {
              this.personSelected = false;
         }

@@ -3,13 +3,12 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {SiteInfo} from '../../../resources/data/siteInfo';
-import {ConfirmDialog} from '../../../resources/elements/confirm-dialog';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import {DialogService} from 'aurelia-dialog';
 import $ from 'jquery';
 import moment from 'moment';
 
-@inject(DataTable, SiteInfo, Utils, DialogService, Validation, AppConfig)
+@inject(DataTable, SiteInfo, Utils, CommonDialogs, Validation, AppConfig)
 export class EditNews {
     newsItemSelected = false;
     navControl = "newsNavButtons";
@@ -116,25 +115,22 @@ export class EditNews {
     }
 
     delete(){
-        var cmd = {
-            header : "Delete Item",
-            message : "Are you sure you want to delete the item?",
-            cancelButton : false,
-            okButton : true
-        };
-
-        this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteItem();
-            }
-        });
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the item?", 
+            "Delete Item", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.deleteItem();    
+                }
+            });
     }
 
     async deleteItem(){
         let serverResponse = await this.siteinfo.deleteItem();
         if (!serverResponse.error) {
                 this.updateArray();
-                this.utils.showNotification("The Item was deleted", "", "", "", "", 5);
+                this.utils.showNotification("The Item was deleted");
         }
         this.newsItemSelected = false;
         this.selectedFiles = undefined;
@@ -144,21 +140,17 @@ export class EditNews {
     back() {
         var changes = this.siteinfo.isDirty(this.originalSiteInfo);
         if(changes.length){
-            var cmd = {
-                header : "Save Changes",
-                message : "The item has been changed. Do you want to save your changes?",
-                cancelButton : false,
-                okButton : true
-            };
-
-            this.dialog.open({ viewModel: ConfirmDialog, model: cmd}).then(response => {
-                if (!response.wasCancelled) {
-                   this.save();
-                } else {
-                    this.newsItemSelected = false;
-                }
-            });
-
+            return this.dialog.showMessage(
+                "The item has been changed. Do you want to save your changes?", 
+                "Save Changes", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if(!response.wasCancelled){
+                        this.save();    
+                    } else {
+                        this.newsItemSelected = false;
+                    }
+                });
         } else {
             this.newsItemSelected = false;
         }

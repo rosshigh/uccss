@@ -229,6 +229,11 @@
             "path": "../node_modules/aurelia-testing/dist/amd",
             "main": "aurelia-testing",
             "env": "dev"
+          },
+          {
+            "name": "chartjs",
+            "path": "../node_modules/chartjs/Chart.min",
+            "exports": "Chart"
           }
         ]
       }
