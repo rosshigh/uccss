@@ -74,7 +74,6 @@ export class ClientRequestAnalytics {
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.requests.groupRequestsByInstitution();
                 this.updateArray();
-                // this.utils.formatDateForDatesPicker(this.requests.selectedRequest)
                 this.dataTable.createPageButtons(1);
             } else {
                 this.displayArray = new Array();

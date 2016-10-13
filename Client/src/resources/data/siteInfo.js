@@ -215,4 +215,12 @@ export class SiteInfo {
             return serverResponse;
     }
 
+    async getWeather(city){
+
+        let response = this.data.getNoAuth(this.data.OPEN_WEATHER_MAP_SERVICE  + '?q=' + city + '&APPID=' + this.data.API_KEY);
+        //"http://openweathermap.org/img/w/";'http://api.openweathermap.org/data/2.5/weather?q=' + city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931');
+        return response;
+    }
+
+
 }

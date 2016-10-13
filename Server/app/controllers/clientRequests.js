@@ -97,8 +97,6 @@ module.exports = function (app) {
   router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
     debug('Get helpTicket');
     var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
-    //query.exec(function(err, object){
-    //ClientRequestDetail.find( { $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]})
       query.sort(req.query.order)
       .exec(function(err, object){
         if (err) {
@@ -108,6 +106,37 @@ module.exports = function (app) {
         }
       });
   });
+
+//   router.get('/api/clientRequests/session/count/:number', requireAuth, function(req, res, next){
+    
+//         var Session = mongoose.model('Session');
+//         var sessionQuery = Session.find({limit: req.params.number}).sort('startDate',-1).exec()
+//         .then(function(result){
+//           if(result){
+// console.log(result)            
+//               var orString = new Array();
+//               // result.forEach(function(item){
+//               //   orString.push({'sessionId': item._id});
+//               // });
+//               var query = buildQuery(req.query, ClientRequestDetail.find({ $or:orString}));
+//               query.sort('sessionId')
+//                 .exec()
+//                 .then(function(details){
+// console.log("DETAILS")
+// console.log(details)                  
+//                   res.status(200).json(details);
+//                 })
+//                 .catch(function(err){
+//                   return next(err);
+//                 });
+//           }
+//           res.status(200).json({});
+//         })
+//         .catch(function(err){
+//             return next(err);
+//         });
+         
+//   };
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Create clientRequest');

@@ -205,6 +205,8 @@ export class AppConfig {
 
     INSTITUTIONS_ACTIVE = '01';
 
+    UCC_HOME="Milwaukee";
+
     
     HOST = location.origin;
 

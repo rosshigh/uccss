@@ -78,24 +78,39 @@ export class User {
   
   async getData(){
     var currentDate = moment(new Date()).format("MM-DD-YYYY");
-      var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+    var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
     if(this.app.userRole >= this.config.UCC_ROLE){
        let responses = await Promise.all([
           this.helpTickets.getCurrentCount(),
           this.requests.getCurrentCount(),  
-          this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
-          this.siteinfo.getInfoArray(true, options)
-       ]);
+          this.requests.getClientRequestsDetailsArray(true,'?filter=institutionId|eq|' + this.app.user.institutionId),
+          this.sessions.getSessionsArray(false, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
+          this.siteinfo.getInfoArray(false, options)
+        ]);
     } else {
-      // var currentDate = moment(new Date()).format("MM-DD-YYYY");
-      // var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
       let responses = await Promise.all([
           this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.app.user._id),
           this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id),
-          this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
-          this.siteinfo.getInfoArray(true, options),  
+          this.sessions.getSessionsArray(false, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
+          this.siteinfo.getInfoArray(false, options),  
       ]);
     }
+    this.temp = undefined;
+    if(!localStorage.getItem('weather')){
+            let weather = await this.siteinfo.getWeather(this.app.user.city);
+             this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
+            this.temp = this.temp + "\u00b0 C";
+            this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
+            var weatherObj = {temp: this.temp, url: this.weatherIcon};
+            localStorage.setItem('weather',JSON.stringify(weatherObj));
+        } else {
+            let weather = JSON.parse(localStorage.getItem('weather'));
+             this.temp = weather.temp;
+            this.weatherIcon = weather.url; //"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
+        }
+        let uccweather = JSON.parse(localStorage.getItem('uccweather'));
+        this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + "\u00b0 C";
+        this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
   }
   
     

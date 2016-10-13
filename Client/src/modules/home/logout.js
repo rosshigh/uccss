@@ -21,6 +21,7 @@ export class Logout {
       .then(response => {
         this.app.logout();
         localStorage.removeItem("user");
+        localStorage.removeItem('weather');
         console.log("Logged Out");
       })
       .catch(err => {

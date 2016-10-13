@@ -8,7 +8,6 @@ import {People} from '../../resources/data/people';
 import {AppState} from '../../resources/data/appState';
 import {Utils} from '../../resources/utils/utils';
 import {AppConfig} from "../../config/appConfig";
-// import jwtLib from 'jsonwebtoken';
 
 
 @inject(Router, AuthService, People, AppState, Utils, AppConfig, BindingEngine)
@@ -50,6 +49,7 @@ export class NavBar {
             });
     }
 
+
     deactivate() {
         this.subscription.dispose();
     }
@@ -60,6 +60,7 @@ export class NavBar {
                 console.log("Login response: " + response);
                 this.loginSuccess(response._id);
                 localStorage.setItem("user", response._id);
+                localStorage.setItem('uccweather', JSON.stringify({temp: response.temp, icon: response.icon}));
                 this.loginError = "";
             })
             .catch(error => {
@@ -69,22 +70,22 @@ export class NavBar {
     };
 
     async loginSuccess(user) {
-        var userObj = await this.people.getPerson(user);
-        if (userObj) {
-            var instObj = await this.people.getInstitution(userObj.institutionId);
+        this.userObj = await this.people.getPerson(user);
+        if (this.userObj) {
+            var instObj = await this.people.getInstitution(this.userObj.institutionId);
             if (instObj.institutionStatus !== this.config.INSTITUTIONS_ACTIVE) {
                 this.utils.showNotification("You must belong to an active institution to access the web site");
                 this.router.navigate("logout");
             } else {
-                if (userObj.personStatus !== this.config.ACTIVE_PERSON) {
-                    this.utils.showNotification("You must have an active account to access the web site", "", "", "", "", 6);
+                if (this.userObj.personStatus !== this.config.ACTIVE_PERSON) {
+                    this.utils.showNotification("You must have an active account to access the web site");
                     this.router.navigate("logout");
                 } else {
-                    this.app.setUser(userObj);
+                    this.app.setUser(this.userObj);
                     // this.app.setRole(userObj.roles);
                     if (!this.app.userRole) this.router.navigate("logout");
                     if (this.app.userRole == this.config.PROV_USER) {
-                        this.utils.showNotification("Please complete your profile", "", "", "", "", 5)
+                        this.utils.showNotification("Please complete your profile")
                         this.router.navigate("profile");
                     } else {
                         this.router.navigate("user");
@@ -92,7 +93,7 @@ export class NavBar {
                 }
             }
         } else {
-            this.utils.showNotification("There was a problem validating your account", "", "", "", "", 6)
+            this.utils.showNotification("There was a problem validating your account")
             this.router.navigate("home");
         }
 

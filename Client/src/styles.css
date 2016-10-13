@@ -1,3 +1,21 @@
+.banner {
+    margin-top: 40px;
+    height: 50px;
+    width: 100%;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.browse .textContainer { 
+    height: 430px; 
+    line-height: 400px;
+}
+
+.textContainer h4 {
+    vertical-align: middle;
+    display: inline-block;
+}
+
 .detail-container .header {
     background: #f2f2f2;
     box-shadow: none;

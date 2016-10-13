@@ -1,5 +1,9 @@
 <template>
-    <div class="row">
+    <div class="textContainer banner">
+        <h4><span show.bind="temp" class="leftMargin">${app.user.city} weather: ${temp} </h4><img src="${weatherIcon}"/>
+        <h4><span show.bind="ucctemp" class="leftMargin">UCC weather: ${ucctemp} </h4><img src="${uccweatherIcon}"/></span> 
+        <span class="pull-right rightMargin"><h4>Welcome ${app.user.fullName}</h4></span></div>
+    <div class="row bigMarginTop">
         <div class="col-md-3 bigMarginTop leftMargin">
             <h2 class="underline">Useful Information</h2>
             <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">

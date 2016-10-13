@@ -6,10 +6,12 @@ module.exports = function(grunt) {
 
     env : {
       dev : {
-        NODE_ENV : 'development'
+        NODE_ENV : 'development',
+        UCC_HOME : 'Milwaukee'
       },
       production: {
-        NODE_ENV : 'production'
+        NODE_ENV : 'production',
+        UCC_HOME : 'Milwaukee'
       }
 	},
 	 nodemon: {

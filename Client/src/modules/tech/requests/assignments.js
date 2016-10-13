@@ -817,9 +817,9 @@ export class Assignments {
                 }
             };     
             let serverResponse = await this.requests.sendCustomerMessage(this.message);
-            if (!serverResponse.status) {
+            if (!serverResponse.error) {
                 // this.email.sendMail('CLIENT_REQUEST_CUSTOMER_ACTION', {id: });
-                this.utils.showNotification("The message was sent", "", "", "", "", 5);
+                this.utils.showNotification("The message was sent");
                 this._cleanUp();
             }
         } 

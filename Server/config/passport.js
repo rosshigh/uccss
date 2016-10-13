@@ -13,7 +13,6 @@ var localOptions = {
 };
 
 var localLogin = new localStrategy(localOptions, function(email, password, next){
-  console.log("HERE")
   User.findOne({email: email}, function(err,user){
     if(err){
       return next(err);
@@ -74,7 +73,9 @@ var jwtLogin = new jwtStrategy(jwtOptions, function(payload, next){
 
     res.status(200).json({
       token: generateToken(userInfo),
-      _id: req.user._id
+      _id: req.user._id,
+        temp: process.env.TEMP,
+        icon: process.env.ICON
     });
   };
 

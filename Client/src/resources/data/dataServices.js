@@ -40,6 +40,24 @@ export class DataServices {
 
 	}
 
+    getNoAuth(url){
+        this.isRequesting = true;
+		return this.http.createRequest(url)
+		.asGet()
+		.send().then(response => {
+			this.isRequesting = false;
+			if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+    }
+
 	saveObject(content, url, method) {
         this.isRequesting = true;
 		if(method === 'put'){
@@ -220,5 +238,8 @@ export class DataServices {
 
     //File upload 
     DOCUMENTS_FILE_UPLOAD = 'documents/file';
+
+    API_KEY='0f85bb931f8faad7e35b6f685aa4e931';
+    OPEN_WEATHER_MAP_SERVICE = 'http://api.openweathermap.org/data/2.5/weather';
 
 }

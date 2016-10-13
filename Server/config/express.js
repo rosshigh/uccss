@@ -32,18 +32,6 @@ module.exports = function(app, config) {
     logger.log("Mongoose connected to the database");
   });
 
-  // app.use(function(req, res, next){
-  //   if(req.query.fields){
-  //     var fieldArray = req.query.fields.split(",");
-  //     var fieldList = '';
-  //     for(var i = 0; i<fieldArray.length; i++){
-  //         fieldList += fieldArray[i] + " ";
-  //     }
-  //     req.fieldList = fieldList.substring(0,fieldList.length-1);
-  //   }
-  //   next()
-  // });
-
   logger.log("Attaching plugins");
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
@@ -56,11 +44,6 @@ module.exports = function(app, config) {
       require(model);
     });
 
-  // var jwtCheck = jwt({
-  //     secret: config.secret
-  // });
-  // jwtCheck.unless = unless;
-
   app.use(function (req, res, next) {
       onFinished(res, function (err) {
         logger.log("[%s] finished request", req.connection.remoteAddress);
@@ -68,9 +51,6 @@ module.exports = function(app, config) {
       next();
   });
 
-  // var openPaths = ['/img/*.*','/favicon.ico','/styles/styles.css','/aurelia-bootstrapper','/config.js','/api/login','/test', '/api/institutions','/api/people/register','/api/site','/api/people/checkEmail','/api/sessions'];
-  // app.use(jwtCheck.unless({path:  openPaths}));
-  // app.use(utils.middleware().unless({path: openPaths }));
   logger.log("Loading controllers");
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
     controllers.forEach(function (controller) {

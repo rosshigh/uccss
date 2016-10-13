@@ -91,6 +91,20 @@ export class ClientRequests {
             return null;
         }
     }
+
+    async getInstitutionCount(options){
+        var url = this.data.CLIENT_REQUESTS_SERVICES;
+        url += options ? options : "";
+        var response = await this.data.get(url);
+        if (!response.status) {
+            this.unassignedRequests = this.utils.countItems(1, 'requestStatus', response);
+            this.updatedRequests =  this.utils.countItems(3, 'requestStatus', response);
+            this.customerActionRequests =  this.utils.countItems(4, 'requestStatus', response);
+            return response.count;
+        } else {
+            return null;
+        }
+    }
     
     async getCurrentCount(options){
         var url = this.data.CLIENT_REQUESTS_SERVICES +'/current/count';
@@ -225,8 +239,7 @@ export class ClientRequests {
     }
     
     async sendCustomerMessage(message){
-        console.log(message)
-        let serverResponse = await this.data.saveObject(message, this.data.CLIENT_REQUESTS_SEND_MESSAGE, "put");
+        let serverResponse = await this.data.saveObject(message, this.data.CLIENT_REQUESTS_SERVICES +'/customerAction', "put"); 
         return serverResponse;
     }
 
@@ -280,12 +293,22 @@ export class ClientRequests {
         }
     }
 
+    async getClientRequestsInstitutionCount(refresh, options){
+         if(!this.requestsDetailsArray) {
+            return;
+        }
+
+        var sortedArray = this.requestsDetailsArrayInternal 
+            .sort((a, b) => {
+                var result = (a['requestId'].sessionId < b['requestId'].institutionId) ? -1 : (a['requestId'].institutionId > b['requestId'].institutionId) ? 1 : 0;
+                return result;
+            });
+    }
+
     groupRequestsByInstitution(){
         if(!this.requestsDetailsArray) {
             return;
         }
-
-        // var sortedArray = this.sortArray("requestId.institutionID","ASC")
         var sortedArray = this.requestsDetailsArrayInternal 
             .sort((a, b) => {
                 var result = (a['requestId'].institutionId < b['requestId'].institutionId) ? -1 : (a['requestId'].institutionId > b['requestId'].institutionId) ? 1 : 0;

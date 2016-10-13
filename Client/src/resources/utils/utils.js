@@ -249,6 +249,18 @@ export class Utils{
     return -1;
   }
 
+  lookupValue(value, array, lookUpProperty, returnProperty){
+      if(!value || !array){
+        return;
+      }
+      for(var i = 0, x = array.length; i < x; i++){
+        if(array[i][lookUpProperty] == value) {
+            return array[i][returnProperty];
+        }
+      }
+      return null;
+    }
+
   // tokenIsExpired() {
   //   let jwt = localStorage.getItem('id_token')
   //   if(jwt) {
