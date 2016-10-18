@@ -12,37 +12,14 @@ export class Products {
         this.utils = utils;
     }
 
-    activate() {
-        if (!this.productsArray) this.getData();
-    }
-
-    async getData() {
-        try {
-            let serverResponse = await this.data.getAllObjects(this.data.PRODUCTS_SERVICE);
-            if (!serverResponse.error) {
-                this.productsArrayInternal = serverResponse;
-                this.productsArray = serverResponse;
-                for (var i = 0, x = this.productsArrayInternal.length; i < x; i++) {
-                    this.productsArrayInternal[i].baseIndex = i;
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     async getProductsArray(refresh, options) {
         if (!this.productsArray || refresh) {
             var url = this.data.PRODUCTS_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.productsArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.productsArray = serverResponse;
-                    for (var i = 0, x = this.productsArrayInternal.length; i < x; i++) {
-                        this.productsArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     return undefined;
                 }
@@ -110,40 +87,29 @@ export class Products {
 
         if(!this.selectedProduct._id){
             let serverResponse = await this.data.saveObject(this.selectedProduct, this.data.PRODUCTS_SERVICE, "post");
-            if (!response.error) {
-                this.productsArrayInternal.push(this.selectedProduct);
+            if (!serverResponse.error) {
                 this.productsArray.push(this.selectedProduct);
-                this.editIndex = this.productsArrayInternal.length - 1;
+                this.editIndex = this.productsArray.length - 1;
             } else {
-                this.data.processError(response, "There was an error creating the product.");
+                this.data.processError(serverResponse, "There was an error creating the product.");
                 }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedProduct, this.data.PRODUCTS_SERVICE, "put");
-            if (!response.error) {
+            if (!serverResponse.error) {
                 this.productsArray[this.editIndex] = this.utils.copyObject(this.selectedProduct, this.productsArray[this.editIndex]);
-                this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedProduct, this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex]);
             } else {
-                this.data.processError(response, "There was an error updating the product.");
+                this.data.processError(serverResponse, "There was an error updating the product.");
                 }
             return serverResponse;
         }
 
     }
 
-    // async uploadFile(files){ 
-    //     let response = await this.data.upLoadFiles(files, this.data.PRODUCTS_SERVICE + "/upload/" + this.selectedProduct._id + "/" + this.selectedProduct.name);
-    //     if(!response.error){
-    //         this.productsArray[this.editIndex] = this.utils.copyObject(response, this.productsArray[this.editIndex]);
-    //         this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex] = this.utils.copyObject(response, this.productsArrayInternal[this.productsArray[this.editIndex].baseIndex]);
-    //     }
-    // }
-
     async deleteProduct(){
          let serverResponse = await this.data.deleteObject(this.data.PRODUCTS_SERVICE + '/' + this.selectedProduct._id);
-            if (!response.error) {
-                this.productsArrayInternal.splice(this.editIndex, 1);
-                this.productsArray = this.productsArrayInternal;
+            if (!serverResponse.error) {
+                this.productsArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
             }
             return serverResponse;
@@ -160,37 +126,37 @@ export class Products {
         }
     }
 
-    filterProducts(filters, sort) {
-        var keep;
-        var index = 0;
-        this.productsArray = this.productsArrayInternal.filter((item) => {
-            //Assume the item should be eliminated
-            keep = false;
-            //For each filter in filterValues
-            for (var i = 0, x = filters.length; i < x; i++) {
-                keep = item[filters[i].property] === filters[i].value;
-                if (!keep) break;
-            }
-            return keep;
-        })
+    // filterProducts(filters, sort) {
+    //     var keep;
+    //     var index = 0;
+    //     this.productsArray = this.productsArrayInternal.filter((item) => {
+    //         //Assume the item should be eliminated
+    //         keep = false;
+    //         //For each filter in filterValues
+    //         for (var i = 0, x = filters.length; i < x; i++) {
+    //             keep = item[filters[i].property] === filters[i].value;
+    //             if (!keep) break;
+    //         }
+    //         return keep;
+    //     })
 
-        if (sort) {
-            this.sortArray(sort);
-        } else {
-            return this.productsArray;
-        }
-    }
+    //     if (sort) {
+    //         this.sortArray(sort);
+    //     } else {
+    //         return this.productsArray;
+    //     }
+    // }
 
-    sortArray(propertyName) {
-        var propName = sort.propertyName;
-        var sortDirection = sort.direction = "ASC" ? 1 : -1;
-        this.productsArray = filteredArray
-            .slice(0)
-            .sort((a, b) => {
-                var result = (a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0;
-                return result * sortDirection;
-            });
-        return this.productsArray;
-    }
+    // sortArray(propertyName) {
+    //     var propName = sort.propertyName;
+    //     var sortDirection = sort.direction = "ASC" ? 1 : -1;
+    //     this.productsArray = filteredArray
+    //         .slice(0)
+    //         .sort((a, b) => {
+    //             var result = (a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0;
+    //             return result * sortDirection;
+    //         });
+    //     return this.productsArray;
+    // }
 
 }

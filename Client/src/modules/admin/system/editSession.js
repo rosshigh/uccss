@@ -3,7 +3,7 @@ import {Router} from "aurelia-router";
 import {Utils} from '../../../resources/utils/utils';
 import {Sessions} from '../../../resources/data/sessions';
 import Validation from '../../../resources/utils/validation';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import moment from 'moment';
@@ -33,31 +33,27 @@ export class EditSessions {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-        await this.sessions.getSessionsArray(true, '?order=startDate');
-        this.updateArray();
+        await this.sessions.getSessionsArray(true, '?order=startDate:DSC');
+        this.dataTable.updateArray(this.sessions.sessionsArray);
         this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.sessions.getSessionsArray(true, '?order=startDate');
-        this.updateArray();
+        this.dataTable.updateArray(this.sessions.sessionsArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-         this.displayArray = this.sessions.sessionsArray;
-        this.baseArray = this.displayArray;
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this.isChecked = true;
-        this.filterOutClosed();
-    }
+    // updateArray(){
+    //     this.displayArray = this.sessions.sessionsArray;
+    //     this.baseArray = this.displayArray;
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this.isChecked = true;
+    //     this.filterOutClosed();
+    // }
 
     new() {
         this.sessions.selectSession();
@@ -73,8 +69,7 @@ export class EditSessions {
         //Open edit form
         this.sessionSelected = true;
         //Save the index of the item to be edited
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.sessions.selectSession(this.editIndex);
 
         //Not a new session
@@ -91,17 +86,18 @@ export class EditSessions {
     async save() {
         if(this.validation.validate(1,this)){
             let serverResponse = await this.sessions.saveSession();
-            if (!serverResponse.status) {
-                this.updateArray();
-                this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated", "", "", "", "", 5);
+            if (!serverResponse.error) {
+                this.dataTable.updateArray(this.sessions.sessionsArray);
+                this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
                 this.sessionSelected = false;
             }
         }
     }
 
     updateStatus(index, session, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+         this.editIndex = this.dataTable.getOriginalIndex(index);
+        // this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+        // this.displayIndex = index + parseInt(this.dataTable.startRecord);
         this.sessions.selectSession(this.editIndex);
 
         switch (el.target.value) {
@@ -120,11 +116,15 @@ export class EditSessions {
 
     filterOutClosed() {
         if (this.isChecked) {
-            this.displayArray = this.baseArray.filter((item) => {
-                return item.sessionStatus !== 'Closed';
-            })
+            this.filterValues.push({property:"sessionStatus", value:"Closed", type:'text'});
+            if(this.dataTable.active) this.dataTable.filter(this.filterValues);
+
+            // this.displayArray = this.baseArray.filter((item) => {
+            //     return item.sessionStatus !== 'Closed';
+            // })
         } else {
-            this.displayArray = this.baseArray;
+            this.dataTable.updateArray(this.sessions.sessionsArray);
+            // this.displayArray = this.baseArray;
         }
     }
 

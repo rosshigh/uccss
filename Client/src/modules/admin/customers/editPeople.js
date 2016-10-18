@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
@@ -36,7 +36,15 @@ export class EditPeople {
     }
 
     async activate() {
-        await this.getData();
+        let responses = await Promise.all([
+            this.people.getPeopleArray(true, '?order=lastName'),
+            this.people.getInstitutionsArray(true, '?order=name'),
+            this.is4ua.loadIs4ua()
+        ]);
+
+        this.dataTable.updateArray(this.people.peopleArray);
+
+        this.dataTable.createPageButtons(1);
         this.instId = this.app.user.institutionId;
     }
 
@@ -45,35 +53,25 @@ export class EditPeople {
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    async getData(){
-        await this.people.getPeopleArray(true, '?order=lastName');
-        await this.people.getInstitutionsArray(true, '?order=name');
-        await this.is4ua.loadIs4ua();
-
-        if(this.people.peopleArray) this.updateArray();
-
-        this.dataTable.createPageButtons(1);
-    }
-
     async refresh(){
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.people.getPeopleArray(true, '?order=lastName');
-        this. updateArray();
+        this.dataTable.updateArray(this.people.peopleArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.people.peopleArray;
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.people.peopleArray;
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this._cleanUpFilters();
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this._cleanUpFilters();
+    // }
 
     edit(index, el){
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectPerson(this.editIndex);
 
         $("#editFirstName").focus();
@@ -96,7 +94,7 @@ export class EditPeople {
             if(this.people.selectedPerson._id) this.editIndex = this.baseArray.length;
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.status) {
-                this. updateArray();
+                 this.dataTable.updateArray(this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName +  " " + serverResponse.lastName + " was updated", "", "", "", "", 5);
             }
             this.personSelected = false;
@@ -119,7 +117,7 @@ export class EditPeople {
         var name = this.people.selectedPerson.fullName;
         let serverResponse = await this.people.deletePerson();
         if (!serverResponse.error) {
-                this.updateArray();
+                 this.dataTable.updateArray(this.people.peopleArray);
                 this.utils.showNotification(name + " was deleted");
         }
         this.personSelected = false;

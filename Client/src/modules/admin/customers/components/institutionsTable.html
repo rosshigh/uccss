@@ -53,7 +53,7 @@
                                 </select>
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="inst of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr click.trigger="edit($index, $event)" repeat.for="inst of dataTable.displayArray">
                                 <td data-title="Name">${inst.name}</td>
                                 <td data-title="Type">${inst.institutionType | lookupDescription:is4ua.institutionTypes}</td>
                                 <td data-tile="Phone">${inst.memberType | lookupDescription:is4ua.memberTypes}</td>

@@ -23,17 +23,8 @@ export class Sessions {
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.sessionsArrayInternal = serverResponse;
-                    for (var i = 0, x = this.sessionsArrayInternal.length; i < x; i++) {
-                        this.sessionsArrayInternal[i].baseIndex = i;
-                    }
+                if (!serverResponse.error) {
                     this.sessionsArray = serverResponse;
-                    if(options.sortProp){
-                        console.log(this.sessionsArray)
-                        this.sessionsArray =  this.sortArray(this.sessionsArrayInternal, options.sortProp, options.direction);
-                        console.log(this.sessionsArray)
-                    }
                 } else {
                     return undefined;
                 }
@@ -47,7 +38,7 @@ export class Sessions {
     }
 
     async getActiveSessions() {
-        if(!this.sessionsInternalArray) await this.getSessionsArray(true,"","",true);
+        if(!this.sessionsArray) await this.getSessionsArray(true);
 
         this.filters = new Array();
         this.sort = new Array();
@@ -59,7 +50,7 @@ export class Sessions {
     }
 
     async getActiveNextSessions(refresh, options) {
-        if(!this.sessionsInternalArray) await this.getSessionsArray(true,options,"",true);
+        if(!this.sessionsArray) await this.getSessionsArray(true,options);
 
         this.filters = new Array();
         this.sort = new Array();
@@ -89,9 +80,10 @@ export class Sessions {
 
     selectSessionById(id){
       this.selectedSession = null;
-      for(var i = 0; i < this.sessionsArrayInternal.length; i++){
-        if(this.sessionsArrayInternal[i]._id === id){
-          this.selectedSession = this.utils.copyObject(this.sessionsArrayInternal[i]);
+      for(var i = 0; i < this.sessionsArray.length; i++){
+        if(this.sessionsArray[i]._id === id){
+          this.selectedSession = this.utils.copyObject(this.sessionsArray[i]);
+          this.editIndex = i;
           break;
         }
       }
@@ -108,7 +100,7 @@ export class Sessions {
 
         var nextSession = -1;
         //Search for the most recent session and set the next session
-        if(!this.sessionsArrayInternal[0]){
+        if(!this.sessionsArray[0]){
             var today = new Date();
             var month = today.getMonth();
             nextSession = 1;
@@ -121,7 +113,7 @@ export class Sessions {
 
         } else {
             for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
-                if (this.sessionsArrayInternal[0].session === this.config.SESSION_PARAMS[i].session) {
+                if (this.sessionsArray[0].session === this.config.SESSION_PARAMS[i].session) {
                     nextSession = i + 1;
                     break;
                 }
@@ -159,18 +151,14 @@ export class Sessions {
 
         if (!this.selectedSession._id) {
             let serverResponse = await this.data.saveObject(this.selectedSession, this.data.SESSIONS_SERVICE, "post");
-            if (!serverResponse.status) {
-                this.sessionsArrayInternal.push(serverResponse);
-                this.sessionsArray = this.sessionsArrayInternal;
+            if (!serverResponse.error) {
+                this.sessionsArray.push(serverResponse);
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedSession, this.data.SESSIONS_SERVICE, "put");
-            if (!serverResponse.status) {
-                 this.sessionsArrayInternal[this.sessionsArray[this.editIndex].baseIndex] = Object.assign(this.selectedSession);
-                 this.sessionsArray = this.sessionsArrayInternal;
-                // this.sessionsArray[this.editIndex] = Object.assign(this.selectedSession);// this.utils.copyObject(this.selectedSession, this.sessionsArray[this.editIndex]);
-                // this.sessionsArrayInternal[this.sessionsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedSession, this.sessionsArrayInternal[this.sessionsArray[this.editIndex].baseIndex]);
+            if (!serverResponse.error) {
+                 this.sessionsArray[ this.editIndex] = this.utils.copyObject(this.selectedSession);
             }
             return serverResponse;
         }
@@ -193,7 +181,7 @@ export class Sessions {
         var keep;
         var index = 0;
         var filters = this.filters;
-        this.sessionsArray = this.sessionsArrayInternal.filter((item) => {
+        this.sessionsArray = this.sessionsArray.filter((item) => {
             //Assume the item should be eliminated
             keep = false;
             //For each filter in filterValues

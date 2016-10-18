@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {Systems} from '../../../resources/data/systems';
@@ -21,6 +21,8 @@ export class EditProducts {
     selectedFiles;
     removedFiles = new Array();
     spinnerHTML = "";
+    notesEditorContent = "";
+    productInfoEditorContent = "";
 
     tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
     tabPath = './';
@@ -44,38 +46,33 @@ export class EditProducts {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-      let responses = await Promise.all([
-        this.products.getProductsArray(true, '?order=name'),
-        this.systems.getSystemsArray(true, '?order=sid'),
-        this.is4ua.loadIs4ua(),
-        this.documents.getDocumentsCategoriesArray()
-      ]);
-
+        let responses = await Promise.all([
+            this.products.getProductsArray(true, '?order=name'),
+            this.systems.getSystemsArray(true, '?order=sid'),
+            this.is4ua.loadIs4ua(),
+            this.documents.getDocumentsCategoriesArray()
+        ]);
+        this.dataTable.updateArray(this.products.productsArray);
         this.filteredDocumentArray = this.documents.docCatsArray;
-        this.updateArray();
         this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.products.getProductsArray(true, '?order=name');
-        this.updateArray();
+        this.dataTable.updateArray(this.products.productsArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.products.productsArray;
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.products.productsArray;
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this. _cleanUpFilters();
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this. _cleanUpFilters();
+    // }
 
     async new() {
         this.editIndex = -1;
@@ -93,8 +90,7 @@ export class EditProducts {
     }
 
     async edit(index, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.products.selectProduct(this.editIndex);
 
         this.editSystemsString = "";
@@ -105,6 +101,8 @@ export class EditProducts {
         }
 
         this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
+        this.notesEditorContent = this.products.selectedProduct.clientInfo || "";
+        this.productInfoEditorContent = this.products.selectedProduct.productInfo || "";
 
         //Editing a product
         $("#editClientKey").focus();
@@ -116,9 +114,9 @@ export class EditProducts {
         this.productSelected = true;
     }
 
-    deleteFile(index){
-        this.removedFiles.push(this.products.selectedProduct.files.splice(index,1));
-    }
+    // deleteFile(index){
+    //     this.removedFiles.push(this.products.selectedProduct.files.splice(index,1));
+    // }
 
     changeFiles() {
         this.filesSelected = "";
@@ -135,11 +133,11 @@ export class EditProducts {
         } else {
             this.products.selectProduct(this.editIndex);
         }
-        for(var i=0; i<this.removedFiles.length; i++){
-            this.products.selectedProduct.files.push(this.removedFiles[i][0]);
-        }
-        this.selectedFiles = new Array();
-        this.files = undefined;
+        // for(var i=0; i<this.removedFiles.length; i++){
+        //     this.products.selectedProduct.files.push(this.removedFiles[i][0]);
+        // }
+        // this.selectedFiles = new Array();
+        // this.files = undefined;
 
          this.editSystemsString = "";
         if(this.products.selectedProduct.systems){
@@ -150,18 +148,20 @@ export class EditProducts {
     }
 
     async save() {
+        this.products.selectedProduct.clientInfo = this.notesEditorContent;
+        this.products.selectedProduct.productInfo = this.productInfoEditorContent;
         if(this.validation.validate(1, this)){
             let serverResponse = await this.products.saveProduct();
             if (!serverResponse.error) {
-                this.updateArray();
-                this.utils.showNotification("Product " + this.baseArray[this.editIndex].name + " was updated", "", "", "", "", 5);
+                this.dataTable.updateArray(this.products.productsArray);
+                this.utils.showNotification("Product " + this.products.productsArray[this.editIndex].name + " was updated");
                 // if (this.files && this.files.length > 0) this.products.uploadFile(this.files);
             }
 
             this. _cleanUp();
             this.productSelected = false;
-            this.selectedFiles = new Array();
-            this.files = undefined;
+            // this.selectedFiles = new Array();
+            // this.files = undefined;
         }
     }
 
@@ -181,14 +181,14 @@ export class EditProducts {
         var name = this.products.selectedProduct.name;
         let serverResponse = await this.products.deleteProduct();
         if (!serverResponse.error) {
-                this.updateArray();
-                this.utils.showNotification("Product " + name + " was deleted", "", "", "", "", 5);
+                this.dataTable.updateArray(this.products.productsArray);
+                this.utils.showNotification("Product " + name + " was deleted");
         }
         this.productSelected = false;
     }
 
     _cleanUp(){
-        this.filesSelected = "";
+        
     }
 
     _cleanUpFilters(){

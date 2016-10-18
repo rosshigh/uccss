@@ -19,7 +19,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr click.trigger="editDocument($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                        <tr click.trigger="editDocument($index, $event)" repeat.for="item of dataTable.displayArray">
                             <td data-title="name">${item.name}</td>
                             <td data-title="description">${item.description}</td>
                             <td data-title="createdDate">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>

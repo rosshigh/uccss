@@ -15,16 +15,12 @@ export class DocumentsServices {
 
     //Documents
     async getDocumentsArray(refresh, options) {
-        if (!this.appDocumentsArray || refresh) {
+        if (!this.documentsArray || refresh) {
             var url = this.data.DOCUMENTS_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.status) {
-                    this.documentsInternal = serverResponse;
-                    for (var i = 0, x = this.documentsInternal.length; i < x; i++) {
-                        this.documentsInternal[i].baseIndex = i;
-                    }
                     this.documentsArray = serverResponse;
                 } else {
                     return undefined;
@@ -73,16 +69,14 @@ export class DocumentsServices {
             let serverResponse = await this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "post");
             if (!serverResponse.status) {
                 this.selectedDocument = serverResponse;
-                this.documentsInternal.push(this.selectedDocument);
-                this.documentsArray = this.documentsInternal;
-                this.editDocumentIndex = this.documentsInternal.length - 1;
+                this.documentsArray.push(this.selectedDocument);
+                this.editDocumentIndex = this.documentsArray.length - 1;
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "put");
             if (!serverResponse.status) {
                 this.documentsArray[this.editDocumentIndex] = this.utils.copyObject(this.selectedDocument, this.documentsArray[this.editDocumentIndex]);
-                this.documentsInternal[this.documentsArray[this.editDocumentIndex].baseIndex] = this.utils.copyObject(this.selectedDocument, this.documentsInternal[this.documentsArray[this.editDocumentIndex].baseIndex]);
             }
             return serverResponse;
         }
@@ -101,7 +95,6 @@ export class DocumentsServices {
         if (!serverResponse.status) {
             this.selectedDocument.files.splice(index,1);
             this.documentsArray[this.editDocumentIndex] = this.utils.copyObject(this.selectedDocument, this.documentsArray[this.editDocumentIndex]);
-            this.documentsInternal[this.documentsArray[this.editDocumentIndex].baseIndex] = this.utils.copyObject(this.selectedDocument, this.documentsInternal[this.documentsArray[this.editDocumentIndex].baseIndex]);
         }
         return serverResponse;
     }
@@ -110,7 +103,6 @@ export class DocumentsServices {
          let serverResponse = await this.data.deleteObject(this.data.DOCUMENTS_SERVICE + '/' + this.selectedDocument._id);
             if (serverResponse.status === 204) {
                 this.documentsArray.splice(this.editDocumentIndex, 1);
-                this.documentsInternal = this.documentsArray;
                 this.editDownloadIndex = - 1;
             }
             return serverResponse;
@@ -128,6 +120,7 @@ export class DocumentsServices {
      }
      
 
+    
     //Categories
     async getDocumentsCategoriesArray(refresh, options) {
         if (!this.docCatsArray || refresh) {
@@ -135,11 +128,7 @@ export class DocumentsServices {
             url += options ? options : "";;
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.docCatsArrayInternal = serverResponse;
-                    for (var i = 0, x = this.docCatsArrayInternal.length; i < x; i++) {
-                        this.docCatsArrayInternal[i].baseIndex = i;
-                    }
+                if (!serverResponse.error) {
                     this.docCatsArray = serverResponse;
                 } else {
                     return undefined;
@@ -191,16 +180,14 @@ export class DocumentsServices {
         if (!this.selectedCat._id) {
             let serverResponse = await this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "post");
             if (!serverResponse.status) {
-                this.docCatsArrayInternal.push(serverResponse);
-                this.docCatsArray = this.docCatsArrayInternal
-                this.editCatIndex = this.docCatsArrayInternal.length - 1;
+                this.docCatsArray.push(serverResponse);
+                this.editCatIndex = this.docCatsArray.length - 1;
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "put");
             if (!serverResponse.status) {
                 this.docCatsArray[this.editCatIndex] = this.utils.copyObject(this.selectedCat, this.docCatsArray[this.editCatIndex]);
-                this.docCatsArrayInternal[this.docCatsArray[this.editCatIndex].baseIndex] = this.utils.copyObject(this.selectedCat, this.docCatsArrayInternal[this.docCatsArray[this.editCatIndex].baseIndex]);
             }
             return serverResponse;
         }
@@ -211,8 +198,7 @@ export class DocumentsServices {
         if (this.selectedCat._id) {
             let serverResponse = await this.data.deleteObject(this.data.DOCUMENTS_CATEGORY_SERVICE + '/' + this.selectedCat._id);
             if (serverResponse.status === 204) {
-                this.docCatsArrayInternal.splice(this.editCatIndex, 1);
-                this.docCatsArray = this.docCatsArrayInternal;
+                this.docCatsArray.splice(this.editCatIndex, 1);
                 this.editCatIndex = - 1;
             }
             return serverResponse;

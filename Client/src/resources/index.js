@@ -6,6 +6,7 @@ export function configure(config) {
     './elements/nav-bar',
     './elements/edit-client',
     './elements/add-systems',
+    './elements/tiny-mce',
     './value-converters/gravatar-url',
     './value-converters/info-filter',
     './value-converters/date-format',
@@ -33,9 +34,9 @@ export function configure(config) {
     './value-converters/stat-value',
     './value-converters/sort-stat',
     './value-converters/utc-format',
-     './value-converters/check-box',
-     './value-converters/phone-number',
-      './charts/chart-data',
-      './charts/doughnut-chart'
-    ]);
+    './value-converters/check-box',
+    './value-converters/phone-number',
+    './charts/chart-data',
+    './charts/doughnut-chart'
+  ]);
 }

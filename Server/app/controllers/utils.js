@@ -10,7 +10,7 @@ module.exports = function (app) {
   buildQuery = function(queryObject, reqQuery){
     if(queryObject.order) {
       var order = queryObject.order.split(':');
-      if(order[1] && order[1]=='DSC') order[0] += "-";
+      if(order[1] && order[1] =='DSC')  order[0] = '-' + order[0];
       reqQuery.sort(order[0]);
     }
     if(queryObject.fields) reqQuery.select(queryObject.fields);

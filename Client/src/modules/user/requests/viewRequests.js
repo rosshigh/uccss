@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {Sessions} from '../../../resources/data/sessions';
 import {Systems} from '../../../resources/data/systems';
 import {Products} from '../../../resources/data/products';
@@ -21,6 +21,7 @@ export class ViewHelpTickets {
 
   navControl = "requestsNavButtons";
   spinnerHTML = "";
+  commentsResponse = "";
 
   constructor(router, config, validation, people, app,  datatable, utils, sessions, systems, products, requests) {
     this.router = router;
@@ -37,20 +38,16 @@ export class ViewHelpTickets {
     this.systems = systems;
   };
 
-  activate() {
+  async activate() {
     $("#infoBox").fadeOut();
     $("#existingRequestInfo").fadeOut();
-    this.getData();
-    // this._setUpValidation();
-  }
-
-  async getData() {
     let responses =  await Promise.all([
       this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate' ),
       this.people.getMyCourses(true, "?filter=personId|eq|" + this.app.user._id),
       this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'),
-      this.systems.getSystemsArray(true)
+      this.systems.getSystemsArray(true) 
     ]);
+    // this._setUpValidation();
   }
 
   async getRequests() {
@@ -61,7 +58,6 @@ export class ViewHelpTickets {
       // this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
       
       this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
-      
       this.dataTable.createPageButtons(1);
       this.selectedDetailIndex = 0;
     } else {
@@ -76,18 +72,12 @@ export class ViewHelpTickets {
   }
 
   updateArray() {
-    if (this.requests.requestsArray && this.requests.requestsArray.length) {
-      $("#infoBox").html("");
-      $("#infoBox").append(this.config.VIEW_REQUEST_MESSAGE);
-      $("#infoBox").fadeIn();
-      this.displayArray = this.requests.requestsArray[0].requestDetails;
-      this.baseArray = this.displayArray;
-      for (var i = 0; i < this.baseArray.length; i++) {
-        this.baseArray[i].originalIndex = i;
-      }
-    } else {
-      this.displayArray = new Array();
-    }
+    // if (this.requests.requestsArray && this.requests.requestsArray.length) {
+        $("#infoBox").html("");
+        $("#infoBox").append(this.config.VIEW_REQUEST_MESSAGE);
+        $("#infoBox").fadeIn();
+        this.dataTable.updateArray(this.requests.requestsArray[0].requestDetails);
+    // }
   }
 
   edit(product, el, index) {
@@ -96,6 +86,7 @@ export class ViewHelpTickets {
     this.requests.setSelectedRequestDetail(product);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
     this.selectedAssignmentIndex = 0;
+    this.commentsResponse = this.requests.selectedRequest.comments;
     if(this.requests.selectedRequestDetail.assignments.length){
       this.systems.selectedSystemFromId(this.requests.selectedRequestDetail.assignments[this.selectedAssignmentIndex].systemId);
       this.showRequest = true;
@@ -109,6 +100,7 @@ export class ViewHelpTickets {
   }
 
   async save() {
+    this.requests.selectedRequest.comments = this.commentsResponse;
     if (this.validation.validate(1, this)) {
       if(this._buildRequest()){
         let serverResponse = await this.requests.saveRequest();

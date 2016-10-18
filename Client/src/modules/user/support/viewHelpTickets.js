@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {HelpTickets} from '../../../resources/data/helpTickets';
 import {Sessions} from '../../../resources/data/sessions';
 import {Products} from '../../../resources/data/products';
@@ -23,6 +23,7 @@ export class ViewHelpTickets {
     navControl = "supportNavButtons";
     spinnerHTML = "";
     filterValues = new Array();
+    responseContent = "";
 
   constructor(router, config, validation, people, app, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
@@ -43,41 +44,32 @@ export class ViewHelpTickets {
       $('[data-toggle="tooltip"]').tooltip();
   }
 
-  activate() {
-    this.getData();
-    // this._setUpValidation();
-  }
+  async activate() {
+      let responses = await Promise.all([
+        this.helpTickets.getHelpTicketArray(true,"?filter=personId|eq|" + this.app.user._id,"",true),
+        this.sessions.getSessionsArray(true, '?order=startDate'),
+        this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
+        this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName')
+      ]);
+      this.updateArray();
+      
+      this.isUCC = this.app.userRole >- this.config.UCC_TECH_ROLE;
 
-  async getData(){
-    let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray(true,"?filter=personId|eq|" + this.app.user._id,"",true),
-      this.sessions.getSessionsArray(true, '?order=startDate'),
-      this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName')
-    ]);
-    this.updateArray();
-    
-    this.isUCC = this.app.userRole >- this.config.UCC_TECH_ROLE;
-
-    //var options = '?filter=[and]itemType|eq|ILNK:expiredDate|gt|' + currentDate + '&order=Category';
-    this.dataTable.createPageButtons(1);
-    this.filterValues.push({property:"helpTicketStatus", value:this.config.NEW_HELPTICKET_STATUS, type:'select-one'});
-    if(this.baseArray) this.dataTable.filter(this.filterValues);
+      this.dataTable.createPageButtons(1);
+      this.filterValues.push({property:"helpTicketStatus", value:this.config.NEW_HELPTICKET_STATUS, type:'select-one'});
+      if(this.dataTable.active) this.dataTable.filter(this.filterValues);
+      this._setUpValidation();
   }
 
   async refresh(){
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
     await this.helpTickets.getHelpTicketArray(true, '?filter=personId|eq|' + this.app.user._id);
-    this. updateArray();
+    this.updateArray();
     this.spinnerHTML = "";
   }
 
   updateArray(){
-    this.displayArray = this.helpTickets.helpTicketsArray;
-    this.baseArray = this.displayArray;
-     for(var i = 0; i<this.baseArray.length; i++){
-      this.baseArray[i].originalIndex = i;
-    }
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this._cleanUpFilters();
   }
 
@@ -88,7 +80,7 @@ export class ViewHelpTickets {
   }
 
   async selectHelpTicket(el, index){
-      this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+      this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
       this.helpTickets.selectHelpTicket(this.editIndex);
 
       if(this.helpTickets.selectedHelpTicket.content[0].content.systemId){
@@ -104,6 +96,7 @@ export class ViewHelpTickets {
   }
 
   respond(){
+    this.responseContent = "";
     this.helpTickets.selectHelpTicketContent();
     this.enterResponse = true;
     this.enableButton = true;
@@ -118,6 +111,7 @@ export class ViewHelpTickets {
   _createResponse(){
     this.helpTickets.selectedHelpTicketContent.personId = this.app.user._id;
     this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_OTHER_TYPE;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent
   }
 
   async saveResponse(){
@@ -125,8 +119,9 @@ export class ViewHelpTickets {
       // if(this.validation.validate(1, this)){
         this. _createResponse();
         let serverResponse = await this.helpTickets.saveHelpTicketResponse();
-        if (!serverResponse.status) {
-            this.utils.showNotification("The help ticket was updated");
+        if (!serverResponse.error) {
+              this.updateArray()
+              this.utils.showNotification("The help ticket was updated");
             if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
         }
         this._cleanUp();
@@ -163,50 +158,50 @@ export class ViewHelpTickets {
     this.helpTicketSelected = false;
   }
 
-  // _setUpValidation(){
-  //   this.validation.addRule("00","curriculumTitle",{"rule":"required","message":"Curriculum Title is required"});
-  //   this.validation.addRule("00","client",{"rule":"required","message":"You must select a client",
-  //     "valFunction":function(context){
-  //       return (context.helpTicket.clientId !== undefined);
-  //     }});
-  //   this.validation.addRule("01","resetPasswordUserIDs",{"rule":"required","message":"You must enter the passwords to reset"});
-  //   this.validation.addRule("01","client",{"rule":"required","message":"You must enter the passwords to reset",
-  //     "valFunction":function(context){
-  //       return (context.helpTicket.clientId !== undefined);
-  //     }});
-  //   this.validation.addRule("02","application",{"rule":"required","message":"You must select the application",
-  //     "valFunction":function(context){
-  //       return (context.content.application !== undefined);
-  //     }});
-  // }
+  _setUpValidation(){
+    this.validation.addRule("00","curriculumTitle",{"rule":"required","message":"Curriculum Title is required"});
+    this.validation.addRule("00","client",{"rule":"required","message":"You must select a client",
+      "valFunction":function(context){
+        return (context.helpTicket.clientId !== undefined);
+      }});
+    this.validation.addRule("01","resetPasswordUserIDs",{"rule":"required","message":"You must enter the passwords to reset"});
+    this.validation.addRule("01","client",{"rule":"required","message":"You must enter the passwords to reset",
+      "valFunction":function(context){
+        return (context.helpTicket.clientId !== undefined);
+      }});
+    this.validation.addRule("02","application",{"rule":"required","message":"You must select the application",
+      "valFunction":function(context){
+        return (context.content.application !== undefined);
+      }});
+  }
 
-  // _cleanUpNewHelpTicket(){
-  //   this.newHelpTicket = {}
-  //   this.newHelpTicket.sessionId = ""
-  //   this.newHelpTicket.courseId = ""
-  //   this.content = {}
-  //   this.clients = []
-  // }
+  _cleanUpNewHelpTicket(){
+    this.newHelpTicket = {}
+    this.newHelpTicket.sessionId = ""
+    this.newHelpTicket.courseId = ""
+    this.content = {}
+    this.clients = []
+  }
 
-  // async _cleanUp(){
-  //   if(this.isTech()){
-  //     this.getTechData();
-  //   } else {
-  //     this.getData();
-  //   }
+  async _cleanUp(){
+    if(this.isTech()){
+      this.getTechData();
+    } else {
+      this.getData();
+    }
 
-  //   this._cleanUpNewHelpTicket()
-  //   this._hideTypes();
-  //   if(this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
-  //   this.showAdditionalInfo = false;
-  //   this.enableButton = false;
-  //   if(this.files.length !== 0 && this.files !== null) {
-  //     $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
-  //     $("#uploadFiles").unwrap();
-  //     this.files = [];
-  //   }
-  //   this.filesSelected="";
-  // }
+    this._cleanUpNewHelpTicket()
+    this._hideTypes();
+    if(this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
+    this.showAdditionalInfo = false;
+    this.enableButton = false;
+    if(this.files.length !== 0 && this.files !== null) {
+      $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
+      $("#uploadFiles").unwrap();
+      this.files = [];
+    }
+    this.filesSelected="";
+  }
 
 
 

@@ -25,6 +25,7 @@ export class ViewHelpTickets {
   spinnerHTML="";
   courseId = -1;
   requestType = -1;
+  commentsResponse = "";
 
   tempRequests = new Array();
   productInfo = new Array();
@@ -46,19 +47,15 @@ export class ViewHelpTickets {
   };
 
   async activate() {
-    await this.getData();
-    this.updateMessages(true);
-    this._setUpValidation();
-  }
-
-  async getData(){
-    let responses =  await Promise.all([
+      let responses =  await Promise.all([
       this.sessions.getSessionsArray(true, '?order=startDate'),
       this.products.getProductsArray(true, '?order=name'),
       this.siteInfo.getMessageArray(true, '?filter=category|eq|CLIENT_REQUESTS')
     ]);
     this.requests.selectRequest()
     this.filterList();
+    this.updateMessages(true);
+    this._setUpValidation();
   }
 
   async getRequests(){
@@ -68,11 +65,10 @@ export class ViewHelpTickets {
 
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
-            // this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
-            var that = this;
-            this.requests.selectedRequest.requestDetails.forEach(function(currentValue){
-              //  that.utils.formatDateForDatesPicker(currentValue);
-            });
+            // var that = this;
+            // this.requests.selectedRequest.requestDetails.forEach(function(currentValue){
+            // });
+            this.commentsResponse = this.requests.selectedRequest.comments || "";
             this.existingRequest = true;
             this.updateMessages(false);
         } else{
@@ -350,6 +346,7 @@ export class ViewHelpTickets {
     if(this.existingRequest){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
     }
+    this.requests.selectedRequest.comments = this.commentsResponse;
     this.requests.selectedRequest.audit[0].personId = this.app.user._id;
     this.requests.selectedRequest.institutionId = this.app.user.institutionId;
     this.requests.selectedRequest.sessionId = this.sessionId;

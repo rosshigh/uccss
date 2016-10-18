@@ -73,7 +73,7 @@ export class AddSystems{
 
   async _updateSystem(system, productId){
     var obj = {productId: productId};
-    let serverResponse = await this.data.saveObject(obj, this.data.SYSTEMS_UPDATE_PRODUCT.replace('SYSTEMID', system._id), "put");
-    return serverResponse.status === 200;
+    let serverResponse = await this.data.saveObject(obj, this.data.SYSTEMS_SERVICE + '/product/' + system._id, "put");
+    return !serverResponse.error;
   }
 }

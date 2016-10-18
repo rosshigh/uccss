@@ -24,6 +24,7 @@ export class CreateHelpTickets{
     filesSelected;
     selectedFiles;
     removedFiles = new Array();
+    commentsResponse = "";
 
     showAdditionalInfo=false;
 
@@ -51,17 +52,13 @@ export class CreateHelpTickets{
     }
 
     async activate(){
-        await this.getData();
-        this._hideTypes();
-    }
-
-    async getData(){
-        let responses = await Promise.all([
+         let responses = await Promise.all([
             this.sessions.getActiveSessions(true, '?order=startDate'),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
             this.systems.getSystemsArray(true)
          ]);
-        this.helpTickets.selectHelpTicket();     
+        this.helpTickets.selectHelpTicket();
+        this._hideTypes();
     }
 
     /*****************************************************************************************
@@ -135,6 +132,7 @@ export class CreateHelpTickets{
         // this.helpTickets.selectedHelpTicket.referenceNo = count + 1;
         this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
         this.helpTickets.selectedHelpTicket.personId = this.app.user._id;
+        this.helpTickets.selectedHelpTicketContent.content.comments =  this.commentsResponse;
 
         if(!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired){
             //If the help ticket type doesn't require a course, insert a dummy courseId

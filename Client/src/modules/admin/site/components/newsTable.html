@@ -54,7 +54,7 @@
                                     <input input.delegate="dataTable.filterList($event)" id="url" type="text" placeholder="Filter URL" class="form-control" />
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
                                 <td data-title="Title">${item.title}</td>
                                 <td data-title="Date Created" style="width: 75px">
                                     <div>${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</div>

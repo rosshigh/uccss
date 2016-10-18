@@ -45,7 +45,8 @@
                                         compare="obj-array">
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="system of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <!-- | pageFilter:dataTable.startRecord:dataTable.take -->
+                            <tr click.trigger="edit($index, $event)" repeat.for="system of dataTable.displayArray">
                                 <td data-title="Client Key">${system.clientKey}</td>
                                 <td data-title="Name">${system.name}</td>
                                 <td data-title="SAP Product">${system.sapProduct | lookupDescription:sapProductsArray}</td>

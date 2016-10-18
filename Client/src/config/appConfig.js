@@ -235,14 +235,15 @@ export class AppConfig {
 
     setParameters(){
          //Client request parameters
-        this.DEFAULT_FACULTY_IDS = this.getParameter('DEFAULT_FACULTY_IDS');
-        this.REQUEST_LIMIT = this.getParameter('REQUEST_LIMIT');
-        this.REQUEST_LEEWAY = this.getParameter('REQUEST_LEEWAY');
-        this.REGULAR_ID_BUFFER = this.getParameter('REGULAR_ID_BUFFER');
-        this.REGULAR_ID_ALLOWANCE = this.getParameter('REGULAR_ID_ALLOWANCE');
-        this.SANDBOX_ID_BUFFER = this.getParameter('SANDBOX_ID_BUFFER');
-        this.SHARED_ID_BUFFER = this.getParameter('SHARED_ID_BUFFER');
-        this.SANDBOX_ID_COUNT = this.getParameter('SANDBOX_ID_COUNT');
+        this.DEFAULT_FACULTY_IDS = parseInt(this.getParameter('DEFAULT_FACULTY_IDS'));
+        this.REQUEST_LIMIT = parseInt(this.getParameter('REQUEST_LIMIT'));
+        this.REQUEST_LEEWAY = parseInt(this.getParameter('REQUEST_LEEWAY'));
+        this.REGULAR_ID_BUFFER = parseInt(this.getParameter('REGULAR_ID_BUFFER'));
+        this.REGULAR_ID_ALLOWANCE = parseInt(this.getParameter('REGULAR_ID_ALLOWANCE'));
+        this.SANDBOX_ID_BUFFER = parseInt(this.getParameter('SANDBOX_ID_BUFFER'));
+        this.SHARED_ID_BUFFER = parseInt(this.getParameter('SHARED_ID_BUFFER'));
+        this.SANDBOX_ID_COUNT = parseInt(this.getParameter('SANDBOX_ID_COUNT'));
+        this.CLIENT_INTERVAL = parseInt(this.getParameter('CLIENT_INTERVAL'));
     }
 
     getParameter(parameter){

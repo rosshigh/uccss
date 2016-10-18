@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {DocumentsServices} from '../../../resources/data/documents';
@@ -36,42 +36,39 @@ export class Documents {
     }
 
     async activate() {
-        await this.getData();
+        let responses = await Promise.all([
+            this.documents.getDocumentsCategoriesArray(),
+            this.people.getPeopleArray(true)
+        ]);
+        this.filteredDocumentArray = this.documents.docCatsArray;
+
+         this.dataTable.updateArray(this.documents.docCatsArray);
+
+        this.dataTable.createPageButtons(1);
     }
 
     attached(){
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    async getData() {
-        
-        await this.documents.getDocumentsCategoriesArray();
-        await this.people.getPeopleArray(true);
-        this.filteredDocumentArray = this.documents.docCatsArray;
-
-        this.updateArray();
-
-        this.dataTable.createPageButtons(1);
-    }
-
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.documents.getDocumentsArray(true);
-        this.updateArray();
+         this.dataTable.updateArray(this.documents.docCatsArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.documents.documentsArray ? this.documents.documentsArray : new Array();
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.documents.documentsArray ? this.documents.documentsArray : new Array();
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    // }
 
     editDocument(index, el){
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.displayIndex = index + parseInt(this.dataTable.startRecord);
         this.documents.selectDocument(this.editIndex);
 
@@ -98,7 +95,7 @@ export class Documents {
         this.categoryIndex = index;
         this.documents.selectCategory(index);
         await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-        this.updateArray();
+        this.dataTable.updateArray(this.documents.documentsArray);
         this.showDocuments = true;
       }
     }
@@ -186,7 +183,7 @@ export class Documents {
         //   if(this.validation.validate(1, this)){ 
             let serverResponse = await this.documents.saveDocument();
             if (!serverResponse.error) {
-                 this.updateArray();
+                 this.dataTable.updateArray(this.documents.documentsArray);
                  this.utils.showNotification("The document was saved");
                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                  if (this.files && this.files.length > 0) await this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);

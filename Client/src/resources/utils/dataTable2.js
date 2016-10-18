@@ -24,6 +24,8 @@ export class DataTable{
   firstVisible = this.startRecord + 1;
   lastVisible = this.startRecord + this.take - 1;
   numRowsShown = this.take.toString();
+
+  active = false;
   
   constructor(utils){
     this.utils = utils;
@@ -34,7 +36,6 @@ export class DataTable{
   }
 
   pageOne(){
-
     setTimeout(() => {
         $("#" + this.context.navControl).children().removeClass('active');
         $($("#" + this.context.navControl).children()[1]).addClass('active');
@@ -42,12 +43,12 @@ export class DataTable{
   }
 
   createPageButtons(start){
-    this.displayLength = this.context.baseArray.length;
+    this.displayLength = this.baseArray.length;
     this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
     var maxButtons = 7;
     this.currentPage = 1;
     this.pageButtons = [];
-    this.numPageButtons = Math.ceil((this.context.baseArray.length - ((start - 1) * this.take)) / this.take);
+    this.numPageButtons = Math.ceil((this.baseArray.length - ((start - 1) * this.take)) / this.take);
     for(var j = 1; j<this.numPageButtons; j++){
       this.pages[j] = j;
     }
@@ -65,6 +66,14 @@ export class DataTable{
     }
   }
 
+  buildDisplayArray(){
+    this.displayArray = new Array();
+    for(var i = 0; i <= this.take; i++){
+      if(i + this.startRecord >= this.baseArray.length) break;
+      this.displayArray.push(this.baseArray[i + this.startRecord]);
+    }
+  }
+
   forward(){
     $("#" + this.context.navControl).children().removeClass('active');
     this.currentPageElement = this.currentPageElement < this.pageButtons.length-1 ? this.currentPageElement += 1 : this.currentPageElement;
@@ -75,12 +84,11 @@ export class DataTable{
     $($("#" + this.context.navControl).children()[this.currentPageElement + 1]).addClass('active');
     var start = parseInt(this.startRecord);
     var tk = parseInt(this.take);
-    this.startRecord = start + tk > this.context.baseArray.length ?
-      start : start + tk;
+    this.startRecord = start + tk > this.baseArray.length ? start : start + tk;
     this.firstVisible = this.startRecord + 1;
-    this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.context.displayArray.length ?
-      this.context.displayArray.length : parseInt(this.firstVisible) + tk - 1 ;
-    if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.displayArray.length ? this.displayArray.length : parseInt(this.firstVisible) + tk - 1 ;
+    this.buildDisplayArray();
+    // if(typeof(this.context.navigate) === 'function')  this.context.navigate();
   }
 
 
@@ -106,7 +114,8 @@ export class DataTable{
       0 : this.startRecord = start - tk;
     this.firstVisible = this.startRecord + 1;
     this.lastVisible = parseInt(this.firstVisible) + tk - 1;
-    if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    this.buildDisplayArray();
+    // if(typeof(this.context.navigate) === 'function')  this.context.navigate();
   }
 
   pageButton(index, el){
@@ -118,10 +127,11 @@ export class DataTable{
     if(this.pageButtons[index] !== '...'){
       this.startRecord = (this.pageButtons[index] - 1) * tk;
       this.firstVisible = this.startRecord + 1;
-      this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.context.displayArray.length ?
-        this.context.displayArray.length : parseInt(this.firstVisible) + tk - 1 ;
+      this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.displayArray.length ?
+        this.displayArray.length : parseInt(this.firstVisible) + tk - 1 ;
     }
-    if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    // if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    this.buildDisplayArray();
   }
 
   updateTake(el){
@@ -130,7 +140,8 @@ export class DataTable{
     this.lastVisible = parseInt(this.firstVisible) + parseInt(this.take) - 1;
     this.createPageButtons(1);
     this.pageOne();
-    if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    // if(typeof(this.context.navigate) === 'function')  this.context.navigate();
+    this.buildDisplayArray();
   }
 
   filterList(el, array){
@@ -153,14 +164,15 @@ export class DataTable{
     }
 
     //If there are no filters in filterValues, reset the displayArray to the original list
-    if(this.filterValues.length === 0){
-      this.context.displayArray = this.context.baseArray;
-    } else { //filter the array
-      this.context.displayArray = this.filter(this.filterValues, this.context.baseArray, array);
+    if(this.filterValues.length > 0){
+      this.baseArray = this.filter(this.filterValues, this.sourceArray, array);
+    } else {
+      this.baseArray = this.sourceArray;
     }
     this.startRecord = this.DEFAULT_START;
     this.firstVisible = 1;
-    this.displayLength = this.context.displayArray.length;
+    this.buildDisplayArray();
+    this.displayLength = this.displayArray.length;
     this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
 
     this.pageOne();
@@ -169,7 +181,7 @@ export class DataTable{
   filter(filters, baseArray, lookupArray){
     var keep;
     var index = 0;
-    return this.context.baseArray.filter((item) => {
+    return this.baseArray.filter((item) => {
       //Assume the item should be eliminated
       keep = false;
       //For each filter in filterValues
@@ -275,7 +287,7 @@ export class DataTable{
     if(!type){
         this.sortProperty=propertyName;
 
-        this.context.displayArray = this.context.baseArray
+        this.displayArray = this.baseArray
           // .slice(0)
           .sort((a, b) => {
             var result = (a[propertyName] < b[propertyName]) ? -1 : (a[propertyName] > b[propertyName]) ? 1 : 0;
@@ -284,7 +296,7 @@ export class DataTable{
       
     } else if (type == 'id'){
       
-        var sortArray = this.utils.copyArray(this.context.baseArray);
+        var sortArray = this.utils.copyArray(this.baseArray);
         sortArray.forEach((item) => {
           var obj = this.findObj(surrogateArray, surrogateProperty, eval('item.' + propertyName));
           if(obj) item[sortProperty] = obj[sortProperty];
@@ -292,7 +304,7 @@ export class DataTable{
         
         this.sortProperty=propertyName;
 
-        this.context.displayArray = sortArray
+        this.displayArray = sortArray
           // .slice(0)
           .sort((a, b) => {
             var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
@@ -308,16 +320,21 @@ export class DataTable{
     return null;
   }
   
-  updateArray(){
-    this.displayArray = this.helpTickets.helpTicketsArray;
-    this.displayArray.forEach(function(item, index){
-      item.baseIndex = index;
-    });
-    this.baseArray = this.displayArray;
-     for(var i = 0; i<this.baseArray.length; i++){
-      this.baseArray[i].originalIndex = i;
+  updateArray(sourceArray){
+    if(sourceArray) {
+      this.active = true;
+      this.sourceArray = sourceArray;
+      this.baseArray = sourceArray;
+      this.baseArray.forEach(function(item, index){
+        item.baseIndex = index;
+        item.originalIndex = index;
+      });
+      this.buildDisplayArray()
     }
-    this._cleanUpFilters();
+  }
+
+  getOriginalIndex(index){
+    return this.displayArray[index].originalIndex;
   }
 
 }

@@ -55,7 +55,7 @@
                 <input input.delegate="dataTable.filterList($event)" id="requestId.personId" type="text" placeholder="Filter Name" class="form-control">
               </th>
             </tr>
-            <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+            <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of dataTable.displayArray">
               <td data-title="Request No">${request.requestNo}</td>
               <td data-title="Required Date">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
               <td data-title="Date Created">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>

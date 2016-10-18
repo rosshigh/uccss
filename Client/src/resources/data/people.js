@@ -21,12 +21,8 @@ export class People {
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.peopleArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.peopleArray = serverResponse;
-                    for (var i = 0, x = this.peopleArrayInternal.length; i < x; i++) {
-                        this.peopleArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     this.data.processError(serverResponse);
                     return undefined;
@@ -40,7 +36,6 @@ export class People {
     }
 
     clearPeopleArray(){
-        this.peopleArrayInternal = new Array();
          this.peopleArray = new Array();
     }
 
@@ -64,16 +59,13 @@ export class People {
     selectPerson(index) {
         if (index === undefined) {
             this.emptyPerson();
-            // this.newPerson = true;
         } else {
             try {
                 this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
-                // this.newPerson = false;
                 this.editIndex = index;
             } catch (error) {
                 console.log(error);
                 this.selectedPerson = this.emptyPerson();
-                // this.newPerson = true;
             }
 
         }
@@ -90,7 +82,6 @@ export class People {
     }
 
     emptyPerson() {
-        //TODO: All properties
         this.selectedPerson = new Object();
         this.selectedPerson.lastName = "";
         this.selectedPerson.firstName = "";
@@ -129,9 +120,8 @@ export class People {
             }
             let response = await this.data.saveObject(this.selectedPerson, url, "post")
                 if (!response.status) {
-                    if(this.peopleArrayInternal){
-                        this.peopleArrayInternal.push(this.selectedPerson);
-                        this.peopleArray = this.peopleArrayInternal;
+                    if(this.peopleArray){
+                        this.peopleArray.push(this.selectedPerson);;
                     }
                 } else {
                      this.data.processError(response, "There was an error creating the account.");
@@ -139,10 +129,9 @@ export class People {
                 return response;
         } else {
             let response = await this.data.saveObject(this.selectedPerson, this.data.PEOPLE_SERVICE, "put")
-                if (!response.status) {
+                if (!response.error) {
                     if(this.peopleArray){
                         this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
-                        this.peopleArrayInternal[this.peopleArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArrayInternal[this.peopleArray[this.editIndex].baseIndex]);
                     }
                 }  else {
                     this.data.processError(response, "There was an error updating the account.");
@@ -185,15 +174,8 @@ export class People {
             var url = this.data.INSTITUTION_SERVICES;
             url += options ? options : "";
             let response = await this.data.get(url)
-            if (!response.status) {
-                this.institutionsArrayInternal = response;
+            if (!response.error) {
                 this.institutionsArray = response;
-                for (var i = 0, x = this.institutionsArrayInternal.length; i < x; i++) {
-                    this.institutionsArrayInternal[i].baseIndex = i;
-                }
-                if(options.sortProp){
-                    this.institutionsArray =  this.sortArray(this.institutionsArrayInternal, options.sortProp, options.direction);
-                }
                 return this.institutionArray;
             } else {
                 this.institutionsArray = undefined;
@@ -237,6 +219,7 @@ export class People {
         this.institutionsArray.forEach((item) => {
           if(item._id === id){
             this.selectedInstitution = this.utils.copyObject(item);
+            this.editInstitutionIndex = i;
             return;
           }
         });
@@ -244,7 +227,6 @@ export class People {
     }
 
     emptyInstitution() {
-        //TODO: All properties
         var newInstitution = new Object();
         newInstitution.joinDate =  moment(this.utils.convertUTCDateToLocalDate(new Date().toString(0,10))).format("YYYY-MM-DD");
 
@@ -252,21 +234,12 @@ export class People {
         return newInstitution;
     }
 
-    sortArray(sortArray, propName, direction) {
-        var sortDirection = direction == "ASC" ? 1 : -1;
-        return  sortArray
-            .sort((a, b) => {
-                return ((a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0) * sortDirection;
-            });
-    }
-
      async saveInstitution() {
         if (!this.selectedInstitution._id) {
             let response = await this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "post")
                 if (!response.status) {
-                    if(this.institutionsArrayInternal){
-                        this.institutionsArrayInternal.push(this.selectedInstitution);
-                        this.institutionsArray = this.institutionsArrayInternal;
+                    if(this.institutionsArray){
+                        this.institutionsArray.push(this.selectedInstitution);
                     }
                 } else {
                      this.data.processError(response, "There was an error creating the account.");
@@ -277,7 +250,6 @@ export class People {
                 if (!response.status) {
                     if(this.institutionsArray){
                         this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
-                        this.institutionsArrayInternal[this.institutionsArray[this.editInstitutionIndex].baseIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArrayInternal[this.institutionsArray[this.editInstitutionIndex].baseIndex]);
                     }
                 }  else {
                     this.data.processError(response, "There was an error updating the account.");
@@ -289,8 +261,7 @@ export class People {
     async deleteInstitution(){
          let serverResponse = await this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
             if (serverResponse.status === 204) {
-                this.institutionsArrayInternal.splice(this.editInstitutionIndex, 1);
-                this.institutionsArray = this.institutionsArrayInternal;
+                this.institutionsArray.splice(this.editInstitutionIndex, 1);
                 this.editInstitutionIndex = - 1;
             }
             return serverResponse;
@@ -313,55 +284,19 @@ export class People {
            return;
         }
 
-        this.peopleInstArray = this.peopleArrayInternal.filter((item) => {
+        this.peopleInstArray = this.peopleArray.filter((item) => {
             return item.institutionId === id;
         });
     }
 
-    filterInstitutions(filters){
-        this.filters = filters;
-        this.filter(this.institutionsArray, this.institutionsArrayInternal);
-    }
-
-    filter(array1, array2) {
-        var keep;
-        var index = 0;
-        var filters = this.filters;
-        array1 = array2.filter((item) => {
-            //Assume the item should be eliminated
-            keep = false;
-            //For each filter in filterValues
-            for (var i = 0, x = filters.length; i < x; i++) {
-                switch (filters[i].compound){
-                    case 'or':
-                        var values = filters[i].value.split(':');
-                        for(var j = 0; j < values.length; j++){
-                            keep = keep || item[filters[i].property] === values[j];
-                        }
-                        break;
-                    case 'and':
-                    break;
-                    default:
-                        var convertVal = convertValues(item[filters[i].property], filters[i].value, filters[i].type)
-                        keep = keep || item[filters[i].property] === filters[i].value;
-
-                }
-
-                if (!keep) break;
-            }
-            return keep;
-        })
-
-    }
-
-    convertValues(val1, val2, type){
-        var obj = new Object();
-        switch(type){
-            case 'string':
-                var obj = {val1: val1.toUpperCase(), val2: val2.toUpperCase()};
-        }
-        return obj;
-    }
+    // convertValues(val1, val2, type){
+    //     var obj = new Object();
+    //     switch(type){
+    //         case 'string':
+    //             var obj = {val1: val1.toUpperCase(), val2: val2.toUpperCase()};
+    //     }
+    //     return obj;
+    // }
 
     async getCoursesArray(refresh, options, fields) {
         if (!this.coursesArray || refresh) {
@@ -370,12 +305,8 @@ export class People {
               url += options ? options : "";
               try {
                   let serverResponse = await this.data.get(url);
-                  if (!serverResponse.status) {
-                      this.coursesArrayInternal = serverResponse;
+                  if (!serverResponse.error) {
                       this.coursesArray = serverResponse;
-                      for (var i = 0, x = this.coursesArrayInternal.length; i < x; i++) {
-                          this.coursesArrayInternal[i].baseIndex = i;
-                      }
                   } else {
                       return undefined;
                   }
@@ -398,12 +329,8 @@ export class People {
                 url += options ? options : "";
                 try {
                     let serverResponse = await this.data.get(url);
-                    if (!serverResponse.status) {
-                        this.coursesArrayInternal = serverResponse;
+                    if (!serverResponse.error) {
                         this.coursesArray = serverResponse;
-                        for (var i = 0, x = this.coursesArrayInternal.length; i < x; i++) {
-                            this.coursesArrayInternal[i].baseIndex = i;
-                        }
                     } else {
                         return undefined;
                     }
@@ -424,12 +351,10 @@ export class People {
         } else {
             try {
                 this.selectedCourse = this.utils.copyObject(this.coursesArray[index]);
-                this.newSystem = false;
                 this.editCourseIndex = index;
             } catch (error) {
                 console.log(error);
                 this.selectedCourse = this.emptyCourse();
-                this.newSystem = true;
             }
 
         }
@@ -451,23 +376,20 @@ export class People {
 
         if(!this.selectedCourse._id){
             let serverResponse = await this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
-            if (!serverResponse.status) {
-                this.coursesArrayInternal.push(this.selectedCourse);
-                this.coursesArray = this.coursesArrayInternal;
+            if (!serverResponse.error) {
+                this.coursesArray.push(this.selectedCourse);
                 this.editIneditCourseIndexdex = this.coursesArrayInternal.length - 1;
-                this.newSystem = false;
             } else {
-                     this.data.processError(response, "There was an error creating the product.");
+                this.data.processError(response, "There was an error creating the product.");
                 }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "put");
-            if (!serverResponse.status) {
+            if (!serverResponse.error) {
                 this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
-                this.coursesArrayInternal[this.coursesArray[this.editCourseIndex].baseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArrayInternal[this.coursesArray[this.editCourseIndex].baseIndex]);
             } else {
-                     this.data.processError(response, "There was an error updating the course.");
-                }
+                this.data.processError(response, "There was an error updating the course.");
+            }
             return serverResponse;
         }
 

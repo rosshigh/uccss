@@ -40,7 +40,7 @@
                             </select>
                         </th>
                     </tr>
-                    <tr click.trigger="edit($index, $event)" repeat.for="system of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                    <tr click.trigger="edit($index, $event)" repeat.for="system of dataTable.displayArray">
                         <td data-title="Session">${system.sid}</td>
                         <td data-title="StartDate">${system.description}</td>
                         <td  class="hidden-xs hidden-sm" data-title="EndDate">${system.server}</td>

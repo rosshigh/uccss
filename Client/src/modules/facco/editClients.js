@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
 
-import {DataTable} from '../../resources/utils/dataTable';
+import {DataTable} from '../../resources/utils/dataTable2';
 import {Sessions} from '../../resources/data/sessions';
 import {Systems} from '../../resources/data/systems';
 import {Products} from '../../resources/data/products';
@@ -41,31 +41,24 @@ export class EditClients {
         this.systems = systems;
     };
 
-    activate() {
-        this.getData();
-    }
-
-    attached(){
-        $('[data-toggle="tooltip"]').tooltip();
-    }
-
-    async getData() {
+    async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate'),
             this.people.getPeopleArray(true, '?filter=institutionId|eq|' + this.app.user.institutionId + '&order=lastName'),
             this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'),
             this.systems.getSystemsArray(true)
         ]);
+       this.updateArray();
+    }
+
+    attached(){
+        $('[data-toggle="tooltip"]').tooltip();
     }
 
     async getRequests() {
         if (this.selectedSession) {
             await this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
-            this.updateArray();
-            this.utils.formatDateForDatesPicker(this.requests.selectedRequest)
-            this.dataTable.createPageButtons(1);
-        } else {
-            this.displayArray = new Array();
+           this.updateArray();
         }
     }
 
@@ -80,13 +73,9 @@ export class EditClients {
             this.displayArray = this.requests.requestsDetailsArray.filter((item) => {
                 return item.requestId.institutionId == this.app.user.institutionId;
             });;
-            this.baseArray = this.displayArray;
-            for (var i = 0; i < this.baseArray.length; i++) {
-                this.baseArray[i].originalIndex = i;
-            }
-        } else {
-            this.displayArray = new Array();
         }
+        this.dataTable.updateArray(this.displayArray);
+           
     }
 
     /*****************************************************************************************************

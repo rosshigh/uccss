@@ -48,11 +48,13 @@
                     <div class="form-group">
                         <label for="editContent" class="col-sm-2 control-label hideOnPhone">Content</label>
                         <div class="col-sm-8">
-                            <textarea value.bind="siteinfo.selectedMessage.content" id="editContent" class="form-control " placeholder="Content" rows="10"></textarea>
+                            <tiny-mce height.bind="150" value.two-way="messageContent"></tiny-mce>
+                        <!--    <textarea value.bind="siteinfo.selectedMessage.content" id="editContent" class="form-control " placeholder="Content" rows="10"></textarea> -->
                         </div>
                     </div>
                 </div>
             </div>
+            <!--
             <div class="row">
                 <div class="col-sm-12 col-lg-12">
                     <div class="form-group">
@@ -63,6 +65,7 @@
                     </div>
                 </div>
             </div>
+            -->
         </form>
     </div>
 </template>

@@ -36,7 +36,7 @@
                                     />
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
                                 <td data-title="Key">${item.key}</td>
                                 <td data-title="Category" style="width: 75px">
                                     <div>${item.category}</div>

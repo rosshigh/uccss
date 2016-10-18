@@ -1,8 +1,8 @@
-import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
-import {AppConfig} from '../../../config/appConfig';
-import {Utils} from '../../../resources/utils/utils';
-import {Downloads} from '../../../resources/data/downloads';
+import { inject } from 'aurelia-framework';
+import { DataTable } from '../../../resources/utils/dataTable2';
+import { AppConfig } from '../../../config/appConfig';
+import { Utils } from '../../../resources/utils/utils';
+import { Downloads } from '../../../resources/data/downloads';
 
 @inject(DataTable, Downloads, Utils, AppConfig)
 export class Download {
@@ -19,10 +19,6 @@ export class Download {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
         await this.downloads.getDownloadsArray();
         await this.downloads.getDownloadCategoriesArray();
 
@@ -38,21 +34,16 @@ export class Download {
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.downloads.appDownloadsArray ? this.downloads.appDownloadsArray : new Array();
-        this.baseArray = this.displayArray;
-
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
+    updateArray() {
+        this.dataTable.updateArray(this.downloads.appDownloadsArray);
     }
 
-    typeChanged(el){
-      if(el.target.value != ""){
-        this.filterValues = new Array();
-        this.filterValues.push({property: "type", value: el.target.value, type: 'select-one', compare: "id"});
-        if(this.baseArray) this.displayArray = this.dataTable.filter(this.filterValues);
+    typeChanged(el) {
+        if (el.target.value != "") {
+            this.filterValues = new Array();
+            this.filterValues.push({ property: "type", value: el.target.value, type: 'select-one', compare: "id" });
+            if (this.baseArray) this.displayArray = this.dataTable.filter(this.filterValues);
 
-      }
+        }
     }
 }

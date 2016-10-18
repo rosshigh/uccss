@@ -1,0 +1,38 @@
+{"level":"info","message":"Polling...","timestamp":"12:05:39 PM"}
+{"level":"info","message":"Starting application","timestamp":"12:05:40 PM"}
+{"level":"info","message":"Loading Mongoose functionality","timestamp":"12:05:40 PM"}
+{"level":"info","message":"Attaching plugins","timestamp":"12:05:40 PM"}
+{"level":"info","message":"Loading models","timestamp":"12:05:40 PM"}
+{"level":"info","message":"Loading controllers","timestamp":"12:05:40 PM"}
+{"level":"info","message":"Creating HTTP server on port: 5000","timestamp":"12:05:41 PM"}
+{"level":"info","message":"HTTP Server listening on port: 5000 in development mode","timestamp":"12:05:41 PM"}
+{"level":"info","message":"Mongoose connected to the database","timestamp":"12:05:41 PM"}
+{"level":"info","message":"Polling...","timestamp":"12:15:46 PM"}
+{"level":"info","message":"Starting application","timestamp":"12:15:47 PM"}
+{"level":"info","message":"Loading Mongoose functionality","timestamp":"12:15:47 PM"}
+{"level":"info","message":"Attaching plugins","timestamp":"12:15:47 PM"}
+{"level":"info","message":"Loading models","timestamp":"12:15:47 PM"}
+{"level":"info","message":"Loading controllers","timestamp":"12:15:47 PM"}
+{"level":"info","message":"Creating HTTP server on port: 5000","timestamp":"12:15:48 PM"}
+{"level":"info","message":"HTTP Server listening on port: 5000 in development mode","timestamp":"12:15:48 PM"}
+{"level":"info","message":"Mongoose connected to the database","timestamp":"12:15:48 PM"}
+{"level":"info","message":"Polling...","timestamp":"12:18:07 PM"}
+{"level":"info","message":"Starting application","timestamp":"12:18:08 PM"}
+{"level":"info","message":"Loading Mongoose functionality","timestamp":"12:18:08 PM"}
+{"level":"info","message":"Attaching plugins","timestamp":"12:18:08 PM"}
+{"level":"info","message":"Loading models","timestamp":"12:18:08 PM"}
+{"level":"info","message":"Loading controllers","timestamp":"12:18:08 PM"}
+{"level":"info","message":"Creating HTTP server on port: 5000","timestamp":"12:18:09 PM"}
+{"level":"info","message":"HTTP Server listening on port: 5000 in development mode","timestamp":"12:18:09 PM"}
+{"level":"info","message":"Mongoose connected to the database","timestamp":"12:18:09 PM"}
+{"level":"info","message":"[object Object]","timestamp":"12:18:09 PM"}
+{"level":"info","message":"Polling...","timestamp":"12:19:13 PM"}
+{"level":"info","message":"Starting application","timestamp":"12:19:14 PM"}
+{"level":"info","message":"Loading Mongoose functionality","timestamp":"12:19:14 PM"}
+{"level":"info","message":"Attaching plugins","timestamp":"12:19:14 PM"}
+{"level":"info","message":"Loading models","timestamp":"12:19:14 PM"}
+{"level":"info","message":"Loading controllers","timestamp":"12:19:14 PM"}
+{"level":"info","message":"Creating HTTP server on port: 5000","timestamp":"12:19:15 PM"}
+{"level":"info","message":"HTTP Server listening on port: 5000 in development mode","timestamp":"12:19:15 PM"}
+{"level":"info","message":"Mongoose connected to the database","timestamp":"12:19:15 PM"}
+{"coord":{"lon":-87.91,"lat":43.04},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01d"}],"base":"stations","main":{"temp":282.21,"pressure":1007.31,"humidity":90,"temp_min":282.21,"temp_max":282.21,"sea_level":1039.71,"grnd_level":1007.31},"wind":{"speed":3.61,"deg":272.501},"clouds":{"all":0},"dt":1476378494,"sys":{"message":0.1613,"country":"US","sunrise":1476360257,"sunset":1476400208},"id":5263045,"name":"Milwaukee","cod":200,"level":"info","message":"","timestamp":"12:19:15 PM"}

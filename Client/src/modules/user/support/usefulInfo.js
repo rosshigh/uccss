@@ -7,7 +7,7 @@ import {Utils} from '../../../resources/utils/utils';
 import moment from 'moment';
 
 @inject(Router,  AppState, AppConfig, SiteInfo, Utils)
-export class Links {
+export class UsefulInfo {
     email = '';
     password = '';
     loginError = '';

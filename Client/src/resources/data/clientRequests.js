@@ -19,12 +19,8 @@ export class ClientRequests {
           url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.requestsArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.requestsArray = serverResponse;
-                    for (var i = 0, x = this.requestsArrayInternal.length; i < x; i++) {
-                        this.requestsArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     return undefined;
                 }
@@ -40,16 +36,10 @@ export class ClientRequests {
       sessionId = sessionId || this.selectedRequest.sessionId;
 
       if( !personId || !sessionId ) return;
-
-      var url = this.data.CLIENT_REQUESTS_PERSON_SESSION.replace('PERSONID', personId).replace('SESSIONID', sessionId) ;
       try {
-          let serverResponse = await this.data.get(url);
-          if (!serverResponse.status) {
-              this.requestsArrayInternal = serverResponse;
+          let serverResponse = await this.data.get( this.data.CLIENT_REQUESTS_SERVICES +'/person/' +  personId + '/session/' +  sessionId);
+          if (!serverResponse.error) {
               this.requestsArray = serverResponse;
-              for (var i = 0, x = this.requestsArrayInternal.length; i < x; i++) {
-                  this.requestsArrayInternal[i].baseIndex = i;
-              }
           } else {
               return undefined;
           }
@@ -65,12 +55,8 @@ export class ClientRequests {
         url += options ? options : "";
         try {
             let serverResponse = await this.data.get(url);
-            if (!serverResponse.status) {
-                this.requestsArrayInternal = serverResponse;
+            if (!serverResponse.error) {
                 this.requestsArray = serverResponse;
-                for (var i = 0, x = this.requestsArrayInternal.length; i < x; i++) {
-                    this.requestsArrayInternal[i].baseIndex = i;
-                }
             } else {
                 return undefined;
             }
@@ -85,7 +71,7 @@ export class ClientRequests {
          var url = this.data.CLIENT_REQUESTS_SERVICES +'/count';
          url += options ? options : "";
         var response = await this.data.get(url);
-        if (!response.status) {
+        if (!response.error) {
             return response.count;
         } else {
             return null;
@@ -96,7 +82,7 @@ export class ClientRequests {
         var url = this.data.CLIENT_REQUESTS_SERVICES;
         url += options ? options : "";
         var response = await this.data.get(url);
-        if (!response.status) {
+        if (!response.error) {
             this.unassignedRequests = this.utils.countItems(1, 'requestStatus', response);
             this.updatedRequests =  this.utils.countItems(3, 'requestStatus', response);
             this.customerActionRequests =  this.utils.countItems(4, 'requestStatus', response);
@@ -110,7 +96,7 @@ export class ClientRequests {
         var url = this.data.CLIENT_REQUESTS_SERVICES +'/current/count';
         url += options ? options : "";
         var response = await this.data.get(url);
-        if (!response.status) {
+        if (!response.error) {
             this.unassignedRequests = this.utils.countItems(1, 'requestStatus', response);
             this.updatedRequests =  this.utils.countItems(3, 'requestStatus', response);
             this.customerActionRequests =  this.utils.countItems(4, 'requestStatus', response);
@@ -137,9 +123,10 @@ export class ClientRequests {
 
     selectRequstById(id){
       this.selectedRequest = null;
-      for(var i = 0; i < this.requestsArrayInternal.length; i++){
-        if(this.requestsArrayInternal[i]._id === id){
-          this.selectedRequest = this.utils.copyObject(this.requestsArrayInternal[i]);
+      for(var i = 0; i < this.requestsArray.length; i++){
+        if(this.requestsArray[i]._id === id){
+          this.selectedRequest = this.utils.copyObject(this.requestsArray[i]);
+           this.editRequestIndex = i;
           break;
         }
       }
@@ -208,19 +195,17 @@ export class ClientRequests {
 
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, this.data.CLIENT_REQUESTS_SERVICES, "post");
-            if(!serverResponse.status){
+            if(!serverResponse.error){
                 if(this.requestsArrayInternal){
-                    this.requestsArrayInternal.push(this.selectedRequest);
-                    this.requestsArray =  this.requestsArrayInternal;
+                    this.requestsArray.push(this.selectedRequest);
                 }
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedRequest, this.data.CLIENT_REQUESTS_SERVICES, "put");
-            if(!serverResponse.status){
-                 if(this.requestsArrayInternal && this.editRequestIndex){
-                    this.requestsArrayInternal[this.requestsArray[this.editRequestIndex].baseIndex] = this.utils.copyObject(this.selectedRequest);
-                    this.requestsArray =  this.requestsArrayInternal;
+            if(!serverResponse.error){
+                 if(this.requestsArray && this.editRequestIndex){
+                    this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
                  }
             }
             return serverResponse;
@@ -249,12 +234,8 @@ export class ClientRequests {
           url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.requestsDetailsArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.requestsDetailsArray = serverResponse;
-                    for (var i = 0, x = this.requestsDetailsArrayInternal.length; i < x; i++) {
-                        this.requestsDetailsArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     return undefined;
                 }
@@ -274,19 +255,17 @@ export class ClientRequests {
 
         if(!this.selectedRequestDetail._id){
             let serverResponse = await this.data.saveObject(this.selectedRequestDetail, this.data.CLIENT_REQUEST_DETAILS, "post");
-            if(!serverResponse.status){
-                if(this.requestsDetailsArrayInternal){
-                    this.requestsDetailsArrayInternal.push(this.selectedRequestDetail);
-                    this.requestsDetailArray =  this.requestsDetailsArrayInternal;
+            if(!serverResponse.error){
+                if(this.requestsDetailArray){
+                    this.requestsDetailArray.push(this.selectedRequestDetail);
                 }
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedRequestDetail, this.data.CLIENT_REQUEST_DETAILS, "put");
-            if(!serverResponse.status){
-                 if(this.requestsDetailsArrayInternal && this.requestDetailIndex){
-                    this.requestsDetailsArrayInternal[this.requestsArray[this.requestDetailIndex].baseIndex] = this.utils.copyObject(this.selectedRequestDetail);
-                    this.requestsDetailArray =  this.requestsDetailsArrayInternal;
+            if(!serverResponse.error){
+                 if(this.requestsDetailArray && this.requestDetailIndex){
+                    this.requestsDetailArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
                  }
             }
             return serverResponse;
@@ -298,7 +277,7 @@ export class ClientRequests {
             return;
         }
 
-        var sortedArray = this.requestsDetailsArrayInternal 
+        var sortedArray = this.requestsDetailArray 
             .sort((a, b) => {
                 var result = (a['requestId'].sessionId < b['requestId'].institutionId) ? -1 : (a['requestId'].institutionId > b['requestId'].institutionId) ? 1 : 0;
                 return result;
@@ -309,7 +288,7 @@ export class ClientRequests {
         if(!this.requestsDetailsArray) {
             return;
         }
-        var sortedArray = this.requestsDetailsArrayInternal 
+        var sortedArray = this.requestsDetailArray 
             .sort((a, b) => {
                 var result = (a['requestId'].institutionId < b['requestId'].institutionId) ? -1 : (a['requestId'].institutionId > b['requestId'].institutionId) ? 1 : 0;
                 return result;
@@ -344,12 +323,8 @@ export class ClientRequests {
             url +=  (fields ? 'fields=' + fields.fields : "");
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.coursesArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.coursesArray = serverResponse;
-                    for (var i = 0, x = this.coursesArrayInternal.length; i < x; i++) {
-                        this.coursesArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     return undefined;
                 }
@@ -394,10 +369,9 @@ export class ClientRequests {
 
         if(!this.selectedCourse._id){
             let serverResponse = await this.data.saveObject(this.selectedCourse, this.data.PRODUCTS_SERVICE, "post");
-            if (!serverResponse.status) {
-                this.coursesArrayInternal.push(this.selectedCourse);
-                this.coursesArray = coursesArrayInternal;
-                this.editIneditCourseIndexdex = this.coursesArrayInternal.length - 1;
+            if (!serverResponse.error) {
+                this.coursesArray.push(this.selectedCourse);
+                this.editIneditCourseIndexdex = this.coursesArray.length - 1;
                 this.newSystem = false;
             } else {
                      this.data.processError(response, "There was an error creating the product.");
@@ -405,9 +379,8 @@ export class ClientRequests {
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedCourse, this.data.PRODUCTS_SERVICE, "put");
-            if (!serverResponse.status) {
+            if (!serverResponse.error) {
                 this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
-                this.coursesArrayInternal[this.coursesArray[this.editCourseIndex].baseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArrayInternal[this.coursesArray[this.editCourseIndex].baseIndex]);
             } else {
                      this.data.processError(response, "There was an error updating the course.");
                 }
@@ -422,36 +395,15 @@ export class ClientRequests {
         }
     }
 
-    // filterProducts(filters, sort) {
-    //     var keep;
-    //     var index = 0;
-    //     this.productsArray = this.productsArrayInternal.filter((item) => {
-    //         //Assume the item should be eliminated
-    //         keep = false;
-    //         //For each filter in filterValues
-    //         for (var i = 0, x = filters.length; i < x; i++) {
-    //             keep = item[filters[i].property] === filters[i].value;
-    //             if (!keep) break;
-    //         }
-    //         return keep;
-    //     })
-
-    //     if (sort) {
-    //         this.sortArray(sort);
-    //     } else {
-    //         return this.productsArray;
-    //     }
+    // sortArray(propertyName, sortDirection) {
+    //     var propName = propertyName;
+    //     var sortDirection = sortDirection = "ASC" ? 1 : -1;
+    //     return this.requestsDetailsArrayInternal 
+    //         // .slice(0)
+    //         .sort((a, b) => {
+    //             var result = (a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0;
+    //             return result * sortDirection;
+    //         });
     // }
-
-    sortArray(propertyName, sortDirection) {
-        var propName = propertyName;
-        var sortDirection = sortDirection = "ASC" ? 1 : -1;
-        return this.requestsDetailsArrayInternal 
-            // .slice(0)
-            .sort((a, b) => {
-                var result = (a[propName] < b[propName]) ? -1 : (a[propName] > b[propName]) ? 1 : 0;
-                return result * sortDirection;
-            });
-    }
 
 }

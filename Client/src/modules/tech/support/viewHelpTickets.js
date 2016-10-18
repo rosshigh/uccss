@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {HelpTickets} from '../../../resources/data/helpTickets';
 import {Sessions} from '../../../resources/data/sessions';
 import {Products} from '../../../resources/data/products';
@@ -24,6 +24,7 @@ export class ViewHelpTickets {
     navControl = "supportNavButtons";
     spinnerHTML = "";
     filterValues = new Array();
+    responseContent = "";
 
   constructor(router, config, validation, people, app, dialog, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
@@ -40,31 +41,26 @@ export class ViewHelpTickets {
     this.products = products;
   };
 
-  activate() {
-    this.getData();
-    this._setUpValidation();
-  }
-
-  attached(){
-        $('[data-toggle="tooltip"]').tooltip();
-  }
-
   /*****************************************************************************************
   * Retrieve the help tickets, sessions, downloads and people
   * Only active help tickets are retrieved
   *****************************************************************************************/
-  async getData(){
+  async activate() {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
       this.sessions.getSessionsArray(true, '?order=startDate'),
       this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName')
     ]);
-    this.updateArray();
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
 
     this.dataTable.createPageButtons(1);
+    this._setUpValidation();
   }
-  
+
+  attached(){
+        $('[data-toggle="tooltip"]').tooltip();
+  }
   
   /*****************************************************************************************
   * Refresh the helpticket collection
@@ -72,21 +68,21 @@ export class ViewHelpTickets {
   async refresh(){
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
     this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
-    this. updateArray();
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.spinnerHTML = "";
   }
 
   /*****************************************************************************************
   *Update the display and base arrays when an array element has changed 
   *****************************************************************************************/
-  updateArray(){
-    this.displayArray = this.helpTickets.helpTicketsArray;
-    this.baseArray = this.displayArray;
-     for(var i = 0; i<this.baseArray.length; i++){
-      this.baseArray[i].originalIndex = i;
-    }
-    this._cleanUpFilters();
-  }
+  // updateArray(){
+  //   this.displayArray = this.helpTickets.helpTicketsArray;
+  //   this.baseArray = this.displayArray;
+  //    for(var i = 0; i<this.baseArray.length; i++){
+  //     this.baseArray[i].originalIndex = i;
+  //   }
+  //   this._cleanUpFilters();
+  // }
 
   // filterInsList(el){
   //   this.selectInstitutions = this.institutions.filter(function (obj) {
@@ -101,7 +97,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async selectHelpTicket(el, index){
       //Make the selected help ticket the selected help ticket
-      this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+      this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
       this.helpTickets.selectHelpTicket(this.editIndex);
 
       //If the help ticket has a systemId, retrieve the system from the server
@@ -122,6 +118,8 @@ export class ViewHelpTickets {
  *****************************************************************************************/
   respond(){
     this.helpTickets.selectHelpTicketContent();
+    this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
+    this.responseContent = "";
     this.enterResponse = true;
     this.enableButton = true;
   }
@@ -138,6 +136,7 @@ export class ViewHelpTickets {
   _createResponse(){
     this.helpTickets.selectedHelpTicketContent.personId = this.app.user._id;
     this.helpTickets.selectedHelpTicketContent.type =  this.config.HELP_TICKET_OTHER_TYPE;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent; 
   }
 
  /*****************************************************************************************
@@ -148,6 +147,7 @@ export class ViewHelpTickets {
         this. _createResponse();
         let serverResponse = await this.helpTickets.saveHelpTicketResponse();
         if (!serverResponse.status) {
+          this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
           if(this.sendEmail){
             var obj = {
               id: this.helpTickets.selectedHelpTicket._id,
@@ -187,7 +187,7 @@ export class ViewHelpTickets {
           // if(this.validation.validate(1, this)){
         let serverResponse = await this.helpTickets.updateKeywords();
         if (!serverResponse.status) {
-            this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+            this.utils.showNotification("The help ticket was updated");
         }
         this._cleanUp();
     // }
@@ -203,7 +203,7 @@ export class ViewHelpTickets {
         }
         let serverResponse = await this.helpTickets.updateOwner(obj);
         if (!serverResponse.status) {
-            this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+            this.utils.showNotification("The help ticket was updated");
         }
         this._cleanUp();
     }

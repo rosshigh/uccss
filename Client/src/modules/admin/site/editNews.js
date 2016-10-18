@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {SiteInfo} from '../../../resources/data/siteInfo';
@@ -14,6 +14,7 @@ export class EditNews {
     navControl = "newsNavButtons";
     spinnerHTML = "";
     isInformationItem = false;
+    newsContent = "";
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -31,40 +32,32 @@ export class EditNews {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-      var currentDate = moment(new Date()).format("MM-DD-YYYY");
-    //   var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-      var options = '?order=sortOrder';
-      await this.siteinfo.getInfoArray(true, options);
-      this.updateArray();
-      this.dataTable.createPageButtons(1);
+        await this.siteinfo.getInfoArray(true, '?order=sortOrder');
+        this.dataTable.updateArray(this.siteinfo.siteArray);
+        this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.siteinfo.getInfoArray(true);
-        this.updateArray();
+        this.dataTable.updateArray(this.siteinfo.siteArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.siteinfo.siteArray ? this.siteinfo.siteArray : new Array();
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.siteinfo.siteArray ? this.siteinfo.siteArray : new Array();
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this.isChecked = true;
-        this.filterOutExpired();
-        this._cleanUpFilters();
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this.isChecked = true;
+    //     this.filterOutExpired();
+    //     this._cleanUpFilters();
+    // }
 
     async new() {
         this.editIndex = -1;
-        // this.displayIndex = -1;
         this.siteinfo.selectSiteItem(this.editIndex);
 
         $("#editTitle").focus();
@@ -72,10 +65,10 @@ export class EditNews {
     }
 
     async edit(index, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectSiteItem(this.editIndex);
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
+        this.newsContent = this.siteinfo.selectedItem.content;
 
         //Editing a product
         $("#editTitle").focus();
@@ -97,10 +90,11 @@ export class EditNews {
 
     async save() {
         if(this.validation.validate(1, this)){
+            this.siteinfo.selectedItem.content = this.newsContent;
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
-                this.updateArray();
-                this.utils.showNotification("The item was updated", "", "", "", "", 5);
+                 this.dataTable.updateArray(this.siteinfo.siteArray);
+                this.utils.showNotification("The item was updated");
                 if (this.files && this.files.length > 0) this.siteinfo.uploadFile(this.files);
             }
             this.newsItemSelected = false;
@@ -129,7 +123,7 @@ export class EditNews {
     async deleteItem(){
         let serverResponse = await this.siteinfo.deleteItem();
         if (!serverResponse.error) {
-                this.updateArray();
+                 this.dataTable.updateArray(this.siteinfo.siteArray);
                 this.utils.showNotification("The Item was deleted");
         }
         this.newsItemSelected = false;

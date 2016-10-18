@@ -71,7 +71,7 @@ module.exports = function (app) {
 
   router.delete('/api/sessions/:id', requireAuth, function(req, res, next){
     debug('Delete session [%s]', req.params.id);
-    Model.removeById(req.params.id, function(err, result){
+    Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {
         return next(err);
       } else {

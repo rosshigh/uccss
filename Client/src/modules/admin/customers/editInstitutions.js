@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
@@ -35,17 +35,13 @@ export class EditPeople {
     }
 
     async activate() {
-        await this.getData();
-    }
+        let responses = await Promise.all([
+            this.people.getPeopleArray(true, '?order=lastName'),
+            this.people.getInstitutionsArray(true, '?order=name'),
+            this.is4ua.loadIs4ua()
+        ]);
 
-    async getData(){
-      let responses = await Promise.all([
-        this.people.getPeopleArray(true, '?order=lastName'),
-        this.people.getInstitutionsArray(true, '?order=name'),
-        this.is4ua.loadIs4ua()
-      ]);
-
-        this. updateArray();
+        this.dataTable.updateArray(this.people.institutionsArray);
 
         this.dataTable.createPageButtons(1);
     }
@@ -53,22 +49,12 @@ export class EditPeople {
     async refresh(){
          this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
          await this.people.getInstitutionsArray(true, '?order=name');
-         this. updateArray();
+        this.dataTable.updateArray(this.people.institutionArray);
          this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.people.institutionsArray;
-        this.baseArray = this.displayArray;
-
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this._cleanUpFilters();
-    }
-
     edit(index, el){
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectInstitution(this.editIndex);
 
         this.people.getInstitutionPeople(this.people.selectedInstitution._id);
@@ -94,12 +80,12 @@ export class EditPeople {
             if(!this.people.selectedInstitution._id) this.editIndex = this.baseArray.length;
             let serverResponse = await this.people.saveInstitution();
             if (!serverResponse.status) {
-                this. updateArray();
-                this.utils.showNotification(serverResponse.name + " was updated", "", "", "", "", 5);
+                this.dataTable.updateArray(this.people.institutionArray);
+                this.utils.showNotification(serverResponse.name + " was updated");
             }
             this.institutionSelected = false;
         } else {
-            this.utils.showNotification("There are errors in the data you enetered. Please check your inputs.", "", "", "", "", 6);
+            this.utils.showNotification("There are errors in the data you enetered. Please check your inputs.");
         }
     }
 
@@ -119,7 +105,7 @@ export class EditPeople {
         var name = this.people.selectedInstitution.name;
         let serverResponse = await this.people.deleteInstitution();
         if (!serverResponse.error) {
-                this.updateArray();
+                this.dataTable.updateArray(this.people.institutionArray);
                 this.utils.showNotification(name + " was deleted");
         }
         this.institutionSelected = false;

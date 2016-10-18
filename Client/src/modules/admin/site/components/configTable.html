@@ -32,7 +32,7 @@
                                 <th></th>
                                 <th></th>
                             </tr>
-                            <tr  repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr  repeat.for="item of dataTable.displayArray">
                                 <td data-title="Parameter">${item.parameter}</td>
                                 <td data-title="Description">${item.description}</td>
                                 <td data-title="Value"><input readonly.bind="item.readOnly" value.bind="item.value" id="editValue" class="form-control" type="text" /></td>

@@ -15,18 +15,14 @@ export class HelpTickets {
         this.config = config;
     }
 
-    async getHelpTicketArray(refresh, options, fields, current){
+    async getHelpTicketArray(refresh, options){
          if (!this.helpTicketsArray || refresh) {
            var url = this.data.HELP_TICKET_SERVICES;
            url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
-                if (!serverResponse.status) {
-                    this.helpTicketsArrayInternal = serverResponse;
+                if (!serverResponse.error) {
                     this.helpTicketsArray = serverResponse;
-                    for (var i = 0, x = this.helpTicketsArrayInternal.length; i < x; i++) {
-                        this.helpTicketsArrayInternal[i].baseIndex = i;
-                    }
                 } else {
                     return undefined;
                 }
@@ -135,8 +131,7 @@ export class HelpTickets {
 
          var response = await this.data.saveObject(obj, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
-            this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].owner = response.owner;
-            this.helpTicketsArray = this.helpTicketsArrayInternal;
+            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].owner = response.owner;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -150,8 +145,7 @@ export class HelpTickets {
 
          var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
-            this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].helpTicketStatus = response.helpTicketStatus;
-            this.helpTicketsArray = this.helpTicketsArrayInternal;
+            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].helpTicketStatus = response.helpTicketStatus;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -165,8 +159,7 @@ export class HelpTickets {
 
          var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
-            this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex].keyWords = response.keyWords;
-            this.helpTicketsArray = this.helpTicketsArrayInternal;
+            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].keyWords = response.keyWords;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -182,8 +175,7 @@ export class HelpTickets {
             var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "post");
             if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.helpTicketsArrayInternal.push(this.selectedHelpTicket);
-                this.helpTicketsArray = this.helpTicketsArrayInternal;
+                this.helpTicketsArray.push(this.selectedHelpTicket);
             } else {
                      this.data.processError(response, "There was an error creating the help ticket.");
                 }
@@ -192,8 +184,8 @@ export class HelpTickets {
             var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "put");
             if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
-                this.helpTicketsArray = this.helpTicketsArrayInternal;
+                this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
+
             } else {
                  this.data.processError(response, "There was an error updating the help ticket.");
                 }
@@ -206,8 +198,7 @@ export class HelpTickets {
             var response = await this.data.saveObject(this.selectedHelpTicketContent, this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id), "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);
-                    this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
-                    this.helpTicketsArray = this.helpTicketsArrayInternal;
+                    this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
                 } else {
                      this.data.processError(response, "There was an error updating the help ticket.");
                 }
@@ -240,8 +231,7 @@ export class HelpTickets {
         let response = await this.data.uploadFiles(files,  this.data.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
         if(!response.error){
             this.selectedHelpTicket = this.utils.copyObject(response);
-            this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArrayInternal[this.helpTicketsArray[this.editIndex].baseIndex]);
-            this.helpTicketsArray = this.helpTicketsArrayInternal;
+            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
         }
     }
 

@@ -6,7 +6,7 @@ import {Systems} from '../../../resources/data/systems';
 import {Sessions} from '../../../resources/data/sessions';
 import {Products} from '../../../resources/data/products';
 import Validation from '../../../resources/utils/validation';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 
 import moment from 'moment';
@@ -38,34 +38,30 @@ export class EditSystem {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-      let responses = await Promise.all([
-        this.systems.getSystemsArray(true,'?order=sid'),
-        this.products.getProductsArray(),
-        this.sessions.getSessionsArray()
-      ]);
-        this.updateArray();
+        let responses = await Promise.all([
+            this.systems.getSystemsArray(true,'?order=sid'),
+            this.products.getProductsArray(),
+            this.sessions.getSessionsArray()
+        ]);
+        this.dataTable.updateArray(this.systems.systemsArray);
         this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.systems.getSystemsArray(true, '?order=sid');
-        this.updateArray();
+         this.dataTable.updateArray(this.systems.systemsArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.systems.systemsArray;
-        this.baseArray = this.displayArray;
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this._cleanUpFilters()
-    }
+    // updateArray(){
+    //     this.displayArray = this.systems.systemsArray;
+    //     this.baseArray = this.displayArray;
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this._cleanUpFilters()
+    // }
 
     new() {
         this.editIndex = -1;
@@ -78,8 +74,7 @@ export class EditSystem {
     }
 
     edit(index, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);;
+         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.systems.selectSystem(this.editIndex);
         this.saveClients = false;
         this.editSystem = true;
@@ -93,12 +88,30 @@ export class EditSystem {
     }
 
     generateClients() {
+        if(this.editFirstClient.length != 3 || this.editLastClient.length != 3){
+            return this.dialog.showMessage(
+                "Clients must have three digits", 
+                "Invalid Client Number", 
+                ['OK']
+                ).then(response => {
+                    return;
+                });
+        }
         var start = parseInt(this.editFirstClient);
         var end = parseInt(this.editLastClient);
+        if(end <= start){
+             return this.dialog.showMessage(
+                "The first client number must be less than the last client number.", 
+                "Invalid Client Number", 
+                ['OK']
+                ).then(response => {
+                    return;
+                });
+        }
         var result = this.systems.generateClients(start, end, this.editClientStatus);
         this.saveClients = true;
         if (result.error) {
-            this.utils.showNotification(result.error, 'bottom', 'right', 2000, 2, '')
+            this.utils.showNotification(result.error);
         }
     }
 
@@ -130,8 +143,8 @@ export class EditSystem {
     async deleteAllClients(){
         let serverResponse = await this.systems.deleteAllClients();
         if (!serverResponse.error) {
-            this.utils.showNotification("The clients were successfully deleted", 'bottom', 'right', 2000, 2, '')
-            this.baseArray[this.editIndex].clients = [];
+            this.utils.showNotification("The clients were successfully deleted");
+            this.dataTable.sourceArray[this.editIndex].clients = [];
         }
     }
 
@@ -161,8 +174,8 @@ export class EditSystem {
     
     async deleteC(){
         let serverResponse = await this.systems.deleteClient();
-        if (!serverResponse.status) {
-            this.utils.showNotification("Client " + this.selectedClient.client + " was deleted", "","","","",5 );
+        if (!serverResponse.error) {
+            this.utils.showNotification("Client " + this.selectedClient.client + " was deleted");
             this.interfaceUpdate = false;
         }
     }
@@ -170,8 +183,8 @@ export class EditSystem {
     async saveClient(){
         try {
             let serverResponse = await this.systems.saveClient();
-            if (!serverResponse.status) {
-                this.utils.showNotification("Client " + this.selectedClient.client + " updated", "","","","",5 );
+            if (!serverResponse.error) {
+                this.utils.showNotification("Client " + this.selectedClient.client + " updated");
                 this.interfaceUpdate = false;
             }
         } catch(error){
@@ -190,9 +203,9 @@ export class EditSystem {
     async save() {
         if(this.validation.validate(1, this)){
             let serverResponse = await this.systems.saveSystem();
-            if (!serverResponse.status) {
-                this.updateArray();
-                this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated", "", "", "", "", 5);
+            if (!serverResponse.error) {
+                 this.dataTable.updateArray(this.systems.systemsArray);
+                this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
                 this.systemSelected = false;
                 this._cleanUp();
             }
@@ -218,8 +231,8 @@ export class EditSystem {
         var name = this.systems.selectedSystem.sid;
         let serverResponse = await this.systems.deleteSystem();
         if (!serverResponse.error) {
-                this.updateArray();
-                this.utils.showNotification("System " + name + " was deleted", "", "", "", "", 5);
+                this.dataTable.updateArray(this.systems.systemsArray);
+                this.utils.showNotification("System " + name + " was deleted");
         }
         this.systemSelected = false;
     }

@@ -50,7 +50,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr repeat.for="helpTicket of displayArray  | pageFilter:dataTable.startRecord:dataTable.take" click.delegate="selectHelpTicket($event, $index)">
+              <!--   | pageFilter:dataTable.startRecord:dataTable.take -->
+              <tr repeat.for="helpTicket of dataTable.displayArray" click.delegate="selectHelpTicket($event, $index)">
                 <td data-title="Reference">${helpTicket.helpTicketNo}</td>
                 <td data-title="Type">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>
                 <td data-title="Status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>
@@ -60,9 +61,11 @@
           </table>
         </div>
       </div>
+      <!--
       <div class="row" show.bind="helpTicketSelected">
         <compose view="./viewHTForm.html"></compose>
       </div>
+      -->
     </div>
   </div>
   </div>

@@ -5,14 +5,14 @@ import {AppState} from '../../../resources/data/appState';
 @inject(Router, AppState)
 export class Support{
     
-    tabs = [
-        {id: 'viewHelpTicket', title: 'View Help Ticket'},
-        {id: 'createHelpTicket', title: 'Create Help Ticket'}, 
-        {id: 'downloads', title: 'Downloads'},
-        {id: "tutorials",title:'Tutorials'},
-        {id: "curriculum",title:'Curriculum'},
-        {id: "links",title:'Useful Information'}];
-    tabPath = "./";
+    // tabs = [
+    //     {id: 'viewHelpTicket', title: 'View Help Ticket'},
+    //     {id: 'createHelpTicket', title: 'Create Help Ticket'}, 
+    //     {id: 'downloads', title: 'Downloads'},
+    //     {id: "tutorials",title:'Tutorials'},
+    //     {id: "curriculum",title:'Curriculum'},
+    //     {id: "links",title:'Useful Information'}];
+    // tabPath = "./";
     
     constructor(router, app){
         this.router = router;
@@ -50,16 +50,8 @@ export class Support{
             title: 'Downloads'
         },
         {
-            route: 'tutorials',
-            moduleId: './tutorials',
-            auth: true,
-            nav: true,
-            name: 'tutorials',
-            title: 'Tutorials'
-        },
-        {
             route: 'curriculum',
-            moduleId: './curriculum',
+            moduleId: './currInfo',
             auth: true,
             nav: true,
             name: 'curriculum',
@@ -67,7 +59,7 @@ export class Support{
         },
          {
             route: 'links',
-            moduleId: './links',
+            moduleId: './usefulInfo',
             auth: true,
             nav: true,
             name: 'links',

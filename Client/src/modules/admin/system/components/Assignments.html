@@ -18,14 +18,10 @@
             <label for="editFirstUsableID " class="control-label ">First usable ID</label>
             <input value.bind="products.selectedProduct.firstAllowableId " id="editFirstUsableID " class="form-control " placeholder="First Usable ID " type="number " />
           </div>
-          <div class="form-group">
-            <label for="editProductInfo " class="control-label ">Product Information</label>
-            <textarea class="form-control" id="editProductInfo" value.bind="products.selectedProduct.productInfo" rows="10"></textarea>
-          </div>
+
         
       </div>
-      
-      
+           
       <div class="col-lg-5 col-sm-offset-1">
         <div class="form-group">
             <label for="editStudentPassword" class="control-label">Student Password</label>
@@ -47,13 +43,10 @@
             <label for="editLastUsableID " class="control-label ">Last usable ID</label>
             <input value.bind="products.selectedProduct.lastAllowableId " id="editLastUsableID " class="form-control " placeholder="Last Usable ID " type="number " />
         </div>
-        <div class="panel panel-default topMargin">
-          <div class="panel-heading">Product Information Preview</div>
-          <div class="panel-body" innerhtml.bind="products.selectedProduct.productInfo"></div>
-        </div>
       </div>
     </div>
-    
-    
-  </div>
+    <div class="col-lg-12">
+      <label for="editProductInfo " class="control-label pull-left">Product Information</label>
+      <tiny-mce height.bind="150" value.two-way="productInfoEditorContent"></tiny-mce>
+    </div>
 </template>

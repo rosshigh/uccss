@@ -38,7 +38,7 @@
                                 </select>
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="person of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr click.trigger="edit($index, $event)" repeat.for="person of dataTable.displayArray">
                                 <td data-title="Name">${person.firstName} ${person.lastName}</td>
                                 <td data-title="Phone">${person.phone}</td>
                                 <td data-title="Email">${person.email}</td>

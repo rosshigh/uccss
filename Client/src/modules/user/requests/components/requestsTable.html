@@ -18,7 +18,7 @@
                         </tr>
                   </thead>
                   <tbody>
-                    <tr  click.delegate="edit(product, $event, $index)" repeat.for="product of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                    <tr  click.delegate="edit(product, $event, $index)" repeat.for="product of dataTable.displayArray">
                       <td data-title="Product">${product.productId | productName:products.productsArray}</td>
                       <td data-title="Status">${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
                       <td data-title="createdDate">${product.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>

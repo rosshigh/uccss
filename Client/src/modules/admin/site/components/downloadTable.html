@@ -54,7 +54,7 @@
                                 </select>
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="item of displayArray | pageFilter:dataTable.startRecord:dataTable.take">
+                            <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
                                 <td data-title="Name">${item.name}</td>
                                 <td data-title="Original Filename" style="width: 75px">
                                     <div>${item.file.originalFilename}</div>

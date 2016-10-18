@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {Downloads} from '../../../resources/data/downloads';
@@ -33,40 +33,34 @@ export class EditProducts {
     }
 
     async activate() {
-        await this.getData();
-    }
+        let responses = await Promise.all([
+            this.downloads.getDownloadsArray(true),
+            this.downloads.getDownloadCategoriesArray()
+        ]);
 
-    async getData() {
-      let responses = await Promise.all([
-        this.downloads.getDownloadsArray(true),
-        this.downloads.getDownloadCategoriesArray()
-      ]);
-
-        this.updateArray();
-
+        this.dataTable.updateArray(this.downloads.appDownloadsArray);
         this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.downloads.getDownloadsArray(true);
-        this.updateArray();
+        this.dataTable.updateArray(this.downloads.appDownloadsArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.downloads.appDownloadsArray ? this.downloads.appDownloadsArray : new Array();
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.downloads.appDownloadsArray ? this.downloads.appDownloadsArray : new Array();
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this._cleanUpFilters();
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this._cleanUpFilters();
+    // }
 
     async new() {
         this.editIndex = -1;
-        // this.displayIndex = -1;
         this.downloads.selectDownload();
 
         $("#editName").focus();
@@ -74,8 +68,7 @@ export class EditProducts {
     }
 
     async edit(index, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.downloads.selectDownload(this.editIndex);
         
          this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
@@ -104,8 +97,8 @@ export class EditProducts {
         if(this.validation.validate(1, this)){
             let serverResponse = await this.downloads.saveDownload();
             if (!serverResponse.error) {
-                 this.updateArray();
-                 this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated", "", "", "", "", 5);
+                this.dataTable.updateArray(this.downloads.appDownloadsArray);
+                 this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
                  this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                  if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
                  this.spinnerHTML = "";
@@ -142,7 +135,7 @@ export class EditProducts {
         var name = this.downloads.selectedDownload.name;
         let serverResponse = await this.downloads.deleteDownload();
         if (!serverResponse.error) {
-                this.updateArray();
+                this.dataTable.updateArray(this.downloads.appDownloadsArray);
                 this.utils.showNotification("Download ${name} was deleted");
         }
         this.downloadSelected = false;
@@ -208,7 +201,7 @@ export class EditProducts {
          if(this.validation.validate(2, this)){
             let serverResponse = await this.downloads.saveCategory();
             if (!serverResponse.error) {
-                this.utils.showNotification("Download category " + this.downloads.selectedCat.description + " was updated", "", "", "", "", 5);
+                this.utils.showNotification("Download category " + this.downloads.selectedCat.description + " was updated");
             }
 
             this.editCat = false;
@@ -237,7 +230,7 @@ export class EditProducts {
         var name = this.downloads.selectedDownload.description;
         let serverResponse = await this.downloads.deleteCat();
         if (!serverResponse.error) {
-            this.utils.showNotification("Category " + name + " was deleted", "", "", "", "", 5);
+            this.utils.showNotification("Category " + name + " was deleted");
         }
         this.editCat = false;
     }

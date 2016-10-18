@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {Config} from '../../../resources/data/config';
@@ -25,44 +25,38 @@ export class EditConfig {
     }
 
     async activate() {
-        await this.getData();
-    }
+        await this.siteConfig.getConfigArray(true)
 
-    async getData() {
-      let responses = await Promise.all([
-        this.siteConfig.getConfigArray(true)
-      ]);
-
-        this.updateArray();
-
+        this.dataTable.updateArray(this.siteConfig.configArray);
         this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.siteConfig.getConfigArray(true);
-        this.updateArray();
+       this.siteConfig.configArray
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.siteConfig.configArray ? this.siteConfig.configArray : new Array();
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.siteConfig.configArray ? this.siteConfig.configArray : new Array();
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    // }
 
 	async save(){
 		let response = await this.siteConfig.saveAll(this.displayArray);
 		if(!response.error){
+            this.refresh();
 			this.utils.showNotification('The confiugration was saved.')
 		}
 	}
 
 	cancel(){
-		this.updateArray();
+		this.siteConfig.configArray
 	}
 
 }

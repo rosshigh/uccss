@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {DataTable} from '../../../resources/utils/dataTable';
+import {DataTable} from '../../../resources/utils/dataTable2';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {SiteInfo} from '../../../resources/data/siteInfo';
@@ -14,6 +14,7 @@ export class EditMessages {
     navControl = "newsNavButtons";
     spinnerHTML = "";
     isInformationItem = false;
+    messageContent = "";
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -30,50 +31,45 @@ export class EditMessages {
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-      var currentDate = moment(new Date()).format("MM-DD-YYYY");
-      await this.siteinfo.getMessageArray(true);
-      this.updateArray();
-      this.dataTable.createPageButtons(1);
+    async activate() {;
+        await this.siteinfo.getMessageArray(true);
+        this.dataTable.updateArray(this.siteinfo.messageArray);
+        this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.siteinfo.getMessageArray(true);
-        this.updateArray();
+       this.dataTable.updateArray(this.siteinfo.messageArray);
         this.spinnerHTML = "";
     }
 
-    updateArray(){
-        this.displayArray = this.siteinfo.messageArray ? this.siteinfo.messageArray : new Array();
-        this.baseArray = this.displayArray;
+    // updateArray(){
+    //     this.displayArray = this.siteinfo.messageArray ? this.siteinfo.messageArray : new Array();
+    //     this.baseArray = this.displayArray;
 
-        for (var i = 0; i < this.baseArray.length; i++) {
-            this.baseArray[i].baseIndex = i;
-        }
-        this._cleanUpFilters();
-    }
+    //     for (var i = 0; i < this.baseArray.length; i++) {
+    //         this.baseArray[i].baseIndex = i;
+    //     }
+    //     this._cleanUpFilters();
+    // }
 
     async new() {
-        this.editIndex = -1;
-        
+        this.editIndex = -1; 
         this.siteinfo.selectMessage(this.editIndex);
         this.siteinfo.selectedMessage.category = this.config.MESSAGE_TYPES[0];
+        this.messageContent = "";
 
         $("#editKey").focus();
         this.messageItemSelected = true;
     }
 
     async edit(index, el) {
-        this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        this.displayIndex = index + parseInt(this.dataTable.startRecord);
+         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectMessage(this.editIndex);
         
         this.originalMessage = this.utils.copyObject(this.siteinfo.selectedMessage);
+        this.messageContent = this.siteinfo.selectedMessage.content;
 
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -92,9 +88,10 @@ export class EditMessages {
 
     async save() {
         if(this.validation.validate(1, this)){
+             this.siteinfo.selectedMessage.content = this.messageContent;
             let serverResponse = await this.siteinfo.saveMessageItem();
             if (!serverResponse.error) {
-                this.updateArray();
+                this.dataTable.updateArray(this.siteinfo.messageArray);
                 this.utils.showNotification("The message was updated");
             }
             this.messageItemSelected = false;
@@ -116,7 +113,7 @@ export class EditMessages {
     async deleteMessage(){
         let serverResponse = await this.siteinfo.deleteMessage();
         if (!serverResponse.error) {
-                this.updateArray();
+                this.dataTable.updateArray(this.siteinfo.messageArray);
                 this.utils.showNotification("The message was deleted");
         }
         this.messageItemSelected = false;
@@ -145,7 +142,6 @@ export class EditMessages {
     _cleanUpFilters(){
         $("#key").val("");
     }
-
 
     _setupValidation(){
         this.validation.addRule(1,"editKey", {"rule":"required","message":"Title is required", "value": "siteinfo.selectedMessage.key"});

@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
 
-import {DataTable} from '../../resources/utils/dataTable';
+import {DataTable} from '../../resources/utils/dataTable2';
 import {Sessions} from '../../resources/data/sessions';
 import {Systems} from '../../resources/data/systems';
 import {Products} from '../../resources/data/products';
@@ -40,11 +40,7 @@ export class ClientRequestAnalytics {
         if (!this.app.user._id) this.router.navigate('logout');
     }
 
-    activate() {
-        this.getData();
-    }
-
-    async getData() {
+    async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'),
             this.people.getPeopleArray(true, '?order=lastName'),
@@ -52,19 +48,20 @@ export class ClientRequestAnalytics {
             this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'),
             this.systems.getSystemsArray(true)
         ]);
+        this.dataTable.updateArray(this.requests.requestsDetailsArray);
     }
 
-    updateArray() {
-        if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-            this.displayArray = this.requests.analyticsResultArray;
-            this.baseArray = this.displayArray;
-            for (var i = 0; i < this.baseArray.length; i++) {
-                this.baseArray[i].originalIndex = i;
-            }
-        } else {
-            this.displayArray = new Array();
-        }
-    }
+    // updateArray() {
+    //     if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+    //         this.displayArray = this.requests.analyticsResultArray;
+    //         this.baseArray = this.displayArray;
+    //         for (var i = 0; i < this.baseArray.length; i++) {
+    //             this.baseArray[i].originalIndex = i;
+    //         }
+    //     } else {
+    //         this.displayArray = new Array();
+    //     }
+    // }
 
     async getRequests() {
         if (this.selectedSession) {
@@ -73,7 +70,7 @@ export class ClientRequestAnalytics {
             await this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.requests.groupRequestsByInstitution();
-                this.updateArray();
+                this.dataTable.updateArray(this.requests.requestsDetailsArray);
                 this.dataTable.createPageButtons(1);
             } else {
                 this.displayArray = new Array();
