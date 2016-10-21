@@ -21,14 +21,10 @@ export class Home {
     }
 
     async activate() {
-        await this.getData();
-    }
-
-    async getData() {
-      var currentDate = moment(new Date()).format("MM-DD-YYYY");
-      var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-      await this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' );
-      await this.siteinfo.getInfoArray(true, options);
+        var currentDate = moment(new Date()).format("MM-DD-YYYY");
+        var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+        await this.sessions.getSessionsArray(true, '?order=startDate' );
+        await this.siteinfo.getInfoArray(true, options);
     }
 
     

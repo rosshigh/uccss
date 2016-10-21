@@ -14,7 +14,7 @@
 		<div class="bigTopMargin">
 			<h2 class="underline">Sessions</h2>
 			<div class="list-group">
-				<a class="list-group-item" repeat.for="session of sessions.sessionsArray">
+				<a class="list-group-item" repeat.for="session of sessions.sessionsArray | sessionType:'Active:Requests:Next'">
 					<h4 class="list-group-item-heading">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>
 					<p class="list-group-item-text">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
 					<p class="list-group-item-text">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>

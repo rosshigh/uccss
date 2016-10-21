@@ -58,7 +58,7 @@ export class People {
 
     selectPerson(index) {
         if (index === undefined) {
-            this.emptyPerson();
+            this.selectedPerson = this.emptyPerson();
         } else {
             try {
                 this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
@@ -82,22 +82,23 @@ export class People {
     }
 
     emptyPerson() {
-        this.selectedPerson = new Object();
-        this.selectedPerson.lastName = "";
-        this.selectedPerson.firstName = "";
-        this.selectedPerson.middleName = "";
-        this.selectedPerson.lastName = "";
-        this.selectedPerson.status = "";
-        this.selectedPerson.phone = "";
-        this.selectedPerson.mobile = ""
-        this.selectedPerson.email = "";
-        this.selectedPerson.gender = "";
-        this.selectedPerson.roles = new Array();
-        this.selectedPerson.roles.push("USER");
-        this.selectedPerson.password = "";
-        this.selectedPerson.institution = "";
-        this.selectedPerson.active = false;
+        var obj  = new Object();
+        obj.lastName = "";
+        obj.firstName = "";
+        obj.middleName = "";
+        obj.lastName = "";
+        obj.status = "";
+        obj.phone = "";
+        obj.mobile = ""
+        obj.email = "";
+        obj.gender = "";
+        obj.roles = new Array();
+        obj.roles.push("USER");
+        obj.password = "";
+        obj.institution = "";
+        obj.active = false;
         this.coursesArray = new Array();
+        return obj;
     }
 
     async checkEmail() {

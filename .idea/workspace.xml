@@ -2,47 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3a85a908-facd-47c2-87b8-683db4bc8443" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Server/app/controllers/default.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Server/app/controllers/files.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/aurelia_project/aurelia.json" afterPath="$PROJECT_DIR$/Client/aurelia_project/aurelia.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/package.json" afterPath="$PROJECT_DIR$/Client/package.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/scripts/app-bundle.js" afterPath="$PROJECT_DIR$/Client/scripts/app-bundle.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/scripts/app-bundle.js.map" afterPath="$PROJECT_DIR$/Client/scripts/app-bundle.js.map" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/scripts/vendor-bundle.js" afterPath="$PROJECT_DIR$/Client/scripts/vendor-bundle.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/app.js" afterPath="$PROJECT_DIR$/Client/src/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/config/authConfig.js" afterPath="$PROJECT_DIR$/Client/src/config/authConfig.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/main.js" afterPath="$PROJECT_DIR$/Client/src/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/admin/customers/components/peopleForm.html" afterPath="$PROJECT_DIR$/Client/src/modules/admin/customers/components/peopleForm.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/admin/documents/documents.js" afterPath="$PROJECT_DIR$/Client/src/modules/admin/documents/documents.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/admin/system/editProduct.js" afterPath="$PROJECT_DIR$/Client/src/modules/admin/system/editProduct.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/user/profile.html" afterPath="$PROJECT_DIR$/Client/src/modules/user/profile.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/user/profile.js" afterPath="$PROJECT_DIR$/Client/src/modules/user/profile.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/user/support/viewHelpTickets.js" afterPath="$PROJECT_DIR$/Client/src/modules/user/support/viewHelpTickets.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/dataServices.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/dataServices.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/downloads.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/downloads.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/home/home.html" afterPath="$PROJECT_DIR$/Client/src/modules/home/home.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/home/home.js" afterPath="$PROJECT_DIR$/Client/src/modules/home/home.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/user/components/uccInformation.html" afterPath="$PROJECT_DIR$/Client/src/modules/user/components/uccInformation.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/modules/user/user.js" afterPath="$PROJECT_DIR$/Client/src/modules/user/user.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/clientRequests.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/clientRequests.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/helpTickets.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/helpTickets.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/products.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/products.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/siteInfo.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/siteInfo.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/data/people.js" afterPath="$PROJECT_DIR$/Client/src/resources/data/people.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/index.js" afterPath="$PROJECT_DIR$/Client/src/resources/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Client/src/resources/utils/utils.js" afterPath="$PROJECT_DIR$/Client/src/resources/utils/utils.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/clientRequests.js" afterPath="$PROJECT_DIR$/Server/app/controllers/clientRequests.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/clients.js" afterPath="$PROJECT_DIR$/Server/app/controllers/clients.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/config.js" afterPath="$PROJECT_DIR$/Server/app/controllers/config.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/documents.js" afterPath="$PROJECT_DIR$/Server/app/controllers/documents.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/downloads.js" afterPath="$PROJECT_DIR$/Server/app/controllers/downloads.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/email.js" afterPath="$PROJECT_DIR$/Server/app/controllers/email.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/helpTickets.js" afterPath="$PROJECT_DIR$/Server/app/controllers/helpTickets.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/institutions.js" afterPath="$PROJECT_DIR$/Server/app/controllers/institutions.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/is4ua.js" afterPath="$PROJECT_DIR$/Server/app/controllers/is4ua.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/people.js" afterPath="$PROJECT_DIR$/Server/app/controllers/people.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/product.js" afterPath="$PROJECT_DIR$/Server/app/controllers/product.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/sessions.js" afterPath="$PROJECT_DIR$/Server/app/controllers/sessions.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/site.js" afterPath="$PROJECT_DIR$/Server/app/controllers/site.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/app/controllers/systems.js" afterPath="$PROJECT_DIR$/Server/app/controllers/systems.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/config/express.js" afterPath="$PROJECT_DIR$/Server/config/express.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/index.js" afterPath="$PROJECT_DIR$/Server/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Server/package.json" afterPath="$PROJECT_DIR$/Server/package.json" />
     </list>
     <ignored path="UCCSS-DEV-FOLDER.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -66,7 +37,7 @@
       <file leaf-file-name="clientRequest.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.481482">
+            <state vertical-scroll-proportion="0.0">
               <caret line="73" column="10" selection-start-line="73" selection-start-column="2" selection-end-line="73" selection-end-column="10" />
               <folding />
             </state>
@@ -76,7 +47,7 @@
       <file leaf-file-name="clients.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/app/controllers/clients.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.5555553">
+            <state vertical-scroll-proportion="0.0">
               <caret line="12" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
               <folding />
             </state>
@@ -86,9 +57,14 @@
       <file leaf-file-name="express.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/config/express.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.8703704">
-              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="48" selection-end-column="29" />
-              <folding />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+              <folding>
+                <marker date="1476454989470" expanded="true" signature="1726:1771" placeholder="{...}" />
+                <marker date="1476454989470" expanded="true" signature="1856:1930" placeholder="{...}" />
+                <marker date="1476454989470" expanded="true" signature="2019:2778" placeholder="{...}" />
+                <marker date="1476454989470" expanded="true" signature="2182:2733" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -96,8 +72,8 @@
       <file leaf-file-name="homeContent.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Client/src/modules/home/components/homeContent.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.4590163">
-              <caret line="6" column="64" selection-start-line="6" selection-start-column="64" selection-end-line="6" selection-end-column="86" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="5" column="64" selection-start-line="6" selection-start-column="64" selection-end-line="6" selection-end-column="86" />
               <folding />
             </state>
           </provider>
@@ -106,7 +82,7 @@
       <file leaf-file-name="embed.rnc" pinned="false" current-in-tab="true">
         <entry file="jar://$APPLICATION_HOME_DIR$/lib/webstorm.jar!/resources/html5-schema/html5/embed.rnc">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.343318">
+            <state vertical-scroll-proportion="0.3521289">
               <caret line="31" column="16" selection-start-line="31" selection-start-column="16" selection-end-line="31" selection-end-column="16" />
               <folding />
             </state>
@@ -154,6 +130,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -400,7 +377,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -475,46 +451,6 @@
     <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.481482">
           <caret line="73" column="10" selection-start-line="73" selection-start-column="2" selection-end-line="73" selection-end-column="10" />
           <folding />
         </state>
@@ -522,7 +458,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/app/controllers/clients.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.5555553">
+        <state vertical-scroll-proportion="0.0">
           <caret line="12" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
@@ -530,15 +466,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/config/express.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.8703704">
+        <state vertical-scroll-proportion="0.0">
           <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="48" selection-end-column="29" />
-          <folding />
+          <folding>
+            <marker date="1476454989470" expanded="true" signature="1726:1771" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="1856:1930" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="2019:2778" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="2182:2733" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/modules/home/components/homeContent.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.4590163">
+        <state vertical-scroll-proportion="0.0">
           <caret line="6" column="64" selection-start-line="6" selection-start-column="64" selection-end-line="6" selection-end-column="86" />
           <folding />
         </state>
@@ -546,7 +487,92 @@
     </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/webstorm.jar!/resources/html5-schema/html5/embed.rnc">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.343318">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/models/clientRequest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="73" column="10" selection-start-line="73" selection-start-column="2" selection-end-line="73" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/app/controllers/clients.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="12" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/config/express.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding>
+            <marker date="1476454989470" expanded="true" signature="1726:1771" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="1856:1930" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="2019:2778" placeholder="{...}" />
+            <marker date="1476454989470" expanded="true" signature="2182:2733" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/modules/home/components/homeContent.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="64" selection-start-line="6" selection-start-column="64" selection-end-line="6" selection-end-column="86" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/webstorm.jar!/resources/html5-schema/html5/embed.rnc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3521289">
           <caret line="31" column="16" selection-start-line="31" selection-start-column="16" selection-end-line="31" selection-end-column="16" />
           <folding />
         </state>

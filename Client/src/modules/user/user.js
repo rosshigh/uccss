@@ -80,25 +80,39 @@ export class User {
     var currentDate = moment(new Date()).format("MM-DD-YYYY");
     var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
     if(this.app.userRole >= this.config.UCC_ROLE){
-       let responses = await Promise.all([
-          this.helpTickets.getCurrentCount(),
-          this.requests.getCurrentCount(),  
-          this.requests.getClientRequestsDetailsArray(true,'?filter=institutionId|eq|' + this.app.user.institutionId),
-          this.sessions.getSessionsArray(false, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
-          this.siteinfo.getInfoArray(false, options)
-        ]);
+        var countOptions = '';
+        this.countHeader = "Recent Request History";
+        let responses = await Promise.all([
+            this.helpTickets.getCurrentCount(),
+            this.requests.getCurrentCount(),  
+            this.requests.getClientRequestsDetailsArray(true,'?filter=institutionId|eq|' + this.app.user.institutionId),
+            this.sessions.getSessionsArray(false),
+            this.siteinfo.getInfoArray(false, options)
+            ]);
     } else {
-      let responses = await Promise.all([
-          this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.app.user._id),
-          this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id),
-          this.sessions.getSessionsArray(false, '?filter=[or]sessionStatus|Active:Requests:Next&order=startDate' ),
-          this.siteinfo.getInfoArray(false, options),  
-      ]);
+        var countOptions = '?filter=institutionId|eq|' + this.app.user.institutionId;
+        this.countHeader = "Your Institution's Recent Request History";
+        let responses = await Promise.all([
+            this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.app.user._id),
+            this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.app.user._id),
+            this.sessions.getSessionsArray(false),
+            this.siteinfo.getInfoArray(false, options)  
+        ]);
     }
+    this.requestsCount = new Array();
+    this.countLabels = new Array();
+    var requestCountArray = await this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+    if(requestCountArray){
+        requestCountArray.forEach((item) => {
+            this.requestsCount.push(item.count);
+            this.countLabels.push(item.session);
+        })
+    } 
+
     this.temp = undefined;
     if(!localStorage.getItem('weather')){
             let weather = await this.siteinfo.getWeather(this.app.user.city);
-             this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
+            this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
             this.temp = this.temp + "\u00b0 C";
             this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
             var weatherObj = {temp: this.temp, url: this.weatherIcon};

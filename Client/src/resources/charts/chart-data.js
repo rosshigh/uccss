@@ -4,6 +4,8 @@ import {bindable, noView} from 'aurelia-framework';
 export class ChartData {
   @bindable data = [];
   @bindable label = '';
+  @bindable height = 150;
+  @bindable width = 300;
   @bindable fillColor = 'rgba(220,220,220,0.2)';
   @bindable strokeColor = 'rgba(220,220,220,1)';
 

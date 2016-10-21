@@ -8,6 +8,7 @@ export function configure(config) {
     './elements/add-systems',
     './elements/tiny-mce',
     './value-converters/gravatar-url',
+     './value-converters/session-type',
     './value-converters/info-filter',
     './value-converters/date-format',
     './value-converters/page-filter',
@@ -37,6 +38,7 @@ export function configure(config) {
     './value-converters/check-box',
     './value-converters/phone-number',
     './charts/chart-data',
-    './charts/doughnut-chart'
+    './charts/doughnut-chart',
+    './charts/bar-chart'
   ]);
 }

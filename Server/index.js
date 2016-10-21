@@ -36,7 +36,7 @@ var express = require('express'),
     // Then notify the polling when your job is done:
     end();
     // This will schedule the next call.
-}, 10800000).run();
+}, 3600000).run();
 
 var app = express();
 

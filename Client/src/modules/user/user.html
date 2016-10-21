@@ -14,21 +14,25 @@
                 <compose view="./components/homePageLinks.html"></compose> 
             </div>
         </div>
-        <div class="col-md-5 bigMarginTop leftMargin">
-            <div class="row"> 
-            
-            </div>
-            <div style="height:300px;margin-top:30px;">
-                <div class="col-lg-5">
-                <!-- <h2 class="underline"><a href="#/support" style="color: inherit;">Help Tickets</a></h2>-->
-                    <compose view="./components/helpTickets.html"></compose>
+        <div class="col-md-5 bigMarginTop leftMargin hidden-xs hidden-sm">
+            <div class="row" style="height:200px;">
+                <div class='col-lg-12 bigMarginTop'>
+                    <div class="col-lg-5">
+                    <!-- <h2 class="underline"><a href="#/support" style="color: inherit;">Help Tickets</a></h2>-->
+                        <compose view="./components/helpTickets.html"></compose>
+                    </div>
+                    <div class="col-lg-6">
+                    <!--    <h2 class="underline"><a href="#/clientRequests" style="color: inherit;">Client Requests</a></h2>-->
+                        <compose view="./components/clientRequests.html"></compose>
+                    </div>
                 </div>
-                <div class="col-lg-6">
-                <!--    <h2 class="underline"><a href="#/clientRequests" style="color: inherit;">Client Requests</a></h2>-->
-                    <compose view="./components/clientRequests.html"></compose>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 bigMarginTop">
+                    <compose view="./components/requestCount.html"></compose>
                 </div>
             </div>
-            <div class="col-md-12 hidden-xs hidden-sm">
+            <div class="row col-lg-12">
                 <h2 class="underline">UCC and UA News</h2>
                 <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
                     <compose view="./components/newsItem.html"></compose>

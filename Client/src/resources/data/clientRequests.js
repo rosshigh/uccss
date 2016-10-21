@@ -87,11 +87,44 @@ export class ClientRequests {
             this.updatedRequests =  this.utils.countItems(3, 'requestStatus', response);
             this.customerActionRequests =  this.utils.countItems(4, 'requestStatus', response);
             return response.count;
-        } else {
+        } else { 
             return null;
         }
     }
     
+    async getSessionCount(sessionArray, numSessions, options, requestStatus){
+        var url = this.data.CLIENT_REQUESTS_SERVICES;
+        url += options ? options : "";
+        var response = await this.data.get(url);
+        if(!response.error){
+            var sessions = new Array(); 
+            var sessionCount = new Array();
+            numSessions = numSessions < sessionArray.length ? numSessions : sessionArray.length - 1;
+            for(var i = 0; i <= numSessions; i++){
+                sessions.push(sessionArray[i]._id);
+                sessionCount.push({count: 0, session: sessionArray[i].session});
+            }
+            requestStatus = requestStatus ? requestStatus.split(':') : undefined;
+            response.forEach((request) => {
+                // var index = this.utils.arrayContainsValue(sessions, 'id', request.sessionId);
+                var index = sessions.indexOf(request.sessionId);
+                if( index > -1){
+                    if(requestStatus){
+                        request.requestDetails.forEach((detail) => {
+                            if(requestStatus.indexOf(detail.requestStatus) > -1) {
+                                sessionCount[index].count += 1;
+                            }
+                        });
+                    } else {
+                        sessionCount[index].count += request.requestDetails.length;
+                    }
+                    
+                }
+            });
+           return sessionCount;
+        }
+    }
+
     async getCurrentCount(options){
         var url = this.data.CLIENT_REQUESTS_SERVICES +'/current/count';
         url += options ? options : "";

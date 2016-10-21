@@ -13,11 +13,13 @@
      
     <div class="detail-container">
        
-    		<div class="row1x2">
+    		<div>
                 <h4>Help Tickets</h4>
-    			<doughnut-chart class="column2x2">
-    				<chart-data data.bind="helpTicketArray"></chart-data>
-    			</doughnut-chart>
+                <div class="bigMarginTop">
+                    <doughnut-chart>
+                        <chart-data data.bind="helpTicketArray"></chart-data>
+                    </doughnut-chart>
+                </div>
     		</div>
     	</div>
 </template>

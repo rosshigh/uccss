@@ -7,9 +7,7 @@ export function chartElement(api) {
     children({ selector: 'chart-data', name: 'datasets' })(target);
     inlineView(`
     <template>
-      <div  style="width: 200px;">
-        <canvas ref="canvas" width="150" height="150"></canvas>
-      </div>
+      <canvas class="center-block"ref="canvas"></canvas>
       <div ref="legend" style="font-size:small;"></div>
       <slot></slot>
     </template>
@@ -41,6 +39,8 @@ export function chartElement(api) {
           labels: this.labels,
           datasets: this.datasets
         };
+        this.canvas.width = this.datasets[0].width;
+        this.canvas.height = this.datasets[0].height;
         this.chart = new Chart(this.context)[api](data);
       }
 
