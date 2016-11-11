@@ -9,13 +9,13 @@ module.exports = function (app) {
   //filter=[in]field|list|value1:value2:value3
   buildQuery = function(queryObject, reqQuery){
     if(queryObject.order) {
-      var order = queryObject.order.split(':');
+      var order = queryObject.order.split(':');  
       if(order[1] && order[1] =='DSC')  order[0] = '-' + order[0];
       reqQuery.sort(order[0]);
     }
-    if(queryObject.fields) reqQuery.select(queryObject.fields);
+    if(queryObject.fields) reqQuery.select(queryObject.fields);   
     if(queryObject.filter){
-      var queryString = queryObject.filter;
+      var queryString = queryObject.filter;     
       if(queryString.indexOf('[or]') > -1){
         queryString = queryString.substring(4);
         var queryArray = queryString.split('|');
@@ -54,7 +54,7 @@ module.exports = function (app) {
         var list = component[1].split(':');
         reqQuery.where(component[0]).in(list)
       } else {
-        var component = queryString.split('|');
+        var component = queryString.split('|');      
         switch(component[1]) {
           case 'eq':
             reqQuery.where(component[0]).eq(component[2]);

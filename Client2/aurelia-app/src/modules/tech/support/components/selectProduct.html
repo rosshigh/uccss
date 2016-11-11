@@ -1,0 +1,29 @@
+<template>
+     <compose view='./Courses.html' show.bind="config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired"></compose>
+
+      <!-- Product Select -->
+      <div show.bind="helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0">
+        <table id="clientTable" class="table table-bordered table-responsive" style="background:white;">
+          <thead>
+          <tr class="header">
+            <th>Product</th>
+            <th>System</th>
+            <th>Client Number</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr id="${product.id}" productId="${product.productId}" 
+              repeat.for="product of clientRequestsArray[0].requestDetails">
+            <td >${product.productId}</td>
+            <td>${product.sid | lookupSid:systems}</td>
+            <td>${product.client}</td>
+            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>
+          </tr>
+          </tbody>
+        </table>
+        <span id="client"></span>
+      </div>
+    </div>
+  </div>
+</template>

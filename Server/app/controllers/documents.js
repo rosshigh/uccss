@@ -37,7 +37,7 @@ module.exports = function (app, config) {
     });
   });
 
-  router.post('/api/documents', requireAuth, function(req, res, next){
+  router.post('/api/documents', requireAuth, function(req, res, next){ 
     debug('Create Document');
     var document =  new Model(req.body);
     document.save( function ( err, object ){

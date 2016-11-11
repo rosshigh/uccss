@@ -1,0 +1,25 @@
+<template>
+  <div class="col-lg-12">
+    <form>
+      <div class="col-md-5 topMargin">
+        <label>Available Systems</label>
+        <div class="well well2 overFlow" style="height:400px;">
+            <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter systems"/>
+            <ul class="list-group">
+              <button click.trigger="selectSystem($event, system)" type="button" repeat.for="system of filteredsystemsarray" id="${system._id}"
+                      class="list-group-item">${system.sid}</button>
+            </ul>
+        </div>
+      </div>
+      <div class="col-md-5 topMargin col-md-offset-1">
+        <label>Assigned Systems</label>
+        <div class="well well2 overFlow" style="height:400px;">
+          <ul class="list-group">
+            <button click.trigger="removeSystem($event, system)" type="button" repeat.for="system of selectedproduct.systems" id="${system._id}"
+                    class="list-group-item">${system.sid}</button>
+          </ul>
+        </div>
+      </div>
+    </form>
+  </div>
+</template>

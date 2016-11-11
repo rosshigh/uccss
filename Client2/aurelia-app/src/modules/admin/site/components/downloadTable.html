@@ -1,0 +1,75 @@
+<template>
+    <div class="col-lg-12 col-sm-12" style='padding:15px;'>
+        <div class='row'>
+            <div class='col-lg-12 bottomMargin'>
+                <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+                <div id="no-more-tables">
+                    <table id="newsTable" class="table table-striped table-hover cf">
+                        <thead class="cf">
+
+                            <tr>
+                                <td colspan='5'>
+                                    <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                                        title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                                    <span click.delegate="new()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Download"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                    <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:75px;">Name <span click.trigger="dataTable.sortArray('name')"><i class="fa fa-sort"></i></span></th>
+                                <th>File <span click.trigger="dataTable.sortArray('file.fileName')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Type <span click.trigger="dataTable.sortArray('type')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Status <span click.trigger="dataTable.sortArray('active')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Help Ticket Relevant <span click.trigger="dataTable.sortArray('helpTicketRelevant')"><i class="fa fa-sort"></i></span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <input input.delegate="dataTable.filterList($event)" id="name" type="text" placeholder="Filter Name" class="form-control"
+                                    />
+                                </th>
+                                <th>
+                                    <input input.delegate="dataTable.filterList($event)" id="file.originalFilename" type="text" placeholder="Filter File" class="form-control"
+                                    />
+                                </th>
+                                <th>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="type" compare="id">
+                                    <option value=""></option>
+                                    <option repeat.for="category of downloads.appCatsArray" value="${category.downCatcode}">${category.description}</option>
+                                </select>
+                                </th>
+                                <th>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="active" compare="id">
+                                    <option value=""></option>
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</options>
+                                </select>
+                                </th>
+                                <th>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="helpTicketRelevant" compare="id">
+                                    <option value=""></option>
+                                    <option value="true">True</option>
+                                    <option value="false">False</options>
+                                </select>
+                                </th>
+                            </tr>
+                            <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
+                                <td data-title="Name">${item.name}</td>
+                                <td data-title="Original Filename" style="width: 75px">
+                                    <div>${item.file.originalFilename}</div>
+                                </td>
+                                <td data-title="Type" style="width: 75px">
+                                    <div>${item.type | lookupDescription:downloads.appCatsArray:downCatcode}</div>
+                                </td>
+                                <td data-title="Status">${item.active | translateStatus}</td>
+                                <td data-title="Help Ticket Relevant">${item.helpTicketRelevant}</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

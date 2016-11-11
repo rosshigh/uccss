@@ -1,0 +1,2 @@
+copy C:\Development\UCCSS\UCCSS-DEV-FOLDER\Client\scripts\app-bundle.js C:\Development\UCCSS\UCCSS-DEV-FOLDER\Server\public\scripts
+copy C:\Development\UCCSS\UCCSS-DEV-FOLDER\Client\scripts\app-bundle.js.map C:\Development\UCCSS\UCCSS-DEV-FOLDER\Server\public\scripts

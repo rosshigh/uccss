@@ -72,8 +72,8 @@ var jwtLogin = new jwtStrategy(jwtOptions, function(payload, next){
     var userInfo = setUserInfo(req.user);
 
     res.status(200).json({
-      token: generateToken(userInfo),
-      _id: req.user._id,
+        token: generateToken(userInfo),
+        user: req.user,
         temp: process.env.TEMP,
         icon: process.env.ICON
     });

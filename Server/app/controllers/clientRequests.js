@@ -323,7 +323,6 @@ module.exports = function (app) {
   router.get('/api/courses', requireAuth, function(req, res, next){
     debug('Get courses');
     var query = buildQuery(req.query, Course.find());
-    query.populate('requestDetails');
     query.exec(function(err, object){
         if (err) {
           return next(err);

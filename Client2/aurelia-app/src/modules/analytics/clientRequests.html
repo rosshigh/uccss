@@ -1,0 +1,15 @@
+<template>
+    <div class="panel panel-default rightMargin leftMargin">
+      <div class="panel-body">
+        <div class="row">
+            <div show.bind="!requestSelected">
+                <compose view="./components/requestsByInstitution.html"></compose>
+            </div> <!-- Table Div -->
+            <div show.bind="requestSelected" >
+                <!--
+                <compose view="./components/viewRequestsForm.html"></compose>
+                -->
+            </div> <!-- Form Div -->
+        </div> <!-- Row -->
+      </div> <!-- Panel Body -->
+</template>

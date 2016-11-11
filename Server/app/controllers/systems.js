@@ -59,8 +59,14 @@ module.exports = function (app) {
 
   router.post('/api/systems', requireAuth, function(req, res, next){
     debug('Create systems');
-    var person =  new Model(req.body);
-    person.save( function ( err, object ){
+    var system =  new Model(req.body);
+    system.validate(function (err) {
+      if (err) {
+        if(!system.productId) system.productId = null;
+      }
+    });
+    console.log("HERE");
+    system.save( function ( err, object ){      
       if (err) {
         return next(err);
       } else {
@@ -125,7 +131,7 @@ module.exports = function (app) {
         res.status(200).json(result);
       }
     })
-  });
+  }); 
 
   router.delete('/api/systems/:id', requireAuth, function(req, res, next){
     debug('Delete systems [%s]', req.params.id);

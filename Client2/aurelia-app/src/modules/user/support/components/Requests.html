@@ -1,0 +1,27 @@
+<template>
+      <div >
+        <table id="clientTable" class="table table-bordered table-responsive" style="background:white;">
+          <thead>
+          <tr class="header">
+            <th>Product</th>
+            <th>System</th>
+            <th>Client</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr id="${product.id}" productId="${product.productId}" 
+                repeat.for="product of clientRequestsArray"
+                click.trigger="requestChosen($event, product)">
+              <td>${product.productId | productName:products.productsArray}</td>
+              <td>${product.systemId | lookupSid:systems.systemsArray}</td>
+              <td>${product.client}</td>
+              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
+            </tr>
+          </tbody>
+        </table>
+        <span id="client"></span>
+      </div>
+    </div>
+  </div>
+</template>

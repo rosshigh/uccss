@@ -1,0 +1,31 @@
+<template>
+     <div class='row'>
+            <div class='col-lg-12'>
+                <table id="requestsTable" class="table table-striped table-hover">
+                    <thead>
+                        
+                        <tr>
+                            <td colspan="6">
+                                <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                                <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                          <th>Product</th>
+                          <th>Status</th>
+                          <th>Date Created</th>
+                          <th>Date Required</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                    <tr  click.delegate="edit(product, $event, $index)" repeat.for="product of dataTable.displayArray">
+                      <td data-title="Product">${product.productId | productName:products.productsArray}</td>
+                      <td data-title="Status">${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
+                      <td data-title="createdDate">${product.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                      <td data-title="createdDate">${product.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+        </div>
+</template>

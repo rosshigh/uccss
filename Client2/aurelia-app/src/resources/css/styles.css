@@ -1,0 +1,257 @@
+ai-dialog-header {
+    background-color: SlateBlue ;
+    color: white;
+}
+
+.banner {
+    margin-top: 40px;
+    height: 50px;
+    width: 100%;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.browse .textContainer { 
+    height: 430px; 
+    line-height: 400px;
+}
+
+.textContainer h4 {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.detail-container .header {
+    background: #f2f2f2;
+    box-shadow: none;
+    height: 64px;
+}
+
+.detail-container .header i {
+    float: left;
+    font-size: 42px;
+    padding: 8px 10px;
+}
+
+.detail-container .header i.separator {
+    float: none;
+    font-size: 8px;
+    padding: 0 8px;
+    position: relative;
+    top: -2px;
+}
+
+.detail-container .header .content {
+    display: inline-block;
+    margin-top: 12px;
+}
+
+.detail-container .header .content .title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.detail-container .header .content .description {
+    color: #7a7a7a;
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+.detail-container h2.select-from-list {
+  text-align: center;
+}
+
+
+.bar-chart {
+    position: absolute;
+    top: 300px;
+}
+
+.doughnut-legend li span {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.doughnut-legend{
+    list-style: none !important;    
+}
+
+.pie-legend li span {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.pie-legend {
+    list-style: none !important;    
+}
+
+donut-chart, bar-chart {
+  display: inline-block;
+  margin: 40px;
+}
+
+chart-data {
+  display: none;
+}
+
+.topMargin {
+    margin-top: 25px;
+}
+
+.bottomMargin {
+    margin-bottom: 25px;
+}
+
+.leftMargin {
+    margin-left: 25px;
+}
+
+.rightMargin {
+  margin-right: 25px;
+}
+
+.smallLeftMargin {
+    margin-left: 10px;
+}
+
+.bigTopMargin {
+    margin-top: 50px;
+}
+
+.smallMarginRight {
+    margin-right: 10px;
+}
+
+.page-host {
+    margin-top: 5rem;
+}
+
+textarea {
+  overflow-y:scroll;
+}
+
+.overFlow {
+    overflow-y:scroll;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.rowSelected{
+  background-color: lightgrey;
+}
+
+.newsTitle {
+  font-size: large;
+  font-weight: bold;
+  border-bottom: thin solid;
+}
+
+.newsUrl{
+  color: blue;
+  float: right;
+}
+
+.centerText{
+  text-align: center;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.smart-timeline{position:relative}
+.smart-timeline-list{list-style:none;margin:0;padding:0}
+.smart-timeline-list:after{content:" ";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}
+.smart-timeline-list li{position:relative;margin:0;padding:15px 0}
+.smart-timeline-list>li:hover{background-color:#f4f4f4}
+.smart-timeline-hover li:hover{background-color:#f9f9f9}
+.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}
+.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}
+.smart-timeline-time{float:left;width:70px;text-align:right}
+.smart-timeline-time>small{font-style:italic}
+.smart-timeline-content{margin-left:123px}
+
+.hover_img a { position:relative; }
+.hover_img a span { position:absolute; display:none; z-index:99; }
+.hover_img a:hover span { display:block; }
+
+.borderTop {
+  border-style: solid;
+  border-top: thin double #ff0000;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  padding-top: 6px;
+}
+
+
+@media only screen and (max-width: 800px) {
+    
+    /* Force table to not be like tables anymore */
+	#no-more-tables table, 
+	#no-more-tables thead, 
+	#no-more-tables tbody, 
+	#no-more-tables th, 
+	#no-more-tables td, 
+	#no-more-tables tr { 
+		display: block; 
+	}
+ 
+	/* Hide table headers (but not display: none;, for accessibility) */
+	#no-more-tables thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+ 
+	#no-more-tables tr { border: 1px solid #ccc; }
+ 
+	#no-more-tables td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+		white-space: normal;
+		text-align:left;
+	}
+ 
+	#no-more-tables td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		text-align:left;
+		font-weight: bold;
+	}
+ 
+	/*
+	Label the data
+	*/
+	#no-more-tables td:before { content: attr(data-title); }

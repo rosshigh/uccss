@@ -1,17 +1,20 @@
 var Mongoose = require('mongoose'),
-  Schema = Mongoose.Schema;
+  Schema = Mongoose.Schema,
+  AutoIncrement = require('mongoose-sequence');
 
 var CategorySchema = new Schema({
-  code: { type: Number, required: true },
+  downCatcode: { type: Number },
   description: { type: String, required: true }
 });
+
+CategorySchema.plugin(AutoIncrement, {inc_field: 'downCatcode'});
 
 module.exports = Mongoose.model('AppCategory', CategorySchema);
 
 var DownloadSchema = new Schema({
   name: { type: String, require: true },
   description: { type: String },
-  type: { type: String },
+  downCatcode: { type: Number },
   file: {
     originalFilename: { type: String },
     fileName: { type: String },

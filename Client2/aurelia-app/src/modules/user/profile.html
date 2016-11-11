@@ -1,0 +1,183 @@
+<template>
+  <div class="container">
+    <div class="panel panel-primary topMargin">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <h3>User Profile</h3>
+        </div>
+      </div>
+      <div class="panel-body">
+          <div class="bottomMargin list-group-item leftMargin rightMargin">
+            <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+            <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+        </div>  
+        <div class="topMargin col-sm-12 col-lg-1">
+            <div style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
+            <div class="topMargin">
+                <h6>Register your email with <a href="https://en.gravatar.com/">gravatar.com</a> to show your image.</h6>
+            </div>
+        </div>
+    <div class="col-sm-12 col-lg-11">
+        <form class="form-horizontal topMargin">
+          <div class="row">
+            <!-- Row 1 -->
+            <div class="col-sm-12 col-lg-4">
+              <div class="form-group">
+                <label for="editFirstName" class="col-sm-3 control-label hideOnPhone">Name</label>
+                <div class="col-sm-8">
+                  <input value.bind="people.selectedPerson.firstName" id="editFirstName" class="form-control input-md" placeholder="First Name" type="text" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-lg-4">
+              <div class="form-group">
+                <label for="editMiddleName" class="col-sm-3 control-label hideOnPhone">Middle Name</label>
+                <div class="col-sm-8">
+                  <input value.bind="people.selectedPerson.middleName" id="editMiddleName" class="form-control input-md" placeholder="Middle Name" type="text" />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-lg-4">
+              <div class="form-group">
+                <label for="editLastName" class="col-sm-3 control-label hideOnPhone">Last Name</label>
+                <div class="col-sm-8">
+                  <input value.bind="people.selectedPerson.lastName" id="editLastName" class="form-control input-md" placeholder="Last Name" type="text" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="row topMargin">
+                <div class="col-lg-5">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone</label>
+                            <div class="col-sm-8">
+                            <input value.bind="people.selectedPerson.phone| phoneNumber" id="editPhone" class="form-control input-md" placeholder="Phone" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editMobile" class="col-sm-3 control-label hideOnPhone">Mobile</label>
+                            <div class="col-sm-8">
+                            <input value.bind="people.selectedPerson.mobile | phoneNumber" id="editMobile" class="form-control input-md" placeholder="Mobile" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editEmail" class="col-sm-3 control-label hideOnPhone">Email</label>
+                            <div class="col-sm-8">
+                            <input disabled value.bind="people.selectedPerson.email" id="editEmail" class="form-control input-md" placeholder="Email" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editGender" class="col-sm-3 control-label">Gender</label>
+                            <div class="col-sm-8">
+                                <select value.bind="people.selectedPerson.gender" id="editGender" class="form-control input-md" placeholder="Gender">
+                                    <option value="">Select an option</option>
+                                    <option value="F">Female</option>
+                                    <option value="M">Male</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editInstitution" class="col-sm-3 control-label">Institution</label>
+                            <div class="col-sm-8">
+                                <select value.bind="people.selectedPerson.institutionId" id="editInstitution" class="form-control input-md" placeholder="Institution">
+                                    <option value="">Select an option</option>
+                                    <option repeat.for="institution of people.institutionsArray" value="${institution._id}">${institution.name}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5 col-lg-offset-1">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editAddress1" class="col-sm-3 control-label hideOnPhone">Address 1</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.address1" id="editAddress1" class="form-control input-md" placeholder="Address 1" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editAddress2" class="col-sm-3 control-label hideOnPhone">Address 2</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.address2" id="editAddress2" class="form-control input-md" placeholder="Address2" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editCity" class="col-sm-3 control-label hideOnPhone">City</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.city" id="editCity" class="form-control input-md" placeholder="City" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editRegion" class="col-sm-3 control-label hideOnPhone">Region</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.region" id="editRegion" class="form-control input-md" placeholder="Region" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editPostalCode" class="col-sm-3 control-label hideOnPhone">Postal Code</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.postalCode" id="editPostalCode" class="form-control input-md" placeholder="Postal Code" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editCountry" class="col-sm-3 control-label hideOnPhone">Country</label>
+                            <div class="col-sm-8">
+                                <input value.bind="people.selectedPerson.country" id="editCountry" class="form-control input-md" placeholder="Country" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           <div class="row topMargin">
+                <div class="col-lg-5">
+                    <div class="form-group">
+                        <label for="editSpecialization" class="col-sm-3 control-label">Specialization</label>
+                        <div class="col-sm-8">
+                            <select value.bind="people.selectedPerson.personSpecialization" id="editSpecialization" class="form-control input-md" placeholder="Specializatin">
+                                <option value="">Select an option</option>
+                                <option repeat.for="name of is4ua.specialArray" value="${name.code}">${name.description}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-lg-offset-1">
+                    <div class="form-group">
+                        <label for="editDepartment" class="col-sm-3 control-label">Department</label>
+                        <div class="col-sm-8">
+                            <select value.bind="people.selectedPerson.departmentCategory" id="editDepartment" class="form-control input-md" placeholder="Department">
+                                <option value="">Select an option</option>
+                                <option repeat.for="name of is4ua.deptArray" value="${name.code}">${name.description}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          </div> <!-- Row -->
+        </form>
+      </div>
+  </div>
+</template>

@@ -16,6 +16,16 @@ var SystemSchema = new Schema({
   dateModified: { type: Date }
 });
 
+SystemSchema.pre('save', function(next){
+  var system = this;
+  console.log(system.productId)
+  if(!system.productId){
+    system.productId = null;
+    next();
+  }
+   return next();
+});
+
 SystemSchema.pre('update', function() {
   this.update({},{ $set: { dateModified: new Date() } });
 });
