@@ -83,7 +83,10 @@
                     <div class="form-group">
                         <label for="editCreatedDate" class="col-sm-2 control-label hideOnPhone">Date Created</label>
                         <div class="col-sm-8">
+                            <date-picker value.two-way="siteinfo.selectedItem.createdDate"  controlid="editCreatedDate"></date-picker>
+                            <!--
                             <input value.bind="siteinfo.selectedItem.createdDate | datePickerDate" id="editCreatedDate" class="form-control " placeholder="Date Created" type="date" />
+                            -->
                         </div>
                     </div>
                 </div>
@@ -93,7 +96,10 @@
                     <div class="form-group">
                         <label for="editExpireddDate" class="col-sm-2 control-label hideOnPhone">Date Expires</label>
                         <div class="col-sm-8">
+                             <date-picker value.two-way="siteinfo.selectedItem.expiredDate"  controlid="editExpireddDate"></date-picker>
+                             <!--
                             <input value.bind="siteinfo.selectedItem.expiredDate | datePickerDate" id="editExpireddDate" class="form-control " placeholder="Date Expires" type="date" />
+                            -->
                         </div>
                     </div>
                 </div>

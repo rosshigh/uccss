@@ -103,8 +103,8 @@ export class ViewHelpTickets {
     wizard.on('actionclicked.fu.wizard', function(e, data) {
       if(data.direction !== "previous"){
         if (!that.validation.validate(data.step)){
-          e.preventDefault();
-        } else {
+          e.preventDefault(); 
+        } else if(data.step === 4) {
             that.validation.makeValid( $("#productListTable"));
             that.save();
         }
@@ -130,7 +130,7 @@ export class ViewHelpTickets {
         this.sessions.selectSession(el.target.selectedIndex - 1);
         //Format the dates for the date pickers
         // this.utils.formatDateForDatesPicker(this.sessions.selectedSession);
-        
+
         this.setDates();
 
         this.validation.makeValid( $(el.target));
@@ -143,15 +143,16 @@ export class ViewHelpTickets {
   setDates(){
     this.requests.selectedRequest.startDate = this.sessions.selectedSession.startDate;
     this.requests.selectedRequest.endDate = this.sessions.selectedSession.endDate;
-    this.minStartDate =this.sessions.selectedSession.startDate;
-    this.maxStartDate =this.sessions.selectedSession.endDate;
+    this.minStartDate = this.sessions.selectedSession.startDate;
+    this.maxStartDate = this.sessions.selectedSession.endDate;
     this.minEndDate =this.sessions.selectedSession.startDate;
     this.maxEndDate =this.sessions.selectedSession.endDate;
+
     var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY,'days');
     this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
     this.minRequiredDate = moment(this.minRequiredDate._d).format('YYYY-MM-DD');
     this.maxRequiredDate = this.sessions.selectedSession.endDate;
-    
+
   }
 
   changeCourse(el){
@@ -178,15 +179,16 @@ export class ViewHelpTickets {
       }
   }
 
-  changeBeginDate(){
-    $("#endDate").attr("min", $("#beginDate").val());
-    this.requests.selectedRequest.endDate = moment.max($("#beginDate").val(), $("#endDate").val());
+  changeBeginDate(evt){
+    this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
+    this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
   }
 
-  changeEndDate(){
-    $("#beginDate").attr("max", $("#endDate").val());
-    this.requests.selectedRequest.startDate = moment.min($("#beginDate").val(), $("#endDate").val());
-  }
+  // changeEndDate(){
+  //   this.maxStartDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
+  //   // $("#beginDate").attr("max", $("#endDate").val());
+  //   this.requests.selectedRequest.startDate = moment.min(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+  // }
 
   async changeRequestType(el){
     switch(el.target.value){
@@ -259,16 +261,16 @@ export class ViewHelpTickets {
         if(this.requests.selectedRequest.requestDetails[i]._id){
           if(this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE){
             return this.dialog.showMessage(
-              "That request has already been assigned and cannot be deleted?", 
-              "Cannot Delete Request", 
+              "That request has already been assigned and cannot be deleted?",
+              "Cannot Delete Request",
               ['Ok']
               ).then(response => {
               });
-          
+
           } else {
             return this.dialog.showMessage(
-              "Are you sure you want to delete that request?", 
-              "Delete Request", 
+              "Are you sure you want to delete that request?",
+              "Delete Request",
               ['Yes','No']
               ).then(response => {
                  if (!response.wasCancelled) {
@@ -296,13 +298,13 @@ export class ViewHelpTickets {
       "valFunction":function(context){
         return !(context.sessionId == -1);
       }});
-      
+
      this.validation.addRule(1,"requestType",{"rule":"custom","message":"Select a request type",
       "valFunction":function(context){
         return !(context.requestType == -1);
       }
-    });  
-      
+    });
+
     this.validation.addRule(1,"course",{"rule":"custom","message":"Select a course",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){

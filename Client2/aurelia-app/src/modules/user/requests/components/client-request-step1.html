@@ -57,26 +57,16 @@
 
   <!-- Begin and End Date -->
   <div class="row" show.bind="sandBoxClient || courseSelected">
-      <div class="col-sm-6">
+      <div class="col-lg-6">
         <div class="form-group topMargin">
-          <div class="input-group">
-            <div>
-              <label for="beginDate" class="leftJustify">Date the course begins</label>
-              <input readonly.bind="existingRequest" change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate | datePickerDate"
-                     class="form-control" id="beginDate" min.bind="minStartDate" max.bind="maxStartDate">
-            </div>
-          </div>
+           <label class="col-sm-2 form-control-label ">Start Date</label>
+           <date-picker value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
         </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-lg-6">
         <div class="form-group topMargin">
-          <div class="input-group">
-            <div>
-              <label for="endDate" class="leftJustify">Date the course ends</label>
-              <input readonly.bind="existingRequest" change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate | datePickerDate"
-                     max.bind="maxEndDate" min.bind="minEndDate" class="form-control" id="endDate">
-            </div>
-          </div>
+          <label class="col-sm-2 form-control-label ">End Date</label>
+          <date-picker value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
         </div>
       </div>
     </div>

@@ -377,6 +377,7 @@ export class ViewHelpTickets {
     this.courseSelected = false;
     this.updateMessages(true);
     this.sessionId = -1;
+     this.requestType = -1;
     $('.wizard').wizard('selectedItem', {
       step: 1
     })

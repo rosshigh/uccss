@@ -17,6 +17,7 @@ module.exports = function (app) {
 
   router.get('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Get clientRequests');
+    console.log("HERE")
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
@@ -28,6 +29,7 @@ module.exports = function (app) {
         }
       });
   });
+  
 
   router.get('/api/clientRequests/person/:id', requireAuth, function(req, res, next){
     debug('Get clientRequests');
@@ -202,9 +204,10 @@ module.exports = function (app) {
     req.body.requestDetailsToSave.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       details.push(obj._id)
-      if(detail._id){
+      if(detail._id){       
+        clientRequest.requestDetails.push(detail._id);
         tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-      } else {
+      } else {       
         var obj = new ClientRequestDetail(detail);
         clientRequest.requestDetails.push(obj._id);
         obj.requestId = clientRequest._id;

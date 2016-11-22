@@ -145,7 +145,7 @@ export class DataTable{
     this.buildDisplayArray();
   }
 
-  filterList(el, array){
+  filterList(el, array){ 
     el.preventDefault();
     array = array || new Array();
     //If the property is already in filterValues, filter it out
@@ -262,6 +262,18 @@ export class DataTable{
                    keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                 }
                 break;
+              case 'not':
+                if(filters[i].property.indexOf('.') > -1){
+                    var properties = filters[i].property.split('.')
+                    var condition = "item"
+                    for(var j = 0; j<properties.length; j++){
+                      condition += "['" + properties[j] + "']"
+                    }
+                    keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
+                  } else {
+                    keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
+                  }
+                 break;
               default:
                 if(filters[i].property.indexOf('.') > -1){
                   var properties = filters[i].property.split('.')

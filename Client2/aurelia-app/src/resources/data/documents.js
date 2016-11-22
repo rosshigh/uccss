@@ -84,7 +84,7 @@ export class DocumentsServices {
     }
 
     uploadFile(files, version){
-       this.data.uploadFiles2(files, 'api/' + this.data.DOCUMENTS_FILE_UPLOAD + "/" + this.selectedDocument.name + '/' + version);
+       this.data.uploadFiles(files, this.data.DOCUMENTS_FILE_UPLOAD + "/" + this.selectedDocument.name + '/' + version);
     }
 
     async deleteFile(index){
@@ -118,8 +118,6 @@ export class DocumentsServices {
         }
         return new Array();
      }
-     
-
     
     //Categories
     async getDocumentsCategoriesArray(refresh, options) {
@@ -141,7 +139,20 @@ export class DocumentsServices {
         return this.docCatsArray;
     }
 
-    selectCategory(index) {
+    selectCategory(index){
+         if (!index && index != 0) {
+            this.selectedCat = this.emptyCat();
+        } else {
+            try {
+                this.selectedCat = this.utils.copyObject(this.docCatsArray[index]);
+                this.editCatIndex = index;
+            } catch (error) {
+                this.selectedCat = this.emptyCat();
+            }
+        }
+    }
+
+    selectCategoryByCode(index) {
         if (!index && index != 0) {
             this.selectedCat = this.emptyCat();
         } else {

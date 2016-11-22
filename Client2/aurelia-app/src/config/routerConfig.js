@@ -21,11 +21,11 @@ export default class {
                 { route: 'system',          moduleId: './modules/admin/system/system',          name: 'system',         settings: { auth: true, roles: [] }  },
                 { route: 'customers',       moduleId: './modules/admin/customers/customers',    name: 'customers',      settings: { auth: true, roles: [] }  },
                 { route: 'site',            moduleId: './modules/admin/site/site',              name: 'site',           settings: { auth: true, roles: [] } },
-                // { route: 'documents',       moduleId: './modules/admin/documents/documents',    name: 'documents',      auth: true },
+                { route: 'documents',       moduleId: './modules/admin/documents/documents',    name: 'documents',      settings: { auth: true, roles: [] } },
                 { route: 'logout',          moduleId: './modules/home/logout',                  name: 'logout',        settings: { auth: true, roles: [] } },
                 { route: 'facco',           moduleId: './modules/facco/facco',                  name: 'facco',          settings: { auth: true, roles: [] } },
                 { route: 'support',         moduleId: './modules/user/support/support',         name: 'support',        settings: { auth: true, roles: [] } },
-                { route: 'analytics',       moduleId: './modules/analytics/analytics',          name: 'analytics',      auth: true },
+                { route: 'analytics',       moduleId: './modules/analytics/analytics',          name: 'analytics',     settings: { auth: true, roles: [] } },
                 { route: 'clientRequests',  moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } },
                 { route: 'techHt',          moduleId: './modules/tech/support/support',         name: 'techHt',         settings: { auth: true, roles: [] } },
                 { route: 'techRq',          moduleId: './modules/tech/requests/assignments',    name: 'techRq',          settings: { auth: true, roles: [] } }

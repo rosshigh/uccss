@@ -59,6 +59,9 @@ export class ViewRequests {
       await this.requests.getPersonClientRequestsArray(true, '?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse);
       if (this.requests.requestsArray.length) this.requests.selectRequest(0);
       this.updateArray();
+
+      this.sessions.selectSessionById(this.selectedSession);
+      this.setDates();
       
       this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
       this.dataTable.createPageButtons(1);
@@ -79,6 +82,13 @@ export class ViewRequests {
       $("#infoBox").append(this.config.VIEW_REQUEST_MESSAGE);
       $("#infoBox").fadeIn();
       this.dataTable.updateArray(this.requests.requestsArray[0].requestDetails);
+  }
+
+  setDates(){
+    this.minStartDate = this.sessions.selectedSession.startDate;
+    this.maxStartDate = this.sessions.selectedSession.endDate;
+    this.minEndDate = this.sessions.selectedSession.startDate;
+    this.maxEndDate = this.sessions.selectedSession.endDate;
   }
 
   edit(product, el, index) { 
@@ -153,14 +163,19 @@ export class ViewRequests {
     this.requests.selectRequest(0);
   }
 
-  changeBeginDate(){
-    $("#endDate").attr("min", $("#beginDate").val());
-    this.requests.selectedRequest.endDate = moment.max(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
+  changeBeginDate(evt){
+    this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
+    this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
   }
 
-  changeEndDate(){
-    $("#beginDate").attr("max", $("#endDate").val());
-    this.requests.selectedRequest.startDate = moment.min(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
-  }
+  // changeBeginDate(){
+  //   $("#endDate").attr("min", $("#beginDate").val());
+  //   this.requests.selectedRequest.endDate = moment.max(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
+  // }
+
+  // changeEndDate(){
+  //   $("#beginDate").attr("max", $("#endDate").val());
+  //   this.requests.selectedRequest.startDate = moment.min(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
+  // }
 
 }

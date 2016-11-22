@@ -1,0 +1,52 @@
+<template>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-4">
+
+                    <div class="bottomMargin list-group-item">
+                        <span click.delegate="newCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                            title="" data-original-title="New Category"><i class="fa fa-plus fa-lg fa-border" aria-hidden="true"></i></span>
+                        <span disabled.bind="showDocuments" click.delegate="editCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                            title="" data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span>
+                    </div>
+                    <div show.bind="categoryForm">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="bottomMargin">
+                                    <div class="bottomMargin list-group-item">
+                                        <span click.delegate="backCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" 
+                                            title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+                                        <span click.delegate="saveCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                                            title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                                        <span click.delegate="cancelEditCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+                                            title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input id="name" value.bind="documents.selectedCat.description" type="text" placeholder="Category Name" class="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div show.bind="!categoryForm">
+                        <label>Available Categories</label>
+                        <div class="well well2 overFlow" style="height:400px;">
+                            <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter Categories" />
+                            <ul class="list-group">
+                                <button click.trigger="typeChanged($index)" type="button" repeat.for="type of filteredDocumentArray" id="${type.code}" class="list-group-item">${type.description}</button>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div show.bind="showDocuments" class="col-lg-8" style='padding:15px;'>
+                    <div show.bind="showDocumentForm">
+                        <compose view="./components/documentForm.html"></compose>
+                    </div>
+                    <compose show.bind="!showDocumentForm" view="./components/documentsTable.html"></compose>
+                </div>
+            </div>
+</template>

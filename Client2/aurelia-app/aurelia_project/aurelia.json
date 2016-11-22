@@ -118,6 +118,7 @@
           "jquery",
           "moment",
           "extend",
+         "eonasdan-bootstrap-datetimepicker",
           {
             "name": "text",
             "path": "../scripts/text"
@@ -214,6 +215,7 @@
               "css/fuelux.min.css"
             ]
           },
+          "eonasdan-bootstrap-datetimepicker",
           "bootstrap-datepicker"
         ]
       }

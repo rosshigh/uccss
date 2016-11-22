@@ -41,6 +41,20 @@
 						<div class="row">
 							<div class="col-lg-6">
 								<div class="form-group topMargin">
+									<label class="col-sm-2 form-control-label ">Start Date</label>
+									<date-picker value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate"
+										enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group topMargin">
+									<label class="col-sm-2 form-control-label ">End Date</label>
+									<date-picker value.two-way="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
+								</div>
+							</div>
+							<!--
+							<div class="col-lg-6">
+								<div class="form-group topMargin">
 									<div class="input-group">
 										<div>
 											<label for="beginDate" class="leftJustify">Date the course begins</label>
@@ -62,12 +76,12 @@
 								</div>
 							</div>
 						</div>
-
+-->
+						</div>
+						<tiny-mce height.bind="150" value.two-way="commentsResponse"></tiny-mce>
 					</div>
-					<tiny-mce height.bind="150" value.two-way="commentsResponse"></tiny-mce>
 				</div>
 			</div>
 		</div>
-	</div>
 	</div>
 </template>

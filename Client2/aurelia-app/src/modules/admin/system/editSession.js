@@ -6,13 +6,11 @@ import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
-import moment from 'moment';
 
 @inject(Router, Sessions, Validation, Utils, DataTable, AppConfig, CommonDialogs)
 export class EditSessions {
     navControl = "sessionNavButtons";
     sessionSelected = false;
-    // columnspan = 5;
     spinnerHTML="";
 
     constructor(router, sessions, validation, utils, datatable, config, dialog) {
@@ -105,8 +103,9 @@ export class EditSessions {
 
     filterOutClosed() {
         if (this.isChecked) {
-            this.filterValues.push({property:"sessionStatus", value:"Closed", type:'text'});
-            if(this.dataTable.active) this.dataTable.filter(this.filterValues);
+             var filterValues = new Array();
+            filterValues.push({property:"sessionStatus", value:"Next", type:'text', compare: 'not'});
+            if(this.dataTable.active) this.dataTable.externalFilter(filterValues);
         } else {
             this.dataTable.updateArray(this.sessions.sessionsArray);
         }

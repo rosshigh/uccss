@@ -1,44 +1,58 @@
 import {customElement, bindable, inject, bindingMode} from 'aurelia-framework';
-import {datepicker} from 'bootstrap-datepicker';
+import {datepicker} from 'eonasdan-bootstrap-datetimepicker';
 import moment from 'moment';
 
 @inject(Element)
 export class DatePicker {
 
-  @bindable value = '';
-  @bindable startdate;
-  @bindable enddate;
+  @bindable value;
+  @bindable startdate ="1/1/1900";
+  @bindable enddate = "12/31/3000";
+  @bindable controlid;
+  @bindable format = "MM/DD/YYYY";
+  @bindable changedate;
 
     constructor(element) {
         this.element = element;
-        this.pickerDate = '';
-        this.datePicker = $(this.element);
     }
 
-    valueChanged(newValue, oldValue){
-         this.datePicker.datepicker('setDate', newValue);
+    valueChanged(newValue, oldValue){ 
+		if(this.datePicker && newValue !== oldValue){
+			 this.datePicker.data("DateTimePicker").date(moment(newValue).format(this.format));
+		}
     }
 
-    startdateChanged(newValue, oldValue) { 
-        this.datePicker.datepicker('setStartDate', newValue);
+    startdateChanged(newValue, oldValue) {
+		if(this.datePicker){
+        	this.datePicker.data("DateTimePicker").minDate(moment(newValue).format(this.format));
+		}
      }
 
-    enddateChanged(newValue, oldValue) { 
-        this.datePicker.datepicker('setEndDate', newValue);
+    enddateChanged(newValue, oldValue) {
+		if(this.datePicker){
+        	this.datePicker.data("DateTimePicker").maxDate(moment(newValue).format(this.format));
+		}
      }
 
-    bind(){
-       this.datePicker.datepicker({ 
-            autoclose: true,
-            format: 'mm/dd/yyyy',
-            daysOfWeekDisabled: "0,6"
-        }).on('changeDate', (ev) => {
-            this.value = ev.date;
-        });
+    attached(){
+      var self = this;
+  		this.datePicker = $("#" + this.controlid);
+  		this.datePicker.datetimepicker({
+  			daysOfWeekDisabled: [0, 6],
+  			toolbarPlacement: "top",
+  			showClose: true,
+  			format: self.format
+  		});
 
-        this.datePicker.datepicker('setDate', this.value);
-        this.datePicker.datepicker('setStartDate',this.startdate);
-        this.datePicker.datepicker('setEndDate', this.enddate);
+      this.datePicker.on("dp.change", function (e) {
+        self.value = moment(e.date).format(self.format);
+        var changeDateEvent = new CustomEvent('changedate', { detail: { event: e }, bubbles: true });
+        self.element.dispatchEvent(changeDateEvent);
+      });
+
+      if(this.value) this.datePicker.data("DateTimePicker").date(moment(this.value).format(self.format));
+  		if(this.startDate) this.datePicker.data("DateTimePicker").minDate(moment(this.startdate).format(self.format));
+  		if(this.endDate) this.datePicker.data("DateTimePicker").maxDate(moment(this.enddate).format(self.format));
+
     }
-
 }
