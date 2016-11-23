@@ -104,7 +104,7 @@ export class EditSessions {
     filterOutClosed() {
         if (this.isChecked) {
              var filterValues = new Array();
-            filterValues.push({property:"sessionStatus", value:"Next", type:'text', compare: 'not'});
+            filterValues.push({property:"sessionStatus", value:"Closed", type:'text', compare: 'not'});
             if(this.dataTable.active) this.dataTable.externalFilter(filterValues);
         } else {
             this.dataTable.updateArray(this.sessions.sessionsArray);
