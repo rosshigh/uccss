@@ -43,4 +43,17 @@ export class Config {
         }
         return null;
     }
+
+     async saveSessions(saveSessionArray){
+        if(saveSessionArray){
+            let response = await this.data.saveObject(saveSessionArray, this.data.SESSIONS_CONFIG_SERVICE, "put")
+            if (!response.error) {
+                return response;
+            }  else {
+                this.data.processError(response, "There was an error updating the configuration.");
+            }
+            return response;
+        }
+        return null;
+    }
 }

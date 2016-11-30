@@ -240,6 +240,7 @@ export class DataServices {
     // CLIENT_REQUESTS_SEND_MESSAGE = 'clientRequests/customerAction';
 
     CONFIG_SERVICE = 'config';
+    SESSIONS_CONFIG_SERVICE = 'semesterConfig';
 
     //File upload 
     DOCUMENTS_FILE_UPLOAD = 'documents/file';

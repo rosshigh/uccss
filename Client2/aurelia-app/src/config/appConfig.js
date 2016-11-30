@@ -4,10 +4,10 @@ import {HttpClient} from 'aurelia-http-client';
 @inject(HttpClient)
 export class AppConfig {
 
-    // BASE_URL = "http://localhost:5000/api/";
+    BASE_URL = "http://localhost:5000/api/";
     //   BASE_URL = "/api/"; 
     HOST = location.origin;
-    BASE_URL = this.HOST + "/api/";
+    // BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -47,12 +47,12 @@ export class AppConfig {
 
      //Session parameters
     SESSION_TERM = "Session";
-    SESSION_PARAMS = [
-        { "session": "A", "startMonth": "01", "startDay": "04", "endMonth": "06", "endDay": "30", "openMonth": "12", "openDay": "01" },
-        { "session": "B", "startMonth": "05", "startDay": "01", "endMonth": "09", "endDay": "30", "openMonth": "04", "openDay": "01" },
-        { "session": "C", "startMonth": "08", "startDay": "01", "endMonth": "12", "endDay": "24", "openMonth": "07", "openDay": "01" },
-        { "session": "D", "startMonth": "11", "startDay": "01", "endMonth": "03", "endDay": "31", "openMonth": "10", "openDay": "01" }
-    ];
+    // SESSION_PARAMS = [
+    //     { "session": "A", "startMonth": "01", "startDay": "04", "endMonth": "06", "endDay": "30", "openMonth": "12", "openDay": "01" },
+    //     { "session": "B", "startMonth": "05", "startDay": "01", "endMonth": "09", "endDay": "30", "openMonth": "04", "openDay": "01" },
+    //     { "session": "C", "startMonth": "08", "startDay": "01", "endMonth": "12", "endDay": "24", "openMonth": "07", "openDay": "01" },
+    //     { "session": "D", "startMonth": "11", "startDay": "01", "endMonth": "03", "endDay": "31", "openMonth": "10", "openDay": "01" }
+    // ];
 
     //Client parametrs
     CLIENT_INCREMENT_INTERVAL = 1;
@@ -202,6 +202,7 @@ export class AppConfig {
         if(refresh || !this.configArray){
             return this.http.createRequest('/config')
                 .asGet()
+                .withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
                 .send().then(response => {
                     if (!response.isSuccess) {
                             return response;
@@ -217,6 +218,25 @@ export class AppConfig {
             }
     }
 
+    async getSessions(refresh){
+        if(refresh || !this.SESSION_PARAMS){
+            return this.http.createRequest('/semesterConfig')
+                .asGet()
+                .withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
+                .send().then(response => {
+                    if (!response.isSuccess) {
+                            return response;
+                        } else {
+                            this.SESSION_PARAMS = JSON.parse(response.response);
+                        }
+                    }).catch(e => {
+                        this.SESSION_PARAMS = new Array();
+                        console.log(e);
+                        return  {error: true, code: e.statusCode, message: e.statusText};
+                    });
+        }
+    }
+
     setParameters(){
          //Client request parameters
         this.DEFAULT_FACULTY_IDS = parseInt(this.getParameter('DEFAULT_FACULTY_IDS'));
@@ -230,6 +250,7 @@ export class AppConfig {
         this.CLIENT_INTERVAL = parseInt(this.getParameter('CLIENT_INTERVAL'));
         this.DATE_FORMAT_TABLE = this.getParameter('DATE_FORMAT_TABLE');
         this.UCC_HOME = this.getParameter('UCC_HOME');
+        console.log(JSON.stringify(this.SESSION_PARAMS));
     }
 
     getParameter(parameter){

@@ -5,6 +5,7 @@ var express = require('express'),
   passport = require('passport'),
   logger = require('../../config/logger'),
   Model = mongoose.model('Config'),
+  Semester = mongoose.model('SemesterConfig'),
   Promise = require('bluebird');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
@@ -73,10 +74,7 @@ module.exports = function (app) {
   router.put('/api/config/saveAll', function(req,res,next){
     logger.log('Save all parameters','verbose');
     var tasks = new Array();
-    // var details = new Array();
     req.body.parameters.forEach(function(item,index){
-      // var obj = new Model(item);
-      // details.push(obj._id)
       tasks.push(Model.findOneAndUpdate({_id: item._id}, item, {safe:true, new:true}));
     });
      Promise.all(tasks)
@@ -106,4 +104,41 @@ module.exports = function (app) {
       }
     })
   });
+
+  router.get('/api/semesterConfig', function(req, res, next){
+    logger.log('Get config','verbose');
+    var query = buildQuery(req.query, Semester.find());
+    query.exec(function(err, object){
+        if (err) {
+          return next(err);
+        } else {
+          res.status(200).json(object);
+        }
+      });
+  });
+
+  router.put('/api/semesterConfig', function(req,res,next){
+    logger.log('Save all parameters','verbose');
+    var tasks = new Array();
+    req.body.forEach(function(item,index){
+      tasks.push(Semester.findOneAndUpdate({_id: item._id}, item, {safe:true, new:true}));
+    });
+     Promise.all(tasks)
+     .then(function(results){
+        res.status(200).json(results);
+     })
+  });
+
+  router.post('/api/semesterConfig', requireAuth, function(req, res, next){
+    logger.log('Create config','verbose');
+    var semester =  new Semester(req.body);
+    semester.save( function ( err, object ){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(object);
+      }
+    });
+  });
+
 };
