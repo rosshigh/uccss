@@ -72,15 +72,6 @@ export class Register {
     this.validation.validate(4);
   }
 
-  // validateEmail()
-  //   if (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(myForm.emailAddr.value))
-  //   {
-  //     return true;
-  //   }
-  //   alert("You have entered an invalid email address!")
-  //   return (false)
-  // }
-
   _setUpValidation(){
     this.validation.addRule(1,"register_firstName",[{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"}]);
     this.validation.addRule(1,"register_lastName",[{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"}]);
