@@ -15,7 +15,7 @@ var express = require('express'),
 module.exports = function (app, config) {
   app.use('/', router);
 
-  router.get('/api/is4ua', requireAuth, function(req, res, next){
+  router.get('/api/is4ua', function(req, res, next){
     debug('Get isua');
     Model.find({}, function(err, object){
         if (err) {

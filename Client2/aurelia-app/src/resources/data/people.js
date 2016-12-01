@@ -108,6 +108,17 @@ export class People {
         } 
     }
 
+    async checkName(){
+         if (this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId) {
+            let serverResponse = await this.data.get(this.data.CHECK_NAME + '?filter=[and]firstName|eq|' +  this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|'+ this.selectedPerson.institutionId);
+            if (serverResponse.code === 409) {
+                return true;
+            } else {
+                return false;
+            }
+        } 
+    }
+
     async savePerson(register) {
         if (!this.selectedPerson._id) {
             if(register) {

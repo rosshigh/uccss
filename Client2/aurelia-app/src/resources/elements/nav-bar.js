@@ -75,13 +75,8 @@ export class NavBar {
                      this.logout();
                 } else {
                     if (!this.userObj.userRole)  this.logout();
-                    if (this.userObj.userRole == this.config.PROV_USER) {
-                        this.utils.showNotification("Please complete your profile")
-                        this.router.navigate("profile");
-                    } else {
-                        sessionStorage.setItem('role',this.userObj.userRole)
-                        this.router.navigate("user");
-                    }
+                    sessionStorage.setItem('role',this.userObj.userRole)
+                    this.router.navigate("user");
                 }
             }
         } else {

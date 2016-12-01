@@ -2,22 +2,27 @@ import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
 import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
+import {is4ua} from '../../resources/data/is4ua';
 import {CommonDialogs} from '../../resources/dialogs/common-dialogs';
 import Validation from '../../resources/utils/validation';
 import {AppConfig} from '../../config/appConfig';
 import $ from 'jquery';
 
-@inject(Router, People,  Utils, AppConfig, CommonDialogs, Validation)
+@inject(Router, People, is4ua, Utils, AppConfig, CommonDialogs, Validation)
 export class Register {
 
-  constructor(router, people,  utils, config, dialog, validation) {
+  constructor(router, people, is4ua, utils, config, dialog, validation) {
     this.router = router;
     this.people = people;
+    this.is4ua = is4ua;
     this.utils = utils;
     this.validation = validation;
     this.config = config;
     this.dialog = dialog;
     this.validation.initialize(this);
+
+    this.thresholdLength = 6;
+    this.threshold = 3;
   };
 
   attached(){
@@ -26,7 +31,8 @@ export class Register {
   }
 
   async activate(){
-    await this.people.getInstitutionsArray(true, '?order=name&fields=_id name');
+    await this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name&fields=_id name');
+    await this.is4ua.loadIs4ua();
     this.people.selectPerson();
   }
 
@@ -40,31 +46,86 @@ export class Register {
     }
   }
 
+  async checkName(){
+    if(await this.people.checkName()){
+      this.duplicateName = true;
+      this.validation.validate(3);
+    } else {
+      this.duplicateName = false;
+      this.validation.makeValid($("#register_institution"));
+    }
+  }
+
+  passwordComplexity(){
+    
+    var newValue = this.people.selectedPerson.password;
+    
+    this.longPassword = newValue.length >=  this.thresholdLength;
+
+    let strength = 0;
+    strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+    strength += /[a-z]+/.test(newValue) ? 1 : 0;
+    strength += /[0-9]+/.test(newValue) ? 1 : 0;
+    strength += /[\W]+/.test(newValue) ? 1 : 0;
+     
+    this.complexPassword = strength >= this.threshold && this.longPassword;
+    this.validation.validate(4);
+  }
+
+  // validateEmail()
+  //   if (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(myForm.emailAddr.value))
+  //   {
+  //     return true;
+  //   }
+  //   alert("You have entered an invalid email address!")
+  //   return (false)
+  // }
+
   _setUpValidation(){
-    this.validation.addRule(1,"register_firstName",{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"});
-    this.validation.addRule(1,"register_lastName",{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"});
-    this.validation.addRule(1,"register_email",{"rule":"custom","message":"An account with that email exists",
+    this.validation.addRule(1,"register_firstName",[{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"}]);
+    this.validation.addRule(1,"register_lastName",[{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"}]);
+    this.validation.addRule(1,"register_email",[
+      {"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"},
+      {"rule":"custom","message":"An account with that email exists",
       "valFunction":function(context){
         return !context.duplicateAccount;
-      }});
-    this.validation.addRule(1,"register_email",{"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"});
-    this.validation.addRule(1,"register_institution",{"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"});
-    this.validation.addRule(1,"register_password",{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"});
-    this.validation.addRule(1,"register_password_repeat",{"rule":"custom","message":"Passwords must match",
+      }},
+      {"rule":"custom","message":"Enter a valid email address",
+      "valFunction":function(context){
+        return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
+      }
+      }]);
+    this.validation.addRule(1,"register_phone",[{"rule":"required","message":"Phone number is required", "value": "people.selectedPerson.phone"}]);
+    this.validation.addRule(1,"register_institution",[
+      {"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"},
+      {"rule":"custom","message":"An account with that name at this institution exists",
+      "valFunction":function(context){
+        return !context.duplicateName;
+      }}]
+      );
+    this.validation.addRule(1,"register_password",[{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"}]);
+    this.validation.addRule(1,"register_password_repeat",[{"rule":"custom","message":"Passwords must match",
       "valFunction":function(context){
         return (context.people.selectedPerson.password === context.password_repeat);
-      }});
-    this.validation.addRule(2,"register_email",{"rule":"custom","message":"An account with that email exists",
+      }}], true); 
+    this.validation.addRule(2,"register_email",[{"rule":"custom","message":"An account with that email exists",
       "valFunction":function(context){
         return !context.duplicateAccount;
-      }});
+      }}]);
+    this.validation.addRule(3,"register_institution",[{"rule":"custom","message":"An account with that name at this institution exists",
+      "valFunction":function(context){
+        return !context.duplicateName;
+      }}]);
+    this.validation.addRule(4,"register_password",[{"rule":"custom","message": "Password should be at least " + this.thresholdLength + " characters long and should contain "  + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+      "valFunction":function(context){
+        return context.complexPassword;
+      }}]);
   }
 
   async save() {
     if(this.validation.validate(1)) {
         console.log(this.people.selectedPerson)
         this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
-        this.people.selectedPerson.roles.push('PROV');
         let response = await this.people.savePerson('register')
             if(!response.error) {
               return this.dialog.showMessage(
@@ -79,11 +140,6 @@ export class Register {
             }
     }
   };
-
-
-  cancel(){
-    this.router.navigate("login");
-  }
 
   back(){
     window.history.back()

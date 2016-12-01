@@ -118,7 +118,7 @@
           "jquery",
           "moment",
           "extend",
-         "eonasdan-bootstrap-datetimepicker",
+          "eonasdan-bootstrap-datetimepicker",
           {
             "name": "text",
             "path": "../scripts/text"
@@ -214,6 +214,11 @@
             "resources": [
               "css/fuelux.min.css"
             ]
+          },
+          {
+            "name": "aurelia-mask",
+            "path": "../node_modules/aurelia-mask/dist",
+            "main": "masked-input"
           },
           "eonasdan-bootstrap-datetimepicker",
           "bootstrap-datepicker"

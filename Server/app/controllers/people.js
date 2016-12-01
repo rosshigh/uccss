@@ -57,6 +57,21 @@ module.exports = function (app) {
       });
   });
 
+  router.get('/api/people/checkName', function(req, res){
+     var query = buildQuery(req.query, Model.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          if(object.length){
+            res.status(409).json({status: 'exists'});
+          } else {
+            res.status(200).json({status: 'available'});
+          }
+        }
+      });
+  })
+
   router.get('/api/people/:id', requireAuth, function(req, res, next){
     logger.log('Get person [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, object){

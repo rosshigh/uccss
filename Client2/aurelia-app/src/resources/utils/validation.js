@@ -41,21 +41,21 @@ export default class {
       if( index === -1){ //This is a new rule group
         this.rules.push({ruleGroup: ruleGroup, fields: fieldArray});
         this.rules[this.rules.length-1].fields[0] = {field:field, rules:ruleArray};
-        this.rules[this.rules.length-1].fields[0].rules[0] =  rule;
+        this.rules[this.rules.length-1].fields[0].rules =  rule;
 
       } else { //Existing rule group
         var found = false;
-        for(var i = 0; i<this.rules[index].fields.length; i++){
-          if(this.rules[index].fields[i].field === field){
-            this.rules[index].fields[i].rules.push(rule);
-            found = true;
-            break;
-          }
+        // for(var i = 0; i<this.rules[index].fields.length; i++){
+        //   if(this.rules[index].fields[i].field === field){
+        //     this.rules[index].fields[i].rules.push(rule);
+        //     found = true;
+        //     break;
+        //   }
 
-        }
+        // }
         if(!found){
           this.rules[index].fields.push({field:field, rules:ruleArray});
-          this.rules[index].fields[this.rules[index].fields.length-1].rules[0] =  rule;
+          this.rules[index].fields[this.rules[index].fields.length-1].rules =  rule;
         }
       }
     };
@@ -80,7 +80,10 @@ export default class {
             thisValid = true;
             var rules = fields.rules[k];
             thisValid =  this.validateRule(rules, fields.field);
-            if(!thisValid) valid = false;
+            if(!thisValid) {
+              valid = false;
+              break;
+            }
           }
         }
       }
@@ -127,9 +130,11 @@ export default class {
       }
       
       if(el.is(':visible')){
-        el.parent().addClass("has-error");
-        if(!el.next().is("span.help-block")){
-          el.after(msg);
+        if(!el.parent().hasClass("has-error")){
+          el.parent().addClass("has-error");
+          if(!el.next().is("span.help-block")){
+            el.after(msg);
+          }
         }
       }
     };

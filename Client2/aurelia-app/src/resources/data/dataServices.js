@@ -181,6 +181,7 @@ export class DataServices {
     // PERSON_SERVICE = "people/PERSONID";
     PERSON_REGISTER = "people/register"
     CHECK_EMAIL = 'people/checkEmail';
+    CHECK_NAME = 'people/checkName'
     // INSTITUTION_PEOPLE = 'people/instituion/INSTITUTIONID';
     // PASSWORD_SERVICE = 'people/password/PERSONID';
 
