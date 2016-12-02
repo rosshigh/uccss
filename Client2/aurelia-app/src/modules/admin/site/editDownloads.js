@@ -65,7 +65,7 @@ export class EditProducts {
          this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
          this.downloads.selectedDownload.downCatcode = this.downloads.selectedDownload.downCatcode.toString();
 
-        this.selectedURL = this.config.FILE_DOWNLOAD_URL + '/downloads/' + this.downloads.selectedDownload.file.fileName;
+        this.selectedURL = this.config.DOWNLOAD_FILE_DOWNLOAD_URL + '/' + this.downloads.selectedDownload.downCatcode + '/' +  this.downloads.selectedDownload.file.fileName;
 
         //Editing a product
         $("#editName").focus();
@@ -82,6 +82,8 @@ export class EditProducts {
             this.new();
         } else {
             this.downloads.selectDownload(this.editIndex);
+            this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
+         this.downloads.selectedDownload.downCatcode = this.downloads.selectedDownload.downCatcode.toString();
         }
     }
 
@@ -156,9 +158,17 @@ export class EditProducts {
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editName", {"rule":"required","message":"Name is required", "value": "downloads.selectedDownload.name"});
-        this.validation.addRule(1,"editType", {"rule":"required","message":"Type is required", "value": "downloads.selectedDownload.downCatcode"});
-         this.validation.addRule(2,"editCatDescription", {"rule":"required","message":"Description is required", "value": "downloads.selectedCat.description"});
+        this.validation.addRule(1,"editName", [{"rule":"required","message":"Name is required", "value": "downloads.selectedDownload.name"}]);
+        this.validation.addRule(1,"editType", [{"rule":"required","message":"Type is required", "value": "downloads.selectedDownload.downCatcode"}]);
+        this.validation.addRule(2,"editCatDescription",[{"rule":"required","message":"Description is required", "value": "downloads.selectedCat.description"},
+         {"rule":"custom","message":"An category with that description already exists",
+            "valFunction":function(context){
+                var valid = true;
+                context.downloads.appCatsArray.forEach((item) => {
+                    if(context.downloads.selectedCat.description === item.description) valid = false;
+                }); 
+                return valid;
+        }}]);
     }
 
      openEditCatForm(action){
@@ -180,7 +190,7 @@ export class EditProducts {
     }
 
     async saveCat(){
-         if(this.validation.validate(2, this)){
+         if(this.validation.validate(2)){
             let serverResponse = await this.downloads.saveCategory();
             if (!serverResponse.error) {
                 this.utils.showNotification("Download category " + this.downloads.selectedCat.description + " was updated");
