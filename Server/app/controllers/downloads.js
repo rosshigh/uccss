@@ -163,8 +163,7 @@ module.exports = function (app, config) {
       if (err) {
         return next(err);
       } else {
-        console.log(object)
-        res.status(200).json(object);
+        res.status(200).json(appsCategory);
       }
     });
   });

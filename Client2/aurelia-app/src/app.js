@@ -1,11 +1,13 @@
 import {inject} from 'aurelia-framework';
 import AppRouterConfig from './config/routerConfig';
+import {DataServices} from './resources/data/dataServices';
 
-@inject( AppRouterConfig )
+@inject( AppRouterConfig, DataServices )
 export class App {
   
-  constructor( appRouterConfig ){
+  constructor( appRouterConfig, data ){
          this.appRouterConfig = appRouterConfig;
+         this.data = data;
     }
     
   activate(){

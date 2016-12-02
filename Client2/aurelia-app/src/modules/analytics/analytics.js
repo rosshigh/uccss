@@ -24,7 +24,7 @@ export class Analytics{
             settings: { auth: true, roles: [] },
             nav: true,
             name: 'helpTickets',
-            title: 'Help TIcktes'
+            title: 'Help Tickets'
         }
         ]);
 

@@ -92,10 +92,8 @@ export class EditProducts {
             let serverResponse = await this.downloads.saveDownload();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.downloads.appDownloadsArray);
+                if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
                  this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
-                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                 if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
-                 this.spinnerHTML = "";
             }
             this.downloadSelected = false;
             this.selectedFiles = undefined;
