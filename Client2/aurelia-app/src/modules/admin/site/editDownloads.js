@@ -176,7 +176,7 @@ export class EditProducts {
         if(this.editCourseFlag){
             if($("#editType").val() != ""){
                 this.editCat = true;
-                this.downloads.selectCategory(this.downloads.selectedDownload.type);
+                this.downloads.selectCategoryByCode(this.downloads.selectedDownload.downCatcode);
             }
         } else {
             this.editCat = true;
@@ -201,15 +201,25 @@ export class EditProducts {
     }
 
     async deleteCat(){
-        return this.dialog.showMessage(
-            "Are you sure you want to delete the category?",
-            "Delete Category",
-            ['Yes', 'No']
+        if(this.downloads.documentsExist(this.downloads.selectedDownload.downCatcode)){
+            return this.dialog.showMessage(
+            "You can't delete that category because there are exisitng downloads that use it?",
+            "Can't Delete Category",
+            ['OK']
         ).then(response => {
-            if (!response.wasCancelled) {
-                this.deleteCategory();
-            }
+            
         });
+        } else {
+            return this.dialog.showMessage(
+                "Are you sure you want to delete the category?",
+                "Delete Category",
+                ['Yes', 'No']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.deleteCategory();
+                }
+            });
+        }  
     }
 
     async deleteCategory(){

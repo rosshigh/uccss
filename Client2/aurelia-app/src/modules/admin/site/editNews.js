@@ -34,6 +34,7 @@ export class EditNews {
 
     async activate() {
         await this.siteinfo.getInfoArray(true, '?order=sortOrder');
+        await this.config.getConfig();
         this.dataTable.updateArray(this.siteinfo.siteArray);
         this.dataTable.createPageButtons(1);
     }
@@ -48,7 +49,7 @@ export class EditNews {
     async new() {
         this.editIndex = -1;
         this.siteinfo.selectSiteItem(this.editIndex);
-
+        this.newsContent = "";
         $("#editTitle").focus();
         this.newsItemSelected = true;
     }
@@ -83,7 +84,7 @@ export class EditNews {
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.siteinfo.siteArray);
-                this.utils.showNotification("The item was updated");
+                this.utils.showNotification("The item was saved");
                 if (this.files && this.files.length > 0) this.siteinfo.uploadFile(this.files);
             }
             this.newsItemSelected = false;

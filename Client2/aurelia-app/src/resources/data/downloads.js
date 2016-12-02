@@ -148,12 +148,40 @@ export class Downloads {
         }
     }
 
+    selectCategoryByCode(code) {
+        if (!code && code != 0) {
+            this.selectedCat = this.emptyCat();
+        } else {
+            try {
+                this.editCatIndex = 0;
+                this.appCatsArray.forEach((item, index) => {
+                    if(item.downCatcode == code)  this.editCatIndex = index;
+                })
+                this.selectedCat = this.utils.copyObject(this.appCatsArray[this.editCatIndex]);
+            } catch (error) {
+                this.selectedCat = this.emptyCat();
+            }
+
+        }
+    }
+
     emptyCat() {
         var newObj = new Object();
         newObj.code = 0;
         newObj.description = "";
 
         return newObj;
+    }
+
+    documentsExist(code){
+        if (!code && code != 0) {
+           return false;
+        } else {
+            for(var i = 0; i <  this.appDownloadsArray.length; i++){
+                if(this.appDownloadsArray[i].downCatcode == code) return true;
+            }
+            return false;
+        }
     }
 
     async saveCategory() {

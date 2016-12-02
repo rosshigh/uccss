@@ -141,7 +141,6 @@ export class DataTable{
     this.lastVisible = parseInt(this.firstVisible) + parseInt(this.take) - 1;
     this.createPageButtons(1);
     this.pageOne();
-    // if(typeof(this.context.navigate) === 'function')  this.context.navigate();
     this.buildDisplayArray();
   }
 
@@ -328,10 +327,18 @@ export class DataTable{
         
         this.sortProperty=propertyName;
 
-        this.displayArray = sortArray
-          // .slice(0)
+        this.baseArray = sortArray
           .sort((a, b) => {
             var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+            return result * this.sortDirection;
+          });
+    } else if (type == 'object'){
+       this.sortProperty = propertyName;
+       propertyName = propertyName.split('.');
+
+        this.baseArray = this.baseArray
+          .sort((a, b) => {
+            var result = (a[propertyName[0]][propertyName[1]] < b[propertyName[0]][propertyName[1]]) ? -1 : (a[propertyName[0]][propertyName[1]] > b[propertyName[0]][propertyName[1]]) ? 1 : 0;
             return result * this.sortDirection;
           });
     }

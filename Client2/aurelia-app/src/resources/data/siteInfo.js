@@ -70,7 +70,7 @@ export class SiteInfo {
         if(!this.selectedItem._id){
             let serverResponse = await this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "post");
             if(!serverResponse.error){
-                 this.siteArray.push(this.selectedItem);
+                 this.siteArray.push(serverResponse);
             }
             return serverResponse;
         } else {
@@ -158,7 +158,7 @@ export class SiteInfo {
         newMessage.content = "";
         return newMessage;
     }
-
+ 
     async saveMessageItem(){
          if(!this.selectedMessage){
             return;
@@ -189,7 +189,7 @@ export class SiteInfo {
         return new Array();
     }
 
-    async deleteItem(){
+    async deleteMessage(){
          let serverResponse = await this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedMessage._id);
             if (!serverResponse.error) {
                 this.messageArray.splice(this.editMessageIndex, 1);

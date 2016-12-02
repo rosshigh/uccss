@@ -17,8 +17,8 @@
                             </tr>
                             <tr>
                                 <th style="width:75px;">Name <span click.trigger="dataTable.sortArray('name')"><i class="fa fa-sort"></i></span></th>
-                                <th>File <span click.trigger="dataTable.sortArray('file.fileName')"><i class="fa fa-sort"></i></span></th>
-                                <th style="width:150px;">Type <span click.trigger="dataTable.sortArray('type')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">File <span click.trigger="dataTable.sortArray('file.originalFilename','object')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Type <span click.trigger="dataTable.sortArray('downCatcode','id',downloads.appCatsArray,'downCatcode','description')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Status <span click.trigger="dataTable.sortArray('active')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Help Ticket Relevant <span click.trigger="dataTable.sortArray('helpTicketRelevant')"><i class="fa fa-sort"></i></span></th>
                             </tr>
@@ -26,28 +26,26 @@
                         <tbody>
                             <tr>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="name" type="text" placeholder="Filter Name" class="form-control"
-                                    />
+                                    <input input.delegate="dataTable.filterList($event)" id="name" type="text" placeholder="Filter Name" class="form-control"/>
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="file.originalFilename" type="text" placeholder="Filter File" class="form-control"
-                                    />
+                                    <input input.delegate="dataTable.filterList($event)" id="file.originalFilename" type="text" placeholder="Filter File" class="form-control"/>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="type" compare="id">
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control" id="downCatcode" compare="id">
                                     <option value=""></option>
                                     <option repeat.for="category of downloads.appCatsArray" value="${category.downCatcode}">${category.description}</option>
                                 </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="active" compare="id">
+                                    <select change.delegate="dataTable.filterList($event)"  class="form-control" id="active" compare="boolean">
                                     <option value=""></option>
                                     <option value="true">Active</option>
                                     <option value="false">Inactive</options>
                                 </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="helpTicketRelevant" compare="id">
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketRelevant" compare="boolean">
                                     <option value=""></option>
                                     <option value="true">True</option>
                                     <option value="false">False</options>
@@ -60,7 +58,7 @@
                                     <div>${item.file.originalFilename}</div>
                                 </td>
                                 <td data-title="Type" style="width: 75px">
-                                    <div>${item.type | lookupDescription:downloads.appCatsArray:downCatcode}</div>
+                                    <div>${item.downCatcode | lookupDescription:downloads.appCatsArray:'downCatcode'}</div>
                                 </td>
                                 <td data-title="Status">${item.active | translateStatus}</td>
                                 <td data-title="Help Ticket Relevant">${item.helpTicketRelevant}</a>
