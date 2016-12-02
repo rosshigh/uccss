@@ -109,10 +109,12 @@ module.exports = function (app, config) {
         if(object){
           var path = config.uploads + '/downloads/' + object.downCatcode + '/' + object.file.originalFilename;
           fs.stat(path, function (err, stats) {
-              if (stats.isFile()) {            
+            if(stats){
+               if (stats.isFile()) {            
                   fs.unlink(path);
               }
               return;
+            }
           });      
           Model.remove({ _id: req.params.id }, function(err) {
             if (err) {
