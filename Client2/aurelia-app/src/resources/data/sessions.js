@@ -74,9 +74,13 @@ export class Sessions {
         newSessionObj.requestsOpenDate = "";
         newSessionObj.sessionStatus = "Next";
 
+        let sessions = this.sessionsArray.sort((a,b) => {
+            return moment(a.startDate).isBefore( b.startDate);
+        });
+
         var nextSession = -1;
         //Search for the most recent session and set the next session
-        if (!this.sessionsArray[0]) {
+        if (!sessions[0]) {
             var today = new Date();
             var month = today.getMonth();
             nextSession = 1;
@@ -89,7 +93,7 @@ export class Sessions {
 
         } else {
             for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
-                if (this.sessionsArray[0].session === this.config.SESSION_PARAMS[i].session) {
+                if (sessions[0].session === this.config.SESSION_PARAMS[i].session) {
                     nextSession = i + 1;
                     break;
                 }
@@ -101,7 +105,8 @@ export class Sessions {
         //Set the session name
         newSessionObj.session = this.config.SESSION_PARAMS[nextSession].session;
         //And the year
-        var thisYear = new Date().getFullYear();
+        let thisYear = parseInt(sessions[0].year);
+        if(nextSession === 0) thisYear++;
         newSessionObj.year = thisYear;
         if (nextSession === 3) {
             newSessionObj.year = thisYear + "/" + (parseInt(thisYear) + 1);

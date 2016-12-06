@@ -146,7 +146,7 @@ export class EditNews {
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editTitle", {"rule":"required","message":"Title is required", "value": "siteinfo.selectedItem.title"});
+        this.validation.addRule(1,"editTitle", [{"rule":"required","message":"Title is required", "value": "siteinfo.selectedItem.title"}]);
     }
 
     //TODO: Fix This

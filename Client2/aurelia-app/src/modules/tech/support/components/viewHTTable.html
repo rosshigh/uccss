@@ -24,6 +24,16 @@
                                 value.bind="type.code">${type.description}</option>
                       </select>
                     </th>
+                    <th>
+                      <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner.[0].personId" compare="obj">
+                        <option value=""></option>
+                        <option repeat.for="person of people.peopleArray | uccStaff"
+                                value.bind="person._id">${person.fullName}</option>
+                      </select>
+                      <!--
+                      <input change.delegate="dataTable.filterList($event, people.peopleArray)" compare="lookup" id="owner[0].personId-fullName" type="text" placeholder="Filter Owner" class="form-control">
+                      -->
+                    </th>
                     <th class="hasinput">
                       <select value.bind="selectedStatus" change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketStatus">
                         <option value=""></option>
@@ -43,6 +53,9 @@
                     <th>
                       Type <span click.trigger="dataTable.sortArray('helpTicketType')"><i class="fa fa-sort"></i></span><br>
                     </th>
+                     <th>
+                      Owner <span click.trigger="dataTable.sortArray('owner[0].personId')"><i class="fa fa-sort"></i></span><br>
+                    </th>
                     <th>
                       Status <span click.trigger="dataTable.sortArray('status')"><i class="fa fa-sort"></i></span><br>
                     </th>
@@ -56,6 +69,7 @@
                   <tr repeat.for="helpTicket of dataTable.displayArray" click.delegate="selectHelpTicket($event, $index)">
                     <td data-title="referenceNo">${helpTicket.helpTicketNo}</td>
                     <td data-title="type">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>
+                    <td data-title="owner">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}
                     <td data-title="status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>
                     <td data-title="createdDate">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
                     <td data-title="personId">${helpTicket.personId | personName:people.peopleArray}

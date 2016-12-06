@@ -62,6 +62,7 @@ export class EditPeople {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectPerson(this.editIndex);
         this.oldEmail = this.people.selectedPerson.email;
+        this.newPerson = false;
         $("#editFirstName").focus();
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -73,6 +74,7 @@ export class EditPeople {
     async new() {
         this.editIndex = -1;
         this.people.selectPerson();
+        this.newPerson = true;
         this.oldEmail = this.people.selectedPerson.email;
         $("#editFirstName").focus();
         this.personSelected = true;
@@ -84,8 +86,10 @@ export class EditPeople {
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.peopleArray);
                 this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+            } else {
+                 this.utils.showNotification("There was a problem saving the person");
             }
-            this.personSelected = false;
+            this._cleanUp();
         }
     }
 
@@ -125,11 +129,11 @@ export class EditPeople {
                 if (!response.wasCancelled) {
                     this.save();
                 } else {
-                    this.personSelected = false;
+                    this._cleanUp();
                 }
             });
         } else {
-            this.personSelected = false;
+            this._cleanUp();
         }
 
     }
@@ -231,37 +235,70 @@ export class EditPeople {
         }
     }
 
+    _cleanUp(){
+        this.personSelected = false;
+        this.newPerson = false;
+        this. _cleanUpFilters();
+        this.validation.makeAllValid(1);
+    }
+
     _setupValidation() {
-        this.validation.addRule(1, "editFirstName", { "rule": "required", "message": "First name is required", "value": "people.selectedPerson.firstName" });
-        this.validation.addRule(1, "editLastName", { "rule": "required", "message": "Last name is required", "value": "people.selectedPerson.lastName" });
-        this.validation.addRule(1, "editStatus", { "rule": "required", "message": "Status is required", "value": "people.selectedPerson.personStatus" });
-        this.validation.addRule(1, "editEmail", { "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" });
-        this.validation.addRule(1, "editEmail", {
-            "rule": "custom", "message": "An account with that email exists",
-            "valFunction": function (context) {
-                return !context.duplicateAccount;
-            }
-        });
-        this.validation.addRule(1, "editInstitution", { "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" });
-        this.validation.addRule(1, "editRoles", {
+        this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First name is required", "value": "people.selectedPerson.firstName" },
+         {"rule":"custom", "message":"A person with that name at that institution already exists",
+            "valFunction":function(context){
+                var found = false;
+                for(var i = 0; i < context.people.peopleArray.length; i++){
+                    if( context.people.peopleArray[i].firstName.toUpperCase() === context.people.selectedPerson.firstName.toUpperCase()
+                        && context.people.peopleArray[i].lastName.toUpperCase() === context.people.selectedPerson.lastName.toUpperCase()
+                        && context.people.peopleArray[i].institutionId === context.people.selectedPerson.institutionId){
+                        if(context.people.selectedPerson._id && context.people.selectedPerson._id != context.people.peopleArray[i]._id){
+                            found = true;
+                        } else if (!context.people.selectedPerson._id){
+                            found = true;
+                        }
+                    }
+                }
+                return !found;
+            }}]);
+        this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last name is required", "value": "people.selectedPerson.lastName" }]);
+        this.validation.addRule(1, "editStatus", [{ "rule": "required", "message": "Status is required", "value": "people.selectedPerson.personStatus" }]);
+        this.validation.addRule(1, "editPhone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }]);
+        this.validation.addRule(1, "editEmail", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" },
+            {"rule": "custom", "message": "An account with that email exists",
+                "valFunction": function (context) {
+                    return !context.duplicateAccount;
+                }
+            },
+            {"rule":"custom","message":"Enter a valid email address",
+                "valFunction":function(context){
+                    return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
+                }
+            }]);
+        this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
+        this.validation.addRule(1, "editRoles", [{
             "rule": "custom", "message": "The person must be assigned a role.",
             "valFunction": function (context) {
                 return (context.people.selectedPerson.roles.length > 0);
             }
-        });
-        this.validation.addRule(2, "number", { "rule": "required", "message": "Course number is required", "value": "people.selectedCourse.number" });
-        this.validation.addRule(2, "name", { "rule": "required", "message": "Course name is required", "value": "people.selectedCourse.name" });
-        this.validation.addRule(3, "password", { "rule": "required", "message": "Password is required", "value": "newPassword" });
-        this.validation.addRule(4, "editEmail", {
+        }]);
+        this.validation.addRule(2, "number", [{ "rule": "required", "message": "Course number is required", "value": "people.selectedCourse.number" }]);
+        this.validation.addRule(2, "name", [{ "rule": "required", "message": "Course name is required", "value": "people.selectedCourse.name" }]);
+        this.validation.addRule(3, "password", [{ "rule": "required", "message": "Password is required", "value": "newPassword" }]);
+        this.validation.addRule(4, "editEmail", [{
             "rule": "custom", "message": "An account with that email exists",
             "valFunction": function (context) {
                 return !context.duplicateAccount;
             }
-        });
+        },
+            {"rule":"custom","message":"Enter a valid email address",
+                "valFunction":function(context){
+                    return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
+                }
+            }]);
     }
 
     _cleanUpFilters() {
-        $("#lastName").val("");
+        $("#fullName").val("");
         $("#institutionId").val("");
         $("#roles").val("");
         $("#personStatus").val("");

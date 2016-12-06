@@ -28,7 +28,7 @@ module.exports = function (app) {
 
   router.get('/api/people/institution/:id', requireAuth, function(req, res){
     logger.log('Get people','verbose');
-    Model.find({})
+    Model.find()
       .sort(req.query.order)
       .where('institutionId').eq(req.params.id)
       .exec(function(err, object){
@@ -40,13 +40,13 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/checkEmail',  function(req, res){
+  router.get('/api/people/checkEmail',  function(req, res, next){
     logger.log('Get person for email =' + req.params.email,'verbose');
     var value = req.query.email;
     Model.find({ email : value})
       .exec(function(err, object){
         if (err) {
-          res.status(500).json(err);
+          return next(err);
         } else {
           if(object.length){
             res.status(409).json({status: 'exists'});
@@ -61,7 +61,7 @@ module.exports = function (app) {
      var query = buildQuery(req.query, Model.find())
     query.exec( function(err, object){
         if (err) {
-          res.status(500).json(err);
+           return next(err);
         } else {
           if(object.length){
             res.status(409).json({status: 'exists'});
@@ -88,7 +88,7 @@ module.exports = function (app) {
     var person =  new Model(req.body);
       person.save(function ( err, object ){
         if (err) {
-          res.status(500).json(err);
+           return next(err);
         } else {
           res.status(200).json(object);
         }
@@ -106,7 +106,7 @@ module.exports = function (app) {
         var person =  new Model(req.body);
         person.save( function ( err, object ){
           if (err) {
-            res.status(500).send();
+             return next(err);
           } else {
             res.status(200).json(object);
           }
@@ -119,7 +119,7 @@ module.exports = function (app) {
     logger.log('Update Person [%s]', req.body._id,'verbose');
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
-        res.status(500).json(err);
+        return next(err);
       } else {
         res.status(200).json(person);
       }
@@ -130,12 +130,12 @@ module.exports = function (app) {
     logger.log('Update Person password [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, result){
       if (err) {
-        res.status(500).json(err);
+         return next(err);
       } else {
         result.password = req.body.password;
         result.save(function(err, person){
           if (err) {
-            res.status(500).json(err);
+             return next(err);
           } else {
             res.status(200).json(result);
           }
@@ -148,9 +148,9 @@ module.exports = function (app) {
     logger.log('Delete person [%s]', req.params.id,'verbose');
     Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {
-        res.status(500).json(err);
+         return next(err);
       } else {
-        res.status(204).json(result);
+        res.status(200).json({msg: "Person Deleted"});
       }
     })
   });

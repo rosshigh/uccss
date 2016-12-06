@@ -6,7 +6,8 @@ var express = require('express'),
   passport = require('passport'),
   Model = mongoose.model('Product'),
   multer = require('multer'),
-  mkdirp = require('mkdirp');
+  mkdirp = require('mkdirp'),
+  logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -14,7 +15,8 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/products', function(req, res, next){
-    debug('Get products');
+    logger.log("Get products","verbose");
+    
     var query = buildQuery(req.query, Model.find())
     query.exec(function(err, object){
         if (err) {
@@ -25,23 +27,25 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/products/active', function(req, res, next){
-    debug('Get products');
-    var fields = req.fieldList ? req.fieldList : undefined;
-    Model.find({active: true})
-      .sort(req.query.order)
-      .select(fields)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/products/active', function(req, res, next){
+  //   logger.log('Get products')
+  //   debug('Get products');
+  //   var fields = req.fieldList ? req.fieldList : undefined;
+  //   Model.find({active: true})
+  //     .sort(req.query.order)
+  //     .select(fields)
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
   router.get('/api/products/:id', function(req, res, next){
-    debug('Get product [%s]', req.params.id);
+    logger.log('Get product ' + req.params.id,"verbose");
+    
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -52,7 +56,8 @@ module.exports = function (app) {
   });
 
   router.post('/api/products', function(req, res, next){
-    debug('Create Product');
+    logger.log('Create a product', "verbose");
+    
     var product =  new Model(req.body);
     product.save( function ( err, object ){
       if (err) {
@@ -64,7 +69,8 @@ module.exports = function (app) {
   });
 
   router.put('/api/products', function(req, res, next){
-    debug('Update Product [%s]', req.body._id);
+    logger.log('Update Product ' + req.body._id, "verbose");
+
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -75,14 +81,34 @@ module.exports = function (app) {
   });
 
   router.delete('/api/products/:id', function(req, res, next){
-    debug('Delete product [%s]', req.params.id);
-    Model.remove({ _id: req.params.id }, function(err, result){
-      if (err) {
+    logger.log('Delete Product ' + req.params._id, "verbose");
+
+    Model.findById(req.params.id, function(err, product){
+      if(err){
         return next(err);
       } else {
-        res.status(204).json(result);
+        if(product){
+          var tasks = new Array();
+          if(product.systems && product.systems.length > 0){
+            product.systems.forEach(item => {
+              tasks.push(System.update( {_id: item.systemId}, { $pull: {productId: req.params.id } } ));
+            })
+          }
+
+          Promise.all(tasks)
+          .then(function(results) {
+                Model.remove({ _id: req.params.id }, function(err, result){
+                  if (err) {
+                    return next(err);
+                  } else {
+                    res.status(204).json(result);
+                  }
+                })
+          })
+        }
       }
-    })
+    }) 
+
   });
 
   var storage = multer.diskStorage({

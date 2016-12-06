@@ -40,6 +40,8 @@ export class EditProducts {
         this.validation = validation;
         this.validation.initialize(this);
         this._setupValidation();
+
+        this.systemChanges = new Array();
     }
 
     attached(){
@@ -69,7 +71,7 @@ export class EditProducts {
         this.editIndex = -1;
         this.products.selectProduct();
         this.editSystemsString = "";
-        this.newSystem = true;
+        this.newProduct = true;
         this.selectedProductSystems = new Array();
         if (this.files && this.files.length !== 0) {
             $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
@@ -83,6 +85,7 @@ export class EditProducts {
     async edit(index, el) {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.products.selectProduct(this.editIndex);
+         this.newProduct = false;
 
         this.editSystemsString = "";
         if(this.products.selectedProduct.systems){
@@ -105,15 +108,6 @@ export class EditProducts {
         this.productSelected = true;
     }
 
-    // changeFiles() {
-    //     this.filesSelected = "";
-    //     this.selectedFiles = new Array();
-    //     for(var i = 0; i<this.files.length; i++){
-    //          this.selectedFiles.push(this.files[i].name);
-    //           this.filesSelected += this.files[i].name + " ";
-    //     }
-    // }
-
     cancel() {
         if (this.editIndex == -1) {
             this.aNewProduct();
@@ -135,17 +129,26 @@ export class EditProducts {
     }
 
     async save() {
-        this.products.selectedProduct.clientInfo = this.notesEditorContent;
-        this.products.selectedProduct.productInfo = this.productInfoEditorContent;
         if(this.validation.validate(1)){
+
+            this.products.selectedProduct.clientInfo = this.notesEditorContent;
+            this.products.selectedProduct.productInfo = this.productInfoEditorContent;
             let serverResponse = await this.products.saveProduct();
             if (!serverResponse.error) {
+                if(this.systemChanges.length > 0) {                  
+                    if(this.newProduct){                        
+                        this.systemChanges.forEach(item => {
+                            item.productId = serverResponse._id;
+                        })
+                    }
+                    let response = await this.systems.saveProductChanges(this.systemChanges);
+                }
                 this.dataTable.updateArray(this.products.productsArray);
-                this.utils.showNotification("Product " + this.products.productsArray[this.editIndex].name + " was updated");
+                this.utils.showNotification("Product " + serverResponse.name + " was updated");
+            } else {
+                this.utils.showNotification("There was a problem updating the product");
             }
-
             this. _cleanUp();
-            this.productSelected = false;
         }
     }
 
@@ -173,7 +176,13 @@ export class EditProducts {
     }
 
     _cleanUp(){
+        this.newProduct = false; 
+        this.productSelected = false;
+        this.systemChanges = new Array();
+        this.notesEditorContent = "";
+        this.productInfoEditorContent = "";
         this._cleanUpFilters();
+        this.validation.makeAllValid(1);
     }
 
     _cleanUpFilters(){
@@ -194,10 +203,12 @@ export class EditProducts {
                         this.save();
                     } else {
                         this.productSelected = false;
+                        this._cleanUp();
                     }
                 });            
         } else {
             this.productSelected = false;
+            this._cleanUp();
         }
 
     }
@@ -245,7 +256,21 @@ export class EditProducts {
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editName",{"rule":"required","message":"Product name is required", "value": "products.selectedProduct.name"});
+        this.validation.addRule(1,"editName",[{"rule":"required","message":"Product name is required", "value": "products.selectedProduct.name"},
+         {"rule":"custom", "message":"A product with that name already exists",
+            "valFunction":function(context){
+                var found = false;
+                for(var i = 0; i < context.products.productsArray.length; i++){
+                    if( context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()){
+                        if(context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id){
+                            found = true;
+                        } else if (!context.products.selectedProduct._id){
+                            found = true;
+                        }
+                    }
+                }
+                return !found;
+            }}]);
     }
 
      changeTab(el, index){

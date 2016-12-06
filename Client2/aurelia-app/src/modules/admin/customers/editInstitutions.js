@@ -56,6 +56,7 @@ export class EditPeople {
     edit(index, el){
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectInstitution(this.editIndex);
+        this.newInstitution = false;
 
         this.people.getInstitutionPeople(this.people.selectedInstitution._id);
 
@@ -71,6 +72,7 @@ export class EditPeople {
         this.editIndex = -1;
         this.people.getInstitutionPeople(-1);
         this.people.selectInstitution();
+        this.newInstitution = true;
         $("#editName").focus();
         this.institutionSelected = true;
     }
@@ -79,13 +81,13 @@ export class EditPeople {
         if(this.validation.validate(1)){
             let serverResponse = await this.people.saveInstitution();
             if (!serverResponse.error) {
-                this.dataTable.updateArray(this.people.institutionArray);
+                this.dataTable.updateArray(this.people.institutionsArray);
                 this.utils.showNotification(serverResponse.name + " was updated");
+            } else {
+                 this.utils.showNotification("There was a problem updating saving the institution");
             }
-            this.institutionSelected = false;
-        } else {
-            this.utils.showNotification("There are errors in the data you enetered. Please check your inputs.");
-        }
+            this._cleanUp();
+        } 
     }
 
     delete(){
@@ -104,10 +106,12 @@ export class EditPeople {
         var name = this.people.selectedInstitution.name;
         let serverResponse = await this.people.deleteInstitution();
         if (!serverResponse.error) {
-                this.dataTable.updateArray(this.people.institutionArray);
+                this.dataTable.updateArray(this.people.institutionsArray);
                 this.utils.showNotification(name + " was deleted");
+        } else {
+             this.utils.showNotification("There was a problem deleting the user");
         }
-        this.institutionSelected = false;
+        this._cleanUp();
     }
 
     cancel(){
@@ -134,11 +138,17 @@ export class EditPeople {
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editName",{"rule":"required","message":"Name is required", "value": "people.selectedInstitution.name"});
-        this.validation.addRule(1,"editInstitutionType",{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.institutionType"});
-        this.validation.addRule(1,"editMemberType",{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.memberType"});
-        this.validation.addRule(1,"editInstitutonStatusArray",{"rule":"required","message":"Institution status is required", "value": "people.selectedInstitution.institutionStatus"});
-        this.validation.addRule(1,"editHighestDegree",{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.highestDegree"});
+        this.validation.addRule(1,"editName",[{"rule":"required","message":"Name is required", "value": "people.selectedInstitution.name"}]);
+        this.validation.addRule(1,"editInstitutionType",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.institutionType"}]);
+        this.validation.addRule(1,"editMemberType",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.memberType"}]);
+        this.validation.addRule(1,"editInstitutonStatusArray",[{"rule":"required","message":"Institution status is required", "value": "people.selectedInstitution.institutionStatus"}]);
+        this.validation.addRule(1,"editHighestDegree",[{"rule":"required","message":"Institution type is required", "value": "people.selectedInstitution.highestDegree"}]);
+    }
+
+    _cleanUp(){
+        this.newInstitution = false;
+        this.institutionSelected = false;
+        this._cleanUpFilters();
     }
 
     _cleanUpFilters(){

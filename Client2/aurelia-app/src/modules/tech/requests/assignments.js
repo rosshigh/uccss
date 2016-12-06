@@ -852,14 +852,14 @@ export class Assignments {
     }
     
     _setUpValidation(){
-        this.validation.addRule(1,"errorRange",{"rule":"custom","message":"Invalid ID range",
+        this.validation.addRule(1,"errorRange",[{"rule":"custom","message":"Invalid ID range",
             "valFunction":function(context){
                 var valid = true;
                 for(var i = 0; i < context.assignmentDetails.length; i++){
                     if(context.assignmentDetails[i].notValid == 'danger') valid = false;
                 }
                 return valid;
-            }});
+            }}]);
     }
     
     openAudit(){

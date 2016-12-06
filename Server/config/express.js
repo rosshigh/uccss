@@ -46,7 +46,7 @@ module.exports = function(app, config) {
 
   app.use(function (req, res, next) {
       onFinished(res, function (err) {
-        logger.log("[%s] finished request", req.connection.remoteAddress);
+        logger.log(req.connection.remoteAddress + " finished request","verbose");
       });
       next();
   });

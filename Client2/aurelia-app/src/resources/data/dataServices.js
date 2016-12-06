@@ -123,7 +123,6 @@ export class DataServices {
              });
 	}
 
-
     uploadFiles(files, url){
         this.isRequesting = true;
 		let formData = new FormData();
@@ -178,51 +177,34 @@ export class DataServices {
 
     // //People Services
     PEOPLE_SERVICE = "people";
-    // PERSON_SERVICE = "people/PERSONID";
     PERSON_REGISTER = "people/register"
     CHECK_EMAIL = 'people/checkEmail';
     CHECK_NAME = 'people/checkName'
-    // INSTITUTION_PEOPLE = 'people/instituion/INSTITUTIONID';
-    // PASSWORD_SERVICE = 'people/password/PERSONID';
 
     // //Sessions Services
     SESSIONS_SERVICE = "sessions";
-    // ACTIVE_SESSIONS_SERVICE = "sessions/active";
 
     // //IS4UA Services
     IS4UA = 'is4ua';
 
     // //Systems Services
-    SYSTEMS_SERVICE = 'systems';
-    // SYSTEMS_UPDATE_PRODUCT = 'systems/product/SYSTEMID';
+    SYSTEMS_SERVICE = "systems";
 
     // //Clients Services
     CLIENTS_SERVICE = 'clients';
-    // DELETE_CLIENT = 'clients/CLIENTID';
     DELETE_ALL_CLIENTS = 'clients/system/SYSTEMID';
 
 
     // //Products Services
     PRODUCTS_SERVICE = 'products';
-    // ACTIVE_PRODUCTS_SERVICE = 'products/active';
-
-    // //File Services
-    // FILES_SERVICE = 'upload';
 
     // //Misc Services
     INFO_SERVICES = "site";
-    // CURRENT_INFO_SERVICES = 'site/current';
     MESSAGE_SERVICES = 'messages';
 
     // //Help Tickets
     HELP_TICKET_SERVICES = 'helpTickets';
     HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
-    // HELP_TICKET_UPLOADS = "helpTicket/upload";
-    // HELP_TICKET_CURRENT = 'helpTickets/current';
-    // HELP_TICKET_UPDATE_OWNER = 'helpTickets/owner/HELPTICKETID';
-    // HELP_TICKET_UPDATE_STATUS = 'helpTickets/status/HELPTICKETID';
-    // HELP_TICKET_UPDATE_KEYWORDS = 'helpTickets/keywords/HELPTICKETID';
-    // HELP_TICKET_EMAIL = "helpTickets/sendMail/HTID";
 
     // //Downloads
     DOWNLOADS_SERVICE = "apps";
@@ -236,9 +218,6 @@ export class DataServices {
     PERSON_COURSES_SERVICE = 'courses/person/PERSONID';
     CLIENT_REQUESTS_SERVICES = 'clientRequests';
     CLIENT_REQUEST_DETAILS='clientRequestsDetails';
-    // CLIENT_REQUESTS_PERSON_COURSEID_SESSION = 'clientRequests/person/PERSONID/session/SESSIONID/course/COURSEID';
-    // CLIENT_REQUESTS_PERSON_SESSION ='clientRequests/person/PERSONID/session/SESSIONID';
-    // CLIENT_REQUESTS_SEND_MESSAGE = 'clientRequests/customerAction';
 
     CONFIG_SERVICE = 'config';
     SESSIONS_CONFIG_SERVICE = 'semesterConfig';

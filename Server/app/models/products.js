@@ -3,10 +3,10 @@ var Mongoose = require('mongoose'),
 
 var ProductSchema = new Schema({
   clientKey: { type: Number },
-  name: { type: String, require: true },
+  name: { type: String, require: true }, 
   clientInfo: { type: String },
   productInfo: { type: String },
-  status: { type: String, require: true },
+  status: { type: String },
   active: { type: Boolean, require: true },
   clientRelevant: { type: Boolean },
   idsAvailable: { type: Number },

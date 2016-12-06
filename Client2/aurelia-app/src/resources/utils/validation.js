@@ -146,4 +146,23 @@ export default class {
       }
     }
 
+    makeAllValid = function(ruleGroup){
+       var index = -1;
+      for(var k = 0; k < this.rules.length; k++){
+        if(this.rules[k].ruleGroup == ruleGroup){
+          index = k;
+          break;
+        }
+      }
+
+      if(index === -1){
+        return true;
+      } else {
+        for(var i = 0; i < this.rules[index].fields.length; i++){
+          this.makeValid($('#' + this.rules[index].fields[i].field));
+        }
+      }
+
+    }
+
 }

@@ -89,7 +89,7 @@ export class Products {
         if(!this.selectedProduct._id){
             let serverResponse = await this.data.saveObject(this.selectedProduct, this.data.PRODUCTS_SERVICE, "post");
             if (!serverResponse.error) {
-                this.productsArray.push(this.selectedProduct);
+                this.productsArray.push(serverResponse);
                 this.editIndex = this.productsArray.length - 1;
             } else {
                 this.data.processError(serverResponse, "There was an error creating the product.");

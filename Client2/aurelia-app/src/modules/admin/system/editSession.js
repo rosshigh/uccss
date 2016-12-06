@@ -37,14 +37,13 @@ export class EditSessions {
         await this.sessions.getSessionsArray(true, '?order=startDate:DSC');
         await this.config.getConfig();
         await this.config.getSessions();
-        this.dataTable.updateArray(this.sessions.sessionsArray);
-        this.dataTable.createPageButtons(1);
+        this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.sessions.getSessionsArray(true, '?order=startDate');
-        this.dataTable.updateArray(this.sessions.sessionsArray);
+        this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         this.spinnerHTML = "";
     }
 
@@ -93,7 +92,7 @@ export class EditSessions {
         if (this.validation.validate(1)) {
             let serverResponse = await this.sessions.saveSession();
             if (!serverResponse.error) {
-                this.dataTable.updateArray(this.sessions.sessionsArray);
+                this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
                 this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
                 this.showScreen = 'sessionTable';
             }
@@ -134,7 +133,7 @@ export class EditSessions {
             filterValues.push({ property: "sessionStatus", value: "Closed", type: 'text', compare: 'not' });
             if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
         } else {
-            this.dataTable.updateArray(this.sessions.sessionsArray);
+            this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         }
     }
 

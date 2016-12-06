@@ -89,7 +89,7 @@ export class Systems{
         newSystemObj.its = "";
         newSystemObj.terms = "";
         newSystemObj.idsAvailable = 0;
-        newSystemObj.productId = "";
+        newSystemObj.productId = new Array();
         this.clientList = [];
         return newSystemObj;
     }
@@ -114,6 +114,11 @@ export class Systems{
         }
     }
 
+    async saveProductChanges(obj){
+        let response = await this.data.saveObject(obj, this.data.SYSTEMS_SERVICE + '/product/', "put");
+        return response;
+    }
+
     async deleteSystem(){
          let serverResponse = await this.data.deleteObject(this.data.SYSTEMS_SERVICE + '/' + this.selectedSystem._id);
             if (!serverResponse.error) {
@@ -136,12 +141,10 @@ export class Systems{
 
     async deleteAllClients(){
         let serverResponse = await this.data.deleteObject(this.data.DELETE_ALL_CLIENTS.replace('SYSTEMID', this.selectedSystem._id));
-        if(serverResponse.error){
+        if(!serverResponse.error){
             this.systemsArray[this.editIndex].clients = [];
             this.selectedSystem.clients = new Array();
-        } else {
-            this.data.processError(serverResponse, " deleting the clients");
-        }
+        } 
         return serverResponse;
     }
 
@@ -153,7 +156,7 @@ export class Systems{
         this.selectedSystem.clients = this.selectedSystem.clients || new Array();
         var lastClientIndex = this.selectedSystem.clients.length - 1;
         if( start > 0 &&  end > 0 && end > start){
-            for(var i = start; i < end; i += this.config.CLIENT_INTERVAL){
+            for(var i = start; i <= end; i += this.config.CLIENT_INTERVAL){
                 if(this._findClient(i, 0, lastClientIndex) < 0){
                     this.selectedSystem.clients.push({client: i, clientStatus: status, systemId: this.selectedSystem._id,  idsAvailable: this.selectedSystem.idsAvailable})
                 }

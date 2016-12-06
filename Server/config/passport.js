@@ -52,9 +52,7 @@ var jwtLogin = new jwtStrategy(jwtOptions, function(payload, next){
 });
 
   generateToken = function(user){
-    return jwt.sign(user, config.secret, {
-      expiresIn: 10000
-    });
+    return jwt.sign(user, config.secret);
   };
 
   setUserInfo = function(req){

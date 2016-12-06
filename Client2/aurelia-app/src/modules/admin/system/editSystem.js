@@ -40,9 +40,10 @@ export class EditSystem {
     async activate() {
         let responses = await Promise.all([
             this.systems.getSystemsArray(true,'?order=sid'),
-            this.products.getProductsArray(),
+            this.products.getProductsArray(true, '?filter=active|eq|true'),
             this.sessions.getSessionsArray(),
-            this.config.getConfig()
+            this.config.getConfig(),
+            this.config.getSessions()
         ]);
         this.dataTable.updateArray(this.systems.systemsArray);
         this.dataTable.createPageButtons(1);
@@ -63,6 +64,7 @@ export class EditSystem {
         this.saveClients = false;
         $("#editSid").focus();
         this.systemSelected = true;
+        this.newSystem = true;
     }
 
     edit(index, el) {
@@ -71,6 +73,7 @@ export class EditSystem {
         this.saveClients = false;
         this.editSystem = true;
         this.systemSelected = true;
+        this.newSystem = false;
         $("#editSid").focus();
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -108,13 +111,22 @@ export class EditSystem {
     }
 
     refreshClients() {
+        if(!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0){
+            return this.dialog.showMessage(
+                "The system doesn't have clients to refresh", 
+                "No Clients",
+                ['OK']
+                ).then(response => {
+                    return;
+                });
+        }
         return this.dialog.showMessage(
-            "This will return clients to an initial state.  You must save the system for this to take effect.", 
+            "This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", 
             "Refresh Clients", 
             ['Yes', 'No']
             ).then(response => {
                 if(!response.wasCancelled){
-                    this.saveClients = true;
+                    this.saveClients = true; 
                     this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);    
                 }
             });
@@ -136,7 +148,6 @@ export class EditSystem {
         let serverResponse = await this.systems.deleteAllClients();
         if (!serverResponse.error) {
             this.utils.showNotification("The clients were successfully deleted");
-            this.dataTable.sourceArray[this.editIndex].clients = [];
         }
     }
 
@@ -159,7 +170,7 @@ export class EditSystem {
             ['Yes', 'No']
             ).then(response => {
                 if (!response.wasCancelled) {
-                    that.deleteC();
+                    this.deleteC();
                 }
             });
     }
@@ -194,11 +205,12 @@ export class EditSystem {
 
     async save() {
         if(this.validation.validate(1)){
+            this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
+            this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
             let serverResponse = await this.systems.saveSystem();
             if (!serverResponse.error) {
-                 this.dataTable.updateArray(this.systems.systemsArray);
+                 this.dataTable.updateArray(this.systems.systemsArray,'sid',1);
                 this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
-                this.systemSelected = false;
                 this._cleanUp();
             }
         }
@@ -229,6 +241,9 @@ export class EditSystem {
 
     _cleanUp(){
         this._cleanUpFilters()
+        this.systemSelected = false;
+        this.newSystem = false;
+        this.validation.makeAllValid(1);
     }
 
     _cleanUpFilters(){
@@ -236,7 +251,6 @@ export class EditSystem {
         $("#description").val("");
         $("#server").val("");
     }
-
 
     back() {
         if (this.systems.isDirty().length) {
@@ -248,18 +262,46 @@ export class EditSystem {
                     if (!response.wasCancelled) {
                         this.save();
                     } else {
-                        this.systemSelected = false;
+                        this._cleanUp();
                     }
                 });
         } else {
-            this.systemSelected = false;
+             this._cleanUp();
         }
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editSid",{"rule":"required","message":"SID is required", "value": "systems.selectedSystem.sid"});
-        this.validation.addRule(1,"editDesc",{"rule":"required","message":"Description is required", "value": "systems.selectedSystem.description"});
-        this.validation.addRule(1,"editServer",{"rule":"required","message":"Server is required", "value": "systems.selectedSystem.server"});
-        this.validation.addRule(1,"editInst",{"rule":"required","message":"Instance is required", "value": "systems.selectedSystem.instance"});
+        this.validation.addRule(1,"editSid",[{"rule":"required","message":"SID is required", "value": "systems.selectedSystem.sid"},
+        {"rule":"custom", "message":"A system with that SID already exists",
+            "valFunction":function(context){
+                var found = false;
+                for(var i = 0; i < context.systems.systemsArray.length; i++){
+                    if( context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()){
+                        if(context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id){
+                            found = true;
+                        } else if (!context.systems.selectedSystem._id){
+                            found = true;
+                        }
+                    }
+                }
+                return !found;
+            }}],true);
+        this.validation.addRule(1,"editDesc",[{"rule":"required","message":"Description is required", "value": "systems.selectedSystem.description"}]);
+        this.validation.addRule(1,"editServer",[{"rule":"required","message":"Server is required", "value": "systems.selectedSystem.server"},
+        {"rule":"custom", "message":"A system with that server already exists",
+            "valFunction":function(context){
+                var found = false;
+                for(var i = 0; i < context.systems.systemsArray.length; i++){
+                    if( context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()){
+                        if(context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id){
+                            found = true;
+                        } else if (!context.systems.selectedSystem._id){
+                            found = true;
+                        }
+                    }
+                }
+                return !found;
+            }}]);
+        this.validation.addRule(1,"editInst",[{"rule":"required","message":"Instance is required", "value": "systems.selectedSystem.instance"}]);
     }
 }

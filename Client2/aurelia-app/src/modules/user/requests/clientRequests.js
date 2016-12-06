@@ -4,9 +4,6 @@ import {Router} from "aurelia-router";
 @inject(Router)
 export class ClientRequests{
     
-    // tabs = [{id: 'viewRequests', title: 'View Requests'},{id: 'createRequests', title: 'Create Request'}];
-    // tabPath = "./";
-    
     constructor(router){
         this.router = router;
     }

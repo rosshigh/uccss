@@ -150,26 +150,26 @@ export class ViewHelpTickets {
   }
 
   _setUpValidation() {
-    this.validation.addRule("00", "curriculumTitle", { "rule": "required", "message": "Curriculum Title is required" });
-    this.validation.addRule("00", "client", {
+    this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
+    this.validation.addRule("00", "client", [{
       "rule": "custom", "message": "You must select a client",
       "valFunction": function (context) {
         return (context.helpTicket.clientId !== undefined);
       }
-    });
-    this.validation.addRule("01", "resetPasswordUserIDs", { "rule": "required", "message": "You must enter the passwords to reset" });
-    this.validation.addRule("01", "client", {
+    }]);
+    this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
+    this.validation.addRule("01", "client", [{
       "rule": "custom", "message": "You must enter the passwords to reset",
       "valFunction": function (context) {
         return (context.helpTicket.clientId !== undefined);
       }
-    });
-    this.validation.addRule("02", "application", {
+    }]);
+    this.validation.addRule("02", "application",[ {
       "rule": "custom", "message": "You must select the application",
       "valFunction": function (context) {
         return (context.content.application !== undefined);
       }
-    });
+    }]);
   }
 
   async _cleanUpResponse() {

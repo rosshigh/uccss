@@ -53,7 +53,7 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
       this.sessions.getSessionsArray(true, '?order=startDate'),
       this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName'),
+      this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName roles'),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -230,24 +230,24 @@ export class ViewHelpTickets {
   * Setup validation rules for each help ticket type
   *****************************************************************************************/
   _setUpValidation(){
-    this.validation.addRule("00","curriculumTitle",{"rule":"required","message":"Curriculum Title is required"});
-    this.validation.addRule("00","client",{"rule":"custom","message":"You must select a client",
+    this.validation.addRule("00","curriculumTitle",[{"rule":"required","message":"Curriculum Title is required"}]);
+    this.validation.addRule("00","client",[{"rule":"custom","message":"You must select a client",
       "valFunction":function(context){
         return (context.helpTicket.clientId !== undefined);
-      }});
-    this.validation.addRule("01","resetPasswordUserIDs",{"rule":"required","message":"You must enter the passwords to reset"});
-    this.validation.addRule("01","client",{"rule":"custom","message":"You must enter the passwords to reset",
+      }}]);
+    this.validation.addRule("01","resetPasswordUserIDs",[{"rule":"required","message":"You must enter the passwords to reset"}]);
+    this.validation.addRule("01","client",[{"rule":"custom","message":"You must enter the passwords to reset",
       "valFunction":function(context){
         return (context.helpTicket.clientId !== undefined);
-      }});
-    this.validation.addRule("02","application",{"rule":"custom","message":"You must select the application",
+      }}]);
+    this.validation.addRule("02","application",[{"rule":"custom","message":"You must select the application",
       "valFunction":function(context){
         return (context.content.application !== undefined);
-      }});
-      this.validation.addRule("9","owner",{"rule":"custom","message":"You are already the owner",
+      }}]);
+      this.validation.addRule("9","owner",[{"rule":"custom","message":"You are already the owner",
       "valFunction":function(context){
         return (context.helpTickets.selectedHelpTicket.owner[0].personId !== context.userObj._id);
-      }});
+      }}]);
   }
   
   

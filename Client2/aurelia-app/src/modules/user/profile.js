@@ -24,15 +24,15 @@ export class Profile {
     };
 
     _setupValidation(){
-        this.validation.addRule(1,"editFirstName",{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"});
-        this.validation.addRule(1,"editLastName",{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"});
-        // this.validation.addRule(1,"editEmail",{"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"});
-        this.validation.addRule(1,"editInstitution",{"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"});
-        // this.validation.addRule(1,"register_password",{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"});
-        // this.validation.addRule(1,"register_password_repeat",{"rule":"Custom","message":"Passwords must match",
+        this.validation.addRule(1,"editFirstName",[{"rule":"required","message":"First Name is required", "value": "people.selectedPerson.firstName"}]);
+        this.validation.addRule(1,"editLastName",[{"rule":"required","message":"Last Name is required", "value": "people.selectedPerson.lastName"}]);
+        // this.validation.addRule(1,"editEmail",[{"rule":"required","message":"Email is required", "value": "people.selectedPerson.email"}]);
+        this.validation.addRule(1,"editInstitution",[{"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"}]);
+        // this.validation.addRule(1,"register_password",[{"rule":"required","message":"Password is required", "value": "people.selectedPerson.password"}]);
+        // this.validation.addRule(1,"register_password_repeat",[{"rule":"Custom","message":"Passwords must match",
         //     "valFunction":function(context){
         //         return (context.people.selectedPerson.password === context.password_repeat);
-        //     }});
+        //     }}]);
     }
 
     attached(){

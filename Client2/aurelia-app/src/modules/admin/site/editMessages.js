@@ -138,7 +138,7 @@ export class EditMessages {
     }
 
     _setupValidation(){
-        this.validation.addRule(1,"editKey", {"rule":"required","message":"Title is required", "value": "siteinfo.selectedMessage.key"});
+        this.validation.addRule(1,"editKey", [{"rule":"required","message":"Title is required", "value": "siteinfo.selectedMessage.key"}]);
     }
 
 }

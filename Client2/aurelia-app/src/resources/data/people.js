@@ -127,9 +127,9 @@ export class People {
                 var url = this.data.PEOPLE_SERVICE;
             }
             let response = await this.data.saveObject(this.selectedPerson, url, "post")
-                if (!response.status) {
+                if (!response.error) {
                     if(this.peopleArray){
-                        this.peopleArray.push(this.selectedPerson);;
+                        this.peopleArray.push(response);;
                     }
                 } else {
                      this.data.processError(response, "There was an error creating the account.");
@@ -141,9 +141,7 @@ export class People {
                     if(this.peopleArray){
                         this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
                     }
-                }  else {
-                    this.data.processError(response, "There was an error updating the account.");
-                }
+                }  
                 return response;
         }
     }
@@ -258,13 +256,11 @@ export class People {
     async saveInstitution() {
         if (!this.selectedInstitution._id) {
             let response = await this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "post")
-                if (!response.status) {
+                if (!response.error) {
                     if(this.institutionsArray){
-                        this.institutionsArray.push(this.selectedInstitution);
+                        this.institutionsArray.push(response);
                     }
-                } else {
-                     this.data.processError(response, "There was an error creating the account.");
-                }
+                } 
                 return response;
         } else {
             let response = await this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "put")
@@ -272,16 +268,14 @@ export class People {
                     if(this.institutionsArray){
                         this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
                     }
-                }  else {
-                    this.data.processError(response, "There was an error updating the account.");
-                }
+                }  
                 return response;
         }
     }
 
     async deleteInstitution(){
          let serverResponse = await this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
-            if (serverResponse.status === 204) {
+            if (!serverResponse.error) {
                 this.institutionsArray.splice(this.editInstitutionIndex, 1);
                 this.editInstitutionIndex = - 1;
             }

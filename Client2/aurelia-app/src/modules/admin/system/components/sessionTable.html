@@ -22,7 +22,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Session <span click.trigger="dataTable.sortArray('session')"><i class="fa fa-sort"></i></span></th>
+                                <th>Session <span click.trigger="dataTable.sortArray('startDate')"><i class="fa fa-sort"></i></span></th>
                                 <th>Start Date <span click.trigger="dataTable.sortArray('startDate')"><i class="fa fa-sort"></i></span></th>
                                 <th>End Date <span click.trigger="dataTable.sortArray('endDate')"><i class="fa fa-sort"></i></span></th>
                                 <th>Requests Open <span click.trigger="dataTable.sortArray('requestsOpenDate')"><i class="fa fa-sort"></i></span></th>
@@ -32,7 +32,7 @@
                     </thead>
                     <tbody>
                         <tr repeat.for="session of dataTable.displayArray">
-                            <td data-title="Session" click.trigger="edit($index, $event)">${session.session}</td>
+                            <td data-title="Session" click.trigger="edit($index, $event)">${session.session} - ${session.year}</td>
                             <td data-title="StartDate" click.trigger="edit($index, $event)">
                                 <div style="width: 100px">${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</div>
                             </td>

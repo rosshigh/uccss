@@ -4,7 +4,8 @@ var express = require('express'),
   mongoose = require('mongoose'),
   Model = mongoose.model('System'),
   passport = require('passport'),
-  Client = mongoose.model('Client');
+  Client = mongoose.model('Client'),
+  logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -12,7 +13,7 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/systems', requireAuth, function(req, res, next){
-    debug('Get systems');
+    logger.log('Get systems',"verbose");
     var query = buildQuery(req.query, Model.find())
     query.populate({
       path: 'clients'
@@ -31,7 +32,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/systems/clients', requireAuth, function(req, res, next){
-    debug('Get systems');
+    logger.log('Get systems with clients',"verbose");
     Model.find({})
       .sort(req.query.order)
       .populate('clients')
@@ -45,7 +46,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/systems/:id', requireAuth, function(req, res, next){
-    debug('Get systems [%s]', req.params.id);
+    logger.log('Get system ' + req.params.id,"verbose");
     Model.findById(req.params.id)
       .populate('clients')
       .exec(function(err, object){
@@ -58,79 +59,98 @@ module.exports = function (app) {
   });
 
   router.post('/api/systems', requireAuth, function(req, res, next){
-    debug('Create systems');
-    var system =  new Model(req.body);
-    system.validate(function (err) {
-      if (err) {
-        if(!system.productId) system.productId = null;
+    logger.log('Create system',"verbose");
+
+    if(req.body){
+      var newClients = req.body.clients;
+      req.body.clients = new Array();
+      var system =  new Model(req.body);
+
+      if(newClients.length > 0){
+        var clients = new Array();
+        var tasks = new Array();
+        newClients.forEach(function(client, index){
+          var obj = new Client(client);
+          system.clients.push(obj._id);
+          clients.push(obj);
+        });
+        
+        clients.forEach(item => {
+          tasks.push(item.save());
+        })
       }
-    });
-    console.log("HERE");
-    system.save( function ( err, object ){      
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
+
+      system.save( function ( err, object ){      
+        if (err) {
+          console.log(err)
+          return next(err);
+        } else {
+          Promise.all(tasks)
+            .then(function(results) {
+              res.status(200).json(object);
+            })
+        }
+      });
+    }
+    
   });
 
-  router.put('/api/systems/product/:id', requireAuth, function(req, res, next){
-    debug('Update Systems [%s]', req.params.id);
-    Model.findById(req.params.id, function(err, system){
-      if(err){
-        return next(err);
-      } else {
-        if(system){
-          if(req.body.productId === ""){
-            system.productId = null;
-          } else {
-            system.productId = req.body.productId;
-          }
-          system.save(function(err, object){
-            if(err){
-              return next(err);
-            } else {
-              res.status(200).json(object);
-            }
-          });
+  router.put('/api/systems/product', requireAuth, function(req, res, next){
+    logger.log('Update systems',"verbose"); 
+
+    if(req.body && Array.isArray(req.body)){  
+      var tasks = new Array();        
+      req.body.forEach(item => {  
+        if(item.operation === 'add'){
+           tasks.push(Model.update({_id: item.systemId}, { $push: { productId: item.productId } }));
+        } else {
+           tasks.push(Model.update({_id: item.systemId}, { $pull: { productId: item.productId } }));
         }
+      });
+      Promise.all(tasks)
+        .then(function(results) {
+          res.status(200).json({msg: "systems updated"});
+        })
+      } else {
+        res.status(404).json({msg: "No updates found"});
       }
-    });
   });
 
   router.put('/api/systems', requireAuth, function(req, res, next){
-    debug('Update Systems [%s]', req.body._id);
+    logger.log('Update Systems ' + req.body._id, "verbose");
+    if(req.body){
+      var system = new Model();
+      system._id = req.body._id;
+      system.sid = req.body.sid;
+      system.active = req.body.active;
+      system.description = req.body.description;
+      system.server = req.body.server;
+      system.its = req.body.its;
+      system.terms = req.body.terms;
+      system.productId = req.body.productId;
+      system.idsAvailable = req.body.idsAvailable;
+      system.instance = req.body.instance;
+      system.sessions = req.body.sessions;    
 
-    var system = new Model();
-    system._id = req.body._id;
-    system.sid = req.body.sid;
-    system.active = req.body.active;
-    system.description = req.body.description;
-    system.server = req.body.server;
-    system.its = req.body.its;
-    system.terms = req.body.terms;
-    system.productId = req.body.productId;
-    system.idsAvailable = req.body.idsAvailable;
-    system.instance = req.body.instance;
+      req.body.clients.forEach(item => {
+        var client = new Client(item);
+        system.clients.push(client._id);
+        Client.findOneAndUpdate({_id: client._id}, client, {upsert: true, new: true}, function(err, client){
+          if(err) {
+            return next(err);
+          }
+        })
+      })
 
-    for(var i = 0, x=req.body.clients.length; i<x; i++){
-      var client = new Client(req.body.clients[i]);
-      system.clients.push(client._id);
-      Client.findOneAndUpdate({_id: client._id}, client, {upsert: true, new: true}, function(err, client){
-        if(err) {
+      Model.findOneAndUpdate({_id: req.body._id}, system, {safe:true, multi:false}, function(err, result){
+        if (err) {
           return next(err);
+        } else {
+          res.status(200).json(result);
         }
       })
     }
 
-  Model.findOneAndUpdate({_id: req.body._id}, system, {safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(result);
-      }
-    })
   }); 
 
   router.delete('/api/systems/:id', requireAuth, function(req, res, next){

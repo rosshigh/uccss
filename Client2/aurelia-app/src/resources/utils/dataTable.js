@@ -214,7 +214,11 @@ export class DataTable{
                 var properties = filters[i].property.split('.')
                 var condition = "item"
                 for(var j = 0; j<properties.length; j++){
-                  condition += "['" + properties[j] + "']"
+                  if(properties[j].indexOf('[') > -1 ) {
+                    condition += properties[j];
+                  } else {
+                    condition += "['" + properties[j] + "']";
+                  }
                 }
                 keep = eval(condition) === filters[i].value;
                 break
@@ -304,10 +308,14 @@ export class DataTable{
     return "";
   }
 
-  sortArray(propertyName, type, surrogateArray, surrogateProperty, sortProperty){
+  sortArray(propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam){
+    if(sortDirectionParam) this.sortDirecction = sortDirectionParam;
     if(propertyName === this.sortProperty){
       this.sortDirection *= -1;
+    } else {
+      this.sortDirection = 1;
     }
+
     if(!type){
         this.sortProperty=propertyName;
 
@@ -337,7 +345,7 @@ export class DataTable{
        propertyName = propertyName.split('.');
 
         this.baseArray = this.baseArray
-          .sort((a, b) => {
+          .sort((a, b) => { 
             var result = (a[propertyName[0]][propertyName[1]] < b[propertyName[0]][propertyName[1]]) ? -1 : (a[propertyName[0]][propertyName[1]] > b[propertyName[0]][propertyName[1]]) ? 1 : 0;
             return result * this.sortDirection;
           });
@@ -357,7 +365,7 @@ export class DataTable{
     return null;
   }
   
-  updateArray(sourceArray){
+  updateArray(sourceArray, sortProperty, sortDirection){
     if(sourceArray) {
       this.sourceArray = new Array();
       this.baseArray = new Array();
@@ -371,6 +379,14 @@ export class DataTable{
         item.baseIndex = index;
         item.originalIndex = index;
       });
+
+      if(sortProperty){
+          this.baseArray.sort((a,b) => {
+            let result =  a[sortProperty] - b[sortProperty];
+            return result * sortDirection
+          })
+      }
+
       this.buildDisplayArray()
     }
   }

@@ -18,11 +18,13 @@ export class AddSystems{
   @bindable
   systemstring;
 
+  @bindable
+  systemchanges
+
   constructor(data){
     this.data = data;
      this.systemsArray = this.systemsarray;
   }
-
 
   filterList(){
       if(this.filter){
@@ -38,11 +40,9 @@ export class AddSystems{
 
   selectSystem(el, system){
     if(!this._systemAlreadySelected(system.sid)){
-      if( this._updateSystem(system, this.selectedproduct._id)) {
-        this.selectedproduct.systems.push({sid: system.sid, systemId: system._id});
-      }
+      this.systemchanges.push({productId: this.selectedproduct._id, systemId: system._id, operation: "add"});
+      this.selectedproduct.systems.push({sid: system.sid, systemId: system._id});
     }
-    this.updateSystemsString();
   }
 
   _systemAlreadySelected(sid){
@@ -54,26 +54,18 @@ export class AddSystems{
 
   removeSystem(el, system){
     for(var i = 0; i<this.selectedproduct.systems.length; i++){
-      if(system.id === this.selectedproduct.systems[i].id){
-        if(this._updateSystem(system, "")) this.selectedproduct.systems.splice(i,1);
+      if(system.systemId === this.selectedproduct.systems[i].systemId){
+        for(var j = 0; j < this.systemchanges.length; j++){
+          if(this.systemchanges[j].systemId ===system.systemId ) break; 
+        }
+        if(this.systemChanges && j === this.systemChanges.length) {
+          this.systemchanges.splice(j,1);
+        } else {
+          this.systemchanges.push({productId: this.selectedproduct._id, systemId: system.systemId, operation: "delete"});
+        }
+          this.selectedproduct.systems.splice(i,1);
         break;
       }
     }
-    this.updateSystemsString();
-  }
-
-  updateSystemsString(){
-    this.systemstring = "";
-    if(this.selectedproduct.systems){
-            for (var i = 0, x = this.selectedproduct.systems.length; i < x; i++) {
-                this.systemstring += this.selectedproduct.systems[i].sid + " "
-            }
-        }
-  }
-
-  async _updateSystem(system, productId){
-    var obj = {productId: productId};
-    let serverResponse = await this.data.saveObject(obj, this.data.SYSTEMS_SERVICE + '/product/' + system._id, "put");
-    return !serverResponse.error;
   }
 }

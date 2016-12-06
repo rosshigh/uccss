@@ -6,7 +6,7 @@
             <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
             <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
             <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
-            <span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+            <span show.bind="!newPerson" click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
         </div>  
 
         <div class="topMargin">
@@ -16,15 +16,15 @@
                         <div style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
                     </div>
                     <div class="col-lg-11">
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editFirstName" class="col-sm-3 control-label hideOnPhone">Name</label>
+                                <label for="editFirstName" class="col-sm-3 control-label hideOnPhone">First Name *</label>
                                 <div class="col-sm-8">
                                 <input value.bind="people.selectedPerson.firstName" id="editFirstName" class="form-control " placeholder="First Name" type="text" />
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="editMiddleName" class="col-sm-3 control-label hideOnPhone">Middle Name</label>
                                 <div class="col-sm-8">
@@ -32,17 +32,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editLastName" class="col-sm-3 control-label hideOnPhone">Last Name</label>
+                                <label for="editLastName" class="col-sm-3 control-label hideOnPhone">Last Name *</label>
                                 <div class="col-sm-8">
                                 <input value.bind="people.selectedPerson.lastName" id="editLastName" class="form-control " placeholder="Last Name" type="text" />
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="control-label col-sm-3 hideOnPhone">Status</label>
+                                <label class="control-label col-sm-3 hideOnPhone">Status *</label>
                                 <div class="col-sm-8">
                                     <select value.bind="people.selectedPerson.personStatus" id="editStatus" class="form-control " placeholder="Status">
                                         <option value="">Select an option</option>
@@ -51,34 +51,31 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone</label>
+                                <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone *</label>
                                 <div class="col-sm-8">
-                                 <!--   <phone-input value.two-way="people.selectedPerson.phone" ></phone-input>
-                                    <numeric-input value.bind="people.selectedPerson.phone | phoneNumber" placeholder="Phone" maxlength="14"/> -->
-                                    <input value.bind="people.selectedPerson.phone | phoneNumber" id="editPhone" class="form-control " placeholder="Phone" type="text" />
+                                    <input class="form-control" id="editPhone" masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *" />
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="editMobile" class="col-sm-3 control-label hideOnPhone">Mobile</label>
                                 <div class="col-sm-8">
-                                    <phone-input value.two-way="people.selectedPerson.mobile" ></phone-input>
-                                    <input value.bind="people.selectedPerson.mobile | phoneNumber" id="editMobile" class="form-control " placeholder="Mobile" type="text" />
+                                    <input class="form-control" id="editMobile" masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *" />
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editEmail" class="col-sm-3 control-label hideOnPhone">Email</label>
+                                <label for="editEmail" class="col-sm-3 control-label hideOnPhone">Email *</label>
                                 <div class="col-sm-8">
                                     <input value.bind="people.selectedPerson.email" id="editEmail" class="form-control " placeholder="Email" type="text" blur.trigger="checkEmail()" />
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="editGender" class="col-sm-3 control-label">Gender</label>
                                 <div class="col-sm-8">
@@ -90,9 +87,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-lg-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editInstitution" class="col-sm-3 control-label">Institution</label>
+                                <label for="editInstitution" class="col-sm-3 control-label">Institution *</label>
                                 <div class="col-sm-8">
                                     <select value.bind="people.selectedPerson.institutionId" id="editInstitution" class="form-control " placeholder="Institution">
                                         <option value="">Select an option</option>
