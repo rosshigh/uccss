@@ -149,7 +149,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             _classCallCheck(this, AppConfig);
 
             this.HOST = location.origin;
-            this.BASE_URL = "http://localhost:5000/api/";
+            this.BASE_URL = this.HOST + "/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -10376,6 +10376,36 @@ define('resources/value-converters/translate-status',["exports"], function (expo
     return TranslateStatusValueConverter;
   }();
 });
+define('resources/value-converters/ucc-staff',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var UccStaffValueConverter = exports.UccStaffValueConverter = function () {
+    function UccStaffValueConverter() {
+      _classCallCheck(this, UccStaffValueConverter);
+    }
+
+    UccStaffValueConverter.prototype.toView = function toView(array) {
+      if (array) {
+        return array.filter(function (item) {
+          return item.roles.indexOf('UCCT') > -1;
+        });
+      }
+      return array;
+    };
+
+    return UccStaffValueConverter;
+  }();
+});
 define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
     'use strict';
 
@@ -11424,6 +11454,412 @@ define('modules/admin/customers/test',["exports"], function (exports) {
   var Test = exports.Test = function Test() {
     _classCallCheck(this, Test);
   };
+});
+define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Documents = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function Documents(router, datatable, documents, people, utils, config, dialog) {
+            _classCallCheck(this, Documents);
+
+            this.navControl = "documentssNavButtons";
+            this.spinnerHTML = "";
+            this.filterValues = new Array();
+            this.typeSelected = "";
+            this.categoryForm = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+
+            this.router = router;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.documents = documents;
+            this.config = config;
+            this.people = people;
+            this.dialog = dialog;
+        }
+
+        Documents.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        Documents.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.documents.getDocumentsCategoriesArray(), this.people.getPeopleArray(true), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+
+                                this.dataTable.updateArray(this.documents.docCatsArray);
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Documents.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Documents.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.documents.getDocumentsArray(true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.documents.docCatsArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Documents.prototype.editDocument = function editDocument(index, el) {
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+
+            this.documents.selectDocument(this.editIndex);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        Documents.prototype.filterList = function filterList() {
+            if (this.filter) {
+                var thisFilter = this.filter;
+                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
+                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+                });
+            } else {
+                this.filteredDocumentArray = this.documents.docCatsArray;
+            }
+        };
+
+        Documents.prototype.typeChanged = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, type) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context3.next = 8;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context3.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.dataTable.updateArray(this.documents.documentsArray);
+                                this.showDocuments = true;
+                                this.showDocumentForm = false;
+
+                            case 8:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function typeChanged(_x, _x2) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        Documents.prototype.new = function _new() {
+            this.editIndex = "";
+            this.showDocumentForm = true;
+            this.documents.selectDocument();
+        };
+
+        Documents.prototype.back = function back() {
+            this.showDocumentForm = false;
+        };
+
+        Documents.prototype.cancel = function cancel() {
+            this.documents.selectDocument(this.editIndex);
+        };
+
+        Documents.prototype.delete = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
+                                    if (!response.wasCancelled) {
+                                        _this.deleteDocument();
+                                    }
+                                }));
+
+                            case 1:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function _delete() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return _delete;
+        }();
+
+        Documents.prototype.deleteDocument = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                _context5.next = 2;
+                                return this.documents.deleteDocument();
+
+                            case 2:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The document was deleted");
+                                    this.showDocumentForm = false;
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteDocument() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteDocument;
+        }();
+
+        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
+            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
+        };
+
+        Documents.prototype.deleteFile = function deleteFile(index) {
+            var _this2 = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the file?", "Delete File", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.documents.deleteFile(index);
+                }
+            });
+        };
+
+        Documents.prototype.buildDocument = function buildDocument() {
+            if (!this.documents.selectedDocument._id) {
+                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
+                this.documents.selectedDocument.dateCreated = new Date();
+            }
+            if (this.files && this.files.length > 0) {
+                var version = 1;
+                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
+                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
+                        version++;
+                    }
+                }
+                var newFile = {
+                    personId: this.userObj._id,
+                    originalFilename: this.files[0].name,
+                    fileName: this.files[0].name + " - version " + version,
+                    dateUploaded: new Date(),
+                    active: true,
+                    version: version
+                };
+                this.documents.selectedDocument.files.unshift(newFile);
+            }
+        };
+
+        Documents.prototype.save = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                this.buildDocument();
+                                _context6.next = 3;
+                                return this.documents.saveDocument();
+
+                            case 3:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.error) {
+                                    _context6.next = 13;
+                                    break;
+                                }
+
+                                this.dataTable.updateArray(this.documents.documentsArray);
+                                this.utils.showNotification("The document was saved");
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+
+                                if (!(this.files && this.files.length > 0)) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                _context6.next = 11;
+                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
+
+                            case 11:
+                                this.spinnerHTML = "";
+                                (0, _jquery2.default)("#spinner").toggle().toggle();
+
+                            case 13:
+                                this.selectedFiles = undefined;
+                                this.files = undefined;
+                                this.selectedFile = "";
+
+                            case 16:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Documents.prototype.changeFiles = function changeFiles() {
+            this.selectedFile = this.files[0].name;
+            this.filesSelected = this.documents.selectedDocument ? true : false;
+        };
+
+        Documents.prototype.newCategory = function newCategory() {
+            this.categoryForm = true;
+            this.documents.selectCategory();
+        };
+
+        Documents.prototype.editCategory = function editCategory() {
+            this.categoryForm = true;
+        };
+
+        Documents.prototype.saveCategory = function saveCategory() {
+            var serverResponse = this.documents.saveCategory();
+            if (!serverResponse.status) {
+                this.utils.showNotification("Category Saved");
+                this.categoryForm = false;
+            }
+        };
+
+        Documents.prototype.backCategory = function backCategory() {
+            this.categoryForm = false;
+        };
+
+        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
+            this.documents.selectCategory();
+        };
+
+        return Documents;
+    }()) || _class);
 });
 define('modules/admin/site/editConfig',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/config', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _config, _jquery) {
     'use strict';
@@ -12809,412 +13245,6 @@ define('modules/admin/site/site',['exports', 'aurelia-framework', 'aurelia-route
         };
 
         return Site;
-    }()) || _class);
-});
-define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _commonDialogs, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Documents = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function Documents(router, datatable, documents, people, utils, config, dialog) {
-            _classCallCheck(this, Documents);
-
-            this.navControl = "documentssNavButtons";
-            this.spinnerHTML = "";
-            this.filterValues = new Array();
-            this.typeSelected = "";
-            this.categoryForm = false;
-            this.showDocumentForm = false;
-            this.showDocuments = false;
-
-            this.router = router;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.documents = documents;
-            this.config = config;
-            this.people = people;
-            this.dialog = dialog;
-        }
-
-        Documents.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        Documents.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.documents.getDocumentsCategoriesArray(), this.people.getPeopleArray(true), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.filteredDocumentArray = this.documents.docCatsArray;
-
-                                this.dataTable.updateArray(this.documents.docCatsArray);
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        Documents.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Documents.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.documents.getDocumentsArray(true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.documents.docCatsArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Documents.prototype.editDocument = function editDocument(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-
-            this.documents.selectDocument(this.editIndex);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showDocumentForm = true;
-        };
-
-        Documents.prototype.filterList = function filterList() {
-            if (this.filter) {
-                var thisFilter = this.filter;
-                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
-                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
-                });
-            } else {
-                this.filteredDocumentArray = this.documents.docCatsArray;
-            }
-        };
-
-        Documents.prototype.typeChanged = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, type) {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!(index >= 0)) {
-                                    _context3.next = 8;
-                                    break;
-                                }
-
-                                this.categoryIndex = index;
-                                this.documents.selectCategory(index);
-                                _context3.next = 5;
-                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-
-                            case 5:
-                                this.dataTable.updateArray(this.documents.documentsArray);
-                                this.showDocuments = true;
-                                this.showDocumentForm = false;
-
-                            case 8:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function typeChanged(_x, _x2) {
-                return _ref3.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        Documents.prototype.new = function _new() {
-            this.editIndex = "";
-            this.showDocumentForm = true;
-            this.documents.selectDocument();
-        };
-
-        Documents.prototype.back = function back() {
-            this.showDocumentForm = false;
-        };
-
-        Documents.prototype.cancel = function cancel() {
-            this.documents.selectDocument(this.editIndex);
-        };
-
-        Documents.prototype.delete = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var _this = this;
-
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
-                                    if (!response.wasCancelled) {
-                                        _this.deleteDocument();
-                                    }
-                                }));
-
-                            case 1:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function _delete() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return _delete;
-        }();
-
-        Documents.prototype.deleteDocument = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                _context5.next = 2;
-                                return this.documents.deleteDocument();
-
-                            case 2:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("The document was deleted");
-                                    this.showDocumentForm = false;
-                                }
-
-                            case 4:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteDocument() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteDocument;
-        }();
-
-        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
-            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
-        };
-
-        Documents.prototype.deleteFile = function deleteFile(index) {
-            var _this2 = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the file?", "Delete File", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.documents.deleteFile(index);
-                }
-            });
-        };
-
-        Documents.prototype.buildDocument = function buildDocument() {
-            if (!this.documents.selectedDocument._id) {
-                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
-                this.documents.selectedDocument.dateCreated = new Date();
-            }
-            if (this.files && this.files.length > 0) {
-                var version = 1;
-                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
-                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
-                        version++;
-                    }
-                }
-                var newFile = {
-                    personId: this.userObj._id,
-                    originalFilename: this.files[0].name,
-                    fileName: this.files[0].name + " - version " + version,
-                    dateUploaded: new Date(),
-                    active: true,
-                    version: version
-                };
-                this.documents.selectedDocument.files.unshift(newFile);
-            }
-        };
-
-        Documents.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                this.buildDocument();
-                                _context6.next = 3;
-                                return this.documents.saveDocument();
-
-                            case 3:
-                                serverResponse = _context6.sent;
-
-                                if (serverResponse.error) {
-                                    _context6.next = 13;
-                                    break;
-                                }
-
-                                this.dataTable.updateArray(this.documents.documentsArray);
-                                this.utils.showNotification("The document was saved");
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-
-                                if (!(this.files && this.files.length > 0)) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                _context6.next = 11;
-                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
-
-                            case 11:
-                                this.spinnerHTML = "";
-                                (0, _jquery2.default)("#spinner").toggle().toggle();
-
-                            case 13:
-                                this.selectedFiles = undefined;
-                                this.files = undefined;
-                                this.selectedFile = "";
-
-                            case 16:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Documents.prototype.changeFiles = function changeFiles() {
-            this.selectedFile = this.files[0].name;
-            this.filesSelected = this.documents.selectedDocument ? true : false;
-        };
-
-        Documents.prototype.newCategory = function newCategory() {
-            this.categoryForm = true;
-            this.documents.selectCategory();
-        };
-
-        Documents.prototype.editCategory = function editCategory() {
-            this.categoryForm = true;
-        };
-
-        Documents.prototype.saveCategory = function saveCategory() {
-            var serverResponse = this.documents.saveCategory();
-            if (!serverResponse.status) {
-                this.utils.showNotification("Category Saved");
-                this.categoryForm = false;
-            }
-        };
-
-        Documents.prototype.backCategory = function backCategory() {
-            this.categoryForm = false;
-        };
-
-        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
-            this.documents.selectCategory();
-        };
-
-        return Documents;
     }()) || _class);
 });
 define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', '../../../resources/data/documents', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _systems, _products, _is4ua, _commonDialogs, _validation, _documents, _jquery) {
@@ -14671,2343 +14701,6 @@ define('modules/admin/system/system',['exports', 'aurelia-framework', 'aurelia-r
 
         return System;
     }()) || _class);
-});
-define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _validation, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Assignments = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function Assignments(router, config, validation, people, dialog, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, Assignments);
-
-            this.requestSelected = false;
-            this.showAddStudentTemplate = false;
-            this.manualMode = false;
-            this.roundTo10 = false;
-            this.showAudit = false;
-            this.lastIDidsRemaining = -1;
-            this.navControl = "requestsNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.config = config;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-            this.dialog = dialog;
-        }
-
-        Assignments.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Assignments.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        Assignments.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
-                                this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
-                                this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
-                                this._setUpValidation();
-
-                            case 7:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        Assignments.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 7;
-                                    break;
-                                }
-
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 4;
-                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 4:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
-                                    this.dataTable.createPageButtons(1);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.displayArray = new Array();
-
-                            case 8:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        Assignments.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.getRequests();
-
-                            case 3:
-                                this.spinnerHTML = "";
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-
-            this.enableButton = false;
-            this.requestSelected = true;
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.requests.selectRequestDetail(this.editIndex);
-            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-
-            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-            if (!this.products.selectedProduct.systems[0]) {
-                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
-            }
-
-            this.clientRequired();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
-
-        Assignments.prototype.clientRequired = function clientRequired() {
-            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
-            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
-            this.lastFirstID = this.firstID;
-            this.firstAllowableID = this.firstID;
-            this.firstNumericFacID = this.firstID;
-            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
-
-            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
-            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
-            if (this.products.selectedProduct.systems[0]) {
-                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
-            }
-            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
-            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.idBuffer = 0;
-                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-                this.sandBoxOnly = true;
-            } else {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
-                this.sandBoxOnly = false;
-            }
-
-            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
-                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
-                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
-                this.idsRemaining = this.idsRequired;
-                this.existingRequest = false;
-                this.totalIdsAssigned = 0;
-                this.idsAssigned = 0;
-                this.assignmentDetails = new Array();
-            } else {
-                this.existingRequest = true;
-                this.unassignedOnly = false;
-                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
-                this.idsRequired = parseInt(this.numberOfIds);
-                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
-                this.totalIdsAssigned = this.idsAssigned;
-                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
-                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
-                this.findAssignedClients();
-            }
-
-            this.assignmentDetailIndex = -1;
-
-            this.calcLastID();
-        };
-
-        Assignments.prototype.selectClient = function selectClient(index, client, el) {
-            if (this.idsRemaining > 0) {
-                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
-                    return;
-                }
-
-                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
-
-                this.proposedClient.push(client);
-
-                this.lastFirstID = this.firstID;
-
-                this.calcLastID();
-
-                this.assignmentDetails.push({
-                    staffId: this.userObj._id,
-
-                    client: client.client,
-                    clientId: client._id,
-                    systemId: client.systemId,
-                    firstID: this.firstID,
-                    lastID: this.lastID,
-                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
-                });
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
-                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
-
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-
-                if (this.studentIDTemplates.length) {
-                    this.calcAssignment();
-                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
-                }
-
-                this.clientSelected = true;
-                this.enableButton = true;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.calcLastID = function calcLastID() {
-            if (this.idsRemaining > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            } else {
-                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
-            }
-
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.calcAssignment = function calcAssignment() {
-            this.calcIDRangeFromTemplate();
-            this.calculatePasswords();
-        };
-
-        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-            } else {
-                var selectedStudentIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
-                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
-                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
-                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
-                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
-                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
-                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
-            }
-
-            this.calcFacIDRangeFromTemplate();
-        };
-
-        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
-            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-            } else {
-                var selectedFacultyIDTemplates = new Array();
-                if (this.selectedStudentIDTemplate.length == 0) {
-                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
-                } else {
-                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
-                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
-                    }
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
-                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
-                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
-                }
-
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
-            }
-        };
-
-        Assignments.prototype.getID = function getID(idPrefix, id) {
-            if (idPrefix) {
-                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
-                var prefix = "000".substr(0, len - id.toString().length);
-                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
-            }
-            return "";
-        };
-
-        Assignments.prototype.calculatePasswords = function calculatePasswords() {
-            if (this.manualMode || this.assignmentDetailIndex == -1) {
-                return;
-            }
-
-            if (this.assignmentDetails.length > 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
-            }
-            var random;
-            var prefix;
-            var len;
-
-            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                prefix = "9" + "000".substr(0, len - 1);
-                random = Math.floor(Math.random() * parseInt(prefix));
-                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
-            }
-
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
-            } else {
-                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
-                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
-                    prefix = "9" + "000".substr(0, len - 1);
-                    random = Math.floor(Math.random() * parseInt(prefix));
-                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
-                }
-            }
-        };
-
-        Assignments.prototype.firstIDChanged = function firstIDChanged() {
-            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
-            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
-                this.firstID = this.lastFirstID;
-                return;
-            }
-
-            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.calcIDRangeFromTemplate();
-            }
-
-            this.lastFirstID = this.firstID;
-        };
-
-        Assignments.prototype.lastIDChanged = function lastIDChanged() {
-            if (this.lastID > this.lastIDAvailable) {
-                this.lastID = this.lastIDAvailable;
-            }
-
-            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-            if (this.assignmentDetailIndex > -1) {
-                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
-
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-
-                this.calcIDRangeFromTemplate();
-            } else {
-                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
-            }
-            this.oldLastID = this.lastID;
-        };
-
-        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
-            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
-            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
-            if (this.assignmentDetailIndex > -1) {
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-                this.calcFacIDRangeFromTemplate();
-            }
-        };
-
-        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
-            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
-            if (this.assignmentDetailIndex == -1) {
-                this.selectedAssignedClient = "";
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            } else {
-                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
-
-                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
-                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
-                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
-                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
-                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
-                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
-                this.oldLastID = this.lastID;
-                this.lastFirstID = this.firstID;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-            }
-        };
-
-        Assignments.prototype.deleteProposedClient = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
-                var _this = this;
-
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (!this.assignmentDetails[index].assignedDate) {
-                                    _context4.next = 4;
-                                    break;
-                                }
-
-                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).then(function (response) {
-                                    if (!response.wasCancelled) {
-                                        _this.deleteSaved(index);
-                                    }
-                                }));
-
-                            case 4:
-                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.assignmentDetailIndex = -1;
-
-                                this.assignmentDetails.splice(index, 1);
-                                this.proposedClient.splice(index, 1);
-
-                            case 9:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function deleteProposedClient(_x) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return deleteProposedClient;
-        }();
-
-        Assignments.prototype.deleteSaved = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
-                var i, request, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
-                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
-
-                                i = 0;
-
-                            case 4:
-                                if (!(i < this.proposedClient[index].assignments.length)) {
-                                    _context5.next = 12;
-                                    break;
-                                }
-
-                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
-                                    _context5.next = 9;
-                                    break;
-                                }
-
-                                this.proposedClient[index].assignments.splice(i, 1);
-                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
-                                return _context5.abrupt('break', 12);
-
-                            case 9:
-                                i++;
-                                _context5.next = 4;
-                                break;
-
-                            case 12:
-                                this.systems.updateClient(this.proposedClient[index]);
-                                this.assignmentDetails.splice(index, 1);
-                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
-
-                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-                                this.requestToSave.requestDetailsToSave = new Array();
-                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-                                delete request['requestId'];
-                                this.requestToSave.requestDetailsToSave.push(request);
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context5.next = 25;
-                                return this.requests.saveRequest();
-
-                            case 25:
-                                serverResponse = _context5.sent;
-
-                                if (serverResponse.status) {
-                                    _context5.next = 30;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
-                                _context5.next = 30;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 30:
-                                this.selectedAssignedClient = "";
-
-                            case 31:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteSaved(_x2) {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteSaved;
-        }();
-
-        Assignments.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                if (!this.validation.validate(1, this)) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                if (!this._buildRequest()) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.requests.setSelectedRequest(this.requestToSave);
-                                _context6.next = 5;
-                                return this.requests.saveRequest();
-
-                            case 5:
-                                serverResponse = _context6.sent;
-
-                                if (serverResponse.status) {
-                                    _context6.next = 11;
-                                    break;
-                                }
-
-                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
-                                _context6.next = 10;
-                                return this.systems.saveClients(this.proposedClient);
-
-                            case 10:
-                                this._cleanUp();
-
-                            case 11:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Assignments.prototype._buildRequest = function _buildRequest() {
-            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
-                for (var i = 0; i < this.assignmentDetails.length; i++) {
-                    for (var j = 0; j < this.proposedClient.length; j++) {
-                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
-                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
-                            if (this.assignmentDetails[i].assignedDate) {
-                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
-                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
-                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
-                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
-                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
-                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
-                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                        this.systems.updateClient(this.proposedClient[j]);
-                                    }
-                                }
-                            } else {
-                                this.assignmentDetails[i].assignedDate = new Date();
-                                this.requests.selectedRequestDetail.assignedDate = new Date();
-                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
-                                this.proposedClient[i].assignments.push({
-                                    assignment: this.requests.selectedRequestDetail._id,
-                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
-                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                                    firstID: this.assignmentDetails[i].firstID,
-                                    lastID: this.assignmentDetails[i].lastID
-                                });
-                                this.systems.updateClient(this.proposedClient[i]);
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (this.provisionalAssignment) {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
-                } else {
-                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
-                }
-
-                for (var i = 0; i < this.proposedClient.length; i++) {
-                    this.assignmentDetails[i].assignedDate = new Date();
-                    this.assignmentDetails[i].modifiedDate = new Date();
-                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
-                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
-                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
-                    this.proposedClient[i].assignments.push({
-                        assignment: this.requests.selectedRequestDetail._id,
-                        studentIDRange: this.assignmentDetails[i].studentUserIds,
-                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
-                        firstID: this.assignmentDetails[i].firstID,
-                        lastID: this.assignmentDetails[i].lastID,
-                        assignedDate: new Date()
-                    });
-                    this.systems.updateClient(this.proposedClient[i]);
-                };
-            }
-
-            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
-            this.requestToSave.audit.push({
-                property: 'Assigned',
-                eventDate: new Date(),
-                personId: this.userObj._id
-            });
-            this.requestToSave.requestDetailsToSave = new Array();
-            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
-            delete request['requestId'];
-            this.requestToSave.requestDetailsToSave.push(request);
-
-            return true;
-        };
-
-        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
-            if (!client.assignments || client.assignments.length == 0) return true;
-            var valid = true;
-            var x1 = parseInt(assignment.firstID);
-            var x2 = parseInt(assignment.lastID);
-            for (var i = 0; i < client.assignments.length; i++) {
-                if (this.existingRequest && client.assignments[i].assignment == id) {
-                    continue;
-                } else {
-                    var y1 = parseInt(client.assignments[i].firstID);
-                    var y2 = parseInt(client.assignments[i].lastID);
-                    if (!(x2 < y1 || x1 > y2)) valid = false;
-                }
-            }
-            return valid;
-        };
-
-        Assignments.prototype.back = function back() {
-            this._cleanUp();
-        };
-
-        Assignments.prototype._cleanUp = function _cleanUp() {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-            this.proposedAssignment = new Object();
-            this.parameterIndex = new Object();
-            this.systems.selectSystem();
-            this.selectedAssignedClient = "";
-            this.firstID = 0;
-            this.lastID = 0;
-            this.requestSelected = false;
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.findAssignedClients = function findAssignedClients() {
-            var _this2 = this;
-
-            this.assignmentDetails.forEach(function (item) {
-                _this2.systems.selectClientFromID(item.systemId, item.clientId);
-                _this2.proposedClient.push(_this2.systems.selectedClient);
-            });
-        };
-
-        Assignments.prototype.systemSelected = function systemSelected() {
-            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
-            if (!this.products.selectedProduct.clientRelevant) {
-                this.calcAssignment();
-            }
-        };
-
-        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
-            this.showAddStudentTemplate = true;
-        };
-
-        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
-            this.showAddStudentTemplate = false;
-        };
-
-        Assignments.prototype.saveStudentTemplate = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                _context7.next = 2;
-                                return this.products.saveProduct();
-
-                            case 2:
-                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
-                                this.showAddStudentTemplate = false;
-
-                            case 4:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function saveStudentTemplate() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return saveStudentTemplate;
-        }();
-
-        Assignments.prototype.changeManualMode = function changeManualMode() {
-            localStorage.setItem('manualMode', this.manualMode);
-        };
-
-        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
-            localStorage.setItem('unassignedOnly', this.unassignedOnly);
-        };
-
-        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
-            localStorage.setItem('roundTo10', this.roundTo10);
-        };
-
-        Assignments.prototype.customerAction = function customerAction() {
-            this.message = {
-                customerMessage: ""
-            };
-
-            this.customerMessage = true;
-            (0, _jquery2.default)("#customerMessage").focus();
-        };
-
-        Assignments.prototype.sendCustomerAction = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var msg, productName, serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                msg = (0, _jquery2.default)("#customerMessage").val();
-
-                                if (!msg) {
-                                    _context8.next = 8;
-                                    break;
-                                }
-
-                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
-
-                                this.message = {
-                                    id: this.requests.selectedRequestDetail._id,
-                                    customerMessage: msg,
-                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
-                                    toEmail: this.people.selectedPerson.email,
-                                    product: productName,
-                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
-                                    audit: {
-                                        property: 'Send Message',
-                                        eventDate: new Date(),
-                                        oldValue: this.customerMessageText,
-                                        personId: this.app.user._id
-                                    }
-                                };
-                                _context8.next = 6;
-                                return this.requests.sendCustomerMessage(this.message);
-
-                            case 6:
-                                serverResponse = _context8.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("The message was sent");
-                                    this._cleanUp();
-                                }
-
-                            case 8:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function sendCustomerAction() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return sendCustomerAction;
-        }();
-
-        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
-            this.customerMessage = false;
-        };
-
-        Assignments.prototype.openSettings = function openSettings() {
-            this.showSettings = !this.showSettings;
-            if (this.showSettings) {
-                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
-            }
-        };
-
-        Assignments.prototype.saveSettings = function saveSettings() {
-            localStorage.setItem('idBuffer', this.idBuffer);
-            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
-            this.showSettings = false;
-        };
-
-        Assignments.prototype.restoreDefaults = function restoreDefaults() {
-            this.idBuffer = this.config.REGULAR_ID_BUFFER;
-            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
-        };
-
-        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
-            this.facultyDetails = !this.facultyDetails;
-        };
-
-        Assignments.prototype._setUpValidation = function _setUpValidation() {
-            this.validation.addRule(1, "errorRange", [{ "rule": "custom", "message": "Invalid ID range",
-                "valFunction": function valFunction(context) {
-                    var valid = true;
-                    for (var i = 0; i < context.assignmentDetails.length; i++) {
-                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
-                    }
-                    return valid;
-                } }]);
-        };
-
-        Assignments.prototype.openAudit = function openAudit() {
-            this.showAudit = !this.showAudit;
-        };
-
-        return Assignments;
-    }()) || _class);
-});
-define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _moment) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ArchiveHelpTickets = undefined;
-
-  var _validation2 = _interopRequireDefault(_validation);
-
-  var _moment2 = _interopRequireDefault(_moment);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _asyncToGenerator(fn) {
-    return function () {
-      var gen = fn.apply(this, arguments);
-      return new Promise(function (resolve, reject) {
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            return Promise.resolve(value).then(function (value) {
-              step("next", value);
-            }, function (err) {
-              step("throw", err);
-            });
-          }
-        }
-
-        return step("next");
-      });
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var ArchiveHelpTickets = exports.ArchiveHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products), _dec(_class = function () {
-    function ArchiveHelpTickets(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
-      _classCallCheck(this, ArchiveHelpTickets);
-
-      this.helpTicketSelected = false;
-      this.enterResponse = false;
-      this.navControl = "supportNavButtons";
-      this.spinnerHTML = "";
-      this.filterValues = new Array();
-
-      this.router = router;
-      this.config = config;
-      this.validation = validation;
-      this.validation.initialize(this);
-      this.people = people;
-      this.dataTable = datatable;
-      this.dataTable.initialize(this);
-      this.utils = utils;
-      this.helpTickets = helpTickets;
-      this.sessions = sessions;
-      this.apps = apps;
-      this.products = products;
-    }
-
-    ArchiveHelpTickets.prototype.activate = function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        var responses;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|gt|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray(true, '?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray(true, '?order=lastName&fields=firstName lastName email phone fullName'), this.config.getConfig()]);
-
-              case 2:
-                responses = _context.sent;
-
-                this.dataTable.updateArray(this.helpTickets.helpTicketArray);
-                this.dataTable.createPageButtons(1);
-                this._setUpValidation();
-
-              case 6:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function activate() {
-        return _ref.apply(this, arguments);
-      }
-
-      return activate;
-    }();
-
-    ArchiveHelpTickets.prototype.attached = function attached() {
-      $("#helpTicketStatus").val(this.config.NEW_HELPTICKET_STATUS).change();
-    };
-
-    ArchiveHelpTickets.prototype.refresh = function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                this._cleanUpFilters();
-                this.spinnerHTML = "";
-
-              case 4:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function refresh() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return refresh;
-    }();
-
-    ArchiveHelpTickets.prototype.selectHelpTicket = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-                this.helpTickets.selectHelpTicket(this.editIndex);
-
-                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-                  _context3.next = 5;
-                  break;
-                }
-
-                _context3.next = 5;
-                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
-
-              case 5:
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = $(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-                this.helpTicketSelected = true;
-
-                this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
-
-              case 10:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function selectHelpTicket(_x, _x2) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return selectHelpTicket;
-    }();
-
-    ArchiveHelpTickets.prototype.updateKeywords = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-        var serverResponse;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return this.helpTickets.updateKeywords();
-
-              case 2:
-                serverResponse = _context4.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-                }
-                this._cleanUp();
-
-              case 5:
-              case 'end':
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function updateKeywords() {
-        return _ref4.apply(this, arguments);
-      }
-
-      return updateKeywords;
-    }();
-
-    ArchiveHelpTickets.prototype.own = function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-        var obj, serverResponse;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                if (!this.validation.validate(9, this)) {
-                  _context5.next = 7;
-                  break;
-                }
-
-                obj = {
-                  personId: this.app.user._id
-                };
-                _context5.next = 4;
-                return this.helpTickets.updateOwner(obj);
-
-              case 4:
-                serverResponse = _context5.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-                }
-                this._cleanUp();
-
-              case 7:
-              case 'end':
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function own() {
-        return _ref5.apply(this, arguments);
-      }
-
-      return own;
-    }();
-
-    ArchiveHelpTickets.prototype._cleanUp = function _cleanUp() {
-      this.enterResponse = false;
-    };
-
-    ArchiveHelpTickets.prototype.changeFiles = function changeFiles() {
-      var foo = "";
-      for (var i = 0; i < this.files.length; i++) {
-        foo += this.files[i].name;
-        if (i < this.files.length - 1) foo += ", ";
-      }
-      this.filesSelected = foo;
-    };
-
-    ArchiveHelpTickets.prototype.back = function back() {
-      this.helpTicketSelected = false;
-    };
-
-    ArchiveHelpTickets.prototype._setUpValidation = function _setUpValidation() {
-      this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
-      this.validation.addRule("00", "client", [{
-        "rule": "required", "message": "You must select a client",
-        "valFunction": function valFunction(context) {
-          return context.helpTicket.clientId !== undefined;
-        }
-      }]);
-      this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
-      this.validation.addRule("01", "client", [{
-        "rule": "required", "message": "You must enter the passwords to reset",
-        "valFunction": function valFunction(context) {
-          return context.helpTicket.clientId !== undefined;
-        }
-      }]);
-      this.validation.addRule("02", "application", [{
-        "rule": "required", "message": "You must select the application",
-        "valFunction": function valFunction(context) {
-          return context.content.application !== undefined;
-        }
-      }]);
-      this.validation.addRule("9", "owner", [{
-        "rule": "required", "message": "You are already the owner",
-        "valFunction": function valFunction(context) {
-          return context.helpTickets.selectedHelpTicket.owner[0].personId !== context.app.user._id;
-        }
-      }]);
-    };
-
-    ArchiveHelpTickets.prototype._cleanUpFilters = function _cleanUpFilters() {
-      $("#type").val("");
-      $("#status").val("");
-      $("#personStatus").val("");
-    };
-
-    return ArchiveHelpTickets;
-  }()) || _class);
-});
-define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/data/downloads', '../../../resources/data/products', '../../../resources/data/systems', '../../../resources/data/helpTickets', '../../../resources/data/clientRequests', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/dialogs/common-dialogs', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _downloads, _products, _systems, _helpTickets, _clientRequests, _people, _validation, _dataTable, _appConfig, _commonDialogs, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.CreateHelpTickets = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var CreateHelpTickets = exports.CreateHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _downloads.Downloads, _helpTickets.HelpTickets, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _people.People, _clientRequests.ClientRequests, _products.Products, _systems.Systems), _dec(_class = function () {
-        function CreateHelpTickets(router, sessions, apps, helpTickets, validation, utils, datatable, config, dialog, people, clientRequests, products, systems) {
-            _classCallCheck(this, CreateHelpTickets);
-
-            this.showInfoBox = false;
-            this.courseSelected = false;
-            this.spinnerHTML = "";
-            this.removedFiles = new Array();
-            this.showAdditionalInfo = false;
-
-            this.router = router;
-            this.sessions = sessions;
-            this.apps = apps;
-            this.helpTickets = helpTickets;
-            this.people = people;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.dialog = dialog;
-            this.clientRequests = clientRequests;
-            this.products = products;
-            this.systems = systems;
-
-            this._setupValidation();
-        }
-
-        CreateHelpTickets.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        CreateHelpTickets.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        CreateHelpTickets.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate:DSC'), this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name'), this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name'), this.systems.getSystemsArray(true), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.selectedInstitutions = this.people.institutionsArray;
-                                this.helpTickets.selectHelpTicket();
-                                this._hideTypes();
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        CreateHelpTickets.prototype._hideTypes = function _hideTypes() {
-            for (var i = 0; i < this.config.HELP_TICKET_TYPES.length; i++) {
-                this.config.HELP_TICKET_TYPES[i].show = false;
-            }
-        };
-
-        CreateHelpTickets.prototype.sessionChanged = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(el) {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.clearTables();
-                                _context2.next = 3;
-                                return this.clientRequests.getPersonSesssionClientRequestsArray(this.editPerson, this.helpTickets.selectedHelpTicket.sessionId);
-
-                            case 3:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function sessionChanged(_x) {
-                return _ref2.apply(this, arguments);
-            }
-
-            return sessionChanged;
-        }();
-
-        CreateHelpTickets.prototype.changeInstitution = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.showPeople = true;
-                                _context3.next = 3;
-                                return this.people.getPeopleArray(true, '?filter=institutionId|eq|' + this.editInstitution + '&order=lastName');
-
-                            case 3:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function changeInstitution() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return changeInstitution;
-        }();
-
-        CreateHelpTickets.prototype.typeChanged = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el) {
-                var index;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                this._hideTypes();
-                                this.clearTables();
-
-                                if (!this.helpTickets.selectedHelpTicket.helpTicketType) {
-                                    _context4.next = 17;
-                                    break;
-                                }
-
-                                index = parseInt(this.helpTickets.selectedHelpTicket.helpTicketType) - 1;
-
-                                this.config.HELP_TICKET_TYPES[index].show = true;
-
-                                if (!(this.config.HELP_TICKET_TYPES[index].appsRequired || !this.config.HELP_TICKET_TYPES[index].clientRequired)) {
-                                    _context4.next = 11;
-                                    break;
-                                }
-
-                                _context4.next = 8;
-                                return this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name');
-
-                            case 8:
-                                this.showAdditionalInfo = true;
-                                _context4.next = 17;
-                                break;
-
-                            case 11:
-                                _context4.next = 13;
-                                return this.products.getProductsArray(true, '?fields=_id name');
-
-                            case 13:
-                                if (!this.config.HELP_TICKET_TYPES[index].clientRequired) {
-                                    _context4.next = 16;
-                                    break;
-                                }
-
-                                _context4.next = 16;
-                                return this.refreshCourses();
-
-                            case 16:
-                                this.showAdditionalInfo = false;
-
-                            case 17:
-                                console.log(this.showAdditionalInfo);
-
-                            case 18:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function typeChanged(_x2) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        CreateHelpTickets.prototype.changePerson = function changePerson($event) {
-            this.showSession = true;
-        };
-
-        CreateHelpTickets.prototype.requestChosen = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(el, product) {
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                this.showAdditionalInfo = true;
-
-                                this.clientRequest = product;
-
-                                if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
-                                this.selectedProductRow = (0, _jquery2.default)(el.target).closest('tr');
-                                this.selectedProductRow.children().addClass('info');
-
-                            case 5:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function requestChosen(_x3, _x4) {
-                return _ref5.apply(this, arguments);
-            }
-
-            return requestChosen;
-        }();
-
-        CreateHelpTickets.prototype.cancel = function cancel() {
-            this.helpTickets.selectHelpTicket();
-            this.showAdditionalInfo = false;
-        };
-
-        CreateHelpTickets.prototype.buldHelpTicket = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                this.helpTickets.selectedHelpTicket.owner = [{ "personId": this.userObj._id, "date": new Date() }];
-                                this.helpTickets.selectedHelpTicket.personId = this.editPerson;
-
-                                if (!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired) {
-                                    this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';
-                                } else {
-                                    this.helpTickets.selectedHelpTicketContent.requestId = this.clientRequest._id;
-                                    this.helpTickets.selectedHelpTicketContent.systemId = this.clientRequest.systemId;
-                                    this.helpTickets.selectedHelpTicketContent.clientId = this.clientRequest.clientId;
-                                }
-
-                                this.helpTickets.selectedHelpTicketContent.personId = this.editPerson;
-                                this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;
-
-                                this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
-
-                            case 6:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function buldHelpTicket() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return buldHelpTicket;
-        }();
-
-        CreateHelpTickets.prototype.save = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                if (!this.validation.validate(this.helpTickets.selectedHelpTicket.helpTicketType, this)) {
-                                    _context7.next = 8;
-                                    break;
-                                }
-
-                                _context7.next = 3;
-                                return this.buldHelpTicket();
-
-                            case 3:
-                                _context7.next = 5;
-                                return this.helpTickets.saveHelpTicket();
-
-                            case 5:
-                                serverResponse = _context7.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("The help ticket was created");
-                                    if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse.content[0]._id);
-                                }
-                                this._cleanUp();
-
-                            case 8:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function save() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
-            this.showAdditionalInfo = false;
-            this.showPeople = false;
-            this.showSession = false;
-            (0, _jquery2.default)("#institution").val("").change();
-            this.helpTickets.selectHelpTicket();
-            this.clearTables();
-            this.filesSelected = "";
-        };
-
-        CreateHelpTickets.prototype.clearTables = function clearTables() {
-            if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('rowSelected');
-            if (this.selectedProductRow) this.selectedProductRow.children().removeClass('rowSelected');
-        };
-
-        CreateHelpTickets.prototype.uploadFiles = function uploadFiles() {
-            this.helpTickets.uploadFile(this.files);
-        };
-
-        CreateHelpTickets.prototype.changeFiles = function changeFiles() {
-            this.filesSelected = "";
-            this.selectedFiles = new Array();
-            for (var i = 0; i < this.files.length; i++) {
-                this.selectedFiles.push(this.files[i].name);
-                this.filesSelected += this.files[i].name + " ";
-            }
-        };
-
-        CreateHelpTickets.prototype.openEditCourseForm = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (this.showCourses) {
-                                    _context8.next = 3;
-                                    break;
-                                }
-
-                                _context8.next = 3;
-                                return this.refreshCourses();
-
-                            case 3:
-                                this.showCourses = !this.showCourses;
-
-                            case 4:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function openEditCourseForm() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return openEditCourseForm;
-        }();
-
-        CreateHelpTickets.prototype.refreshCourses = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                _context9.next = 2;
-                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.editPerson + '&order=number');
-
-                            case 2:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-
-            function refreshCourses() {
-                return _ref9.apply(this, arguments);
-            }
-
-            return refreshCourses;
-        }();
-
-        CreateHelpTickets.prototype.selectCourse = function selectCourse(index, el) {
-            var _this = this;
-
-            if (index === this.config.SANDBOX_ID) {
-                this.helpTickets.selectedHelpTicket.courseId = this.config.SANDBOX_ID;
-            } else {
-                this.editCourseIndex = index;
-
-                this.people.selectCourse(this.editCourseIndex);
-                this.helpTickets.selectedHelpTicket.courseId = this.people.selectedCourse._id;
-
-                if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
-                this.selectedCourseRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedCourseRow.children().addClass('info');
-            }
-
-            var myArray = this.clientRequests.requestsArray.filter(function (item) {
-                return item.courseId == _this.helpTickets.selectedHelpTicket.courseId;
-            });
-
-            if (myArray.length > 0) {
-                this.clientRequestsArray = new Array();
-                myArray[0].requestDetails.forEach(function (item) {
-                    if (item.assignments.length > 0) {
-                        item.assignments.forEach(function (assign) {
-                            _this.clientRequestsArray.push({
-                                productId: item.productId,
-                                requestStatus: item.requestStatus,
-                                systemId: assign.systemId,
-                                client: assign.client,
-                                clientId: assign.clientId,
-                                _id: item._id
-                            });
-                        });
-                    } else {
-                        _this.clientRequestsArray.push({
-                            productId: item.productId,
-                            requestStatus: item.requestStatus
-                        });
-                    }
-                });
-            }
-        };
-
-        CreateHelpTickets.prototype.editACourse = function editACourse(index, el) {
-            if (this.people.selectedCourse) {
-                (0, _jquery2.default)("#number").focus();
-                this.courseSelected = true;
-            }
-        };
-
-        CreateHelpTickets.prototype.newCourse = function newCourse() {
-            this.editCourseIndex = -1;
-            this.people.selectCourse();
-            (0, _jquery2.default)("#number").focus();
-            this.courseSelected = true;
-        };
-
-        CreateHelpTickets.prototype.saveCourse = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
-                    while (1) {
-                        switch (_context10.prev = _context10.next) {
-                            case 0:
-                                if (!this.validation.validate(99, this)) {
-                                    _context10.next = 8;
-                                    break;
-                                }
-
-                                if (!this.userObj._id) {
-                                    _context10.next = 8;
-                                    break;
-                                }
-
-                                this.people.selectedCourse.personId = this.userObj._id;
-                                _context10.next = 5;
-                                return this.people.saveCourse();
-
-                            case 5:
-                                serverResponse = _context10.sent;
-
-                                if (!serverResponse.status) {
-                                    this.utils.showNotification("The course was updated");
-                                }
-                                this.courseSelected = false;
-
-                            case 8:
-                            case 'end':
-                                return _context10.stop();
-                        }
-                    }
-                }, _callee10, this);
-            }));
-
-            function saveCourse() {
-                return _ref10.apply(this, arguments);
-            }
-
-            return saveCourse;
-        }();
-
-        CreateHelpTickets.prototype.cancelEditCourse = function cancelEditCourse() {
-            this.courseSelected = false;
-        };
-
-        CreateHelpTickets.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[0].code, "curriculumTitle", [{ "rule": "required", "message": "Curriculum title is required", "value": "helpTickets.selectedHelpTicketContent.content.curriculumTitle" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[1].code, "resetPasswordUserIDs", [{ "rule": "required", "message": "The user IDs to reset are required", "value": "helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[2].code, "application", [{ "rule": "required", "message": "Choose an application", "value": "helpTickets.selectedHelpTicketContent.content.applicationId" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[3].code, "descriptionID", [{ "rule": "required", "message": "Enter a description", "value": "helpTickets.selectedHelpTicketContent.content.comments" }]);
-            this.validation.addRule(99, "number", [{ "rule": "required", "message": "Course number is required", "value": "people.selectedCourse.number" }]);
-            this.validation.addRule(99, "name", [{ "rule": "required", "message": "Course name is required", "value": "people.selectedCourse.name" }]);
-        };
-
-        return CreateHelpTickets;
-    }()) || _class);
-});
-define('modules/tech/support/support',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Support = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Support = exports.Support = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function Support(router) {
-            _classCallCheck(this, Support);
-
-            this.router = router;
-        }
-
-        Support.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'viewHelpTickets'],
-                moduleId: './viewHelpTickets',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'viewHelpTickets',
-                title: 'View Help Tickets'
-            }, {
-                route: 'createHelpTickets',
-                moduleId: './createHelpTickets',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'createHelpTickets',
-                title: 'Create Help Tickets'
-            }, {
-                route: 'archiveHelpTickets',
-                moduleId: './archiveHelpTickets',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'archiveHelpTickets',
-                title: 'Help Tickets Archive'
-            }]);
-
-            this.router = router;
-        };
-
-        return Support;
-    }()) || _class);
-});
-define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/dialogs/common-dialogs', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _commonDialogs, _moment, _jquery) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ViewHelpTickets = undefined;
-
-  var _validation2 = _interopRequireDefault(_validation);
-
-  var _moment2 = _interopRequireDefault(_moment);
-
-  var _jquery2 = _interopRequireDefault(_jquery);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _asyncToGenerator(fn) {
-    return function () {
-      var gen = fn.apply(this, arguments);
-      return new Promise(function (resolve, reject) {
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            return Promise.resolve(value).then(function (value) {
-              step("next", value);
-            }, function (err) {
-              step("throw", err);
-            });
-          }
-        }
-
-        return step("next");
-      });
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products), _dec(_class = function () {
-    function ViewHelpTickets(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
-      _classCallCheck(this, ViewHelpTickets);
-
-      this.helpTicketSelected = false;
-      this.enterResponse = false;
-      this.sendEmail = false;
-      this.navControl = "supportNavButtons";
-      this.spinnerHTML = "";
-      this.filterValues = new Array();
-      this.responseContent = "";
-
-      this.router = router;
-      this.config = config;
-      this.validation = validation;
-      this.validation.initialize(this);
-      this.people = people;
-      this.dataTable = datatable;
-      this.dataTable.initialize(this);
-      this.utils = utils;
-      this.helpTickets = helpTickets;
-      this.sessions = sessions;
-      this.apps = apps;
-      this.products = products;
-    }
-
-    ViewHelpTickets.prototype.canActivate = function canActivate() {
-      this.userObj = JSON.parse(sessionStorage.getItem('user'));
-    };
-
-    ViewHelpTickets.prototype.activate = function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        var responses;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray(true, '?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray(true, '?order=lastName&fields=firstName lastName email phone fullName roles'), this.config.getConfig()]);
-
-              case 2:
-                responses = _context.sent;
-
-                this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-
-                this.dataTable.createPageButtons(1);
-                this._setUpValidation();
-
-              case 6:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function activate() {
-        return _ref.apply(this, arguments);
-      }
-
-      return activate;
-    }();
-
-    ViewHelpTickets.prototype.attached = function attached() {
-      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-    };
-
-    ViewHelpTickets.prototype.refresh = function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                this.spinnerHTML = "";
-
-              case 3:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function refresh() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return refresh;
-    }();
-
-    ViewHelpTickets.prototype.selectHelpTicket = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-                this.helpTickets.selectHelpTicket(this.editIndex);
-
-                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-                  _context3.next = 5;
-                  break;
-                }
-
-                _context3.next = 5;
-                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
-
-              case 5:
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
-                this.helpTicketSelected = true;
-
-                this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
-
-              case 10:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function selectHelpTicket(_x, _x2) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return selectHelpTicket;
-    }();
-
-    ViewHelpTickets.prototype.respond = function respond() {
-      this.helpTickets.selectHelpTicketContent();
-      this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
-      this.responseContent = "";
-      this.enterResponse = true;
-      this.enableButton = true;
-    };
-
-    ViewHelpTickets.prototype.cancelResponse = function cancelResponse() {
-      this.response = new Object();
-      this.isUnchanged = true;
-      this.enterResponse = false;
-    };
-
-    ViewHelpTickets.prototype._createResponse = function _createResponse() {
-      this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
-      this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
-      this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
-    };
-
-    ViewHelpTickets.prototype.saveResponse = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-        var serverResponse, obj;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                this._createResponse();
-                _context4.next = 3;
-                return this.helpTickets.saveHelpTicketResponse();
-
-              case 3:
-                serverResponse = _context4.sent;
-
-                if (!serverResponse.status) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                  if (this.sendEmail) {
-                    obj = {
-                      id: this.helpTickets.selectedHelpTicket._id,
-                      audit: {
-                        property: 'Send Response Message',
-                        eventDate: new Date(),
-                        oldValue: "",
-                        personId: this.userObj._id
-                      }
-                    };
-
-                    this.helpTickets.sendMail(obj);
-                  }
-                  this.utils.showNotification("The help ticket was updated");
-                  if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
-                }
-                this._cleanUp();
-
-              case 6:
-              case 'end':
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function saveResponse() {
-        return _ref4.apply(this, arguments);
-      }
-
-      return saveResponse;
-    }();
-
-    ViewHelpTickets.prototype.updateStatus = function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-        var serverResponse;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.next = 2;
-                return this.helpTickets.updateStatus();
-
-              case 2:
-                serverResponse = _context5.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 5:
-              case 'end':
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function updateStatus() {
-        return _ref5.apply(this, arguments);
-      }
-
-      return updateStatus;
-    }();
-
-    ViewHelpTickets.prototype.updateKeywords = function () {
-      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-        var serverResponse;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
-                return this.helpTickets.updateKeywords();
-
-              case 2:
-                serverResponse = _context6.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 5:
-              case 'end':
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function updateKeywords() {
-        return _ref6.apply(this, arguments);
-      }
-
-      return updateKeywords;
-    }();
-
-    ViewHelpTickets.prototype.own = function () {
-      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-        var obj, serverResponse;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                if (!this.validation.validate(9, this)) {
-                  _context7.next = 7;
-                  break;
-                }
-
-                obj = {
-                  personId: this.userObj._id
-                };
-                _context7.next = 4;
-                return this.helpTickets.updateOwner(obj);
-
-              case 4:
-                serverResponse = _context7.sent;
-
-                if (!serverResponse.error) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 7:
-              case 'end':
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function own() {
-        return _ref7.apply(this, arguments);
-      }
-
-      return own;
-    }();
-
-    ViewHelpTickets.prototype._cleanUp = function _cleanUp() {
-      this.enterResponse = false;
-      this.files = new Array();
-      this.filesSelected = "";
-    };
-
-    ViewHelpTickets.prototype.changeFiles = function changeFiles() {
-      var foo = "";
-      for (var i = 0; i < this.files.length; i++) {
-        foo += this.files[i].name;
-        if (i < this.files.length - 1) foo += ", ";
-      }
-      this.filesSelected = foo;
-    };
-
-    ViewHelpTickets.prototype.back = function back() {
-      this.helpTicketSelected = false;
-    };
-
-    ViewHelpTickets.prototype._setUpValidation = function _setUpValidation() {
-      this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
-      this.validation.addRule("00", "client", [{ "rule": "custom", "message": "You must select a client",
-        "valFunction": function valFunction(context) {
-          return context.helpTicket.clientId !== undefined;
-        } }]);
-      this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
-      this.validation.addRule("01", "client", [{ "rule": "custom", "message": "You must enter the passwords to reset",
-        "valFunction": function valFunction(context) {
-          return context.helpTicket.clientId !== undefined;
-        } }]);
-      this.validation.addRule("02", "application", [{ "rule": "custom", "message": "You must select the application",
-        "valFunction": function valFunction(context) {
-          return context.content.application !== undefined;
-        } }]);
-      this.validation.addRule("9", "owner", [{ "rule": "custom", "message": "You are already the owner",
-        "valFunction": function valFunction(context) {
-          return context.helpTickets.selectedHelpTicket.owner[0].personId !== context.userObj._id;
-        } }]);
-    };
-
-    ViewHelpTickets.prototype._cleanUpFilters = function _cleanUpFilters() {
-      (0, _jquery2.default)("#helpTicketType").val("");
-      (0, _jquery2.default)("#helpTicketStatus").val("");
-    };
-
-    ViewHelpTickets.prototype.checkSendMail = function checkSendMail() {
-      this.sendMail = !this.sendMail;
-    };
-
-    return ViewHelpTickets;
-  }()) || _class);
 });
 define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
     'use strict';
@@ -19363,6 +17056,2343 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
       return changeTab;
     }();
+
+    return ViewHelpTickets;
+  }()) || _class);
+});
+define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _validation, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Assignments = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Assignments = exports.Assignments = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function Assignments(router, config, validation, people, dialog, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, Assignments);
+
+            this.requestSelected = false;
+            this.showAddStudentTemplate = false;
+            this.manualMode = false;
+            this.roundTo10 = false;
+            this.showAudit = false;
+            this.lastIDidsRemaining = -1;
+            this.navControl = "requestsNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.config = config;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+            this.dialog = dialog;
+        }
+
+        Assignments.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Assignments.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        Assignments.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray(true, '?order=lastName'), this.people.getInstitutionsArray(true, '?order=name'), this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(true), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.manualMode = localStorage.getItem('manualMode') ? localStorage.getItem('manualMode') == "true" : false;
+                                this.unassignedOnly = localStorage.getItem('unassignedOnly') ? localStorage.getItem('unassignedOnly') == "true" : false;
+                                this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
+                                this._setUpValidation();
+
+                            case 7:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Assignments.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 4:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
+                                    this.dataTable.createPageButtons(1);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.displayArray = new Array();
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        Assignments.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+
+            this.enableButton = false;
+            this.requestSelected = true;
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.requests.selectRequestDetail(this.editIndex);
+            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+
+            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+            if (!this.products.selectedProduct.systems[0]) {
+                this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
+            }
+
+            this.clientRequired();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        Assignments.prototype.clientRequired = function clientRequired() {
+            this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
+            this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+            this.lastFirstID = this.firstID;
+            this.firstAllowableID = this.firstID;
+            this.firstNumericFacID = this.firstID;
+            this.lastNumericFacID = this.firstNumericFacID + this.numberOfFacIDs - 1;
+
+            this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
+            this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
+            if (this.products.selectedProduct.systems[0]) {
+                this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
+                (0, _jquery2.default)('#systemSelect option:eq(1)').attr('selected', 'true');
+            }
+            this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
+            this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.idBuffer = 0;
+                this.numberOfIds = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+                this.sandBoxOnly = true;
+            } else {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds) + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates) + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
+                this.sandBoxOnly = false;
+            }
+
+            if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
+                this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
+                this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
+                this.idsRemaining = this.idsRequired;
+                this.existingRequest = false;
+                this.totalIdsAssigned = 0;
+                this.idsAssigned = 0;
+                this.assignmentDetails = new Array();
+            } else {
+                this.existingRequest = true;
+                this.unassignedOnly = false;
+                this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
+                this.idsRequired = parseInt(this.numberOfIds);
+                this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
+                this.totalIdsAssigned = this.idsAssigned;
+                this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
+                this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
+                this.findAssignedClients();
+            }
+
+            this.assignmentDetailIndex = -1;
+
+            this.calcLastID();
+        };
+
+        Assignments.prototype.selectClient = function selectClient(index, client, el) {
+            if (this.idsRemaining > 0) {
+                if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
+                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
+                    return;
+                }
+
+                if (this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
+
+                this.proposedClient.push(client);
+
+                this.lastFirstID = this.firstID;
+
+                this.calcLastID();
+
+                this.assignmentDetails.push({
+                    staffId: this.userObj._id,
+
+                    client: client.client,
+                    clientId: client._id,
+                    systemId: client.systemId,
+                    firstID: this.firstID,
+                    lastID: this.lastID,
+                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
+                });
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
+                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
+
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+
+                if (this.studentIDTemplates.length) {
+                    this.calcAssignment();
+                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
+                }
+
+                this.clientSelected = true;
+                this.enableButton = true;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.calcLastID = function calcLastID() {
+            if (this.idsRemaining > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            } else {
+                this.lastID = parseInt(this.firstID) + parseInt(this.idsRemaining);
+            }
+
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.calcAssignment = function calcAssignment() {
+            this.calcIDRangeFromTemplate();
+            this.calculatePasswords();
+        };
+
+        Assignments.prototype.calcIDRangeFromTemplate = function calcIDRangeFromTemplate() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+            } else {
+                var selectedStudentIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedStudentIDTemplates.push(this.studentIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedStudentIDTemplates.push(this.studentIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+                for (var i = 0; i < selectedStudentIDTemplates.length; i++) {
+                    var firstStudentId = this.getID(selectedStudentIDTemplates[i], this.firstID);
+                    var lastStudentId = this.getID(selectedStudentIDTemplates[i], this.lastID);
+                    this.assignmentDetails[this.assignmentDetailIndex].studentUserIds += firstStudentId + " to " + lastStudentId + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length - 1);
+                this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex], this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger';
+                if (this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid((0, _jquery2.default)("#errorRange"));
+            }
+
+            this.calcFacIDRangeFromTemplate();
+        };
+
+        Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
+            if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+            } else {
+                var selectedFacultyIDTemplates = new Array();
+                if (this.selectedStudentIDTemplate.length == 0) {
+                    selectedFacultyIDTemplates.push(this.facultyIDTemplates[0]);
+                } else {
+                    for (var k = 0; k < this.selectedStudentIDTemplate.length; k++) {
+                        selectedFacultyIDTemplate.push(this.facultyIDTemplates[parseInt(this.selectedFacultyIDTemplate[k])]);
+                    }
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+                for (var i = 0; i < selectedFacultyIDTemplates.length; i++) {
+                    var firstFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
+                    var lastFacID = this.getID(selectedFacultyIDTemplates[i], this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
+                }
+
+                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0, this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length - 1);
+            }
+        };
+
+        Assignments.prototype.getID = function getID(idPrefix, id) {
+            if (idPrefix) {
+                var len = idPrefix.lastIndexOf(this.config.ID_WILDCARD) - idPrefix.indexOf(this.config.ID_WILDCARD) + 1;
+                var prefix = "000".substr(0, len - id.toString().length);
+                return idPrefix.substr(0, idPrefix.indexOf(this.config.ID_WILDCARD)) + prefix + id;
+            }
+            return "";
+        };
+
+        Assignments.prototype.calculatePasswords = function calculatePasswords() {
+            if (this.manualMode || this.assignmentDetailIndex == -1) {
+                return;
+            }
+
+            if (this.assignmentDetails.length > 0) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.assignmentDetails[0].facultyPassword;
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.assignmentDetails[0].studentPassword;
+            }
+            var random;
+            var prefix;
+            var len;
+
+            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                prefix = "9" + "000".substr(0, len - 1);
+                random = Math.floor(Math.random() * parseInt(prefix));
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
+            }
+
+            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+                this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
+            } else {
+                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                    len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
+                    prefix = "9" + "000".substr(0, len - 1);
+                    random = Math.floor(Math.random() * parseInt(prefix));
+                    this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
+                }
+            }
+        };
+
+        Assignments.prototype.firstIDChanged = function firstIDChanged() {
+            if (this.firstID < this.firstAllowableID) this.firstID = this.firstAllowableID;
+            if (parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID) > this.lastIDAvailable) {
+                this.firstID = this.lastFirstID;
+                return;
+            }
+
+            this.lastID = parseInt(this.lastID) + parseInt(this.firstID) - parseInt(this.lastFirstID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.calcIDRangeFromTemplate();
+            }
+
+            this.lastFirstID = this.firstID;
+        };
+
+        Assignments.prototype.lastIDChanged = function lastIDChanged() {
+            if (this.lastID > this.lastIDAvailable) {
+                this.lastID = this.lastIDAvailable;
+            }
+
+            this.idsRequired = parseInt(this.idsRequired) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+            if (this.assignmentDetailIndex > -1) {
+                this.assignmentDetails[this.assignmentDetailIndex].idsAssigned = parseInt(this.assignmentDetails[this.assignmentDetailIndex].idsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.oldLastID);
+
+                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+
+                this.calcIDRangeFromTemplate();
+            } else {
+                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.lastID) - parseInt(this.oldLastID);
+            }
+            this.oldLastID = this.lastID;
+        };
+
+        Assignments.prototype.lastFacIDChanged = function lastFacIDChanged() {
+            this.numberOfFacIDs = parseInt(this.lastNumericFacID) - parseInt(this.firstNumericFacID) + 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = parseInt(this.lastNumericFacID);
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = parseInt(this.lastNumericFacID);
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.firstFacIDChanged = function firstFacIDChanged() {
+            this.lastNumericFacID = parseInt(this.firstNumericFacID) + parseInt(this.numberOfFacIDs) - 1;
+            if (this.assignmentDetailIndex > -1) {
+                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+                this.calcFacIDRangeFromTemplate();
+            }
+        };
+
+        Assignments.prototype.selectProposedClient = function selectProposedClient(index, el) {
+            this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
+            if (this.assignmentDetailIndex == -1) {
+                this.selectedAssignedClient = "";
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            } else {
+                this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
+
+                this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
+                this.lastID = this.assignmentDetails[this.assignmentDetailIndex].lastID;
+                this.proposedClient[this.assignmentDetailIndex].lastIdAssigned = this.lastID;
+                this.firstNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].firstFacID;
+                this.lastNumericFacID = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.assignmentDetails[this.assignmentDetailIndex].lastFacID;
+                this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
+                this.oldLastID = this.lastID;
+                this.lastFirstID = this.firstID;
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+            }
+        };
+
+        Assignments.prototype.deleteProposedClient = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!this.assignmentDetails[index].assignedDate) {
+                                    _context4.next = 4;
+                                    break;
+                                }
+
+                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).then(function (response) {
+                                    if (!response.wasCancelled) {
+                                        _this.deleteSaved(index);
+                                    }
+                                }));
+
+                            case 4:
+                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.assignmentDetailIndex = -1;
+
+                                this.assignmentDetails.splice(index, 1);
+                                this.proposedClient.splice(index, 1);
+
+                            case 9:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function deleteProposedClient(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return deleteProposedClient;
+        }();
+
+        Assignments.prototype.deleteSaved = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(index) {
+                var i, request, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                this.proposedClient[index].idsAvailable = parseInt(this.proposedClient[index].idsAvailable) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
+                                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
+
+                                i = 0;
+
+                            case 4:
+                                if (!(i < this.proposedClient[index].assignments.length)) {
+                                    _context5.next = 12;
+                                    break;
+                                }
+
+                                if (!(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id)) {
+                                    _context5.next = 9;
+                                    break;
+                                }
+
+                                this.proposedClient[index].assignments.splice(i, 1);
+                                if (this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+                                return _context5.abrupt('break', 12);
+
+                            case 9:
+                                i++;
+                                _context5.next = 4;
+                                break;
+
+                            case 12:
+                                this.systems.updateClient(this.proposedClient[index]);
+                                this.assignmentDetails.splice(index, 1);
+                                if (this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
+
+                                this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+                                this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+                                this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+                                this.requestToSave.requestDetailsToSave = new Array();
+                                request = this.utils.copyObject(this.requests.selectedRequestDetail);
+
+                                delete request['requestId'];
+                                this.requestToSave.requestDetailsToSave.push(request);
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context5.next = 25;
+                                return this.requests.saveRequest();
+
+                            case 25:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.status) {
+                                    _context5.next = 30;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The assignment was deleted", "", "", "", "", 5);
+                                _context5.next = 30;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 30:
+                                this.selectedAssignedClient = "";
+
+                            case 31:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteSaved(_x2) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteSaved;
+        }();
+
+        Assignments.prototype.save = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                if (!this._buildRequest()) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.requests.setSelectedRequest(this.requestToSave);
+                                _context6.next = 5;
+                                return this.requests.saveRequest();
+
+                            case 5:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.status) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                this.utils.showNotification("The request was updated", "", "", "", "", 5);
+                                _context6.next = 10;
+                                return this.systems.saveClients(this.proposedClient);
+
+                            case 10:
+                                this._cleanUp();
+
+                            case 11:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Assignments.prototype._buildRequest = function _buildRequest() {
+            if (this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+                for (var i = 0; i < this.assignmentDetails.length; i++) {
+                    for (var j = 0; j < this.proposedClient.length; j++) {
+                        var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
+                        var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
+                        if (this.assignmentDetails[i].clientId == this.proposedClient[j]._id) {
+                            if (this.assignmentDetails[i].assignedDate) {
+                                for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
+                                    if (this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id) {
+                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
+                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
+                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
+                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
+                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                        this.systems.updateClient(this.proposedClient[j]);
+                                    }
+                                }
+                            } else {
+                                this.assignmentDetails[i].assignedDate = new Date();
+                                this.requests.selectedRequestDetail.assignedDate = new Date();
+                                if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                                var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
+                                this.proposedClient[i].assignments.push({
+                                    assignment: this.requests.selectedRequestDetail._id,
+                                    studentIDRange: this.assignmentDetails[i].studentUserIds,
+                                    facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                                    firstID: this.assignmentDetails[i].firstID,
+                                    lastID: this.assignmentDetails[i].lastID
+                                });
+                                this.systems.updateClient(this.proposedClient[i]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (this.provisionalAssignment) {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
+                } else {
+                    this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
+                }
+
+                for (var i = 0; i < this.proposedClient.length; i++) {
+                    this.assignmentDetails[i].assignedDate = new Date();
+                    this.assignmentDetails[i].modifiedDate = new Date();
+                    if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                    if (this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
+                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                    this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
+                    this.proposedClient[i].assignments.push({
+                        assignment: this.requests.selectedRequestDetail._id,
+                        studentIDRange: this.assignmentDetails[i].studentUserIds,
+                        facultyIDRange: this.assignmentDetails[i].facultyUserIds,
+                        institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                        firstID: this.assignmentDetails[i].firstID,
+                        lastID: this.assignmentDetails[i].lastID,
+                        assignedDate: new Date()
+                    });
+                    this.systems.updateClient(this.proposedClient[i]);
+                };
+            }
+
+            this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+            this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
+            this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+            this.requestToSave.audit.push({
+                property: 'Assigned',
+                eventDate: new Date(),
+                personId: this.userObj._id
+            });
+            this.requestToSave.requestDetailsToSave = new Array();
+            var request = this.utils.copyObject(this.requests.selectedRequestDetail);
+            delete request['requestId'];
+            this.requestToSave.requestDetailsToSave.push(request);
+
+            return true;
+        };
+
+        Assignments.prototype.validateIDRange = function validateIDRange(client, assignment, id) {
+            if (!client.assignments || client.assignments.length == 0) return true;
+            var valid = true;
+            var x1 = parseInt(assignment.firstID);
+            var x2 = parseInt(assignment.lastID);
+            for (var i = 0; i < client.assignments.length; i++) {
+                if (this.existingRequest && client.assignments[i].assignment == id) {
+                    continue;
+                } else {
+                    var y1 = parseInt(client.assignments[i].firstID);
+                    var y2 = parseInt(client.assignments[i].lastID);
+                    if (!(x2 < y1 || x1 > y2)) valid = false;
+                }
+            }
+            return valid;
+        };
+
+        Assignments.prototype.back = function back() {
+            this._cleanUp();
+        };
+
+        Assignments.prototype._cleanUp = function _cleanUp() {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+            this.proposedAssignment = new Object();
+            this.parameterIndex = new Object();
+            this.systems.selectSystem();
+            this.selectedAssignedClient = "";
+            this.firstID = 0;
+            this.lastID = 0;
+            this.requestSelected = false;
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.findAssignedClients = function findAssignedClients() {
+            var _this2 = this;
+
+            this.assignmentDetails.forEach(function (item) {
+                _this2.systems.selectClientFromID(item.systemId, item.clientId);
+                _this2.proposedClient.push(_this2.systems.selectedClient);
+            });
+        };
+
+        Assignments.prototype.systemSelected = function systemSelected() {
+            this.systems.selectedSystemFromId((0, _jquery2.default)("#systemSelect").val());
+            if (!this.products.selectedProduct.clientRelevant) {
+                this.calcAssignment();
+            }
+        };
+
+        Assignments.prototype.openEditStudentTemplate = function openEditStudentTemplate() {
+            this.showAddStudentTemplate = true;
+        };
+
+        Assignments.prototype.cancelEditStudentTemplate = function cancelEditStudentTemplate() {
+            this.showAddStudentTemplate = false;
+        };
+
+        Assignments.prototype.saveStudentTemplate = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                _context7.next = 2;
+                                return this.products.saveProduct();
+
+                            case 2:
+                                this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
+                                this.showAddStudentTemplate = false;
+
+                            case 4:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function saveStudentTemplate() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return saveStudentTemplate;
+        }();
+
+        Assignments.prototype.changeManualMode = function changeManualMode() {
+            localStorage.setItem('manualMode', this.manualMode);
+        };
+
+        Assignments.prototype.changeUnassignedOnly = function changeUnassignedOnly() {
+            localStorage.setItem('unassignedOnly', this.unassignedOnly);
+        };
+
+        Assignments.prototype.changeRoundTo10 = function changeRoundTo10() {
+            localStorage.setItem('roundTo10', this.roundTo10);
+        };
+
+        Assignments.prototype.customerAction = function customerAction() {
+            this.message = {
+                customerMessage: ""
+            };
+
+            this.customerMessage = true;
+            (0, _jquery2.default)("#customerMessage").focus();
+        };
+
+        Assignments.prototype.sendCustomerAction = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                var msg, productName, serverResponse;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                msg = (0, _jquery2.default)("#customerMessage").val();
+
+                                if (!msg) {
+                                    _context8.next = 8;
+                                    break;
+                                }
+
+                                productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+
+                                this.message = {
+                                    id: this.requests.selectedRequestDetail._id,
+                                    customerMessage: msg,
+                                    requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                                    toEmail: this.people.selectedPerson.email,
+                                    product: productName,
+                                    session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+                                    audit: {
+                                        property: 'Send Message',
+                                        eventDate: new Date(),
+                                        oldValue: this.customerMessageText,
+                                        personId: this.app.user._id
+                                    }
+                                };
+                                _context8.next = 6;
+                                return this.requests.sendCustomerMessage(this.message);
+
+                            case 6:
+                                serverResponse = _context8.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The message was sent");
+                                    this._cleanUp();
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function sendCustomerAction() {
+                return _ref8.apply(this, arguments);
+            }
+
+            return sendCustomerAction;
+        }();
+
+        Assignments.prototype.cancelCustomerAction = function cancelCustomerAction() {
+            this.customerMessage = false;
+        };
+
+        Assignments.prototype.openSettings = function openSettings() {
+            this.showSettings = !this.showSettings;
+            if (this.showSettings) {
+                this.idBuffer = localStorage.getItem('idBuffer') ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
+                this.sandBoxIDs = localStorage.getItem('sandBoxIDs') ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
+            }
+        };
+
+        Assignments.prototype.saveSettings = function saveSettings() {
+            localStorage.setItem('idBuffer', this.idBuffer);
+            localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
+            this.showSettings = false;
+        };
+
+        Assignments.prototype.restoreDefaults = function restoreDefaults() {
+            this.idBuffer = this.config.REGULAR_ID_BUFFER;
+            this.sandBoxIDs = this.config.SANDBOX_ID_COUNT;
+        };
+
+        Assignments.prototype.openFacultyDetails = function openFacultyDetails() {
+            this.facultyDetails = !this.facultyDetails;
+        };
+
+        Assignments.prototype._setUpValidation = function _setUpValidation() {
+            this.validation.addRule(1, "errorRange", [{ "rule": "custom", "message": "Invalid ID range",
+                "valFunction": function valFunction(context) {
+                    var valid = true;
+                    for (var i = 0; i < context.assignmentDetails.length; i++) {
+                        if (context.assignmentDetails[i].notValid == 'danger') valid = false;
+                    }
+                    return valid;
+                } }]);
+        };
+
+        Assignments.prototype.openAudit = function openAudit() {
+            this.showAudit = !this.showAudit;
+        };
+
+        return Assignments;
+    }()) || _class);
+});
+define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _moment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ArchiveHelpTickets = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var ArchiveHelpTickets = exports.ArchiveHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products), _dec(_class = function () {
+    function ArchiveHelpTickets(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
+      _classCallCheck(this, ArchiveHelpTickets);
+
+      this.helpTicketSelected = false;
+      this.enterResponse = false;
+      this.navControl = "supportNavButtons";
+      this.spinnerHTML = "";
+      this.filterValues = new Array();
+
+      this.router = router;
+      this.config = config;
+      this.validation = validation;
+      this.validation.initialize(this);
+      this.people = people;
+      this.dataTable = datatable;
+      this.dataTable.initialize(this);
+      this.utils = utils;
+      this.helpTickets = helpTickets;
+      this.sessions = sessions;
+      this.apps = apps;
+      this.products = products;
+    }
+
+    ArchiveHelpTickets.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        var responses;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return Promise.all([this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|gt|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray(true, '?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray(true, '?order=lastName&fields=firstName lastName email phone fullName'), this.config.getConfig()]);
+
+              case 2:
+                responses = _context.sent;
+
+                this.dataTable.updateArray(this.helpTickets.helpTicketArray);
+                this.dataTable.createPageButtons(1);
+                this._setUpValidation();
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    ArchiveHelpTickets.prototype.attached = function attached() {
+      $("#helpTicketStatus").val(this.config.NEW_HELPTICKET_STATUS).change();
+    };
+
+    ArchiveHelpTickets.prototype.refresh = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                this._cleanUpFilters();
+                this.spinnerHTML = "";
+
+              case 4:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function refresh() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return refresh;
+    }();
+
+    ArchiveHelpTickets.prototype.selectHelpTicket = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+                this.helpTickets.selectHelpTicket(this.editIndex);
+
+                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                _context3.next = 5;
+                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
+
+              case 5:
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = $(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+                this.helpTicketSelected = true;
+
+                this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+
+              case 10:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function selectHelpTicket(_x, _x2) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return selectHelpTicket;
+    }();
+
+    ArchiveHelpTickets.prototype.updateKeywords = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var serverResponse;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return this.helpTickets.updateKeywords();
+
+              case 2:
+                serverResponse = _context4.sent;
+
+                if (!serverResponse.status) {
+                  this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+                }
+                this._cleanUp();
+
+              case 5:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function updateKeywords() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return updateKeywords;
+    }();
+
+    ArchiveHelpTickets.prototype.own = function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        var obj, serverResponse;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                if (!this.validation.validate(9, this)) {
+                  _context5.next = 7;
+                  break;
+                }
+
+                obj = {
+                  personId: this.app.user._id
+                };
+                _context5.next = 4;
+                return this.helpTickets.updateOwner(obj);
+
+              case 4:
+                serverResponse = _context5.sent;
+
+                if (!serverResponse.status) {
+                  this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
+                }
+                this._cleanUp();
+
+              case 7:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function own() {
+        return _ref5.apply(this, arguments);
+      }
+
+      return own;
+    }();
+
+    ArchiveHelpTickets.prototype._cleanUp = function _cleanUp() {
+      this.enterResponse = false;
+    };
+
+    ArchiveHelpTickets.prototype.changeFiles = function changeFiles() {
+      var foo = "";
+      for (var i = 0; i < this.files.length; i++) {
+        foo += this.files[i].name;
+        if (i < this.files.length - 1) foo += ", ";
+      }
+      this.filesSelected = foo;
+    };
+
+    ArchiveHelpTickets.prototype.back = function back() {
+      this.helpTicketSelected = false;
+    };
+
+    ArchiveHelpTickets.prototype._setUpValidation = function _setUpValidation() {
+      this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
+      this.validation.addRule("00", "client", [{
+        "rule": "required", "message": "You must select a client",
+        "valFunction": function valFunction(context) {
+          return context.helpTicket.clientId !== undefined;
+        }
+      }]);
+      this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
+      this.validation.addRule("01", "client", [{
+        "rule": "required", "message": "You must enter the passwords to reset",
+        "valFunction": function valFunction(context) {
+          return context.helpTicket.clientId !== undefined;
+        }
+      }]);
+      this.validation.addRule("02", "application", [{
+        "rule": "required", "message": "You must select the application",
+        "valFunction": function valFunction(context) {
+          return context.content.application !== undefined;
+        }
+      }]);
+      this.validation.addRule("9", "owner", [{
+        "rule": "required", "message": "You are already the owner",
+        "valFunction": function valFunction(context) {
+          return context.helpTickets.selectedHelpTicket.owner[0].personId !== context.app.user._id;
+        }
+      }]);
+    };
+
+    ArchiveHelpTickets.prototype._cleanUpFilters = function _cleanUpFilters() {
+      $("#type").val("");
+      $("#status").val("");
+      $("#personStatus").val("");
+    };
+
+    return ArchiveHelpTickets;
+  }()) || _class);
+});
+define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/data/downloads', '../../../resources/data/products', '../../../resources/data/systems', '../../../resources/data/helpTickets', '../../../resources/data/clientRequests', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/dialogs/common-dialogs', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _downloads, _products, _systems, _helpTickets, _clientRequests, _people, _validation, _dataTable, _appConfig, _commonDialogs, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.CreateHelpTickets = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var CreateHelpTickets = exports.CreateHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _downloads.Downloads, _helpTickets.HelpTickets, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _people.People, _clientRequests.ClientRequests, _products.Products, _systems.Systems), _dec(_class = function () {
+        function CreateHelpTickets(router, sessions, apps, helpTickets, validation, utils, datatable, config, dialog, people, clientRequests, products, systems) {
+            _classCallCheck(this, CreateHelpTickets);
+
+            this.showInfoBox = false;
+            this.courseSelected = false;
+            this.spinnerHTML = "";
+            this.removedFiles = new Array();
+            this.showAdditionalInfo = false;
+
+            this.router = router;
+            this.sessions = sessions;
+            this.apps = apps;
+            this.helpTickets = helpTickets;
+            this.people = people;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.clientRequests = clientRequests;
+            this.products = products;
+            this.systems = systems;
+
+            this._setupValidation();
+        }
+
+        CreateHelpTickets.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        CreateHelpTickets.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        CreateHelpTickets.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate:DSC'), this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name'), this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name'), this.systems.getSystemsArray(true), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.selectedInstitutions = this.people.institutionsArray;
+                                this.helpTickets.selectHelpTicket();
+                                this._hideTypes();
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        CreateHelpTickets.prototype._hideTypes = function _hideTypes() {
+            for (var i = 0; i < this.config.HELP_TICKET_TYPES.length; i++) {
+                this.config.HELP_TICKET_TYPES[i].show = false;
+            }
+        };
+
+        CreateHelpTickets.prototype.sessionChanged = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(el) {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.clearTables();
+                                _context2.next = 3;
+                                return this.clientRequests.getPersonSesssionClientRequestsArray(this.editPerson, this.helpTickets.selectedHelpTicket.sessionId);
+
+                            case 3:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function sessionChanged(_x) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return sessionChanged;
+        }();
+
+        CreateHelpTickets.prototype.changeInstitution = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.showPeople = true;
+                                _context3.next = 3;
+                                return this.people.getPeopleArray(true, '?filter=institutionId|eq|' + this.editInstitution + '&order=lastName');
+
+                            case 3:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function changeInstitution() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return changeInstitution;
+        }();
+
+        CreateHelpTickets.prototype.typeChanged = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el) {
+                var index;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this._hideTypes();
+                                this.clearTables();
+
+                                if (!this.helpTickets.selectedHelpTicket.helpTicketType) {
+                                    _context4.next = 17;
+                                    break;
+                                }
+
+                                index = parseInt(this.helpTickets.selectedHelpTicket.helpTicketType) - 1;
+
+                                this.config.HELP_TICKET_TYPES[index].show = true;
+
+                                if (!(this.config.HELP_TICKET_TYPES[index].appsRequired || !this.config.HELP_TICKET_TYPES[index].clientRequired)) {
+                                    _context4.next = 11;
+                                    break;
+                                }
+
+                                _context4.next = 8;
+                                return this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name');
+
+                            case 8:
+                                this.showAdditionalInfo = true;
+                                _context4.next = 17;
+                                break;
+
+                            case 11:
+                                _context4.next = 13;
+                                return this.products.getProductsArray(true, '?fields=_id name');
+
+                            case 13:
+                                if (!this.config.HELP_TICKET_TYPES[index].clientRequired) {
+                                    _context4.next = 16;
+                                    break;
+                                }
+
+                                _context4.next = 16;
+                                return this.refreshCourses();
+
+                            case 16:
+                                this.showAdditionalInfo = false;
+
+                            case 17:
+                                console.log(this.showAdditionalInfo);
+
+                            case 18:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function typeChanged(_x2) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        CreateHelpTickets.prototype.changePerson = function changePerson($event) {
+            this.showSession = true;
+        };
+
+        CreateHelpTickets.prototype.requestChosen = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(el, product) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                this.showAdditionalInfo = true;
+
+                                this.clientRequest = product;
+
+                                if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
+                                this.selectedProductRow = (0, _jquery2.default)(el.target).closest('tr');
+                                this.selectedProductRow.children().addClass('info');
+
+                            case 5:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function requestChosen(_x3, _x4) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return requestChosen;
+        }();
+
+        CreateHelpTickets.prototype.cancel = function cancel() {
+            this.helpTickets.selectHelpTicket();
+            this.showAdditionalInfo = false;
+        };
+
+        CreateHelpTickets.prototype.buldHelpTicket = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                this.helpTickets.selectedHelpTicket.owner = [{ "personId": this.userObj._id, "date": new Date() }];
+                                this.helpTickets.selectedHelpTicket.personId = this.editPerson;
+
+                                if (!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired) {
+                                    this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';
+                                } else {
+                                    this.helpTickets.selectedHelpTicketContent.requestId = this.clientRequest._id;
+                                    this.helpTickets.selectedHelpTicketContent.systemId = this.clientRequest.systemId;
+                                    this.helpTickets.selectedHelpTicketContent.clientId = this.clientRequest.clientId;
+                                }
+
+                                this.helpTickets.selectedHelpTicketContent.personId = this.editPerson;
+                                this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;
+
+                                this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
+
+                            case 6:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function buldHelpTicket() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return buldHelpTicket;
+        }();
+
+        CreateHelpTickets.prototype.save = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (!this.validation.validate(this.helpTickets.selectedHelpTicket.helpTicketType, this)) {
+                                    _context7.next = 8;
+                                    break;
+                                }
+
+                                _context7.next = 3;
+                                return this.buldHelpTicket();
+
+                            case 3:
+                                _context7.next = 5;
+                                return this.helpTickets.saveHelpTicket();
+
+                            case 5:
+                                serverResponse = _context7.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The help ticket was created");
+                                    if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse.content[0]._id);
+                                }
+                                this._cleanUp();
+
+                            case 8:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function save() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
+            this.showAdditionalInfo = false;
+            this.showPeople = false;
+            this.showSession = false;
+            (0, _jquery2.default)("#institution").val("").change();
+            this.helpTickets.selectHelpTicket();
+            this.clearTables();
+            this.filesSelected = "";
+        };
+
+        CreateHelpTickets.prototype.clearTables = function clearTables() {
+            if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('rowSelected');
+            if (this.selectedProductRow) this.selectedProductRow.children().removeClass('rowSelected');
+        };
+
+        CreateHelpTickets.prototype.uploadFiles = function uploadFiles() {
+            this.helpTickets.uploadFile(this.files);
+        };
+
+        CreateHelpTickets.prototype.changeFiles = function changeFiles() {
+            this.filesSelected = "";
+            this.selectedFiles = new Array();
+            for (var i = 0; i < this.files.length; i++) {
+                this.selectedFiles.push(this.files[i].name);
+                this.filesSelected += this.files[i].name + " ";
+            }
+        };
+
+        CreateHelpTickets.prototype.openEditCourseForm = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                if (this.showCourses) {
+                                    _context8.next = 3;
+                                    break;
+                                }
+
+                                _context8.next = 3;
+                                return this.refreshCourses();
+
+                            case 3:
+                                this.showCourses = !this.showCourses;
+
+                            case 4:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function openEditCourseForm() {
+                return _ref8.apply(this, arguments);
+            }
+
+            return openEditCourseForm;
+        }();
+
+        CreateHelpTickets.prototype.refreshCourses = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                _context9.next = 2;
+                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.editPerson + '&order=number');
+
+                            case 2:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function refreshCourses() {
+                return _ref9.apply(this, arguments);
+            }
+
+            return refreshCourses;
+        }();
+
+        CreateHelpTickets.prototype.selectCourse = function selectCourse(index, el) {
+            var _this = this;
+
+            if (index === this.config.SANDBOX_ID) {
+                this.helpTickets.selectedHelpTicket.courseId = this.config.SANDBOX_ID;
+            } else {
+                this.editCourseIndex = index;
+
+                this.people.selectCourse(this.editCourseIndex);
+                this.helpTickets.selectedHelpTicket.courseId = this.people.selectedCourse._id;
+
+                if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
+                this.selectedCourseRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedCourseRow.children().addClass('info');
+            }
+
+            var myArray = this.clientRequests.requestsArray.filter(function (item) {
+                return item.courseId == _this.helpTickets.selectedHelpTicket.courseId;
+            });
+
+            if (myArray.length > 0) {
+                this.clientRequestsArray = new Array();
+                myArray[0].requestDetails.forEach(function (item) {
+                    if (item.assignments.length > 0) {
+                        item.assignments.forEach(function (assign) {
+                            _this.clientRequestsArray.push({
+                                productId: item.productId,
+                                requestStatus: item.requestStatus,
+                                systemId: assign.systemId,
+                                client: assign.client,
+                                clientId: assign.clientId,
+                                _id: item._id
+                            });
+                        });
+                    } else {
+                        _this.clientRequestsArray.push({
+                            productId: item.productId,
+                            requestStatus: item.requestStatus
+                        });
+                    }
+                });
+            }
+        };
+
+        CreateHelpTickets.prototype.editACourse = function editACourse(index, el) {
+            if (this.people.selectedCourse) {
+                (0, _jquery2.default)("#number").focus();
+                this.courseSelected = true;
+            }
+        };
+
+        CreateHelpTickets.prototype.newCourse = function newCourse() {
+            this.editCourseIndex = -1;
+            this.people.selectCourse();
+            (0, _jquery2.default)("#number").focus();
+            this.courseSelected = true;
+        };
+
+        CreateHelpTickets.prototype.saveCourse = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                if (!this.validation.validate(99, this)) {
+                                    _context10.next = 8;
+                                    break;
+                                }
+
+                                if (!this.userObj._id) {
+                                    _context10.next = 8;
+                                    break;
+                                }
+
+                                this.people.selectedCourse.personId = this.userObj._id;
+                                _context10.next = 5;
+                                return this.people.saveCourse();
+
+                            case 5:
+                                serverResponse = _context10.sent;
+
+                                if (!serverResponse.status) {
+                                    this.utils.showNotification("The course was updated");
+                                }
+                                this.courseSelected = false;
+
+                            case 8:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this);
+            }));
+
+            function saveCourse() {
+                return _ref10.apply(this, arguments);
+            }
+
+            return saveCourse;
+        }();
+
+        CreateHelpTickets.prototype.cancelEditCourse = function cancelEditCourse() {
+            this.courseSelected = false;
+        };
+
+        CreateHelpTickets.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(this.config.HELP_TICKET_TYPES[0].code, "curriculumTitle", [{ "rule": "required", "message": "Curriculum title is required", "value": "helpTickets.selectedHelpTicketContent.content.curriculumTitle" }]);
+            this.validation.addRule(this.config.HELP_TICKET_TYPES[1].code, "resetPasswordUserIDs", [{ "rule": "required", "message": "The user IDs to reset are required", "value": "helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs" }]);
+            this.validation.addRule(this.config.HELP_TICKET_TYPES[2].code, "application", [{ "rule": "required", "message": "Choose an application", "value": "helpTickets.selectedHelpTicketContent.content.applicationId" }]);
+            this.validation.addRule(this.config.HELP_TICKET_TYPES[3].code, "descriptionID", [{ "rule": "required", "message": "Enter a description", "value": "helpTickets.selectedHelpTicketContent.content.comments" }]);
+            this.validation.addRule(99, "number", [{ "rule": "required", "message": "Course number is required", "value": "people.selectedCourse.number" }]);
+            this.validation.addRule(99, "name", [{ "rule": "required", "message": "Course name is required", "value": "people.selectedCourse.name" }]);
+        };
+
+        return CreateHelpTickets;
+    }()) || _class);
+});
+define('modules/tech/support/support',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Support = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Support = exports.Support = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function Support(router) {
+            _classCallCheck(this, Support);
+
+            this.router = router;
+        }
+
+        Support.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'viewHelpTickets'],
+                moduleId: './viewHelpTickets',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'viewHelpTickets',
+                title: 'View Help Tickets'
+            }, {
+                route: 'createHelpTickets',
+                moduleId: './createHelpTickets',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'createHelpTickets',
+                title: 'Create Help Tickets'
+            }, {
+                route: 'archiveHelpTickets',
+                moduleId: './archiveHelpTickets',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'archiveHelpTickets',
+                title: 'Help Tickets Archive'
+            }]);
+
+            this.router = router;
+        };
+
+        return Support;
+    }()) || _class);
+});
+define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/dialogs/common-dialogs', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _commonDialogs, _moment, _jquery) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ViewHelpTickets = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  var _jquery2 = _interopRequireDefault(_jquery);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products), _dec(_class = function () {
+    function ViewHelpTickets(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
+      _classCallCheck(this, ViewHelpTickets);
+
+      this.helpTicketSelected = false;
+      this.enterResponse = false;
+      this.sendEmail = false;
+      this.navControl = "supportNavButtons";
+      this.spinnerHTML = "";
+      this.filterValues = new Array();
+      this.responseContent = "";
+
+      this.router = router;
+      this.config = config;
+      this.validation = validation;
+      this.validation.initialize(this);
+      this.people = people;
+      this.dataTable = datatable;
+      this.dataTable.initialize(this);
+      this.utils = utils;
+      this.helpTickets = helpTickets;
+      this.sessions = sessions;
+      this.apps = apps;
+      this.products = products;
+    }
+
+    ViewHelpTickets.prototype.canActivate = function canActivate() {
+      this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    };
+
+    ViewHelpTickets.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        var responses;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return Promise.all([this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray(true, '?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray(true, '?order=lastName&fields=firstName lastName email phone fullName roles'), this.config.getConfig()]);
+
+              case 2:
+                responses = _context.sent;
+
+                this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+
+                this.dataTable.createPageButtons(1);
+                this._setUpValidation();
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    ViewHelpTickets.prototype.attached = function attached() {
+      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+    };
+
+    ViewHelpTickets.prototype.refresh = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                this.spinnerHTML = "";
+
+              case 3:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function refresh() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return refresh;
+    }();
+
+    ViewHelpTickets.prototype.selectHelpTicket = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+                this.helpTickets.selectHelpTicket(this.editIndex);
+
+                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                _context3.next = 5;
+                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
+
+              case 5:
+
+                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                this.selectedRow.children().addClass('info');
+                this.helpTicketSelected = true;
+
+                this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+
+              case 10:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function selectHelpTicket(_x, _x2) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return selectHelpTicket;
+    }();
+
+    ViewHelpTickets.prototype.respond = function respond() {
+      this.helpTickets.selectHelpTicketContent();
+      this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
+      this.responseContent = "";
+      this.enterResponse = true;
+      this.enableButton = true;
+    };
+
+    ViewHelpTickets.prototype.cancelResponse = function cancelResponse() {
+      this.response = new Object();
+      this.isUnchanged = true;
+      this.enterResponse = false;
+    };
+
+    ViewHelpTickets.prototype._createResponse = function _createResponse() {
+      this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
+      this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
+      this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
+    };
+
+    ViewHelpTickets.prototype.saveResponse = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var serverResponse, obj;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this._createResponse();
+                _context4.next = 3;
+                return this.helpTickets.saveHelpTicketResponse();
+
+              case 3:
+                serverResponse = _context4.sent;
+
+                if (!serverResponse.status) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  if (this.sendEmail) {
+                    obj = {
+                      id: this.helpTickets.selectedHelpTicket._id,
+                      audit: {
+                        property: 'Send Response Message',
+                        eventDate: new Date(),
+                        oldValue: "",
+                        personId: this.userObj._id
+                      }
+                    };
+
+                    this.helpTickets.sendMail(obj);
+                  }
+                  this.utils.showNotification("The help ticket was updated");
+                  if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
+                }
+                this._cleanUp();
+
+              case 6:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function saveResponse() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return saveResponse;
+    }();
+
+    ViewHelpTickets.prototype.updateStatus = function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        var serverResponse;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return this.helpTickets.updateStatus();
+
+              case 2:
+                serverResponse = _context5.sent;
+
+                if (!serverResponse.status) {
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                this._cleanUp();
+
+              case 5:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function updateStatus() {
+        return _ref5.apply(this, arguments);
+      }
+
+      return updateStatus;
+    }();
+
+    ViewHelpTickets.prototype.updateKeywords = function () {
+      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+        var serverResponse;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this.helpTickets.updateKeywords();
+
+              case 2:
+                serverResponse = _context6.sent;
+
+                if (!serverResponse.status) {
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                this._cleanUp();
+
+              case 5:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function updateKeywords() {
+        return _ref6.apply(this, arguments);
+      }
+
+      return updateKeywords;
+    }();
+
+    ViewHelpTickets.prototype.own = function () {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        var obj, serverResponse;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                if (!this.validation.validate(9, this)) {
+                  _context7.next = 7;
+                  break;
+                }
+
+                obj = {
+                  personId: this.userObj._id
+                };
+                _context7.next = 4;
+                return this.helpTickets.updateOwner(obj);
+
+              case 4:
+                serverResponse = _context7.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                this._cleanUp();
+
+              case 7:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function own() {
+        return _ref7.apply(this, arguments);
+      }
+
+      return own;
+    }();
+
+    ViewHelpTickets.prototype._cleanUp = function _cleanUp() {
+      this.enterResponse = false;
+      this.files = new Array();
+      this.filesSelected = "";
+    };
+
+    ViewHelpTickets.prototype.changeFiles = function changeFiles() {
+      var foo = "";
+      for (var i = 0; i < this.files.length; i++) {
+        foo += this.files[i].name;
+        if (i < this.files.length - 1) foo += ", ";
+      }
+      this.filesSelected = foo;
+    };
+
+    ViewHelpTickets.prototype.back = function back() {
+      this.helpTicketSelected = false;
+    };
+
+    ViewHelpTickets.prototype._setUpValidation = function _setUpValidation() {
+      this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
+      this.validation.addRule("00", "client", [{ "rule": "custom", "message": "You must select a client",
+        "valFunction": function valFunction(context) {
+          return context.helpTicket.clientId !== undefined;
+        } }]);
+      this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
+      this.validation.addRule("01", "client", [{ "rule": "custom", "message": "You must enter the passwords to reset",
+        "valFunction": function valFunction(context) {
+          return context.helpTicket.clientId !== undefined;
+        } }]);
+      this.validation.addRule("02", "application", [{ "rule": "custom", "message": "You must select the application",
+        "valFunction": function valFunction(context) {
+          return context.content.application !== undefined;
+        } }]);
+      this.validation.addRule("9", "owner", [{ "rule": "custom", "message": "You are already the owner",
+        "valFunction": function valFunction(context) {
+          return context.helpTickets.selectedHelpTicket.owner[0].personId !== context.userObj._id;
+        } }]);
+    };
+
+    ViewHelpTickets.prototype._cleanUpFilters = function _cleanUpFilters() {
+      (0, _jquery2.default)("#helpTicketType").val("");
+      (0, _jquery2.default)("#helpTicketStatus").val("");
+    };
+
+    ViewHelpTickets.prototype.checkSendMail = function checkSendMail() {
+      this.sendMail = !this.sendMail;
+    };
 
     return ViewHelpTickets;
   }()) || _class);
@@ -26601,39 +26631,9 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
     }
   }
 });
-define('resources/value-converters/ucc-staff',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var UccStaffValueConverter = exports.UccStaffValueConverter = function () {
-    function UccStaffValueConverter() {
-      _classCallCheck(this, UccStaffValueConverter);
-    }
-
-    UccStaffValueConverter.prototype.toView = function toView(array) {
-      if (array) {
-        return array.filter(function (item) {
-          return item.roles.indexOf('UCCT') > -1;
-        });
-      }
-      return array;
-    };
-
-    return UccStaffValueConverter;
-  }();
-});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"resources/css/styles.css\"></require>\n  <require from=\"humane-js/themes/flatty.css\"></require>\n\n  <nav-bar></nav-bar>\n\n  <div class=\"page-host\">\n     <loading-indicator loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n  </div>\n   \n</template>"; });
-define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], function(module) { module.exports = "/*!\n * Datetimepicker for Bootstrap 3\n * version : 4.17.43\n * https://github.com/Eonasdan/bootstrap-datetimepicker/\n */.bootstrap-datetimepicker-widget{list-style:none}.bootstrap-datetimepicker-widget.dropdown-menu{margin:2px 0;padding:4px;width:19em}@media (min-width:768px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:992px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:1200px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}.bootstrap-datetimepicker-widget.dropdown-menu:before,.bootstrap-datetimepicker-widget.dropdown-menu:after{content:'';display:inline-block;position:absolute}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:before{border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #ccc;border-bottom-color:rgba(0,0,0,0.2);top:-7px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:after{border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid white;top:-6px;left:8px}.bootstrap-datetimepicker-widget.dropdown-menu.top:before{border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ccc;border-top-color:rgba(0,0,0,0.2);bottom:-7px;left:6px}.bootstrap-datetimepicker-widget.dropdown-menu.top:after{border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid white;bottom:-6px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before{left:auto;right:6px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after{left:auto;right:7px}.bootstrap-datetimepicker-widget .list-unstyled{margin:0}.bootstrap-datetimepicker-widget a[data-action]{padding:6px 0}.bootstrap-datetimepicker-widget a[data-action]:active{box-shadow:none}.bootstrap-datetimepicker-widget .timepicker-hour,.bootstrap-datetimepicker-widget .timepicker-minute,.bootstrap-datetimepicker-widget .timepicker-second{width:54px;font-weight:bold;font-size:1.2em;margin:0}.bootstrap-datetimepicker-widget button[data-action]{padding:6px}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"togglePeriod\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle AM/PM\"}.bootstrap-datetimepicker-widget .btn[data-action=\"clear\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Clear the picker\"}.bootstrap-datetimepicker-widget .btn[data-action=\"today\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Set the date to today\"}.bootstrap-datetimepicker-widget .picker-switch{text-align:center}.bootstrap-datetimepicker-widget .picker-switch::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle Date and Time Screens\"}.bootstrap-datetimepicker-widget .picker-switch td{padding:0;margin:0;height:auto;width:auto;line-height:inherit}.bootstrap-datetimepicker-widget .picker-switch td span{line-height:2.5;height:2.5em;width:100%}.bootstrap-datetimepicker-widget table{width:100%;margin:0}.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{text-align:center;border-radius:4px}.bootstrap-datetimepicker-widget table th{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table th.picker-switch{width:145px}.bootstrap-datetimepicker-widget table th.disabled,.bootstrap-datetimepicker-widget table th.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table th.prev::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Previous Month\"}.bootstrap-datetimepicker-widget table th.next::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Next Month\"}.bootstrap-datetimepicker-widget table thead tr:first-child th{cursor:pointer}.bootstrap-datetimepicker-widget table thead tr:first-child th:hover{background:#eee}.bootstrap-datetimepicker-widget table td{height:54px;line-height:54px;width:54px}.bootstrap-datetimepicker-widget table td.cw{font-size:.8em;height:20px;line-height:20px;color:#777}.bootstrap-datetimepicker-widget table td.day{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table td.hour:hover,.bootstrap-datetimepicker-widget table td.minute:hover,.bootstrap-datetimepicker-widget table td.second:hover{background:#eee;cursor:pointer}.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:#777}.bootstrap-datetimepicker-widget table td.today{position:relative}.bootstrap-datetimepicker-widget table td.today:before{content:'';display:inline-block;border:solid transparent;border-width:0 0 7px 7px;border-bottom-color:#337ab7;border-top-color:rgba(0,0,0,0.2);position:absolute;bottom:4px;right:4px}.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td.active.today:before{border-bottom-color:#fff}.bootstrap-datetimepicker-widget table td.disabled,.bootstrap-datetimepicker-widget table td.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table td span{display:inline-block;width:54px;height:54px;line-height:54px;margin:2px 1.5px;cursor:pointer;border-radius:4px}.bootstrap-datetimepicker-widget table td span:hover{background:#eee}.bootstrap-datetimepicker-widget table td span.active{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td span.old{color:#777}.bootstrap-datetimepicker-widget table td span.disabled,.bootstrap-datetimepicker-widget table td span.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget.usetwentyfour td.hour{height:27px;line-height:27px}.bootstrap-datetimepicker-widget.wider{width:21em}.bootstrap-datetimepicker-widget .datepicker-decades .decade{line-height:1.8em !important}.input-group.date .input-group-addon{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}"; });
+define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/analytics/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/requestsByInstitution.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <!--\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n                -->\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!resources/css/bootstrap.min.css', ['module'], function(module) { module.exports = "@import url(\"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700\");/*!\n * bootswatch v3.3.7\n * Homepage: http://bootswatch.com\n * Copyright 2012-2016 Thomas Park\n * Licensed under MIT\n * Based on Bootstrap\n*//*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}dfn{font-style:italic}h1{font-size:2em;margin:0.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace, monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=\"button\"],input[type=\"reset\"],input[type=\"submit\"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=\"checkbox\"],input[type=\"radio\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=\"number\"]::-webkit-inner-spin-button,input[type=\"number\"]::-webkit-outer-spin-button{height:auto}input[type=\"search\"]{-webkit-appearance:textfield;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}input[type=\"search\"]::-webkit-search-cancel-button,input[type=\"search\"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:0.35em 0.625em 0.75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:bold}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,*:before,*:after{background:transparent !important;color:#000 !important;-webkit-box-shadow:none !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}p,h2,h3{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000 !important}.label{border:1px solid #000}.table{border-collapse:collapse !important}.table td,.table th{background-color:#fff !important}.table-bordered th,.table-bordered td{border:1px solid #ddd !important}}@font-face{font-family:'Glyphicons Halflings';src:url('../fonts/glyphicons-halflings-regular.eot');src:url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'),url('../fonts/glyphicons-halflings-regular.woff') format('woff'),url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:normal;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-euro:before,.glyphicon-eur:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*:before,*:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;color:#222222;background-color:#ffffff}input,button,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#008cba;text-decoration:none}a:hover,a:focus{color:#008cba;text-decoration:underline}a:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.img-responsive,.thumbnail>img,.thumbnail a>img,.carousel-inner>.item>img,.carousel-inner>.item>a>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:0}.img-thumbnail{padding:4px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out;display:inline-block;max-width:100%;height:auto}.img-circle{border-radius:50%}hr{margin-top:21px;margin-bottom:21px;border:0;border-top:1px solid #dddddd}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=\"button\"]{cursor:pointer}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-weight:300;line-height:1.1;color:inherit}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small,.h1 small,.h2 small,.h3 small,.h4 small,.h5 small,.h6 small,h1 .small,h2 .small,h3 .small,h4 .small,h5 .small,h6 .small,.h1 .small,.h2 .small,.h3 .small,.h4 .small,.h5 .small,.h6 .small{font-weight:normal;line-height:1;color:#999999}h1,.h1,h2,.h2,h3,.h3{margin-top:21px;margin-bottom:10.5px}h1 small,.h1 small,h2 small,.h2 small,h3 small,.h3 small,h1 .small,.h1 .small,h2 .small,.h2 .small,h3 .small,.h3 .small{font-size:65%}h4,.h4,h5,.h5,h6,.h6{margin-top:10.5px;margin-bottom:10.5px}h4 small,.h4 small,h5 small,.h5 small,h6 small,.h6 small,h4 .small,.h4 .small,h5 .small,.h5 .small,h6 .small,.h6 .small{font-size:75%}h1,.h1{font-size:39px}h2,.h2{font-size:32px}h3,.h3{font-size:26px}h4,.h4{font-size:19px}h5,.h5{font-size:15px}h6,.h6{font-size:13px}p{margin:0 0 10.5px}.lead{margin-bottom:21px;font-size:17px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:22.5px}}small,.small{font-size:80%}mark,.mark{background-color:#fcf8e3;padding:.2em}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#999999}.text-primary{color:#008cba}a.text-primary:hover,a.text-primary:focus{color:#006687}.text-success{color:#43ac6a}a.text-success:hover,a.text-success:focus{color:#358753}.text-info{color:#5bc0de}a.text-info:hover,a.text-info:focus{color:#31b0d5}.text-warning{color:#e99002}a.text-warning:hover,a.text-warning:focus{color:#b67102}.text-danger{color:#f04124}a.text-danger:hover,a.text-danger:focus{color:#d32a0e}.bg-primary{color:#fff;background-color:#008cba}a.bg-primary:hover,a.bg-primary:focus{background-color:#006687}.bg-success{background-color:#dff0d8}a.bg-success:hover,a.bg-success:focus{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:hover,a.bg-info:focus{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:hover,a.bg-warning:focus{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:hover,a.bg-danger:focus{background-color:#e4b9b9}.page-header{padding-bottom:9.5px;margin:42px 0 21px;border-bottom:1px solid #dddddd}ul,ol{margin-top:0;margin-bottom:10.5px}ul ul,ol ul,ul ol,ol ol{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;list-style:none;margin-left:-5px}.list-inline>li{display:inline-block;padding-left:5px;padding-right:5px}dl{margin-top:0;margin-bottom:21px}dt,dd{line-height:1.4}dt{font-weight:bold}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[title],abbr[data-original-title]{cursor:help;border-bottom:1px dotted #999999}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10.5px 21px;margin:0 0 21px;font-size:18.75px;border-left:5px solid #dddddd}blockquote p:last-child,blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}blockquote footer,blockquote small,blockquote .small{display:block;font-size:80%;line-height:1.4;color:#6f6f6f}blockquote footer:before,blockquote small:before,blockquote .small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;border-right:5px solid #dddddd;border-left:0;text-align:right}.blockquote-reverse footer:before,blockquote.pull-right footer:before,.blockquote-reverse small:before,blockquote.pull-right small:before,.blockquote-reverse .small:before,blockquote.pull-right .small:before{content:''}.blockquote-reverse footer:after,blockquote.pull-right footer:after,.blockquote-reverse small:after,blockquote.pull-right small:after,.blockquote-reverse .small:after,blockquote.pull-right .small:after{content:'\\00A0 \\2014'}address{margin-bottom:21px;font-style:normal;line-height:1.4}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:0}kbd{padding:2px 4px;font-size:90%;color:#ffffff;background-color:#333333;border-radius:0;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25)}kbd kbd{padding:0;font-size:100%;font-weight:bold;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:10px;margin:0 0 10.5px;font-size:14px;line-height:1.4;word-break:break-all;word-wrap:break-word;color:#333333;background-color:#f5f5f5;border:1px solid #cccccc;border-radius:0}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}.row{margin-left:-15px;margin-right:-15px}.col-xs-1,.col-sm-1,.col-md-1,.col-lg-1,.col-xs-2,.col-sm-2,.col-md-2,.col-lg-2,.col-xs-3,.col-sm-3,.col-md-3,.col-lg-3,.col-xs-4,.col-sm-4,.col-md-4,.col-lg-4,.col-xs-5,.col-sm-5,.col-md-5,.col-lg-5,.col-xs-6,.col-sm-6,.col-md-6,.col-lg-6,.col-xs-7,.col-sm-7,.col-md-7,.col-lg-7,.col-xs-8,.col-sm-8,.col-md-8,.col-lg-8,.col-xs-9,.col-sm-9,.col-md-9,.col-lg-9,.col-xs-10,.col-sm-10,.col-md-10,.col-lg-10,.col-xs-11,.col-sm-11,.col-md-11,.col-lg-11,.col-xs-12,.col-sm-12,.col-md-12,.col-lg-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0%}@media (min-width:768px){.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0%}}@media (min-width:992px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0%}}@media (min-width:1200px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0%}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#999999;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:21px}.table>thead>tr>th,.table>tbody>tr>th,.table>tfoot>tr>th,.table>thead>tr>td,.table>tbody>tr>td,.table>tfoot>tr>td{padding:8px;line-height:1.4;vertical-align:top;border-top:1px solid #dddddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #dddddd}.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>th,.table>caption+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>td,.table>thead:first-child>tr:first-child>td{border-top:0}.table>tbody+tbody{border-top:2px solid #dddddd}.table .table{background-color:#ffffff}.table-condensed>thead>tr>th,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>tbody>tr>td,.table-condensed>tfoot>tr>td{padding:5px}.table-bordered{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>tbody>tr>td,.table-bordered>tfoot>tr>td{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>thead>tr>td{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=\"col-\"]{position:static;float:none;display:table-column}table td[class*=\"col-\"],table th[class*=\"col-\"]{position:static;float:none;display:table-cell}.table>thead>tr>td.active,.table>tbody>tr>td.active,.table>tfoot>tr>td.active,.table>thead>tr>th.active,.table>tbody>tr>th.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>tbody>tr.active>td,.table>tfoot>tr.active>td,.table>thead>tr.active>th,.table>tbody>tr.active>th,.table>tfoot>tr.active>th{background-color:#f5f5f5}.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover,.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr.active:hover>th{background-color:#e8e8e8}.table>thead>tr>td.success,.table>tbody>tr>td.success,.table>tfoot>tr>td.success,.table>thead>tr>th.success,.table>tbody>tr>th.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>tbody>tr.success>td,.table>tfoot>tr.success>td,.table>thead>tr.success>th,.table>tbody>tr.success>th,.table>tfoot>tr.success>th{background-color:#dff0d8}.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover,.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr.success:hover>th{background-color:#d0e9c6}.table>thead>tr>td.info,.table>tbody>tr>td.info,.table>tfoot>tr>td.info,.table>thead>tr>th.info,.table>tbody>tr>th.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>tbody>tr.info>td,.table>tfoot>tr.info>td,.table>thead>tr.info>th,.table>tbody>tr.info>th,.table>tfoot>tr.info>th{background-color:#d9edf7}.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover,.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr.info:hover>th{background-color:#c4e3f3}.table>thead>tr>td.warning,.table>tbody>tr>td.warning,.table>tfoot>tr>td.warning,.table>thead>tr>th.warning,.table>tbody>tr>th.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>tbody>tr.warning>td,.table>tfoot>tr.warning>td,.table>thead>tr.warning>th,.table>tbody>tr.warning>th,.table>tfoot>tr.warning>th{background-color:#fcf8e3}.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover,.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr.warning:hover>th{background-color:#faf2cc}.table>thead>tr>td.danger,.table>tbody>tr>td.danger,.table>tfoot>tr>td.danger,.table>thead>tr>th.danger,.table>tbody>tr>th.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>tbody>tr.danger>td,.table>tfoot>tr.danger>td,.table>thead>tr.danger>th,.table>tbody>tr.danger>th,.table>tfoot>tr.danger>th{background-color:#f2dede}.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover,.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr.danger:hover>th{background-color:#ebcccc}.table-responsive{overflow-x:auto;min-height:0.01%}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15.75px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #dddddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>thead>tr>th,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tfoot>tr>td{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>thead>tr>th:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.table-responsive>.table-bordered>thead>tr>th:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>th,.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>td{border-bottom:0}}fieldset{padding:0;margin:0;border:0;min-width:0}legend{display:block;width:100%;padding:0;margin-bottom:21px;font-size:22.5px;line-height:inherit;color:#333333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:bold}input[type=\"search\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=\"radio\"],input[type=\"checkbox\"]{margin:4px 0 0;margin-top:1px \\9;line-height:normal}input[type=\"file\"]{display:block}input[type=\"range\"]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=\"file\"]:focus,input[type=\"radio\"]:focus,input[type=\"checkbox\"]:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:9px;font-size:15px;line-height:1.4;color:#6f6f6f}.form-control{display:block;width:100%;height:39px;padding:8px 12px;font-size:15px;line-height:1.4;color:#6f6f6f;background-color:#ffffff;background-image:none;border:1px solid #cccccc;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6)}.form-control::-moz-placeholder{color:#999999;opacity:1}.form-control:-ms-input-placeholder{color:#999999}.form-control::-webkit-input-placeholder{color:#999999}.form-control::-ms-expand{border:0;background-color:transparent}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eeeeee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=\"search\"]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=\"date\"].form-control,input[type=\"time\"].form-control,input[type=\"datetime-local\"].form-control,input[type=\"month\"].form-control{line-height:39px}input[type=\"date\"].input-sm,input[type=\"time\"].input-sm,input[type=\"datetime-local\"].input-sm,input[type=\"month\"].input-sm,.input-group-sm input[type=\"date\"],.input-group-sm input[type=\"time\"],.input-group-sm input[type=\"datetime-local\"],.input-group-sm input[type=\"month\"]{line-height:36px}input[type=\"date\"].input-lg,input[type=\"time\"].input-lg,input[type=\"datetime-local\"].input-lg,input[type=\"month\"].input-lg,.input-group-lg input[type=\"date\"],.input-group-lg input[type=\"time\"],.input-group-lg input[type=\"datetime-local\"],.input-group-lg input[type=\"month\"]{line-height:60px}}.form-group{margin-bottom:15px}.radio,.checkbox{position:relative;display:block;margin-top:10px;margin-bottom:10px}.radio label,.checkbox label{min-height:21px;padding-left:20px;margin-bottom:0;font-weight:normal;cursor:pointer}.radio input[type=\"radio\"],.radio-inline input[type=\"radio\"],.checkbox input[type=\"checkbox\"],.checkbox-inline input[type=\"checkbox\"]{position:absolute;margin-left:-20px;margin-top:4px \\9}.radio+.radio,.checkbox+.checkbox{margin-top:-5px}.radio-inline,.checkbox-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;vertical-align:middle;font-weight:normal;cursor:pointer}.radio-inline+.radio-inline,.checkbox-inline+.checkbox-inline{margin-top:0;margin-left:10px}input[type=\"radio\"][disabled],input[type=\"checkbox\"][disabled],input[type=\"radio\"].disabled,input[type=\"checkbox\"].disabled,fieldset[disabled] input[type=\"radio\"],fieldset[disabled] input[type=\"checkbox\"]{cursor:not-allowed}.radio-inline.disabled,.checkbox-inline.disabled,fieldset[disabled] .radio-inline,fieldset[disabled] .checkbox-inline{cursor:not-allowed}.radio.disabled label,.checkbox.disabled label,fieldset[disabled] .radio label,fieldset[disabled] .checkbox label{cursor:not-allowed}.form-control-static{padding-top:9px;padding-bottom:9px;margin-bottom:0;min-height:36px}.form-control-static.input-lg,.form-control-static.input-sm{padding-left:0;padding-right:0}.input-sm{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-sm{height:36px;line-height:36px}textarea.input-sm,select[multiple].input-sm{height:auto}.form-group-sm .form-control{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.form-group-sm select.form-control{height:36px;line-height:36px}.form-group-sm textarea.form-control,.form-group-sm select[multiple].form-control{height:auto}.form-group-sm .form-control-static{height:36px;min-height:33px;padding:9px 12px;font-size:12px;line-height:1.5}.input-lg{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-lg{height:60px;line-height:60px}textarea.input-lg,select[multiple].input-lg{height:auto}.form-group-lg .form-control{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.form-group-lg select.form-control{height:60px;line-height:60px}.form-group-lg textarea.form-control,.form-group-lg select[multiple].form-control{height:auto}.form-group-lg .form-control-static{height:60px;min-height:40px;padding:17px 20px;font-size:19px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:48.75px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:39px;height:39px;line-height:39px;text-align:center;pointer-events:none}.input-lg+.form-control-feedback,.input-group-lg+.form-control-feedback,.form-group-lg .form-control+.form-control-feedback{width:60px;height:60px;line-height:60px}.input-sm+.form-control-feedback,.input-group-sm+.form-control-feedback,.form-group-sm .form-control+.form-control-feedback{width:36px;height:36px;line-height:36px}.has-success .help-block,.has-success .control-label,.has-success .radio,.has-success .checkbox,.has-success .radio-inline,.has-success .checkbox-inline,.has-success.radio label,.has-success.checkbox label,.has-success.radio-inline label,.has-success.checkbox-inline label{color:#43ac6a}.has-success .form-control{border-color:#43ac6a;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-success .form-control:focus{border-color:#358753;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1}.has-success .input-group-addon{color:#43ac6a;border-color:#43ac6a;background-color:#dff0d8}.has-success .form-control-feedback{color:#43ac6a}.has-warning .help-block,.has-warning .control-label,.has-warning .radio,.has-warning .checkbox,.has-warning .radio-inline,.has-warning .checkbox-inline,.has-warning.radio label,.has-warning.checkbox label,.has-warning.radio-inline label,.has-warning.checkbox-inline label{color:#e99002}.has-warning .form-control{border-color:#e99002;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-warning .form-control:focus{border-color:#b67102;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53}.has-warning .input-group-addon{color:#e99002;border-color:#e99002;background-color:#fcf8e3}.has-warning .form-control-feedback{color:#e99002}.has-error .help-block,.has-error .control-label,.has-error .radio,.has-error .checkbox,.has-error .radio-inline,.has-error .checkbox-inline,.has-error.radio label,.has-error.checkbox label,.has-error.radio-inline label,.has-error.checkbox-inline label{color:#f04124}.has-error .form-control{border-color:#f04124;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-error .form-control:focus{border-color:#d32a0e;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483}.has-error .input-group-addon{color:#f04124;border-color:#f04124;background-color:#f2dede}.has-error .form-control-feedback{color:#f04124}.has-feedback label~.form-control-feedback{top:26px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#626262}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn,.form-inline .input-group .form-control{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .radio,.form-inline .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .radio label,.form-inline .checkbox label{padding-left:0}.form-inline .radio input[type=\"radio\"],.form-inline .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .radio,.form-horizontal .checkbox,.form-horizontal .radio-inline,.form-horizontal .checkbox-inline{margin-top:0;margin-bottom:0;padding-top:9px}.form-horizontal .radio,.form-horizontal .checkbox{min-height:30px}.form-horizontal .form-group{margin-left:-15px;margin-right:-15px}@media (min-width:768px){.form-horizontal .control-label{text-align:right;margin-bottom:0;padding-top:9px}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:17px;font-size:19px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:9px;font-size:12px}}.btn{display:inline-block;margin-bottom:0;font-weight:normal;text-align:center;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid transparent;white-space:nowrap;padding:8px 12px;font-size:15px;line-height:1.4;border-radius:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn:focus,.btn:active:focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn.active.focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn:hover,.btn:focus,.btn.focus{color:#333333;text-decoration:none}.btn:active,.btn.active{outline:0;background-image:none;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;opacity:0.65;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333333;background-color:#e7e7e7;border-color:#cccccc}.btn-default:focus,.btn-default.focus{color:#333333;background-color:#cecece;border-color:#8c8c8c}.btn-default:hover{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active:hover,.btn-default.active:hover,.open>.dropdown-toggle.btn-default:hover,.btn-default:active:focus,.btn-default.active:focus,.open>.dropdown-toggle.btn-default:focus,.btn-default:active.focus,.btn-default.active.focus,.open>.dropdown-toggle.btn-default.focus{color:#333333;background-color:#bcbcbc;border-color:#8c8c8c}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled:hover,.btn-default[disabled]:hover,fieldset[disabled] .btn-default:hover,.btn-default.disabled:focus,.btn-default[disabled]:focus,fieldset[disabled] .btn-default:focus,.btn-default.disabled.focus,.btn-default[disabled].focus,fieldset[disabled] .btn-default.focus{background-color:#e7e7e7;border-color:#cccccc}.btn-default .badge{color:#e7e7e7;background-color:#333333}.btn-primary{color:#ffffff;background-color:#008cba;border-color:#0079a1}.btn-primary:focus,.btn-primary.focus{color:#ffffff;background-color:#006687;border-color:#001921}.btn-primary:hover{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active:hover,.btn-primary.active:hover,.open>.dropdown-toggle.btn-primary:hover,.btn-primary:active:focus,.btn-primary.active:focus,.open>.dropdown-toggle.btn-primary:focus,.btn-primary:active.focus,.btn-primary.active.focus,.open>.dropdown-toggle.btn-primary.focus{color:#ffffff;background-color:#004b63;border-color:#001921}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled:hover,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary:hover,.btn-primary.disabled:focus,.btn-primary[disabled]:focus,fieldset[disabled] .btn-primary:focus,.btn-primary.disabled.focus,.btn-primary[disabled].focus,fieldset[disabled] .btn-primary.focus{background-color:#008cba;border-color:#0079a1}.btn-primary .badge{color:#008cba;background-color:#ffffff}.btn-success{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.btn-success:focus,.btn-success.focus{color:#ffffff;background-color:#358753;border-color:#183e26}.btn-success:hover{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active:hover,.btn-success.active:hover,.open>.dropdown-toggle.btn-success:hover,.btn-success:active:focus,.btn-success.active:focus,.open>.dropdown-toggle.btn-success:focus,.btn-success:active.focus,.btn-success.active.focus,.open>.dropdown-toggle.btn-success.focus{color:#ffffff;background-color:#2b6e44;border-color:#183e26}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled:hover,.btn-success[disabled]:hover,fieldset[disabled] .btn-success:hover,.btn-success.disabled:focus,.btn-success[disabled]:focus,fieldset[disabled] .btn-success:focus,.btn-success.disabled.focus,.btn-success[disabled].focus,fieldset[disabled] .btn-success.focus{background-color:#43ac6a;border-color:#3c9a5f}.btn-success .badge{color:#43ac6a;background-color:#ffffff}.btn-info{color:#ffffff;background-color:#5bc0de;border-color:#46b8da}.btn-info:focus,.btn-info.focus{color:#ffffff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active:hover,.btn-info.active:hover,.open>.dropdown-toggle.btn-info:hover,.btn-info:active:focus,.btn-info.active:focus,.open>.dropdown-toggle.btn-info:focus,.btn-info:active.focus,.btn-info.active.focus,.open>.dropdown-toggle.btn-info.focus{color:#ffffff;background-color:#269abc;border-color:#1b6d85}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled:hover,.btn-info[disabled]:hover,fieldset[disabled] .btn-info:hover,.btn-info.disabled:focus,.btn-info[disabled]:focus,fieldset[disabled] .btn-info:focus,.btn-info.disabled.focus,.btn-info[disabled].focus,fieldset[disabled] .btn-info.focus{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#ffffff}.btn-warning{color:#ffffff;background-color:#e99002;border-color:#d08002}.btn-warning:focus,.btn-warning.focus{color:#ffffff;background-color:#b67102;border-color:#513201}.btn-warning:hover{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active:hover,.btn-warning.active:hover,.open>.dropdown-toggle.btn-warning:hover,.btn-warning:active:focus,.btn-warning.active:focus,.open>.dropdown-toggle.btn-warning:focus,.btn-warning:active.focus,.btn-warning.active.focus,.open>.dropdown-toggle.btn-warning.focus{color:#ffffff;background-color:#935b01;border-color:#513201}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled:hover,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning:hover,.btn-warning.disabled:focus,.btn-warning[disabled]:focus,fieldset[disabled] .btn-warning:focus,.btn-warning.disabled.focus,.btn-warning[disabled].focus,fieldset[disabled] .btn-warning.focus{background-color:#e99002;border-color:#d08002}.btn-warning .badge{color:#e99002;background-color:#ffffff}.btn-danger{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.btn-danger:focus,.btn-danger.focus{color:#ffffff;background-color:#d32a0e;border-color:#731708}.btn-danger:hover{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active:hover,.btn-danger.active:hover,.open>.dropdown-toggle.btn-danger:hover,.btn-danger:active:focus,.btn-danger.active:focus,.open>.dropdown-toggle.btn-danger:focus,.btn-danger:active.focus,.btn-danger.active.focus,.open>.dropdown-toggle.btn-danger.focus{color:#ffffff;background-color:#b1240c;border-color:#731708}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled:hover,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger:hover,.btn-danger.disabled:focus,.btn-danger[disabled]:focus,fieldset[disabled] .btn-danger:focus,.btn-danger.disabled.focus,.btn-danger[disabled].focus,fieldset[disabled] .btn-danger.focus{background-color:#f04124;border-color:#ea2f10}.btn-danger .badge{color:#f04124;background-color:#ffffff}.btn-link{color:#008cba;font-weight:normal;border-radius:0}.btn-link,.btn-link:active,.btn-link.active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:hover,.btn-link:focus,.btn-link:active{border-color:transparent}.btn-link:hover,.btn-link:focus{color:#008cba;text-decoration:underline;background-color:transparent}.btn-link[disabled]:hover,fieldset[disabled] .btn-link:hover,.btn-link[disabled]:focus,fieldset[disabled] .btn-link:focus{color:#999999;text-decoration:none}.btn-lg,.btn-group-lg>.btn{padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.btn-sm,.btn-group-sm>.btn{padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.btn-xs,.btn-group-xs>.btn{padding:4px 6px;font-size:12px;line-height:1.5;border-radius:0}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=\"submit\"].btn-block,input[type=\"reset\"].btn-block,input[type=\"button\"].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity 0.15s linear;-o-transition:opacity 0.15s linear;transition:opacity 0.15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-property:height, visibility;-o-transition-property:height, visibility;transition-property:height, visibility;-webkit-transition-duration:0.35s;-o-transition-duration:0.35s;transition-duration:0.35s;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid \\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropup,.dropdown{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;list-style:none;font-size:15px;text-align:left;background-color:#ffffff;border:1px solid #cccccc;border:1px solid rgba(0,0,0,0.15);border-radius:0;-webkit-box-shadow:0 6px 12px rgba(0,0,0,0.175);box-shadow:0 6px 12px rgba(0,0,0,0.175);-webkit-background-clip:padding-box;background-clip:padding-box}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:rgba(0,0,0,0.2)}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.4;color:#555555;white-space:nowrap}.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus{text-decoration:none;color:#262626;background-color:#eeeeee}.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus{color:#ffffff;text-decoration:none;outline:0;background-color:#008cba}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{color:#999999}.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{text-decoration:none;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);cursor:not-allowed}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{left:auto;right:0}.dropdown-menu-left{left:0;right:auto}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.4;color:#999999;white-space:nowrap}.dropdown-backdrop{position:fixed;left:0;right:0;bottom:0;top:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{border-top:0;border-bottom:4px dashed;border-bottom:4px solid \\9;content:\"\"}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{left:auto;right:0}.navbar-right .dropdown-menu-left{left:0;right:auto}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group>.btn,.btn-group-vertical>.btn{position:relative;float:left}.btn-group>.btn:hover,.btn-group-vertical>.btn:hover,.btn-group>.btn:focus,.btn-group-vertical>.btn:focus,.btn-group>.btn:active,.btn-group-vertical>.btn:active,.btn-group>.btn.active,.btn-group-vertical>.btn.active{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-bottom-left-radius:0;border-top-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-bottom-left-radius:0;border-top-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-left:8px;padding-right:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-left:12px;padding-right:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-right-radius:0;border-top-left-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{float:none;display:table-cell;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=\"buttons\"]>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn input[type=\"checkbox\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"checkbox\"]{position:absolute;clip:rect(0, 0, 0, 0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=\"col-\"]{float:none;padding-left:0;padding-right:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:60px;line-height:60px}textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn,select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:36px;line-height:36px}textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn,select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn{height:auto}.input-group-addon,.input-group-btn,.input-group .form-control{display:table-cell}.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child),.input-group .form-control:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:8px 12px;font-size:15px;font-weight:normal;line-height:1;color:#6f6f6f;text-align:center;background-color:#eeeeee;border:1px solid #cccccc;border-radius:0}.input-group-addon.input-sm{padding:8px 12px;font-size:12px;border-radius:0}.input-group-addon.input-lg{padding:16px 20px;font-size:19px;border-radius:0}.input-group-addon input[type=\"radio\"],.input-group-addon input[type=\"checkbox\"]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle),.input-group-btn:last-child>.btn-group:not(:last-child)>.btn{border-bottom-right-radius:0;border-top-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:first-child>.btn-group:not(:first-child)>.btn{border-bottom-left-radius:0;border-top-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:hover,.input-group-btn>.btn:focus,.input-group-btn>.btn:active{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{margin-bottom:0;padding-left:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:hover,.nav>li>a:focus{text-decoration:none;background-color:#eeeeee}.nav>li.disabled>a{color:#999999}.nav>li.disabled>a:hover,.nav>li.disabled>a:focus{color:#999999;text-decoration:none;background-color:transparent;cursor:not-allowed}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{background-color:#eeeeee;border-color:#008cba}.nav .nav-divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #dddddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.4;border:1px solid transparent;border-radius:0 0 0 0}.nav-tabs>li>a:hover{border-color:#eeeeee #eeeeee #dddddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:hover,.nav-tabs>li.active>a:focus{color:#6f6f6f;background-color:#ffffff;border:1px solid #dddddd;border-bottom-color:transparent;cursor:default}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border-bottom-color:#ffffff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:0}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:hover,.nav-pills>li.active>a:focus{color:#ffffff;background-color:#008cba}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border-bottom-color:#ffffff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-right-radius:0;border-top-left-radius:0}.navbar{position:relative;min-height:45px;margin-bottom:21px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:0}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{overflow-x:visible;padding-right:15px;padding-left:15px;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);-webkit-overflow-scrolling:touch}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block !important;height:auto !important;padding-bottom:0;overflow:visible !important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{padding-left:0;padding-right:0}}.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:200px}}.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-top,.navbar-fixed-bottom{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-top,.navbar-fixed-bottom{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;padding:12px 15px;font-size:19px;line-height:21px;height:45px}.navbar-brand:hover,.navbar-brand:focus{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;margin-right:15px;padding:9px 10px;margin-top:5.5px;margin-bottom:5.5px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:0}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:6px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:21px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu>li>a,.navbar-nav .open .dropdown-menu .dropdown-header{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:21px}.navbar-nav .open .dropdown-menu>li>a:hover,.navbar-nav .open .dropdown-menu>li>a:focus{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:12px;padding-bottom:12px}}.navbar-form{margin-left:-15px;margin-right:-15px;padding:10px 15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);margin-top:3px;margin-bottom:3px}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn,.navbar-form .input-group .form-control{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .radio,.navbar-form .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .radio label,.navbar-form .checkbox label{padding-left:0}.navbar-form .radio input[type=\"radio\"],.navbar-form .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;border:0;margin-left:0;margin-right:0;padding-top:0;padding-bottom:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-right-radius:0;border-top-left-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:3px;margin-bottom:3px}.navbar-btn.btn-sm{margin-top:4.5px;margin-bottom:4.5px}.navbar-btn.btn-xs{margin-top:11.5px;margin-bottom:11.5px}.navbar-text{margin-top:12px;margin-bottom:12px}@media (min-width:768px){.navbar-text{float:left;margin-left:15px;margin-right:15px}}@media (min-width:768px){.navbar-left{float:left !important}.navbar-right{float:right !important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#333333;border-color:#222222}.navbar-default .navbar-brand{color:#ffffff}.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-default .navbar-text{color:#ffffff}.navbar-default .navbar-nav>li>a{color:#ffffff}.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:hover,.navbar-default .navbar-nav>.disabled>a:focus{color:#cccccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:transparent}.navbar-default .navbar-toggle:hover,.navbar-default .navbar-toggle:focus{background-color:transparent}.navbar-default .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#222222}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:hover,.navbar-default .navbar-nav>.open>a:focus{background-color:#272727;color:#ffffff}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#cccccc;background-color:transparent}}.navbar-default .navbar-link{color:#ffffff}.navbar-default .navbar-link:hover{color:#ffffff}.navbar-default .btn-link{color:#ffffff}.navbar-default .btn-link:hover,.navbar-default .btn-link:focus{color:#ffffff}.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:hover,.navbar-default .btn-link[disabled]:focus,fieldset[disabled] .navbar-default .btn-link:focus{color:#cccccc}.navbar-inverse{background-color:#008cba;border-color:#006687}.navbar-inverse .navbar-brand{color:#ffffff}.navbar-inverse .navbar-brand:hover,.navbar-inverse .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-inverse .navbar-text{color:#ffffff}.navbar-inverse .navbar-nav>li>a{color:#ffffff}.navbar-inverse .navbar-nav>li>a:hover,.navbar-inverse .navbar-nav>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:hover,.navbar-inverse .navbar-nav>.disabled>a:focus{color:#444444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:transparent}.navbar-inverse .navbar-toggle:hover,.navbar-inverse .navbar-toggle:focus{background-color:transparent}.navbar-inverse .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#007196}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a:focus{background-color:#006687;color:#ffffff}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#444444;background-color:transparent}}.navbar-inverse .navbar-link{color:#ffffff}.navbar-inverse .navbar-link:hover{color:#ffffff}.navbar-inverse .btn-link{color:#ffffff}.navbar-inverse .btn-link:hover,.navbar-inverse .btn-link:focus{color:#ffffff}.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:hover,.navbar-inverse .btn-link[disabled]:focus,fieldset[disabled] .navbar-inverse .btn-link:focus{color:#444444}.breadcrumb{padding:8px 15px;margin-bottom:21px;list-style:none;background-color:#f5f5f5;border-radius:0}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{content:\"/\\00a0\";padding:0 5px;color:#999999}.breadcrumb>.active{color:#333333}.pagination{display:inline-block;padding-left:0;margin:21px 0;border-radius:0}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:8px 12px;line-height:1.4;text-decoration:none;color:#008cba;background-color:transparent;border:1px solid transparent;margin-left:-1px}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-bottom-left-radius:0;border-top-left-radius:0}.pagination>li:last-child>a,.pagination>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination>li>a:hover,.pagination>li>span:hover,.pagination>li>a:focus,.pagination>li>span:focus{z-index:2;color:#008cba;background-color:#eeeeee;border-color:transparent}.pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus{z-index:3;color:#ffffff;background-color:#008cba;border-color:transparent;cursor:default}.pagination>.disabled>span,.pagination>.disabled>span:hover,.pagination>.disabled>span:focus,.pagination>.disabled>a,.pagination>.disabled>a:hover,.pagination>.disabled>a:focus{color:#999999;background-color:#ffffff;border-color:transparent;cursor:not-allowed}.pagination-lg>li>a,.pagination-lg>li>span{padding:16px 20px;font-size:19px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination-sm>li>a,.pagination-sm>li>span{padding:8px 12px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pager{padding-left:0;margin:21px 0;list-style:none;text-align:center}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:transparent;border:1px solid transparent;border-radius:3px}.pager li>a:hover,.pager li>a:focus{text-decoration:none;background-color:#eeeeee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:hover,.pager .disabled>a:focus,.pager .disabled>span{color:#999999;background-color:transparent;cursor:not-allowed}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:bold;line-height:1;color:#ffffff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:hover,a.label:focus{color:#ffffff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#999999}.label-default[href]:hover,.label-default[href]:focus{background-color:#808080}.label-primary{background-color:#008cba}.label-primary[href]:hover,.label-primary[href]:focus{background-color:#006687}.label-success{background-color:#43ac6a}.label-success[href]:hover,.label-success[href]:focus{background-color:#358753}.label-info{background-color:#5bc0de}.label-info[href]:hover,.label-info[href]:focus{background-color:#31b0d5}.label-warning{background-color:#e99002}.label-warning[href]:hover,.label-warning[href]:focus{background-color:#b67102}.label-danger{background-color:#f04124}.label-danger[href]:hover,.label-danger[href]:focus{background-color:#d32a0e}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:bold;color:#ffffff;line-height:1;vertical-align:middle;white-space:nowrap;text-align:center;background-color:#008cba;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-xs .badge,.btn-group-xs>.btn .badge{top:0;padding:1px 5px}a.badge:hover,a.badge:focus{color:#ffffff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#008cba;background-color:#ffffff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#fafafa}.jumbotron h1,.jumbotron .h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:23px;font-weight:200}.jumbotron>hr{border-top-color:#e1e1e1}.container .jumbotron,.container-fluid .jumbotron{border-radius:0;padding-left:15px;padding-right:15px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-left:60px;padding-right:60px}.jumbotron h1,.jumbotron .h1{font-size:68px}}.thumbnail{display:block;padding:4px;margin-bottom:21px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail>img,.thumbnail a>img{margin-left:auto;margin-right:auto}a.thumbnail:hover,a.thumbnail:focus,a.thumbnail.active{border-color:#008cba}.thumbnail .caption{padding:9px;color:#222222}.alert{padding:15px;margin-bottom:21px;border:1px solid transparent;border-radius:0}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:bold}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{background-color:#43ac6a;border-color:#3c9a5f;color:#ffffff}.alert-success hr{border-top-color:#358753}.alert-success .alert-link{color:#e6e6e6}.alert-info{background-color:#5bc0de;border-color:#3db5d8;color:#ffffff}.alert-info hr{border-top-color:#2aabd2}.alert-info .alert-link{color:#e6e6e6}.alert-warning{background-color:#e99002;border-color:#d08002;color:#ffffff}.alert-warning hr{border-top-color:#b67102}.alert-warning .alert-link{color:#e6e6e6}.alert-danger{background-color:#f04124;border-color:#ea2f10;color:#ffffff}.alert-danger hr{border-top-color:#d32a0e}.alert-danger .alert-link{color:#e6e6e6}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{overflow:hidden;height:21px;margin-bottom:21px;background-color:#f5f5f5;border-radius:0;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);box-shadow:inset 0 1px 2px rgba(0,0,0,0.1)}.progress-bar{float:left;width:0%;height:100%;font-size:12px;line-height:21px;color:#ffffff;text-align:center;background-color:#008cba;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition:width 0.6s ease;-o-transition:width 0.6s ease;transition:width 0.6s ease}.progress-striped .progress-bar,.progress-bar-striped{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress.active .progress-bar,.progress-bar.active{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#43ac6a}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-warning{background-color:#e99002}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-danger{background-color:#f04124}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{zoom:1;overflow:hidden}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-left,.media-right,.media-body{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{margin-bottom:20px;padding-left:0}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#ffffff;border:1px solid #dddddd}.list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:0;border-bottom-left-radius:0}a.list-group-item,button.list-group-item{color:#555555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333333}a.list-group-item:hover,button.list-group-item:hover,a.list-group-item:focus,button.list-group-item:focus{text-decoration:none;color:#555555;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:hover,.list-group-item.disabled:focus{background-color:#eeeeee;color:#999999;cursor:not-allowed}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text{color:#999999}.list-group-item.active,.list-group-item.active:hover,.list-group-item.active:focus{z-index:2;color:#ffffff;background-color:#008cba;border-color:#008cba}.list-group-item.active .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>.small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:hover .list-group-item-text,.list-group-item.active:focus .list-group-item-text{color:#87e1ff}.list-group-item-success{color:#43ac6a;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#43ac6a}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:hover,button.list-group-item-success:hover,a.list-group-item-success:focus,button.list-group-item-success:focus{color:#43ac6a;background-color:#d0e9c6}a.list-group-item-success.active,button.list-group-item-success.active,a.list-group-item-success.active:hover,button.list-group-item-success.active:hover,a.list-group-item-success.active:focus,button.list-group-item-success.active:focus{color:#fff;background-color:#43ac6a;border-color:#43ac6a}.list-group-item-info{color:#5bc0de;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#5bc0de}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:hover,button.list-group-item-info:hover,a.list-group-item-info:focus,button.list-group-item-info:focus{color:#5bc0de;background-color:#c4e3f3}a.list-group-item-info.active,button.list-group-item-info.active,a.list-group-item-info.active:hover,button.list-group-item-info.active:hover,a.list-group-item-info.active:focus,button.list-group-item-info.active:focus{color:#fff;background-color:#5bc0de;border-color:#5bc0de}.list-group-item-warning{color:#e99002;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#e99002}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:hover,button.list-group-item-warning:hover,a.list-group-item-warning:focus,button.list-group-item-warning:focus{color:#e99002;background-color:#faf2cc}a.list-group-item-warning.active,button.list-group-item-warning.active,a.list-group-item-warning.active:hover,button.list-group-item-warning.active:hover,a.list-group-item-warning.active:focus,button.list-group-item-warning.active:focus{color:#fff;background-color:#e99002;border-color:#e99002}.list-group-item-danger{color:#f04124;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#f04124}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:hover,button.list-group-item-danger:hover,a.list-group-item-danger:focus,button.list-group-item-danger:focus{color:#f04124;background-color:#ebcccc}a.list-group-item-danger.active,button.list-group-item-danger.active,a.list-group-item-danger.active:hover,button.list-group-item-danger.active:hover,a.list-group-item-danger.active:focus,button.list-group-item-danger.active:focus{color:#fff;background-color:#f04124;border-color:#f04124}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:21px;background-color:#ffffff;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.05);box-shadow:0 1px 1px rgba(0,0,0,0.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:-1;border-top-left-radius:-1}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:17px;color:inherit}.panel-title>a,.panel-title>small,.panel-title>.small,.panel-title>small>a,.panel-title>.small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #dddddd;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-right-radius:-1;border-top-left-radius:-1}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.table,.panel>.table-responsive>.table,.panel>.panel-collapse>.table{margin-bottom:0}.panel>.table caption,.panel>.table-responsive>.table caption,.panel>.panel-collapse>.table caption{padding-left:15px;padding-right:15px}.panel>.table:first-child,.panel>.table-responsive:first-child>.table:first-child{border-top-right-radius:-1;border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child{border-top-left-radius:-1;border-top-right-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child{border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child{border-top-right-radius:-1}.panel>.table:last-child,.panel>.table-responsive:last-child>.table:last-child{border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-left-radius:-1;border-bottom-right-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:-1}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #dddddd}.panel>.table>tbody:first-child>tr:first-child th,.panel>.table>tbody:first-child>tr:first-child td{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{border:0;margin-bottom:0}.panel-group{margin-bottom:21px}.panel-group .panel{margin-bottom:0;border-radius:0}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.panel-body,.panel-group .panel-heading+.panel-collapse>.list-group{border-top:1px solid #dddddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #dddddd}.panel-default{border-color:#dddddd}.panel-default>.panel-heading{color:#333333;background-color:#f5f5f5;border-color:#dddddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#dddddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#dddddd}.panel-primary{border-color:#008cba}.panel-primary>.panel-heading{color:#ffffff;background-color:#008cba;border-color:#008cba}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#008cba}.panel-primary>.panel-heading .badge{color:#008cba;background-color:#ffffff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#008cba}.panel-success{border-color:#3c9a5f}.panel-success>.panel-heading{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3c9a5f}.panel-success>.panel-heading .badge{color:#43ac6a;background-color:#ffffff}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3c9a5f}.panel-info{border-color:#3db5d8}.panel-info>.panel-heading{color:#ffffff;background-color:#5bc0de;border-color:#3db5d8}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3db5d8}.panel-info>.panel-heading .badge{color:#5bc0de;background-color:#ffffff}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3db5d8}.panel-warning{border-color:#d08002}.panel-warning>.panel-heading{color:#ffffff;background-color:#e99002;border-color:#d08002}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d08002}.panel-warning>.panel-heading .badge{color:#e99002;background-color:#ffffff}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d08002}.panel-danger{border-color:#ea2f10}.panel-danger>.panel-heading{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ea2f10}.panel-danger>.panel-heading .badge{color:#f04124;background-color:#ffffff}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ea2f10}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive iframe,.embed-responsive embed,.embed-responsive object,.embed-responsive video{position:absolute;top:0;left:0;bottom:0;height:100%;width:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#fafafa;border:1px solid #e8e8e8;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);box-shadow:inset 0 1px 1px rgba(0,0,0,0.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,0.15)}.well-lg{padding:24px;border-radius:0}.well-sm{padding:9px;border-radius:0}.close{float:right;font-size:22.5px;font-weight:bold;line-height:1;color:#ffffff;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.close:hover,.close:focus{color:#ffffff;text-decoration:none;cursor:pointer;opacity:0.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:transparent;border:0;-webkit-appearance:none}.modal-open{overflow:hidden}.modal{display:none;overflow:hidden;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transform:translate(0, -25%);-ms-transform:translate(0, -25%);-o-transform:translate(0, -25%);transform:translate(0, -25%);-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out}.modal.in .modal-dialog{-webkit-transform:translate(0, 0);-ms-transform:translate(0, 0);-o-transform:translate(0, 0);transform:translate(0, 0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#ffffff;border:1px solid #999999;border:1px solid rgba(0,0,0,0.2);border-radius:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,0.5);box-shadow:0 3px 9px rgba(0,0,0,0.5);-webkit-background-clip:padding-box;background-clip:padding-box;outline:0}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000000}.modal-backdrop.fade{opacity:0;filter:alpha(opacity=0)}.modal-backdrop.in{opacity:0.5;filter:alpha(opacity=50)}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.4}.modal-body{position:relative;padding:20px}.modal-footer{padding:20px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-left:5px;margin-bottom:0}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,0.5);box-shadow:0 5px 15px rgba(0,0,0,0.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:12px;opacity:0;filter:alpha(opacity=0)}.tooltip.in{opacity:0.9;filter:alpha(opacity=90)}.tooltip.top{margin-top:-3px;padding:5px 0}.tooltip.right{margin-left:3px;padding:0 5px}.tooltip.bottom{margin-top:3px;padding:5px 0}.tooltip.left{margin-left:-3px;padding:0 5px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#ffffff;text-align:center;background-color:#333333;border-radius:0}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-left .tooltip-arrow{bottom:0;right:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#333333}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#333333}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:15px;background-color:#333333;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #333333;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2)}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{margin:0;padding:8px 14px;font-size:15px;background-color:#333333;border-bottom:1px solid #262626;border-radius:-1 -1 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{border-width:10px;content:\"\"}.popover.top>.arrow{left:50%;margin-left:-11px;border-bottom-width:0;border-top-color:#000000;border-top-color:rgba(0,0,0,0.05);bottom:-11px}.popover.top>.arrow:after{content:\" \";bottom:1px;margin-left:-10px;border-bottom-width:0;border-top-color:#333333}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-left-width:0;border-right-color:#000000;border-right-color:rgba(0,0,0,0.05)}.popover.right>.arrow:after{content:\" \";left:1px;bottom:-10px;border-left-width:0;border-right-color:#333333}.popover.bottom>.arrow{left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#000000;border-bottom-color:rgba(0,0,0,0.05);top:-11px}.popover.bottom>.arrow:after{content:\" \";top:1px;margin-left:-10px;border-top-width:0;border-bottom-color:#333333}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#000000;border-left-color:rgba(0,0,0,0.05)}.popover.left>.arrow:after{content:\" \";right:1px;border-right-width:0;border-left-color:#333333;bottom:-10px}.carousel{position:relative}.carousel-inner{position:relative;overflow:hidden;width:100%}.carousel-inner>.item{display:none;position:relative;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>img,.carousel-inner>.item>a>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.next,.carousel-inner>.item.active.right{-webkit-transform:translate3d(100%, 0, 0);transform:translate3d(100%, 0, 0);left:0}.carousel-inner>.item.prev,.carousel-inner>.item.active.left{-webkit-transform:translate3d(-100%, 0, 0);transform:translate3d(-100%, 0, 0);left:0}.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right,.carousel-inner>.item.active{-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0);left:0}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;left:0;bottom:0;width:15%;opacity:0.5;filter:alpha(opacity=50);font-size:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6);background-color:rgba(0,0,0,0)}.carousel-control.left{background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.0001)));background-image:linear-gradient(to right, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1)}.carousel-control.right{left:auto;right:0;background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.0001)), to(rgba(0,0,0,0.5)));background-image:linear-gradient(to right, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1)}.carousel-control:hover,.carousel-control:focus{outline:0;color:#ffffff;text-decoration:none;opacity:0.9;filter:alpha(opacity=90)}.carousel-control .icon-prev,.carousel-control .icon-next,.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right{position:absolute;top:50%;margin-top:-10px;z-index:5;display:inline-block}.carousel-control .icon-prev,.carousel-control .glyphicon-chevron-left{left:50%;margin-left:-10px}.carousel-control .icon-next,.carousel-control .glyphicon-chevron-right{right:50%;margin-right:-10px}.carousel-control .icon-prev,.carousel-control .icon-next{width:20px;height:20px;line-height:1;font-family:serif}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;margin-left:-30%;padding-left:0;list-style:none;text-align:center}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;border:1px solid #ffffff;border-radius:10px;cursor:pointer;background-color:#000 \\9;background-color:rgba(0,0,0,0)}.carousel-indicators .active{margin:0;width:12px;height:12px;background-color:#ffffff}.carousel-caption{position:absolute;left:15%;right:15%;bottom:20px;z-index:10;padding-top:20px;padding-bottom:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-prev,.carousel-control .icon-next{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{left:20%;right:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.clearfix:before,.clearfix:after,.dl-horizontal dd:before,.dl-horizontal dd:after,.container:before,.container:after,.container-fluid:before,.container-fluid:after,.row:before,.row:after,.form-horizontal .form-group:before,.form-horizontal .form-group:after,.btn-toolbar:before,.btn-toolbar:after,.btn-group-vertical>.btn-group:before,.btn-group-vertical>.btn-group:after,.nav:before,.nav:after,.navbar:before,.navbar:after,.navbar-header:before,.navbar-header:after,.navbar-collapse:before,.navbar-collapse:after,.pager:before,.pager:after,.panel-body:before,.panel-body:after,.modal-header:before,.modal-header:after,.modal-footer:before,.modal-footer:after{content:\" \";display:table}.clearfix:after,.dl-horizontal dd:after,.container:after,.container-fluid:after,.row:after,.form-horizontal .form-group:after,.btn-toolbar:after,.btn-group-vertical>.btn-group:after,.nav:after,.navbar:after,.navbar-header:after,.navbar-collapse:after,.pager:after,.panel-body:after,.modal-header:after,.modal-footer:after{clear:both}.center-block{display:block;margin-left:auto;margin-right:auto}.pull-right{float:right !important}.pull-left{float:left !important}.hide{display:none !important}.show{display:block !important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none !important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-xs,.visible-sm,.visible-md,.visible-lg{display:none !important}.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block{display:none !important}@media (max-width:767px){.visible-xs{display:block !important}table.visible-xs{display:table !important}tr.visible-xs{display:table-row !important}th.visible-xs,td.visible-xs{display:table-cell !important}}@media (max-width:767px){.visible-xs-block{display:block !important}}@media (max-width:767px){.visible-xs-inline{display:inline !important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block !important}table.visible-sm{display:table !important}tr.visible-sm{display:table-row !important}th.visible-sm,td.visible-sm{display:table-cell !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block !important}table.visible-md{display:table !important}tr.visible-md{display:table-row !important}th.visible-md,td.visible-md{display:table-cell !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block !important}}@media (min-width:1200px){.visible-lg{display:block !important}table.visible-lg{display:table !important}tr.visible-lg{display:table-row !important}th.visible-lg,td.visible-lg{display:table-cell !important}}@media (min-width:1200px){.visible-lg-block{display:block !important}}@media (min-width:1200px){.visible-lg-inline{display:inline !important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block !important}}@media (max-width:767px){.hidden-xs{display:none !important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none !important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none !important}}@media (min-width:1200px){.hidden-lg{display:none !important}}.visible-print{display:none !important}@media print{.visible-print{display:block !important}table.visible-print{display:table !important}tr.visible-print{display:table-row !important}th.visible-print,td.visible-print{display:table-cell !important}}.visible-print-block{display:none !important}@media print{.visible-print-block{display:block !important}}.visible-print-inline{display:none !important}@media print{.visible-print-inline{display:inline !important}}.visible-print-inline-block{display:none !important}@media print{.visible-print-inline-block{display:inline-block !important}}@media print{.hidden-print{display:none !important}}.navbar{border:none;font-size:13px;font-weight:300}.navbar .navbar-toggle:hover .icon-bar{background-color:#b3b3b3}.navbar-collapse{border-top-color:rgba(0,0,0,0.2);-webkit-box-shadow:none;box-shadow:none}.navbar .btn{padding-top:6px;padding-bottom:6px}.navbar-form{margin-top:7px;margin-bottom:5px}.navbar-form .form-control{height:auto;padding:4px 6px}.navbar-text{margin:12px 15px;line-height:21px}.navbar .dropdown-menu{border:none}.navbar .dropdown-menu>li>a,.navbar .dropdown-menu>li>a:focus{background-color:transparent;font-size:13px;font-weight:300}.navbar .dropdown-header{color:rgba(255,255,255,0.5)}.navbar-default .dropdown-menu{background-color:#333333}.navbar-default .dropdown-menu>li>a,.navbar-default .dropdown-menu>li>a:focus{color:#ffffff}.navbar-default .dropdown-menu>li>a:hover,.navbar-default .dropdown-menu>.active>a,.navbar-default .dropdown-menu>.active>a:hover{background-color:#272727}.navbar-inverse .dropdown-menu{background-color:#008cba}.navbar-inverse .dropdown-menu>li>a,.navbar-inverse .dropdown-menu>li>a:focus{color:#ffffff}.navbar-inverse .dropdown-menu>li>a:hover,.navbar-inverse .dropdown-menu>.active>a,.navbar-inverse .dropdown-menu>.active>a:hover{background-color:#006687}.btn{padding:8px 12px}.btn-lg{padding:16px 20px}.btn-sm{padding:8px 12px}.btn-xs{padding:4px 6px}.btn-group .btn~.dropdown-toggle{padding-left:16px;padding-right:16px}.btn-group .dropdown-menu{border-top-width:0}.btn-group.dropup .dropdown-menu{border-top-width:1px;border-bottom-width:0;margin-bottom:0}.btn-group .dropdown-toggle.btn-default~.dropdown-menu{background-color:#e7e7e7;border-color:#cccccc}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a{color:#333333}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a:hover{background-color:#d3d3d3}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu{background-color:#008cba;border-color:#0079a1}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a:hover{background-color:#006d91}.btn-group .dropdown-toggle.btn-success~.dropdown-menu{background-color:#43ac6a;border-color:#3c9a5f}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a:hover{background-color:#388f58}.btn-group .dropdown-toggle.btn-info~.dropdown-menu{background-color:#5bc0de;border-color:#46b8da}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a:hover{background-color:#39b3d7}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu{background-color:#e99002;border-color:#d08002}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a:hover{background-color:#c17702}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu{background-color:#f04124;border-color:#ea2f10}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a:hover{background-color:#dc2c0f}.lead{color:#6f6f6f}cite{font-style:italic}blockquote{border-left-width:1px;color:#6f6f6f}blockquote.pull-right{border-right-width:1px}blockquote small{font-size:12px;font-weight:300}table{font-size:12px}label,.control-label,.help-block,.checkbox,.radio{font-size:12px;font-weight:normal}input[type=\"radio\"],input[type=\"checkbox\"]{margin-top:1px}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{border-color:transparent}.nav-tabs>li>a{background-color:#e7e7e7;color:#222222}.nav-tabs .caret{border-top-color:#222222;border-bottom-color:#222222}.nav-pills{font-weight:300}.breadcrumb{border:1px solid #dddddd;border-radius:3px;font-size:10px;font-weight:300;text-transform:uppercase}.pagination{font-size:12px;font-weight:300;color:#999999}.pagination>li>a,.pagination>li>span{margin-left:4px;color:#999999}.pagination>.active>a,.pagination>.active>span{color:#fff}.pagination>li>a,.pagination>li:first-child>a,.pagination>li:last-child>a,.pagination>li>span,.pagination>li:first-child>span,.pagination>li:last-child>span{border-radius:3px}.pagination-lg>li>a,.pagination-lg>li>span{padding-left:22px;padding-right:22px}.pagination-sm>li>a,.pagination-sm>li>span{padding:0 5px}.pager{font-size:12px;font-weight:300;color:#999999}.list-group{font-size:12px;font-weight:300}.close{opacity:0.4;text-decoration:none;text-shadow:none}.close:hover,.close:focus{opacity:1}.alert{font-size:12px;font-weight:300}.alert .alert-link{font-weight:normal;color:#fff;text-decoration:underline}.label{padding-left:1em;padding-right:1em;border-radius:0;font-weight:300}.label-default{background-color:#e7e7e7;color:#333333}.badge{font-weight:300}.progress{height:22px;padding:2px;background-color:#f6f6f6;border:1px solid #ccc;-webkit-box-shadow:none;box-shadow:none}.dropdown-menu{padding:0;margin-top:0;font-size:12px}.dropdown-menu>li>a{padding:12px 15px}.dropdown-header{padding-left:15px;padding-right:15px;font-size:9px;text-transform:uppercase}.popover{color:#fff;font-size:12px;font-weight:300}.panel-heading,.panel-footer{border-top-right-radius:0;border-top-left-radius:0}.panel-default .close{color:#222222}.modal .close{color:#222222}"; });
 define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Help Tickets</h1>\n</template>"; });
@@ -26655,6 +26655,8 @@ define('text!resources/elements/nav-bar.html', ['module'], function(module) { mo
 define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!resources/elements/tiny-mce.html', ['module'], function(module) { module.exports = "<template>\n\t<textarea class=\"tinymce-host\" id.bind=\"editor_id\"></textarea>\n</template>"; });
+define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n</template>"; });
+define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <th>Institution  <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[0].description} <span click.trigger=\"dataTable.sortArray('1')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[1].description} <span click.trigger=\"dataTable.sortArray('2')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[2].description} <span click.trigger=\"dataTable.sortArray('3')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[3].description} <span click.trigger=\"dataTable.sortArray('4')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[4].description} <span click.trigger=\"dataTable.sortArray('5')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[5].description} <span click.trigger=\"dataTable.sortArray('6')\"><i class=\"fa fa-sort\"></i></span></th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"stat of dataTable.displayArray\">\n                        <td data-title=\"Institution\">${stat.institutionId  | lookupValue:people.institutionsArray:'_id':'name'}</td>\n                        <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
@@ -26669,8 +26671,6 @@ define('text!modules/admin/system/editProduct.html', ['module'], function(module
 define('text!modules/admin/system/editSession.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"showScreen == 'sessionTable'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"showScreen == 'editSession'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionForm.html\"></compose>\n            </div> <!-- Form Div -->\n            <div show.bind=\"showScreen == 'editConfig'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionConfigTable.html\"></compose>\n            </div>\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/editSystem.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/system.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-10\">\n        <router-view></router-view>\n    </div>\n</template>"; });
-define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n</template>"; });
-define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <th>Institution  <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[0].description} <span click.trigger=\"dataTable.sortArray('1')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[1].description} <span click.trigger=\"dataTable.sortArray('2')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[2].description} <span click.trigger=\"dataTable.sortArray('3')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[3].description} <span click.trigger=\"dataTable.sortArray('4')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[4].description} <span click.trigger=\"dataTable.sortArray('5')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[5].description} <span click.trigger=\"dataTable.sortArray('6')\"><i class=\"fa fa-sort\"></i></span></th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"stat of dataTable.displayArray\">\n                        <td data-title=\"Institution\">${stat.institutionId  | lookupValue:people.institutionsArray:'_id':'name'}</td>\n                        <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-12\">\n\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\n\t\t<div class=\"topMargin\">\n\t\t\t<form class=\"form-horizontal topMargin\">\n\t\t\t\t<!-- Row 1 -->\n\t\t\t\t<div class=\"row\">\n\t\t\t\t\t<div class=\"col-lg-1\">\n\t\t\t\t\t\t<div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-10 col-lg-offset-1\">\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<h3 innerhtml.bind=\"people.selectedPerson.fullName\"></h3>\n\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"form-group pull-left\">\n\t\t\t\t\t\t\t\t\t<label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-8\">\n\t\t\t\t\t\t\t\t\t\t<select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control input-md\" placeholder=\"Status\">\n                                                <option value=\"\">Select an option</option>\n                                                <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\n                                            </select>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Contact</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Phone: <span innerhtml.bind=\"people.selectedPerson.phone\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Mobile: <span innerhtml.bind=\"people.selectedPerson.mobile\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Email: <span innerhtml.bind=\"people.selectedPerson.email\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Address</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.address1\"></span>\n\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t<h4 if.bind=\"people.selectedPerson.address2\"><span innerhtml.bind=\"people.selectedPerson.address2\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.city\"></span> <span innerhtml.bind=\"people.selectedPerson.region\">, <span innerhtml.bind=\"people.selectedPerson.postalCode\"></span></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.country\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Area</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Specialization: <span innerhtml.bind=\"people.selectedPerson.personSpecialization\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Department: <span innerhtml.bind=\"people.selectedPerson.departmentCategory\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Roles</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4 innerhtml.bind=\"roles\"></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t</div>\n\t\t<!-- Row -->\n\t\t</form>\n\t</div>\n\t</div>\n</template>"; });
 define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='6'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:15rem;\">Phone</th>\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>Role</th>\n                                <th>Status</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\n                                        compare=\"array\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\n                                </select>\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\n                                <td data-title=\"Name\">${person.fullName}</td>\n                                <td data-title=\"Phone\">${person.phone | phoneNumber}</td>\n                                <td data-title=\"Email\">${person.email}</td>\n                                <td data-title=\"Role\">${person.roles}</td>\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
@@ -26703,8 +26703,6 @@ define('text!modules/user/support/support.html', ['module'], function(module) { 
 define('text!modules/user/support/tutorials.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Tutorials Damn It!</h1>\n</template>"; });
 define('text!modules/user/support/usefulInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row\">\n      <div repeat.for=\"category of linkArray\" class=\"col-lg-3\">\n        <h2>${category.category}</h2>\n        <div>\n          <a repeat.for=\"link of category.links\" href=\"${link.url}\" class=\"list-group-item\" target=\"_blank\">\n            <h4 class=\"list-group-item-heading\">${link.title}</h4>\n            <p class=\"list-group-item-text\">${link.content}</p>\n          </a>\n        </div>\n      </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n   \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> \n           \n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> \n           \n        </div> \n      </div> \n    \n</template>"; });
-define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <!--\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                        <div class=\"col-sm-3 topMargin\" show.bind=\"documents.selectedDocument.file.fileName != undefined\">\r\n                            <a href.bind=\"selectedURL\" innerhtml.bind='documents.selectedDocument.file.fileName' target='_blank'></a>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Address.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"topMargin\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"copyInstAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Copy Instituion Address\"><i class=\"fa fa-files-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control \" placeholder=\"Address 1\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control \" placeholder=\"Address2\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control \" placeholder=\"City\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control \" placeholder=\"Region\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control \" placeholder=\"Postal Code\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control \" placeholder=\"Country\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                    <th style=\"width:15rem;\">Status</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"editACourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"name\">${course.number} </td>\n                    <td data-title=\"insitution\">${course.name}</td>\n                    <td data-tile=\"phone\">${course.active | translateStatus}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"courseSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <div class=\"checkbox\">\n                            <label class=\"pull-left\">\n                                <input id=\"activeProduct\" checked.bind=\"people.selectedCourse.active\" type=\"checkbox\"> Active\n                            </label>\n                        </div>\n                    </div>\n                </div>\n                \n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/instAddress.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row topMargin\">\n        <!-- Row 5 -->\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 1</label>\n                        <input value.bind=\"people.selectedInstitution.address1\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 1\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 2</label>\n                        <input value.bind=\"people.selectedInstitution.address2\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 2\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>City</label>\n                        <input value.bind=\"people.selectedInstitution.city\" id=\"editCity\" class=\"form-control\" placeholder=\"City\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Region</label>\n                        <input value.bind=\"people.selectedInstitution.region\" id=\"editRegion\" class=\"form-control\" placeholder=\"Region\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Postal Code</label>\n                        <input value.bind=\"people.selectedInstitution.postalCode\" id=\"editPostalCode\" class=\"form-control\" placeholder=\"Postal Code\"\n                            type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Country</label>\n                        <input value.bind=\"people.selectedInstitution.country\" id=\"editCountry\" class=\"form-control\" placeholder=\"Country\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>URL</label>\n                        <input value.bind=\"people.selectedInstitution.url\" id=\"editCountry\" class=\"form-control\" placeholder=\"URL\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Time Zone</label>\n                        <select value.bind=\"people.selectedInstitution.timeZone\" class=\"form-control\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"zone of config.TIMEZONES\" value=\"${zone}\">${zone}</option>\n                    </select>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
@@ -26717,6 +26715,16 @@ define('text!modules/admin/customers/components/Password.html', ['module'], func
 define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n        \r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control \" placeholder=\"Gender\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option value=\"F\">Female</option>\r\n                                        <option value=\"M\">Male</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a  class=\"${ $first ? 'active' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n    <div>\r\n        \r\n</template>\r\n"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td data-title=\"Email\">${person.email}</td>\r\n                                <td data-title=\"Role\">${person.roles}</td>\r\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"people.selectedPerson.roles\">${role.label}\n            </label>\n        </div>\n    </div> <!-- Right side of form -->\n</template"; });
+define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <!--\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                        <div class=\"col-sm-3 topMargin\" show.bind=\"documents.selectedDocument.file.fileName != undefined\">\r\n                            <a href.bind=\"selectedURL\" innerhtml.bind='documents.selectedDocument.file.fileName' target='_blank'></a>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                -->\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/site/components/configForm.html', ['module'], function(module) { module.exports = "<template>\n\t\n</template>"; });
+define('text!modules/admin/site/components/configTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>   \n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:200px;\">Parameter <span click.trigger=\"dataTable.sortArray('parameter')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:300px;\">Description</th>\n                                <th style=\"width:100px;\">Value</th>\n\t\t\t\t\t\t\t\t<th style=\"width:200px;\">Date Modified</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"parameter\" type=\"text\" placeholder=\"Filter Parameter\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Parameter\">${item.parameter}</td>\n                                <td data-title=\"Description\">${item.description}</td>\n                                <td data-title=\"Value\"><input readonly.bind=\"item.readOnly\" value.bind=\"item.value\" id=\"editValue\" class=\"form-control\" type=\"text\" /></td>\n                                <td data-title=\"Modified Date\"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/site/components/downloadForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <form class=\"form-horizontal topMargin\">\r\n\r\n            <!-- Row 1 -->\r\n              <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-6\">\r\n                    <div class=\"form-group\">\r\n                        <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.active\" type=\"checkbox\"> Active\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.helpTicketRelevant\" type=\"checkbox\"> Help Ticket Relevant\r\n                                </label>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"downloads.selectedDownload.downCatcode\" class=\"form-control\" id=\"editType\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.downCatcode}\">${category.description}</options>\r\n                            </select>\r\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\r\n                            <a class=\"btn btn-link\" disable.bind=\"this.downloads.selectedDownload.downCatcode == 0\"  click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <!-- Edit Category -->\r\n            <div class=\"row topMargin col-sm-8 col-sm-offset-2\" show.bind=\"editCat\">\r\n                <div class=\"panel panel-default\">\r\n                    <div class=\"panel-body\">\r\n                        <!--\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input disabled id=\"editCode\" value.bind=\"downloads.selectedCat.downCatcode\" type=\"text\" placeholder=\"Code\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                        -->\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input id=\"editCatDescription\" value.bind=\"downloads.selectedCat.description\" type=\"text\" placeholder=\"Description\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\r\n                        <span click.delegate=\"saveCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"cancelEditCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span show.bind=\" editCourseFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                  <div class=\"form-group\">\r\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"downloads.selectedDownload.file.fileName != undefined\">\r\n                          <a href.bind=\"selectedURL\" innerhtml.bind='downloads.selectedDownload.file.fileName' target='_blank'></a>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                  <div class=\"panel panel-default\">\r\n                      <div class=\"input-group\">\r\n                          <span class=\"input-group-btn\">\r\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                              </span>\r\n                          </span>\r\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n\r\n                </div>\r\n            </div>\r\n        </form>\r\n    </div>\r\n</template>\r\n"; });
+define('text!modules/admin/site/components/downloadTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Download\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:75px;\">Name <span click.trigger=\"dataTable.sortArray('name')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">File <span click.trigger=\"dataTable.sortArray('file.originalFilename','object')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('downCatcode','id',downloads.appCatsArray,'downCatcode','description')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Status <span click.trigger=\"dataTable.sortArray('active')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Help Ticket Relevant <span click.trigger=\"dataTable.sortArray('helpTicketRelevant')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"name\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"file.originalFilename\" type=\"text\" placeholder=\"Filter File\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"downCatcode\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.downCatcode}\">${category.description}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\"  class=\"form-control\" id=\"active\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">Active</option>\r\n                                    <option value=\"false\">Inactive</options>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketRelevant\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">True</option>\r\n                                    <option value=\"false\">False</options>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${item.name}</td>\r\n                                <td data-title=\"Original Filename\" style=\"width: 75px\">\r\n                                    <div>${item.file.originalFilename}</div>\r\n                                </td>\r\n                                <td data-title=\"Type\" style=\"width: 75px\">\r\n                                    <div>${item.downCatcode | lookupDescription:downloads.appCatsArray:'downCatcode'}</div>\r\n                                </td>\r\n                                <td data-title=\"Status\">${item.active | translateStatus}</td>\r\n                                <td data-title=\"Help Ticket Relevant\">${item.helpTicketRelevant}</a>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/site/components/messageForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <!--\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n            -->\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedMessage.category\" class=\"form-control\" id=\"category\">\n                                <option value=\"\">-- Select an Option --</option>\n                                <option value=\"${type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editKey\" class=\"col-sm-2 control-label hideOnPhone\">Key</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.key\" id=\"editKey\" class=\"form-control \" placeholder=\"Key\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <tiny-mce height.bind=\"150\" value.two-way=\"messageContent\"></tiny-mce>\n                        <!--    <textarea value.bind=\"siteinfo.selectedMessage.content\" id=\"editContent\" class=\"form-control \" placeholder=\"Content\" rows=\"10\"></textarea> -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Preview</label>\n                        <div class=\"col-sm-8\">\n                            <div show.bind=\"siteinfo.selectedMessage.content\" class=\"bottomMargin topMargin\" innerhtml.bind=\"siteinfo.selectedMessage.content\"></div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            -->\n        </form>\n    </div>\n</template>\n"; });
+define('text!modules/admin/site/components/messageTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='3'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Key <span click.trigger=\"dataTable.sortArray('key')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"key\" type=\"text\" placeholder=\"Key\" class=\"form-control\" />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"description\" type=\"text\" placeholder=\"Description\" class=\"form-control\"\n                                    />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Key\">${item.key}</td>\n                                <td data-title=\"Category\" style=\"width: 75px\">\n                                    <div>${item.category}</div>\n                                </td>\n                                <td data-title=\"Description\" style=\"width: 75px\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/site/components/newsForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"siteinfo.selectedItem._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.itemType\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\" show.bind=\"siteinfo.selectedItem.itemType == 'SYST'\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editPriority\" class=\"col-sm-2 control-label hideOnPhone\">Priority</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.priority\" class=\"form-control \" id=\"priority\">\n                                <option value=\"\"></option>\n                                <option value=\"INFO\">Information</option>\n                                <option value=\"WARN\">Warning</options>\n                                <option value=\"DANG\">Danger</options>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <tiny-mce height.bind=\"150\" value.two-way=\"newsContent\"></tiny-mce>\n                       <!--    <textarea value.bind=\"siteinfo.selectedItem.content\" id=\"editContent\" class=\"form-control \" placeholder=\"Content\" rows=\"10\"></textarea>-->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Category</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.category\" id=\"editCategory\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editUrl\" class=\"col-sm-2 control-label hideOnPhone\"><a href=\"${siteinfo.selectedItem.url}\" target=\"_blank\">URL</a></label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.url\" id=\"editUrl\" class=\"form-control \" placeholder=\"URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCreatedDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Created</label>\n                        <div class=\"col-sm-8\">\n                            <date-picker value.two-way=\"siteinfo.selectedItem.createdDate\"  controlid=\"editCreatedDate\"></date-picker>\n                            <!--\n                            <input value.bind=\"siteinfo.selectedItem.createdDate | datePickerDate\" id=\"editCreatedDate\" class=\"form-control \" placeholder=\"Date Created\" type=\"date\" />\n                            -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editExpireddDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Expires</label>\n                        <div class=\"col-sm-8\">\n                             <date-picker value.two-way=\"siteinfo.selectedItem.expiredDate\"  controlid=\"editExpireddDate\"></date-picker>\n                             <!--\n                            <input value.bind=\"siteinfo.selectedItem.expiredDate | datePickerDate\" id=\"editExpireddDate\" class=\"form-control \" placeholder=\"Date Expires\" type=\"date\" />\n                            -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editImageUrl\" class=\"col-sm-2 control-label hideOnPhone\">Image URL</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.image\" id=\"editImageUrl\" class=\"form-control \" placeholder=\"Image URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n             <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editSortOrder\" class=\"col-sm-2 control-label hideOnPhone\">Sort Order</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.sortOrder\" id=\"editSortOrder\" class=\"form-control \" placeholder=\"Sort Order\" type=\"number\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                  <div class=\"form-group\">\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"siteinfo.selectedItem.file.fileName != undefined\">\n                          <a href.bind=\"selectedURL\" innerhtml.bind='siteinfo.selectedItem.file.fileName' target='_blank'></a>\n                      </div>\n                  </div>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6 col-lg-offset-2\">\n                  <div class=\"panel panel-default\">\n                      <div class=\"input-group\">\n                          <span class=\"input-group-btn\">\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                              </span>\n                          </span>\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\n                      </div>\n                  </div>\n                </div>\n              </div>\n        </form>\n    </div>\n</template>\n"; });
+define('text!modules/admin/site/components/newsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <div class=\"checkbox\">\n                                        <label>\n                                        <input checked.bind=\"isChecked\" change.trigger=\"filterOutExpired()\" type=\"checkbox\"> Hide expired entries\n                                    </label>\n                                    </div>\n                                </td>\n                            </tr>\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Title <span click.trigger=\"dataTable.sortArray('title')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Expires <span click.trigger=\"dataTable.sortArray('expiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('itemType')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">URL <span click.trigger=\"dataTable.sortArray('url')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"title\" type=\"text\" placeholder=\"Filter Title\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"expiredDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"itemType\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"url\" type=\"text\" placeholder=\"Filter URL\" class=\"form-control\" />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Title\">${item.title}</td>\n                                <td data-title=\"Date Created\" style=\"width: 75px\">\n                                    <div>${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Date Expired\" style=\"width: 75px\">\n                                    <div>${item.expiredDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Type\">${item.itemType}</td>\n                                <td data-title=\"url\"><a href=\"${item.url}\" target=\"_blank\">${item.url}</a></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/system/components/Assignments.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"col-lg-12\">\r\n      <div class=\"col-lg-6\">\r\n    \r\n          <div class=\"form-group\">\r\n            <label for=\"editStudentId\" class=\"control-label hideOnPhone\">Student ID Prefix</label>\r\n            <input value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" id=\"editStudentId\" class=\"form-control \" placeholder=\"Student ID Prefix\" type=\"text\" />\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <label for=\"editFacultyId\" class=\"control-label\">Faculty ID Prefix</label>\r\n            <input value.bind=\"products.selectedProduct.defaultFacultyIdPrefix\" id=\"editFacultyId\" class=\"form-control \" placeholder=\"Faculty ID Prefix\" type=\"text\" />\r\n          </div>\r\n          <div class=\"form-group \">\r\n            <label for=\"editIdsAvailable \" class=\"control-label \">Number of IDs</label>\r\n            <input value.bind=\"products.selectedProduct.idsAvailable \" id=\"editIdsAvailable \" class=\"form-control\" placeholder=\"Number of IDs \" type=\"text \" />\r\n          </div>\r\n          <div class=\"form-group \">\r\n            <label for=\"editFirstUsableID \" class=\"control-label \">First usable ID</label>\r\n            <input value.bind=\"products.selectedProduct.firstAllowableId \" id=\"editFirstUsableID \" class=\"form-control \" placeholder=\"First Usable ID \" type=\"number \" />\r\n          </div>\r\n\r\n        \r\n      </div>\r\n           \r\n      <div class=\"col-lg-5 col-sm-offset-1\">  \r\n        <div class=\"form-group\">\r\n            <label for=\"editStudentPassword\" class=\"control-label\">Student Password</label>\r\n            <input value.bind=\"products.selectedProduct.defaultStudentPassword\" id=\"editStudentPassword\" class=\"form-control \" placeholder=\"Student Password\" type=\"text\" />\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"editFacultyPassword\" class=\"control-label\">Faculty Password</label>\r\n            <input value.bind=\"products.selectedProduct.defaultFacultyPassword\" id=\"editFacultyPassword\" class=\"form-control \" placeholder=\"Faculty Password\" type=\"text\" />\r\n        </div>\r\n        <div class=\"form-group\">\r\n        <label class=\"control-label hideOnPhone\">Clients</label>\r\n          <div class=\"checkbox\">\r\n            <label class=\"pull-left\">\r\n              <input  id=\"clientRelevant\" checked.bind=\"products.selectedProduct.clientRelevant\" type=\"checkbox\"> Required\r\n            </label>\r\n          </div>\r\n        </div>\r\n        <div class=\"form-group \">\r\n            <label for=\"editLastUsableID \" class=\"control-label \">Last usable ID</label>\r\n            <input value.bind=\"products.selectedProduct.lastAllowableId \" id=\"editLastUsableID \" class=\"form-control \" placeholder=\"Last Usable ID \" type=\"number \" />\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <div class=\"col-lg-12\">\r\n      <label for=\"editProductInfo \" class=\"control-label pull-left\">Product Information</label>\r\n      <tiny-mce height.bind=\"150\" value.two-way=\"productInfoEditorContent\"></tiny-mce>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                    <th>Select</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-check\" aria-hidden=\"true\"></i></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/system/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
@@ -26763,14 +26771,6 @@ define('text!modules/user/requests/components/requestDetails.html', ['module'], 
 define('text!modules/user/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n     <div class='row'>\n            <div class='col-lg-12'>\n                <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n                    <thead>\n                        \n                        <tr>\n                            <td colspan=\"6\">\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                            </td>\n                        </tr>\n                        <tr>\n                          <th>Product</th>\n                          <th>Status</th>\n                          <th>Date Created</th>\n                          <th>Date Required</th>\n                        </tr>\n                  </thead>\n                  <tbody>\n                    <tr  click.delegate=\"edit(product, $event, $index)\" repeat.for=\"product of dataTable.displayArray\">\n                      <td data-title=\"Product\">${product.productId | productName:products.productsArray}</td>\n                      <td data-title=\"Status\">${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n                      <td data-title=\"createdDate\">${product.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                      <td data-title=\"createdDate\">${product.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    </tr>\n                </tbody>\n            </table>\n          </div>\n        </div>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-lg-7\">\n      \n      <!-- Session Select -->\n      <div class=\"row\">\n        <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      \n    \n        <!-- Course Select -->\n        <div show.bind=\"selectedSession != ''\">\n          <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedCourse\" change.delegate=\"getRequests()\" id=\"course\"\n                    class=\"form-control\">\n              <option value=\"\">Select a course</option>\n              <option value.bind=\"config.SANDBOX_ID\">${config.SANDBOX_NAME}</option>\n              <option repeat.for=\"course of people.coursesArray\"\n                      value.bind=\"course._id\">${course.number} - ${course.name}</option>\n            </select>\n          </div>\n        </div>\n      </div>\n    \n      <div show.bind=\"dataTable.displayArray.length > 0\">\n        <!-- Request Table -->\n        <compose view=\"./requestsTable.html\"></compose>\n        <!-- Request Details -->\n        <compose view=\"./requestDetails.html\"></compose>\n      </div>\n  </div>\n  \n  <compose view=\"./requestDetailDetails.html\"></compose>\n \n</div>\n\n    \n</template>"; });
-define('text!modules/admin/site/components/configForm.html', ['module'], function(module) { module.exports = "<template>\n\t\n</template>"; });
-define('text!modules/admin/site/components/configTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>   \n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:200px;\">Parameter <span click.trigger=\"dataTable.sortArray('parameter')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:300px;\">Description</th>\n                                <th style=\"width:100px;\">Value</th>\n\t\t\t\t\t\t\t\t<th style=\"width:200px;\">Date Modified</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"parameter\" type=\"text\" placeholder=\"Filter Parameter\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Parameter\">${item.parameter}</td>\n                                <td data-title=\"Description\">${item.description}</td>\n                                <td data-title=\"Value\"><input readonly.bind=\"item.readOnly\" value.bind=\"item.value\" id=\"editValue\" class=\"form-control\" type=\"text\" /></td>\n                                <td data-title=\"Modified Date\"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/admin/site/components/downloadForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <form class=\"form-horizontal topMargin\">\r\n\r\n            <!-- Row 1 -->\r\n              <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-6\">\r\n                    <div class=\"form-group\">\r\n                        <label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.active\" type=\"checkbox\"> Active\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input id=\"activeProduct\" checked.bind=\"downloads.selectedDownload.helpTicketRelevant\" type=\"checkbox\"> Help Ticket Relevant\r\n                                </label>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"downloads.selectedDownload.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"downloads.selectedDownload.downCatcode\" class=\"form-control\" id=\"editType\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.downCatcode}\">${category.description}</options>\r\n                            </select>\r\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\r\n                            <a class=\"btn btn-link\" disable.bind=\"this.downloads.selectedDownload.downCatcode == 0\"  click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <!-- Edit Category -->\r\n            <div class=\"row topMargin col-sm-8 col-sm-offset-2\" show.bind=\"editCat\">\r\n                <div class=\"panel panel-default\">\r\n                    <div class=\"panel-body\">\r\n                        <!--\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input disabled id=\"editCode\" value.bind=\"downloads.selectedCat.downCatcode\" type=\"text\" placeholder=\"Code\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                        -->\r\n                        <div class=\"form-group\">\r\n                            <div class=\"col-sm-8\">\r\n                                <input id=\"editCatDescription\" value.bind=\"downloads.selectedCat.description\" type=\"text\" placeholder=\"Description\"\r\n                                    class=\"form-control\"/>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\r\n                        <span click.delegate=\"saveCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"cancelEditCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span show.bind=\" editCourseFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                  <div class=\"form-group\">\r\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\r\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"downloads.selectedDownload.file.fileName != undefined\">\r\n                          <a href.bind=\"selectedURL\" innerhtml.bind='downloads.selectedDownload.file.fileName' target='_blank'></a>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                  <div class=\"panel panel-default\">\r\n                      <div class=\"input-group\">\r\n                          <span class=\"input-group-btn\">\r\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                              </span>\r\n                          </span>\r\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                      </div>\r\n                  </div>\r\n                </div>\r\n              </div>\r\n\r\n                </div>\r\n            </div>\r\n        </form>\r\n    </div>\r\n</template>\r\n"; });
-define('text!modules/admin/site/components/downloadTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Download\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:75px;\">Name <span click.trigger=\"dataTable.sortArray('name')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">File <span click.trigger=\"dataTable.sortArray('file.originalFilename','object')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('downCatcode','id',downloads.appCatsArray,'downCatcode','description')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Status <span click.trigger=\"dataTable.sortArray('active')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Help Ticket Relevant <span click.trigger=\"dataTable.sortArray('helpTicketRelevant')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"name\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"file.originalFilename\" type=\"text\" placeholder=\"Filter File\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"downCatcode\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.downCatcode}\">${category.description}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\"  class=\"form-control\" id=\"active\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">Active</option>\r\n                                    <option value=\"false\">Inactive</options>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketRelevant\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">True</option>\r\n                                    <option value=\"false\">False</options>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${item.name}</td>\r\n                                <td data-title=\"Original Filename\" style=\"width: 75px\">\r\n                                    <div>${item.file.originalFilename}</div>\r\n                                </td>\r\n                                <td data-title=\"Type\" style=\"width: 75px\">\r\n                                    <div>${item.downCatcode | lookupDescription:downloads.appCatsArray:'downCatcode'}</div>\r\n                                </td>\r\n                                <td data-title=\"Status\">${item.active | translateStatus}</td>\r\n                                <td data-title=\"Help Ticket Relevant\">${item.helpTicketRelevant}</a>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!modules/admin/site/components/messageForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <!--\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n            -->\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedMessage.category\" class=\"form-control\" id=\"category\">\n                                <option value=\"\">-- Select an Option --</option>\n                                <option value=\"${type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editKey\" class=\"col-sm-2 control-label hideOnPhone\">Key</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.key\" id=\"editKey\" class=\"form-control \" placeholder=\"Key\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <tiny-mce height.bind=\"150\" value.two-way=\"messageContent\"></tiny-mce>\n                        <!--    <textarea value.bind=\"siteinfo.selectedMessage.content\" id=\"editContent\" class=\"form-control \" placeholder=\"Content\" rows=\"10\"></textarea> -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Preview</label>\n                        <div class=\"col-sm-8\">\n                            <div show.bind=\"siteinfo.selectedMessage.content\" class=\"bottomMargin topMargin\" innerhtml.bind=\"siteinfo.selectedMessage.content\"></div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            -->\n        </form>\n    </div>\n</template>\n"; });
-define('text!modules/admin/site/components/messageTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='3'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Key <span click.trigger=\"dataTable.sortArray('key')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"key\" type=\"text\" placeholder=\"Key\" class=\"form-control\" />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"description\" type=\"text\" placeholder=\"Description\" class=\"form-control\"\n                                    />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Key\">${item.key}</td>\n                                <td data-title=\"Category\" style=\"width: 75px\">\n                                    <div>${item.category}</div>\n                                </td>\n                                <td data-title=\"Description\" style=\"width: 75px\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/admin/site/components/newsForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"siteinfo.selectedItem._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.itemType\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\" show.bind=\"siteinfo.selectedItem.itemType == 'SYST'\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editPriority\" class=\"col-sm-2 control-label hideOnPhone\">Priority</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.priority\" class=\"form-control \" id=\"priority\">\n                                <option value=\"\"></option>\n                                <option value=\"INFO\">Information</option>\n                                <option value=\"WARN\">Warning</options>\n                                <option value=\"DANG\">Danger</options>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <tiny-mce height.bind=\"150\" value.two-way=\"newsContent\"></tiny-mce>\n                       <!--    <textarea value.bind=\"siteinfo.selectedItem.content\" id=\"editContent\" class=\"form-control \" placeholder=\"Content\" rows=\"10\"></textarea>-->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Category</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.category\" id=\"editCategory\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editUrl\" class=\"col-sm-2 control-label hideOnPhone\"><a href=\"${siteinfo.selectedItem.url}\" target=\"_blank\">URL</a></label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.url\" id=\"editUrl\" class=\"form-control \" placeholder=\"URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCreatedDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Created</label>\n                        <div class=\"col-sm-8\">\n                            <date-picker value.two-way=\"siteinfo.selectedItem.createdDate\"  controlid=\"editCreatedDate\"></date-picker>\n                            <!--\n                            <input value.bind=\"siteinfo.selectedItem.createdDate | datePickerDate\" id=\"editCreatedDate\" class=\"form-control \" placeholder=\"Date Created\" type=\"date\" />\n                            -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editExpireddDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Expires</label>\n                        <div class=\"col-sm-8\">\n                             <date-picker value.two-way=\"siteinfo.selectedItem.expiredDate\"  controlid=\"editExpireddDate\"></date-picker>\n                             <!--\n                            <input value.bind=\"siteinfo.selectedItem.expiredDate | datePickerDate\" id=\"editExpireddDate\" class=\"form-control \" placeholder=\"Date Expires\" type=\"date\" />\n                            -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editImageUrl\" class=\"col-sm-2 control-label hideOnPhone\">Image URL</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.image\" id=\"editImageUrl\" class=\"form-control \" placeholder=\"Image URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n             <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editSortOrder\" class=\"col-sm-2 control-label hideOnPhone\">Sort Order</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.sortOrder\" id=\"editSortOrder\" class=\"form-control \" placeholder=\"Sort Order\" type=\"number\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                  <div class=\"form-group\">\n                      <label for=\"editFile\" class=\"col-sm-2 control-label hideOnPhone topMargin\">File</label>\n                      <div class=\"col-sm-3 topMargin\" show.bind=\"siteinfo.selectedItem.file.fileName != undefined\">\n                          <a href.bind=\"selectedURL\" innerhtml.bind='siteinfo.selectedItem.file.fileName' target='_blank'></a>\n                      </div>\n                  </div>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6 col-lg-offset-2\">\n                  <div class=\"panel panel-default\">\n                      <div class=\"input-group\">\n                          <span class=\"input-group-btn\">\n                              <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                              Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                              </span>\n                          </span>\n                          <input type=\"text\" value.bind=\"selectedFile\" class=\"form-control\" readonly/>\n                      </div>\n                  </div>\n                </div>\n              </div>\n        </form>\n    </div>\n</template>\n"; });
-define('text!modules/admin/site/components/newsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <div class=\"checkbox\">\n                                        <label>\n                                        <input checked.bind=\"isChecked\" change.trigger=\"filterOutExpired()\" type=\"checkbox\"> Hide expired entries\n                                    </label>\n                                    </div>\n                                </td>\n                            </tr>\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Title <span click.trigger=\"dataTable.sortArray('title')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Expires <span click.trigger=\"dataTable.sortArray('expiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('itemType')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">URL <span click.trigger=\"dataTable.sortArray('url')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"title\" type=\"text\" placeholder=\"Filter Title\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"expiredDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"itemType\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"url\" type=\"text\" placeholder=\"Filter URL\" class=\"form-control\" />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Title\">${item.title}</td>\n                                <td data-title=\"Date Created\" style=\"width: 75px\">\n                                    <div>${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Date Expired\" style=\"width: 75px\">\n                                    <div>${item.expiredDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Type\">${item.itemType}</td>\n                                <td data-title=\"url\"><a href=\"${item.url}\" target=\"_blank\">${item.url}</a></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/user/support/components/-time.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
 define('text!modules/user/support/components/1-time.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n    </div>\n    <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n    </div>\n    <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n        <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n        <label>Curriculum Title: ${event.content.curriculumTitle}</label>\n        <label class=\"col-sm-offset-1\">Exercise Module: ${event.content.exerciseModule}</label>\n        <label class=\"col-sm-offset-1\">Page: ${event.content.pageNumber}</label>\n        <label class=\"col-sm-offset-1\">User IDs: ${event.content.UserIDsaffected}</label>\n        <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n        </div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n    </div>\n\n    </div>\n</template>"; });
 define('text!modules/user/support/components/2-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <h4>User Ids: ${event.content.resetPasswordUserIDs}</h4>\n      <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"hover_img\" repeat.for=\"file of event.files\">\n          <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n            target=\"_blank\"\n            innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n        </div>\n      </div>\n    </div>\n\n\n  </div>\n\n</template>\n"; });
