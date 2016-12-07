@@ -133,7 +133,7 @@ export class Sessions {
         if (!this.selectedSession._id) {
             let serverResponse = await this.data.saveObject(this.selectedSession, this.data.SESSIONS_SERVICE, "post");
             if (!serverResponse.error) {
-                this.sessionsArray.push(serverResponse);
+                this.sessionsArray.unshift(serverResponse);
             }
             return serverResponse;
         } else {

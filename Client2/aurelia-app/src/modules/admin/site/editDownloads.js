@@ -16,6 +16,7 @@ export class EditProducts {
     selectedFile = "";
     removedFiles = new Array();
     filesSelected = false;
+    newDownload = false;
 
     constructor(datatable, downloads, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -53,6 +54,7 @@ export class EditProducts {
     async new() {
         this.editIndex = -1;
         this.downloads.selectDownload();
+        this.newDownload = true;
 
         $("#editName").focus();
         this.downloadSelected = true;
@@ -61,7 +63,7 @@ export class EditProducts {
     async edit(index, el) {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.downloads.selectDownload(this.editIndex);
-        
+        this.newDownload = false;
          this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
          this.downloads.selectedDownload.downCatcode = this.downloads.selectedDownload.downCatcode.toString();
 
@@ -95,10 +97,7 @@ export class EditProducts {
                 if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
                  this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
             }
-            this.downloadSelected = false;
-            this.selectedFiles = undefined;
-            this.files = undefined;
-            this.selectedFile = "";
+            this._cleanUp();
         }
     }
 
@@ -130,9 +129,7 @@ export class EditProducts {
                 this.dataTable.updateArray(this.downloads.appDownloadsArray);
                 this.utils.showNotification("Download ${name} was deleted");
         }
-        this.downloadSelected = false;
-        this.selectedFiles = undefined;
-        this.files = undefined;
+        this._cleanUp();
     }
 
     back() {
@@ -227,6 +224,15 @@ export class EditProducts {
             this.utils.showNotification("Category " + name + " was deleted");
         }
         this.editCat = false;
+    }
+
+    _cleanUp(){
+        this. _cleanUpFilters();
+        this.downloadSelected = false;
+        this.selectedFiles = undefined;
+        this.files = undefined;
+        this.selectedFile = "";
+        this.newDownload = false;
     }
 
     _cleanUpFilters(){

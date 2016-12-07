@@ -1,10 +1,9 @@
-import {DataServices} from '../data/dataServices';
 import {bindable} from 'aurelia-framework';
 import {inject} from 'aurelia-framework';
-import {Utils} from '../utils/utils';
+// import {Utils} from '../utils/utils';
 import {AppConfig} from '../../config/appConfig'; 
 
-@inject(DataServices, Utils, AppConfig)
+@inject( AppConfig)
 export class EditClient{
     
   assignmentArray = [];
@@ -33,11 +32,9 @@ export class EditClient{
    @bindable
    action2=()=>{};
 
-  constructor(data, utils, config){
-    this.data = data;
-    this.utils = utils;
-    this.config = config;
-  }
+   constructor(config){
+     this.config = config;
+   }
   
   save(){
     this.action2();  

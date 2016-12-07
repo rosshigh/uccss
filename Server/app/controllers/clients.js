@@ -93,7 +93,7 @@ module.exports = function (app) {
   router.put('/api/clients', requireAuth, function(req, res, next){
     logger.log('Update Clients ' + req.body._id,"verbose");
 
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
       } else {

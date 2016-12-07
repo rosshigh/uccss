@@ -61,16 +61,15 @@ export class EditSystem {
         this.displayIndex = -1;
         this.systems.selectSystem();
         this.editStatus = true;
-        this.saveClients = false;
+        // this.saveClients = false;
         $("#editSid").focus();
         this.systemSelected = true;
         this.newSystem = true;
     }
 
     edit(index, el) {
-         this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.systems.selectSystem(this.editIndex);
-        this.saveClients = false;
         this.editSystem = true;
         this.systemSelected = true;
         this.newSystem = false;
@@ -104,7 +103,7 @@ export class EditSystem {
                 });
         }
         var result = this.systems.generateClients(start, end, this.editClientStatus);
-        this.saveClients = true;
+        // this.saveClients = true;
         if (result.error) {
             this.utils.showNotification(result.error);
         }
@@ -126,7 +125,7 @@ export class EditSystem {
             ['Yes', 'No']
             ).then(response => {
                 if(!response.wasCancelled){
-                    this.saveClients = true; 
+                    // this.saveClients = true; 
                     this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);    
                 }
             });
@@ -160,7 +159,7 @@ export class EditSystem {
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.interfaceUpdate = true;
-        this.saveClients = true;
+        // this.saveClients = true;
     }
 
     async deleteClient(){
@@ -184,14 +183,10 @@ export class EditSystem {
     }
 
     async saveClient(){
-        try {
-            let serverResponse = await this.systems.saveClient();
-            if (!serverResponse.error) {
-                this.utils.showNotification("Client " + this.selectedClient.client + " updated");
-                this.interfaceUpdate = false;
-            }
-        } catch(error){
-            console.log(error)
+        let serverResponse = await this.systems.saveClient();
+        if (!serverResponse.error) {
+            this.utils.showNotification("Client " + this.selectedClient.client + " updated");
+            this.interfaceUpdate = false;
         }
     }
 
@@ -209,10 +204,9 @@ export class EditSystem {
             this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
             let serverResponse = await this.systems.saveSystem();
             if (!serverResponse.error) {
-                 this.dataTable.updateArray(this.systems.systemsArray,'sid',1);
                 this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
                 this._cleanUp();
-            }
+            } 
         }
     }
 
@@ -250,6 +244,7 @@ export class EditSystem {
         $("#sid").val("");
         $("#description").val("");
         $("#server").val("");
+        this.dataTable.updateArray(this.systems.systemsArray,'sid',1);
     }
 
     back() {

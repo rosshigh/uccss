@@ -43,10 +43,7 @@
         <label for="editStatus" class="col-sm-2 form-control-label  bottomMargin">Status</label>
         <div class="col-sm-10">
           <select value.bind="sessions.selectedSession.sessionStatus" id="editStatus" class="form-control bottomMargin" id="editStatus">
-            <option value="Closed">Closed</option>
-            <option value="Active">Active</option>
-            <option value="Requests">Requests</option>
-            <option value="Next">Next</option>
+            <option repeat.for="session of config.SESSION_STATUSES" value.bind="session">${session}</option>
           </select>
         </div>
       </div>

@@ -47,7 +47,6 @@ export class TinyMce {
 				statusbar: that.statusBar,
 				toolbar: that.toolBar,
 				contextmenu: that.contextMenu,
-				//content_css: "/tinymce/editor_content.css",
 				height: that.height,
 				convert_urls: that.convertUrls,
 				setup: editor => {
@@ -55,7 +54,7 @@ export class TinyMce {
 						that.editor = editor;
 						editor.setContent(that.value);
 					});
-					editor.on('change redo undo', e => {
+					editor.on('change redo undo mouseleave', e => {
 						if(once) that.value = editor.getContent({format: 'raw'}); 
 						once = true;
 					});

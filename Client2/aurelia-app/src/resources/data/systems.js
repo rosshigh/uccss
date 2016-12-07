@@ -100,15 +100,19 @@ export class Systems{
         }
 
         if(!this.selectedSystem._id){
-            let serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE, "post");
+            let serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE + "A", "post");
             if(!serverResponse.error){
                  this.systemsArray.push(serverResponse);
+            } else {
+                this.data.processError(serverResponse,"Error updating the system.<br>")
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE, "put");
             if(!serverResponse.error){
                 this.systemsArray[this.editIndex] = this.utils.copyObject(this.selectedSystem);
+            } else {
+                this.data.processError(serverResponse,"Error updating the system.<br>")
             }
             return serverResponse;
         }
@@ -124,6 +128,8 @@ export class Systems{
             if (!serverResponse.error) {
                 this.systemsArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
+            } else {
+                this.data.processError(serverResponse,"Error deleting the system.<br>")
             }
             return serverResponse;
     }
@@ -144,7 +150,9 @@ export class Systems{
         if(!serverResponse.error){
             this.systemsArray[this.editIndex].clients = [];
             this.selectedSystem.clients = new Array();
-        } 
+        } else {
+                this.data.processError(serverResponse,"Error deleting the clients.<br>")
+            }
         return serverResponse;
     }
 
@@ -233,7 +241,8 @@ export class Systems{
     async saveClient(){
         var serverResponse = await this.data.saveObject(this.selectedClient, this.data.CLIENTS_SERVICE, "put");
         if(!serverResponse.error){
-           this.selectedSystem.clients[this.clientIndex] = this.utils.copyObject(this.selectedClient);
+            this.updateClient(serverResponse);
+            this.selectedSystem.clients[this.clientIndex] = serverResponse;
         }
         return serverResponse;
     }

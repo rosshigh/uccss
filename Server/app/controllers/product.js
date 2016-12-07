@@ -27,22 +27,6 @@ module.exports = function (app) {
       });
   });
 
-  // router.get('/api/products/active', function(req, res, next){
-  //   logger.log('Get products')
-  //   debug('Get products');
-  //   var fields = req.fieldList ? req.fieldList : undefined;
-  //   Model.find({active: true})
-  //     .sort(req.query.order)
-  //     .select(fields)
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
-
   router.get('/api/products/:id', function(req, res, next){
     logger.log('Get product ' + req.params.id,"verbose");
     
@@ -71,7 +55,7 @@ module.exports = function (app) {
   router.put('/api/products', function(req, res, next){
     logger.log('Update Product ' + req.body._id, "verbose");
 
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
       } else {

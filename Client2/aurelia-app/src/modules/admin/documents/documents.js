@@ -6,9 +6,10 @@ import {Utils} from '../../../resources/utils/utils';
 import {DocumentsServices} from '../../../resources/data/documents';
 import {People} from '../../../resources/data/people';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
+import Validation from '../../../resources/utils/validation';
 import $ from 'jquery';
 
-@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, CommonDialogs)
+@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, CommonDialogs, Validation)
 export class Documents {
     navControl = "documentssNavButtons";
     spinnerHTML = "";
@@ -17,8 +18,9 @@ export class Documents {
     categoryForm = false;
     showDocumentForm = false;
     showDocuments = false;
+    displayTitle = "";
 
-    constructor(router, datatable, documents, people, utils, config, dialog) {
+    constructor(router, datatable, documents, people, utils, config, dialog, validation) {
         this.router = router;
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -27,6 +29,8 @@ export class Documents {
         this.config = config;
         this.people = people;
         this.dialog = dialog;
+        this.validation = validation;
+        this.validation.initialize(this);
     }
 
     canActivate(){
@@ -48,6 +52,7 @@ export class Documents {
 
     attached(){
         $('[data-toggle="tooltip"]').tooltip();
+         this._setupValidation();
     }
 
     async refresh() {
@@ -61,6 +66,7 @@ export class Documents {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         // this.displayIndex = index + parseInt(this.dataTable.startRecord);
         this.documents.selectDocument(this.editIndex);
+         this.displayTitle = "Files";
 
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -80,7 +86,7 @@ export class Documents {
         }
     }
 
-    async typeChanged(index, type){
+    async typeChanged(index, el){
       if(index >= 0){
         this.categoryIndex = index;
         this.documents.selectCategory(index);
@@ -88,6 +94,11 @@ export class Documents {
         this.dataTable.updateArray(this.documents.documentsArray);
         this.showDocuments = true;
         this.showDocumentForm =  false;
+        this.displayTitle = "Documents";
+
+        if (this.selectedRow) this.selectedRow.removeClass('info');
+        this.selectedRow = $(el.target);
+        this.selectedRow.addClass('info')
       }
     }
 
@@ -98,6 +109,7 @@ export class Documents {
     }
 
     back(){
+        this.displayTitle = "Documents";
         this.showDocumentForm = false;
     }
 
@@ -123,6 +135,7 @@ export class Documents {
                 this.utils.showNotification("The document was deleted");
                 this.showDocumentForm = false;
         }
+        this. _cleanUp();
     }
 
     toggleFileActive(index){
@@ -168,7 +181,7 @@ export class Documents {
 
     async save(){
          this.buildDocument();
-        //   if(this.validation.validate(1, this)){ 
+          if(this.validation.validate(1)){ 
             let serverResponse = await this.documents.saveDocument();
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.documents.documentsArray);
@@ -178,10 +191,9 @@ export class Documents {
                  this.spinnerHTML = "";
                  $("#spinner").toggle().toggle();
             }
-            this.selectedFiles = undefined;
-            this.files = undefined;
+            this. _cleanUp();
             this.selectedFile = "";
-        // }
+        }
     }
 
     changeFiles(){
@@ -206,11 +218,23 @@ export class Documents {
         }
     }
 
+    _cleanUp(){
+        document.getElementById("uploadFiles").value = "";
+        this.selectedFiles = undefined;
+        this.files = undefined;
+    }
+
     backCategory(){
         this.categoryForm = false;
     }
 
     cancelEditCategory(){
          this.documents.selectCategory();
+    }
+
+    _setupValidation(){
+         this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Document name is required", "value": "documents.selectedDocument.name" }]);
+         this.validation.addRule(1, "editDescription", [{ "rule": "required", "message": "Document description is required", "value": "documents.selectedDocument.description" }]);
+         this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
     }
 }

@@ -71,18 +71,19 @@ module.exports = function (app, config) {
           Model.remove({ _id: req.params.id }, function(err) {
             if (err) {
               return next(err);
-            } else {          
-                if( fs.existsSync(path) ) {              
-                  fs.readdirSync(path).forEach(function(file,index){
-                    var curPath = path + "/" + file;                
-                    if(fs.lstatSync(curPath).isDirectory()) { // recurse
-                      deleteFolderRecursive(curPath);
-                    } else { // delete file
-                      fs.unlinkSync(curPath);
-                    }
-                  });
-                  fs.rmdirSync(path);
-                }
+            } else {       
+              deleteFolderRecursive(curPath);   
+                // if( fs.existsSync(path) ) {              
+                //   fs.readdirSync(path).forEach(function(file,index){
+                //     var curPath = path + "/" + file;                
+                //     if(fs.lstatSync(curPath).isDirectory()) { // recurse
+                //       deleteFolderRecursive(curPath);
+                //     } else { // delete file
+                //       fs.unlinkSync(curPath);
+                //     }
+                //   });
+                //   fs.rmdirSync(path);
+                // }
               res.status(204).json({message: 'Record deleted'});
             }
           });

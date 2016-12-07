@@ -5,7 +5,7 @@ import {HttpClient} from 'aurelia-http-client';
 export class AppConfig {
 
     HOST = location.origin;
-    // BASE_URL = "http://localhost:5000/api/";; 
+    // BASE_URL = "http://localhost:5000/api/";
     BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -43,6 +43,8 @@ export class AppConfig {
     CUSTOMER_ACTION_CLIENT_REQUEST = 4;
 
      TIMEZONES = ["EST", "CST", "MST", "PST"];
+
+     SESSION_STATUSES = ["Closed","Active","Requests","Next"];
 
      //Session parameters
     SESSION_TERM = "Session";

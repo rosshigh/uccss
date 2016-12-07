@@ -9,6 +9,7 @@ export function configure(config) {
     './elements/date-picker',
      './elements/edit-client',
      './value-converters/ucc-staff',
+     './value-converters/session-status-button',
     './value-converters/to-uppercase',
     './value-converters/info-filter',
     './value-converters/date-format',

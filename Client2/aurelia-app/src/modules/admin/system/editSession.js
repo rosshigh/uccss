@@ -47,11 +47,6 @@ export class EditSessions {
         this.spinnerHTML = "";
     }
 
-    async refreshConfig(){
-        await this.config.getConfig();
-        this.editSessionConfig();
-    }
-
     new() {
         this.sessions.selectSession();
         this.showScreen = 'editSession';
@@ -60,14 +55,6 @@ export class EditSessions {
         this.newSession = true;
         $("#editSession").focus();
         if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
-    }
-
-    editSessionConfig() {
-        this.editSessionConfigArray = new Array();
-        this.config.SESSION_PARAMS.forEach((item) => {
-            this.editSessionConfigArray.push(this.utils.copyObject(item));
-        })
-        this.showScreen = 'editConfig';
     }
 
     //User clicked a session to edit
@@ -99,10 +86,26 @@ export class EditSessions {
         }
     }
 
+     async refreshConfig(){
+       await this.config.getSessions(true);
+        this.editSessionConfig();
+    }
+
+    editSessionConfig() {
+        this.editSessionConfigArray = new Array();
+        this.config.SESSION_PARAMS.forEach((item) => {
+            this.editSessionConfigArray.push(this.utils.copyObject(item));
+        })
+        this.showScreen = 'editConfig';
+    }
+
     async saveConfig() {
         if (this.editSessionConfigArray) {
             let serverResponse = await this.siteConfig.saveSessions(this.editSessionConfigArray);
             if (!serverResponse.error) {
+                this.editSessionConfigArray.forEach((item, index) => {
+                    this.config.SESSION_PARAMS[index] = item;
+                })
                 this.utils.showNotification("Session configuration updated");
                 this.showScreen = 'sessionTable';
             }
@@ -110,18 +113,21 @@ export class EditSessions {
     }
 
     updateStatus(index, session, el) {
+        if(session.sessionStatus === "Closed") return;
+        
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.sessions.selectSession(this.editIndex);
 
-        switch (el.target.value) {
-            case "Open":
+        switch (session.sessionStatus) {
+            case "Next":
                 this.editStatus = "Requests";
                 break;
-            case "Activate":
+            case "Requests":
                 this.editStatus = "Active";
                 break;
-            case "Close":
-                this.editStatus = "Closed";
+            case "Active":
+                this.editStatus = "Closed"
+                break;
         }
         this.sessions.selectedSession.sessionStatus = this.editStatus;
         this.save();

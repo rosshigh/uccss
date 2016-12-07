@@ -53,7 +53,8 @@ export class EditProducts {
             this.products.getProductsArray(true, '?order=name'),
             this.systems.getSystemsArray(true, '?order=sid'),
             this.is4ua.loadIs4ua(),
-            this.documents.getDocumentsCategoriesArray()
+            this.documents.getDocumentsCategoriesArray(),
+            this.config.getConfig()
         ]);
         this.dataTable.updateArray(this.products.productsArray);
         this.filteredDocumentArray = this.documents.docCatsArray;

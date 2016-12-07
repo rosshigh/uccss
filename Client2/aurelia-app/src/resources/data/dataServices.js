@@ -151,22 +151,27 @@ export class DataServices {
 
     }
 
-    // processError(obj, message) {
-    //     console.log(obj);
-    //     var msg = (message ? message : "") + " ";
-    //     switch (obj.status) {
-    //         case 404:
-    //             msg = msg += "The service wasn't found.  Contact your UCC.";
-    //             break;
-    //         case 422:
-    //             msg = msg += "The request was bad.  Contact your UCC.";
-    //             break;
-    //         case 409:
-    //             msg = msg += "The record already exists.";
-    //             break;
-    //     }
-    //     this.utils.showNotification(msg);
-    // }
+    processError(obj, message) {
+        console.log(obj);
+        var msg = (message ? message : "") + " ";
+        switch (obj.code) {
+            case 404:
+                msg = msg += "The service wasn't found.  Contact your UCC.";
+                break;
+            case 422:
+                msg = msg += "The request was bad.  Contact your UCC.";
+                break;
+            case 409:
+                msg = msg += "The record already exists.";
+                break;
+            case 500:
+                msg = msg += "An unspecified error occured on the server.  Contact your UCC.";
+                break;
+            default:
+                msg = msg += "An unspecified error occured.  Contact your UCC."
+        }
+        this.utils.showNotification(msg);
+    }
 
     // //File URLs
     FILE_URL = "http://localhost:5000/api/upload";

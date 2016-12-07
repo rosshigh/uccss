@@ -43,15 +43,17 @@
                                 <div style="width: 100px">${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</div>
                             </td>
                             <td data-title="createdDate" click.trigger="edit($index, $event)">${session.sessionStatus}</td>
-                            <td data-title="Update">
-                                <div style="width: 100px">
+                            <td data-title="Update" style="width: 100px" click.trigger="updateStatus($index, session, $event)" innerhtml.bind="session.sessionStatus | sessionStatusButton">
+                         
+                                   
+                                    <!--
                                     <button click.trigger="updateStatus($index, session, $event)" class='btn btn-primary btn-fill btn-sm' show.bind="session.sessionStatus === 'Active'"
                                         value="Close">Close</button>
                                     <button click.trigger="updateStatus($index, session, $event)" class='btn btn-primary btn-fill btn-sm' show.bind="session.sessionStatus === 'Requests'"
                                         value="Activate">Activate</button>
                                     <button click.trigger="updateStatus($index, session, $event)" class='btn btn-primary btn-fill btn-sm' show.bind="session.sessionStatus === 'Next'"
                                         value="Open">Open</button>
-                                </div>
+                                        -->
                             </td>
                         </tr>
                     </tbody>
