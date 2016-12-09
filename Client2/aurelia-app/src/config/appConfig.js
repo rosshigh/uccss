@@ -46,6 +46,8 @@ export class AppConfig {
 
      SESSION_STATUSES = ["Closed","Active","Requests","Next"];
 
+      SESSION_EXPLANATION = "The UCC sessions are used to define when systems are available and when you can request products.  A session classified as <b>Active</b> is the currently active session whereas when a session classified as <b>Requests</b> it means customers may request products but the systems are not yet available.  A <b>Next</b> status means that we are not taking requests yet but will be soon.  Use the information on this page to plan.  We don't extend products across sessions so make sure you choose the session that matches your requirements."
+
      //Session parameters
     SESSION_TERM = "Session";
     // SESSION_PARAMS = [

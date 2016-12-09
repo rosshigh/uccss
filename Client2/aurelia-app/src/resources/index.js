@@ -8,6 +8,7 @@ export function configure(config) {
     './elements/add-systems',
     './elements/date-picker',
      './elements/edit-client',
+      './value-converters/append-products',
      './value-converters/ucc-staff',
      './value-converters/session-status-button',
     './value-converters/to-uppercase',

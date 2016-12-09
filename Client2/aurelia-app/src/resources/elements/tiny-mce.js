@@ -52,6 +52,7 @@ export class TinyMce {
 				setup: editor => {
 					editor.on('init', e => {
 						that.editor = editor;
+						if(!that.value) that.value = "";
 						editor.setContent(that.value);
 					});
 					editor.on('change redo undo mouseleave', e => {

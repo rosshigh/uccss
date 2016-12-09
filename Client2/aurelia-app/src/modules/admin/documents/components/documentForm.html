@@ -74,7 +74,7 @@
                     </thead>
                     <tbody>
                         <tr repeat.for="item of documents.selectedDocument.files">
-                            <td data-title="Name"><a target="_blank" href="${config.HOST}/${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}">${item.originalFilename}</a></td>
+                            <td data-title="Name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}">${item.originalFilename}</a></td>
                             <td data-title="Version">${item.version}</td>
                             <td data-title="Date Uploaded">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>
                             <td data-title="Person">${item.personId | personName:people.peopleArray}</td>

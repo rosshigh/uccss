@@ -1,5 +1,4 @@
 var express = require('express'),
-  debug = require('debug')('uccss'),
   router = express.Router(),
   mongoose = require('mongoose'),
   System = mongoose.model('System'),

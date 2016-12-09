@@ -184,7 +184,11 @@ export class DataServices {
     PEOPLE_SERVICE = "people";
     PERSON_REGISTER = "people/register"
     CHECK_EMAIL = 'people/checkEmail';
-    CHECK_NAME = 'people/checkName'
+    CHECK_NAME = 'people/checkName';
+    
+    CURRICULUM_SERVICE = 'curriculum';
+    CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
+
 
     // //Sessions Services
     SESSIONS_SERVICE = "sessions";

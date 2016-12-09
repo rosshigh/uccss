@@ -1,3 +1,22 @@
 <template>
-	<h1>Curriculum Information</h1>
+	<div class="col-lg-3">
+		<h4>Curriculum Categories</h4>
+		<div>
+			<ul class="list-group">
+				<button click.trigger="typeChanged($index, $event)" type="button" repeat.for="category of curriculum.curriculumCatArray" id="${category.name}"
+					class="list-group-item">${category.name}</button>
+			</ul>
+		</div>
+	</div>
+	<div class="col-lg-9">
+		<div class="col-md-6" repeat.for = "curriculum of curriculumArray">
+			<div class="panel panel-default">
+				<div class="panel-heading clearfix panel-collapsed" click.trigger="togglePanel($event)">
+					<h3 class="panel-title pull-left">${curriculum.title}</h3>
+					<span class="pull-right clickable"><i class="fa fa-chevron-down"></i></span>
+				</div>
+				<div class="panel-body" style="display: none;" innerhtml.bind="curriculum | appendProducts:products.productsArray"></div>
+			</div>
+		</div>
+	</div>
 </template>

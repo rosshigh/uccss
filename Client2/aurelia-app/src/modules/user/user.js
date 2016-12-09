@@ -22,6 +22,12 @@ export class User {
     this.helpTickets = helpTickets;
     this.requests = requests;
   };
+
+  attached(){
+    $('.carousel').carousel({
+        interval: 10000
+    })
+  }
   
   async activate(){
     await this.getData();

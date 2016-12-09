@@ -41,6 +41,14 @@ export class Site{
             nav: true,
             name: 'config',
             title: 'Config'
+        },
+        {
+            route: 'curriculum',
+            moduleId: './editCurriculum',
+            settings: { auth: false, roles: [] },
+            nav: true,
+            name: 'curriculum',
+            title: 'Curriculum'
         }
         ]);
 
