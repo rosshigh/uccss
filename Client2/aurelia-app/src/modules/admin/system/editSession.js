@@ -34,7 +34,7 @@ export class EditSessions {
     }
 
     async activate() {
-        await this.sessions.getSessionsArray(true, '?order=startDate:DSC');
+        await this.sessions.getSessionsArray('?order=startDate:DSC');
         await this.config.getConfig();
         await this.config.getSessions();
         this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
@@ -42,7 +42,7 @@ export class EditSessions {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.sessions.getSessionsArray(true, '?order=startDate');
+        await this.sessions.getSessionsArray('?order=startDate', true);
         this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         this.spinnerHTML = "";
     }

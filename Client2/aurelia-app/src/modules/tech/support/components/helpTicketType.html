@@ -13,7 +13,7 @@
         <select value.bind="editPerson" change.delegate="changePerson($event)" id="person" class="form-control">
           <option value="">Select a person</option>
           <option repeat.for="person of people.peopleArray"
-                  value.bind="person._id">${person._id | personName:people.peopleArray}</option>
+                  value.bind="person._id">${person._id | person:people.peopleArray:"fullName"}</option>
         </select>
       </div>
       

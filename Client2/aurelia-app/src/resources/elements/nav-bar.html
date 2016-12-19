@@ -40,13 +40,13 @@
                      <li class="dropdown">
                         <a if.bind="userObj.userRole >= 8" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Technical <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#/techRq">Client Requests</a></li>
+                            <li><a href="#/techRq">Product Requests</a></li>
                             <li><a href="#/techHt">Help Tickets</a></li>
                         </ul>
                     </li>
                     <li if.bind="userObj.userRole >= 4"><a href="#/facco">Faculty Coordinator</a></li>
                     <li if.bind="isAuthenticated"><a href="#/support">Support</a></li>
-                    <li if.bind="isAuthenticated"><a href="#/clientRequests">Client Requests</a></li>
+                    <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
                     <li if.bind="isAuthenticated && userObj.userRole >= 8"><a href="#/analytics">Analytics</a></li>
                 </ul>
 

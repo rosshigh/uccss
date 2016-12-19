@@ -36,8 +36,8 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray(true, '?order=lastName'),
-            this.people.getInstitutionsArray(true, '?order=name'),
+            this.people.getPeopleArray('?order=lastName'),
+            this.people.getInstitutionsArray('?order=name'),
             this.is4ua.loadIs4ua()
         ]);
 
@@ -48,7 +48,7 @@ export class EditPeople {
 
     async refresh(){
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getInstitutionsArray(true, '?order=name');
+        await this.people.getInstitutionsArray('?order=name', true);
         this.dataTable.updateArray(this.people.institutionArray);
         this.spinnerHTML = "";
     }

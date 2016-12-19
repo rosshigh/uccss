@@ -7,7 +7,7 @@
   </div>
   <div class="smart-timeline-content borderTop leftJustify">
     <div class="form-group">
-      <p>${event.personId | personName:people.peopleArray}</p>
+      <p>${event.personId | person:people.peopleArray"fullName"}</p>
       <h4>User Ids: ${event.content.resetPasswordUserIDs}</h4>
       <div class="form-group">
         <label if.bind="client.status==='01'" class="col-md-6">System: ${client.sid}</label>

@@ -17,7 +17,7 @@ export class Sessions {
         this.config = config;
     }
 
-    async getSessionsArray(refresh, options) {
+    async getSessionsArray(options, refresh) {
         if (!this.sessionsArray || refresh) {
             var url = this.data.SESSIONS_SERVICE;
             url += options ? options : "";

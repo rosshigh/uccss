@@ -56,10 +56,10 @@ export class CreateHelpTickets{
 
     async activate(){
         let responses = await Promise.all([
-            this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate:DSC'),
+            this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate:DSC'),
             this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name'),
-            this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name'),
-            this.systems.getSystemsArray(true),
+            this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name'),
+            this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
         this.selectedInstitutions = this.people.institutionsArray;

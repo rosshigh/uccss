@@ -39,8 +39,8 @@ export class EditSystem {
 
     async activate() {
         let responses = await Promise.all([
-            this.systems.getSystemsArray(true,'?order=sid'),
-            this.products.getProductsArray(true, '?filter=active|eq|true'),
+            this.systems.getSystemsArray('?order=sid'),
+            this.products.getProductsArray('?filter=active|eq|true'),
             this.sessions.getSessionsArray(),
             this.config.getConfig(),
             this.config.getSessions()
@@ -51,7 +51,7 @@ export class EditSystem {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.systems.getSystemsArray(true, '?order=sid');
+        await this.systems.getSystemsArray('?order=sid', true);
          this.dataTable.updateArray(this.systems.systemsArray);
         this.spinnerHTML = "";
     }

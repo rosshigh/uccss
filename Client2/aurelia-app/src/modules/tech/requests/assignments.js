@@ -52,11 +52,11 @@ export class Assignments {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray(true, '?filter=[in]sessionStatus[list]Active:Requests&order=startDate'),
-            this.people.getPeopleArray(true, '?order=lastName'),
-            this.people.getInstitutionsArray(true, '?order=name'),
-            this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'),
-            this.systems.getSystemsArray(true),
+            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'),
+            this.people.getPeopleArray('?order=lastName'),
+            this.people.getInstitutionsArray( '?order=name'),
+            this.products.getProductsArray('?filter=active|eq|true&order=Category'),
+            this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
@@ -68,7 +68,7 @@ export class Assignments {
     async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailsArray(true, '?filter=sessionId|eq|' + this.selectedSession);
+            await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
                 this.utils.formatDateForDatesPicker(this.requests.selectedRequest)

@@ -33,7 +33,7 @@ export function configure(config) {
     './value-converters/lookup-sid',
     './value-converters/course-name',
     './value-converters/stat-value',
-     './value-converters/person-name',
+     './value-converters/person-property',
      './value-converters/sandbox',
      './value-converters/ids-requested',
      './value-converters/filter-clients',

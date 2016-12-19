@@ -50,10 +50,10 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async activate() {
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
-      this.sessions.getSessionsArray(true, '?order=startDate'),
+      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
+      this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray(true,'?order=lastName&fields=firstName lastName email phone fullName roles'),
+      this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName roles'),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -71,7 +71,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async refresh(){
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
+    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.spinnerHTML = "";
   }

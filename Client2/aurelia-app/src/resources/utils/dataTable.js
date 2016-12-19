@@ -12,14 +12,14 @@ export class DataTable{
   filterValues = [];
   displayLength;
 
-  DEFAULT_TAKE = 10;
+  DEFAULT_TAKE = 20;
   DEFAULT_START = 0;
 
   sortProperty = '';
   sortDirection = 1;
   currentPageElement = 0;
 
-  startRecord = this.DEFAULT_START;
+  startRecord = this.DEFAULT_START; 
   take = this.DEFAULT_TAKE;
   firstVisible = this.startRecord + 1;
   lastVisible = this.startRecord + this.take - 1;
@@ -143,7 +143,7 @@ export class DataTable{
     this.pageOne();
     this.buildDisplayArray();
   }
-
+ 
   filterList(el, array){ 
     el.preventDefault();
     array = array || new Array();
@@ -292,8 +292,15 @@ export class DataTable{
             }
             break;
           case 'date':
-            var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-            keep = moment(dt).isSame(filters[i].value);
+          switch(filters[i].compare){
+            case 'after':
+              var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+              keep = moment(dt).isAfter(filters[i].value);
+              break;
+            default:
+              var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+              keep = moment(dt).isSame(filters[i].value);
+          }
         }
         if(!keep) break;
       }

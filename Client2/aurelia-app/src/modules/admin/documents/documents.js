@@ -40,7 +40,7 @@ export class Documents {
     async activate() {
         let responses = await Promise.all([
             this.documents.getDocumentsCategoriesArray(),
-            this.people.getPeopleArray(true),
+            this.people.getPeopleArray(),
             this.config.getConfig()
         ]);
         this.filteredDocumentArray = this.documents.docCatsArray;

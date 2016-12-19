@@ -10,6 +10,24 @@ export class Support{
     constructor(router){
         this.router = router;
     }
+
+    attached(){
+        // var url = window.location.href.split("#");
+        // if(url[1].substr(url[1].length-1) !== '/'){
+        //      $(".first").addClass('active');
+        // } else {
+        //     $("[href='" + window.location.hash + "']").parent().addClass('active');
+        // }
+       
+        $(".nav a").on("click", function(){
+            $(".nav").find(".active").removeClass("active");
+            $(this).parent().addClass("active");
+        });
+    }
+
+    getClass(first){
+        return first ? 'active' : '';
+    }
     
     configureRouter(config, router) {
         config.map([

@@ -127,6 +127,10 @@ export class User {
         this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + "\u00b0 C";
         this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
   }
+
+  moreInfoExists(item){
+      return item.url && item.url.length > 0;
+  }
   
     
 }

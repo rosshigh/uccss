@@ -10,6 +10,13 @@ export class Customers{
     constructor(router){
         this.router = router;
     }
+
+    attached(){
+        $(".nav a").on("click", function(){
+            $(".nav").find(".active").removeClass("active");
+            $(this).parent().addClass("active");
+        });
+    }
     
     configureRouter(config, router) {
         config.map([

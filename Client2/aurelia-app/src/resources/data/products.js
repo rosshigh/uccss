@@ -12,7 +12,7 @@ export class Products {
         this.utils = utils;
     }
 
-    async getProductsArray(refresh, options) {
+    async getProductsArray(options, refresh) {
         if (!this.productsArray || refresh) {
             var url = this.data.PRODUCTS_SERVICE;
             url += options ? options : "";

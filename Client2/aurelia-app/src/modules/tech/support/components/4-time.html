@@ -7,7 +7,7 @@
   </div>
   <div class="smart-timeline-content borderTop leftJustify">
     <div class="form-group">
-      <p>${event.personId | personName:people.peopleArray}</p>
+      <p>${event.personId | person:people.peopleArray"fullName"}</p>
 
       <div if.bind="event.content.comments.length > 0" innerhtml.bind="event.content.comments"></div>
     </div>

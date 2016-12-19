@@ -55,8 +55,8 @@ export class ViewHelpTickets {
 
   async activate() {
       let responses =  await Promise.all([
-      this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate'),
-      this.products.getProductsArray(true, '?order=name'),
+      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
+      this.products.getProductsArray('?order=name'),
       this.siteInfo.getMessageArray(true, '?filter=category|eq|CLIENT_REQUESTS'),
       this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' ),
       this.config.getConfig()
@@ -70,7 +70,7 @@ export class ViewHelpTickets {
   async getRequests(){
     if( this.sessionId != -1 &&  this.courseId != -1  ){
         this.existingRequest = false;
-        await this.requests.getPersonClientRequestsArray(true, '?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId);
+        await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);

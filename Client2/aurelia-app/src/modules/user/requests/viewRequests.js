@@ -45,10 +45,10 @@ export class ViewRequests {
     $("#infoBox").fadeOut();
     $("#existingRequestInfo").fadeOut();
     let responses =  await Promise.all([
-      this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate' ),
+      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate' ),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
-      this.products.getProductsArray(true, '?filter=active|eq|true&order=Category'),
-      this.systems.getSystemsArray(true),
+      this.products.getProductsArray('?filter=active|eq|true&order=Category'),
+      this.systems.getSystemsArray(),
       this.config.getConfig() 
     ]);
     // this._setUpValidation();
@@ -56,7 +56,7 @@ export class ViewRequests {
 
   async getRequests() {
     if (this.selectedSession && this.selectedCourse) {
-      await this.requests.getPersonClientRequestsArray(true, '?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse);
+      await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse, true);
       if (this.requests.requestsArray.length) this.requests.selectRequest(0);
       this.updateArray();
 

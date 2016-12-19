@@ -15,7 +15,7 @@ export class People {
         this.utils = utils;
     }
 
-    async getPeopleArray(refresh, options) { 
+    async getPeopleArray(options, refresh) { 
         if (!this.peopleArray || refresh) {
             var url = this.data.PEOPLE_SERVICE;
             url += options ? options : "";
@@ -177,7 +177,7 @@ export class People {
 
 
     //Institutions
-	async getInstitutionsArray(refresh, options) {
+	async getInstitutionsArray(options, refresh) {
         if (!this.institutionsArray || refresh) {
             var url = this.data.INSTITUTION_SERVICES;
             url += options ? options : "";

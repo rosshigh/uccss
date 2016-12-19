@@ -56,9 +56,9 @@ export class CreateHelpTickets{
 
     async activate(){ //[or]field1|value1:value2
          let responses = await Promise.all([
-            this.sessions.getSessionsArray(true, '?filter=[or]sessionStatus|Active:Requests&order=startDate'),
+            this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
-            this.systems.getSystemsArray(true),
+            this.systems.getSystemsArray(),
             this.config.getConfig()
          ]);
         this.helpTickets.selectHelpTicket();
@@ -79,7 +79,7 @@ export class CreateHelpTickets{
     // *****************************************************************************************/
     async sessionChanged(el){
         this.clearTables();
-        await this.clientRequests.getClientRequestsArray(true, '?filter=[and]sessionId|eq|' + this.helpTickets.selectedHelpTicket.sessionId + ':personId|eq|' + this.userObj._id);
+        await this.clientRequests.getClientRequestsArray( '?filter=[and]sessionId|eq|' + this.helpTickets.selectedHelpTicket.sessionId + ':personId|eq|' + this.userObj._id, true);
     }
 
     // /*****************************************************************************************
@@ -102,7 +102,7 @@ export class CreateHelpTickets{
                this.showAdditionalInfo = true;
            } else {
                //get support SAP products and, if a client is required for help, refresh the courses table
-                await this.products.getProductsArray(true,'?fields=_id name');
+                await this.products.getProductsArray('?fields=_id name');
                 if( this.config.HELP_TICKET_TYPES[index].clientRequired) await this.refreshCourses();
                 this.showAdditionalInfo = false;
            }

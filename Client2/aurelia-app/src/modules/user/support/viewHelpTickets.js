@@ -49,10 +49,10 @@ export class ViewHelpTickets {
 
   async activate() {
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray(true, "?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"),
-      this.sessions.getSessionsArray(true, '?order=startDate'),
+      this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"),
+      this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray(true, '?order=lastName&fields=firstName lastName email phone fullName'),
+      this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'),
       this.config.getConfig()
     ]);
     this.updateArray();
@@ -67,7 +67,7 @@ export class ViewHelpTickets {
 
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    await this.helpTickets.getHelpTicketArray(true, '?filter=personId|eq|' + this.userObj._id);
+    await this.helpTickets.getHelpTicketArray('?filter=personId|eq|' + this.userObj._id, true);
     this.updateArray();
     this.spinnerHTML = "";
   }

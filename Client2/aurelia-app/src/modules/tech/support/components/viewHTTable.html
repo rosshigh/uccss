@@ -5,12 +5,12 @@
                 <table id="helpTicketTable" class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <td colspan='6'>
+                            <td colspan='8'>
                                 <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
                             </td>
                         </tr>
                         <tr>
-                            <td colspan='6'>
+                            <td colspan='8'>
                                 <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
                                 <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
                             </td>
@@ -42,9 +42,11 @@
                       </select>
                     </th>
                     <th class="hasinput">
-                      <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" placeholder="Filter Date" class="form-control datepicker" data-dateformat="yy/mm/dd">
+                      <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" compare="after" placeholder="Filter Date" class="form-control datepicker" data-dateformat="yy/mm/dd">
                     </th>
-                    <th></th>
+                    <th>
+                      <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" />
+                    </th>
                   </tr>
                   <tr>
                     <th>
@@ -60,9 +62,11 @@
                       Status <span click.trigger="dataTable.sortArray('status')"><i class="fa fa-sort"></i></span><br>
                     </th>
                     <th>
-                      Date Created <span click.trigger="dataTable.sortArray('dateCreated')"><i class="fa fa-sort"></i></span>
+                      Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span>
                     </th>
                     <th>Customer</th>
+                    <th>Email</th>
+                     <th>Phone</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -72,7 +76,9 @@
                     <td data-title="owner">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}
                     <td data-title="status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>
                     <td data-title="createdDate">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
-                    <td data-title="personId">${helpTicket.personId | personName:people.peopleArray}
+                    <td data-title="Customer">${helpTicket.personId | person:people.peopleArray:"fullName"}</td>
+                    <td data-title="email">${helpTicket.personId | person:people.peopleArray:"email"}</td>
+                    <td data-title="phone">${helpTicket.personId | person:people.peopleArray:"phone"}</td>
                   </tr>
                   </tbody>
                 </table>

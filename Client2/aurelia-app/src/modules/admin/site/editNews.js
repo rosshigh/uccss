@@ -88,8 +88,7 @@ export class EditNews {
                 if (this.files && this.files.length > 0) this.siteinfo.uploadFile(this.files);
             }
             this.newsItemSelected = false;
-             this.selectedFiles = undefined;
-            this.files = undefined;
+            this._cleanUp();
         }
     }
     
@@ -120,7 +119,7 @@ export class EditNews {
         this.selectedFiles = undefined;
         this.files = undefined;
     }
-
+ 
     back() {
         var changes = this.siteinfo.isDirty(this.originalSiteInfo);
         if(changes.length){
@@ -141,8 +140,18 @@ export class EditNews {
 
     }
 
+    _cleanUp(){
+        this._cleanUpFilters();
+        this.selectedFiles = undefined;
+        this.files = undefined;
+    }
+
     _cleanUpFilters(){
         $("#title").val("");
+        $("#createdDate").val("");
+        $("#expiredDate").val("");
+        $("#itemType").val("");
+        $("#url").val("");
     }
 
     _setupValidation(){
@@ -151,15 +160,13 @@ export class EditNews {
 
     //TODO: Fix This
     filterOutExpired(){
-        // if (this.isChecked) {
-        //     var currentDate = moment(new Date()).format("MM-DD-YYYY");
-    
-        //     this.displayArray = this.baseArray.filter((item) => {
-        //         return moment(currentDate).isBefore(item.expiredDate)
-        //     })
-        // } else {
-        //     this.displayArray = this.baseArray;
-        // }
+        if (this.isChecked) {
+            var filterValues = new Array();
+            filterValues.push({ property: "expiredDate", value: new Date(), type: 'date', compare: 'after' });
+            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+        } else {
+            this.dataTable.updateArray(this.siteinfo.siteArray);
+        }
     }
 
 }

@@ -50,8 +50,8 @@ export class EditProducts {
 
     async activate() {
         let responses = await Promise.all([
-            this.products.getProductsArray(true, '?order=name'),
-            this.systems.getSystemsArray(true, '?order=sid'),
+            this.products.getProductsArray('?order=name'),
+            this.systems.getSystemsArray('?order=sid'),
             this.is4ua.loadIs4ua(),
             this.documents.getDocumentsCategoriesArray(),
             this.config.getConfig()
@@ -63,7 +63,7 @@ export class EditProducts {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.products.getProductsArray(true, '?order=name');
+        await this.products.getProductsArray('?order=name', true);
         this.dataTable.updateArray(this.products.productsArray);
         this.spinnerHTML = "";
     }

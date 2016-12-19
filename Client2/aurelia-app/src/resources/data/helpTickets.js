@@ -15,7 +15,7 @@ export class HelpTickets {
         this.config = config;
     }
 
-    async getHelpTicketArray(refresh, options){
+    async getHelpTicketArray(options, refresh){
          if (!this.helpTicketsArray || refresh) {
            var url = this.data.HELP_TICKET_SERVICES;
            url += options ? options : "";

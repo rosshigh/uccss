@@ -13,7 +13,7 @@ export class ClientRequests {
         this.config = config;
     }
 
-    async getClientRequestsArray(refresh, options, fields){
+    async getClientRequestsArray(options, fields, refresh){
         if (!this.requestsArray || refresh) {
           var url = this.data.CLIENT_REQUESTS_SERVICES;
           url += options ? options : "";
@@ -32,7 +32,7 @@ export class ClientRequests {
         return this.requestsArray;
     }
 
-    async getPersonClientRequestsArray(refresh, options,){
+    async getPersonClientRequestsArray(options, refresh){
         var url = this.data.CLIENT_REQUESTS_SERVICES;
         url += options ? options : "";
         try {
@@ -96,7 +96,7 @@ export class ClientRequests {
     }
 
 	//Client Request Details
-	async getClientRequestsDetailsArray(refresh, options){
+	async getClientRequestsDetailsArray(options, refresh){
         if (!this.requestsArray || refresh) {
           var url = this.data.CLIENT_REQUEST_DETAILS;
           url += options ? options : "";

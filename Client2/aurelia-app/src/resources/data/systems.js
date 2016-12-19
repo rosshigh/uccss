@@ -14,7 +14,7 @@ export class Systems{
         this.config = config;
     }
 
-    async getSystemsArray(refresh, options){
+    async getSystemsArray(options, refresh){
         if(!this.systemsArray || refresh) {
             var url = this.data.SYSTEMS_SERVICE;
             url += options ? options : "";
