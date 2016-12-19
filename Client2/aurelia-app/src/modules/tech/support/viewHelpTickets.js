@@ -24,6 +24,7 @@ export class ViewHelpTickets {
     spinnerHTML = "";
     filterValues = new Array();
     responseContent = "";
+    commentShown = "";
 
   constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
@@ -53,7 +54,7 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName roles'),
+      this.people.getPeopleArray(),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -64,6 +65,28 @@ export class ViewHelpTickets {
 
   attached(){
         $('[data-toggle="tooltip"]').tooltip();
+
+        // $('.hover').mouseover(function(el) {
+        //   // var foo = $(el.target).children()[0];
+        //   var foo = $(el.target).next();
+        //   $(foo).css("display","block");
+        // });
+
+        // $('.hover').mouseout(function(el) {
+        //   var foo = $(el.target).children()[0];
+        //   $(foo).css("display","none");
+        // });
+  }
+
+  showComment(helpTicket, el){
+    this.commentShown = helpTicket.content[0].content.comments;
+    $(".hover").css("top",el.clientY - 100);
+    $(".hover").css("left",el.clientX + 10);
+    $(".hover").css("display","block");
+  }
+
+  hideComment(){
+    $(".hover").css("display","none");
   }
   
   /*****************************************************************************************

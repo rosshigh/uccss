@@ -87,7 +87,7 @@ export class CreateHelpTickets{
 
     async changeInstitution(){
        this.showPeople = true;
-       await this.people.getPeopleArray(true, '?filter=institutionId|eq|' + this.editInstitution + '&order=lastName');
+       await this.people.getPeopleArray('?filter=institutionId|eq|' + this.editInstitution + '&order=lastName', true);
     };
 
     async typeChanged(el){
@@ -100,7 +100,7 @@ export class CreateHelpTickets{
                await this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name');
                this.showAdditionalInfo = true;
            } else {
-                await this.products.getProductsArray(true,'?fields=_id name');
+                await this.products.getProductsArray('?fields=_id name');
                 if( this.config.HELP_TICKET_TYPES[index].clientRequired) await this.refreshCourses();
                 this.showAdditionalInfo = false;
            }

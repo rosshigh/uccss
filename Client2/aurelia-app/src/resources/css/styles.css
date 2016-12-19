@@ -256,6 +256,17 @@ textarea {
 .hover_img a span { position:absolute; display:none; z-index:99; }
 .hover_img a:hover span { display:block; }
 
+.hover {
+    position:absolute;
+    height: 200px;
+    width: 400px;
+    z-index:99;
+    display:none;
+    box-shadow: 10px 10px 5px #888888;
+    overflow: hidden;
+    background-color: white;
+}
+
 .borderTop {
   border-style: solid;
   border-top: thin double #ff0000;

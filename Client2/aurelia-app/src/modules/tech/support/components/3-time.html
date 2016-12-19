@@ -7,7 +7,7 @@
   </div>
   <div class="smart-timeline-content borderTop leftJustify">
     <div class="form-group">
-      <p>${event.personId | person:people.peopleArray"fullName"}</p>
+      <p>${event.personId | person:people.peopleArray:"fullName"}</p>
       <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>
       <div class="row">
         <div class="col-lg-4" show.bind="event.content.osWindows || event.content.osMac">
