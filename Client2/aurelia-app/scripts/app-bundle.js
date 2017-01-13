@@ -18202,7 +18202,9 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype._unLock = function _unLock() {
       if (!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId) {
-        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+        if (this.helpTickets.selectedHelpTicket) {
+          this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+        }
       }
     };
 
@@ -20645,7 +20647,9 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype._unLock = function _unLock() {
       if (!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId) {
-        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+        if (this.helpTickets.selectedHelpTicket) {
+          this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+        }
       }
     };
 

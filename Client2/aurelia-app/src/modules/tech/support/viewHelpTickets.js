@@ -246,7 +246,9 @@ export class ViewHelpTickets {
 
   _unLock(){
     if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
-      this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if(this.helpTickets.selectedHelpTicket){
+        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      }    
     }
   }
 
