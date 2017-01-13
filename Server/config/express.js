@@ -1,7 +1,6 @@
 var logger = require('./logger');
 var path = require('path');
 var fs = require("fs");
-// var jwt = require("express-jwt");
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
@@ -10,7 +9,6 @@ var cors = require('cors')
 var onFinished = require('on-finished');
 var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
 var utils = require(path.join(__dirname, "utils.js"));
-// var unless = require('express-unless');
 
 
 module.exports = function(app, config) {

@@ -8,7 +8,8 @@ var express = require('express'),
   multer = require('multer'),
   mkdirp = require('mkdirp'),
   passport = require('passport'),
-  HelpTicketLock = mongoose.model('HelpTicketLock');
+  HelpTicketLock = mongoose.model('HelpTicketLock'),
+  logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
