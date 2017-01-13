@@ -19,6 +19,7 @@ export class ViewHelpTickets {
     helpTicketSelected = false;
     enterResponse = false;
     sendEmail = false;
+    showLockMessage = false; 
 
     navControl = "supportNavButtons";
     spinnerHTML = "";
@@ -54,7 +55,7 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC","",true),
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true,'?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray(),
+      this.people.getPeopleArray('',true),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -76,6 +77,10 @@ export class ViewHelpTickets {
         //   var foo = $(el.target).children()[0];
         //   $(foo).css("display","none");
         // });
+  }
+
+  detached(){
+    this. _unLock();
   }
 
   showComment(helpTicket, el){
@@ -114,6 +119,22 @@ export class ViewHelpTickets {
         await this.sytems.getSystem(this.helpTickets.content.content.systemId);
       }
 
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if(!response.error){
+        if(response.helpTicketId === 0){
+             //Lock help ticket
+            this.helpTickets.lockHelpTicket({
+              helpTicketId: this.helpTickets.selectedHelpTicket._id,
+              personId: this.userObj._id
+            });
+           this.showLockMessage = false;
+           this.lockObject = {}; 
+        } else {
+           this.lockObject = response[0];
+           this.showLockMessage = true;  
+        }
+      }
+
       if (this.selectedRow) this.selectedRow.children().removeClass('info');
       this.selectedRow = $(el.target).closest('tr');
       this.selectedRow.children().addClass('info')
@@ -126,11 +147,13 @@ export class ViewHelpTickets {
  * Open the response form and create an empty help ticket content object
  *****************************************************************************************/
   respond(){
-    this.helpTickets.selectHelpTicketContent();
-    this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
-    this.responseContent = "";
-    this.enterResponse = true;
-    this.enableButton = true;
+    if(!this.showLockMessage){
+      this.helpTickets.selectHelpTicketContent();
+      this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
+      this.responseContent = "";
+      this.enterResponse = true;
+      this.enableButton = true;
+    }
   }
 
   cancelResponse(){
@@ -206,23 +229,31 @@ export class ViewHelpTickets {
   * Update the help ticket ownder
   *****************************************************************************************/
   async own(){
-     if(this.validation.validate(9, this)){
-        var obj = {
-          personId: this.userObj._id
-        }
-        let serverResponse = await this.helpTickets.updateOwner(obj);
-        if (!serverResponse.error) {
-          this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-          this.utils.showNotification("The help ticket was updated");
-        }
-        this._cleanUp();
+     if(!this.showLockMessage){
+      if(this.validation.validate(9, this)){
+          var obj = {
+            personId: this.userObj._id
+          }
+          let serverResponse = await this.helpTickets.updateOwner(obj);
+          if (!serverResponse.error) {
+            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.utils.showNotification("The help ticket was updated");
+          }
+          this._cleanUp();
+      }
+     }
+  }
+
+  _unLock(){
+    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+      this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
     }
   }
 
   _cleanUp(){
     this.enterResponse = false;
     this.files = new Array();
-    this.filesSelected = "";
+    this.filesSelected = "";  
   }
 
   /*****************************************************************************************
@@ -247,6 +278,8 @@ export class ViewHelpTickets {
 
   back(){
     this.helpTicketSelected = false;
+    this._cleanUp();
+    this._unLock();
   }
 
   /*****************************************************************************************

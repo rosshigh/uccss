@@ -85,7 +85,7 @@ module.exports = function (app) {
 
   router.post('/api/people', requireAuth, function(req, res){
     logger.log('Create Person','verbose');
-    var person =  new Model(req.body);
+    var person =  new Model(req.body);  
       person.save(function ( err, object ){
         if (err) {
            return next(err);
@@ -103,7 +103,7 @@ module.exports = function (app) {
       } if (person.length){
         return next(new DuplicateRecordError("409"));
       } else {
-        var person =  new Model(req.body);
+        var person =  new Model(req.body);          
         person.save( function ( err, object ){
           if (err) {
              return next(err);

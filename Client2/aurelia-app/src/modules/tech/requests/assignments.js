@@ -52,7 +52,7 @@ export class Assignments {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'),
+            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray( '?order=name'),
             this.products.getProductsArray('?filter=active|eq|true&order=Category'),
@@ -71,8 +71,8 @@ export class Assignments {
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                this.utils.formatDateForDatesPicker(this.requests.selectedRequest)
-                this.dataTable.createPageButtons(1);
+                // this.utils.formatDateForDatesPicker(this.requests.selectedRequest)
+                // this.dataTable.createPageButtons(1);
             } else {
                 this.displayArray = new Array();
             }

@@ -42,7 +42,7 @@ export class Profile {
     async activate() {
         let responses = await Promise.all([
             this.people.getPerson(this.userObj._id),
-            this.people.getInstitutionsArray(true, '?fields=_id name&order=name'),
+            this.people.getInstitutionsArray('?fields=_id name&order=name'),
             this.is4ua.loadIs4ua()
         ]);
         

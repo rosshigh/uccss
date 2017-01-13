@@ -3,6 +3,14 @@ var Mongoose = require('mongoose'),
   Person = require('./people').Person,
   AutoIncrement = require('mongoose-sequence');
 
+var helpTicketLockSchema = new Schema({
+  helpTicketId: { type: Schema.Types.ObjectId },
+  personId: { type: Schema.Types.ObjectId },
+  createdAt: { type: Date, expires: '1800s', default: Date.now }
+});
+
+module.exports = Mongoose.model('HelpTicketLock', helpTicketLockSchema);
+
 var HelpTicketContentSchema = new Schema({
   type: { type: Number, required: true},
   createdDate: { type: Date, default: Date.now, required: true },

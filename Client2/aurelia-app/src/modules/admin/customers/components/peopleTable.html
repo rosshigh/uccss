@@ -15,6 +15,7 @@
                             </tr>
                             <tr>
                                 <th style="width:20rem;">Name <span click.trigger="dataTable.sortArray('lastName')"><i class="fa fa-sort"></i></span></th>
+                                <th class="col-lg-1">Nickname <span click.trigger="dataTable.sortArray('nickName')"><i class="fa fa-sort"></i></span></th>                                
                                 <th style="width:30rem;">Institution</th>
                                 <th style="width:15rem;">Phone</th>
                                 <th style="width:20rem;">eMail <span click.trigger="dataTable.sortArray('email')"><i class="fa fa-sort"></i></span></th>
@@ -26,6 +27,9 @@
                             <tr>
                                 <th>
                                     <input input.delegate="dataTable.filterList($event)" id="fullName" type="text" placeholder="Filter Name" class="form-control"> 
+                                </th>
+                                <th>
+                                    <input input.delegate="dataTable.filterList($event)" id="nickName" type="text" placeholder="Filter Nickname" class="form-control"> 
                                 </th>
                                 <th>
                                     <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionId" compare="id">
@@ -48,6 +52,7 @@
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="person of dataTable.displayArray">
                                 <td data-title="Name">${person.firstName} ${person.lastName}</td>
+                                 <td data-title="Nickname">${person.nickName}</td>
                                 <td data-title="Insitution">${person.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
                                 <td data-tile="Phone">${person.phone | phoneNumber}</td>
                                 <td data-title="Email">${person.email}</td>

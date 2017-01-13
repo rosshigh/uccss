@@ -7,6 +7,7 @@ var PersonSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   middleName: { type: String },
+  nickName: { type: String },
   gender: { type: String },
   title: { type: String },
   salutation: { type: String },
@@ -51,6 +52,13 @@ var PersonSchema = new Schema({
     courseName: { type: String, required: true },
     courseDescription: { type: String }
   }],
+  audit: [{
+    property: { type: String, default: 'Created' },
+    eventDate: { type: Date, default: Date.now },
+    oldValue: { type: Schema.Types.Mixed },
+    newValue: { type: Schema.Types.Mixed },
+    personId: { type: Schema.Types.ObjectId }
+  }]
 }, {
     toObject: {
         virtuals: true

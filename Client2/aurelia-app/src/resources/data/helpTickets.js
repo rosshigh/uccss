@@ -216,4 +216,23 @@ export class HelpTickets {
         }
     }
 
+    lockHelpTicket(obj){
+        if(obj.helpTicketId) {
+            var response = this.data.saveObject(obj, this.data.HELP_TICKET_LOCK_SERVICES, "post");
+        }
+    }
+
+    async getHelpTicketLock(id){
+        var response = await this.data.get(this.data.HELP_TICKET_LOCK_SERVICES + "/" + id);
+        if (!response.error) {
+                return response;
+        } else {
+                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+        }
+    }
+
+    removeHelpTicketLock(id){
+        var response = this.data.deleteObject(this.data.HELP_TICKET_LOCK_SERVICES + "/" + id);
+    }
+
 }

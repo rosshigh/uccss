@@ -83,6 +83,7 @@ export class People {
         obj.firstName = "";
         obj.middleName = "";
         obj.lastName = "";
+        obj.nickName = "";
         obj.status = "";
         obj.phone = "";
         obj.mobile = ""
@@ -93,7 +94,12 @@ export class People {
         obj.password = "";
         obj.institution = "";
         obj.active = false;
-        this.coursesArray = new Array();
+        obj.coursesArray = new Array();
+        var auditObj = {
+            property: "Created",
+            eventDate: new Date()
+        }
+        obj.audit = [auditObj];
         return obj;
     }
 

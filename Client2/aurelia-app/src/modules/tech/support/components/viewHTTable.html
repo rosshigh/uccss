@@ -48,6 +48,9 @@
                     <th>
                       <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" />
                     </th>
+                    <th>
+                      <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-nickName" type="text" compare="lookup" class="form-control" />
+                    </th>
                   </tr>
                   <tr>
                     <th>
@@ -65,7 +68,8 @@
                     <th>
                       Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span>
                     </th>
-                    <th>Customer</th>
+                    <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th>
+                     <th class="col-lg-1">Nickname <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')"><i class="fa fa-sort"></i></span></th>
                     <th>Email</th>
                      <th>Phone</th>
                   </tr>
@@ -74,12 +78,13 @@
                   <tr repeat.for="helpTicket of dataTable.displayArray" click.delegate="selectHelpTicket($event, $index)">
                     <td data-title="referenceNo">${helpTicket.helpTicketNo}</td>
                     <td mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" data-title="type">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES} 
-                    <td data-title="owner">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}
-                    <td data-title="status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>
-                    <td data-title="createdDate">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
+                    <td data-title="Owner">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}
+                    <td data-title="Status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>
+                    <td data-title="Created Date">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
                     <td data-title="Customer">${helpTicket.personId | person:people.peopleArray:"fullName"}</td>
-                    <td data-title="email">${helpTicket.personId | person:people.peopleArray:"email"}</td>
-                    <td data-title="phone">${helpTicket.personId | person:people.peopleArray:"phone"}</td>
+                    <td data-title="Nickname">${helpTicket.personId | person:people.peopleArray:"nickName"}</td>
+                    <td data-title="Email">${helpTicket.personId | person:people.peopleArray:"email"}</td>
+                    <td data-title="Phone">${helpTicket.personId | person:people.peopleArray:"phone"}</td>
                   </tr>
                   </tbody>
                 </table>

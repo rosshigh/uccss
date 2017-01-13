@@ -31,7 +31,7 @@ export class Register {
   }
 
   async activate(){
-    await this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name&fields=_id name');
+    await this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
     await this.is4ua.loadIs4ua();
     this.people.selectPerson();
   }
@@ -86,7 +86,9 @@ export class Register {
         return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
       }
       }]);
-    this.validation.addRule(1,"register_phone",[{"rule":"required","message":"Phone number is required", "value": "people.selectedPerson.phone"}]);
+    this.validation.addRule(1,"register_phone",[{"rule":"required","message":"Phone number is required", "value": "people.selectedPerson.phone"},
+    {"rule":"length","message":"Phone number isn't valid", "value": "people.selectedPerson.phone","ruleValue": 10}]);
+     this.validation.addRule(1,"register_mobile",[{"rule":"length","message":"Phone number isn't valid", "value": "people.selectedPerson.mobile","ruleValue": 10}]);
     this.validation.addRule(1,"register_institution",[
       {"rule":"required","message":"Institution is required", "value": "people.selectedPerson.institutionId"},
       {"rule":"custom","message":"An account with that name at this institution exists",
@@ -115,7 +117,6 @@ export class Register {
 
   async save() {
     if(this.validation.validate(1)) {
-        console.log(this.people.selectedPerson)
         this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
         let response = await this.people.savePerson('register')
             if(!response.error) {

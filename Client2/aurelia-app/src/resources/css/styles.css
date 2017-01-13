@@ -259,12 +259,13 @@ textarea {
 .hover {
     position:absolute;
     height: 200px;
-    width: 400px;
+    width: 600px;
     z-index:99;
     display:none;
     box-shadow: 10px 10px 5px #888888;
     overflow: hidden;
     background-color: white;
+    padding: 10px;
 }
 
 .borderTop {

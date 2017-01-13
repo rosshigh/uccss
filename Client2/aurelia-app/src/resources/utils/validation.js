@@ -103,12 +103,17 @@ export default class {
             }
             break;
           case "min":
-            if (eval('this.context.' + rules.value) < rules.value) {
+            if (eval('this.context.' + rules.value) < rules.ruleValue) {
               thisValid = false;
             }
             break;
           case "max":
-            if (eval('this.context.' + rules.value) > rules.value) {
+            if (eval('this.context.' + rules.value) > rules.ruleValue) {
+              thisValid = false;
+            }
+            break;
+          case "length":
+           if (eval('this.context.' + rules.value).length > 0 && eval('this.context.' + rules.value).length < rules.ruleValue) {
               thisValid = false;
             }
             break;

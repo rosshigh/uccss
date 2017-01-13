@@ -18,6 +18,7 @@ import $ from 'jquery';
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
+  showLockMessage = false; 
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -43,6 +44,9 @@ export class ViewHelpTickets {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
+  detached(){
+    this. _unLock();
+  }
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
   }
@@ -85,6 +89,22 @@ export class ViewHelpTickets {
       await this.sytems.getSystem(this.helpTickets.content.content.systemId);
     }
 
+    var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+    if(!response.error){
+      if(response.helpTicketId === 0){
+            //Lock help ticket
+          this.helpTickets.lockHelpTicket({
+            helpTicketId: this.helpTickets.selectedHelpTicket._id,
+            personId: this.userObj._id
+          });
+          this.showLockMessage = false;
+          this.lockObject = {}; 
+      } else {
+          this.lockObject = response[0];
+          this.showLockMessage = true;  
+      }
+    }
+
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
     this.selectedRow.children().addClass('info')
@@ -94,11 +114,13 @@ export class ViewHelpTickets {
   }
 
   respond() {
-    this.responseContent = "";
-    this.helpTickets.selectHelpTicketContent();
-    this.enterResponse = true;
-    this.enableButton = true;
-    tinyMCE.activeEditor.focus();
+     if(!this.showLockMessage){
+        this.responseContent = "";
+        this.helpTickets.selectHelpTicketContent();
+        this.enterResponse = true;
+        this.enableButton = true;
+        tinyMCE.activeEditor.focus();
+     }
   }
 
   cancelResponse() {
@@ -145,8 +167,16 @@ export class ViewHelpTickets {
     this.filesSelected = "";
   }
 
+  _unLock(){
+    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+      this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+    }
+  }
+
   back() {
     this.helpTicketSelected = false;
+    this._cleanUp();
+    this._unLock();
   }
 
   _setUpValidation() {

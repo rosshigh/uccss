@@ -86,7 +86,7 @@ export class User {
         let responses = await Promise.all([
             this.helpTickets.getCurrentCount(),
             this.requests.getCurrentCount(),  
-            this.requests.getClientRequestsDetailsArray(true,'?filter=institutionId|eq|' + this.userObj.institutionId),
+            this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true),
             this.sessions.getSessionsArray(false),
             this.siteinfo.getInfoArray(false, options)
             ]);

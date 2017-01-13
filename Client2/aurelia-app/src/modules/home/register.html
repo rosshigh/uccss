@@ -1,11 +1,13 @@
 <template>
-  <div class="container">
-    <div class="panel panel-primary topMargin">
-      <div class="panel-heading">
-        <div class="panel-title">
-          <h3>Create an Account</h3>
+        <nav class="navbar navbar-inverse subMenu">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">Register</a>
+            </div>
         </div>
-      </div>
+    </nav>
+  <div class="fluid-container col-lg-10 col-lg-offset-1">
+    <div class="panel panel-primary topMargin">
       <div class="panel-body">
           <div class="bottomMargin list-group-item leftMargin rightMargin">
             <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Backve"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
@@ -17,7 +19,7 @@
                 <h6>Register your email with <a href="https://en.gravatar.com/">gravatar.com</a> to show your image.</h6>
             </div>
         </div>
-    <div class="col-sm-12 col-lg-11">
+    <div class="col-sm-12 col-lg-10" style="margin-left:10px;">
         <form class="form-horizontal topMargin">
           <div class="row">
             <!-- Row 1 -->
@@ -45,7 +47,16 @@
                 </div>
               </div>
             </div>
+             <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="editNickName" class="col-sm-3 control-label">Nickname</label>
+                    <div class="col-sm-8">
+                        <input value.bind="people.selectedPerson.nickName" id="editNickName" class="form-control " placeholder="Nickname" type="text" />
+                    </div>
+                </div>
+            </div>
           </div>
+
 
           <!-- Row 2 -->
           <div class="row topMargin">
@@ -74,6 +85,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--
                     <div class="col-lg-12">
                         <div class="form-group">
                             <label for="register_gender" class="col-sm-3 control-label">Gender</label>
@@ -86,6 +98,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                     <div class="col-lg-12">
                         <div class="form-group">
                             <label for="register_institution" class="col-sm-3 control-label">Institution *</label>

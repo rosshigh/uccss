@@ -149,7 +149,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             _classCallCheck(this, AppConfig);
 
             this.HOST = location.origin;
-            this.BASE_URL = this.HOST + "/api/";
+            this.BASE_URL = "http://localhost:5000/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -448,6 +448,1375 @@ define('resources/index',['exports'], function (exports) {
     config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/tiny-mce', './elements/add-systems', './elements/date-picker', './elements/edit-client', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/session-status-button', './value-converters/to-uppercase', './value-converters/info-filter', './value-converters/date-format', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/date-picker-date', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
   }
 });
+define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Analytics = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Analytics = exports.Analytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function Analytics(router) {
+            _classCallCheck(this, Analytics);
+
+            this.router = router;
+        }
+
+        Analytics.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        Analytics.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'clientRequestsAnalytics'],
+                moduleId: './clientRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'clientRequests',
+                title: 'Client Requests'
+            }, {
+                route: 'helpTicketAnalytics',
+                moduleId: './helpTickets',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'helpTickets',
+                title: 'Help Tickets'
+            }]);
+
+            this.router = router;
+        };
+
+        return Analytics;
+    }()) || _class);
+});
+define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ClientRequestAnalytics = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ClientRequestAnalytics = exports.ClientRequestAnalytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function ClientRequestAnalytics(router, config, people, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, ClientRequestAnalytics);
+
+            this.router = router;
+            this.config = config;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+        }
+
+        ClientRequestAnalytics.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        ClientRequestAnalytics.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        ClientRequestAnalytics.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        ClientRequestAnalytics.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 8;
+                                    break;
+                                }
+
+                                this.numCols = this.config.REQUEST_STATUS.length + 1;
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 5;
+                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 5:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.requests.groupRequestsByInstitution();
+                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
+                                    this.dataTable.createPageButtons(1);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context2.next = 9;
+                                break;
+
+                            case 8:
+                                this.displayArray = new Array();
+
+                            case 9:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        return ClientRequestAnalytics;
+    }()) || _class);
+});
+define('modules/analytics/helpTickets',["exports"], function (exports) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var HelpTicketAnalytics = exports.HelpTicketAnalytics = function HelpTicketAnalytics() {
+        _classCallCheck(this, HelpTicketAnalytics);
+    };
+});
+define('modules/facco/editClients',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var EditClients = exports.EditClients = function EditClients() {
+    _classCallCheck(this, EditClients);
+  };
+});
+define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditPeople = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
+            _classCallCheck(this, EditPeople);
+
+            this.personSelected = false;
+            this.navControl = "peopleNavButtons";
+            this.spinnerHTML = "";
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.utils = utils;
+            this.people = people;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+        }
+
+        EditPeople.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditPeople.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        EditPeople.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.dataTable.updateArray(this.people.peopleArray);
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditPeople.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.people.getPeopleArray(true, '?order=lastName');
+
+                            case 3:
+                                this.people.getInstitutionPeople(this.userObj.institutionId);
+                                this.dataTable.updateArray(this.people.peopleArray);
+                                this.spinnerHTML = "";
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditPeople.prototype.edit = function edit(index, el) {
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.people.selectPerson(this.editIndex);
+            this.roles = "";
+            for (var i = 0; i < this.config.ROLES.length; i++) {
+                if (this.people.selectedPerson.roles.indexOf(this.config.ROLES[i].role) > -1) {
+                    this.roles += this.config.ROLES[i].label + "<br/>";
+                }
+            }
+
+            (0, _jquery2.default)("#editFirstName").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.personSelected = true;
+        };
+
+        EditPeople.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty();
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: _this.userObj._id
+                });
+            });
+        };
+
+        EditPeople.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.buildAudit();
+                                _context3.next = 3;
+                                return this.people.savePerson();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.people.peopleArray);
+                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+                                }
+                                this.personSelected = false;
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditPeople.prototype.cancel = function cancel() {
+            this.people.selectPerson(this.editIndex);
+        };
+
+        EditPeople.prototype.back = function back() {
+            var _this2 = this;
+
+            if (this.people.isPersonDirty().length) {
+                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this2.save();
+                    } else {
+                        _this2.personSelected = false;
+                    }
+                });
+            } else {
+                this.personSelected = false;
+            }
+        };
+
+        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
+            (0, _jquery2.default)("#lastName").val("");
+            (0, _jquery2.default)("#roles").val("");
+            (0, _jquery2.default)("#personStatus").val("");
+        };
+
+        return EditPeople;
+    }()) || _class);
+});
+define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.FacCo = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function FacCo(router) {
+            _classCallCheck(this, FacCo);
+
+            this.router = router;
+        }
+
+        FacCo.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        FacCo.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editPeople'],
+                moduleId: './editPeople',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editPeople',
+                title: 'People'
+            }, {
+                route: 'editClients',
+                moduleId: './editClients',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editClients',
+                title: 'Clients Requests'
+            }]);
+
+            this.router = router;
+        };
+
+        return FacCo;
+    }()) || _class);
+});
+define('modules/home/home',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _siteInfo, _sessions, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Home = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _sessions.Sessions, _appConfig.AppConfig), _dec(_class = function () {
+        function Home(siteinfo, sessions, config) {
+            _classCallCheck(this, Home);
+
+            this.email = '';
+            this.password = '';
+            this.loginError = '';
+
+            this.sessions = sessions;
+            this.siteinfo = siteinfo;
+            this.config = config;
+            this.config.getConfig(true);
+        }
+
+        Home.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var currentDate, options;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+                                _context.next = 4;
+                                return this.sessions.getSessionsArray(true, '?order=startDate');
+
+                            case 4:
+                                _context.next = 6;
+                                return this.siteinfo.getInfoArray(true, options);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        return Home;
+    }()) || _class);
+});
+define('modules/home/logout',['exports', 'aurelia-framework', '../../resources/data/auth'], function (exports, _aureliaFramework, _auth) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Logout = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Logout = exports.Logout = (_dec = (0, _aureliaFramework.inject)(_auth.Auth), _dec(_class = function () {
+    function Logout(auth) {
+      _classCallCheck(this, Logout);
+
+      this.auth = auth;
+    }
+
+    Logout.prototype.activate = function activate() {
+      this.auth.logout();
+      this.router.navigate("home");
+    };
+
+    return Logout;
+  }()) || _class);
+});
+define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', '../../resources/utils/validation', '../../config/appConfig', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _people, _is4ua, _commonDialogs, _validation, _appConfig, _jquery) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Register = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  var _jquery2 = _interopRequireDefault(_jquery);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Register = exports.Register = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _people.People, _is4ua.is4ua, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
+    function Register(router, people, is4ua, utils, config, dialog, validation) {
+      _classCallCheck(this, Register);
+
+      this.router = router;
+      this.people = people;
+      this.is4ua = is4ua;
+      this.utils = utils;
+      this.validation = validation;
+      this.config = config;
+      this.dialog = dialog;
+      this.validation.initialize(this);
+
+      this.thresholdLength = 6;
+      this.threshold = 3;
+    }
+
+    Register.prototype.attached = function attached() {
+      this._setUpValidation();
+      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+    };
+
+    Register.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
+
+              case 2:
+                _context.next = 4;
+                return this.is4ua.loadIs4ua();
+
+              case 4:
+                this.people.selectPerson();
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    Register.prototype.checkEmail = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.people.checkEmail();
+
+              case 2:
+                if (!_context2.sent) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                this.duplicateAccount = true;
+                this.validation.validate(2);
+                _context2.next = 9;
+                break;
+
+              case 7:
+                this.duplicateAccount = false;
+                this.validation.makeValid((0, _jquery2.default)("#register_email"));
+
+              case 9:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function checkEmail() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return checkEmail;
+    }();
+
+    Register.prototype.checkName = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.people.checkName();
+
+              case 2:
+                if (!_context3.sent) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                this.duplicateName = true;
+                this.validation.validate(3);
+                _context3.next = 9;
+                break;
+
+              case 7:
+                this.duplicateName = false;
+                this.validation.makeValid((0, _jquery2.default)("#register_institution"));
+
+              case 9:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function checkName() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return checkName;
+    }();
+
+    Register.prototype.passwordComplexity = function passwordComplexity() {
+
+      var newValue = this.people.selectedPerson.password;
+
+      this.longPassword = newValue.length >= this.thresholdLength;
+
+      var strength = 0;
+      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+      strength += /[a-z]+/.test(newValue) ? 1 : 0;
+      strength += /[0-9]+/.test(newValue) ? 1 : 0;
+      strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+      this.complexPassword = strength >= this.threshold && this.longPassword;
+      this.validation.validate(4);
+    };
+
+    Register.prototype._setUpValidation = function _setUpValidation() {
+      this.validation.addRule(1, "register_firstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+      this.validation.addRule(1, "register_lastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+      this.validation.addRule(1, "register_email", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }, { "rule": "custom", "message": "Enter a valid email address",
+        "valFunction": function valFunction(context) {
+          return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email)
+          );
+        }
+      }]);
+      this.validation.addRule(1, "register_phone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }, { "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.phone", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_mobile", [{ "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.mobile", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_institution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }, { "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
+      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+        "valFunction": function valFunction(context) {
+          return context.people.selectedPerson.password === context.password_repeat;
+        } }], true);
+      this.validation.addRule(2, "register_email", [{ "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }]);
+      this.validation.addRule(3, "register_institution", [{ "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+        "valFunction": function valFunction(context) {
+          return context.complexPassword;
+        } }]);
+    };
+
+    Register.prototype.save = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var _this = this;
+
+        var response;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.validation.validate(1)) {
+                  _context4.next = 10;
+                  break;
+                }
+
+                this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
+                _context4.next = 4;
+                return this.people.savePerson('register');
+
+              case 4:
+                response = _context4.sent;
+
+                if (response.error) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).then(function (response) {
+                  _this.router.navigate("home");
+                }));
+
+              case 9:
+                this.utils.showNotification("An error occurred creating the account");
+
+              case 10:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function save() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return save;
+    }();
+
+    Register.prototype.back = function back() {
+      window.history.back();
+    };
+
+    return Register;
+  }()) || _class);
+});
+define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Profile = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_is4ua.is4ua, _people.People, _aureliaRouter.Router, _utils.Utils, _validation2.default), _dec(_class = function () {
+        function Profile(is4ua, people, router, utils, validation) {
+            _classCallCheck(this, Profile);
+
+            this.is4ua = is4ua;
+            this.people = people;
+            this.router = router;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this._setupValidation();
+
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        }
+
+        Profile.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+            this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+
+            this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
+        };
+
+        Profile.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Profile.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getPerson(this.userObj._id), this.people.getInstitutionsArray('?fields=_id name&order=name'), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.user = this.people.selectedPerson;
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Profile.prototype.save = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context2.next = 6;
+                                    break;
+                                }
+
+                                if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
+                                    this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+                                }
+                                _context2.next = 4;
+                                return this.people.savePerson();
+
+                            case 4:
+                                response = _context2.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("Your profile has been updated");
+                                    this.router.navigate("user");
+                                } else {
+                                    this.utils.showNotification("An error occurred updating your profile");
+                                }
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function save() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Profile.prototype.cancel = function cancel() {
+            this.utils.copyObject(this.users, this.people.selectedPerson);
+        };
+
+        return Profile;
+    }()) || _class);
+});
+define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _helpTickets, _clientRequests, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.User = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests), _dec(_class = function () {
+        function User(router, utils, config, siteinfo, sessions, helpTickets, requests) {
+            _classCallCheck(this, User);
+
+            this.router = router;
+            this.utils = utils;
+            this.config = config;
+            this.siteinfo = siteinfo;
+            this.sessions = sessions;
+            this.helpTickets = helpTickets;
+            this.requests = requests;
+        }
+
+        User.prototype.attached = function attached() {
+            $('.carousel').carousel({
+                interval: 10000
+            });
+        };
+
+        User.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.getData();
+
+                            case 2:
+
+                                this.helpTicketArray = [{
+                                    value: this.helpTickets.newHelpTickets || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "New"
+                                }, {
+                                    value: this.helpTickets.underReviewHelpTickets || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Under Review"
+                                }, {
+                                    value: this.helpTickets.customerActionHelpTickets || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                                this.clientRequestsArray = [{
+                                    value: this.requests.unassignedRequests || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "Unassigned"
+                                }, {
+                                    value: this.requests.updatedRequests || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Updated"
+                                }, {
+                                    value: this.requests.customerActionRequests || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        User.prototype.getData = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _this = this;
+
+                var currentDate, options, countOptions, responses, _responses, requestCountArray, weather, weatherObj, _weather, uccweather;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+
+                                if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
+                                    _context2.next = 11;
+                                    break;
+                                }
+
+                                countOptions = '';
+
+                                this.countHeader = "Recent Request History";
+                                _context2.next = 8;
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
+
+                            case 8:
+                                responses = _context2.sent;
+                                _context2.next = 16;
+                                break;
+
+                            case 11:
+                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
+
+                                this.countHeader = "Your Institution's Recent Request History";
+                                _context2.next = 15;
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
+
+                            case 15:
+                                _responses = _context2.sent;
+
+                            case 16:
+                                this.requestsCount = new Array();
+                                this.countLabels = new Array();
+                                _context2.next = 20;
+                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+
+                            case 20:
+                                requestCountArray = _context2.sent;
+
+                                if (requestCountArray) {
+                                    requestCountArray.forEach(function (item) {
+                                        _this.requestsCount.push(item.count);
+                                        _this.countLabels.push(item.session);
+                                    });
+                                }
+
+                                this.temp = undefined;
+
+                                if (sessionStorage.getItem('weather')) {
+                                    _context2.next = 34;
+                                    break;
+                                }
+
+                                _context2.next = 26;
+                                return this.siteinfo.getWeather(this.userObj.city);
+
+                            case 26:
+                                weather = _context2.sent;
+
+                                this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
+                                this.temp = this.temp + '\xB0 C';
+                                this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
+                                weatherObj = { temp: this.temp, url: this.weatherIcon };
+
+                                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
+                                _context2.next = 37;
+                                break;
+
+                            case 34:
+                                _weather = JSON.parse(sessionStorage.getItem('weather'));
+
+                                this.temp = _weather.temp;
+                                this.weatherIcon = _weather.url;
+
+                            case 37:
+                                uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
+
+                                this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + '\xB0 C';
+                                this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
+
+                            case 40:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getData() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        User.prototype.moreInfoExists = function moreInfoExists(item) {
+            return item.url && item.url.length > 0;
+        };
+
+        return User;
+    }()) || _class);
+});
 define('resources/charts/bar-chart',['exports', './chart-element'], function (exports, _chartElement) {
   'use strict';
 
@@ -689,6 +2058,115 @@ define('resources/charts/doughnut-chart',['exports', './chart-element'], functio
   var DoughnutChart = exports.DoughnutChart = (_dec = (0, _chartElement.chartElement)('Doughnut'), _dec(_class = function DoughnutChart() {
     _classCallCheck(this, DoughnutChart);
   }) || _class);
+});
+define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.CommonDialogs = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var CommonDialogs = exports.CommonDialogs = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogService), _dec(_class = function () {
+    function CommonDialogs(dialogService) {
+      _classCallCheck(this, CommonDialogs);
+
+      this.dialogService = dialogService;
+    }
+
+    CommonDialogs.prototype.showMessage = function showMessage(message) {
+      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Message';
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
+
+      return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
+    };
+
+    return CommonDialogs;
+  }()) || _class);
+});
+define('resources/dialogs/confirm-dialog',["exports", "aurelia-framework", "aurelia-dialog"], function (exports, _aureliaFramework, _aureliaDialog) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ConfirmDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ConfirmDialog = exports.ConfirmDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+        function ConfirmDialog(controller) {
+            _classCallCheck(this, ConfirmDialog);
+
+            this.message = "";
+
+            this.controller = controller;
+        }
+
+        ConfirmDialog.prototype.activate = function activate(data) {
+            this.message = data.message;
+            this.header = data.header == undefined ? "Confirmation" : data.header;
+        };
+
+        return ConfirmDialog;
+    }()) || _class);
+});
+define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.MessageDialog = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var MessageDialog = exports.MessageDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+    function MessageDialog(dialogController) {
+      _classCallCheck(this, MessageDialog);
+
+      this.dialogController = dialogController;
+    }
+
+    MessageDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    MessageDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(option);
+      }
+    };
+
+    return MessageDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
 });
 define('resources/data/auth',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './dataServices', '../utils/utils'], function (exports, _aureliaFramework, _aureliaEventAggregator, _dataServices, _utils) {
 	'use strict';
@@ -1108,53 +2586,55 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
+                                console.log(options);
+
                                 if (!(!this.requestsArray || refresh)) {
-                                    _context5.next = 18;
+                                    _context5.next = 19;
                                     break;
                                 }
 
                                 url = this.data.CLIENT_REQUEST_DETAILS;
 
                                 url += options ? options : "";
-                                _context5.prev = 3;
-                                _context5.next = 6;
+                                _context5.prev = 4;
+                                _context5.next = 7;
                                 return this.data.get(url);
 
-                            case 6:
+                            case 7:
                                 serverResponse = _context5.sent;
 
                                 if (serverResponse.error) {
-                                    _context5.next = 11;
+                                    _context5.next = 12;
                                     break;
                                 }
 
                                 this.requestsDetailsArray = serverResponse;
-                                _context5.next = 12;
+                                _context5.next = 13;
                                 break;
-
-                            case 11:
-                                return _context5.abrupt('return', undefined);
 
                             case 12:
-                                _context5.next = 18;
+                                return _context5.abrupt('return', undefined);
+
+                            case 13:
+                                _context5.next = 19;
                                 break;
 
-                            case 14:
-                                _context5.prev = 14;
-                                _context5.t0 = _context5['catch'](3);
+                            case 15:
+                                _context5.prev = 15;
+                                _context5.t0 = _context5['catch'](4);
 
                                 console.log(_context5.t0);
                                 return _context5.abrupt('return', undefined);
 
-                            case 18:
+                            case 19:
                                 return _context5.abrupt('return', this.requestsDetailsArray);
 
-                            case 19:
+                            case 20:
                             case 'end':
                                 return _context5.stop();
                         }
                     }
-                }, _callee5, this, [[3, 14]]);
+                }, _callee5, this, [[4, 15]]);
             }));
 
             function getClientRequestsDetailsArray(_x11, _x12) {
@@ -1368,134 +2848,6 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 that.analyticsResultArray[that.analyticsResultArray.length - 1][item.requestStatus] += 1;
             });
         };
-
-        ClientRequests.prototype.getClientRequestsDetailsArray = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(refresh, options) {
-                var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (!(!this.requestsArray || refresh)) {
-                                    _context8.next = 18;
-                                    break;
-                                }
-
-                                url = this.data.CLIENT_REQUEST_DETAILS;
-
-                                url += options ? options : "";
-                                _context8.prev = 3;
-                                _context8.next = 6;
-                                return this.data.get(url);
-
-                            case 6:
-                                serverResponse = _context8.sent;
-
-                                if (serverResponse.error) {
-                                    _context8.next = 11;
-                                    break;
-                                }
-
-                                this.requestsDetailsArray = serverResponse;
-                                _context8.next = 12;
-                                break;
-
-                            case 11:
-                                return _context8.abrupt('return', undefined);
-
-                            case 12:
-                                _context8.next = 18;
-                                break;
-
-                            case 14:
-                                _context8.prev = 14;
-                                _context8.t0 = _context8['catch'](3);
-
-                                console.log(_context8.t0);
-                                return _context8.abrupt('return', undefined);
-
-                            case 18:
-                                return _context8.abrupt('return', this.requestsDetailsArray);
-
-                            case 19:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this, [[3, 14]]);
-            }));
-
-            function getClientRequestsDetailsArray(_x14, _x15) {
-                return _ref8.apply(this, arguments);
-            }
-
-            return getClientRequestsDetailsArray;
-        }();
-
-        ClientRequests.prototype.getPersonSesssionClientRequestsArray = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(personId, sessionId) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                sessionId = sessionId || this.selectedRequest.sessionId;
-
-                                if (!(!personId || !sessionId)) {
-                                    _context9.next = 3;
-                                    break;
-                                }
-
-                                return _context9.abrupt('return');
-
-                            case 3:
-                                _context9.prev = 3;
-                                _context9.next = 6;
-                                return this.data.get(this.data.CLIENT_REQUESTS_SERVICES + '/person/' + personId + '/session/' + sessionId);
-
-                            case 6:
-                                serverResponse = _context9.sent;
-
-                                if (serverResponse.error) {
-                                    _context9.next = 11;
-                                    break;
-                                }
-
-                                this.requestsArray = serverResponse;
-                                _context9.next = 12;
-                                break;
-
-                            case 11:
-                                return _context9.abrupt('return', undefined);
-
-                            case 12:
-                                _context9.next = 18;
-                                break;
-
-                            case 14:
-                                _context9.prev = 14;
-                                _context9.t0 = _context9['catch'](3);
-
-                                console.log(_context9.t0);
-                                return _context9.abrupt('return', undefined);
-
-                            case 18:
-                                return _context9.abrupt('return', this.requestsArray);
-
-                            case 19:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this, [[3, 14]]);
-            }));
-
-            function getPersonSesssionClientRequestsArray(_x16, _x17) {
-                return _ref9.apply(this, arguments);
-            }
-
-            return getPersonSesssionClientRequestsArray;
-        }();
 
         return ClientRequests;
     }()) || _class);
@@ -2230,6 +3582,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.MESSAGE_SERVICES = 'messages';
             this.HELP_TICKET_SERVICES = 'helpTickets';
             this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
+            this.HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
             this.DOWNLOADS_SERVICE = "apps";
             this.APPLICATION_CATEGORY_SERVICE = "appsCategory";
             this.DOCUMENTS_SERVICE = "documents";
@@ -3930,6 +5283,54 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             return uploadFile;
         }();
 
+        HelpTickets.prototype.lockHelpTicket = function lockHelpTicket(obj) {
+            if (obj.helpTicketId) {
+                var response = this.data.saveObject(obj, this.data.HELP_TICKET_LOCK_SERVICES, "post");
+            }
+        };
+
+        HelpTickets.prototype.getHelpTicketLock = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(id) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                _context9.next = 2;
+                                return this.data.get(this.data.HELP_TICKET_LOCK_SERVICES + "/" + id);
+
+                            case 2:
+                                response = _context9.sent;
+
+                                if (response.error) {
+                                    _context9.next = 7;
+                                    break;
+                                }
+
+                                return _context9.abrupt('return', response);
+
+                            case 7:
+                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+
+                            case 8:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function getHelpTicketLock(_x7) {
+                return _ref9.apply(this, arguments);
+            }
+
+            return getHelpTicketLock;
+        }();
+
+        HelpTickets.prototype.removeHelpTicketLock = function removeHelpTicketLock(id) {
+            var response = this.data.deleteObject(this.data.HELP_TICKET_LOCK_SERVICES + "/" + id);
+        };
+
         return HelpTickets;
     }()) || _class);
 });
@@ -4342,6 +5743,7 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
             obj.firstName = "";
             obj.middleName = "";
             obj.lastName = "";
+            obj.nickName = "";
             obj.status = "";
             obj.phone = "";
             obj.mobile = "";
@@ -4352,7 +5754,12 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
             obj.password = "";
             obj.institution = "";
             obj.active = false;
-            this.coursesArray = new Array();
+            obj.coursesArray = new Array();
+            var auditObj = {
+                property: "Created",
+                eventDate: new Date()
+            };
+            obj.audit = [auditObj];
             return obj;
         };
 
@@ -6607,115 +8014,6 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         return Systems;
     }()) || _class);
 });
-define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.CommonDialogs = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var CommonDialogs = exports.CommonDialogs = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogService), _dec(_class = function () {
-    function CommonDialogs(dialogService) {
-      _classCallCheck(this, CommonDialogs);
-
-      this.dialogService = dialogService;
-    }
-
-    CommonDialogs.prototype.showMessage = function showMessage(message) {
-      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Message';
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
-
-      return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
-    };
-
-    return CommonDialogs;
-  }()) || _class);
-});
-define('resources/dialogs/confirm-dialog',["exports", "aurelia-framework", "aurelia-dialog"], function (exports, _aureliaFramework, _aureliaDialog) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ConfirmDialog = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ConfirmDialog = exports.ConfirmDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-        function ConfirmDialog(controller) {
-            _classCallCheck(this, ConfirmDialog);
-
-            this.message = "";
-
-            this.controller = controller;
-        }
-
-        ConfirmDialog.prototype.activate = function activate(data) {
-            this.message = data.message;
-            this.header = data.header == undefined ? "Confirmation" : data.header;
-        };
-
-        return ConfirmDialog;
-    }()) || _class);
-});
-define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.MessageDialog = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var MessageDialog = exports.MessageDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-    function MessageDialog(dialogController) {
-      _classCallCheck(this, MessageDialog);
-
-      this.dialogController = dialogController;
-    }
-
-    MessageDialog.prototype.activate = function activate(model) {
-      this.model = model;
-    };
-
-    MessageDialog.prototype.selectOption = function selectOption(option) {
-      if (isCancel(option)) {
-        this.dialogController.cancel(option);
-      } else {
-        this.dialogController.ok(option);
-      }
-    };
-
-    return MessageDialog;
-  }()) || _class);
-
-
-  function isCancel(option) {
-    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
-  }
-});
 define('resources/elements/add-systems',['exports', '../data/dataServices', 'aurelia-framework'], function (exports, _dataServices, _aureliaFramework) {
   'use strict';
 
@@ -8641,12 +9939,17 @@ define('resources/utils/validation',["exports", "aurelia-framework"], function (
           }
           break;
         case "min":
-          if (eval('this.context.' + rules.value) < rules.value) {
+          if (eval('this.context.' + rules.value) < rules.ruleValue) {
             thisValid = false;
           }
           break;
         case "max":
-          if (eval('this.context.' + rules.value) > rules.value) {
+          if (eval('this.context.' + rules.value) > rules.ruleValue) {
+            thisValid = false;
+          }
+          break;
+        case "length":
+          if (eval('this.context.' + rules.value).length > 0 && eval('this.context.' + rules.value).length < rules.ruleValue) {
             thisValid = false;
           }
           break;
@@ -9662,1359 +10965,6 @@ define('resources/value-converters/ucc-staff',['exports'], function (exports) {
     return UccStaffValueConverter;
   }();
 });
-define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Analytics = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Analytics = exports.Analytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function Analytics(router) {
-            _classCallCheck(this, Analytics);
-
-            this.router = router;
-        }
-
-        Analytics.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        Analytics.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'clientRequestsAnalytics'],
-                moduleId: './clientRequests',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'clientRequests',
-                title: 'Client Requests'
-            }, {
-                route: 'helpTicketAnalytics',
-                moduleId: './helpTickets',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'helpTickets',
-                title: 'Help Tickets'
-            }]);
-
-            this.router = router;
-        };
-
-        return Analytics;
-    }()) || _class);
-});
-define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ClientRequestAnalytics = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ClientRequestAnalytics = exports.ClientRequestAnalytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function ClientRequestAnalytics(router, config, people, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, ClientRequestAnalytics);
-
-            this.router = router;
-            this.config = config;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-        }
-
-        ClientRequestAnalytics.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        ClientRequestAnalytics.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        ClientRequestAnalytics.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
-
-                            case 4:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        ClientRequestAnalytics.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 8;
-                                    break;
-                                }
-
-                                this.numCols = this.config.REQUEST_STATUS.length + 1;
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 5;
-                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 5:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.requests.groupRequestsByInstitution();
-                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
-                                    this.dataTable.createPageButtons(1);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context2.next = 9;
-                                break;
-
-                            case 8:
-                                this.displayArray = new Array();
-
-                            case 9:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        return ClientRequestAnalytics;
-    }()) || _class);
-});
-define('modules/analytics/helpTickets',["exports"], function (exports) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var HelpTicketAnalytics = exports.HelpTicketAnalytics = function HelpTicketAnalytics() {
-        _classCallCheck(this, HelpTicketAnalytics);
-    };
-});
-define('modules/facco/editClients',["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var EditClients = exports.EditClients = function EditClients() {
-    _classCallCheck(this, EditClients);
-  };
-});
-define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditPeople = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
-            _classCallCheck(this, EditPeople);
-
-            this.personSelected = false;
-            this.navControl = "peopleNavButtons";
-            this.spinnerHTML = "";
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.utils = utils;
-            this.people = people;
-            this.is4ua = is4ua;
-            this.dialog = dialog;
-        }
-
-        EditPeople.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditPeople.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        EditPeople.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.is4ua.loadIs4ua()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-
-                                this.dataTable.updateArray(this.people.peopleArray);
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditPeople.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.people.getPeopleArray(true, '?order=lastName');
-
-                            case 3:
-                                this.people.getInstitutionPeople(this.userObj.institutionId);
-                                this.dataTable.updateArray(this.people.peopleArray);
-                                this.spinnerHTML = "";
-
-                            case 6:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditPeople.prototype.edit = function edit(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.people.selectPerson(this.editIndex);
-            this.roles = "";
-            for (var i = 0; i < this.config.ROLES.length; i++) {
-                if (this.people.selectedPerson.roles.indexOf(this.config.ROLES[i].role) > -1) {
-                    this.roles += this.config.ROLES[i].label + "<br/>";
-                }
-            }
-
-            (0, _jquery2.default)("#editFirstName").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.personSelected = true;
-        };
-
-        EditPeople.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                _context3.next = 2;
-                                return this.people.savePerson();
-
-                            case 2:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.people.peopleArray);
-                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
-                                }
-                                this.personSelected = false;
-
-                            case 5:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditPeople.prototype.cancel = function cancel() {
-            this.people.selectPerson(this.editIndex);
-        };
-
-        EditPeople.prototype.back = function back() {
-            var _this = this;
-
-            if (this.people.isPersonDirty().length) {
-                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this.save();
-                    } else {
-                        _this.personSelected = false;
-                    }
-                });
-            } else {
-                this.personSelected = false;
-            }
-        };
-
-        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
-            (0, _jquery2.default)("#lastName").val("");
-            (0, _jquery2.default)("#roles").val("");
-            (0, _jquery2.default)("#personStatus").val("");
-        };
-
-        return EditPeople;
-    }()) || _class);
-});
-define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.FacCo = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function FacCo(router) {
-            _classCallCheck(this, FacCo);
-
-            this.router = router;
-        }
-
-        FacCo.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        FacCo.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'editPeople'],
-                moduleId: './editPeople',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editPeople',
-                title: 'People'
-            }, {
-                route: 'editClients',
-                moduleId: './editClients',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editClients',
-                title: 'Clients Requests'
-            }]);
-
-            this.router = router;
-        };
-
-        return FacCo;
-    }()) || _class);
-});
-define('modules/home/home',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _siteInfo, _sessions, _appConfig, _moment) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Home = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _sessions.Sessions, _appConfig.AppConfig), _dec(_class = function () {
-        function Home(siteinfo, sessions, config) {
-            _classCallCheck(this, Home);
-
-            this.email = '';
-            this.password = '';
-            this.loginError = '';
-
-            this.sessions = sessions;
-            this.siteinfo = siteinfo;
-            this.config = config;
-            this.config.getConfig(true);
-        }
-
-        Home.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var currentDate, options;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
-                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-                                _context.next = 4;
-                                return this.sessions.getSessionsArray(true, '?order=startDate');
-
-                            case 4:
-                                _context.next = 6;
-                                return this.siteinfo.getInfoArray(true, options);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        return Home;
-    }()) || _class);
-});
-define('modules/home/logout',['exports', 'aurelia-framework', '../../resources/data/auth'], function (exports, _aureliaFramework, _auth) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Logout = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Logout = exports.Logout = (_dec = (0, _aureliaFramework.inject)(_auth.Auth), _dec(_class = function () {
-    function Logout(auth) {
-      _classCallCheck(this, Logout);
-
-      this.auth = auth;
-    }
-
-    Logout.prototype.activate = function activate() {
-      this.auth.logout();
-      this.router.navigate("home");
-    };
-
-    return Logout;
-  }()) || _class);
-});
-define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', '../../resources/utils/validation', '../../config/appConfig', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _people, _is4ua, _commonDialogs, _validation, _appConfig, _jquery) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Register = undefined;
-
-  var _validation2 = _interopRequireDefault(_validation);
-
-  var _jquery2 = _interopRequireDefault(_jquery);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _asyncToGenerator(fn) {
-    return function () {
-      var gen = fn.apply(this, arguments);
-      return new Promise(function (resolve, reject) {
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            return Promise.resolve(value).then(function (value) {
-              step("next", value);
-            }, function (err) {
-              step("throw", err);
-            });
-          }
-        }
-
-        return step("next");
-      });
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Register = exports.Register = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _people.People, _is4ua.is4ua, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
-    function Register(router, people, is4ua, utils, config, dialog, validation) {
-      _classCallCheck(this, Register);
-
-      this.router = router;
-      this.people = people;
-      this.is4ua = is4ua;
-      this.utils = utils;
-      this.validation = validation;
-      this.config = config;
-      this.dialog = dialog;
-      this.validation.initialize(this);
-
-      this.thresholdLength = 6;
-      this.threshold = 3;
-    }
-
-    Register.prototype.attached = function attached() {
-      this._setUpValidation();
-      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-    };
-
-    Register.prototype.activate = function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return this.people.getInstitutionsArray(true, '?filter=institutionStatus|eq|01&order=name&fields=_id name');
-
-              case 2:
-                _context.next = 4;
-                return this.is4ua.loadIs4ua();
-
-              case 4:
-                this.people.selectPerson();
-
-              case 5:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function activate() {
-        return _ref.apply(this, arguments);
-      }
-
-      return activate;
-    }();
-
-    Register.prototype.checkEmail = function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return this.people.checkEmail();
-
-              case 2:
-                if (!_context2.sent) {
-                  _context2.next = 7;
-                  break;
-                }
-
-                this.duplicateAccount = true;
-                this.validation.validate(2);
-                _context2.next = 9;
-                break;
-
-              case 7:
-                this.duplicateAccount = false;
-                this.validation.makeValid((0, _jquery2.default)("#register_email"));
-
-              case 9:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function checkEmail() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return checkEmail;
-    }();
-
-    Register.prototype.checkName = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return this.people.checkName();
-
-              case 2:
-                if (!_context3.sent) {
-                  _context3.next = 7;
-                  break;
-                }
-
-                this.duplicateName = true;
-                this.validation.validate(3);
-                _context3.next = 9;
-                break;
-
-              case 7:
-                this.duplicateName = false;
-                this.validation.makeValid((0, _jquery2.default)("#register_institution"));
-
-              case 9:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function checkName() {
-        return _ref3.apply(this, arguments);
-      }
-
-      return checkName;
-    }();
-
-    Register.prototype.passwordComplexity = function passwordComplexity() {
-
-      var newValue = this.people.selectedPerson.password;
-
-      this.longPassword = newValue.length >= this.thresholdLength;
-
-      var strength = 0;
-      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
-      strength += /[a-z]+/.test(newValue) ? 1 : 0;
-      strength += /[0-9]+/.test(newValue) ? 1 : 0;
-      strength += /[\W]+/.test(newValue) ? 1 : 0;
-
-      this.complexPassword = strength >= this.threshold && this.longPassword;
-      this.validation.validate(4);
-    };
-
-    Register.prototype._setUpValidation = function _setUpValidation() {
-      this.validation.addRule(1, "register_firstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
-      this.validation.addRule(1, "register_lastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
-      this.validation.addRule(1, "register_email", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateAccount;
-        } }, { "rule": "custom", "message": "Enter a valid email address",
-        "valFunction": function valFunction(context) {
-          return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email)
-          );
-        }
-      }]);
-      this.validation.addRule(1, "register_phone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }]);
-      this.validation.addRule(1, "register_institution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }, { "rule": "custom", "message": "An account with that name at this institution exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateName;
-        } }]);
-      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
-      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
-        "valFunction": function valFunction(context) {
-          return context.people.selectedPerson.password === context.password_repeat;
-        } }], true);
-      this.validation.addRule(2, "register_email", [{ "rule": "custom", "message": "An account with that email exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateAccount;
-        } }]);
-      this.validation.addRule(3, "register_institution", [{ "rule": "custom", "message": "An account with that name at this institution exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateName;
-        } }]);
-      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
-        "valFunction": function valFunction(context) {
-          return context.complexPassword;
-        } }]);
-    };
-
-    Register.prototype.save = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-        var _this = this;
-
-        var response;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                if (!this.validation.validate(1)) {
-                  _context4.next = 11;
-                  break;
-                }
-
-                console.log(this.people.selectedPerson);
-                this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
-                _context4.next = 5;
-                return this.people.savePerson('register');
-
-              case 5:
-                response = _context4.sent;
-
-                if (response.error) {
-                  _context4.next = 10;
-                  break;
-                }
-
-                return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).then(function (response) {
-                  _this.router.navigate("home");
-                }));
-
-              case 10:
-                this.utils.showNotification("An error occurred creating the account");
-
-              case 11:
-              case 'end':
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function save() {
-        return _ref4.apply(this, arguments);
-      }
-
-      return save;
-    }();
-
-    Register.prototype.back = function back() {
-      window.history.back();
-    };
-
-    return Register;
-  }()) || _class);
-});
-define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Profile = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_is4ua.is4ua, _people.People, _aureliaRouter.Router, _utils.Utils, _validation2.default), _dec(_class = function () {
-        function Profile(is4ua, people, router, utils, validation) {
-            _classCallCheck(this, Profile);
-
-            this.is4ua = is4ua;
-            this.people = people;
-            this.router = router;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this._setupValidation();
-
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        }
-
-        Profile.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
-            this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
-
-            this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
-        };
-
-        Profile.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Profile.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getPerson(this.userObj._id), this.people.getInstitutionsArray(true, '?fields=_id name&order=name'), this.is4ua.loadIs4ua()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-
-                                this.user = this.people.selectedPerson;
-
-                            case 4:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        Profile.prototype.save = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var response;
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.validation.validate(1, this)) {
-                                    _context2.next = 6;
-                                    break;
-                                }
-
-                                if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
-                                    this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
-                                }
-                                _context2.next = 4;
-                                return this.people.savePerson();
-
-                            case 4:
-                                response = _context2.sent;
-
-                                if (!response.error) {
-                                    this.utils.showNotification("Your profile has been updated");
-                                    this.router.navigate("user");
-                                } else {
-                                    this.utils.showNotification("An error occurred updating your profile");
-                                }
-
-                            case 6:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function save() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Profile.prototype.cancel = function cancel() {
-            this.utils.copyObject(this.users, this.people.selectedPerson);
-        };
-
-        return Profile;
-    }()) || _class);
-});
-define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _helpTickets, _clientRequests, _moment) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.User = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests), _dec(_class = function () {
-        function User(router, utils, config, siteinfo, sessions, helpTickets, requests) {
-            _classCallCheck(this, User);
-
-            this.router = router;
-            this.utils = utils;
-            this.config = config;
-            this.siteinfo = siteinfo;
-            this.sessions = sessions;
-            this.helpTickets = helpTickets;
-            this.requests = requests;
-        }
-
-        User.prototype.attached = function attached() {
-            $('.carousel').carousel({
-                interval: 10000
-            });
-        };
-
-        User.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return this.getData();
-
-                            case 2:
-
-                                this.helpTicketArray = [{
-                                    value: this.helpTickets.newHelpTickets || 0,
-                                    color: "#F7464A",
-                                    highlight: "#FF5A5E",
-                                    label: "New"
-                                }, {
-                                    value: this.helpTickets.underReviewHelpTickets || 0,
-                                    color: "#46BFBD",
-                                    highlight: "#5AD3D1",
-                                    label: "Under Review"
-                                }, {
-                                    value: this.helpTickets.customerActionHelpTickets || 0,
-                                    color: "#FDB45C",
-                                    highlight: "#FFC870",
-                                    label: "Customer Action"
-                                }];
-
-                                this.clientRequestsArray = [{
-                                    value: this.requests.unassignedRequests || 0,
-                                    color: "#F7464A",
-                                    highlight: "#FF5A5E",
-                                    label: "Unassigned"
-                                }, {
-                                    value: this.requests.updatedRequests || 0,
-                                    color: "#46BFBD",
-                                    highlight: "#5AD3D1",
-                                    label: "Updated"
-                                }, {
-                                    value: this.requests.customerActionRequests || 0,
-                                    color: "#FDB45C",
-                                    highlight: "#FFC870",
-                                    label: "Customer Action"
-                                }];
-
-                            case 4:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        User.prototype.getData = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var _this = this;
-
-                var currentDate, options, countOptions, responses, _responses, requestCountArray, weather, weatherObj, _weather, uccweather;
-
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
-                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
-                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-
-                                if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
-                                    _context2.next = 11;
-                                    break;
-                                }
-
-                                countOptions = '';
-
-                                this.countHeader = "Recent Request History";
-                                _context2.next = 8;
-                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray(true, '?filter=institutionId|eq|' + this.userObj.institutionId), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
-
-                            case 8:
-                                responses = _context2.sent;
-                                _context2.next = 16;
-                                break;
-
-                            case 11:
-                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
-
-                                this.countHeader = "Your Institution's Recent Request History";
-                                _context2.next = 15;
-                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
-
-                            case 15:
-                                _responses = _context2.sent;
-
-                            case 16:
-                                this.requestsCount = new Array();
-                                this.countLabels = new Array();
-                                _context2.next = 20;
-                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
-
-                            case 20:
-                                requestCountArray = _context2.sent;
-
-                                if (requestCountArray) {
-                                    requestCountArray.forEach(function (item) {
-                                        _this.requestsCount.push(item.count);
-                                        _this.countLabels.push(item.session);
-                                    });
-                                }
-
-                                this.temp = undefined;
-
-                                if (sessionStorage.getItem('weather')) {
-                                    _context2.next = 34;
-                                    break;
-                                }
-
-                                _context2.next = 26;
-                                return this.siteinfo.getWeather(this.userObj.city);
-
-                            case 26:
-                                weather = _context2.sent;
-
-                                this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
-                                this.temp = this.temp + '\xB0 C';
-                                this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
-                                weatherObj = { temp: this.temp, url: this.weatherIcon };
-
-                                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
-                                _context2.next = 37;
-                                break;
-
-                            case 34:
-                                _weather = JSON.parse(sessionStorage.getItem('weather'));
-
-                                this.temp = _weather.temp;
-                                this.weatherIcon = _weather.url;
-
-                            case 37:
-                                uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
-
-                                this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + '\xB0 C';
-                                this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
-
-                            case 40:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getData() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getData;
-        }();
-
-        User.prototype.moreInfoExists = function moreInfoExists(item) {
-            return item.url && item.url.length > 0;
-        };
-
-        return User;
-    }()) || _class);
-});
 define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
     'use strict';
 
@@ -11480,7 +11430,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             this.showPassword = false;
             this.navControl = "peopleNavButtons";
             this.spinnerHTML = "";
-            this.tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'is4ua' }];
+            this.tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }];
             this.tabPath = './';
 
             this.dataTable = datatable;
@@ -11504,7 +11454,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.is4ua.loadIs4ua()]);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.is4ua.loadIs4ua(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
@@ -11567,6 +11517,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             this.editIndex = this.dataTable.getOriginalIndex(index);
             this.people.selectPerson(this.editIndex);
             this.oldEmail = this.people.selectedPerson.email;
+            this.institutionId = this.people.selectedPerson.institutionId;
             this.newPerson = false;
             (0, _jquery2.default)("#editFirstName").focus();
 
@@ -11604,6 +11555,21 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             return _new;
         }();
 
+        EditPeople.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty();
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: JSON.parse(sessionStorage.getItem('user'))._id
+                });
+            });
+        };
+
         EditPeople.prototype.save = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
                 var serverResponse;
@@ -11612,14 +11578,15 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context4.next = 6;
+                                    _context4.next = 7;
                                     break;
                                 }
 
-                                _context4.next = 3;
+                                this.buildAudit();
+                                _context4.next = 4;
                                 return this.people.savePerson();
 
-                            case 3:
+                            case 4:
                                 serverResponse = _context4.sent;
 
                                 if (!serverResponse.error) {
@@ -11630,7 +11597,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                                 }
                                 this._cleanUp();
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -11646,11 +11613,11 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
         }();
 
         EditPeople.prototype.delete = function _delete() {
-            var _this = this;
+            var _this2 = this;
 
             return this.dialog.showMessage("Are you sure you want to delete the person?", "Delete Person", ['Yes', 'No']).then(function (response) {
                 if (!response.wasCancelled) {
-                    _this.deletePerson();
+                    _this2.deletePerson();
                 }
             });
         };
@@ -11695,14 +11662,14 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.back = function back() {
-            var _this2 = this;
+            var _this3 = this;
 
             if (this.people.isPersonDirty().length) {
                 return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
                     if (!response.wasCancelled) {
-                        _this2.save();
+                        _this3.save();
                     } else {
-                        _this2._cleanUp();
+                        _this3._cleanUp();
                     }
                 });
             } else {
@@ -11753,6 +11720,18 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
 
             return checkEmail;
         }();
+
+        EditPeople.prototype.changeInstitution = function changeInstitution() {
+            var _this4 = this;
+
+            return this.dialog.showMessage("Are you sure you want to change the institution? This should normally only be done if the account was created in the wrong institution.  If the user has changed institutions, create a new account.", "Change Institution", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this4.people.selectedPerson.institutionId = _this4.institutionId;
+                } else {
+                    _this4.institutionId = _this4.people.selectedPerson.institutionId;
+                }
+            });
+        };
 
         EditPeople.prototype.openEditCourseForm = function () {
             var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
@@ -11971,7 +11950,8 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                 } }]);
             this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last name is required", "value": "people.selectedPerson.lastName" }]);
             this.validation.addRule(1, "editStatus", [{ "rule": "required", "message": "Status is required", "value": "people.selectedPerson.personStatus" }]);
-            this.validation.addRule(1, "editPhone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }]);
+            this.validation.addRule(1, "editPhone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }, { "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.phone", "ruleValue": 10 }]);
+            this.validation.addRule(1, "editMobile", [{ "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.mobile", "ruleValue": 10 }]);
             this.validation.addRule(1, "editEmail", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
                 "valFunction": function valFunction(context) {
                     return !context.duplicateAccount;
@@ -15846,41 +15826,6 @@ define('modules/admin/system/system',["exports", "aurelia-framework", "aurelia-r
         return System;
     }()) || _class);
 });
-define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.SuccessDialog = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var SuccessDialog = exports.SuccessDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-        function SuccessDialog(controller) {
-            _classCallCheck(this, SuccessDialog);
-
-            this.controller = controller;
-        }
-
-        SuccessDialog.prototype.ok = function ok() {
-            alert("OK");
-        };
-
-        SuccessDialog.prototype.activate = function activate(cmd) {
-            console.log(cmd);
-            this.cmd = cmd;
-        };
-
-        return SuccessDialog;
-    }()) || _class);
-});
 define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _validation, _moment, _jquery) {
     'use strict';
 
@@ -15982,7 +15927,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
@@ -16025,8 +15970,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                             case 4:
                                 if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                                     this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                                    this.utils.formatDateForDatesPicker(this.requests.selectedRequest);
-                                    this.dataTable.createPageButtons(1);
                                 } else {
                                     this.displayArray = new Array();
                                 }
@@ -16865,6 +16808,41 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         };
 
         return Assignments;
+    }()) || _class);
+});
+define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.SuccessDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var SuccessDialog = exports.SuccessDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+        function SuccessDialog(controller) {
+            _classCallCheck(this, SuccessDialog);
+
+            this.controller = controller;
+        }
+
+        SuccessDialog.prototype.ok = function ok() {
+            alert("OK");
+        };
+
+        SuccessDialog.prototype.activate = function activate(cmd) {
+            console.log(cmd);
+            this.cmd = cmd;
+        };
+
+        return SuccessDialog;
     }()) || _class);
 });
 define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _moment) {
@@ -17875,6 +17853,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.helpTicketSelected = false;
       this.enterResponse = false;
       this.sendEmail = false;
+      this.showLockMessage = false;
       this.navControl = "supportNavButtons";
       this.spinnerHTML = "";
       this.filterValues = new Array();
@@ -17907,7 +17886,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray(), this.config.getConfig()]);
+                return Promise.all([this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('', true), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;
@@ -17934,6 +17913,10 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.attached = function attached() {
       (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+    };
+
+    ViewHelpTickets.prototype.detached = function detached() {
+      this._unLock();
     };
 
     ViewHelpTickets.prototype.showComment = function showComment(helpTicket, el) {
@@ -17974,6 +17957,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.selectHelpTicket = function () {
       var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
+        var response;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -17990,6 +17974,25 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 return this.sytems.getSystem(this.helpTickets.content.content.systemId);
 
               case 5:
+                _context3.next = 7;
+                return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+
+              case 7:
+                response = _context3.sent;
+
+                if (!response.error) {
+                  if (response.helpTicketId === 0) {
+                    this.helpTickets.lockHelpTicket({
+                      helpTicketId: this.helpTickets.selectedHelpTicket._id,
+                      personId: this.userObj._id
+                    });
+                    this.showLockMessage = false;
+                    this.lockObject = {};
+                  } else {
+                    this.lockObject = response[0];
+                    this.showLockMessage = true;
+                  }
+                }
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
                 this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
@@ -17998,7 +18001,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
 
-              case 10:
+              case 14:
               case 'end':
                 return _context3.stop();
             }
@@ -18014,11 +18017,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.respond = function respond() {
-      this.helpTickets.selectHelpTicketContent();
-      this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
-      this.responseContent = "";
-      this.enterResponse = true;
-      this.enableButton = true;
+      if (!this.showLockMessage) {
+        this.helpTickets.selectHelpTicketContent();
+        this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
+        this.responseContent = "";
+        this.enterResponse = true;
+        this.enableButton = true;
+      }
     };
 
     ViewHelpTickets.prototype.cancelResponse = function cancelResponse() {
@@ -18155,18 +18160,23 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
+                if (this.showLockMessage) {
+                  _context7.next = 8;
+                  break;
+                }
+
                 if (!this.validation.validate(9, this)) {
-                  _context7.next = 7;
+                  _context7.next = 8;
                   break;
                 }
 
                 obj = {
                   personId: this.userObj._id
                 };
-                _context7.next = 4;
+                _context7.next = 5;
                 return this.helpTickets.updateOwner(obj);
 
-              case 4:
+              case 5:
                 serverResponse = _context7.sent;
 
                 if (!serverResponse.error) {
@@ -18175,7 +18185,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 7:
+              case 8:
               case 'end':
                 return _context7.stop();
             }
@@ -18189,6 +18199,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
       return own;
     }();
+
+    ViewHelpTickets.prototype._unLock = function _unLock() {
+      if (!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId) {
+        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      }
+    };
 
     ViewHelpTickets.prototype._cleanUp = function _cleanUp() {
       this.enterResponse = false;
@@ -18207,6 +18223,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.back = function back() {
       this.helpTicketSelected = false;
+      this._cleanUp();
+      this._unLock();
     };
 
     ViewHelpTickets.prototype._setUpValidation = function _setUpValidation() {
@@ -20388,6 +20406,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
       this.helpTicketSelected = false;
       this.enterResponse = false;
+      this.showLockMessage = false;
       this.navControl = "supportNavButtons";
       this.spinnerHTML = "";
       this.filterValues = new Array();
@@ -20409,6 +20428,10 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.attached = function attached() {
       (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+    };
+
+    ViewHelpTickets.prototype.detached = function detached() {
+      this._unLock();
     };
 
     ViewHelpTickets.prototype.canActivate = function canActivate() {
@@ -20488,6 +20511,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.selectHelpTicket = function () {
       var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el, index) {
+        var response;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -20504,6 +20528,25 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 return this.sytems.getSystem(this.helpTickets.content.content.systemId);
 
               case 5:
+                _context3.next = 7;
+                return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+
+              case 7:
+                response = _context3.sent;
+
+                if (!response.error) {
+                  if (response.helpTicketId === 0) {
+                    this.helpTickets.lockHelpTicket({
+                      helpTicketId: this.helpTickets.selectedHelpTicket._id,
+                      personId: this.userObj._id
+                    });
+                    this.showLockMessage = false;
+                    this.lockObject = {};
+                  } else {
+                    this.lockObject = response[0];
+                    this.showLockMessage = true;
+                  }
+                }
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
                 this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
@@ -20512,7 +20555,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
 
-              case 10:
+              case 14:
               case 'end':
                 return _context3.stop();
             }
@@ -20528,11 +20571,13 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.respond = function respond() {
-      this.responseContent = "";
-      this.helpTickets.selectHelpTicketContent();
-      this.enterResponse = true;
-      this.enableButton = true;
-      tinyMCE.activeEditor.focus();
+      if (!this.showLockMessage) {
+        this.responseContent = "";
+        this.helpTickets.selectHelpTicketContent();
+        this.enterResponse = true;
+        this.enableButton = true;
+        tinyMCE.activeEditor.focus();
+      }
     };
 
     ViewHelpTickets.prototype.cancelResponse = function cancelResponse() {
@@ -20598,8 +20643,16 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.filesSelected = "";
     };
 
+    ViewHelpTickets.prototype._unLock = function _unLock() {
+      if (!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId) {
+        this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      }
+    };
+
     ViewHelpTickets.prototype.back = function back() {
       this.helpTicketSelected = false;
+      this._cleanUp();
+      this._unLock();
     };
 
     ViewHelpTickets.prototype._setUpValidation = function _setUpValidation() {
@@ -27920,30 +27973,28 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"resources/css/styles.css\"></require>\n  <require from=\"humane-js/themes/flatty.css\"></require>\n\n  <nav-bar></nav-bar>\n\n  <div class=\"page-host\">\n     <loading-indicator loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n  </div>\n   \n</template>"; });
 define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], function(module) { module.exports = "/*!\n * Datetimepicker for Bootstrap 3\n * version : 4.17.43\n * https://github.com/Eonasdan/bootstrap-datetimepicker/\n */.bootstrap-datetimepicker-widget{list-style:none}.bootstrap-datetimepicker-widget.dropdown-menu{margin:2px 0;padding:4px;width:19em}@media (min-width:768px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:992px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:1200px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}.bootstrap-datetimepicker-widget.dropdown-menu:before,.bootstrap-datetimepicker-widget.dropdown-menu:after{content:'';display:inline-block;position:absolute}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:before{border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #ccc;border-bottom-color:rgba(0,0,0,0.2);top:-7px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:after{border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid white;top:-6px;left:8px}.bootstrap-datetimepicker-widget.dropdown-menu.top:before{border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ccc;border-top-color:rgba(0,0,0,0.2);bottom:-7px;left:6px}.bootstrap-datetimepicker-widget.dropdown-menu.top:after{border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid white;bottom:-6px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before{left:auto;right:6px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after{left:auto;right:7px}.bootstrap-datetimepicker-widget .list-unstyled{margin:0}.bootstrap-datetimepicker-widget a[data-action]{padding:6px 0}.bootstrap-datetimepicker-widget a[data-action]:active{box-shadow:none}.bootstrap-datetimepicker-widget .timepicker-hour,.bootstrap-datetimepicker-widget .timepicker-minute,.bootstrap-datetimepicker-widget .timepicker-second{width:54px;font-weight:bold;font-size:1.2em;margin:0}.bootstrap-datetimepicker-widget button[data-action]{padding:6px}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"togglePeriod\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle AM/PM\"}.bootstrap-datetimepicker-widget .btn[data-action=\"clear\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Clear the picker\"}.bootstrap-datetimepicker-widget .btn[data-action=\"today\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Set the date to today\"}.bootstrap-datetimepicker-widget .picker-switch{text-align:center}.bootstrap-datetimepicker-widget .picker-switch::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle Date and Time Screens\"}.bootstrap-datetimepicker-widget .picker-switch td{padding:0;margin:0;height:auto;width:auto;line-height:inherit}.bootstrap-datetimepicker-widget .picker-switch td span{line-height:2.5;height:2.5em;width:100%}.bootstrap-datetimepicker-widget table{width:100%;margin:0}.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{text-align:center;border-radius:4px}.bootstrap-datetimepicker-widget table th{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table th.picker-switch{width:145px}.bootstrap-datetimepicker-widget table th.disabled,.bootstrap-datetimepicker-widget table th.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table th.prev::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Previous Month\"}.bootstrap-datetimepicker-widget table th.next::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Next Month\"}.bootstrap-datetimepicker-widget table thead tr:first-child th{cursor:pointer}.bootstrap-datetimepicker-widget table thead tr:first-child th:hover{background:#eee}.bootstrap-datetimepicker-widget table td{height:54px;line-height:54px;width:54px}.bootstrap-datetimepicker-widget table td.cw{font-size:.8em;height:20px;line-height:20px;color:#777}.bootstrap-datetimepicker-widget table td.day{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table td.hour:hover,.bootstrap-datetimepicker-widget table td.minute:hover,.bootstrap-datetimepicker-widget table td.second:hover{background:#eee;cursor:pointer}.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:#777}.bootstrap-datetimepicker-widget table td.today{position:relative}.bootstrap-datetimepicker-widget table td.today:before{content:'';display:inline-block;border:solid transparent;border-width:0 0 7px 7px;border-bottom-color:#337ab7;border-top-color:rgba(0,0,0,0.2);position:absolute;bottom:4px;right:4px}.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td.active.today:before{border-bottom-color:#fff}.bootstrap-datetimepicker-widget table td.disabled,.bootstrap-datetimepicker-widget table td.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table td span{display:inline-block;width:54px;height:54px;line-height:54px;margin:2px 1.5px;cursor:pointer;border-radius:4px}.bootstrap-datetimepicker-widget table td span:hover{background:#eee}.bootstrap-datetimepicker-widget table td span.active{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td span.old{color:#777}.bootstrap-datetimepicker-widget table td span.disabled,.bootstrap-datetimepicker-widget table td span.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget.usetwentyfour td.hour{height:27px;line-height:27px}.bootstrap-datetimepicker-widget.wider{width:21em}.bootstrap-datetimepicker-widget .datepicker-decades .decade{line-height:1.8em !important}.input-group.date .input-group-addon{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}"; });
-define('text!resources/dialogs/confirm-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <div tabindex=\"-1\" role=\"dialog\">\n        <div class=\"modal-dialog\">\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <button type=\"button\" click.trigger=\"controller.cancel()\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                    <h4 class=\"modal-title\">${header}</h4>\n                </div>\n                <div class=\"modal-body\">\n                   ${message}?\n                </div>\n                <div class=\"modal-footer\">\n                    <button type=\"button\" class=\"btn btn-default\" click.trigger=\"controller.cancel()\">No!</button>\n                    <button type=\"button\" class=\"btn btn-danger\" click.trigger=\"controller.ok()\">Yes</button>\n                </div>\n            </div><!-- /.modal-content  -->\n        </div><!-- /.modal-dialog -->\n    </div><!-- /.modal -->\n</template>"; });
-define('text!resources/dialogs/message-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ai-dialog style=\"max-width: 325px\">\n    <ai-dialog-header>${model.title}</ai-dialog-header>\n\n    <ai-dialog-body>\n      ${model.message}\n    </ai-dialog-body>\n\n    <ai-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ai-dialog-footer>\n  </ai-dialog>\n</template>"; });
-define('text!resources/css/bootstrap.min.css', ['module'], function(module) { module.exports = "@import url(\"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700\");/*!\n * bootswatch v3.3.7\n * Homepage: http://bootswatch.com\n * Copyright 2012-2016 Thomas Park\n * Licensed under MIT\n * Based on Bootstrap\n*//*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}dfn{font-style:italic}h1{font-size:2em;margin:0.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace, monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=\"button\"],input[type=\"reset\"],input[type=\"submit\"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=\"checkbox\"],input[type=\"radio\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=\"number\"]::-webkit-inner-spin-button,input[type=\"number\"]::-webkit-outer-spin-button{height:auto}input[type=\"search\"]{-webkit-appearance:textfield;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}input[type=\"search\"]::-webkit-search-cancel-button,input[type=\"search\"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:0.35em 0.625em 0.75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:bold}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,*:before,*:after{background:transparent !important;color:#000 !important;-webkit-box-shadow:none !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}p,h2,h3{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000 !important}.label{border:1px solid #000}.table{border-collapse:collapse !important}.table td,.table th{background-color:#fff !important}.table-bordered th,.table-bordered td{border:1px solid #ddd !important}}@font-face{font-family:'Glyphicons Halflings';src:url('../fonts/glyphicons-halflings-regular.eot');src:url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'),url('../fonts/glyphicons-halflings-regular.woff') format('woff'),url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:normal;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-euro:before,.glyphicon-eur:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*:before,*:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;color:#222222;background-color:#ffffff}input,button,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#008cba;text-decoration:none}a:hover,a:focus{color:#008cba;text-decoration:underline}a:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.img-responsive,.thumbnail>img,.thumbnail a>img,.carousel-inner>.item>img,.carousel-inner>.item>a>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:0}.img-thumbnail{padding:4px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out;display:inline-block;max-width:100%;height:auto}.img-circle{border-radius:50%}hr{margin-top:21px;margin-bottom:21px;border:0;border-top:1px solid #dddddd}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=\"button\"]{cursor:pointer}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-weight:300;line-height:1.1;color:inherit}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small,.h1 small,.h2 small,.h3 small,.h4 small,.h5 small,.h6 small,h1 .small,h2 .small,h3 .small,h4 .small,h5 .small,h6 .small,.h1 .small,.h2 .small,.h3 .small,.h4 .small,.h5 .small,.h6 .small{font-weight:normal;line-height:1;color:#999999}h1,.h1,h2,.h2,h3,.h3{margin-top:21px;margin-bottom:10.5px}h1 small,.h1 small,h2 small,.h2 small,h3 small,.h3 small,h1 .small,.h1 .small,h2 .small,.h2 .small,h3 .small,.h3 .small{font-size:65%}h4,.h4,h5,.h5,h6,.h6{margin-top:10.5px;margin-bottom:10.5px}h4 small,.h4 small,h5 small,.h5 small,h6 small,.h6 small,h4 .small,.h4 .small,h5 .small,.h5 .small,h6 .small,.h6 .small{font-size:75%}h1,.h1{font-size:39px}h2,.h2{font-size:32px}h3,.h3{font-size:26px}h4,.h4{font-size:19px}h5,.h5{font-size:15px}h6,.h6{font-size:13px}p{margin:0 0 10.5px}.lead{margin-bottom:21px;font-size:17px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:22.5px}}small,.small{font-size:80%}mark,.mark{background-color:#fcf8e3;padding:.2em}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#999999}.text-primary{color:#008cba}a.text-primary:hover,a.text-primary:focus{color:#006687}.text-success{color:#43ac6a}a.text-success:hover,a.text-success:focus{color:#358753}.text-info{color:#5bc0de}a.text-info:hover,a.text-info:focus{color:#31b0d5}.text-warning{color:#e99002}a.text-warning:hover,a.text-warning:focus{color:#b67102}.text-danger{color:#f04124}a.text-danger:hover,a.text-danger:focus{color:#d32a0e}.bg-primary{color:#fff;background-color:#008cba}a.bg-primary:hover,a.bg-primary:focus{background-color:#006687}.bg-success{background-color:#dff0d8}a.bg-success:hover,a.bg-success:focus{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:hover,a.bg-info:focus{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:hover,a.bg-warning:focus{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:hover,a.bg-danger:focus{background-color:#e4b9b9}.page-header{padding-bottom:9.5px;margin:42px 0 21px;border-bottom:1px solid #dddddd}ul,ol{margin-top:0;margin-bottom:10.5px}ul ul,ol ul,ul ol,ol ol{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;list-style:none;margin-left:-5px}.list-inline>li{display:inline-block;padding-left:5px;padding-right:5px}dl{margin-top:0;margin-bottom:21px}dt,dd{line-height:1.4}dt{font-weight:bold}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[title],abbr[data-original-title]{cursor:help;border-bottom:1px dotted #999999}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10.5px 21px;margin:0 0 21px;font-size:18.75px;border-left:5px solid #dddddd}blockquote p:last-child,blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}blockquote footer,blockquote small,blockquote .small{display:block;font-size:80%;line-height:1.4;color:#6f6f6f}blockquote footer:before,blockquote small:before,blockquote .small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;border-right:5px solid #dddddd;border-left:0;text-align:right}.blockquote-reverse footer:before,blockquote.pull-right footer:before,.blockquote-reverse small:before,blockquote.pull-right small:before,.blockquote-reverse .small:before,blockquote.pull-right .small:before{content:''}.blockquote-reverse footer:after,blockquote.pull-right footer:after,.blockquote-reverse small:after,blockquote.pull-right small:after,.blockquote-reverse .small:after,blockquote.pull-right .small:after{content:'\\00A0 \\2014'}address{margin-bottom:21px;font-style:normal;line-height:1.4}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:0}kbd{padding:2px 4px;font-size:90%;color:#ffffff;background-color:#333333;border-radius:0;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25)}kbd kbd{padding:0;font-size:100%;font-weight:bold;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:10px;margin:0 0 10.5px;font-size:14px;line-height:1.4;word-break:break-all;word-wrap:break-word;color:#333333;background-color:#f5f5f5;border:1px solid #cccccc;border-radius:0}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}.row{margin-left:-15px;margin-right:-15px}.col-xs-1,.col-sm-1,.col-md-1,.col-lg-1,.col-xs-2,.col-sm-2,.col-md-2,.col-lg-2,.col-xs-3,.col-sm-3,.col-md-3,.col-lg-3,.col-xs-4,.col-sm-4,.col-md-4,.col-lg-4,.col-xs-5,.col-sm-5,.col-md-5,.col-lg-5,.col-xs-6,.col-sm-6,.col-md-6,.col-lg-6,.col-xs-7,.col-sm-7,.col-md-7,.col-lg-7,.col-xs-8,.col-sm-8,.col-md-8,.col-lg-8,.col-xs-9,.col-sm-9,.col-md-9,.col-lg-9,.col-xs-10,.col-sm-10,.col-md-10,.col-lg-10,.col-xs-11,.col-sm-11,.col-md-11,.col-lg-11,.col-xs-12,.col-sm-12,.col-md-12,.col-lg-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0%}@media (min-width:768px){.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0%}}@media (min-width:992px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0%}}@media (min-width:1200px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0%}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#999999;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:21px}.table>thead>tr>th,.table>tbody>tr>th,.table>tfoot>tr>th,.table>thead>tr>td,.table>tbody>tr>td,.table>tfoot>tr>td{padding:8px;line-height:1.4;vertical-align:top;border-top:1px solid #dddddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #dddddd}.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>th,.table>caption+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>td,.table>thead:first-child>tr:first-child>td{border-top:0}.table>tbody+tbody{border-top:2px solid #dddddd}.table .table{background-color:#ffffff}.table-condensed>thead>tr>th,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>tbody>tr>td,.table-condensed>tfoot>tr>td{padding:5px}.table-bordered{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>tbody>tr>td,.table-bordered>tfoot>tr>td{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>thead>tr>td{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=\"col-\"]{position:static;float:none;display:table-column}table td[class*=\"col-\"],table th[class*=\"col-\"]{position:static;float:none;display:table-cell}.table>thead>tr>td.active,.table>tbody>tr>td.active,.table>tfoot>tr>td.active,.table>thead>tr>th.active,.table>tbody>tr>th.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>tbody>tr.active>td,.table>tfoot>tr.active>td,.table>thead>tr.active>th,.table>tbody>tr.active>th,.table>tfoot>tr.active>th{background-color:#f5f5f5}.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover,.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr.active:hover>th{background-color:#e8e8e8}.table>thead>tr>td.success,.table>tbody>tr>td.success,.table>tfoot>tr>td.success,.table>thead>tr>th.success,.table>tbody>tr>th.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>tbody>tr.success>td,.table>tfoot>tr.success>td,.table>thead>tr.success>th,.table>tbody>tr.success>th,.table>tfoot>tr.success>th{background-color:#dff0d8}.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover,.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr.success:hover>th{background-color:#d0e9c6}.table>thead>tr>td.info,.table>tbody>tr>td.info,.table>tfoot>tr>td.info,.table>thead>tr>th.info,.table>tbody>tr>th.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>tbody>tr.info>td,.table>tfoot>tr.info>td,.table>thead>tr.info>th,.table>tbody>tr.info>th,.table>tfoot>tr.info>th{background-color:#d9edf7}.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover,.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr.info:hover>th{background-color:#c4e3f3}.table>thead>tr>td.warning,.table>tbody>tr>td.warning,.table>tfoot>tr>td.warning,.table>thead>tr>th.warning,.table>tbody>tr>th.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>tbody>tr.warning>td,.table>tfoot>tr.warning>td,.table>thead>tr.warning>th,.table>tbody>tr.warning>th,.table>tfoot>tr.warning>th{background-color:#fcf8e3}.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover,.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr.warning:hover>th{background-color:#faf2cc}.table>thead>tr>td.danger,.table>tbody>tr>td.danger,.table>tfoot>tr>td.danger,.table>thead>tr>th.danger,.table>tbody>tr>th.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>tbody>tr.danger>td,.table>tfoot>tr.danger>td,.table>thead>tr.danger>th,.table>tbody>tr.danger>th,.table>tfoot>tr.danger>th{background-color:#f2dede}.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover,.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr.danger:hover>th{background-color:#ebcccc}.table-responsive{overflow-x:auto;min-height:0.01%}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15.75px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #dddddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>thead>tr>th,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tfoot>tr>td{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>thead>tr>th:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.table-responsive>.table-bordered>thead>tr>th:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>th,.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>td{border-bottom:0}}fieldset{padding:0;margin:0;border:0;min-width:0}legend{display:block;width:100%;padding:0;margin-bottom:21px;font-size:22.5px;line-height:inherit;color:#333333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:bold}input[type=\"search\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=\"radio\"],input[type=\"checkbox\"]{margin:4px 0 0;margin-top:1px \\9;line-height:normal}input[type=\"file\"]{display:block}input[type=\"range\"]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=\"file\"]:focus,input[type=\"radio\"]:focus,input[type=\"checkbox\"]:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:9px;font-size:15px;line-height:1.4;color:#6f6f6f}.form-control{display:block;width:100%;height:39px;padding:8px 12px;font-size:15px;line-height:1.4;color:#6f6f6f;background-color:#ffffff;background-image:none;border:1px solid #cccccc;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6)}.form-control::-moz-placeholder{color:#999999;opacity:1}.form-control:-ms-input-placeholder{color:#999999}.form-control::-webkit-input-placeholder{color:#999999}.form-control::-ms-expand{border:0;background-color:transparent}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eeeeee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=\"search\"]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=\"date\"].form-control,input[type=\"time\"].form-control,input[type=\"datetime-local\"].form-control,input[type=\"month\"].form-control{line-height:39px}input[type=\"date\"].input-sm,input[type=\"time\"].input-sm,input[type=\"datetime-local\"].input-sm,input[type=\"month\"].input-sm,.input-group-sm input[type=\"date\"],.input-group-sm input[type=\"time\"],.input-group-sm input[type=\"datetime-local\"],.input-group-sm input[type=\"month\"]{line-height:36px}input[type=\"date\"].input-lg,input[type=\"time\"].input-lg,input[type=\"datetime-local\"].input-lg,input[type=\"month\"].input-lg,.input-group-lg input[type=\"date\"],.input-group-lg input[type=\"time\"],.input-group-lg input[type=\"datetime-local\"],.input-group-lg input[type=\"month\"]{line-height:60px}}.form-group{margin-bottom:15px}.radio,.checkbox{position:relative;display:block;margin-top:10px;margin-bottom:10px}.radio label,.checkbox label{min-height:21px;padding-left:20px;margin-bottom:0;font-weight:normal;cursor:pointer}.radio input[type=\"radio\"],.radio-inline input[type=\"radio\"],.checkbox input[type=\"checkbox\"],.checkbox-inline input[type=\"checkbox\"]{position:absolute;margin-left:-20px;margin-top:4px \\9}.radio+.radio,.checkbox+.checkbox{margin-top:-5px}.radio-inline,.checkbox-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;vertical-align:middle;font-weight:normal;cursor:pointer}.radio-inline+.radio-inline,.checkbox-inline+.checkbox-inline{margin-top:0;margin-left:10px}input[type=\"radio\"][disabled],input[type=\"checkbox\"][disabled],input[type=\"radio\"].disabled,input[type=\"checkbox\"].disabled,fieldset[disabled] input[type=\"radio\"],fieldset[disabled] input[type=\"checkbox\"]{cursor:not-allowed}.radio-inline.disabled,.checkbox-inline.disabled,fieldset[disabled] .radio-inline,fieldset[disabled] .checkbox-inline{cursor:not-allowed}.radio.disabled label,.checkbox.disabled label,fieldset[disabled] .radio label,fieldset[disabled] .checkbox label{cursor:not-allowed}.form-control-static{padding-top:9px;padding-bottom:9px;margin-bottom:0;min-height:36px}.form-control-static.input-lg,.form-control-static.input-sm{padding-left:0;padding-right:0}.input-sm{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-sm{height:36px;line-height:36px}textarea.input-sm,select[multiple].input-sm{height:auto}.form-group-sm .form-control{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.form-group-sm select.form-control{height:36px;line-height:36px}.form-group-sm textarea.form-control,.form-group-sm select[multiple].form-control{height:auto}.form-group-sm .form-control-static{height:36px;min-height:33px;padding:9px 12px;font-size:12px;line-height:1.5}.input-lg{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-lg{height:60px;line-height:60px}textarea.input-lg,select[multiple].input-lg{height:auto}.form-group-lg .form-control{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.form-group-lg select.form-control{height:60px;line-height:60px}.form-group-lg textarea.form-control,.form-group-lg select[multiple].form-control{height:auto}.form-group-lg .form-control-static{height:60px;min-height:40px;padding:17px 20px;font-size:19px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:48.75px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:39px;height:39px;line-height:39px;text-align:center;pointer-events:none}.input-lg+.form-control-feedback,.input-group-lg+.form-control-feedback,.form-group-lg .form-control+.form-control-feedback{width:60px;height:60px;line-height:60px}.input-sm+.form-control-feedback,.input-group-sm+.form-control-feedback,.form-group-sm .form-control+.form-control-feedback{width:36px;height:36px;line-height:36px}.has-success .help-block,.has-success .control-label,.has-success .radio,.has-success .checkbox,.has-success .radio-inline,.has-success .checkbox-inline,.has-success.radio label,.has-success.checkbox label,.has-success.radio-inline label,.has-success.checkbox-inline label{color:#43ac6a}.has-success .form-control{border-color:#43ac6a;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-success .form-control:focus{border-color:#358753;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1}.has-success .input-group-addon{color:#43ac6a;border-color:#43ac6a;background-color:#dff0d8}.has-success .form-control-feedback{color:#43ac6a}.has-warning .help-block,.has-warning .control-label,.has-warning .radio,.has-warning .checkbox,.has-warning .radio-inline,.has-warning .checkbox-inline,.has-warning.radio label,.has-warning.checkbox label,.has-warning.radio-inline label,.has-warning.checkbox-inline label{color:#e99002}.has-warning .form-control{border-color:#e99002;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-warning .form-control:focus{border-color:#b67102;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53}.has-warning .input-group-addon{color:#e99002;border-color:#e99002;background-color:#fcf8e3}.has-warning .form-control-feedback{color:#e99002}.has-error .help-block,.has-error .control-label,.has-error .radio,.has-error .checkbox,.has-error .radio-inline,.has-error .checkbox-inline,.has-error.radio label,.has-error.checkbox label,.has-error.radio-inline label,.has-error.checkbox-inline label{color:#f04124}.has-error .form-control{border-color:#f04124;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-error .form-control:focus{border-color:#d32a0e;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483}.has-error .input-group-addon{color:#f04124;border-color:#f04124;background-color:#f2dede}.has-error .form-control-feedback{color:#f04124}.has-feedback label~.form-control-feedback{top:26px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#626262}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn,.form-inline .input-group .form-control{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .radio,.form-inline .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .radio label,.form-inline .checkbox label{padding-left:0}.form-inline .radio input[type=\"radio\"],.form-inline .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .radio,.form-horizontal .checkbox,.form-horizontal .radio-inline,.form-horizontal .checkbox-inline{margin-top:0;margin-bottom:0;padding-top:9px}.form-horizontal .radio,.form-horizontal .checkbox{min-height:30px}.form-horizontal .form-group{margin-left:-15px;margin-right:-15px}@media (min-width:768px){.form-horizontal .control-label{text-align:right;margin-bottom:0;padding-top:9px}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:17px;font-size:19px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:9px;font-size:12px}}.btn{display:inline-block;margin-bottom:0;font-weight:normal;text-align:center;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid transparent;white-space:nowrap;padding:8px 12px;font-size:15px;line-height:1.4;border-radius:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn:focus,.btn:active:focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn.active.focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn:hover,.btn:focus,.btn.focus{color:#333333;text-decoration:none}.btn:active,.btn.active{outline:0;background-image:none;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;opacity:0.65;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333333;background-color:#e7e7e7;border-color:#cccccc}.btn-default:focus,.btn-default.focus{color:#333333;background-color:#cecece;border-color:#8c8c8c}.btn-default:hover{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active:hover,.btn-default.active:hover,.open>.dropdown-toggle.btn-default:hover,.btn-default:active:focus,.btn-default.active:focus,.open>.dropdown-toggle.btn-default:focus,.btn-default:active.focus,.btn-default.active.focus,.open>.dropdown-toggle.btn-default.focus{color:#333333;background-color:#bcbcbc;border-color:#8c8c8c}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled:hover,.btn-default[disabled]:hover,fieldset[disabled] .btn-default:hover,.btn-default.disabled:focus,.btn-default[disabled]:focus,fieldset[disabled] .btn-default:focus,.btn-default.disabled.focus,.btn-default[disabled].focus,fieldset[disabled] .btn-default.focus{background-color:#e7e7e7;border-color:#cccccc}.btn-default .badge{color:#e7e7e7;background-color:#333333}.btn-primary{color:#ffffff;background-color:#008cba;border-color:#0079a1}.btn-primary:focus,.btn-primary.focus{color:#ffffff;background-color:#006687;border-color:#001921}.btn-primary:hover{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active:hover,.btn-primary.active:hover,.open>.dropdown-toggle.btn-primary:hover,.btn-primary:active:focus,.btn-primary.active:focus,.open>.dropdown-toggle.btn-primary:focus,.btn-primary:active.focus,.btn-primary.active.focus,.open>.dropdown-toggle.btn-primary.focus{color:#ffffff;background-color:#004b63;border-color:#001921}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled:hover,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary:hover,.btn-primary.disabled:focus,.btn-primary[disabled]:focus,fieldset[disabled] .btn-primary:focus,.btn-primary.disabled.focus,.btn-primary[disabled].focus,fieldset[disabled] .btn-primary.focus{background-color:#008cba;border-color:#0079a1}.btn-primary .badge{color:#008cba;background-color:#ffffff}.btn-success{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.btn-success:focus,.btn-success.focus{color:#ffffff;background-color:#358753;border-color:#183e26}.btn-success:hover{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active:hover,.btn-success.active:hover,.open>.dropdown-toggle.btn-success:hover,.btn-success:active:focus,.btn-success.active:focus,.open>.dropdown-toggle.btn-success:focus,.btn-success:active.focus,.btn-success.active.focus,.open>.dropdown-toggle.btn-success.focus{color:#ffffff;background-color:#2b6e44;border-color:#183e26}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled:hover,.btn-success[disabled]:hover,fieldset[disabled] .btn-success:hover,.btn-success.disabled:focus,.btn-success[disabled]:focus,fieldset[disabled] .btn-success:focus,.btn-success.disabled.focus,.btn-success[disabled].focus,fieldset[disabled] .btn-success.focus{background-color:#43ac6a;border-color:#3c9a5f}.btn-success .badge{color:#43ac6a;background-color:#ffffff}.btn-info{color:#ffffff;background-color:#5bc0de;border-color:#46b8da}.btn-info:focus,.btn-info.focus{color:#ffffff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active:hover,.btn-info.active:hover,.open>.dropdown-toggle.btn-info:hover,.btn-info:active:focus,.btn-info.active:focus,.open>.dropdown-toggle.btn-info:focus,.btn-info:active.focus,.btn-info.active.focus,.open>.dropdown-toggle.btn-info.focus{color:#ffffff;background-color:#269abc;border-color:#1b6d85}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled:hover,.btn-info[disabled]:hover,fieldset[disabled] .btn-info:hover,.btn-info.disabled:focus,.btn-info[disabled]:focus,fieldset[disabled] .btn-info:focus,.btn-info.disabled.focus,.btn-info[disabled].focus,fieldset[disabled] .btn-info.focus{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#ffffff}.btn-warning{color:#ffffff;background-color:#e99002;border-color:#d08002}.btn-warning:focus,.btn-warning.focus{color:#ffffff;background-color:#b67102;border-color:#513201}.btn-warning:hover{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active:hover,.btn-warning.active:hover,.open>.dropdown-toggle.btn-warning:hover,.btn-warning:active:focus,.btn-warning.active:focus,.open>.dropdown-toggle.btn-warning:focus,.btn-warning:active.focus,.btn-warning.active.focus,.open>.dropdown-toggle.btn-warning.focus{color:#ffffff;background-color:#935b01;border-color:#513201}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled:hover,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning:hover,.btn-warning.disabled:focus,.btn-warning[disabled]:focus,fieldset[disabled] .btn-warning:focus,.btn-warning.disabled.focus,.btn-warning[disabled].focus,fieldset[disabled] .btn-warning.focus{background-color:#e99002;border-color:#d08002}.btn-warning .badge{color:#e99002;background-color:#ffffff}.btn-danger{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.btn-danger:focus,.btn-danger.focus{color:#ffffff;background-color:#d32a0e;border-color:#731708}.btn-danger:hover{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active:hover,.btn-danger.active:hover,.open>.dropdown-toggle.btn-danger:hover,.btn-danger:active:focus,.btn-danger.active:focus,.open>.dropdown-toggle.btn-danger:focus,.btn-danger:active.focus,.btn-danger.active.focus,.open>.dropdown-toggle.btn-danger.focus{color:#ffffff;background-color:#b1240c;border-color:#731708}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled:hover,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger:hover,.btn-danger.disabled:focus,.btn-danger[disabled]:focus,fieldset[disabled] .btn-danger:focus,.btn-danger.disabled.focus,.btn-danger[disabled].focus,fieldset[disabled] .btn-danger.focus{background-color:#f04124;border-color:#ea2f10}.btn-danger .badge{color:#f04124;background-color:#ffffff}.btn-link{color:#008cba;font-weight:normal;border-radius:0}.btn-link,.btn-link:active,.btn-link.active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:hover,.btn-link:focus,.btn-link:active{border-color:transparent}.btn-link:hover,.btn-link:focus{color:#008cba;text-decoration:underline;background-color:transparent}.btn-link[disabled]:hover,fieldset[disabled] .btn-link:hover,.btn-link[disabled]:focus,fieldset[disabled] .btn-link:focus{color:#999999;text-decoration:none}.btn-lg,.btn-group-lg>.btn{padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.btn-sm,.btn-group-sm>.btn{padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.btn-xs,.btn-group-xs>.btn{padding:4px 6px;font-size:12px;line-height:1.5;border-radius:0}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=\"submit\"].btn-block,input[type=\"reset\"].btn-block,input[type=\"button\"].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity 0.15s linear;-o-transition:opacity 0.15s linear;transition:opacity 0.15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-property:height, visibility;-o-transition-property:height, visibility;transition-property:height, visibility;-webkit-transition-duration:0.35s;-o-transition-duration:0.35s;transition-duration:0.35s;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid \\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropup,.dropdown{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;list-style:none;font-size:15px;text-align:left;background-color:#ffffff;border:1px solid #cccccc;border:1px solid rgba(0,0,0,0.15);border-radius:0;-webkit-box-shadow:0 6px 12px rgba(0,0,0,0.175);box-shadow:0 6px 12px rgba(0,0,0,0.175);-webkit-background-clip:padding-box;background-clip:padding-box}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:rgba(0,0,0,0.2)}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.4;color:#555555;white-space:nowrap}.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus{text-decoration:none;color:#262626;background-color:#eeeeee}.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus{color:#ffffff;text-decoration:none;outline:0;background-color:#008cba}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{color:#999999}.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{text-decoration:none;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);cursor:not-allowed}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{left:auto;right:0}.dropdown-menu-left{left:0;right:auto}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.4;color:#999999;white-space:nowrap}.dropdown-backdrop{position:fixed;left:0;right:0;bottom:0;top:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{border-top:0;border-bottom:4px dashed;border-bottom:4px solid \\9;content:\"\"}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{left:auto;right:0}.navbar-right .dropdown-menu-left{left:0;right:auto}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group>.btn,.btn-group-vertical>.btn{position:relative;float:left}.btn-group>.btn:hover,.btn-group-vertical>.btn:hover,.btn-group>.btn:focus,.btn-group-vertical>.btn:focus,.btn-group>.btn:active,.btn-group-vertical>.btn:active,.btn-group>.btn.active,.btn-group-vertical>.btn.active{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-bottom-left-radius:0;border-top-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-bottom-left-radius:0;border-top-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-left:8px;padding-right:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-left:12px;padding-right:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-right-radius:0;border-top-left-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{float:none;display:table-cell;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=\"buttons\"]>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn input[type=\"checkbox\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"checkbox\"]{position:absolute;clip:rect(0, 0, 0, 0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=\"col-\"]{float:none;padding-left:0;padding-right:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:60px;line-height:60px}textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn,select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:36px;line-height:36px}textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn,select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn{height:auto}.input-group-addon,.input-group-btn,.input-group .form-control{display:table-cell}.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child),.input-group .form-control:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:8px 12px;font-size:15px;font-weight:normal;line-height:1;color:#6f6f6f;text-align:center;background-color:#eeeeee;border:1px solid #cccccc;border-radius:0}.input-group-addon.input-sm{padding:8px 12px;font-size:12px;border-radius:0}.input-group-addon.input-lg{padding:16px 20px;font-size:19px;border-radius:0}.input-group-addon input[type=\"radio\"],.input-group-addon input[type=\"checkbox\"]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle),.input-group-btn:last-child>.btn-group:not(:last-child)>.btn{border-bottom-right-radius:0;border-top-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:first-child>.btn-group:not(:first-child)>.btn{border-bottom-left-radius:0;border-top-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:hover,.input-group-btn>.btn:focus,.input-group-btn>.btn:active{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{margin-bottom:0;padding-left:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:hover,.nav>li>a:focus{text-decoration:none;background-color:#eeeeee}.nav>li.disabled>a{color:#999999}.nav>li.disabled>a:hover,.nav>li.disabled>a:focus{color:#999999;text-decoration:none;background-color:transparent;cursor:not-allowed}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{background-color:#eeeeee;border-color:#008cba}.nav .nav-divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #dddddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.4;border:1px solid transparent;border-radius:0 0 0 0}.nav-tabs>li>a:hover{border-color:#eeeeee #eeeeee #dddddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:hover,.nav-tabs>li.active>a:focus{color:#6f6f6f;background-color:#ffffff;border:1px solid #dddddd;border-bottom-color:transparent;cursor:default}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border-bottom-color:#ffffff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:0}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:hover,.nav-pills>li.active>a:focus{color:#ffffff;background-color:#008cba}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border-bottom-color:#ffffff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-right-radius:0;border-top-left-radius:0}.navbar{position:relative;min-height:45px;margin-bottom:21px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:0}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{overflow-x:visible;padding-right:15px;padding-left:15px;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);-webkit-overflow-scrolling:touch}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block !important;height:auto !important;padding-bottom:0;overflow:visible !important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{padding-left:0;padding-right:0}}.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:200px}}.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-top,.navbar-fixed-bottom{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-top,.navbar-fixed-bottom{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;padding:12px 15px;font-size:19px;line-height:21px;height:45px}.navbar-brand:hover,.navbar-brand:focus{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;margin-right:15px;padding:9px 10px;margin-top:5.5px;margin-bottom:5.5px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:0}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:6px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:21px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu>li>a,.navbar-nav .open .dropdown-menu .dropdown-header{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:21px}.navbar-nav .open .dropdown-menu>li>a:hover,.navbar-nav .open .dropdown-menu>li>a:focus{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:12px;padding-bottom:12px}}.navbar-form{margin-left:-15px;margin-right:-15px;padding:10px 15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);margin-top:3px;margin-bottom:3px}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn,.navbar-form .input-group .form-control{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .radio,.navbar-form .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .radio label,.navbar-form .checkbox label{padding-left:0}.navbar-form .radio input[type=\"radio\"],.navbar-form .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;border:0;margin-left:0;margin-right:0;padding-top:0;padding-bottom:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-right-radius:0;border-top-left-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:3px;margin-bottom:3px}.navbar-btn.btn-sm{margin-top:4.5px;margin-bottom:4.5px}.navbar-btn.btn-xs{margin-top:11.5px;margin-bottom:11.5px}.navbar-text{margin-top:12px;margin-bottom:12px}@media (min-width:768px){.navbar-text{float:left;margin-left:15px;margin-right:15px}}@media (min-width:768px){.navbar-left{float:left !important}.navbar-right{float:right !important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#333333;border-color:#222222}.navbar-default .navbar-brand{color:#ffffff}.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-default .navbar-text{color:#ffffff}.navbar-default .navbar-nav>li>a{color:#ffffff}.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:hover,.navbar-default .navbar-nav>.disabled>a:focus{color:#cccccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:transparent}.navbar-default .navbar-toggle:hover,.navbar-default .navbar-toggle:focus{background-color:transparent}.navbar-default .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#222222}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:hover,.navbar-default .navbar-nav>.open>a:focus{background-color:#272727;color:#ffffff}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#cccccc;background-color:transparent}}.navbar-default .navbar-link{color:#ffffff}.navbar-default .navbar-link:hover{color:#ffffff}.navbar-default .btn-link{color:#ffffff}.navbar-default .btn-link:hover,.navbar-default .btn-link:focus{color:#ffffff}.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:hover,.navbar-default .btn-link[disabled]:focus,fieldset[disabled] .navbar-default .btn-link:focus{color:#cccccc}.navbar-inverse{background-color:#008cba;border-color:#006687}.navbar-inverse .navbar-brand{color:#ffffff}.navbar-inverse .navbar-brand:hover,.navbar-inverse .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-inverse .navbar-text{color:#ffffff}.navbar-inverse .navbar-nav>li>a{color:#ffffff}.navbar-inverse .navbar-nav>li>a:hover,.navbar-inverse .navbar-nav>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:hover,.navbar-inverse .navbar-nav>.disabled>a:focus{color:#444444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:transparent}.navbar-inverse .navbar-toggle:hover,.navbar-inverse .navbar-toggle:focus{background-color:transparent}.navbar-inverse .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#007196}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a:focus{background-color:#006687;color:#ffffff}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#444444;background-color:transparent}}.navbar-inverse .navbar-link{color:#ffffff}.navbar-inverse .navbar-link:hover{color:#ffffff}.navbar-inverse .btn-link{color:#ffffff}.navbar-inverse .btn-link:hover,.navbar-inverse .btn-link:focus{color:#ffffff}.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:hover,.navbar-inverse .btn-link[disabled]:focus,fieldset[disabled] .navbar-inverse .btn-link:focus{color:#444444}.breadcrumb{padding:8px 15px;margin-bottom:21px;list-style:none;background-color:#f5f5f5;border-radius:0}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{content:\"/\\00a0\";padding:0 5px;color:#999999}.breadcrumb>.active{color:#333333}.pagination{display:inline-block;padding-left:0;margin:21px 0;border-radius:0}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:8px 12px;line-height:1.4;text-decoration:none;color:#008cba;background-color:transparent;border:1px solid transparent;margin-left:-1px}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-bottom-left-radius:0;border-top-left-radius:0}.pagination>li:last-child>a,.pagination>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination>li>a:hover,.pagination>li>span:hover,.pagination>li>a:focus,.pagination>li>span:focus{z-index:2;color:#008cba;background-color:#eeeeee;border-color:transparent}.pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus{z-index:3;color:#ffffff;background-color:#008cba;border-color:transparent;cursor:default}.pagination>.disabled>span,.pagination>.disabled>span:hover,.pagination>.disabled>span:focus,.pagination>.disabled>a,.pagination>.disabled>a:hover,.pagination>.disabled>a:focus{color:#999999;background-color:#ffffff;border-color:transparent;cursor:not-allowed}.pagination-lg>li>a,.pagination-lg>li>span{padding:16px 20px;font-size:19px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination-sm>li>a,.pagination-sm>li>span{padding:8px 12px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pager{padding-left:0;margin:21px 0;list-style:none;text-align:center}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:transparent;border:1px solid transparent;border-radius:3px}.pager li>a:hover,.pager li>a:focus{text-decoration:none;background-color:#eeeeee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:hover,.pager .disabled>a:focus,.pager .disabled>span{color:#999999;background-color:transparent;cursor:not-allowed}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:bold;line-height:1;color:#ffffff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:hover,a.label:focus{color:#ffffff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#999999}.label-default[href]:hover,.label-default[href]:focus{background-color:#808080}.label-primary{background-color:#008cba}.label-primary[href]:hover,.label-primary[href]:focus{background-color:#006687}.label-success{background-color:#43ac6a}.label-success[href]:hover,.label-success[href]:focus{background-color:#358753}.label-info{background-color:#5bc0de}.label-info[href]:hover,.label-info[href]:focus{background-color:#31b0d5}.label-warning{background-color:#e99002}.label-warning[href]:hover,.label-warning[href]:focus{background-color:#b67102}.label-danger{background-color:#f04124}.label-danger[href]:hover,.label-danger[href]:focus{background-color:#d32a0e}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:bold;color:#ffffff;line-height:1;vertical-align:middle;white-space:nowrap;text-align:center;background-color:#008cba;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-xs .badge,.btn-group-xs>.btn .badge{top:0;padding:1px 5px}a.badge:hover,a.badge:focus{color:#ffffff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#008cba;background-color:#ffffff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#fafafa}.jumbotron h1,.jumbotron .h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:23px;font-weight:200}.jumbotron>hr{border-top-color:#e1e1e1}.container .jumbotron,.container-fluid .jumbotron{border-radius:0;padding-left:15px;padding-right:15px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-left:60px;padding-right:60px}.jumbotron h1,.jumbotron .h1{font-size:68px}}.thumbnail{display:block;padding:4px;margin-bottom:21px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail>img,.thumbnail a>img{margin-left:auto;margin-right:auto}a.thumbnail:hover,a.thumbnail:focus,a.thumbnail.active{border-color:#008cba}.thumbnail .caption{padding:9px;color:#222222}.alert{padding:15px;margin-bottom:21px;border:1px solid transparent;border-radius:0}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:bold}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{background-color:#43ac6a;border-color:#3c9a5f;color:#ffffff}.alert-success hr{border-top-color:#358753}.alert-success .alert-link{color:#e6e6e6}.alert-info{background-color:#5bc0de;border-color:#3db5d8;color:#ffffff}.alert-info hr{border-top-color:#2aabd2}.alert-info .alert-link{color:#e6e6e6}.alert-warning{background-color:#e99002;border-color:#d08002;color:#ffffff}.alert-warning hr{border-top-color:#b67102}.alert-warning .alert-link{color:#e6e6e6}.alert-danger{background-color:#f04124;border-color:#ea2f10;color:#ffffff}.alert-danger hr{border-top-color:#d32a0e}.alert-danger .alert-link{color:#e6e6e6}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{overflow:hidden;height:21px;margin-bottom:21px;background-color:#f5f5f5;border-radius:0;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);box-shadow:inset 0 1px 2px rgba(0,0,0,0.1)}.progress-bar{float:left;width:0%;height:100%;font-size:12px;line-height:21px;color:#ffffff;text-align:center;background-color:#008cba;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition:width 0.6s ease;-o-transition:width 0.6s ease;transition:width 0.6s ease}.progress-striped .progress-bar,.progress-bar-striped{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress.active .progress-bar,.progress-bar.active{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#43ac6a}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-warning{background-color:#e99002}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-danger{background-color:#f04124}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{zoom:1;overflow:hidden}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-left,.media-right,.media-body{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{margin-bottom:20px;padding-left:0}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#ffffff;border:1px solid #dddddd}.list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:0;border-bottom-left-radius:0}a.list-group-item,button.list-group-item{color:#555555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333333}a.list-group-item:hover,button.list-group-item:hover,a.list-group-item:focus,button.list-group-item:focus{text-decoration:none;color:#555555;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:hover,.list-group-item.disabled:focus{background-color:#eeeeee;color:#999999;cursor:not-allowed}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text{color:#999999}.list-group-item.active,.list-group-item.active:hover,.list-group-item.active:focus{z-index:2;color:#ffffff;background-color:#008cba;border-color:#008cba}.list-group-item.active .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>.small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:hover .list-group-item-text,.list-group-item.active:focus .list-group-item-text{color:#87e1ff}.list-group-item-success{color:#43ac6a;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#43ac6a}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:hover,button.list-group-item-success:hover,a.list-group-item-success:focus,button.list-group-item-success:focus{color:#43ac6a;background-color:#d0e9c6}a.list-group-item-success.active,button.list-group-item-success.active,a.list-group-item-success.active:hover,button.list-group-item-success.active:hover,a.list-group-item-success.active:focus,button.list-group-item-success.active:focus{color:#fff;background-color:#43ac6a;border-color:#43ac6a}.list-group-item-info{color:#5bc0de;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#5bc0de}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:hover,button.list-group-item-info:hover,a.list-group-item-info:focus,button.list-group-item-info:focus{color:#5bc0de;background-color:#c4e3f3}a.list-group-item-info.active,button.list-group-item-info.active,a.list-group-item-info.active:hover,button.list-group-item-info.active:hover,a.list-group-item-info.active:focus,button.list-group-item-info.active:focus{color:#fff;background-color:#5bc0de;border-color:#5bc0de}.list-group-item-warning{color:#e99002;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#e99002}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:hover,button.list-group-item-warning:hover,a.list-group-item-warning:focus,button.list-group-item-warning:focus{color:#e99002;background-color:#faf2cc}a.list-group-item-warning.active,button.list-group-item-warning.active,a.list-group-item-warning.active:hover,button.list-group-item-warning.active:hover,a.list-group-item-warning.active:focus,button.list-group-item-warning.active:focus{color:#fff;background-color:#e99002;border-color:#e99002}.list-group-item-danger{color:#f04124;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#f04124}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:hover,button.list-group-item-danger:hover,a.list-group-item-danger:focus,button.list-group-item-danger:focus{color:#f04124;background-color:#ebcccc}a.list-group-item-danger.active,button.list-group-item-danger.active,a.list-group-item-danger.active:hover,button.list-group-item-danger.active:hover,a.list-group-item-danger.active:focus,button.list-group-item-danger.active:focus{color:#fff;background-color:#f04124;border-color:#f04124}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:21px;background-color:#ffffff;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.05);box-shadow:0 1px 1px rgba(0,0,0,0.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:-1;border-top-left-radius:-1}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:17px;color:inherit}.panel-title>a,.panel-title>small,.panel-title>.small,.panel-title>small>a,.panel-title>.small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #dddddd;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-right-radius:-1;border-top-left-radius:-1}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.table,.panel>.table-responsive>.table,.panel>.panel-collapse>.table{margin-bottom:0}.panel>.table caption,.panel>.table-responsive>.table caption,.panel>.panel-collapse>.table caption{padding-left:15px;padding-right:15px}.panel>.table:first-child,.panel>.table-responsive:first-child>.table:first-child{border-top-right-radius:-1;border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child{border-top-left-radius:-1;border-top-right-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child{border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child{border-top-right-radius:-1}.panel>.table:last-child,.panel>.table-responsive:last-child>.table:last-child{border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-left-radius:-1;border-bottom-right-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:-1}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #dddddd}.panel>.table>tbody:first-child>tr:first-child th,.panel>.table>tbody:first-child>tr:first-child td{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{border:0;margin-bottom:0}.panel-group{margin-bottom:21px}.panel-group .panel{margin-bottom:0;border-radius:0}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.panel-body,.panel-group .panel-heading+.panel-collapse>.list-group{border-top:1px solid #dddddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #dddddd}.panel-default{border-color:#dddddd}.panel-default>.panel-heading{color:#333333;background-color:#f5f5f5;border-color:#dddddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#dddddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#dddddd}.panel-primary{border-color:#008cba}.panel-primary>.panel-heading{color:#ffffff;background-color:#008cba;border-color:#008cba}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#008cba}.panel-primary>.panel-heading .badge{color:#008cba;background-color:#ffffff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#008cba}.panel-success{border-color:#3c9a5f}.panel-success>.panel-heading{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3c9a5f}.panel-success>.panel-heading .badge{color:#43ac6a;background-color:#ffffff}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3c9a5f}.panel-info{border-color:#3db5d8}.panel-info>.panel-heading{color:#ffffff;background-color:#5bc0de;border-color:#3db5d8}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3db5d8}.panel-info>.panel-heading .badge{color:#5bc0de;background-color:#ffffff}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3db5d8}.panel-warning{border-color:#d08002}.panel-warning>.panel-heading{color:#ffffff;background-color:#e99002;border-color:#d08002}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d08002}.panel-warning>.panel-heading .badge{color:#e99002;background-color:#ffffff}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d08002}.panel-danger{border-color:#ea2f10}.panel-danger>.panel-heading{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ea2f10}.panel-danger>.panel-heading .badge{color:#f04124;background-color:#ffffff}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ea2f10}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive iframe,.embed-responsive embed,.embed-responsive object,.embed-responsive video{position:absolute;top:0;left:0;bottom:0;height:100%;width:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#fafafa;border:1px solid #e8e8e8;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);box-shadow:inset 0 1px 1px rgba(0,0,0,0.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,0.15)}.well-lg{padding:24px;border-radius:0}.well-sm{padding:9px;border-radius:0}.close{float:right;font-size:22.5px;font-weight:bold;line-height:1;color:#ffffff;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.close:hover,.close:focus{color:#ffffff;text-decoration:none;cursor:pointer;opacity:0.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:transparent;border:0;-webkit-appearance:none}.modal-open{overflow:hidden}.modal{display:none;overflow:hidden;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transform:translate(0, -25%);-ms-transform:translate(0, -25%);-o-transform:translate(0, -25%);transform:translate(0, -25%);-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out}.modal.in .modal-dialog{-webkit-transform:translate(0, 0);-ms-transform:translate(0, 0);-o-transform:translate(0, 0);transform:translate(0, 0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#ffffff;border:1px solid #999999;border:1px solid rgba(0,0,0,0.2);border-radius:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,0.5);box-shadow:0 3px 9px rgba(0,0,0,0.5);-webkit-background-clip:padding-box;background-clip:padding-box;outline:0}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000000}.modal-backdrop.fade{opacity:0;filter:alpha(opacity=0)}.modal-backdrop.in{opacity:0.5;filter:alpha(opacity=50)}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.4}.modal-body{position:relative;padding:20px}.modal-footer{padding:20px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-left:5px;margin-bottom:0}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,0.5);box-shadow:0 5px 15px rgba(0,0,0,0.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:12px;opacity:0;filter:alpha(opacity=0)}.tooltip.in{opacity:0.9;filter:alpha(opacity=90)}.tooltip.top{margin-top:-3px;padding:5px 0}.tooltip.right{margin-left:3px;padding:0 5px}.tooltip.bottom{margin-top:3px;padding:5px 0}.tooltip.left{margin-left:-3px;padding:0 5px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#ffffff;text-align:center;background-color:#333333;border-radius:0}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-left .tooltip-arrow{bottom:0;right:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#333333}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#333333}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:15px;background-color:#333333;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #333333;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2)}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{margin:0;padding:8px 14px;font-size:15px;background-color:#333333;border-bottom:1px solid #262626;border-radius:-1 -1 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{border-width:10px;content:\"\"}.popover.top>.arrow{left:50%;margin-left:-11px;border-bottom-width:0;border-top-color:#000000;border-top-color:rgba(0,0,0,0.05);bottom:-11px}.popover.top>.arrow:after{content:\" \";bottom:1px;margin-left:-10px;border-bottom-width:0;border-top-color:#333333}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-left-width:0;border-right-color:#000000;border-right-color:rgba(0,0,0,0.05)}.popover.right>.arrow:after{content:\" \";left:1px;bottom:-10px;border-left-width:0;border-right-color:#333333}.popover.bottom>.arrow{left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#000000;border-bottom-color:rgba(0,0,0,0.05);top:-11px}.popover.bottom>.arrow:after{content:\" \";top:1px;margin-left:-10px;border-top-width:0;border-bottom-color:#333333}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#000000;border-left-color:rgba(0,0,0,0.05)}.popover.left>.arrow:after{content:\" \";right:1px;border-right-width:0;border-left-color:#333333;bottom:-10px}.carousel{position:relative}.carousel-inner{position:relative;overflow:hidden;width:100%}.carousel-inner>.item{display:none;position:relative;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>img,.carousel-inner>.item>a>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.next,.carousel-inner>.item.active.right{-webkit-transform:translate3d(100%, 0, 0);transform:translate3d(100%, 0, 0);left:0}.carousel-inner>.item.prev,.carousel-inner>.item.active.left{-webkit-transform:translate3d(-100%, 0, 0);transform:translate3d(-100%, 0, 0);left:0}.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right,.carousel-inner>.item.active{-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0);left:0}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;left:0;bottom:0;width:15%;opacity:0.5;filter:alpha(opacity=50);font-size:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6);background-color:rgba(0,0,0,0)}.carousel-control.left{background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.0001)));background-image:linear-gradient(to right, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1)}.carousel-control.right{left:auto;right:0;background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.0001)), to(rgba(0,0,0,0.5)));background-image:linear-gradient(to right, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1)}.carousel-control:hover,.carousel-control:focus{outline:0;color:#ffffff;text-decoration:none;opacity:0.9;filter:alpha(opacity=90)}.carousel-control .icon-prev,.carousel-control .icon-next,.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right{position:absolute;top:50%;margin-top:-10px;z-index:5;display:inline-block}.carousel-control .icon-prev,.carousel-control .glyphicon-chevron-left{left:50%;margin-left:-10px}.carousel-control .icon-next,.carousel-control .glyphicon-chevron-right{right:50%;margin-right:-10px}.carousel-control .icon-prev,.carousel-control .icon-next{width:20px;height:20px;line-height:1;font-family:serif}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;margin-left:-30%;padding-left:0;list-style:none;text-align:center}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;border:1px solid #ffffff;border-radius:10px;cursor:pointer;background-color:#000 \\9;background-color:rgba(0,0,0,0)}.carousel-indicators .active{margin:0;width:12px;height:12px;background-color:#ffffff}.carousel-caption{position:absolute;left:15%;right:15%;bottom:20px;z-index:10;padding-top:20px;padding-bottom:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-prev,.carousel-control .icon-next{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{left:20%;right:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.clearfix:before,.clearfix:after,.dl-horizontal dd:before,.dl-horizontal dd:after,.container:before,.container:after,.container-fluid:before,.container-fluid:after,.row:before,.row:after,.form-horizontal .form-group:before,.form-horizontal .form-group:after,.btn-toolbar:before,.btn-toolbar:after,.btn-group-vertical>.btn-group:before,.btn-group-vertical>.btn-group:after,.nav:before,.nav:after,.navbar:before,.navbar:after,.navbar-header:before,.navbar-header:after,.navbar-collapse:before,.navbar-collapse:after,.pager:before,.pager:after,.panel-body:before,.panel-body:after,.modal-header:before,.modal-header:after,.modal-footer:before,.modal-footer:after{content:\" \";display:table}.clearfix:after,.dl-horizontal dd:after,.container:after,.container-fluid:after,.row:after,.form-horizontal .form-group:after,.btn-toolbar:after,.btn-group-vertical>.btn-group:after,.nav:after,.navbar:after,.navbar-header:after,.navbar-collapse:after,.pager:after,.panel-body:after,.modal-header:after,.modal-footer:after{clear:both}.center-block{display:block;margin-left:auto;margin-right:auto}.pull-right{float:right !important}.pull-left{float:left !important}.hide{display:none !important}.show{display:block !important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none !important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-xs,.visible-sm,.visible-md,.visible-lg{display:none !important}.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block{display:none !important}@media (max-width:767px){.visible-xs{display:block !important}table.visible-xs{display:table !important}tr.visible-xs{display:table-row !important}th.visible-xs,td.visible-xs{display:table-cell !important}}@media (max-width:767px){.visible-xs-block{display:block !important}}@media (max-width:767px){.visible-xs-inline{display:inline !important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block !important}table.visible-sm{display:table !important}tr.visible-sm{display:table-row !important}th.visible-sm,td.visible-sm{display:table-cell !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block !important}table.visible-md{display:table !important}tr.visible-md{display:table-row !important}th.visible-md,td.visible-md{display:table-cell !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block !important}}@media (min-width:1200px){.visible-lg{display:block !important}table.visible-lg{display:table !important}tr.visible-lg{display:table-row !important}th.visible-lg,td.visible-lg{display:table-cell !important}}@media (min-width:1200px){.visible-lg-block{display:block !important}}@media (min-width:1200px){.visible-lg-inline{display:inline !important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block !important}}@media (max-width:767px){.hidden-xs{display:none !important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none !important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none !important}}@media (min-width:1200px){.hidden-lg{display:none !important}}.visible-print{display:none !important}@media print{.visible-print{display:block !important}table.visible-print{display:table !important}tr.visible-print{display:table-row !important}th.visible-print,td.visible-print{display:table-cell !important}}.visible-print-block{display:none !important}@media print{.visible-print-block{display:block !important}}.visible-print-inline{display:none !important}@media print{.visible-print-inline{display:inline !important}}.visible-print-inline-block{display:none !important}@media print{.visible-print-inline-block{display:inline-block !important}}@media print{.hidden-print{display:none !important}}.navbar{border:none;font-size:13px;font-weight:300}.navbar .navbar-toggle:hover .icon-bar{background-color:#b3b3b3}.navbar-collapse{border-top-color:rgba(0,0,0,0.2);-webkit-box-shadow:none;box-shadow:none}.navbar .btn{padding-top:6px;padding-bottom:6px}.navbar-form{margin-top:7px;margin-bottom:5px}.navbar-form .form-control{height:auto;padding:4px 6px}.navbar-text{margin:12px 15px;line-height:21px}.navbar .dropdown-menu{border:none}.navbar .dropdown-menu>li>a,.navbar .dropdown-menu>li>a:focus{background-color:transparent;font-size:13px;font-weight:300}.navbar .dropdown-header{color:rgba(255,255,255,0.5)}.navbar-default .dropdown-menu{background-color:#333333}.navbar-default .dropdown-menu>li>a,.navbar-default .dropdown-menu>li>a:focus{color:#ffffff}.navbar-default .dropdown-menu>li>a:hover,.navbar-default .dropdown-menu>.active>a,.navbar-default .dropdown-menu>.active>a:hover{background-color:#272727}.navbar-inverse .dropdown-menu{background-color:#008cba}.navbar-inverse .dropdown-menu>li>a,.navbar-inverse .dropdown-menu>li>a:focus{color:#ffffff}.navbar-inverse .dropdown-menu>li>a:hover,.navbar-inverse .dropdown-menu>.active>a,.navbar-inverse .dropdown-menu>.active>a:hover{background-color:#006687}.btn{padding:8px 12px}.btn-lg{padding:16px 20px}.btn-sm{padding:8px 12px}.btn-xs{padding:4px 6px}.btn-group .btn~.dropdown-toggle{padding-left:16px;padding-right:16px}.btn-group .dropdown-menu{border-top-width:0}.btn-group.dropup .dropdown-menu{border-top-width:1px;border-bottom-width:0;margin-bottom:0}.btn-group .dropdown-toggle.btn-default~.dropdown-menu{background-color:#e7e7e7;border-color:#cccccc}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a{color:#333333}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a:hover{background-color:#d3d3d3}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu{background-color:#008cba;border-color:#0079a1}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a:hover{background-color:#006d91}.btn-group .dropdown-toggle.btn-success~.dropdown-menu{background-color:#43ac6a;border-color:#3c9a5f}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a:hover{background-color:#388f58}.btn-group .dropdown-toggle.btn-info~.dropdown-menu{background-color:#5bc0de;border-color:#46b8da}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a:hover{background-color:#39b3d7}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu{background-color:#e99002;border-color:#d08002}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a:hover{background-color:#c17702}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu{background-color:#f04124;border-color:#ea2f10}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a:hover{background-color:#dc2c0f}.lead{color:#6f6f6f}cite{font-style:italic}blockquote{border-left-width:1px;color:#6f6f6f}blockquote.pull-right{border-right-width:1px}blockquote small{font-size:12px;font-weight:300}table{font-size:12px}label,.control-label,.help-block,.checkbox,.radio{font-size:12px;font-weight:normal}input[type=\"radio\"],input[type=\"checkbox\"]{margin-top:1px}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{border-color:transparent}.nav-tabs>li>a{background-color:#e7e7e7;color:#222222}.nav-tabs .caret{border-top-color:#222222;border-bottom-color:#222222}.nav-pills{font-weight:300}.breadcrumb{border:1px solid #dddddd;border-radius:3px;font-size:10px;font-weight:300;text-transform:uppercase}.pagination{font-size:12px;font-weight:300;color:#999999}.pagination>li>a,.pagination>li>span{margin-left:4px;color:#999999}.pagination>.active>a,.pagination>.active>span{color:#fff}.pagination>li>a,.pagination>li:first-child>a,.pagination>li:last-child>a,.pagination>li>span,.pagination>li:first-child>span,.pagination>li:last-child>span{border-radius:3px}.pagination-lg>li>a,.pagination-lg>li>span{padding-left:22px;padding-right:22px}.pagination-sm>li>a,.pagination-sm>li>span{padding:0 5px}.pager{font-size:12px;font-weight:300;color:#999999}.list-group{font-size:12px;font-weight:300}.close{opacity:0.4;text-decoration:none;text-shadow:none}.close:hover,.close:focus{opacity:1}.alert{font-size:12px;font-weight:300}.alert .alert-link{font-weight:normal;color:#fff;text-decoration:underline}.label{padding-left:1em;padding-right:1em;border-radius:0;font-weight:300}.label-default{background-color:#e7e7e7;color:#333333}.badge{font-weight:300}.progress{height:22px;padding:2px;background-color:#f6f6f6;border:1px solid #ccc;-webkit-box-shadow:none;box-shadow:none}.dropdown-menu{padding:0;margin-top:0;font-size:12px}.dropdown-menu>li>a{padding:12px 15px}.dropdown-header{padding-left:15px;padding-right:15px;font-size:9px;text-transform:uppercase}.popover{color:#fff;font-size:12px;font-weight:300}.panel-heading,.panel-footer{border-top-right-radius:0;border-top-left-radius:0}.panel-default .close{color:#222222}.modal .close{color:#222222}"; });
-define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\n                      class=\"list-group-item\">${system.sid}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\n                    class=\"list-group-item\">${system.sid}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
-define('text!resources/css/styles.css', ['module'], function(module) { module.exports = ".subMenu{\n    position: relative;\n    top: -5px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/campus-panorama.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/DataCenter.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.center-text {\n     text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\nai-dialog-header {\n    background-color: SlateBlue ;\n    color: white;\n}\n\n.banner {\n    margin-top: 40px;\n    height: 50px;\n    width: 100%;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.browse .textContainer { \n    height: 430px; \n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.detail-container .header {\n    background: #f2f2f2;\n    box-shadow: none;\n    height: 64px;\n}\n\n.detail-container .header i {\n    float: left;\n    font-size: 42px;\n    padding: 8px 10px;\n}\n\n.detail-container .header i.separator {\n    float: none;\n    font-size: 8px;\n    padding: 0 8px;\n    position: relative;\n    top: -2px;\n}\n\n.detail-container .header .content {\n    display: inline-block;\n    margin-top: 12px;\n}\n\n.detail-container .header .content .title {\n    font-size: 16px;\n    font-weight: bold;\n}\n\n.detail-container .header .content .description {\n    color: #7a7a7a;\n    font-size: 12px;\n    margin-left: 2px;\n}\n\n.detail-container h2.select-from-list {\n  text-align: center;\n}\n\n\n.bar-chart {\n    position: absolute;\n    top: 300px;\n}\n\n.doughnut-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.doughnut-legend{\n    list-style: none !important;    \n}\n\n.pie-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.pie-legend {\n    list-style: none !important;    \n}\n\ndonut-chart, bar-chart {\n  display: inline-block;\n  margin: 40px;\n}\n\nchart-data {\n  display: none;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.page-host {\n    margin-top: 5rem;\n}\n\ntextarea {\n  overflow-y:scroll;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.rowSelected{\n  background-color: lightgrey;\n}\n\n.newsTitle {\n  font-size: large;\n  font-weight: bold;\n  border-bottom: thin solid;\n}\n\n.newsUrl{\n  color: blue;\n  float: right;\n}\n\n.centerText{\n  text-align: center;\n}\n\n.btn-file {\n    position: relative;\n    overflow: hidden;\n}\n.btn-file input[type=file] {\n    position: absolute;\n    top: 0;\n    right: 0;\n    min-width: 100%;\n    min-height: 100%;\n    font-size: 100px;\n    text-align: right;\n    filter: alpha(opacity=0);\n    opacity: 0;\n    outline: none;\n    background: white;\n    cursor: inherit;\n    display: block;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n.hover_img a { position:relative; }\n.hover_img a span { position:absolute; display:none; z-index:99; }\n.hover_img a:hover span { display:block; }\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 400px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n}\n\n.borderTop {\n  border-style: solid;\n  border-top: thin double #ff0000;\n  border-bottom: none;\n  border-right: none;\n  border-left: none;\n  padding-top: 6px;\n}\n\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n \n\t/*\n\tLabel the data\n\t*/\n\t#no-more-tables td:before { content: attr(data-title); }"; });
-define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input type='text' class=\"form-control\" />\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
-define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
-define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"setPassword()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= 6\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= 8\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= 4\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= 8\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
-define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
-define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!resources/elements/tiny-mce.html', ['module'], function(module) { module.exports = "<template>\n\t<textarea class=\"tinymce-host\" id.bind=\"editor_id\"></textarea>\n</template>"; });
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Analytics</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
+define('text!resources/css/bootstrap.min.css', ['module'], function(module) { module.exports = "@import url(\"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700\");/*!\n * bootswatch v3.3.7\n * Homepage: http://bootswatch.com\n * Copyright 2012-2016 Thomas Park\n * Licensed under MIT\n * Based on Bootstrap\n*//*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}dfn{font-style:italic}h1{font-size:2em;margin:0.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace, monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=\"button\"],input[type=\"reset\"],input[type=\"submit\"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=\"checkbox\"],input[type=\"radio\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=\"number\"]::-webkit-inner-spin-button,input[type=\"number\"]::-webkit-outer-spin-button{height:auto}input[type=\"search\"]{-webkit-appearance:textfield;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}input[type=\"search\"]::-webkit-search-cancel-button,input[type=\"search\"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:0.35em 0.625em 0.75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:bold}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,*:before,*:after{background:transparent !important;color:#000 !important;-webkit-box-shadow:none !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}p,h2,h3{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000 !important}.label{border:1px solid #000}.table{border-collapse:collapse !important}.table td,.table th{background-color:#fff !important}.table-bordered th,.table-bordered td{border:1px solid #ddd !important}}@font-face{font-family:'Glyphicons Halflings';src:url('../fonts/glyphicons-halflings-regular.eot');src:url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'),url('../fonts/glyphicons-halflings-regular.woff') format('woff'),url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:normal;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-euro:before,.glyphicon-eur:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*:before,*:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;color:#222222;background-color:#ffffff}input,button,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#008cba;text-decoration:none}a:hover,a:focus{color:#008cba;text-decoration:underline}a:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.img-responsive,.thumbnail>img,.thumbnail a>img,.carousel-inner>.item>img,.carousel-inner>.item>a>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:0}.img-thumbnail{padding:4px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out;display:inline-block;max-width:100%;height:auto}.img-circle{border-radius:50%}hr{margin-top:21px;margin-bottom:21px;border:0;border-top:1px solid #dddddd}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=\"button\"]{cursor:pointer}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-weight:300;line-height:1.1;color:inherit}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small,.h1 small,.h2 small,.h3 small,.h4 small,.h5 small,.h6 small,h1 .small,h2 .small,h3 .small,h4 .small,h5 .small,h6 .small,.h1 .small,.h2 .small,.h3 .small,.h4 .small,.h5 .small,.h6 .small{font-weight:normal;line-height:1;color:#999999}h1,.h1,h2,.h2,h3,.h3{margin-top:21px;margin-bottom:10.5px}h1 small,.h1 small,h2 small,.h2 small,h3 small,.h3 small,h1 .small,.h1 .small,h2 .small,.h2 .small,h3 .small,.h3 .small{font-size:65%}h4,.h4,h5,.h5,h6,.h6{margin-top:10.5px;margin-bottom:10.5px}h4 small,.h4 small,h5 small,.h5 small,h6 small,.h6 small,h4 .small,.h4 .small,h5 .small,.h5 .small,h6 .small,.h6 .small{font-size:75%}h1,.h1{font-size:39px}h2,.h2{font-size:32px}h3,.h3{font-size:26px}h4,.h4{font-size:19px}h5,.h5{font-size:15px}h6,.h6{font-size:13px}p{margin:0 0 10.5px}.lead{margin-bottom:21px;font-size:17px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:22.5px}}small,.small{font-size:80%}mark,.mark{background-color:#fcf8e3;padding:.2em}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#999999}.text-primary{color:#008cba}a.text-primary:hover,a.text-primary:focus{color:#006687}.text-success{color:#43ac6a}a.text-success:hover,a.text-success:focus{color:#358753}.text-info{color:#5bc0de}a.text-info:hover,a.text-info:focus{color:#31b0d5}.text-warning{color:#e99002}a.text-warning:hover,a.text-warning:focus{color:#b67102}.text-danger{color:#f04124}a.text-danger:hover,a.text-danger:focus{color:#d32a0e}.bg-primary{color:#fff;background-color:#008cba}a.bg-primary:hover,a.bg-primary:focus{background-color:#006687}.bg-success{background-color:#dff0d8}a.bg-success:hover,a.bg-success:focus{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:hover,a.bg-info:focus{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:hover,a.bg-warning:focus{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:hover,a.bg-danger:focus{background-color:#e4b9b9}.page-header{padding-bottom:9.5px;margin:42px 0 21px;border-bottom:1px solid #dddddd}ul,ol{margin-top:0;margin-bottom:10.5px}ul ul,ol ul,ul ol,ol ol{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;list-style:none;margin-left:-5px}.list-inline>li{display:inline-block;padding-left:5px;padding-right:5px}dl{margin-top:0;margin-bottom:21px}dt,dd{line-height:1.4}dt{font-weight:bold}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[title],abbr[data-original-title]{cursor:help;border-bottom:1px dotted #999999}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10.5px 21px;margin:0 0 21px;font-size:18.75px;border-left:5px solid #dddddd}blockquote p:last-child,blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}blockquote footer,blockquote small,blockquote .small{display:block;font-size:80%;line-height:1.4;color:#6f6f6f}blockquote footer:before,blockquote small:before,blockquote .small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;border-right:5px solid #dddddd;border-left:0;text-align:right}.blockquote-reverse footer:before,blockquote.pull-right footer:before,.blockquote-reverse small:before,blockquote.pull-right small:before,.blockquote-reverse .small:before,blockquote.pull-right .small:before{content:''}.blockquote-reverse footer:after,blockquote.pull-right footer:after,.blockquote-reverse small:after,blockquote.pull-right small:after,.blockquote-reverse .small:after,blockquote.pull-right .small:after{content:'\\00A0 \\2014'}address{margin-bottom:21px;font-style:normal;line-height:1.4}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:0}kbd{padding:2px 4px;font-size:90%;color:#ffffff;background-color:#333333;border-radius:0;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25)}kbd kbd{padding:0;font-size:100%;font-weight:bold;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:10px;margin:0 0 10.5px;font-size:14px;line-height:1.4;word-break:break-all;word-wrap:break-word;color:#333333;background-color:#f5f5f5;border:1px solid #cccccc;border-radius:0}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}.row{margin-left:-15px;margin-right:-15px}.col-xs-1,.col-sm-1,.col-md-1,.col-lg-1,.col-xs-2,.col-sm-2,.col-md-2,.col-lg-2,.col-xs-3,.col-sm-3,.col-md-3,.col-lg-3,.col-xs-4,.col-sm-4,.col-md-4,.col-lg-4,.col-xs-5,.col-sm-5,.col-md-5,.col-lg-5,.col-xs-6,.col-sm-6,.col-md-6,.col-lg-6,.col-xs-7,.col-sm-7,.col-md-7,.col-lg-7,.col-xs-8,.col-sm-8,.col-md-8,.col-lg-8,.col-xs-9,.col-sm-9,.col-md-9,.col-lg-9,.col-xs-10,.col-sm-10,.col-md-10,.col-lg-10,.col-xs-11,.col-sm-11,.col-md-11,.col-lg-11,.col-xs-12,.col-sm-12,.col-md-12,.col-lg-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0%}@media (min-width:768px){.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0%}}@media (min-width:992px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0%}}@media (min-width:1200px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0%}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#999999;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:21px}.table>thead>tr>th,.table>tbody>tr>th,.table>tfoot>tr>th,.table>thead>tr>td,.table>tbody>tr>td,.table>tfoot>tr>td{padding:8px;line-height:1.4;vertical-align:top;border-top:1px solid #dddddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #dddddd}.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>th,.table>caption+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>td,.table>thead:first-child>tr:first-child>td{border-top:0}.table>tbody+tbody{border-top:2px solid #dddddd}.table .table{background-color:#ffffff}.table-condensed>thead>tr>th,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>tbody>tr>td,.table-condensed>tfoot>tr>td{padding:5px}.table-bordered{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>tbody>tr>td,.table-bordered>tfoot>tr>td{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>thead>tr>td{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=\"col-\"]{position:static;float:none;display:table-column}table td[class*=\"col-\"],table th[class*=\"col-\"]{position:static;float:none;display:table-cell}.table>thead>tr>td.active,.table>tbody>tr>td.active,.table>tfoot>tr>td.active,.table>thead>tr>th.active,.table>tbody>tr>th.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>tbody>tr.active>td,.table>tfoot>tr.active>td,.table>thead>tr.active>th,.table>tbody>tr.active>th,.table>tfoot>tr.active>th{background-color:#f5f5f5}.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover,.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr.active:hover>th{background-color:#e8e8e8}.table>thead>tr>td.success,.table>tbody>tr>td.success,.table>tfoot>tr>td.success,.table>thead>tr>th.success,.table>tbody>tr>th.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>tbody>tr.success>td,.table>tfoot>tr.success>td,.table>thead>tr.success>th,.table>tbody>tr.success>th,.table>tfoot>tr.success>th{background-color:#dff0d8}.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover,.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr.success:hover>th{background-color:#d0e9c6}.table>thead>tr>td.info,.table>tbody>tr>td.info,.table>tfoot>tr>td.info,.table>thead>tr>th.info,.table>tbody>tr>th.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>tbody>tr.info>td,.table>tfoot>tr.info>td,.table>thead>tr.info>th,.table>tbody>tr.info>th,.table>tfoot>tr.info>th{background-color:#d9edf7}.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover,.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr.info:hover>th{background-color:#c4e3f3}.table>thead>tr>td.warning,.table>tbody>tr>td.warning,.table>tfoot>tr>td.warning,.table>thead>tr>th.warning,.table>tbody>tr>th.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>tbody>tr.warning>td,.table>tfoot>tr.warning>td,.table>thead>tr.warning>th,.table>tbody>tr.warning>th,.table>tfoot>tr.warning>th{background-color:#fcf8e3}.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover,.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr.warning:hover>th{background-color:#faf2cc}.table>thead>tr>td.danger,.table>tbody>tr>td.danger,.table>tfoot>tr>td.danger,.table>thead>tr>th.danger,.table>tbody>tr>th.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>tbody>tr.danger>td,.table>tfoot>tr.danger>td,.table>thead>tr.danger>th,.table>tbody>tr.danger>th,.table>tfoot>tr.danger>th{background-color:#f2dede}.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover,.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr.danger:hover>th{background-color:#ebcccc}.table-responsive{overflow-x:auto;min-height:0.01%}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15.75px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #dddddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>thead>tr>th,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tfoot>tr>td{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>thead>tr>th:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.table-responsive>.table-bordered>thead>tr>th:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>th,.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>td{border-bottom:0}}fieldset{padding:0;margin:0;border:0;min-width:0}legend{display:block;width:100%;padding:0;margin-bottom:21px;font-size:22.5px;line-height:inherit;color:#333333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:bold}input[type=\"search\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=\"radio\"],input[type=\"checkbox\"]{margin:4px 0 0;margin-top:1px \\9;line-height:normal}input[type=\"file\"]{display:block}input[type=\"range\"]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=\"file\"]:focus,input[type=\"radio\"]:focus,input[type=\"checkbox\"]:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:9px;font-size:15px;line-height:1.4;color:#6f6f6f}.form-control{display:block;width:100%;height:39px;padding:8px 12px;font-size:15px;line-height:1.4;color:#6f6f6f;background-color:#ffffff;background-image:none;border:1px solid #cccccc;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6)}.form-control::-moz-placeholder{color:#999999;opacity:1}.form-control:-ms-input-placeholder{color:#999999}.form-control::-webkit-input-placeholder{color:#999999}.form-control::-ms-expand{border:0;background-color:transparent}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eeeeee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=\"search\"]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=\"date\"].form-control,input[type=\"time\"].form-control,input[type=\"datetime-local\"].form-control,input[type=\"month\"].form-control{line-height:39px}input[type=\"date\"].input-sm,input[type=\"time\"].input-sm,input[type=\"datetime-local\"].input-sm,input[type=\"month\"].input-sm,.input-group-sm input[type=\"date\"],.input-group-sm input[type=\"time\"],.input-group-sm input[type=\"datetime-local\"],.input-group-sm input[type=\"month\"]{line-height:36px}input[type=\"date\"].input-lg,input[type=\"time\"].input-lg,input[type=\"datetime-local\"].input-lg,input[type=\"month\"].input-lg,.input-group-lg input[type=\"date\"],.input-group-lg input[type=\"time\"],.input-group-lg input[type=\"datetime-local\"],.input-group-lg input[type=\"month\"]{line-height:60px}}.form-group{margin-bottom:15px}.radio,.checkbox{position:relative;display:block;margin-top:10px;margin-bottom:10px}.radio label,.checkbox label{min-height:21px;padding-left:20px;margin-bottom:0;font-weight:normal;cursor:pointer}.radio input[type=\"radio\"],.radio-inline input[type=\"radio\"],.checkbox input[type=\"checkbox\"],.checkbox-inline input[type=\"checkbox\"]{position:absolute;margin-left:-20px;margin-top:4px \\9}.radio+.radio,.checkbox+.checkbox{margin-top:-5px}.radio-inline,.checkbox-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;vertical-align:middle;font-weight:normal;cursor:pointer}.radio-inline+.radio-inline,.checkbox-inline+.checkbox-inline{margin-top:0;margin-left:10px}input[type=\"radio\"][disabled],input[type=\"checkbox\"][disabled],input[type=\"radio\"].disabled,input[type=\"checkbox\"].disabled,fieldset[disabled] input[type=\"radio\"],fieldset[disabled] input[type=\"checkbox\"]{cursor:not-allowed}.radio-inline.disabled,.checkbox-inline.disabled,fieldset[disabled] .radio-inline,fieldset[disabled] .checkbox-inline{cursor:not-allowed}.radio.disabled label,.checkbox.disabled label,fieldset[disabled] .radio label,fieldset[disabled] .checkbox label{cursor:not-allowed}.form-control-static{padding-top:9px;padding-bottom:9px;margin-bottom:0;min-height:36px}.form-control-static.input-lg,.form-control-static.input-sm{padding-left:0;padding-right:0}.input-sm{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-sm{height:36px;line-height:36px}textarea.input-sm,select[multiple].input-sm{height:auto}.form-group-sm .form-control{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.form-group-sm select.form-control{height:36px;line-height:36px}.form-group-sm textarea.form-control,.form-group-sm select[multiple].form-control{height:auto}.form-group-sm .form-control-static{height:36px;min-height:33px;padding:9px 12px;font-size:12px;line-height:1.5}.input-lg{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-lg{height:60px;line-height:60px}textarea.input-lg,select[multiple].input-lg{height:auto}.form-group-lg .form-control{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.form-group-lg select.form-control{height:60px;line-height:60px}.form-group-lg textarea.form-control,.form-group-lg select[multiple].form-control{height:auto}.form-group-lg .form-control-static{height:60px;min-height:40px;padding:17px 20px;font-size:19px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:48.75px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:39px;height:39px;line-height:39px;text-align:center;pointer-events:none}.input-lg+.form-control-feedback,.input-group-lg+.form-control-feedback,.form-group-lg .form-control+.form-control-feedback{width:60px;height:60px;line-height:60px}.input-sm+.form-control-feedback,.input-group-sm+.form-control-feedback,.form-group-sm .form-control+.form-control-feedback{width:36px;height:36px;line-height:36px}.has-success .help-block,.has-success .control-label,.has-success .radio,.has-success .checkbox,.has-success .radio-inline,.has-success .checkbox-inline,.has-success.radio label,.has-success.checkbox label,.has-success.radio-inline label,.has-success.checkbox-inline label{color:#43ac6a}.has-success .form-control{border-color:#43ac6a;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-success .form-control:focus{border-color:#358753;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1}.has-success .input-group-addon{color:#43ac6a;border-color:#43ac6a;background-color:#dff0d8}.has-success .form-control-feedback{color:#43ac6a}.has-warning .help-block,.has-warning .control-label,.has-warning .radio,.has-warning .checkbox,.has-warning .radio-inline,.has-warning .checkbox-inline,.has-warning.radio label,.has-warning.checkbox label,.has-warning.radio-inline label,.has-warning.checkbox-inline label{color:#e99002}.has-warning .form-control{border-color:#e99002;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-warning .form-control:focus{border-color:#b67102;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53}.has-warning .input-group-addon{color:#e99002;border-color:#e99002;background-color:#fcf8e3}.has-warning .form-control-feedback{color:#e99002}.has-error .help-block,.has-error .control-label,.has-error .radio,.has-error .checkbox,.has-error .radio-inline,.has-error .checkbox-inline,.has-error.radio label,.has-error.checkbox label,.has-error.radio-inline label,.has-error.checkbox-inline label{color:#f04124}.has-error .form-control{border-color:#f04124;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-error .form-control:focus{border-color:#d32a0e;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483}.has-error .input-group-addon{color:#f04124;border-color:#f04124;background-color:#f2dede}.has-error .form-control-feedback{color:#f04124}.has-feedback label~.form-control-feedback{top:26px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#626262}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn,.form-inline .input-group .form-control{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .radio,.form-inline .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .radio label,.form-inline .checkbox label{padding-left:0}.form-inline .radio input[type=\"radio\"],.form-inline .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .radio,.form-horizontal .checkbox,.form-horizontal .radio-inline,.form-horizontal .checkbox-inline{margin-top:0;margin-bottom:0;padding-top:9px}.form-horizontal .radio,.form-horizontal .checkbox{min-height:30px}.form-horizontal .form-group{margin-left:-15px;margin-right:-15px}@media (min-width:768px){.form-horizontal .control-label{text-align:right;margin-bottom:0;padding-top:9px}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:17px;font-size:19px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:9px;font-size:12px}}.btn{display:inline-block;margin-bottom:0;font-weight:normal;text-align:center;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid transparent;white-space:nowrap;padding:8px 12px;font-size:15px;line-height:1.4;border-radius:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn:focus,.btn:active:focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn.active.focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn:hover,.btn:focus,.btn.focus{color:#333333;text-decoration:none}.btn:active,.btn.active{outline:0;background-image:none;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;opacity:0.65;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333333;background-color:#e7e7e7;border-color:#cccccc}.btn-default:focus,.btn-default.focus{color:#333333;background-color:#cecece;border-color:#8c8c8c}.btn-default:hover{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active:hover,.btn-default.active:hover,.open>.dropdown-toggle.btn-default:hover,.btn-default:active:focus,.btn-default.active:focus,.open>.dropdown-toggle.btn-default:focus,.btn-default:active.focus,.btn-default.active.focus,.open>.dropdown-toggle.btn-default.focus{color:#333333;background-color:#bcbcbc;border-color:#8c8c8c}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled:hover,.btn-default[disabled]:hover,fieldset[disabled] .btn-default:hover,.btn-default.disabled:focus,.btn-default[disabled]:focus,fieldset[disabled] .btn-default:focus,.btn-default.disabled.focus,.btn-default[disabled].focus,fieldset[disabled] .btn-default.focus{background-color:#e7e7e7;border-color:#cccccc}.btn-default .badge{color:#e7e7e7;background-color:#333333}.btn-primary{color:#ffffff;background-color:#008cba;border-color:#0079a1}.btn-primary:focus,.btn-primary.focus{color:#ffffff;background-color:#006687;border-color:#001921}.btn-primary:hover{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active:hover,.btn-primary.active:hover,.open>.dropdown-toggle.btn-primary:hover,.btn-primary:active:focus,.btn-primary.active:focus,.open>.dropdown-toggle.btn-primary:focus,.btn-primary:active.focus,.btn-primary.active.focus,.open>.dropdown-toggle.btn-primary.focus{color:#ffffff;background-color:#004b63;border-color:#001921}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled:hover,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary:hover,.btn-primary.disabled:focus,.btn-primary[disabled]:focus,fieldset[disabled] .btn-primary:focus,.btn-primary.disabled.focus,.btn-primary[disabled].focus,fieldset[disabled] .btn-primary.focus{background-color:#008cba;border-color:#0079a1}.btn-primary .badge{color:#008cba;background-color:#ffffff}.btn-success{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.btn-success:focus,.btn-success.focus{color:#ffffff;background-color:#358753;border-color:#183e26}.btn-success:hover{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active:hover,.btn-success.active:hover,.open>.dropdown-toggle.btn-success:hover,.btn-success:active:focus,.btn-success.active:focus,.open>.dropdown-toggle.btn-success:focus,.btn-success:active.focus,.btn-success.active.focus,.open>.dropdown-toggle.btn-success.focus{color:#ffffff;background-color:#2b6e44;border-color:#183e26}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled:hover,.btn-success[disabled]:hover,fieldset[disabled] .btn-success:hover,.btn-success.disabled:focus,.btn-success[disabled]:focus,fieldset[disabled] .btn-success:focus,.btn-success.disabled.focus,.btn-success[disabled].focus,fieldset[disabled] .btn-success.focus{background-color:#43ac6a;border-color:#3c9a5f}.btn-success .badge{color:#43ac6a;background-color:#ffffff}.btn-info{color:#ffffff;background-color:#5bc0de;border-color:#46b8da}.btn-info:focus,.btn-info.focus{color:#ffffff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active:hover,.btn-info.active:hover,.open>.dropdown-toggle.btn-info:hover,.btn-info:active:focus,.btn-info.active:focus,.open>.dropdown-toggle.btn-info:focus,.btn-info:active.focus,.btn-info.active.focus,.open>.dropdown-toggle.btn-info.focus{color:#ffffff;background-color:#269abc;border-color:#1b6d85}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled:hover,.btn-info[disabled]:hover,fieldset[disabled] .btn-info:hover,.btn-info.disabled:focus,.btn-info[disabled]:focus,fieldset[disabled] .btn-info:focus,.btn-info.disabled.focus,.btn-info[disabled].focus,fieldset[disabled] .btn-info.focus{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#ffffff}.btn-warning{color:#ffffff;background-color:#e99002;border-color:#d08002}.btn-warning:focus,.btn-warning.focus{color:#ffffff;background-color:#b67102;border-color:#513201}.btn-warning:hover{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active:hover,.btn-warning.active:hover,.open>.dropdown-toggle.btn-warning:hover,.btn-warning:active:focus,.btn-warning.active:focus,.open>.dropdown-toggle.btn-warning:focus,.btn-warning:active.focus,.btn-warning.active.focus,.open>.dropdown-toggle.btn-warning.focus{color:#ffffff;background-color:#935b01;border-color:#513201}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled:hover,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning:hover,.btn-warning.disabled:focus,.btn-warning[disabled]:focus,fieldset[disabled] .btn-warning:focus,.btn-warning.disabled.focus,.btn-warning[disabled].focus,fieldset[disabled] .btn-warning.focus{background-color:#e99002;border-color:#d08002}.btn-warning .badge{color:#e99002;background-color:#ffffff}.btn-danger{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.btn-danger:focus,.btn-danger.focus{color:#ffffff;background-color:#d32a0e;border-color:#731708}.btn-danger:hover{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active:hover,.btn-danger.active:hover,.open>.dropdown-toggle.btn-danger:hover,.btn-danger:active:focus,.btn-danger.active:focus,.open>.dropdown-toggle.btn-danger:focus,.btn-danger:active.focus,.btn-danger.active.focus,.open>.dropdown-toggle.btn-danger.focus{color:#ffffff;background-color:#b1240c;border-color:#731708}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled:hover,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger:hover,.btn-danger.disabled:focus,.btn-danger[disabled]:focus,fieldset[disabled] .btn-danger:focus,.btn-danger.disabled.focus,.btn-danger[disabled].focus,fieldset[disabled] .btn-danger.focus{background-color:#f04124;border-color:#ea2f10}.btn-danger .badge{color:#f04124;background-color:#ffffff}.btn-link{color:#008cba;font-weight:normal;border-radius:0}.btn-link,.btn-link:active,.btn-link.active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:hover,.btn-link:focus,.btn-link:active{border-color:transparent}.btn-link:hover,.btn-link:focus{color:#008cba;text-decoration:underline;background-color:transparent}.btn-link[disabled]:hover,fieldset[disabled] .btn-link:hover,.btn-link[disabled]:focus,fieldset[disabled] .btn-link:focus{color:#999999;text-decoration:none}.btn-lg,.btn-group-lg>.btn{padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.btn-sm,.btn-group-sm>.btn{padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.btn-xs,.btn-group-xs>.btn{padding:4px 6px;font-size:12px;line-height:1.5;border-radius:0}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=\"submit\"].btn-block,input[type=\"reset\"].btn-block,input[type=\"button\"].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity 0.15s linear;-o-transition:opacity 0.15s linear;transition:opacity 0.15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-property:height, visibility;-o-transition-property:height, visibility;transition-property:height, visibility;-webkit-transition-duration:0.35s;-o-transition-duration:0.35s;transition-duration:0.35s;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid \\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropup,.dropdown{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;list-style:none;font-size:15px;text-align:left;background-color:#ffffff;border:1px solid #cccccc;border:1px solid rgba(0,0,0,0.15);border-radius:0;-webkit-box-shadow:0 6px 12px rgba(0,0,0,0.175);box-shadow:0 6px 12px rgba(0,0,0,0.175);-webkit-background-clip:padding-box;background-clip:padding-box}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:rgba(0,0,0,0.2)}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.4;color:#555555;white-space:nowrap}.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus{text-decoration:none;color:#262626;background-color:#eeeeee}.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus{color:#ffffff;text-decoration:none;outline:0;background-color:#008cba}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{color:#999999}.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{text-decoration:none;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);cursor:not-allowed}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{left:auto;right:0}.dropdown-menu-left{left:0;right:auto}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.4;color:#999999;white-space:nowrap}.dropdown-backdrop{position:fixed;left:0;right:0;bottom:0;top:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{border-top:0;border-bottom:4px dashed;border-bottom:4px solid \\9;content:\"\"}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{left:auto;right:0}.navbar-right .dropdown-menu-left{left:0;right:auto}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group>.btn,.btn-group-vertical>.btn{position:relative;float:left}.btn-group>.btn:hover,.btn-group-vertical>.btn:hover,.btn-group>.btn:focus,.btn-group-vertical>.btn:focus,.btn-group>.btn:active,.btn-group-vertical>.btn:active,.btn-group>.btn.active,.btn-group-vertical>.btn.active{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-bottom-left-radius:0;border-top-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-bottom-left-radius:0;border-top-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-left:8px;padding-right:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-left:12px;padding-right:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-right-radius:0;border-top-left-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{float:none;display:table-cell;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=\"buttons\"]>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn input[type=\"checkbox\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"checkbox\"]{position:absolute;clip:rect(0, 0, 0, 0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=\"col-\"]{float:none;padding-left:0;padding-right:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:60px;line-height:60px}textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn,select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:36px;line-height:36px}textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn,select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn{height:auto}.input-group-addon,.input-group-btn,.input-group .form-control{display:table-cell}.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child),.input-group .form-control:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:8px 12px;font-size:15px;font-weight:normal;line-height:1;color:#6f6f6f;text-align:center;background-color:#eeeeee;border:1px solid #cccccc;border-radius:0}.input-group-addon.input-sm{padding:8px 12px;font-size:12px;border-radius:0}.input-group-addon.input-lg{padding:16px 20px;font-size:19px;border-radius:0}.input-group-addon input[type=\"radio\"],.input-group-addon input[type=\"checkbox\"]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle),.input-group-btn:last-child>.btn-group:not(:last-child)>.btn{border-bottom-right-radius:0;border-top-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:first-child>.btn-group:not(:first-child)>.btn{border-bottom-left-radius:0;border-top-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:hover,.input-group-btn>.btn:focus,.input-group-btn>.btn:active{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{margin-bottom:0;padding-left:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:hover,.nav>li>a:focus{text-decoration:none;background-color:#eeeeee}.nav>li.disabled>a{color:#999999}.nav>li.disabled>a:hover,.nav>li.disabled>a:focus{color:#999999;text-decoration:none;background-color:transparent;cursor:not-allowed}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{background-color:#eeeeee;border-color:#008cba}.nav .nav-divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #dddddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.4;border:1px solid transparent;border-radius:0 0 0 0}.nav-tabs>li>a:hover{border-color:#eeeeee #eeeeee #dddddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:hover,.nav-tabs>li.active>a:focus{color:#6f6f6f;background-color:#ffffff;border:1px solid #dddddd;border-bottom-color:transparent;cursor:default}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border-bottom-color:#ffffff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:0}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:hover,.nav-pills>li.active>a:focus{color:#ffffff;background-color:#008cba}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border-bottom-color:#ffffff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-right-radius:0;border-top-left-radius:0}.navbar{position:relative;min-height:45px;margin-bottom:21px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:0}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{overflow-x:visible;padding-right:15px;padding-left:15px;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);-webkit-overflow-scrolling:touch}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block !important;height:auto !important;padding-bottom:0;overflow:visible !important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{padding-left:0;padding-right:0}}.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:200px}}.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-top,.navbar-fixed-bottom{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-top,.navbar-fixed-bottom{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;padding:12px 15px;font-size:19px;line-height:21px;height:45px}.navbar-brand:hover,.navbar-brand:focus{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;margin-right:15px;padding:9px 10px;margin-top:5.5px;margin-bottom:5.5px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:0}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:6px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:21px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu>li>a,.navbar-nav .open .dropdown-menu .dropdown-header{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:21px}.navbar-nav .open .dropdown-menu>li>a:hover,.navbar-nav .open .dropdown-menu>li>a:focus{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:12px;padding-bottom:12px}}.navbar-form{margin-left:-15px;margin-right:-15px;padding:10px 15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);margin-top:3px;margin-bottom:3px}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn,.navbar-form .input-group .form-control{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .radio,.navbar-form .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .radio label,.navbar-form .checkbox label{padding-left:0}.navbar-form .radio input[type=\"radio\"],.navbar-form .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;border:0;margin-left:0;margin-right:0;padding-top:0;padding-bottom:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-right-radius:0;border-top-left-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:3px;margin-bottom:3px}.navbar-btn.btn-sm{margin-top:4.5px;margin-bottom:4.5px}.navbar-btn.btn-xs{margin-top:11.5px;margin-bottom:11.5px}.navbar-text{margin-top:12px;margin-bottom:12px}@media (min-width:768px){.navbar-text{float:left;margin-left:15px;margin-right:15px}}@media (min-width:768px){.navbar-left{float:left !important}.navbar-right{float:right !important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#333333;border-color:#222222}.navbar-default .navbar-brand{color:#ffffff}.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-default .navbar-text{color:#ffffff}.navbar-default .navbar-nav>li>a{color:#ffffff}.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:hover,.navbar-default .navbar-nav>.disabled>a:focus{color:#cccccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:transparent}.navbar-default .navbar-toggle:hover,.navbar-default .navbar-toggle:focus{background-color:transparent}.navbar-default .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#222222}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:hover,.navbar-default .navbar-nav>.open>a:focus{background-color:#272727;color:#ffffff}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#cccccc;background-color:transparent}}.navbar-default .navbar-link{color:#ffffff}.navbar-default .navbar-link:hover{color:#ffffff}.navbar-default .btn-link{color:#ffffff}.navbar-default .btn-link:hover,.navbar-default .btn-link:focus{color:#ffffff}.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:hover,.navbar-default .btn-link[disabled]:focus,fieldset[disabled] .navbar-default .btn-link:focus{color:#cccccc}.navbar-inverse{background-color:#008cba;border-color:#006687}.navbar-inverse .navbar-brand{color:#ffffff}.navbar-inverse .navbar-brand:hover,.navbar-inverse .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-inverse .navbar-text{color:#ffffff}.navbar-inverse .navbar-nav>li>a{color:#ffffff}.navbar-inverse .navbar-nav>li>a:hover,.navbar-inverse .navbar-nav>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:hover,.navbar-inverse .navbar-nav>.disabled>a:focus{color:#444444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:transparent}.navbar-inverse .navbar-toggle:hover,.navbar-inverse .navbar-toggle:focus{background-color:transparent}.navbar-inverse .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#007196}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a:focus{background-color:#006687;color:#ffffff}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#444444;background-color:transparent}}.navbar-inverse .navbar-link{color:#ffffff}.navbar-inverse .navbar-link:hover{color:#ffffff}.navbar-inverse .btn-link{color:#ffffff}.navbar-inverse .btn-link:hover,.navbar-inverse .btn-link:focus{color:#ffffff}.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:hover,.navbar-inverse .btn-link[disabled]:focus,fieldset[disabled] .navbar-inverse .btn-link:focus{color:#444444}.breadcrumb{padding:8px 15px;margin-bottom:21px;list-style:none;background-color:#f5f5f5;border-radius:0}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{content:\"/\\00a0\";padding:0 5px;color:#999999}.breadcrumb>.active{color:#333333}.pagination{display:inline-block;padding-left:0;margin:21px 0;border-radius:0}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:8px 12px;line-height:1.4;text-decoration:none;color:#008cba;background-color:transparent;border:1px solid transparent;margin-left:-1px}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-bottom-left-radius:0;border-top-left-radius:0}.pagination>li:last-child>a,.pagination>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination>li>a:hover,.pagination>li>span:hover,.pagination>li>a:focus,.pagination>li>span:focus{z-index:2;color:#008cba;background-color:#eeeeee;border-color:transparent}.pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus{z-index:3;color:#ffffff;background-color:#008cba;border-color:transparent;cursor:default}.pagination>.disabled>span,.pagination>.disabled>span:hover,.pagination>.disabled>span:focus,.pagination>.disabled>a,.pagination>.disabled>a:hover,.pagination>.disabled>a:focus{color:#999999;background-color:#ffffff;border-color:transparent;cursor:not-allowed}.pagination-lg>li>a,.pagination-lg>li>span{padding:16px 20px;font-size:19px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination-sm>li>a,.pagination-sm>li>span{padding:8px 12px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pager{padding-left:0;margin:21px 0;list-style:none;text-align:center}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:transparent;border:1px solid transparent;border-radius:3px}.pager li>a:hover,.pager li>a:focus{text-decoration:none;background-color:#eeeeee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:hover,.pager .disabled>a:focus,.pager .disabled>span{color:#999999;background-color:transparent;cursor:not-allowed}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:bold;line-height:1;color:#ffffff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:hover,a.label:focus{color:#ffffff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#999999}.label-default[href]:hover,.label-default[href]:focus{background-color:#808080}.label-primary{background-color:#008cba}.label-primary[href]:hover,.label-primary[href]:focus{background-color:#006687}.label-success{background-color:#43ac6a}.label-success[href]:hover,.label-success[href]:focus{background-color:#358753}.label-info{background-color:#5bc0de}.label-info[href]:hover,.label-info[href]:focus{background-color:#31b0d5}.label-warning{background-color:#e99002}.label-warning[href]:hover,.label-warning[href]:focus{background-color:#b67102}.label-danger{background-color:#f04124}.label-danger[href]:hover,.label-danger[href]:focus{background-color:#d32a0e}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:bold;color:#ffffff;line-height:1;vertical-align:middle;white-space:nowrap;text-align:center;background-color:#008cba;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-xs .badge,.btn-group-xs>.btn .badge{top:0;padding:1px 5px}a.badge:hover,a.badge:focus{color:#ffffff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#008cba;background-color:#ffffff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#fafafa}.jumbotron h1,.jumbotron .h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:23px;font-weight:200}.jumbotron>hr{border-top-color:#e1e1e1}.container .jumbotron,.container-fluid .jumbotron{border-radius:0;padding-left:15px;padding-right:15px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-left:60px;padding-right:60px}.jumbotron h1,.jumbotron .h1{font-size:68px}}.thumbnail{display:block;padding:4px;margin-bottom:21px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail>img,.thumbnail a>img{margin-left:auto;margin-right:auto}a.thumbnail:hover,a.thumbnail:focus,a.thumbnail.active{border-color:#008cba}.thumbnail .caption{padding:9px;color:#222222}.alert{padding:15px;margin-bottom:21px;border:1px solid transparent;border-radius:0}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:bold}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{background-color:#43ac6a;border-color:#3c9a5f;color:#ffffff}.alert-success hr{border-top-color:#358753}.alert-success .alert-link{color:#e6e6e6}.alert-info{background-color:#5bc0de;border-color:#3db5d8;color:#ffffff}.alert-info hr{border-top-color:#2aabd2}.alert-info .alert-link{color:#e6e6e6}.alert-warning{background-color:#e99002;border-color:#d08002;color:#ffffff}.alert-warning hr{border-top-color:#b67102}.alert-warning .alert-link{color:#e6e6e6}.alert-danger{background-color:#f04124;border-color:#ea2f10;color:#ffffff}.alert-danger hr{border-top-color:#d32a0e}.alert-danger .alert-link{color:#e6e6e6}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{overflow:hidden;height:21px;margin-bottom:21px;background-color:#f5f5f5;border-radius:0;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);box-shadow:inset 0 1px 2px rgba(0,0,0,0.1)}.progress-bar{float:left;width:0%;height:100%;font-size:12px;line-height:21px;color:#ffffff;text-align:center;background-color:#008cba;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition:width 0.6s ease;-o-transition:width 0.6s ease;transition:width 0.6s ease}.progress-striped .progress-bar,.progress-bar-striped{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress.active .progress-bar,.progress-bar.active{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#43ac6a}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-warning{background-color:#e99002}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-danger{background-color:#f04124}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{zoom:1;overflow:hidden}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-left,.media-right,.media-body{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{margin-bottom:20px;padding-left:0}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#ffffff;border:1px solid #dddddd}.list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:0;border-bottom-left-radius:0}a.list-group-item,button.list-group-item{color:#555555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333333}a.list-group-item:hover,button.list-group-item:hover,a.list-group-item:focus,button.list-group-item:focus{text-decoration:none;color:#555555;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:hover,.list-group-item.disabled:focus{background-color:#eeeeee;color:#999999;cursor:not-allowed}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text{color:#999999}.list-group-item.active,.list-group-item.active:hover,.list-group-item.active:focus{z-index:2;color:#ffffff;background-color:#008cba;border-color:#008cba}.list-group-item.active .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>.small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:hover .list-group-item-text,.list-group-item.active:focus .list-group-item-text{color:#87e1ff}.list-group-item-success{color:#43ac6a;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#43ac6a}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:hover,button.list-group-item-success:hover,a.list-group-item-success:focus,button.list-group-item-success:focus{color:#43ac6a;background-color:#d0e9c6}a.list-group-item-success.active,button.list-group-item-success.active,a.list-group-item-success.active:hover,button.list-group-item-success.active:hover,a.list-group-item-success.active:focus,button.list-group-item-success.active:focus{color:#fff;background-color:#43ac6a;border-color:#43ac6a}.list-group-item-info{color:#5bc0de;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#5bc0de}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:hover,button.list-group-item-info:hover,a.list-group-item-info:focus,button.list-group-item-info:focus{color:#5bc0de;background-color:#c4e3f3}a.list-group-item-info.active,button.list-group-item-info.active,a.list-group-item-info.active:hover,button.list-group-item-info.active:hover,a.list-group-item-info.active:focus,button.list-group-item-info.active:focus{color:#fff;background-color:#5bc0de;border-color:#5bc0de}.list-group-item-warning{color:#e99002;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#e99002}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:hover,button.list-group-item-warning:hover,a.list-group-item-warning:focus,button.list-group-item-warning:focus{color:#e99002;background-color:#faf2cc}a.list-group-item-warning.active,button.list-group-item-warning.active,a.list-group-item-warning.active:hover,button.list-group-item-warning.active:hover,a.list-group-item-warning.active:focus,button.list-group-item-warning.active:focus{color:#fff;background-color:#e99002;border-color:#e99002}.list-group-item-danger{color:#f04124;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#f04124}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:hover,button.list-group-item-danger:hover,a.list-group-item-danger:focus,button.list-group-item-danger:focus{color:#f04124;background-color:#ebcccc}a.list-group-item-danger.active,button.list-group-item-danger.active,a.list-group-item-danger.active:hover,button.list-group-item-danger.active:hover,a.list-group-item-danger.active:focus,button.list-group-item-danger.active:focus{color:#fff;background-color:#f04124;border-color:#f04124}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:21px;background-color:#ffffff;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.05);box-shadow:0 1px 1px rgba(0,0,0,0.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:-1;border-top-left-radius:-1}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:17px;color:inherit}.panel-title>a,.panel-title>small,.panel-title>.small,.panel-title>small>a,.panel-title>.small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #dddddd;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-right-radius:-1;border-top-left-radius:-1}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.table,.panel>.table-responsive>.table,.panel>.panel-collapse>.table{margin-bottom:0}.panel>.table caption,.panel>.table-responsive>.table caption,.panel>.panel-collapse>.table caption{padding-left:15px;padding-right:15px}.panel>.table:first-child,.panel>.table-responsive:first-child>.table:first-child{border-top-right-radius:-1;border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child{border-top-left-radius:-1;border-top-right-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child{border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child{border-top-right-radius:-1}.panel>.table:last-child,.panel>.table-responsive:last-child>.table:last-child{border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-left-radius:-1;border-bottom-right-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:-1}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #dddddd}.panel>.table>tbody:first-child>tr:first-child th,.panel>.table>tbody:first-child>tr:first-child td{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{border:0;margin-bottom:0}.panel-group{margin-bottom:21px}.panel-group .panel{margin-bottom:0;border-radius:0}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.panel-body,.panel-group .panel-heading+.panel-collapse>.list-group{border-top:1px solid #dddddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #dddddd}.panel-default{border-color:#dddddd}.panel-default>.panel-heading{color:#333333;background-color:#f5f5f5;border-color:#dddddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#dddddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#dddddd}.panel-primary{border-color:#008cba}.panel-primary>.panel-heading{color:#ffffff;background-color:#008cba;border-color:#008cba}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#008cba}.panel-primary>.panel-heading .badge{color:#008cba;background-color:#ffffff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#008cba}.panel-success{border-color:#3c9a5f}.panel-success>.panel-heading{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3c9a5f}.panel-success>.panel-heading .badge{color:#43ac6a;background-color:#ffffff}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3c9a5f}.panel-info{border-color:#3db5d8}.panel-info>.panel-heading{color:#ffffff;background-color:#5bc0de;border-color:#3db5d8}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3db5d8}.panel-info>.panel-heading .badge{color:#5bc0de;background-color:#ffffff}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3db5d8}.panel-warning{border-color:#d08002}.panel-warning>.panel-heading{color:#ffffff;background-color:#e99002;border-color:#d08002}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d08002}.panel-warning>.panel-heading .badge{color:#e99002;background-color:#ffffff}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d08002}.panel-danger{border-color:#ea2f10}.panel-danger>.panel-heading{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ea2f10}.panel-danger>.panel-heading .badge{color:#f04124;background-color:#ffffff}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ea2f10}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive iframe,.embed-responsive embed,.embed-responsive object,.embed-responsive video{position:absolute;top:0;left:0;bottom:0;height:100%;width:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#fafafa;border:1px solid #e8e8e8;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);box-shadow:inset 0 1px 1px rgba(0,0,0,0.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,0.15)}.well-lg{padding:24px;border-radius:0}.well-sm{padding:9px;border-radius:0}.close{float:right;font-size:22.5px;font-weight:bold;line-height:1;color:#ffffff;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.close:hover,.close:focus{color:#ffffff;text-decoration:none;cursor:pointer;opacity:0.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:transparent;border:0;-webkit-appearance:none}.modal-open{overflow:hidden}.modal{display:none;overflow:hidden;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transform:translate(0, -25%);-ms-transform:translate(0, -25%);-o-transform:translate(0, -25%);transform:translate(0, -25%);-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out}.modal.in .modal-dialog{-webkit-transform:translate(0, 0);-ms-transform:translate(0, 0);-o-transform:translate(0, 0);transform:translate(0, 0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#ffffff;border:1px solid #999999;border:1px solid rgba(0,0,0,0.2);border-radius:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,0.5);box-shadow:0 3px 9px rgba(0,0,0,0.5);-webkit-background-clip:padding-box;background-clip:padding-box;outline:0}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000000}.modal-backdrop.fade{opacity:0;filter:alpha(opacity=0)}.modal-backdrop.in{opacity:0.5;filter:alpha(opacity=50)}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.4}.modal-body{position:relative;padding:20px}.modal-footer{padding:20px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-left:5px;margin-bottom:0}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,0.5);box-shadow:0 5px 15px rgba(0,0,0,0.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:12px;opacity:0;filter:alpha(opacity=0)}.tooltip.in{opacity:0.9;filter:alpha(opacity=90)}.tooltip.top{margin-top:-3px;padding:5px 0}.tooltip.right{margin-left:3px;padding:0 5px}.tooltip.bottom{margin-top:3px;padding:5px 0}.tooltip.left{margin-left:-3px;padding:0 5px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#ffffff;text-align:center;background-color:#333333;border-radius:0}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-left .tooltip-arrow{bottom:0;right:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#333333}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#333333}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:15px;background-color:#333333;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #333333;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2)}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{margin:0;padding:8px 14px;font-size:15px;background-color:#333333;border-bottom:1px solid #262626;border-radius:-1 -1 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{border-width:10px;content:\"\"}.popover.top>.arrow{left:50%;margin-left:-11px;border-bottom-width:0;border-top-color:#000000;border-top-color:rgba(0,0,0,0.05);bottom:-11px}.popover.top>.arrow:after{content:\" \";bottom:1px;margin-left:-10px;border-bottom-width:0;border-top-color:#333333}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-left-width:0;border-right-color:#000000;border-right-color:rgba(0,0,0,0.05)}.popover.right>.arrow:after{content:\" \";left:1px;bottom:-10px;border-left-width:0;border-right-color:#333333}.popover.bottom>.arrow{left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#000000;border-bottom-color:rgba(0,0,0,0.05);top:-11px}.popover.bottom>.arrow:after{content:\" \";top:1px;margin-left:-10px;border-top-width:0;border-bottom-color:#333333}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#000000;border-left-color:rgba(0,0,0,0.05)}.popover.left>.arrow:after{content:\" \";right:1px;border-right-width:0;border-left-color:#333333;bottom:-10px}.carousel{position:relative}.carousel-inner{position:relative;overflow:hidden;width:100%}.carousel-inner>.item{display:none;position:relative;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>img,.carousel-inner>.item>a>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.next,.carousel-inner>.item.active.right{-webkit-transform:translate3d(100%, 0, 0);transform:translate3d(100%, 0, 0);left:0}.carousel-inner>.item.prev,.carousel-inner>.item.active.left{-webkit-transform:translate3d(-100%, 0, 0);transform:translate3d(-100%, 0, 0);left:0}.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right,.carousel-inner>.item.active{-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0);left:0}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;left:0;bottom:0;width:15%;opacity:0.5;filter:alpha(opacity=50);font-size:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6);background-color:rgba(0,0,0,0)}.carousel-control.left{background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.0001)));background-image:linear-gradient(to right, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1)}.carousel-control.right{left:auto;right:0;background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.0001)), to(rgba(0,0,0,0.5)));background-image:linear-gradient(to right, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1)}.carousel-control:hover,.carousel-control:focus{outline:0;color:#ffffff;text-decoration:none;opacity:0.9;filter:alpha(opacity=90)}.carousel-control .icon-prev,.carousel-control .icon-next,.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right{position:absolute;top:50%;margin-top:-10px;z-index:5;display:inline-block}.carousel-control .icon-prev,.carousel-control .glyphicon-chevron-left{left:50%;margin-left:-10px}.carousel-control .icon-next,.carousel-control .glyphicon-chevron-right{right:50%;margin-right:-10px}.carousel-control .icon-prev,.carousel-control .icon-next{width:20px;height:20px;line-height:1;font-family:serif}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;margin-left:-30%;padding-left:0;list-style:none;text-align:center}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;border:1px solid #ffffff;border-radius:10px;cursor:pointer;background-color:#000 \\9;background-color:rgba(0,0,0,0)}.carousel-indicators .active{margin:0;width:12px;height:12px;background-color:#ffffff}.carousel-caption{position:absolute;left:15%;right:15%;bottom:20px;z-index:10;padding-top:20px;padding-bottom:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-prev,.carousel-control .icon-next{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{left:20%;right:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.clearfix:before,.clearfix:after,.dl-horizontal dd:before,.dl-horizontal dd:after,.container:before,.container:after,.container-fluid:before,.container-fluid:after,.row:before,.row:after,.form-horizontal .form-group:before,.form-horizontal .form-group:after,.btn-toolbar:before,.btn-toolbar:after,.btn-group-vertical>.btn-group:before,.btn-group-vertical>.btn-group:after,.nav:before,.nav:after,.navbar:before,.navbar:after,.navbar-header:before,.navbar-header:after,.navbar-collapse:before,.navbar-collapse:after,.pager:before,.pager:after,.panel-body:before,.panel-body:after,.modal-header:before,.modal-header:after,.modal-footer:before,.modal-footer:after{content:\" \";display:table}.clearfix:after,.dl-horizontal dd:after,.container:after,.container-fluid:after,.row:after,.form-horizontal .form-group:after,.btn-toolbar:after,.btn-group-vertical>.btn-group:after,.nav:after,.navbar:after,.navbar-header:after,.navbar-collapse:after,.pager:after,.panel-body:after,.modal-header:after,.modal-footer:after{clear:both}.center-block{display:block;margin-left:auto;margin-right:auto}.pull-right{float:right !important}.pull-left{float:left !important}.hide{display:none !important}.show{display:block !important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none !important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-xs,.visible-sm,.visible-md,.visible-lg{display:none !important}.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block{display:none !important}@media (max-width:767px){.visible-xs{display:block !important}table.visible-xs{display:table !important}tr.visible-xs{display:table-row !important}th.visible-xs,td.visible-xs{display:table-cell !important}}@media (max-width:767px){.visible-xs-block{display:block !important}}@media (max-width:767px){.visible-xs-inline{display:inline !important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block !important}table.visible-sm{display:table !important}tr.visible-sm{display:table-row !important}th.visible-sm,td.visible-sm{display:table-cell !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block !important}table.visible-md{display:table !important}tr.visible-md{display:table-row !important}th.visible-md,td.visible-md{display:table-cell !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block !important}}@media (min-width:1200px){.visible-lg{display:block !important}table.visible-lg{display:table !important}tr.visible-lg{display:table-row !important}th.visible-lg,td.visible-lg{display:table-cell !important}}@media (min-width:1200px){.visible-lg-block{display:block !important}}@media (min-width:1200px){.visible-lg-inline{display:inline !important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block !important}}@media (max-width:767px){.hidden-xs{display:none !important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none !important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none !important}}@media (min-width:1200px){.hidden-lg{display:none !important}}.visible-print{display:none !important}@media print{.visible-print{display:block !important}table.visible-print{display:table !important}tr.visible-print{display:table-row !important}th.visible-print,td.visible-print{display:table-cell !important}}.visible-print-block{display:none !important}@media print{.visible-print-block{display:block !important}}.visible-print-inline{display:none !important}@media print{.visible-print-inline{display:inline !important}}.visible-print-inline-block{display:none !important}@media print{.visible-print-inline-block{display:inline-block !important}}@media print{.hidden-print{display:none !important}}.navbar{border:none;font-size:13px;font-weight:300}.navbar .navbar-toggle:hover .icon-bar{background-color:#b3b3b3}.navbar-collapse{border-top-color:rgba(0,0,0,0.2);-webkit-box-shadow:none;box-shadow:none}.navbar .btn{padding-top:6px;padding-bottom:6px}.navbar-form{margin-top:7px;margin-bottom:5px}.navbar-form .form-control{height:auto;padding:4px 6px}.navbar-text{margin:12px 15px;line-height:21px}.navbar .dropdown-menu{border:none}.navbar .dropdown-menu>li>a,.navbar .dropdown-menu>li>a:focus{background-color:transparent;font-size:13px;font-weight:300}.navbar .dropdown-header{color:rgba(255,255,255,0.5)}.navbar-default .dropdown-menu{background-color:#333333}.navbar-default .dropdown-menu>li>a,.navbar-default .dropdown-menu>li>a:focus{color:#ffffff}.navbar-default .dropdown-menu>li>a:hover,.navbar-default .dropdown-menu>.active>a,.navbar-default .dropdown-menu>.active>a:hover{background-color:#272727}.navbar-inverse .dropdown-menu{background-color:#008cba}.navbar-inverse .dropdown-menu>li>a,.navbar-inverse .dropdown-menu>li>a:focus{color:#ffffff}.navbar-inverse .dropdown-menu>li>a:hover,.navbar-inverse .dropdown-menu>.active>a,.navbar-inverse .dropdown-menu>.active>a:hover{background-color:#006687}.btn{padding:8px 12px}.btn-lg{padding:16px 20px}.btn-sm{padding:8px 12px}.btn-xs{padding:4px 6px}.btn-group .btn~.dropdown-toggle{padding-left:16px;padding-right:16px}.btn-group .dropdown-menu{border-top-width:0}.btn-group.dropup .dropdown-menu{border-top-width:1px;border-bottom-width:0;margin-bottom:0}.btn-group .dropdown-toggle.btn-default~.dropdown-menu{background-color:#e7e7e7;border-color:#cccccc}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a{color:#333333}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a:hover{background-color:#d3d3d3}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu{background-color:#008cba;border-color:#0079a1}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a:hover{background-color:#006d91}.btn-group .dropdown-toggle.btn-success~.dropdown-menu{background-color:#43ac6a;border-color:#3c9a5f}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a:hover{background-color:#388f58}.btn-group .dropdown-toggle.btn-info~.dropdown-menu{background-color:#5bc0de;border-color:#46b8da}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a:hover{background-color:#39b3d7}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu{background-color:#e99002;border-color:#d08002}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a:hover{background-color:#c17702}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu{background-color:#f04124;border-color:#ea2f10}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a:hover{background-color:#dc2c0f}.lead{color:#6f6f6f}cite{font-style:italic}blockquote{border-left-width:1px;color:#6f6f6f}blockquote.pull-right{border-right-width:1px}blockquote small{font-size:12px;font-weight:300}table{font-size:12px}label,.control-label,.help-block,.checkbox,.radio{font-size:12px;font-weight:normal}input[type=\"radio\"],input[type=\"checkbox\"]{margin-top:1px}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{border-color:transparent}.nav-tabs>li>a{background-color:#e7e7e7;color:#222222}.nav-tabs .caret{border-top-color:#222222;border-bottom-color:#222222}.nav-pills{font-weight:300}.breadcrumb{border:1px solid #dddddd;border-radius:3px;font-size:10px;font-weight:300;text-transform:uppercase}.pagination{font-size:12px;font-weight:300;color:#999999}.pagination>li>a,.pagination>li>span{margin-left:4px;color:#999999}.pagination>.active>a,.pagination>.active>span{color:#fff}.pagination>li>a,.pagination>li:first-child>a,.pagination>li:last-child>a,.pagination>li>span,.pagination>li:first-child>span,.pagination>li:last-child>span{border-radius:3px}.pagination-lg>li>a,.pagination-lg>li>span{padding-left:22px;padding-right:22px}.pagination-sm>li>a,.pagination-sm>li>span{padding:0 5px}.pager{font-size:12px;font-weight:300;color:#999999}.list-group{font-size:12px;font-weight:300}.close{opacity:0.4;text-decoration:none;text-shadow:none}.close:hover,.close:focus{opacity:1}.alert{font-size:12px;font-weight:300}.alert .alert-link{font-weight:normal;color:#fff;text-decoration:underline}.label{padding-left:1em;padding-right:1em;border-radius:0;font-weight:300}.label-default{background-color:#e7e7e7;color:#333333}.badge{font-weight:300}.progress{height:22px;padding:2px;background-color:#f6f6f6;border:1px solid #ccc;-webkit-box-shadow:none;box-shadow:none}.dropdown-menu{padding:0;margin-top:0;font-size:12px}.dropdown-menu>li>a{padding:12px 15px}.dropdown-header{padding-left:15px;padding-right:15px;font-size:9px;text-transform:uppercase}.popover{color:#fff;font-size:12px;font-weight:300}.panel-heading,.panel-footer{border-top-right-radius:0;border-top-left-radius:0}.panel-default .close{color:#222222}.modal .close{color:#222222}"; });
 define('text!modules/analytics/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/requestsByInstitution.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <!--\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n                -->\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
+define('text!resources/css/styles.css', ['module'], function(module) { module.exports = ".subMenu{\n    position: relative;\n    top: -5px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/campus-panorama.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/DataCenter.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.center-text {\n     text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\nai-dialog-header {\n    background-color: SlateBlue ;\n    color: white;\n}\n\n.banner {\n    margin-top: 40px;\n    height: 50px;\n    width: 100%;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.browse .textContainer { \n    height: 430px; \n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.detail-container .header {\n    background: #f2f2f2;\n    box-shadow: none;\n    height: 64px;\n}\n\n.detail-container .header i {\n    float: left;\n    font-size: 42px;\n    padding: 8px 10px;\n}\n\n.detail-container .header i.separator {\n    float: none;\n    font-size: 8px;\n    padding: 0 8px;\n    position: relative;\n    top: -2px;\n}\n\n.detail-container .header .content {\n    display: inline-block;\n    margin-top: 12px;\n}\n\n.detail-container .header .content .title {\n    font-size: 16px;\n    font-weight: bold;\n}\n\n.detail-container .header .content .description {\n    color: #7a7a7a;\n    font-size: 12px;\n    margin-left: 2px;\n}\n\n.detail-container h2.select-from-list {\n  text-align: center;\n}\n\n\n.bar-chart {\n    position: absolute;\n    top: 300px;\n}\n\n.doughnut-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.doughnut-legend{\n    list-style: none !important;    \n}\n\n.pie-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.pie-legend {\n    list-style: none !important;    \n}\n\ndonut-chart, bar-chart {\n  display: inline-block;\n  margin: 40px;\n}\n\nchart-data {\n  display: none;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.page-host {\n    margin-top: 5rem;\n}\n\ntextarea {\n  overflow-y:scroll;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.rowSelected{\n  background-color: lightgrey;\n}\n\n.newsTitle {\n  font-size: large;\n  font-weight: bold;\n  border-bottom: thin solid;\n}\n\n.newsUrl{\n  color: blue;\n  float: right;\n}\n\n.centerText{\n  text-align: center;\n}\n\n.btn-file {\n    position: relative;\n    overflow: hidden;\n}\n.btn-file input[type=file] {\n    position: absolute;\n    top: 0;\n    right: 0;\n    min-width: 100%;\n    min-height: 100%;\n    font-size: 100px;\n    text-align: right;\n    filter: alpha(opacity=0);\n    opacity: 0;\n    outline: none;\n    background: white;\n    cursor: inherit;\n    display: block;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n.hover_img a { position:relative; }\n.hover_img a span { position:absolute; display:none; z-index:99; }\n.hover_img a:hover span { display:block; }\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 600px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n}\n\n.borderTop {\n  border-style: solid;\n  border-top: thin double #ff0000;\n  border-bottom: none;\n  border-right: none;\n  border-left: none;\n  padding-top: 6px;\n}\n\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n \n\t/*\n\tLabel the data\n\t*/\n\t#no-more-tables td:before { content: attr(data-title); }"; });
 define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Help Tickets</h1>\n</template>"; });
 define('text!modules/facco/editClients.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/facco/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      \n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div> \n      </div> \n</template>"; });
 define('text!modules/facco/facco.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Faculty Coordinator</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li  class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/home/home.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"${item.priority} textContainer banner\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\n        <h4 class=\"leftMargin\">${item.title}</h4>\n    </div>\n\n <div class=\"parallax1\">\n     <div class=\"caption\">\n         <span class=\"border\">Welcome to the UWM UCC</span>\n    </div>\n </div>\n\n     <div class=\"row center-text\" style=\"color: #777;background-color:white;text-align:center;padding:25px 80px;text-align: justify;\">\n            <compose view=\"./components/uccInformation.html\"></compose>\n     </div>\n\n   <div class=\"parallax2\"></div>\n\n    <div class=\"row bigMarginTop\" style=\"color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;\">\n        <div class=\"col-lg-3 bigMarginTop\">\n            <h2 class=\"underline\">Useful Information</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\n                <compose view=\"./components/newsItem.html\"></compose>\n            </div>\n        </div>\n        <div class=\"col-lg-5 bigMarginTop leftMargin\">\n            <h2 class=\"underline bottomMargin\">Useful Links</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\n                <compose view=\"./components/homePageLinks.html\"></compose>\n            </div>\n        </div>\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\n            <h2 class=\"underline\">UCC and UA News</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\n                <compose view=\"./components/newsItem.html\"></compose>\n            </div>\n        </div>\n\n       \n    </div>\n    </div>\n\n    \n    <!--\n        <div class='row topMargin leftMargin'>\n            <div class=\"col-lg-2 bigTopMargin\">\n                <h2 class=\"underline\">UCC Information</h2>\n                 <div class=\"${item.priority}\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\n                    <h3>${item.title}</h3>\n                    <span innerhtml=\"${item.content}\"></span>\n                    <hr/>\n                </div>\n\t\t\t\t\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'INFO'\">\n                    <h3>${item.title}</h3>\n                    <span innerhtml=\"${item.content}\"></span>\n                    <hr/>\n                </div>\n\t\t\t\n                <div class=\"bigTopMargin\">\n                    <h2 class=\"underline\">Sessions</h2>\n                    <div class=\"list-group\">\n                        <a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray | sessionType:'Active:Requests:Next'\">\n                            <h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\n                            <p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                            <p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                            <p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n                        </a>\n                    </div>\n                </div>\n            \n            </div>\n\n            <div class=\"container bigTopMargin col-lg-10\">\n                <div class=\"col-md-8\">\n                    <compose class=\"hidden-xs hidden-sm\" view=\"./components/homeContent.html\"></compose>\n                   \n                    <div class=\"col-md-12 bigTopMargin hidden-xs hidden-sm\">\n                        <h3 class=\"underline bottomMargin\">Useful Links</h3>\n                        <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\n                            <compose view=\"./components/homePageLinks.html\"></compose>\n                        </div>\n                    </div>\n                \n                </div>\n\n                <div class=\"col-md-4 hidden-xs hidden-sm\">\n                    <h2 class=\"underline\">UCC and UA News</h2>\n                    <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\n                    <compose view=\"./components/newsItem.html\"></compose>\n                    </div>\n                </div>\n            </div>\n        </div>\n        -->\n</template>"; });
 define('text!modules/home/logout.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Logout</h1>\n</template>"; });
-define('text!modules/home/register.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"container\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-heading\">\r\n        <div class=\"panel-title\">\r\n          <h3>Create an Account</h3>\r\n        </div>\r\n      </div>\r\n      <div class=\"panel-body\">\r\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Backve\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n        <div class=\"topMargin col-sm-12 col-lg-1\">\r\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n            <div class=\"topMargin\">\r\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\r\n            </div>\r\n        </div>\r\n    <div class=\"col-sm-12 col-lg-11\">\r\n        <form class=\"form-horizontal topMargin\">\r\n          <div class=\"row\">\r\n            <!-- Row 1 -->\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_firstName\" class=\"col-sm-3 control-label \">First Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"register_firstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_middletName\" class=\"col-sm-3 control-label \">Middle Name</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"register_middletName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_lastName\" class=\"col-sm-3 control-label \">Last Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"register_lastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- Row 2 -->\r\n          <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_phone\" class=\"col-sm-3 control-label \">Phone *</label>\r\n                            <div class=\"col-sm-8\">\r\n                             <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_mobile\" class=\"col-sm-3 control-label \">Mobile</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input id=\"register_mobile\" class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_email\" class=\"col-sm-3 control-label\">Email *</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input blur.trigger=\"checkEmail()\" value.bind=\"people.selectedPerson.email\" id=\"register_email\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_gender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"register_gender\" class=\"form-control input-md\" placeholder=\"Gender\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option value=\"F\">Female</option>\r\n                                    <option value=\"M\">Male</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_institution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"register_institution\" class=\"form-control input-md\" placeholder=\"Institution\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password\" class=\"col-sm-3 control-label\">Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"people.selectedPerson.password\"\r\n                              blur.trigger=\"passwordComplexity()\" />\r\n                        </div>\r\n                      </div>\r\n                    </div>\r\n                     <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"password_repeat\" />\r\n                        </div>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                \r\n\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address1\" class=\"col-sm-3 control-label \">Address 1</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"register_address1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address2\" class=\"col-sm-3 control-label \">Address 2</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"register_address2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">City</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.city\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_region\" class=\"col-sm-3 control-label \">Region</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.region\" id=\"register_region\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_postal_code\" class=\"col-sm-3 control-label \">Postal Code</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"register_postal_code\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">Country</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.country\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"topMargin\">Password should be at least ${thresholdLength} characters long and should contain a combination of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters</div>\r\n\r\n           <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_specialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"register_specialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_department\" class=\"col-sm-3 control-label\">Department</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"register_department\" class=\"form-control input-md\" placeholder=\"Department\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n          </div> <!-- Row -->\r\n        </form>\r\n      </div>\r\n  </div>\r\n</template>\r\n\r\n<!--\r\n<template>\r\n  <div class=\"container topMargin\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-heading\">\r\n        <div class=\"panel-title\">\r\n          <h3>Create an Account</h3>\r\n        </div>\r\n      </div>\r\n        <div class=\"topMargin bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n      <div class=\"panel-body\">\r\n        <form role=\"form\" class=\"form-horizontal\">\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_firstName\" class=\"col-sm-2 form-control-label topMargin\">First Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_firstName\" type=\"text\" placeholder=\"First Name\"\r\n                   class=\"form-control\"\r\n                   value.bind=\"people.selectedPerson.firstName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <label for=\"register_middletName\" class=\"col-sm-2 form-control-label topMargin\">Middle Name</label>\r\n            <div class=\"col-sm-10\">\r\n              <input type=\"text\" placeholder=\"Middle Name\" id=\"register_middletName\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.middleName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_lastName\" class=\"col-sm-2 form-control-label topMargin\">Last Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_lastName\" type=\"text\" placeholder=\"Last Name\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.lastName\" />\r\n              </div>\r\n          </div> \r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">EMail *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_email\" type=\"text\" placeholder=\"eMail\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.email\"\r\n                   blur.trigger=\"checkEmail()\"/>\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Phone *</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Mobile</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password\" class=\"col-sm-2 form-control-label topMargin\">Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.password\"\r\n                   blur.trigger=\"passwordComplexity()\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password_repeat\" class=\"col-sm-2 form-control-label topMargin\">Repeat Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"password_repeat\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_institution\" class=\"col-sm-2 form-control-label topMargin\">Institution *</label>\r\n            <div class=\"col-md-10\">\r\n              <select id=\"register_institution\" change.delegate=\"checkName()\" value.bind=\"people.selectedPerson.institutionId\" id=\"iType\"\r\n                    class=\"form-control topMargin\" placeholder=\"Institution\">\r\n                <option value=\"\"></option>\r\n                <option repeat.for=\"institution of people.institutionsArray\"\r\n                        value=\"${institution._id}\">${institution.name}</option>\r\n              </select>\r\n            </div>\r\n          </div>\r\n        </form>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n-->"; });
-define('text!modules/user/profile.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <div class=\"panel-title\">\n          <h3>User Profile</h3>\n        </div>\n      </div>\n      <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>  \n        <div class=\"topMargin col-sm-12 col-lg-1\">\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n            <div class=\"topMargin\">\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\n            </div>\n        </div>\n    <div class=\"col-sm-12 col-lg-11\">\n        <form class=\"form-horizontal topMargin\">\n          <div class=\"row\">\n            <!-- Row 1 -->\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n          </div>\n\n          <!-- Row 2 -->\n          <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.phone| phoneNumber\" id=\"editPhone\" class=\"form-control input-md\" placeholder=\"Phone\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control input-md\" placeholder=\"Mobile\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\n                            <div class=\"col-sm-8\">\n                            <input disabled value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control input-md\" placeholder=\"Gender\">\n                                    <option value=\"\">Select an option</option>\n                                    <option value=\"F\">Female</option>\n                                    <option value=\"M\">Male</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control input-md\" placeholder=\"Institution\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n           <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"form-group\">\n                        <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"form-group\">\n                        <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control input-md\" placeholder=\"Department\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n          </div> <!-- Row -->\n        </form>\n      </div>\n  </div>\n</template>\n"; });
+define('text!modules/home/register.html', ['module'], function(module) { module.exports = "<template>\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n        <div class=\"container-fluid\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Register</a>\r\n            </div>\r\n        </div>\r\n    </nav>\r\n  <div class=\"fluid-container col-lg-10 col-lg-offset-1\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-body\">\r\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Backve\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n        <div class=\"topMargin col-sm-12 col-lg-1\">\r\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n            <div class=\"topMargin\">\r\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\r\n            </div>\r\n        </div>\r\n    <div class=\"col-sm-12 col-lg-10\" style=\"margin-left:10px;\">\r\n        <form class=\"form-horizontal topMargin\">\r\n          <div class=\"row\">\r\n            <!-- Row 1 -->\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_firstName\" class=\"col-sm-3 control-label \">First Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"register_firstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_middletName\" class=\"col-sm-3 control-label \">Middle Name</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"register_middletName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_lastName\" class=\"col-sm-3 control-label \">Last Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"register_lastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n             <div class=\"col-lg-4\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\" />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n          </div>\r\n\r\n\r\n          <!-- Row 2 -->\r\n          <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_phone\" class=\"col-sm-3 control-label \">Phone *</label>\r\n                            <div class=\"col-sm-8\">\r\n                             <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_mobile\" class=\"col-sm-3 control-label \">Mobile</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input id=\"register_mobile\" class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_email\" class=\"col-sm-3 control-label\">Email *</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input blur.trigger=\"checkEmail()\" value.bind=\"people.selectedPerson.email\" id=\"register_email\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <!--\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_gender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"register_gender\" class=\"form-control input-md\" placeholder=\"Gender\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option value=\"F\">Female</option>\r\n                                    <option value=\"M\">Male</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    -->\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_institution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"register_institution\" class=\"form-control input-md\" placeholder=\"Institution\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password\" class=\"col-sm-3 control-label\">Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"people.selectedPerson.password\"\r\n                              blur.trigger=\"passwordComplexity()\" />\r\n                        </div>\r\n                      </div>\r\n                    </div>\r\n                     <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"password_repeat\" />\r\n                        </div>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                \r\n\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address1\" class=\"col-sm-3 control-label \">Address 1</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"register_address1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address2\" class=\"col-sm-3 control-label \">Address 2</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"register_address2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">City</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.city\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_region\" class=\"col-sm-3 control-label \">Region</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.region\" id=\"register_region\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_postal_code\" class=\"col-sm-3 control-label \">Postal Code</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"register_postal_code\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">Country</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.country\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"topMargin\">Password should be at least ${thresholdLength} characters long and should contain a combination of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters</div>\r\n\r\n           <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_specialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"register_specialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_department\" class=\"col-sm-3 control-label\">Department</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"register_department\" class=\"form-control input-md\" placeholder=\"Department\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n          </div> <!-- Row -->\r\n        </form>\r\n      </div>\r\n  </div>\r\n</template>\r\n\r\n<!--\r\n<template>\r\n  <div class=\"container topMargin\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-heading\">\r\n        <div class=\"panel-title\">\r\n          <h3>Create an Account</h3>\r\n        </div>\r\n      </div>\r\n        <div class=\"topMargin bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n      <div class=\"panel-body\">\r\n        <form role=\"form\" class=\"form-horizontal\">\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_firstName\" class=\"col-sm-2 form-control-label topMargin\">First Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_firstName\" type=\"text\" placeholder=\"First Name\"\r\n                   class=\"form-control\"\r\n                   value.bind=\"people.selectedPerson.firstName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <label for=\"register_middletName\" class=\"col-sm-2 form-control-label topMargin\">Middle Name</label>\r\n            <div class=\"col-sm-10\">\r\n              <input type=\"text\" placeholder=\"Middle Name\" id=\"register_middletName\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.middleName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_lastName\" class=\"col-sm-2 form-control-label topMargin\">Last Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_lastName\" type=\"text\" placeholder=\"Last Name\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.lastName\" />\r\n              </div>\r\n          </div> \r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">EMail *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_email\" type=\"text\" placeholder=\"eMail\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.email\"\r\n                   blur.trigger=\"checkEmail()\"/>\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Phone *</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Mobile</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password\" class=\"col-sm-2 form-control-label topMargin\">Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.password\"\r\n                   blur.trigger=\"passwordComplexity()\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password_repeat\" class=\"col-sm-2 form-control-label topMargin\">Repeat Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"password_repeat\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_institution\" class=\"col-sm-2 form-control-label topMargin\">Institution *</label>\r\n            <div class=\"col-md-10\">\r\n              <select id=\"register_institution\" change.delegate=\"checkName()\" value.bind=\"people.selectedPerson.institutionId\" id=\"iType\"\r\n                    class=\"form-control topMargin\" placeholder=\"Institution\">\r\n                <option value=\"\"></option>\r\n                <option repeat.for=\"institution of people.institutionsArray\"\r\n                        value=\"${institution._id}\">${institution.name}</option>\r\n              </select>\r\n            </div>\r\n          </div>\r\n        </form>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n-->"; });
+define('text!modules/user/profile.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Profile</a>\n            </div>\n        </div>\n    </nav>\n  <div class=\"fluid-container col-lg-8 col-lg-offset-2\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>  \n        <div class=\"topMargin col-sm-12 col-lg-1\">\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n            <div class=\"topMargin\">\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\n            </div>\n        </div>\n    <div class=\"col-sm-12 col-lg-11\">\n        <form class=\"form-horizontal topMargin\">\n          <div class=\"row\">\n            <!-- Row 1 -->\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n          </div>\n\n          <!-- Row 2 -->\n          <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.phone| phoneNumber\" id=\"editPhone\" class=\"form-control input-md\" placeholder=\"Phone\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control input-md\" placeholder=\"Mobile\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\n                            <div class=\"col-sm-8\">\n                            <input disabled value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control input-md\" placeholder=\"Gender\">\n                                    <option value=\"\">Select an option</option>\n                                    <option value=\"F\">Female</option>\n                                    <option value=\"M\">Male</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control input-md\" placeholder=\"Institution\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n           <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"form-group\">\n                        <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"form-group\">\n                        <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control input-md\" placeholder=\"Department\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n          </div> <!-- Row -->\n        </form>\n      </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/user.html', ['module'], function(module) { module.exports = "<template>\r\n    \r\n    <div class=\"textContainer banner\">\r\n        <h4><span show.bind=\"temp\" class=\"leftMargin\">${userObj.city} weather: ${temp} </h4><img src=\"${weatherIcon}\"/>\r\n        <h4><span show.bind=\"ucctemp\" class=\"leftMargin\">UCC weather: ${ucctemp} </h4><img src=\"${uccweatherIcon}\"/></span> \r\n        <div class=\"pull-right\">\r\n            <a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"requests.customerActionRequests > 0\">Requests <span class=\"badge\">${requests.customerActionRequests}</span></a>            \r\n            <a href=\"#/support\" class=\"rightMargin\" if.bind=\"helpTickets.customerActionHelpTickets > 0\">Help Tickets <span class=\"badge\">${helpTickets.customerActionHelpTickets}</span></a>\r\n            <span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\r\n        </div>\r\n    </div>\r\n        \r\n    <div class=\"row\">\r\n        <div class=\"col-lg-3 col-lg-offset-1 bigMarginTop leftMargin\">\r\n            <h2 class=\"underline\">Useful Information</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\r\n                <compose view=\"./components/newsItem.html\"></compose>\r\n            </div>\r\n            <h2 class=\"underline bottomMargin\">Useful Links</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\r\n                <compose view=\"./components/homePageLinks.html\"></compose> \r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-8\">\r\n            <div class=\"col-lg-12\" style=\"height:700px;\">\r\n                <compose view=\"./components/carousel.html\"></compose>\r\n            </div>\r\n            <div class=\"col-lg-5\">\r\n                <h2 class=\"underline\">UCC and UA News</h2>\r\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\r\n                    <compose view=\"./components/newsItem.html\"></compose>\r\n                </div>\r\n            </div>\r\n            <div class=\"col-md-5 bigMarginTop leftMargin\">\r\n                <compose view=\"./components/uccInformation.html\"></compose>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    \r\n\r\n        <!--\r\n        <div class=\"col-md-5 bigMarginTop leftMargin hidden-xs hidden-sm\">\r\n            <div class=\"row\" style=\"height:200px;\">\r\n                <div class='col-lg-12 bigMarginTop'>\r\n                    <div class=\"col-lg-5\">\r\n                        <compose view=\"./components/helpTickets.html\"></compose>\r\n                    </div>\r\n                    <div class=\"col-lg-6\">\r\n                        <compose view=\"./components/clientRequests.html\"></compose>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n    \r\n            <div class=\"row\">\r\n                <div class=\"col-lg-12 bigMarginTop\">\r\n                    <compose view=\"./components/requestCount.html\"></compose>\r\n                </div>\r\n            </div>\r\n       \r\n            <div class=\"row col-lg-12\">\r\n                <h2 class=\"underline\">UCC and UA News</h2>\r\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\r\n                    <compose view=\"./components/newsItem.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\r\n            <compose view=\"./components/uccInformation.html\"></compose>\r\n        </div>\r\n    </div>\r\n     -->\r\n  \r\n</template>"; });
-define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n</template>"; });
-define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <th>Institution  <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[0].description} <span click.trigger=\"dataTable.sortArray('1')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[1].description} <span click.trigger=\"dataTable.sortArray('2')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[2].description} <span click.trigger=\"dataTable.sortArray('3')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[3].description} <span click.trigger=\"dataTable.sortArray('4')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[4].description} <span click.trigger=\"dataTable.sortArray('5')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[5].description} <span click.trigger=\"dataTable.sortArray('6')\"><i class=\"fa fa-sort\"></i></span></th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"stat of dataTable.displayArray\">\n                        <td data-title=\"Institution\">${stat.institutionId  | lookupValue:people.institutionsArray:'_id':'name'}</td>\n                        <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    </div>\n</template>"; });
+define('text!resources/dialogs/confirm-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <div tabindex=\"-1\" role=\"dialog\">\n        <div class=\"modal-dialog\">\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <button type=\"button\" click.trigger=\"controller.cancel()\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                    <h4 class=\"modal-title\">${header}</h4>\n                </div>\n                <div class=\"modal-body\">\n                   ${message}?\n                </div>\n                <div class=\"modal-footer\">\n                    <button type=\"button\" class=\"btn btn-default\" click.trigger=\"controller.cancel()\">No!</button>\n                    <button type=\"button\" class=\"btn btn-danger\" click.trigger=\"controller.ok()\">Yes</button>\n                </div>\n            </div><!-- /.modal-content  -->\n        </div><!-- /.modal-dialog -->\n    </div><!-- /.modal -->\n</template>"; });
+define('text!resources/dialogs/message-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ai-dialog style=\"max-width: 325px\">\n    <ai-dialog-header>${model.title}</ai-dialog-header>\n\n    <ai-dialog-body>\n      ${model.message}\n    </ai-dialog-body>\n\n    <ai-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ai-dialog-footer>\n  </ai-dialog>\n</template>"; });
+define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\n                      class=\"list-group-item\">${system.sid}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\n                    class=\"list-group-item\">${system.sid}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
+define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input type='text' class=\"form-control\" />\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
+define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"setPassword()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= 6\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= 8\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= 4\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= 8\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
+define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
+define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!resources/elements/tiny-mce.html', ['module'], function(module) { module.exports = "<template>\n\t<textarea class=\"tinymce-host\" id.bind=\"editor_id\"></textarea>\n</template>"; });
 define('text!modules/admin/customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Customers</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
@@ -27959,6 +28010,8 @@ define('text!modules/admin/system/editProduct.html', ['module'], function(module
 define('text!modules/admin/system/editSession.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"showScreen == 'sessionTable'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"showScreen == 'editSession'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionForm.html\"></compose>\n            </div> <!-- Form Div -->\n            <div show.bind=\"showScreen == 'editConfig'\" class=\"col-lg-12\">\n                <compose view=\"./components/sessionConfigTable.html\"></compose>\n            </div>\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/editSystem.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/systemForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/system/system.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">System</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n         <h4 class=\"leftMargin\">Systems Administration</h4>\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
+define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n</template>"; });
+define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <th>Institution  <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[0].description} <span click.trigger=\"dataTable.sortArray('1')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[1].description} <span click.trigger=\"dataTable.sortArray('2')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[2].description} <span click.trigger=\"dataTable.sortArray('3')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[3].description} <span click.trigger=\"dataTable.sortArray('4')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[4].description} <span click.trigger=\"dataTable.sortArray('5')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>${config.REQUEST_STATUS[5].description} <span click.trigger=\"dataTable.sortArray('6')\"><i class=\"fa fa-sort\"></i></span></th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"stat of dataTable.displayArray\">\n                        <td data-title=\"Institution\">${stat.institutionId  | lookupValue:people.institutionsArray:'_id':'name'}</td>\n                        <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-12\">\n\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\n\t\t<div class=\"topMargin\">\n\t\t\t<form class=\"form-horizontal topMargin\">\n\t\t\t\t<!-- Row 1 -->\n\t\t\t\t<div class=\"row\">\n\t\t\t\t\t<div class=\"col-lg-1\">\n\t\t\t\t\t\t<div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-10 col-lg-offset-1\">\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<h3 innerhtml.bind=\"people.selectedPerson.fullName\"></h3>\n\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"form-group pull-left\">\n\t\t\t\t\t\t\t\t\t<label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-8\">\n\t\t\t\t\t\t\t\t\t\t<select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control input-md\" placeholder=\"Status\">\n                                                <option value=\"\">Select an option</option>\n                                                <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\n                                            </select>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Contact</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Phone: <span innerhtml.bind=\"people.selectedPerson.phone\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Mobile: <span innerhtml.bind=\"people.selectedPerson.mobile\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Email: <span innerhtml.bind=\"people.selectedPerson.email\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Address</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.address1\"></span>\n\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t<h4 if.bind=\"people.selectedPerson.address2\"><span innerhtml.bind=\"people.selectedPerson.address2\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.city\"></span> <span innerhtml.bind=\"people.selectedPerson.region\">, <span innerhtml.bind=\"people.selectedPerson.postalCode\"></span></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.country\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Area</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Specialization: <span innerhtml.bind=\"people.selectedPerson.personSpecialization\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Department: <span innerhtml.bind=\"people.selectedPerson.departmentCategory\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Roles</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4 innerhtml.bind=\"roles\"></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t</div>\n\t\t<!-- Row -->\n\t\t</form>\n\t</div>\n\t</div>\n</template>"; });
 define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='6'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:15rem;\">Phone</th>\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>Role</th>\n                                <th>Status</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\n                                        compare=\"array\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\n                                </select>\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\n                                <td data-title=\"Name\">${person.fullName}</td>\n                                <td data-title=\"Phone\">${person.phone | phoneNumber}</td>\n                                <td data-title=\"Email\">${person.email}</td>\n                                <td data-title=\"Role\">${person.roles}</td>\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
@@ -28002,8 +28055,8 @@ define('text!modules/admin/customers/components/institutionsTable.html', ['modul
 define('text!modules/admin/customers/components/instPeople.html', ['module'], function(module) { module.exports = "<template>\r\n            <div class=\"col-lg-10 col-offset-lg-1\" style=\"padding:15px;\">\r\n\r\n            <table id=\"personTable2\" class=\"table table-striped table-hover\">\r\n                <thead>\r\n                    <tr>\r\n                        <th style=\"width:20rem;\">Name</th>\r\n                        <th style=\"width:15rem;\">Phone</th>\r\n                        <th style=\"width:20rem;\">eMail</th>\r\n                        <th>Role</th>\r\n                        <th>Status</th>\r\n                    </tr>\r\n                </thead>\r\n                <tbody>\r\n                    <tr repeat.for=\"person of people.peopleInstArray\" class=\"blackText\">\r\n                        <td data-title=\"name\">${person.firstName} ${person.lastName}</td>\r\n                        <td data-tile=\"phone\">${person.phone | phoneNumber}</td>\r\n                        <td data-title=\"email\">${person.email}</td>\r\n                        <td data-title=\"role\">${person.roles}</td>\r\n                        <td data-title=\"status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/is4ua.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <!-- Row 4 -->\n            <div class=\"col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                    <div class=\"col-sm-8\">\n                        <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                        </select>\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                    <div class=\"col-sm-8\">\n                        <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                        </select>\n                    </div>\n                </div>\n            </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Password.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <div class=\"panel panel-default col-md-12\">\n            <div class=\"panel-body\">\n                <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"savePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditPassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                <div class=\"form-group\">\n                    <input id=\"newPassword\" type=\"text\" placeholder=\"New Password\"\n                        class=\"form-control topMargin\"\n                        value.bind=\"newPassword\" />\n                </div>\n                <!--\n                <div class=\"form-group\">\n                    <input id=\"password_repeat\" type=\"text\" placeholder=\"Repeat Password\"\n                        class=\"form-control topMargin\"\n                        value.bind=\"newPassword_repeat\" />\n                </div>\n                -->\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n        \r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control \" placeholder=\"Gender\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option value=\"F\">Female</option>\r\n                                        <option value=\"M\">Male</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a  class=\"${ $first ? 'active' : ''} list-group-item\"  repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n    <div>\r\n        \r\n</template>\r\n"; });
-define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td data-title=\"Email\">${person.email}</td>\r\n                                <td data-title=\"Role\">${person.roles}</td>\r\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
+define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"nickName\" type=\"text\" placeholder=\"Filter Nickname\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                 <td data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td data-title=\"Email\">${person.email}</td>\r\n                                <td data-title=\"Role\">${person.roles}</td>\r\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"people.selectedPerson.roles\">${role.label}\n            </label>\n        </div>\n    </div> <!-- Right side of form -->\n</template"; });
 define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\"  value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                        <div id=\"editFiles\"></div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
@@ -28033,7 +28086,7 @@ define('text!modules/admin/system/components/Systems.html', ['module'], function
 define('text!modules/admin/system/components/systemTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class='col-lg-12'>\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n             <div id=\"no-more-tables\">\n            <table id=\"systemsTable\" class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr>\n                        <td colspan=5>\n                            <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                            <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                        </td>\n                    </tr>\n                    <tr>\n                        <th style=\"width:100px;\">SID <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th class=\"hidden-xs hidden-sm\">Server <span click.trigger=\"dataTable.sortArray('server')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th class=\"hidden-xs hidden-sm\">Instance</th>\n                        <th class=\"hidden-xs hidden-sm\">Status</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr>\n                        <th class=\"hasinput\">\n                            <input input.delegate=\"dataTable.filterList($event)\" id=\"sid\" type=\"text\" placeholder=\"Filter SID\" class=\"form-control\">\n                        </th>\n                        <th>\n                            <input input.delegate=\"dataTable.filterList($event)\" id=\"description\" type=\"text\" placeholder=\"Filter description\" class=\"form-control\">\n                        </th>\n                        <th class=\"hidden-xs hidden-sm\">\n                            <input input.delegate=\"dataTable.filterList($event)\" id=\"server\" type=\"text\" placeholder=\"Filter server\" class=\"form-control\">\n                        </th>\n                        <th class=\"hidden-xs hidden-sm\"></th>\n                        <th class=\"hidden-xs hidden-sm\">\n                            <select md-select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"active\" compare=\"boolean\">\n                                <option value=\"\"></option>\n                                <option value=true>Active</option>\n                                <option value=false>Inactive</option>\n                            </select>\n                        </th>\n                    </tr>\n                    <tr click.trigger=\"edit($index, $event)\" repeat.for=\"system of dataTable.displayArray\">\n                        <td data-title=\"Session\">${system.sid}</td>\n                        <td data-title=\"StartDate\">${system.description}</td>\n                        <td  class=\"hidden-xs hidden-sm\" data-title=\"EndDate\">${system.server}</td>\n                        <td  class=\"hidden-xs hidden-sm\" data-title=\"RequestsOpen\">${system.instance}</td>\n                        <td  class=\"hidden-xs hidden-sm\" data-title=\"createdDate\">${system.active | translateStatus}</td>\n                    </tr>\n                </tbody>\n            </table>\n            </div>\n        </div>\n    </div>    \n</template>"; });
 define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div  class=\"panel panel-default topMargin\">\n            <div class=\"panel-body leftJustify\">\n              <div class=\"bottomMargin\">\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"save()\">Save</button>\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"cancel()\">Cancel</button>\n              </div>\n              <div class=\"form-group\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>\n                  </div>\n                </div>\n                 \n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddUnder\" class=\"control-label\">Add Undergraduates</label>\n                            <input value.bind=\"requests.selectedRequest.addUndergraduates\" id=\"editAddUnder\" class=\"form-control input-sm\" placeholder=\"Addiiontal undergraduates\" type=\"number\" />\n                        </div>\n                    </div>\n                              \n                    <div class=\"col-lg-4 col-lg-offset-2\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddGrad\" class=\"control-label\">Add Graduate</label>\n                             <input value.bind=\"requests.selectedRequest.addGraduates\" type=\"number\" id=\"editAddGrad\" class=\"form-control input-sm\" placeholder=\"Addiiontal Graduates\"/>\n                        </div>\n                    </div>\n                  </div>\n                \n                \n                 <label show.bind=\"request.addUndergraduates > 0\">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>\n                 <label show.bind=\"request.addGraduates > 0\">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>\n              </div>\n              <div class=\"leftJustify\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"beginDate\" class=\"leftJustify\">Date the course begins</label>\n                          <input change.trigger=\"changeBeginDate()\" type=\"date\" value.bind=\"requests.selectedRequest.startDate\"\n                                class=\"form-control\" id=\"beginDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"endDate\" class=\"leftJustify\">Date the course ends</label>\n                          <input change.trigger=\"changeEndDate()\" type=\"date\" value.bind=\"requests.selectedRequest.endDate\"\n                                class=\"form-control\" id=\"endDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                \n              </div>\n               <textarea  placeholder=\"Additional Comments\" class=\"topMargin col-lg-12\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n              \n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n</template>\n    "; });
-define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n      <div class='row'>\n        <table id=\"peopleTable\" class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                  <td colspan='8'>\n                      <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                  </td>\n              </tr>\n              <tr>\n                  <td colspan='7'>\n                      <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                      <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                  </td>\n              </tr>\n             <tr>\n               <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('requiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th class=\"col-lg-1\">Type</th>\n               <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th class=\"col-sm-1\">IDS Requestd</th>\n               <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n             </tr>\n           </thead>\n           <tbody>\n             <tr>\n               <th></th>\n               <th>\n                 <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n               </th>\n               <th>\n                 <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n               </th>\n               <th>\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestId.courseId\" compare=\"obj\">\n                   <option value=\"\"></option>\n                   <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\n                   <option  value=\"\">Regular</option>\n                 </select>\n               </th>\n               <th>\n                 <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n               </th>\n               <th></th>\n               <th>\n                 <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n                 </select>\n               </th>\n               <th>\n                 <input input.delegate=\"dataTable.filterList($event)\" id=\"requestId.personId\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n               </th>\n             </tr>\n             <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\n               <td data-title=\"requestNo\">${request.requestNo}</td>\n               <td data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n               <td data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n               <td data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n               <td data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n               <td data-title=\"ids-requested\">${request.requestId | idsRequested}\n               <td data-title=\"product\">${request.productId | productName:products.productsArray}</td>\n               <td data-title=\"personId\">${request.requestId.personId | personName:people.peopleArray}</td>\n             </tr>\n           </tbody>\n         </table>\n      </div>\n    </div>\n  </div>\n  -->\n</template>\n"; });
+define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n    <div class='row'>\n      <table id=\"peopleTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='8'>\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='7'>\n              <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n            </td>\n          </tr>\n          <tr>\n            <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('requiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Type</th>\n            <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-sm-1\">IDS Requestd</th>\n            <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th></th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestId.courseId\" compare=\"obj\">\n                   <option value=\"\"></option>\n                   <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\n                   <option  value=\"\">Regular</option>\n                 </select>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n            </th>\n            <th></th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n              </select>\n            </th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\"\n                class=\"form-control\" />\n            </th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\"\n                class=\"form-control\" />\n            </th>\n          </tr>\n          <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\n            <td data-title=\"requestNo\">${request.requestNo}</td>\n            <td data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n            <td data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            <td data-title=\"ids-requested\">${request.requestId | idsRequested}\n              <td data-title=\"product\">${request.productId | productName:products.productsArray}</td>\n              <td data-title=\"Name\">${request.requestId.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n              <td data-title=\"Nickname\">${request.requestId.personId | personProperty:people.peopleArray:\"nickName\"}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  </div>\n  -->\n</template>"; });
 define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerAction()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"row\">\n        <div class=\"col-lg-2\">\n          <h3>Request No: ${requests.selectedRequestDetail.requestNo}</h3>\n        </div>\n        <div class=\"col-lg-10\">\n          <span show.bind=\"facultyDetails\">\n            <div class=\"row\">\n              <div class=\"col-lg-3\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-4\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-lg-3\">\n                <h5>Phone: ${people.selectedPerson.phone}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Mobile: ${people.selectedPerson.mobile}</h5>\n              </div>\n            </div>\n          </span>\n          <div class=\"row\">\n            <div class=\"col-lg-3\">\n                <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n              </div>\n            <div class=\"col-lg-5\">\n                <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n            </div>\n          </div>\n\n          <div class=\"row\">\n            <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n            </div>\n             <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n            </div>\n             <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n            </div>\n          </div>\n      </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId | personName:people.peopleArray}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin rightMargin\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default col-lg-12 leftMargin\">\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"form-group col-lg-2\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-2\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n          <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-2x fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-2x fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n      </div>\n    </div>\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th class=\"col-sm-1\">System</th>\n          <th class=\"col-sm-1\">Client</th>\n          <th class=\"col-sm-1\">Assigned IDs</th>\n          <th>Student IDs</th>\n          <th>Student Password</th>\n          <th>Faculty IDs</th>\n          <th>Faculty Password</th>\n          <th>Assigned Date</th>\n          <th>Status</th>\n          <th></th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n          <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n          <td>${client.client}</td>\n          <td>${client.idsAssigned}</td>\n          <td>${client.studentUserIds}</td>\n          <td>${client.studentPassword}</td>\n          <td>${client.facultyUserIds}</td>\n          <td>${client.facultyPassword}</td>\n          <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${client.notValid | overlap}\n          <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12\">\n                    <div class=\"panel-body\">\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control input-lg\"/>\n                        </div>\n                    </div>\n                    <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-2x\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-2x\" aria-hidden=\"true\"></i></span>\n                    </div>\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <textarea innerhtml.bind=\"requests.selectedRequestDetail.techComments\" class=\"form-control\" rows=\"10\"></textarea>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <textarea readonly class=\"topMargin form-control\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" rows=\"10\"></textarea>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n          \n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
 define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n          <!--\n          <div class=\"col-lg-6\">\n             Request Details\n            <compose view=\"./requestDetails.html\"></compose>\n          </div>\n          -->\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/tech/support/components/-time.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
@@ -28051,8 +28104,8 @@ define('text!modules/tech/support/components/helpTicketDetails.html', ['module']
 define('text!modules/tech/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n \n      <div class=\"form-group topMargin\" >\n        <select value.bind=\"editInstitution\" change.delegate=\"changeInstitution($event)\" id=\"institution\" class=\"form-control\">\n          <option value=\"\">Select an institution</option>\n          <option repeat.for=\"institution of selectedInstitutions\"\n                  value.bind=\"institution._id\">${institution.name}</option>\n        </select>\n      </div>\n\n      <!-- People Select -->\n      <div class=\"form-group\" show.bind=\"showPeople\">\n        <select value.bind=\"editPerson\" change.delegate=\"changePerson($event)\" id=\"person\" class=\"form-control\">\n          <option value=\"\">Select a person</option>\n          <option repeat.for=\"person of people.peopleArray\"\n                  value.bind=\"person._id\">${person._id | person:people.peopleArray:\"fullName\"}</option>\n        </select>\n      </div>\n      \n     <div class=\"form-group\" show.bind=\"showSession\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.sessionId\" change.delegate=\"sessionChanged($event)\" id=\"session\" class=\"form-control\">\n          <option value=\"\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n\n      <!-- Type Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.sessionId !== ''\" class=\"form-group\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"typeChanged($event)\"\n                id=\"helpTicketPurpose\" class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of config.HELP_TICKET_TYPES\"\n                  value.bind=\"types.code\">${types.description}</option>\n        </select>\n      </div>\n\n      <div show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message !== undefined\">\n        <div  class=\"well well-sm\" innerhtml.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message\" ></div>\n      </div>\n</template>"; });
 define('text!modules/tech/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n  <div>\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, product)\">\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <h2>${viewHelpTicketsHeading}</h2>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"own()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"col-md-12 topMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n\n          <div class=\"col-md-12 topMargin\">\n            <div class=\"row\">\n              <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\"></tiny-mce>\n            <!--  <rich-text-editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\"></rich-text-editor> -->\n            </div>\n            <div class=\"row\">\n               <div class=\"col-lg-2\">\n                  <div class=\"checkbox \">\n                    <label>\n                      <input checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" type=\"checkbox\"> Confidential\n                    </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-2\">\n                  <div class=\"checkbox\">\n                    <label>\n                      <input change.bind=\"checkSendMail()\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </div>\n            </div>\n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default col-md-12\">\n            \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                  <div class=\"form-group col-md-10\">\n                    <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n                </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <label class=\"col-md-offset-1\" id=\"owner\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</label>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                  <div class=\"form-group col-md-10\">\n                    <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                  </div>\n                </div>\n              </div>\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <button class=\"btn btn-primary btn-file btn-fill\" placeholder=\"Change status\"\n                                click.delegate=\"updateStatus()\" type=\"button\">Save Status</button>\n                    </span>\n                    <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control\">\n                      <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" value=${status.code}>${status.description}</option>\n                    </select>\n                  </div>\n                </div>\n\n                <!-- Add keywords -->\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                      <button class=\"btn btn-primary btn-fill\" placeholder=\"Enter keywords\"\n                              click.delegate=\"updateKeywords()\" type=\"button\">Save Keywords</button>\n                    </span>\n                    <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control\">\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"well well-sm topMargin\">\n          <!-- Timeline Content -->\n          <div class=\"smart-timeline\">\n            <ul class=\"smart-timeline-list\">\n              <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':1:isUCC\">\n                <compose view=\"./${event.type}-time.html\"></compose>\n              </li>\n            </ul>\n          </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\">\n      <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n                    <thead>\n                        <tr>\n                            <td colspan='8'>\n                                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                            </td>\n                        </tr>\n                        <tr>\n                            <td colspan='8'>\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                            </td>\n                        </tr>\n                  <tr>\n                    <th></th>\n                    <th class=\"hasinput\">\n                      <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                    </th>\n                    <th>\n                      <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                                value.bind=\"person._id\">${person.fullName}</option>\n                      </select>\n                      <!--\n                      <input change.delegate=\"dataTable.filterList($event, people.peopleArray)\" compare=\"lookup\" id=\"owner[0].personId-fullName\" type=\"text\" placeholder=\"Filter Owner\" class=\"form-control\">\n                      -->\n                    </th>\n                    <th class=\"hasinput\">\n                      <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                    </th>\n                    <th class=\"hasinput\">\n                      <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n                    </th>\n                    <th>\n                      <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" />\n                    </th>\n                  </tr>\n                  <tr>\n                    <th>\n                      Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                    </th>\n                    <th>\n                      Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                     <th>\n                      Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                    <th>\n                      Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                    <th>\n                      Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                    </th>\n                    <th>Customer</th>\n                    <th>Email</th>\n                     <th>Phone</th>\n                  </tr>\n                  </thead>\n                  <tbody>\n                  <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket($event, $index)\">\n                    <td data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n                    <td mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES} \n                    <td data-title=\"owner\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}\n                    <td data-title=\"status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                    <td data-title=\"createdDate\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                    <td data-title=\"Customer\">${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n                    <td data-title=\"email\">${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n                    <td data-title=\"phone\">${helpTicket.personId | person:people.peopleArray:\"phone\"}</td>\n                  </tr>\n                  </tbody>\n                </table>\n            </div>\n            <div class=\"row\" show.bind=\"helpTicketSelected\">\n              <compose view=\"./viewHTForm.html\"></compose>\n            </div>\n          </div>\n      </div>\n    </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <h2>${viewHelpTicketsHeading}</h2>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"own()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\" show.bind=\"showLockMessage\">Help Ticket is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"col-md-12 topMargin\">\n            <span  click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n\n          <div class=\"col-md-12 topMargin\">\n            <div class=\"row\">\n              <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\"></tiny-mce>\n            <!--  <rich-text-editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\"></rich-text-editor> -->\n            </div>\n            <div class=\"row\">\n               <div class=\"col-lg-2\">\n                  <div class=\"checkbox \">\n                    <label>\n                      <input checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" type=\"checkbox\"> Confidential\n                    </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-2\">\n                  <div class=\"checkbox\">\n                    <label>\n                      <input change.bind=\"checkSendMail()\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </div>\n            </div>\n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default col-md-12\">\n            \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                  <div class=\"form-group col-md-10\">\n                    <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n                </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-6\">\n                  <div class=\"form-group\">\n                    <label class=\"col-md-offset-1\" id=\"owner\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</label>\n                  </div>\n                </div>\n                <div class=\"col-md-6\">\n                  <div class=\"form-group col-md-10\">\n                    <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                  </div>\n                </div>\n              </div>\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-file btn-fill\" placeholder=\"Change status\"\n                                click.delegate=\"updateStatus()\" type=\"button\">Save Status</button>\n                    </span>\n                    <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control\">\n                      <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" value=${status.code}>${status.description}</option>\n                    </select>\n                  </div>\n                </div>\n\n                <!-- Add keywords -->\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                      <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-fill\" placeholder=\"Enter keywords\"\n                              click.delegate=\"updateKeywords()\" type=\"button\">Save Keywords</button>\n                    </span>\n                    <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control\">\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"well well-sm topMargin\">\n          <!-- Timeline Content -->\n          <div class=\"smart-timeline\">\n            <ul class=\"smart-timeline-list\">\n              <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':1:isUCC\">\n                <compose view=\"./${event.type}-time.html\"></compose>\n              </li>\n            </ul>\n          </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\">\n      <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n                    <thead>\n                        <tr>\n                            <td colspan='8'>\n                                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                            </td>\n                        </tr>\n                        <tr>\n                            <td colspan='8'>\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                            </td>\n                        </tr>\n                  <tr>\n                    <th></th>\n                    <th class=\"hasinput\">\n                      <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                    </th>\n                    <th>\n                      <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                                value.bind=\"person._id\">${person.fullName}</option>\n                      </select>\n                      <!--\n                      <input change.delegate=\"dataTable.filterList($event, people.peopleArray)\" compare=\"lookup\" id=\"owner[0].personId-fullName\" type=\"text\" placeholder=\"Filter Owner\" class=\"form-control\">\n                      -->\n                    </th>\n                    <th class=\"hasinput\">\n                      <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                    </th>\n                    <th class=\"hasinput\">\n                      <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n                    </th>\n                    <th>\n                      <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" />\n                    </th>\n                    <th>\n                      <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" />\n                    </th>\n                  </tr>\n                  <tr>\n                    <th>\n                      Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                    </th>\n                    <th>\n                      Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                     <th>\n                      Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                    <th>\n                      Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n                    </th>\n                    <th>\n                      Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                    </th>\n                    <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n                     <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n                    <th>Email</th>\n                     <th>Phone</th>\n                  </tr>\n                  </thead>\n                  <tbody>\n                  <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket($event, $index)\">\n                    <td data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n                    <td mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES} \n                    <td data-title=\"Owner\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}\n                    <td data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                    <td data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                    <td data-title=\"Customer\">${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n                    <td data-title=\"Nickname\">${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n                    <td data-title=\"Email\">${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n                    <td data-title=\"Phone\">${helpTicket.personId | person:people.peopleArray:\"phone\"}</td>\n                  </tr>\n                  </tbody>\n                </table>\n            </div>\n            <div class=\"row\" show.bind=\"helpTicketSelected\">\n              <compose view=\"./viewHTForm.html\"></compose>\n            </div>\n          </div>\n      </div>\n    </div>\n</template>"; });
 define('text!modules/user/requests/components/client-request-step1.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Term Select -->\n  <div class=\"row\">\n    <div class=\"col-sm-12\">\n      <div class=\"form-group leftJustify\">\n        <select value.bind=\"sessionId\" class=\"form-control\" change.delegate=\"changeSession($event)\" id=\"session\">\n          <option value=\"-1\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n\n  <div class=\"row\">\n    <div show.bind=\"sessionSelected\" class=\"col-sm-12\">\n      <div class=\"form-group\">\n        <select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\n          <option value=\"-1\">Choose the Type of The Request</option>\n           <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\n           <option value=\"regularCourse\">Regular Course</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n  <compose show.bind=\"regularClient && sessionSelected\" view='./Courses.html'></compose>\n\n  <!-- Number of students -->\n  <div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected\">\n    <div class=\"col-sm-6\">\n      <div class=\"form-group topMargin\">\n        <div class=\"input-group  col-md-9\">\n          <div >\n            <label for=\"undergraduates\" class=\"leftJustify\">Number of Undergraduates</label>\n            <input readonly.bind=\"existingRequest\" id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\n                   class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\" style=\"width:343px;\"/>\n            <label show.bind=\"requests.selectedRequest.addUndergraduates > 0\">Additional id's requested: ${requests.selectedRequest.addUndergraduates}</label>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-sm-6\">\n      <div class=\"form-group topMargin\">\n        <div class=\"input-group col-md-9\">\n          <div  class=\"form-group\">\n            <label for=\"graduates\" class=\"leftJustify\">Number of Graduates</label>\n            <input readonly.bind=\"existingRequest\" id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\n                   class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\" style=\"width:343px;\"/>\n            <label show.bind=\"requests.selectedRequest.addGraduates > 0\">Additional id's requested: ${requests.selectedRequest.addGraduates}</label>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Begin and End Date -->\n  <div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\n      <div class=\"col-lg-6\">\n        <div class=\"form-group topMargin\">\n           <label class=\"col-sm-2 form-control-label \">Start Date</label>\n           <date-picker value.two-way=\"requests.selectedRequest.startDate\" changedate.delegate=\"changeBeginDate($event)\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\" controlid=\"startDate\"></date-picker>\n        </div>\n      </div>\n      <div class=\"col-lg-6\">\n        <div class=\"form-group topMargin\">\n          <label class=\"col-sm-2 form-control-label \">End Date</label>\n          <date-picker value.two-way=\"requests.selectedRequest.endDate\"  startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\" controlid=\"endDate\"></date-picker>\n        </div>\n      </div>\n    </div>\n\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step2.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\"  >\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content}</div>\n    </div>\n    <span class=\"leftMargin\" id=\"productList\"></span>\n    <div class=\"col-md-12\" >\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Products</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    class=\"list-group-item\">${product.name}</button>\n          </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 col-md-offset-1 topMargin\">\n        <label id=\"requestProductsLabel\">Requested Products</label>\n        <div class=\"well well2 overflow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button  click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                    class=\"list-group-item\">${product.productId | productName:products.productsArray}</button>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step3.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('CLIENT_REQUESTS_COMMENTS').content}</div>\n    </div>\n    <div class=\"form-group col-md-12\">\n      <tiny-mce height.bind=\"150\" value.two-way=\"commentsResponse\"></tiny-mce>\n       <!--\n      <textarea readonly.bind=\"existingRequest\" placeholder=\"Additional Comments\" class=\"col-md-12 topMargin\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n                -->\n    </div>\n  </div>\n</template>"; });
@@ -28078,6 +28131,8 @@ define('text!modules/user/support/components/helpTicketDetails.html', ['module']
 define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"form-group topMargin\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.sessionId\" change.delegate=\"sessionChanged($event)\" id=\"session\" class=\"form-control\">\n          <option value=\"\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n\n      <!-- Type Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.sessionId !== ''\" class=\"form-group\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"typeChanged($event)\"\n                id=\"helpTicketPurpose\" class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of config.HELP_TICKET_TYPES\"\n                  value.bind=\"types.code\">${types.description}</option>\n        </select>\n      </div>\n\n      <div show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message !== undefined\">\n        <div  class=\"well well-sm\" innerhtml.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message\" ></div>\n      </div>\n</template>"; });
 define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div >\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, product)\">\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>Click here to respond</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\" ></tiny-mce>\n            <!-- helpTickets.selectedHelpTicketContent.content.comments -->\n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n            <compose view=\"./${event.type}-time.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
+define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>Click here to respond</span>\n         <span class=\"pull-right\" show.bind=\"showLockMessage\">Help Ticket is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\" ></tiny-mce>\n            <!-- helpTickets.selectedHelpTicketContent.content.comments -->\n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n            <compose view=\"./${event.type}-time.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12 col-sm-12\">\n    <div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <!--   | pageFilter:dataTable.startRecord:dataTable.take -->\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket($event, $index)\">\n                <td data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td data-title=\"Type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>\n                <td data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/admin/customers/components/audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
+define('text!modules/admin/customers/components/Audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

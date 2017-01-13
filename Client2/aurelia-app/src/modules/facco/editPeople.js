@@ -34,8 +34,8 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'),
-            this.is4ua.loadIs4ua(),
+            this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true),
+            this.is4ua.loadIs4ua()
         ]);
 
         this.dataTable.updateArray(this.people.peopleArray);
@@ -69,7 +69,21 @@ export class EditPeople {
         this.personSelected = true;
     }
 
+    buildAudit(){
+        var changes = this.people.isPersonDirty();
+        changes.forEach(item => {
+            this.people.selectedPerson.audit.push({
+                 property: item.property,
+                eventDate: new Date(),
+                oldValue: item.oldValue,
+                newValue: item.newValue,
+                personId: this.userObj._id
+            })
+        });
+    }
+
     async save() {
+        this.buildAudit();
         let serverResponse = await this.people.savePerson();
         if (!serverResponse.error) {
             this.dataTable.updateArray(this.people.peopleArray);

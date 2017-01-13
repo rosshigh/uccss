@@ -30,60 +30,60 @@ module.exports = function (app) {
       });
   });
   
+ 
+  // router.get('/api/clientRequests/person/:id', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   Model.find({personId: req.params.id})
+  //     .sort(req.query.order)
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
-  router.get('/api/clientRequests/person/:id', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    Model.find({personId: req.params.id})
-      .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/clientRequests/person/:id/session/:sessionId', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   Model.find({personId: req.params.id, sessionId: req.params.sessionId})
+  //     .sort(req.query.order)
+  //     .populate('requestDetails')
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
-  router.get('/api/clientRequests/person/:id/session/:sessionId', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    Model.find({personId: req.params.id, sessionId: req.params.sessionId})
-      .sort(req.query.order)
-      .populate('requestDetails')
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/clientRequests/person/:personId/session/:sessionId/course/:courseId', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   Model.find({personId: req.params.personId, sessionId: req.params.sessionId, courseId: req.params.courseId })
+  //     .sort(req.query.order)
+  //     .populate('requestDetails')
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
-  router.get('/api/clientRequests/person/:personId/session/:sessionId/course/:courseId', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    Model.find({personId: req.params.personId, sessionId: req.params.sessionId, courseId: req.params.courseId })
-      .sort(req.query.order)
-      .populate('requestDetails')
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
-
-  router.get('/api/clientRequests/active', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    Model.find({active: true})
-      .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/clientRequests/active', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   Model.find({active: true})
+  //     .sort(req.query.order)
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
     debug('Get clientRequest [%s]', req.params.id);
@@ -270,17 +270,17 @@ module.exports = function (app) {
     })
   });
 
-  router.post('/api/clientRequestDetails', requireAuth, function(req, res, next){
-    debug('Create clientRequestDeails');
-    var clientRequestDetail =  new ClientRequestDetail(req.body);
-    clientRequestDetail.save( function ( err, object ){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+  // router.post('/api/clientRequestDetails', requireAuth, function(req, res, next){
+  //   debug('Create clientRequestDeails');
+  //   var clientRequestDetail =  new ClientRequestDetail(req.body);
+  //   clientRequestDetail.save( function ( err, object ){
+  //     if (err) {
+  //       return next(err);
+  //     } else {
+  //       res.status(200).json(object);
+  //     }
+  //   });
+  // });
 
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     debug('Get clientRequests');
@@ -295,32 +295,32 @@ module.exports = function (app) {
     });
   });
 
-  router.get('/api.clientRequestsDetails/count', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    var query = buildQuery(req.query, ClientRequestDetail.find());
-    query.exec(function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json({count: object.length});
-      }
-    });
-  });
+  // router.get('/api.clientRequestsDetails/count', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   var query = buildQuery(req.query, ClientRequestDetail.find());
+  //   query.exec(function(err, object){
+  //     if (err) {
+  //       return next(err);
+  //     } else {
+  //       res.status(200).json({count: object.length});
+  //     }
+  //   });
+  // });
 
-  router.put('/api/clientRequestsDetails', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
-    var clientRequest = new Model(req.body.requestId);
+  // router.put('/api/clientRequestsDetails', requireAuth, function(req, res, next){
+  //   debug('Get clientRequests');
+  //   var clientRequest = new Model(req.body.requestId);
 
-    Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body, {safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+  //   Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body, {safe:true, multi:false}, function(err, result){
+  //     if (err) {
+  //       return next(err);
+  //     } else {
 
-        res.status(200).json(result);
-      }
-    })
+  //       res.status(200).json(result);
+  //     }
+  //   })
 
-  });
+  // });
 
   //Courses Routes
   router.get('/api/courses', requireAuth, function(req, res, next){

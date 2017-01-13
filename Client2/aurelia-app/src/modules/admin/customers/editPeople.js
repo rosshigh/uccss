@@ -17,9 +17,9 @@ export class EditPeople {
     navControl = "peopleNavButtons";
     spinnerHTML = "";
 
-    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'is4ua' }];
+    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }];
     tabPath = './';
-
+//, { id: 'is4ua' }
     constructor(datatable, config, people, utils, is4ua, dialog, validation) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -38,7 +38,8 @@ export class EditPeople {
         let responses = await Promise.all([
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?order=name'),
-            this.is4ua.loadIs4ua()
+            this.is4ua.loadIs4ua(),
+            this.config.getConfig()
         ]);
 
         this.dataTable.updateArray(this.people.peopleArray);
@@ -62,6 +63,7 @@ export class EditPeople {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectPerson(this.editIndex);
         this.oldEmail = this.people.selectedPerson.email;
+        this.institutionId = this.people.selectedPerson.institutionId;
         this.newPerson = false;
         $("#editFirstName").focus();
 
@@ -80,8 +82,22 @@ export class EditPeople {
         this.personSelected = true;
     }
 
+    buildAudit(){
+        var changes = this.people.isPersonDirty();
+        changes.forEach(item => {
+            this.people.selectedPerson.audit.push({
+                 property: item.property,
+                eventDate: new Date(),
+                oldValue: item.oldValue,
+                newValue: item.newValue,
+                personId: JSON.parse(sessionStorage.getItem('user'))._id
+            })
+        });
+    }
+
     async save() {
         if (this.validation.validate(1)) {
+            this.buildAudit();
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.peopleArray);
@@ -148,6 +164,20 @@ export class EditPeople {
                 this.validation.makeValid($("#register_email"));
             }
         }
+    }
+
+    changeInstitution(){
+         return this.dialog.showMessage(
+                "Are you sure you want to change the institution? This should normally only be done if the account was created in the wrong institution.  If the user has changed institutions, create a new account." ,
+                "Change Institution",
+                ['Yes', 'No']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.people.selectedPerson.institutionId = this.institutionId;
+                } else {
+                    this.institutionId = this.people.selectedPerson.institutionId;
+                }
+            });
     }
 
     async openEditCourseForm() {
@@ -263,7 +293,9 @@ export class EditPeople {
             }}]);
         this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last name is required", "value": "people.selectedPerson.lastName" }]);
         this.validation.addRule(1, "editStatus", [{ "rule": "required", "message": "Status is required", "value": "people.selectedPerson.personStatus" }]);
-        this.validation.addRule(1, "editPhone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }]);
+        this.validation.addRule(1, "editPhone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" },
+        {"rule":"length","message":"Phone number isn't valid", "value": "people.selectedPerson.phone","ruleValue": 10}]);
+          this.validation.addRule(1,"editMobile",[{"rule":"length","message":"Phone number isn't valid", "value": "people.selectedPerson.mobile","ruleValue": 10}]);
         this.validation.addRule(1, "editEmail", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" },
             {"rule": "custom", "message": "An account with that email exists",
                 "valFunction": function (context) {

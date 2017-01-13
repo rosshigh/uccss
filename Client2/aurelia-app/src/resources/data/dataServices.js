@@ -214,6 +214,7 @@ export class DataServices {
     // //Help Tickets
     HELP_TICKET_SERVICES = 'helpTickets';
     HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
+    HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
 
     // //Downloads
     DOWNLOADS_SERVICE = "apps";

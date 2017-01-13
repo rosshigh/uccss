@@ -7,7 +7,8 @@ var express = require('express'),
   Content = mongoose.model('HelpTicketContent'),
   multer = require('multer'),
   mkdirp = require('mkdirp'),
-  passport = require('passport');
+  passport = require('passport'),
+  HelpTicketLock = mongoose.model('HelpTicketLock');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -303,6 +304,64 @@ module.exports = function (app, config) {
           }
         }
       });
+
+    });
+
+  
+  router.get('/api/helpTicketLocks', function(req, res, next){
+      logger.log('Get helpTicket Locks','verbose');
+      HelpTicketLock.find()
+        .sort("-createdAt")
+        .exec()
+        .then(function(locks){
+          res.status(200).json(locks);
+        })
+        .catch(function(err){
+          return next(err);
+			})
+
+    });
+
+    router.get('/api/helpTicketLocks/:id',  function(req, res, next){
+      logger.log('Get helpTicket Locks' + req.params.id,'verbose');
+      HelpTicketLock.find({helpTicketId: req.params.id})
+        .sort("-createdAt")
+        .exec()
+        .then(function(locks){         
+          if(locks.length === 0){
+            res.status(200).json({helpTicketId: 0});
+          } else {
+            res.status(200).json(locks);
+          }
+        })
+        .catch(function(err){
+          return next(err);
+			})
+
+    });
+
+  router.post('/api/helpTicketLocks',  function(req, res, next){
+     logger.log('Create helpTicket Lock','verbose');
+      var helpTicketLock =  new HelpTicketLock(req.body);
+      helpTicketLock.save()
+				.then(function (result) {
+					res.status(201).json(result);
+				})
+				.catch(function (err) {
+					return next(err);
+				});
+    });
+
+    router.delete('/api/helpTicketLocks/:id',  function(req, res, next){
+      logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+			var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
+				.exec()
+				.then(function (result) {
+					res.status(200).json({"message" : "Lock removed"});
+				})
+				.catch(function (err) {
+					return next(err);
+				});
 
     });
 

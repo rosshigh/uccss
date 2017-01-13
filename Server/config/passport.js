@@ -6,7 +6,8 @@ var passport = require('passport'),
     extractJwt = require('passport-jwt').ExtractJwt,
     localStrategy = require('passport-local'),
     NotFoundError = require('./errors/NotFoundError'),
-    UnauthorizedAccessError = require('./errors/UnauthorizedAccessError');
+    UnauthorizedAccessError = require('./errors/UnauthorizedAccessError'),
+    logger = require('./log-authenticate');
 
 var localOptions = {
   usernameField: 'email'
@@ -26,6 +27,7 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
           } else if(!isMatch){
             return next(new UnauthorizedAccessError("401", {message: 'Invalid username or password'}));
           } else {
+            logger.log('User ' + user.email + ' logged on ', 'info');
             return next(null, user);
           }
         });
