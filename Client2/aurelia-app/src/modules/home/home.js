@@ -20,7 +20,7 @@ export class Home {
     async activate() {
         var currentDate = moment(new Date()).format("MM-DD-YYYY");
         var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-        await this.sessions.getSessionsArray(true, '?order=startDate' );
+        await this.sessions.getSessionsArray('?order=startDate', true );
         await this.siteinfo.getInfoArray(true, options);
     }
 

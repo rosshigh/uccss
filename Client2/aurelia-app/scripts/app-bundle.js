@@ -149,7 +149,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             _classCallCheck(this, AppConfig);
 
             this.HOST = location.origin;
-            this.BASE_URL = "http://localhost:5000/api/";
+            this.BASE_URL = this.HOST + "/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -1060,7 +1060,7 @@ define('modules/home/home',['exports', 'aurelia-framework', '../../resources/dat
                                 currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
                                 options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
                                 _context.next = 4;
-                                return this.sessions.getSessionsArray(true, '?order=startDate');
+                                return this.sessions.getSessionsArray('?order=startDate', true);
 
                             case 4:
                                 _context.next = 6;
@@ -2058,115 +2058,6 @@ define('resources/charts/doughnut-chart',['exports', './chart-element'], functio
   var DoughnutChart = exports.DoughnutChart = (_dec = (0, _chartElement.chartElement)('Doughnut'), _dec(_class = function DoughnutChart() {
     _classCallCheck(this, DoughnutChart);
   }) || _class);
-});
-define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.CommonDialogs = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var CommonDialogs = exports.CommonDialogs = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogService), _dec(_class = function () {
-    function CommonDialogs(dialogService) {
-      _classCallCheck(this, CommonDialogs);
-
-      this.dialogService = dialogService;
-    }
-
-    CommonDialogs.prototype.showMessage = function showMessage(message) {
-      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Message';
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
-
-      return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
-    };
-
-    return CommonDialogs;
-  }()) || _class);
-});
-define('resources/dialogs/confirm-dialog',["exports", "aurelia-framework", "aurelia-dialog"], function (exports, _aureliaFramework, _aureliaDialog) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ConfirmDialog = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ConfirmDialog = exports.ConfirmDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-        function ConfirmDialog(controller) {
-            _classCallCheck(this, ConfirmDialog);
-
-            this.message = "";
-
-            this.controller = controller;
-        }
-
-        ConfirmDialog.prototype.activate = function activate(data) {
-            this.message = data.message;
-            this.header = data.header == undefined ? "Confirmation" : data.header;
-        };
-
-        return ConfirmDialog;
-    }()) || _class);
-});
-define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.MessageDialog = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var MessageDialog = exports.MessageDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-    function MessageDialog(dialogController) {
-      _classCallCheck(this, MessageDialog);
-
-      this.dialogController = dialogController;
-    }
-
-    MessageDialog.prototype.activate = function activate(model) {
-      this.model = model;
-    };
-
-    MessageDialog.prototype.selectOption = function selectOption(option) {
-      if (isCancel(option)) {
-        this.dialogController.cancel(option);
-      } else {
-        this.dialogController.ok(option);
-      }
-    };
-
-    return MessageDialog;
-  }()) || _class);
-
-
-  function isCancel(option) {
-    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
-  }
 });
 define('resources/data/auth',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './dataServices', '../utils/utils'], function (exports, _aureliaFramework, _aureliaEventAggregator, _dataServices, _utils) {
 	'use strict';
@@ -8013,6 +7904,115 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
 
         return Systems;
     }()) || _class);
+});
+define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.CommonDialogs = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var CommonDialogs = exports.CommonDialogs = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogService), _dec(_class = function () {
+    function CommonDialogs(dialogService) {
+      _classCallCheck(this, CommonDialogs);
+
+      this.dialogService = dialogService;
+    }
+
+    CommonDialogs.prototype.showMessage = function showMessage(message) {
+      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Message';
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
+
+      return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
+    };
+
+    return CommonDialogs;
+  }()) || _class);
+});
+define('resources/dialogs/confirm-dialog',["exports", "aurelia-framework", "aurelia-dialog"], function (exports, _aureliaFramework, _aureliaDialog) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ConfirmDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ConfirmDialog = exports.ConfirmDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+        function ConfirmDialog(controller) {
+            _classCallCheck(this, ConfirmDialog);
+
+            this.message = "";
+
+            this.controller = controller;
+        }
+
+        ConfirmDialog.prototype.activate = function activate(data) {
+            this.message = data.message;
+            this.header = data.header == undefined ? "Confirmation" : data.header;
+        };
+
+        return ConfirmDialog;
+    }()) || _class);
+});
+define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.MessageDialog = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var MessageDialog = exports.MessageDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+    function MessageDialog(dialogController) {
+      _classCallCheck(this, MessageDialog);
+
+      this.dialogController = dialogController;
+    }
+
+    MessageDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    MessageDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(option);
+      }
+    };
+
+    return MessageDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
 });
 define('resources/elements/add-systems',['exports', '../data/dataServices', 'aurelia-framework'], function (exports, _dataServices, _aureliaFramework) {
   'use strict';
@@ -15826,6 +15826,41 @@ define('modules/admin/system/system',["exports", "aurelia-framework", "aurelia-r
         return System;
     }()) || _class);
 });
+define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.SuccessDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var SuccessDialog = exports.SuccessDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+        function SuccessDialog(controller) {
+            _classCallCheck(this, SuccessDialog);
+
+            this.controller = controller;
+        }
+
+        SuccessDialog.prototype.ok = function ok() {
+            alert("OK");
+        };
+
+        SuccessDialog.prototype.activate = function activate(cmd) {
+            console.log(cmd);
+            this.cmd = cmd;
+        };
+
+        return SuccessDialog;
+    }()) || _class);
+});
 define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _validation, _moment, _jquery) {
     'use strict';
 
@@ -16808,41 +16843,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         };
 
         return Assignments;
-    }()) || _class);
-});
-define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.SuccessDialog = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var SuccessDialog = exports.SuccessDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
-        function SuccessDialog(controller) {
-            _classCallCheck(this, SuccessDialog);
-
-            this.controller = controller;
-        }
-
-        SuccessDialog.prototype.ok = function ok() {
-            alert("OK");
-        };
-
-        SuccessDialog.prototype.activate = function activate(cmd) {
-            console.log(cmd);
-            this.cmd = cmd;
-        };
-
-        return SuccessDialog;
     }()) || _class);
 });
 define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _moment) {
@@ -28047,6 +28047,7 @@ define('text!modules/user/support/tutorials.html', ['module'], function(module) 
 define('text!modules/user/support/usefulInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row\">\n      <div repeat.for=\"category of linkArray\" class=\"col-lg-3\">\n        <h2>${category.category}</h2>\n        <div>\n          <a repeat.for=\"link of category.links\" href=\"${link.url}\" class=\"list-group-item\" target=\"_blank\">\n            <h4 class=\"list-group-item-heading\">${link.title}</h4>\n            <p class=\"list-group-item-text\">${link.content}</p>\n          </a>\n        </div>\n      </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n   \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> \n           \n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> \n           \n        </div> \n      </div> \n    \n</template>"; });
 define('text!modules/admin/customers/components/Address.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"topMargin\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"copyInstAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Copy Instituion Address\"><i class=\"fa fa-files-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control \" placeholder=\"Address 1\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control \" placeholder=\"Address2\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control \" placeholder=\"City\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control \" placeholder=\"Region\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control \" placeholder=\"Postal Code\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control \" placeholder=\"Country\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/customers/components/Audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
 define('text!modules/admin/customers/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                    <th style=\"width:15rem;\">Status</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"editACourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"name\">${course.number} </td>\n                    <td data-title=\"insitution\">${course.name}</td>\n                    <td data-tile=\"phone\">${course.active | translateStatus}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"courseSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <div class=\"checkbox\">\n                            <label class=\"pull-left\">\n                                <input id=\"activeProduct\" checked.bind=\"people.selectedCourse.active\" type=\"checkbox\"> Active\n                            </label>\n                        </div>\n                    </div>\n                </div>\n                \n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/instAddress.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row topMargin\">\n        <!-- Row 5 -->\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 1</label>\n                        <input value.bind=\"people.selectedInstitution.address1\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 1\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 2</label>\n                        <input value.bind=\"people.selectedInstitution.address2\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 2\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>City</label>\n                        <input value.bind=\"people.selectedInstitution.city\" id=\"editCity\" class=\"form-control\" placeholder=\"City\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Region</label>\n                        <input value.bind=\"people.selectedInstitution.region\" id=\"editRegion\" class=\"form-control\" placeholder=\"Region\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Postal Code</label>\n                        <input value.bind=\"people.selectedInstitution.postalCode\" id=\"editPostalCode\" class=\"form-control\" placeholder=\"Postal Code\"\n                            type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Country</label>\n                        <input value.bind=\"people.selectedInstitution.country\" id=\"editCountry\" class=\"form-control\" placeholder=\"Country\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>URL</label>\n                        <input value.bind=\"people.selectedInstitution.url\" id=\"editCountry\" class=\"form-control\" placeholder=\"URL\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Time Zone</label>\n                        <select value.bind=\"people.selectedInstitution.timeZone\" class=\"form-control\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"zone of config.TIMEZONES\" value=\"${zone}\">${zone}</option>\n                    </select>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/instIs4ua.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-6 topMargin\">\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Institution Type *</label>\n                    <select value.bind=\"people.selectedInstitution.institutionType\" id=\"editInstitutionType\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.institutionTypes\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Member Type *</label>\n                    <select value.bind=\"people.selectedInstitution.memberType\" id=\"editMemberType\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.memberTypes\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n     <div class=\"col-lg-6 topMargin\">\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label class=\"left\">Highest Degree *</label>\n                    <select value.bind=\"people.selectedInstitution.highestDegree\" id=\"editHighestDegree\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.highestDegrees\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Department</label>\n                    <input value.bind=\"people.selectedInstitution.universityDept\" id=\"editDepartment\" class=\"form-control\" placeholder=\"Department\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
@@ -28133,6 +28134,4 @@ define('text!modules/user/support/components/Requests.html', ['module'], functio
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>Click here to respond</span>\n         <span class=\"pull-right\" show.bind=\"showLockMessage\">Help Ticket is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\" ></tiny-mce>\n            <!-- helpTickets.selectedHelpTicketContent.content.comments -->\n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n            <compose view=\"./${event.type}-time.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12 col-sm-12\">\n    <div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <!--   | pageFilter:dataTable.startRecord:dataTable.take -->\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket($event, $index)\">\n                <td data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td data-title=\"Type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>\n                <td data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
-define('text!modules/admin/customers/components/audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
-define('text!modules/admin/customers/components/Audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map
