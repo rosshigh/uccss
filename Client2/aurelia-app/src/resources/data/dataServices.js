@@ -123,6 +123,27 @@ export class DataServices {
              });
 	}
 
+    sendMail(content) {
+        this.isRequesting = true;
+			return this.http.createRequest('sendMail')
+			 .asPost()
+			 .withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
+			 .withContent(content)
+			 .send().then(response => {
+				 this.isRequesting = false;
+				if (!response.isSuccess) {
+                     return response;
+                 } else {
+                     return JSON.parse(response.response);
+                 }
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+       
+    }
+
     uploadFiles(files, url){
         this.isRequesting = true;
 		let formData = new FormData();
@@ -228,6 +249,7 @@ export class DataServices {
     PERSON_COURSES_SERVICE = 'courses/person/PERSONID';
     CLIENT_REQUESTS_SERVICES = 'clientRequests';
     CLIENT_REQUEST_DETAILS='clientRequestsDetails';
+    CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
 
     CONFIG_SERVICE = 'config';
     SESSIONS_CONFIG_SERVICE = 'semesterConfig';

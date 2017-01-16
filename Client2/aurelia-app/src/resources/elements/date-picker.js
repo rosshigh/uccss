@@ -11,6 +11,7 @@ export class DatePicker {
   @bindable controlid;
   @bindable format = "MM/DD/YYYY";
   @bindable changedate;
+  @bindable disabled = false;
 
     constructor(element) {
         this.element = element;
@@ -51,8 +52,8 @@ export class DatePicker {
       });
 
       if(this.value) this.datePicker.data("DateTimePicker").date(moment(this.value).format(self.format));
-  		if(this.startDate) this.datePicker.data("DateTimePicker").minDate(moment(this.startdate).format(self.format));
-  		if(this.endDate) this.datePicker.data("DateTimePicker").maxDate(moment(this.enddate).format(self.format));
+  		if(this.startdate) this.datePicker.data("DateTimePicker").minDate(moment(this.startdate).format(self.format));
+  		if(this.enddate) this.datePicker.data("DateTimePicker").maxDate(moment(this.enddate).format(self.format));
 
     }
 }

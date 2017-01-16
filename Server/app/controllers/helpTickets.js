@@ -366,4 +366,14 @@ module.exports = function (app, config) {
 
     });
 
+    router.post('/api/sendMail', function(req,res,next){
+      var mailObj = {
+                email: 'hightowe@uwm.edu',
+                subject: 'Help Ticket Created',
+                template: 'help-ticket-created',
+                context: {helpTicketNo: 5}
+              }
+              sendMail(mailObj);
+    })
+
 };

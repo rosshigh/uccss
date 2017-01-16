@@ -8,7 +8,9 @@ var express = require('express'),
   Course = mongoose.model('Course'),
   Person = mongoose.model('Person'),
   passport = require('passport'),
-  Promise = require('bluebird');
+  Promise = require('bluebird'),
+  ClientRequestLock = mongoose.model('ClientRequestLock'),
+  logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -405,4 +407,61 @@ module.exports = function (app) {
       }
     })
   });
+
+   router.get('/api/clientRequestLocks', function(req, res, next){
+      logger.log('Get clientRequest Locks','verbose');
+      ClientRequestLock.find()
+        .sort("-createdAt")
+        .exec()
+        .then(function(locks){
+          res.status(200).json(locks);
+        })
+        .catch(function(err){
+          return next(err);
+			})
+
+    });
+
+    router.get('/api/clientRequestLocks/:id',  function(req, res, next){
+      logger.log('Get clientRequest Locks' + req.params.id,'verbose');
+      ClientRequestLock.find({requestId: req.params.id})
+        .sort("-createdAt")
+        .exec()
+        .then(function(locks){         
+          if(locks.length === 0){
+            res.status(200).json({requestId: 0});
+          } else {
+            res.status(200).json(locks);
+          }
+        })
+        .catch(function(err){
+          return next(err);
+			})
+
+    });
+
+  router.post('/api/clientRequestLocks',  function(req, res, next){
+     logger.log('Create clientRequest Lock','verbose');
+      var clientRequestLock =  new ClientRequestLock(req.body);
+      clientRequestLock.save()
+				.then(function (result) {
+					res.status(201).json(result);
+				})
+				.catch(function (err) {
+					return next(err);
+				});
+    });
+
+    router.delete('/api/clientRequestLocks/:id',  function(req, res, next){
+      logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+			var query = ClientRequestLock.remove({ requestId: req.params.id })
+				.exec()
+				.then(function (result) {
+					res.status(200).json({"message" : "Lock removed"});
+				})
+				.catch(function (err) {
+					return next(err);
+				});
+
+    });
 };

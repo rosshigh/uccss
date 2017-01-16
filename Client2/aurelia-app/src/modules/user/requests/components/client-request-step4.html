@@ -29,8 +29,12 @@
           <td>${request.productId | productName:products.productsArray}</td>
           <td>
             <div class="form-group  col-md-8">
+          
+              <date-picker disabled.bind="showLockMessage || request._id" value.two-way="request.requiredDate"  startdate.bind="minRequiredDate" enddate.bind="maxRequiredDate" controlid="requiredDate-${$index}"></date-picker>
+<!--
               <input readonly.bind="request._id" type="date" min.bind="minRequiredDate" max.bind="maxRequiredDate" value.bind="request.requiredDate | datePickerDate"
                      class="form-control requiredDates" id="requiredDate-${$index}">
+   -->
             </div>
           </td>
         </tr>

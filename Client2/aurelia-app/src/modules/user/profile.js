@@ -49,23 +49,37 @@ export class Profile {
         this.user = this.people.selectedPerson;
     }
 
-  async save() {
-    if(this.validation.validate(1,this)) {
-        if(this.people.selectedPerson.roles.indexOf("PROV") > -1){
-             this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
-        }
-        let response = await this.people.savePerson()
-        if(!response.error){
-            this.utils.showNotification("Your profile has been updated");
-            this.router.navigate("user");
-        } else {
-            this.utils.showNotification("An error occurred updating your profile");
-        }
+    buildAudit(){
+        var changes = this.people.isPersonDirty();
+        changes.forEach(item => {
+            this.people.selectedPerson.audit.push({
+                 property: item.property,
+                eventDate: new Date(),
+                oldValue: item.oldValue,
+                newValue: item.newValue,
+                personId: JSON.parse(sessionStorage.getItem('user'))._id
+            })
+        });
     }
-  };
 
-  cancel(){
-      this.utils.copyObject(this.users, this.people.selectedPerson);
-  }
+    async save() {
+        if(this.validation.validate(1,this)) {
+            if(this.people.selectedPerson.roles.indexOf("PROV") > -1){
+                this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+            }
+            this.buildAudit();
+            let response = await this.people.savePerson()
+            if(!response.error){
+                this.utils.showNotification("Your profile has been updated");
+                this.router.navigate("user");
+            } else {
+                this.utils.showNotification("An error occurred updating your profile");
+            }
+        }
+    };
+
+    cancel(){
+        this.utils.copyObject(this.users, this.people.selectedPerson);
+    }
 
 }

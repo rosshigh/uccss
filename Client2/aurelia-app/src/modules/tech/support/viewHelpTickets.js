@@ -83,6 +83,10 @@ export class ViewHelpTickets {
     this. _unLock();
   }
 
+  sendMailNow(){
+    this.helpTickets.sendMail();
+  }
+
   showComment(helpTicket, el){
     this.commentShown = helpTicket.content[0].content.comments;
     $(".hover").css("top",el.clientY - 100);

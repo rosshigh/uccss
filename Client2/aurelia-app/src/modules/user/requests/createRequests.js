@@ -21,6 +21,7 @@ export class ViewHelpTickets {
   courseSelected = false;
   editCourse = false;
   editCourseFlag = false;
+  showLockMessage = false;
   spinnerHTML="";
   courseId = -1;
   requestType = -1;
@@ -54,9 +55,10 @@ export class ViewHelpTickets {
   }
 
   async activate() {
-      let responses =  await Promise.all([
+    let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
       this.products.getProductsArray('?order=name'),
+      this.people.getPeopleArray(),
       this.siteInfo.getMessageArray(true, '?filter=category|eq|CLIENT_REQUESTS'),
       this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' ),
       this.config.getConfig()
@@ -69,11 +71,13 @@ export class ViewHelpTickets {
 
   async getRequests(){
     if( this.sessionId != -1 &&  this.courseId != -1  ){
+        this._unLock();
         this.existingRequest = false;
         await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
+            await this._lock();
             this.commentsResponse = this.requests.selectedRequest.comments || "";
             this.existingRequest = true;
             this.updateMessages(false);
@@ -112,7 +116,8 @@ export class ViewHelpTickets {
     })
   }
 
-  detach(){
+  detached(){
+    this. _unLock();
     this.updateMessages(true);
   }
 
@@ -238,7 +243,7 @@ export class ViewHelpTickets {
   }
 
   selectProduct(el){
-    if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT){
+    if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage){
       $("#requestProductsLabel").html("Requested Products");
       var newObj = this.requests.emptyRequestDetail();
       newObj.productId = el.target.id;
@@ -256,56 +261,85 @@ export class ViewHelpTickets {
   }
 
   removeProduct(el){
-    for(var i = 0; i<this.requests.selectedRequest.requestDetails.length; i++){
-      if(el.target.id === this.requests.selectedRequest.requestDetails[i].productId){
-        if(this.requests.selectedRequest.requestDetails[i]._id){
-          if(this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE){
-            return this.dialog.showMessage(
-              "That request has already been assigned and cannot be deleted?",
-              "Cannot Delete Request",
-              ['Ok']
-              ).then(response => {
-              });
+    if(!this.showLockMessage){
+      for(var i = 0; i<this.requests.selectedRequest.requestDetails.length; i++){
+        if(el.target.id === this.requests.selectedRequest.requestDetails[i].productId){
+          if(this.requests.selectedRequest.requestDetails[i]._id){
+            if(this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE){
+              return this.dialog.showMessage(
+                "That request has already been assigned and cannot be deleted?",
+                "Cannot Delete Request",
+                ['Ok']
+                ).then(response => {
+                });
 
-          } else {
-            return this.dialog.showMessage(
-              "Are you sure you want to delete that request?",
-              "Delete Request",
-              ['Yes','No']
-              ).then(response => {
-                 if (!response.wasCancelled) {
-                     this.requests.selectedRequest.requestDetails.splice(i,1);
-                }
-              });
-          }
-          break;
-        } else {
-          this.requests.selectedRequest.requestDetails.splice(i,1);
-          for(var j=0; j<this.productInfo.length; j++){
-            if(el.target.id == this.productInfo[j].productId) {
-              this.productInfo.splice(j,1);
-              break;
+            } else {
+              return this.dialog.showMessage(
+                "Are you sure you want to delete that request?",
+                "Delete Request",
+                ['Yes','No']
+                ).then(response => {
+                  if (!response.wasCancelled) {
+                      this.requests.selectedRequest.requestDetails.splice(i,1);
+                  }
+                });
             }
+            break;
+          } else {
+            this.requests.selectedRequest.requestDetails.splice(i,1);
+            for(var j=0; j<this.productInfo.length; j++){
+              if(el.target.id == this.productInfo[j].productId) {
+                this.productInfo.splice(j,1);
+                break;
+              }
+            }
+            break;
           }
-          break;
         }
       }
     }
   }
 
   _setUpValidation(){
-    this.validation.addRule(1,"session",{"rule":"custom","message":"Select a session",
+    this.validation.addRule(1,"session",[
+      {"rule":"custom","message":"Select a session",
       "valFunction":function(context){
         return !(context.sessionId == -1);
-      }});
+      }},
+    //   {"rule":"custom","message":"Select a request type",
+    //   "valFunction":function(context){
+    //     return !(context.requestType == -1);
+    //   }},
+    //   {"rule":"custom","message":"Select a course",
+    //   "valFunction":function(context){
+    //     if(context.requestType === "sandboxCourse"){
+    //       return true
+    //     } else {
+    //       return !(context.courseId == -1);
+    //     }
+    //   }
+    // },
+    // {"rule":"custom","message":"Enter the number of students",
+    //   "valFunction":function(context){
+    //     if(context.requestType === "sandboxCourse"){
+    //       return true;
+    //     // } else if(($("#undergraduates").val() === "" || $("#undergraduates").val() == 0) && ($("#graduates").val() === "" || $("#graduates").val() == 0)){
+    //     } else if(context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0){
+    //       return false;
+    //     } else {
+    //       return true;
+    //     }
+    //   }
+    // }
+      
+      ]);
 
-     this.validation.addRule(1,"requestType",{"rule":"custom","message":"Select a request type",
+     this.validation.addRule(1,"requestType",[{"rule":"custom","message":"Select a request type",
       "valFunction":function(context){
         return !(context.requestType == -1);
-      }
-    });
+      }}]);
 
-    this.validation.addRule(1,"course",{"rule":"custom","message":"Select a course",
+    this.validation.addRule(1,"course",[{"rule":"custom","message":"Select a course",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
           return true
@@ -313,8 +347,8 @@ export class ViewHelpTickets {
           return !(context.courseId == -1);
         }
       }
-    });
-    this.validation.addRule(1,"numStudents",{"rule":"custom","message":"Enter the number of students",
+    }]);
+    this.validation.addRule(1,"undergraduates",[{"rule":"custom","message":"Enter the number of students",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
           return true;
@@ -325,8 +359,8 @@ export class ViewHelpTickets {
           return true;
         }
       }
-    });
-    this.validation.addRule(2,"productList",{"rule":"custom","message":"Select at least one product",
+    }]);
+    this.validation.addRule(2,"productList",[{"rule":"custom","message":"Select at least one product",
       "valFunction":function(context){
         if(context.requests.selectedRequest.requestDetails.length === 0){
           return false;
@@ -334,20 +368,27 @@ export class ViewHelpTickets {
           return true;
         }
       }
-    });
-    this.validation.addRule(4,"productListTable",{"rule":"custom","message":"Enter all required dates",
+    }
+    ]);
+    this.validation.addRule(4,"productListTable",[{"rule":"custom","message":"Enter all required dates",
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-          var foo = '#requiredDate-' + i;
-          if($(foo).val() === ""){
+          if(context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
             return false;
           }
+          // var foo = '#requiredDate-' + i;
+          // if($(foo).val() === ""){
+          //   return false;
+          // }
         }
         return true;
       }
-    });
-    this.validation.addRule(5,"number",{"rule":"required","message":"Enter the course number", "value": "people.selectedCourse.number"});
-    this.validation.addRule(5,"name",{"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"});
+    }]);
+    this.validation.addRule(5,"number",[
+      {"rule":"required","message":"Enter the course number", "value": "people.selectedCourse.number"},
+      {"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"}
+    ]);
+    // this.validation.addRule(5,"name",{"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"});
   }
 
   _buildRequest(){
@@ -440,6 +481,33 @@ export class ViewHelpTickets {
 
   cancelEditCourse(){
       this.editCourse = false;
+  }
+
+  async _lock(){
+    var response = await this.requests.getRequestLock(this.requests.selectedRequest._id);
+    if(!response.error){
+      if(response.requestId === 0){
+            //Lock help ticket
+          this.requests.lockRequest({
+            requestId: this.requests.selectedRequest._id,
+            personId: this.userObj._id
+          });
+          this.showLockMessage = false;
+          this.lockObject = {}; 
+      } else {
+          this.lockObject = response[0];
+          this.showLockMessage = true;  
+      }
+    }
+  }
+
+   _unLock(){
+    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+      if(this.requests.selectedRequest._id){
+        this.showLockMessage = false;
+        this.requests.removeRequestLock(this.requests.selectedRequest._id);
+      }    
+    }
   }
 
 }

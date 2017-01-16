@@ -15,41 +15,39 @@
 							rows="10"></textarea>
 						<h5>Enter your response in the comments box below and click save</h5>
 					</div>
-					<div class="form-group" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
-
+					<div class="leftJustify" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
 						<div class="row">
-							<div class="col-lg-4">
-								<div class="form-group">
-									<label for="editAddUnder" class="control-label">Undergraduates</label>
-									<input value.bind="requests.selectedRequest.undergradIds" id="editAddUnder" class="form-control input-sm" placeholder="Undergraduates"
-										type="number" />
+							<div class="col-lg-6">
+								<div class="form-group topMargin">
+									<label class="col-sm-2 form-control-label ">Undergraduates</label>
+									<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.undergradIds" id="editAddUnder" class="form-control input-sm"
+										placeholder="Undergraduates" type="number" />
 								</div>
 							</div>
 
-							<div class="col-lg-4 col-lg-offset-2">
-								<div class="form-group">
-									<label for="editAddGrad" class="control-label">Graduates</label>
-									<input value.bind="requests.selectedRequest.graduateIds" type="number" id="editAddGrad" class="form-control input-sm" placeholder="Graduates"
-									/>
+							<div class="col-lg-6">
+								<div class="form-group topMargin">
+									<label for="editAddGrad" class="col-sm-2 form-control-label ">Graduates</label>
+									<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.graduateIds" type="number" id="editAddGrad" class="form-control input-sm"
+										placeholder="Graduates" />
 								</div>
 							</div>
 						</div>
-
-
 					</div>
 					<div class="leftJustify">
 						<div class="row">
 							<div class="col-lg-6">
 								<div class="form-group topMargin">
 									<label class="col-sm-2 form-control-label ">Start Date</label>
-									<date-picker value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate"
-										enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+									<date-picker id="editStartDate" disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)"
+										startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
 								</div>
 							</div>
 							<div class="col-lg-6">
 								<div class="form-group topMargin">
 									<label class="col-sm-2 form-control-label ">End Date</label>
-									<date-picker value.two-way="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
+									<date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate" startdate.bind="minEndDate"
+										enddate.bind="maxEndDate" controlid="endDate"></date-picker>
 								</div>
 							</div>
 							<!--

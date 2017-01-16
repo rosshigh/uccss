@@ -235,4 +235,8 @@ export class HelpTickets {
         var response = this.data.deleteObject(this.data.HELP_TICKET_LOCK_SERVICES + "/" + id);
     }
 
+    sendMail(){
+        this.data.sendMail({message: "send an email"});
+    }
+
 }

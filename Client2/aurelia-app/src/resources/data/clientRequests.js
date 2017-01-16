@@ -299,4 +299,23 @@ console.log(options)
 //       }
 //       return this.requestsArray;
 //    }
+
+    lockRequest(obj){
+        if(obj.requestId) {
+            var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");
+        }
+    }
+
+    async getRequestLock(id){
+        var response = await this.data.get(this.data.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+        if (!response.error) {
+                return response;
+        } else {
+                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+        }
+    }
+
+    removeRequestLock(id){
+        var response = this.data.deleteObject(this.data.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+    }
 }

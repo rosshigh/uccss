@@ -3,10 +3,10 @@
     <div class="col-md-12"  >
       <div  class="well well-sm col-md-10 col-sm-offset-1">${siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content}</div>
     </div>
-    <span class="leftMargin" id="productList"></span>
+    
     <div class="col-md-12" >
       <div class="col-md-5 topMargin">
-        <label>Available Products</label>
+        <label id="productList">Available Products</label>
         <div class="well well2 overFlow" style="height:400px;">
           <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products"/>
           <ul class="list-group">

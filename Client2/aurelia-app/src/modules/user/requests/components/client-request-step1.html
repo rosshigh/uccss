@@ -31,24 +31,22 @@
   <div class="row"  id="numStudents" show.bind="courseSelected">
     <div class="col-sm-6">
       <div class="form-group topMargin">
-        <div class="input-group  col-md-9">
+        <div class="input-group">
           <div >
             <label for="undergraduates" class="leftJustify">Number of Undergraduates</label>
             <input readonly.bind="existingRequest" id="undergraduates"  type="number" placeholder="Number of Undergraduates"
-                   class="form-control" value.bind="requests.selectedRequest.undergradIds" style="width:343px;"/>
-            <label show.bind="requests.selectedRequest.addUndergraduates > 0">Additional id's requested: ${requests.selectedRequest.addUndergraduates}</label>
+                   class="form-control" value.bind="requests.selectedRequest.undergradIds"/>
           </div>
         </div>
       </div>
     </div>
     <div class="col-sm-6">
       <div class="form-group topMargin">
-        <div class="input-group col-md-9">
+        <div class="input-group">
           <div  class="form-group">
             <label for="graduates" class="leftJustify">Number of Graduates</label>
             <input readonly.bind="existingRequest" id="graduates" type="number" placeholder="Number of Graduates"
-                   class="form-control" value.bind="requests.selectedRequest.graduateIds" style="width:343px;"/>
-            <label show.bind="requests.selectedRequest.addGraduates > 0">Additional id's requested: ${requests.selectedRequest.addGraduates}</label>
+                   class="form-control" value.bind="requests.selectedRequest.graduateIds"/>
           </div>
         </div>
       </div>
@@ -60,13 +58,13 @@
       <div class="col-lg-6">
         <div class="form-group topMargin">
            <label class="col-sm-2 form-control-label ">Start Date</label>
-           <date-picker value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+           <date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
         </div>
       </div>
       <div class="col-lg-6">
         <div class="form-group topMargin">
           <label class="col-sm-2 form-control-label ">End Date</label>
-          <date-picker value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
+          <date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
         </div>
       </div>
     </div>

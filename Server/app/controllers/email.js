@@ -18,6 +18,8 @@ transporter.use('compile', options);
 module.exports = function (app) {
 
   sendMail = function(mailObject){
+    console.log(config.smtp)
+
     var mail = {
       from: config.emailAddress,
       to: mailObject.email,
@@ -31,6 +33,7 @@ module.exports = function (app) {
               console.log('Error: ' + err);
           }
           else {
+            res.status(200).json(info);
               console.log('Response: ' + info);
           }
       });

@@ -17,6 +17,8 @@ import $ from 'jquery';
 @inject(Router, AppConfig, Validation, People, DataTable, Utils, Sessions, Systems, Products, ClientRequests)
 export class ViewRequests {
   requestSelected = false;
+  showLockMessage = false;
+  showRequests = false;
 
   navControl = "requestsNavButtons";
   spinnerHTML = "";
@@ -45,7 +47,8 @@ export class ViewRequests {
     $("#infoBox").fadeOut();
     $("#existingRequestInfo").fadeOut();
     let responses =  await Promise.all([
-      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate' ),
+      this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate',true ),
+      this.people.getPeopleArray(),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
       this.products.getProductsArray('?filter=active|eq|true&order=Category'),
       this.systems.getSystemsArray(),
@@ -54,18 +57,33 @@ export class ViewRequests {
     // this._setUpValidation();
   }
 
+  detached(){
+    this. _unLock();
+  }
+
   async getRequests() {
     if (this.selectedSession && this.selectedCourse) {
+      this._unLock();
       await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse, true);
-      if (this.requests.requestsArray.length) this.requests.selectRequest(0);
-      this.updateArray();
-
-      this.sessions.selectSessionById(this.selectedSession);
-      this.setDates();
-      
-      this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
-      this.dataTable.createPageButtons(1);
-      this.selectedDetailIndex = 0;
+      if (this.requests.requestsArray.length) {
+        //Select the first request by default
+        this.requests.selectRequest(0);
+         await this._lock();
+        //Update the display array
+        this.updateArray();
+        //Select the displayed session
+        this.sessions.selectSessionById(this.selectedSession);
+        //Set the date limits in the date controls
+        this.setDates();
+        //Save the request so we can check if it's dirty later'
+        this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
+        // this.dataTable.createPageButtons(1);
+        this.selectedDetailIndex = 0;
+        this.showRequests = true;
+      } else {
+        this.showRequests = false;
+      }
+     
     } else {
       this.displayArray = new Array();
     }
@@ -91,7 +109,7 @@ export class ViewRequests {
     this.maxEndDate = this.sessions.selectedSession.endDate;
   }
 
-  edit(product, el, index) { 
+  async edit(product, el, index) { 
     this.selectedDetailIndex = index;
     this.requests.setSelectedRequestDetail(product);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
@@ -110,16 +128,18 @@ export class ViewRequests {
   }
 
   async save() {
-    this.requests.selectedRequest.comments = this.commentsResponse;
-    if (this.validation.validate(1)) {
-      if(this._buildRequest()){
-        let serverResponse = await this.requests.saveRequest();
-        if (!serverResponse.status) {
-          this.utils.showNotification("The request was updated");
-          this._cleanUp();
+    if(!showLockMessage){
+      this.requests.selectedRequest.comments = this.commentsResponse;
+      if (this.validation.validate(1)) {
+        if(this._buildRequest()){
+          let serverResponse = await this.requests.saveRequest();
+          if (!serverResponse.status) {
+            this.utils.showNotification("The request was updated");
+            this._cleanUp();
+          }
         }
+      this._cleanUp();
       }
-    this._cleanUp();
     }
   }
 
@@ -166,6 +186,33 @@ export class ViewRequests {
   changeBeginDate(evt){
     this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
     this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+  }
+
+  async _lock(){
+    var response = await this.requests.getRequestLock(this.requests.selectedRequest._id);
+    if(!response.error){
+      if(response.requestId === 0){
+            //Lock help ticket
+          this.requests.lockRequest({
+            requestId: this.requests.selectedRequest._id,
+            personId: this.userObj._id
+          });
+          this.showLockMessage = false;
+          this.lockObject = {}; 
+      } else {
+          this.lockObject = response[0];
+          this.showLockMessage = true;  
+      }
+    }
+  }
+
+   _unLock(){
+    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+      if(this.requests.selectedRequest){
+         this.showLockMessage = false;
+        this.requests.removeRequestLock(this.requests.selectedRequest._id);
+      }    
+    }
   }
 
   // changeBeginDate(){

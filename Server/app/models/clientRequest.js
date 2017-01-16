@@ -3,6 +3,14 @@ var Mongoose = require('mongoose'),
   Product = require('./products').Product,
   AutoIncrement = require('mongoose-sequence');
 
+var clientRequestLockSchema = new Schema({
+  requestId: { type: Schema.Types.ObjectId },
+  personId: { type: Schema.Types.ObjectId },
+  createdAt: { type: Date, expires: '1800s', default: Date.now }
+});
+
+module.exports = Mongoose.model('ClientRequestLock', clientRequestLockSchema);
+
 var CourseSchema = new Schema({
   name: { type: String, required: true },
   personId: { type: Schema.Types.ObjectId, required: true },
