@@ -3,11 +3,16 @@ var nodemailer = require('nodemailer'),
     hbs = require('nodemailer-express-handlebars'),
     handlebars = require('express-handlebars'),
     passport = require('passport'),
-    path = require('path');
+    path = require('path'),
+    logger = require('../../config/logger');
 
-  var requireAuth = passport.authenticate('jwt', { session: false });    
+  var requireAuth = passport.authenticate('jwt', { session: false });   
 
-var transporter = nodemailer.createTransport(config.smtp);
+var smtpConfig = {
+  host: config.smtp
+}   
+
+var transporter = nodemailer.createTransport(smtpConfig);
 var viewEngine = handlebars.create({});
 var options = hbs({
   viewEngine: viewEngine,
@@ -18,26 +23,35 @@ transporter.use('compile', options);
 module.exports = function (app) {
 
   sendMail = function(mailObject){
-    console.log(config.smtp)
+    switch(mailObject.type){
+      case 'help-ticket-created':
+        helpTicketCreated(mailObject);
+        break;
+    }
 
+  }
+
+};
+
+ helpTicketCreated = function(mailObject){
     var mail = {
       from: config.emailAddress,
       to: mailObject.email,
       subject: mailObject.subject,
-      template: mailObject.template,
+      template: 'help-ticket-created',
       context: mailObject.context
     };
 
     transporter.sendMail(mail, function (err, info) {
           if (err) {
-              console.log('Error: ' + err);
-          }
-          else {
-            res.status(200).json(info);
-              console.log('Response: ' + info);
+            logger.log('Error: ' + err, 'error');
+            var response = {Response: err};
+            return response;
+          } else {
+            var response = {Response: info};
+            return response;
           }
       });
-  }
 
-};
+ }
 

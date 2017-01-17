@@ -108,7 +108,7 @@ module.exports = function (app, config) {
               var mailObj = {
                 email: person.email,
                 subject: 'Help Ticket Created',
-                template: 'help-ticket-created',
+                type: 'help-ticket-created',
                 context: object
               }
               sendMail(mailObj);
