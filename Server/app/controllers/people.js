@@ -6,6 +6,7 @@ var express = require('express'),
     logger = require('../../config/logger'),
     passportService = require('../../config/passport'),
     passport = require('passport'),
+    Promise = require('bluebird'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
 
     var requireAuth = passport.authenticate('jwt', { session: false }),
@@ -114,9 +115,16 @@ module.exports = function (app) {
                 subject: 'Account Created',
                 type: 'welcome',
                 context: object
-              }          
-            sendMail(mailObj);
-            res.status(200).json(object);
+              }     
+              welcome(mailObj)
+                .then(result => {
+                    res.status(200).json(object);
+                })
+                .catch(error => {
+                    return next(error);
+                });     
+            // sendMail(mailObj);
+            // res.status(200).json(object);
           }
         });
       }
@@ -160,6 +168,36 @@ module.exports = function (app) {
       } else {
         res.status(200).json({msg: "Person Deleted"});
       }
+    })
+  });
+
+  router.put('/api/people/sendMail', requireAuth, function(req, res, next){
+    logger.log("Sending email to " + req.body.id, "verbose");
+    Model.findById(req.body.id).exec()
+    .then(person => {
+        var obj = {
+          email: req.body.email,
+          type: 'generic',
+          subject: req.body.subject,
+          context: {
+            name: person.fullName,
+            message: req.body.message
+          }
+        };
+  
+        genericEmail(obj)
+          .then(result => {
+              person.audit.push(req.body.audit);
+              person.save();
+              res.status(200).json({message: "Email Sent"});
+          })
+          .catch(error => {
+              return next(error);
+          });
+        
+    })
+    .catch(error => {
+       return next(error);
     })
   });
 

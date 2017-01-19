@@ -181,6 +181,13 @@ export class People {
         }
     }
 
+    async sendCustomerMessage(message){
+        if(message.email){
+            var serverResponse = await this.data.saveObject(message, this.data.SEND_MAIL, "put");
+            return serverResponse;
+        }
+    }
+
 
     //Institutions
 	async getInstitutionsArray(options, refresh) {
@@ -318,29 +325,6 @@ export class People {
             return this.coursesArray;
         }
     }
-
-    // async getMyCourses(refresh, options){
-    //     if (!this.coursesArray || refresh) {
-    //         if(this.selectedPerson._id){
-    //             var url = this.data.COURSES_SERVICE;
-    //             url += options ? options : "";
-    //             try {
-    //                 let serverResponse = await this.data.get(url);
-    //                 if (!serverResponse.error) {
-    //                     this.coursesArray = serverResponse;
-    //                 } else {
-    //                     return undefined;
-    //                 }
-    //             } catch (error) {
-    //                 console.log(error);
-    //                 return undefined;
-    //             }
-    //         } else {
-    //             this.coursesArray = new Array();
-    //         }
-    //         return this.coursesArray;
-    //     }
-    // }
 
      selectCourse(index) {
         if (index === undefined) {

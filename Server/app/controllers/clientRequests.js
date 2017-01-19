@@ -134,6 +134,27 @@ module.exports = function (app) {
           if(err) {
             return next(err);
           } else {
+            if(req.query.email == 1){
+              var id = results._id;
+              var query = Model.findOne({_id: id}).populate('requestDetails').exec(function(err, result){
+                if(err){
+                  return next(err);
+                } else {
+                    Person.findById(result.personId, function(err, person){
+                    if(err){
+                      return next(err);
+                    } else {             
+                      var mailObj = {
+                        email: person.email,
+                        type: 'client-request-updated',
+                        context: result
+                      }
+                      sendMail(mailObj);
+                    }
+                  })
+                }
+              })     
+            }
             res.status(200).json(result);
           }
         });
@@ -154,9 +175,8 @@ module.exports = function (app) {
             return next(err);
           } else {
             var obj = {
-              subject: 'Customer action required',
               email: req.body.toEmail,
-              template: 'client-request-customer-action',
+              type: 'client-request-customer-action',
               context: {
                 requestNo: request.requestNo,
                 product: req.body.product,

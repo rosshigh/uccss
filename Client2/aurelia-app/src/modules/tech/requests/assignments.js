@@ -810,7 +810,7 @@ export class Assignments {
                     property: 'Send Message',
                     eventDate: new Date(),
                     oldValue: this.customerMessageText,
-                    personId: this.app.user._id
+                    personId: this.userObj._id
                 }
             };     
             let serverResponse = await this.requests.sendCustomerMessage(this.message);

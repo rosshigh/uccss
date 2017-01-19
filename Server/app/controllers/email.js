@@ -1,5 +1,6 @@
 var config = require('../../config/config'),
     mongoose = require('mongoose'),
+    Promise = require('bluebird'),
     Person = mongoose.model('Person'),
     Institution = mongoose.model('Institution'),
     logger = require('../../config/logger'),
@@ -31,13 +32,15 @@ module.exports = function (app) {
         case 'client-request-updated':       
           requestUpdated(mailObject);
           break;
-        case 'generic-email':       
+        case 'generic':       
           genericEmail(mailObject);
           break;
         case 'annual-update-contact-info':
           annualUpdateContactInfo(mailObject);
           break;
-
+        case 'client-request-customer-action':        
+          customerAction(mailObject);
+          break;
       }
     }
 
@@ -53,10 +56,14 @@ if(env === 'development'){
   var HelpTicketCreateTemplate = fs.readFileSync(viewPath + "/help-ticket-created.handlebars", 'utf-8');
   var WelcomeTemplate = fs.readFileSync(viewPath + "/welcome.handlebars", 'utf-8');
   var FacoCoWelcomeTemplate = fs.readFileSync(viewPath + "/facco-welcome.handlebars", 'utf-8');
+  var CustomerActionTemplate = fs.readFileSync(viewPath + "/client-request-customer-action.handlebars", "utf-8");
+  var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
   var FacoCoWelcomeTemplateCompiled = hbs.compile(FacoCoWelcomeTemplate);
+  var CustomerActionTemplateCompiled = hbs.compile(CustomerActionTemplate);
+  var GenericTemplateCompiled = hbs.compile(GenericTemplate);
 
   sendGrid = function(mailObject){
     var helper = require('sendgrid').mail;
@@ -70,72 +77,89 @@ if(env === 'development'){
       path: '/v3/mail/send',
       body: mail.toJSON(),
     });
-    
-    sg.API(request, function(error, response) {
-      if(error){
-        logger.log(error,'error');
-      } else {
-        logger.log(response);
-      }
+
+    return new Promise(function(resolve, reject) {
+        sg.API(request)
+          .then(response => {
+              logger.log(response, "verbose");
+              resolve(response);
+          })
+          .catch(error => {
+              logger.log(error, "verbose");
+              reject(Error(result));
+          });
     });
   }
 
   welcome = function(mailObject){
-    var fullName = ""; 
-    var facultyCoordinator = "";
-    var institution = "";
-    var facultyCoordinatorEmail = "";
-    var helper = require('sendgrid').mail;
+    logger.log("Welcome email", "verbose");    
+    return new Promise(function(resolve, reject) {
+      var fullName = ""; 
+      var facultyCoordinator = "";
+      var institution = "";
+      var facultyCoordinatorEmail = "";
+      var helper = require('sendgrid').mail;
 
-    var queryP = Person.findById(mailObject.personId).exec()
-    .then((person) => {         
-      fullName = person ? person.fullName : "";        
-      Person
-        .find({ institutionId: person.institutionId, roles: {$in: ['PRIM']}  }).exec()
-        .then((people) => {    
-           if(people.length > 0){
-             facultyCoordinator = people[0].fullName;
-             facultyCoordinatorEmail = people[0].email;
-           }   
-           Institution.findById(person.institutionId).exec()
-              .then((institution) => {       
-                institution = institution ? institution.name : "";
-                var faccoMsg = facultyCoordinator && institution ? "The faculy coordnator at " + institution + "  is " + facultyCoordinator + "." : "";
-                var context = {fullName: fullName, facultyCoordinator: faccoMsg};   
-                mailObject.body = WelcomeTemplateCompiled({fullName: fullName, facultyCoordinator: faccoMsg}); 
-                mailObject.to_email = mailObject.email;
-                mailObject.subject = 'UWM UCC Account Created';
-                // var content = new helper.Content('text/html', body);
-                // var mail = new helper.Mail(from_email, subject, to_email, content);
-
-                sendGrid(mailObject);
-
-                if(facultyCoordinatorEmail){               
+      var queryP = Person.findById(mailObject.personId).exec()
+      .then((person) => {         
+        fullName = person ? person.fullName : "";        
+        Person
+          .find({ institutionId: person.institutionId, roles: {$in: ['PRIM']}  }).exec()
+          .then((people) => {    
+            if(people.length > 0){
+              facultyCoordinator = people[0].fullName;
+              facultyCoordinatorEmail = people[0].email;
+            }   
+            Institution.findById(person.institutionId).exec()
+                .then((institution) => {       
+                  institution = institution ? institution.name : "";
+                  var faccoMsg = facultyCoordinator && institution ? "The faculy coordnator at " + institution + "  is " + facultyCoordinator + "." : "";
                   var context = {fullName: fullName, facultyCoordinator: faccoMsg};   
-                  mailObject.body = FacoCoWelcomeTemplateCompiled({fullName: fullName}); 
-                  mailObject.to_email = facultyCoordinatorEmail;
+                  mailObject.body = WelcomeTemplateCompiled({fullName: fullName, facultyCoordinator: faccoMsg}); 
+                  mailObject.email = mailObject.email;
                   mailObject.subject = 'UWM UCC Account Created';
-                  // var content = new helper.Content('text/html', body);
-                  // var mail = new helper.Mail(from_email, subject, to_email, content);
 
-                  sendGrid(mailObject);
-                }  
-                
-            })
-            .catch(error => {
-              logger.log(error,"error");
-            })   
-        })
-        .catch(error => {
-          logger.log(error,"error");
-        })
-      
-    })
-    .catch(error => {
-      logger.log(error,"error");
-    });
+
+                    sendGrid(mailObject)
+                      .then(result => {                      
+                        if(facultyCoordinatorEmail){               
+                          mailObject.body = FacoCoWelcomeTemplateCompiled({fullName: fullName}); 
+                          mailObject.email = facultyCoordinatorEmail;
+                          mailObject.subject = 'UWM UCC Account Created';
+
+                          sendGrid(mailObject)
+                            .then(result => {                            
+                              if (result.statusCode === 202) {     
+                                  resolve(result);
+                                } else {
+                                  reject(Error(result));
+                                }
+                            })
+                            .catch(error => {
+                              reject(Error(result));
+                            })
+                        }  
+                      })
+                      .catch(error => {
+                        reject(Error(result));
+                      })
+              })
+              .catch(error => {
+                logger.log(error,"error");
+                reject(Error(error));
+              })   
+          })
+          .catch(error => {
+            logger.log(error,"error");
+            reject(Error(error));
+          })
+        
+      })
+      .catch(error => {
+        logger.log(error,"error");
+      });
     
-
+    });
   }
 
   helpTicketCreated = function(mailObject){
@@ -178,12 +202,30 @@ if(env === 'development'){
     sendGrid(mailObject);
   }
 
+  customerAction = function(mailObject){
+    logger.log("Customer Action email", "verbose");
+    mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
+    mailObject.to_email = mailObject.email;
+    mailObject.subject = 'Customer Action Required'; 
+    sendGrid(mailObject);
+  }
+
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");    
-    mailObject.body = GenericTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Message from your UCC'; 
-    sendGrid(mailObject);
+    return new Promise(function(resolve, reject) {
+      mailObject.body = GenericTemplateCompiled(mailObject.context);
+      mailObject.to_email = mailObject.email;
+      mailObject.subject = mailObject.subject; 
+      sendGrid(mailObject)
+        .then(result => {
+            if (result.statusCode === 202) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+
+    });
   }
 
   annualUpdateContactInfo = function(mailObject){
@@ -191,7 +233,8 @@ if(env === 'development'){
   }
 
 } else {
-  var nodemailer = require('nodemailer'),
+   var nodemailer = require('nodemailer'),
+      handlebars = require('express-handlebars'),
       exphbs = require('nodemailer-express-handlebars');
 
   var smtpConfig = {
@@ -200,34 +243,91 @@ if(env === 'development'){
 
   var transporter = nodemailer.createTransport(smtpConfig);
   var viewEngine = handlebars.create({});
-  var options = hbs({
+  var options = exphbs({
     viewEngine: viewEngine,
     viewPath: path.resolve(__dirname, '../views')
   });
   transporter.use('compile', options);
 
-  var hbs = exphbs.create({
-      layoutsDir: viewPath + "/views"
-  });
-  app.engine('handlebars', hbs.engine);
-  app.set('view engine', 'handlebars');
-
   nodeMailerSendMail = function(mailObject){
-        transporter.sendMail(mail)
-        .then(info => {
-            logger.log(info, 'verbose ');
-            var response = {Response: info};
-            return response;
+     return new Promise(function(resolve, reject) {  
+        transporter.sendMail(mailObject)
+        .then(result => {
+            logger.log(result, 'verbose ');
+            resolve(result);
         })
         .catch(error => {
             logger.log(error, 'error');
-            var response = {Response: error};
-            return response;
+             reject(Error(error));
         })
-      };
+     });
+  };
+
+  welcome = function(mailObject){
+    var fullName = ""; 
+    var facultyCoordinator = "";
+    var institution = "";
+    var facultyCoordinatorEmail = "";
+    var helper = require('sendgrid').mail;
+
+    var queryP = Person.findById(mailObject.personId).exec()
+    .then((person) => {         
+      fullName = person ? person.fullName : "";        
+      Person
+        .find({ institutionId: person.institutionId, roles: {$in: ['PRIM']}  }).exec()
+        .then((people) => {    
+           if(people.length > 0){
+             facultyCoordinator = people[0].fullName;
+             facultyCoordinatorEmail = people[0].email;
+           }   
+           Institution.findById(person.institutionId).exec()
+              .then((institution) => { 
+                institution = institution ? institution.name : "";
+                var faccoMsg = facultyCoordinator && institution ? "The faculy coordnator at " + institution + "  is " + facultyCoordinator + "." : "";
+                var context = {fullName: fullName, facultyCoordinator: faccoMsg};   
+
+                 var mail = {
+                    from: config.emailAddress,
+                    to: mailObject.email,
+                    subject: 'UWM UCC Account Created',
+                    template: 'welcome',
+                    context: context
+                  };
+
+                nodeMailerSendMail(mail)
+
+                if(facultyCoordinatorEmail){               
+                    var context = {fullName: fullName}; 
+                    var mail = {
+                      from: config.emailAddress,
+                      to: facultyCoordinatorEmail,
+                      subject: 'UWM UCC Account Created',
+                      template: 'welcome',
+                      context: context
+                    };
+
+                    nodeMailerSendMail(mail)
+                }  
+                
+            })
+            .catch(error => {
+              logger.log(error,"error");
+            })   
+        })
+        .catch(error => {
+          logger.log(error,"error");
+        })
+      
+    })
+    .catch(error => {
+      logger.log(error,"error");
+    });
+    
+
+  }
 
   helpTicketCreated = function(mailObject){
-    console.log(mailObject)
+      logger.log("Help Ticket Created email", "verbose");
       var mail = {
         from: config.emailAddress,
         to: mailObject.email,
@@ -236,7 +336,99 @@ if(env === 'development'){
         context: mailObject.context
       };
 
-      nodeMailerSendMail(mailObject)
+      nodeMailerSendMail(mail);
+  }
+
+  helpTicketUpdated = function(mailObject){
+      logger.log("Help Ticket Update email", "verbose");
+      var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: 'Help Ticket Updated',
+          template: 'help-ticket-updated',
+          context: mailObject.context
+        };
+
+        nodeMailerSendMail(mail);
+  }
+
+  helpTicketClosed = function(mailObject){
+    logger.log("Help Ticket Closed email", "verbose");
+     var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: 'Help Ticket Closed',
+          template: 'help-ticket-closed',
+          context: mailObject.context
+      };
+
+      nodeMailerSendMail(mail);
+  }
+
+  requestCreated = function(mailObject){
+     logger.log("Request Created email", "verbose");
+     var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: 'Product Request Created',
+          template: 'client-request-created',
+          context: mailObject.context
+      };
+
+      nodeMailerSendMail(mail);
+  }
+
+  requestUpdated = function(mailObject){
+    logger.log("Request Update email", "verbose");
+    var mail = {
+        from: config.emailAddress,
+        to: mailObject.email,
+        subject: 'Product Request Updated',
+        template: 'client-request-updated',
+        context: mailObject.context
+    };
+
+    nodeMailerSendMail(mail);
+  }
+
+  customerAction = function(mailObject){
+    logger.log("Customer Action email", "verbose");
+    var mail = {
+        from: config.emailAddress,
+        to: mailObject.email,
+        subject: 'Customer Action Required',
+        template: 'client-request-customer-action',
+        context: mailObject.context
+    };
+
+    nodeMailerSendMail(mail);
+  }
+
+  genericEmail = function(mailObject){
+    logger.log("Generic email", "verbose");  
+    return new Promise(function(resolve, reject) {
+      var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: mailObject.subject,
+          template: 'generic',
+          context: mailObject.context
+      };
+
+      nodeMailerSendMail(mail)
+      .then(result => {
+console.log(result);        
+            if (result.statusCode === 202) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+    });      
+  }
+
+  annualUpdateContactInfo = function(mailObject){
+     logger.log("Update Contact Info email", "verbose");   
   }
 
 }

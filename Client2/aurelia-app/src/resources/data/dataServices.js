@@ -206,6 +206,7 @@ export class DataServices {
     PERSON_REGISTER = "people/register"
     CHECK_EMAIL = 'people/checkEmail';
     CHECK_NAME = 'people/checkName';
+    SEND_MAIL = 'people/sendMail';
     
     CURRICULUM_SERVICE = 'curriculum';
     CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
@@ -250,6 +251,7 @@ export class DataServices {
     CLIENT_REQUESTS_SERVICES = 'clientRequests';
     CLIENT_REQUEST_DETAILS='clientRequestsDetails';
     CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
+    CUSTOMER_ACTION = 'clientRequests/customerAction';
 
     CONFIG_SERVICE = 'config';
     SESSIONS_CONFIG_SERVICE = 'semesterConfig';

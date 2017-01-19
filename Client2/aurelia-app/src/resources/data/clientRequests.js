@@ -265,42 +265,10 @@ console.log(options)
         
     }
 
-    // async getClientRequestsDetailsArray(refresh, options){
-    //     if (!this.requestsArray || refresh) {
-    //       var url = this.data.CLIENT_REQUEST_DETAILS;
-    //       url += options ? options : "";
-    //         try {
-    //             let serverResponse = await this.data.get(url);
-    //             if (!serverResponse.error) {
-    //                 this.requestsDetailsArray = serverResponse;
-    //             } else {
-    //                 return undefined;
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //             return undefined;
-    //         }
-    //     }
-    //     return this.requestsDetailsArray;
-    // }
-
-//     async getPersonSesssionClientRequestsArray(personId, sessionId){
-//       sessionId = sessionId || this.selectedRequest.sessionId;
-
-//       if( !personId || !sessionId ) return;
-//       try {
-//           let serverResponse = await this.data.get( this.data.CLIENT_REQUESTS_SERVICES +'/person/' +  personId + '/session/' +  sessionId);
-//           if (!serverResponse.error) {
-//               this.requestsArray = serverResponse;
-//           } else {
-//               return undefined;
-//           }
-//       } catch (error) {
-//           console.log(error);
-//           return undefined;
-//       }
-//       return this.requestsArray;
-//    }
+    async sendCustomerMessage(message){
+        var serverResponse = await this.data.saveObject(message, this.data.CUSTOMER_ACTION, "put");
+        return serverResponse;
+    }
 
     lockRequest(obj){
         if(obj.requestId) {

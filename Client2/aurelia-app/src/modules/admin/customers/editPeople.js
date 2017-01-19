@@ -14,10 +14,13 @@ export class EditPeople {
     showCourses = false;
     courseSelected = false;
     showPassword = false;
+    customerEmail = false;
+    emailSubject = "";
+    emailMessage = "";
     navControl = "peopleNavButtons";
     spinnerHTML = "";
 
-    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }];
+    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"}];
     tabPath = './';
 //, { id: 'is4ua' }
     constructor(datatable, config, people, utils, is4ua, dialog, validation) {
@@ -354,6 +357,32 @@ export class EditPeople {
         $("#institutionId").val("");
         $("#roles").val("");
         $("#personStatus").val("");
+    }
+
+    cancelCustomerEmail(){
+        this.emailMessage = "";
+        this.emailSubject = "";
+    }
+
+    async sendCustomerEmail(){
+        if(this.emailMessage){
+            var message = {
+                id: this.people.selectedPerson._id,
+                message : this.emailMessage,
+                email: this.people.selectedPerson.email,
+                subject: this.emailSubject,
+                audit: {
+                    property: 'Send Message',
+                    eventDate: new Date(),
+                    newValue: this.emailMessage,
+                    personId: this.userObj._id
+                }
+            };     
+            let serverResponse = await this.people.sendCustomerMessage(message);
+            if (!serverResponse.error) {
+                this.utils.showNotification("The message was sent");
+            }
+        } 
     }
 
     async changeTab(el, index) {

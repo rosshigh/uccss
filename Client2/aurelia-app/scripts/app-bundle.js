@@ -1375,36 +1375,21 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             });
         };
 
-        ClientRequests.prototype.lockRequest = function lockRequest(obj) {
-            if (obj.requestId) {
-                var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");
-            }
-        };
-
-        ClientRequests.prototype.getRequestLock = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(id) {
-                var response;
+        ClientRequests.prototype.sendCustomerMessage = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(message) {
+                var serverResponse;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 _context8.next = 2;
-                                return this.data.get(this.data.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+                                return this.data.saveObject(message, this.data.CUSTOMER_ACTION, "put");
 
                             case 2:
-                                response = _context8.sent;
+                                serverResponse = _context8.sent;
+                                return _context8.abrupt('return', serverResponse);
 
-                                if (response.error) {
-                                    _context8.next = 7;
-                                    break;
-                                }
-
-                                return _context8.abrupt('return', response);
-
-                            case 7:
-                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
-
-                            case 8:
+                            case 4:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -1412,8 +1397,52 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee8, this);
             }));
 
-            function getRequestLock(_x15) {
+            function sendCustomerMessage(_x15) {
                 return _ref8.apply(this, arguments);
+            }
+
+            return sendCustomerMessage;
+        }();
+
+        ClientRequests.prototype.lockRequest = function lockRequest(obj) {
+            if (obj.requestId) {
+                var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");
+            }
+        };
+
+        ClientRequests.prototype.getRequestLock = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(id) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                _context9.next = 2;
+                                return this.data.get(this.data.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+
+                            case 2:
+                                response = _context9.sent;
+
+                                if (response.error) {
+                                    _context9.next = 7;
+                                    break;
+                                }
+
+                                return _context9.abrupt('return', response);
+
+                            case 7:
+                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+
+                            case 8:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function getRequestLock(_x16) {
+                return _ref9.apply(this, arguments);
             }
 
             return getRequestLock;
@@ -2144,6 +2173,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.PERSON_REGISTER = "people/register";
             this.CHECK_EMAIL = 'people/checkEmail';
             this.CHECK_NAME = 'people/checkName';
+            this.SEND_MAIL = 'people/sendMail';
             this.CURRICULUM_SERVICE = 'curriculum';
             this.CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
             this.SESSIONS_SERVICE = "sessions";
@@ -2167,6 +2197,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.CLIENT_REQUESTS_SERVICES = 'clientRequests';
             this.CLIENT_REQUEST_DETAILS = 'clientRequestsDetails';
             this.CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
+            this.CUSTOMER_ACTION = 'clientRequests/customerAction';
             this.CONFIG_SERVICE = 'config';
             this.SESSIONS_CONFIG_SERVICE = 'semesterConfig';
             this.DOCUMENTS_FILE_UPLOAD = 'documents/file';
@@ -4569,42 +4600,26 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
             }
         };
 
-        People.prototype.getInstitutionsArray = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(options, refresh) {
-                var url, _response3;
-
+        People.prototype.sendCustomerMessage = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(message) {
+                var serverResponse;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
                             case 0:
-                                if (!(!this.institutionsArray || refresh)) {
-                                    _context7.next = 14;
+                                if (!message.email) {
+                                    _context7.next = 5;
                                     break;
                                 }
 
-                                url = this.data.INSTITUTION_SERVICES;
+                                _context7.next = 3;
+                                return this.data.saveObject(message, this.data.SEND_MAIL, "put");
 
-                                url += options ? options : "";
-                                _context7.next = 5;
-                                return this.data.get(url);
+                            case 3:
+                                serverResponse = _context7.sent;
+                                return _context7.abrupt('return', serverResponse);
 
                             case 5:
-                                _response3 = _context7.sent;
-
-                                if (_response3.error) {
-                                    _context7.next = 11;
-                                    break;
-                                }
-
-                                this.institutionsArray = _response3;
-                                return _context7.abrupt('return', this.institutionArray);
-
-                            case 11:
-                                this.institutionsArray = undefined;
-                                this.data.processError(_response3);
-                                return _context7.abrupt('return', this.institutionArray);
-
-                            case 14:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -4612,38 +4627,49 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
                 }, _callee7, this);
             }));
 
-            function getInstitutionsArray(_x5, _x6) {
+            function sendCustomerMessage(_x5) {
                 return _ref7.apply(this, arguments);
             }
 
-            return getInstitutionsArray;
+            return sendCustomerMessage;
         }();
 
-        People.prototype.getInstitution = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(id) {
-                var url, response;
+        People.prototype.getInstitutionsArray = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(options, refresh) {
+                var url, _response3;
+
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
                             case 0:
-                                url = this.data.INSTITUTION_SERVICES + '/' + id;
-                                _context8.next = 3;
-                                return this.data.get(url);
-
-                            case 3:
-                                response = _context8.sent;
-
-                                if (response.status) {
-                                    _context8.next = 8;
+                                if (!(!this.institutionsArray || refresh)) {
+                                    _context8.next = 14;
                                     break;
                                 }
 
-                                return _context8.abrupt('return', response);
+                                url = this.data.INSTITUTION_SERVICES;
 
-                            case 8:
-                                return _context8.abrupt('return', { institutionStatus: '99' });
+                                url += options ? options : "";
+                                _context8.next = 5;
+                                return this.data.get(url);
 
-                            case 9:
+                            case 5:
+                                _response3 = _context8.sent;
+
+                                if (_response3.error) {
+                                    _context8.next = 11;
+                                    break;
+                                }
+
+                                this.institutionsArray = _response3;
+                                return _context8.abrupt('return', this.institutionArray);
+
+                            case 11:
+                                this.institutionsArray = undefined;
+                                this.data.processError(_response3);
+                                return _context8.abrupt('return', this.institutionArray);
+
+                            case 14:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -4651,8 +4677,47 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
                 }, _callee8, this);
             }));
 
-            function getInstitution(_x7) {
+            function getInstitutionsArray(_x6, _x7) {
                 return _ref8.apply(this, arguments);
+            }
+
+            return getInstitutionsArray;
+        }();
+
+        People.prototype.getInstitution = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(id) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                url = this.data.INSTITUTION_SERVICES + '/' + id;
+                                _context9.next = 3;
+                                return this.data.get(url);
+
+                            case 3:
+                                response = _context9.sent;
+
+                                if (response.status) {
+                                    _context9.next = 8;
+                                    break;
+                                }
+
+                                return _context9.abrupt('return', response);
+
+                            case 8:
+                                return _context9.abrupt('return', { institutionStatus: '99' });
+
+                            case 9:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function getInstitution(_x8) {
+                return _ref9.apply(this, arguments);
             }
 
             return getInstitution;
@@ -4709,80 +4774,46 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
         };
 
         People.prototype.saveInstitution = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
                 var _response4, _response5;
 
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 if (this.selectedInstitution._id) {
-                                    _context9.next = 8;
+                                    _context10.next = 8;
                                     break;
                                 }
 
-                                _context9.next = 3;
+                                _context10.next = 3;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "post");
 
                             case 3:
-                                _response4 = _context9.sent;
+                                _response4 = _context10.sent;
 
                                 if (!_response4.error) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray.push(_response4);
                                     }
                                 }
-                                return _context9.abrupt('return', _response4);
+                                return _context10.abrupt('return', _response4);
 
                             case 8:
-                                _context9.next = 10;
+                                _context10.next = 10;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "put");
 
                             case 10:
-                                _response5 = _context9.sent;
+                                _response5 = _context10.sent;
 
                                 if (!_response5.status) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
                                     }
                                 }
-                                return _context9.abrupt('return', _response5);
+                                return _context10.abrupt('return', _response5);
 
                             case 13:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-
-            function saveInstitution() {
-                return _ref9.apply(this, arguments);
-            }
-
-            return saveInstitution;
-        }();
-
-        People.prototype.deleteInstitution = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
-                    while (1) {
-                        switch (_context10.prev = _context10.next) {
-                            case 0:
-                                _context10.next = 2;
-                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
-
-                            case 2:
-                                serverResponse = _context10.sent;
-
-                                if (!serverResponse.error) {
-                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
-                                    this.editInstitutionIndex = -1;
-                                }
-                                return _context10.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context10.stop();
                         }
@@ -4790,8 +4821,42 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
                 }, _callee10, this);
             }));
 
-            function deleteInstitution() {
+            function saveInstitution() {
                 return _ref10.apply(this, arguments);
+            }
+
+            return saveInstitution;
+        }();
+
+        People.prototype.deleteInstitution = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                        switch (_context11.prev = _context11.next) {
+                            case 0:
+                                _context11.next = 2;
+                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
+
+                            case 2:
+                                serverResponse = _context11.sent;
+
+                                if (!serverResponse.error) {
+                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
+                                    this.editInstitutionIndex = -1;
+                                }
+                                return _context11.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
+            }));
+
+            function deleteInstitution() {
+                return _ref11.apply(this, arguments);
             }
 
             return deleteInstitution;
@@ -4809,63 +4874,63 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
         };
 
         People.prototype.getCoursesArray = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(refresh, options, fields) {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(refresh, options, fields) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 if (!(!this.coursesArray || refresh)) {
-                                    _context11.next = 19;
+                                    _context12.next = 19;
                                     break;
                                 }
 
                                 url = this.data.COURSES_SERVICE;
 
                                 url += options ? options : "";
-                                _context11.prev = 3;
-                                _context11.next = 6;
+                                _context12.prev = 3;
+                                _context12.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context11.sent;
+                                serverResponse = _context12.sent;
 
                                 if (serverResponse.error) {
-                                    _context11.next = 11;
+                                    _context12.next = 11;
                                     break;
                                 }
 
                                 this.coursesArray = serverResponse;
-                                _context11.next = 12;
+                                _context12.next = 12;
                                 break;
 
                             case 11:
-                                return _context11.abrupt('return', undefined);
+                                return _context12.abrupt('return', undefined);
 
                             case 12:
-                                _context11.next = 18;
+                                _context12.next = 18;
                                 break;
 
                             case 14:
-                                _context11.prev = 14;
-                                _context11.t0 = _context11['catch'](3);
+                                _context12.prev = 14;
+                                _context12.t0 = _context12['catch'](3);
 
-                                console.log(_context11.t0);
-                                return _context11.abrupt('return', undefined);
+                                console.log(_context12.t0);
+                                return _context12.abrupt('return', undefined);
 
                             case 18:
-                                return _context11.abrupt('return', this.coursesArray);
+                                return _context12.abrupt('return', this.coursesArray);
 
                             case 19:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this, [[3, 14]]);
+                }, _callee12, this, [[3, 14]]);
             }));
 
-            function getCoursesArray(_x8, _x9, _x10) {
-                return _ref11.apply(this, arguments);
+            function getCoursesArray(_x9, _x10, _x11) {
+                return _ref12.apply(this, arguments);
             }
 
             return getCoursesArray;
@@ -4895,31 +4960,31 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
         };
 
         People.prototype.saveCourse = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
                 var _serverResponse, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 if (this.selectedCourse) {
-                                    _context12.next = 2;
+                                    _context13.next = 2;
                                     break;
                                 }
 
-                                return _context12.abrupt('return');
+                                return _context13.abrupt('return');
 
                             case 2:
                                 if (this.selectedCourse._id) {
-                                    _context12.next = 10;
+                                    _context13.next = 10;
                                     break;
                                 }
 
-                                _context12.next = 5;
+                                _context13.next = 5;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
 
                             case 5:
-                                _serverResponse = _context12.sent;
+                                _serverResponse = _context13.sent;
 
                                 if (!_serverResponse.error) {
                                     this.coursesArray.push(this.selectedCourse);
@@ -4927,32 +4992,32 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
                                 } else {
                                     this.data.processError(response, "There was an error creating the product.");
                                 }
-                                return _context12.abrupt('return', _serverResponse);
+                                return _context13.abrupt('return', _serverResponse);
 
                             case 10:
-                                _context12.next = 12;
+                                _context13.next = 12;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context12.sent;
+                                serverResponse = _context13.sent;
 
                                 if (!serverResponse.error) {
                                     this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the course.");
                                 }
-                                return _context12.abrupt('return', serverResponse);
+                                return _context13.abrupt('return', serverResponse);
 
                             case 15:
                             case 'end':
-                                return _context12.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee13, this);
             }));
 
             function saveCourse() {
-                return _ref12.apply(this, arguments);
+                return _ref13.apply(this, arguments);
             }
 
             return saveCourse;
@@ -11528,9 +11593,12 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             this.showCourses = false;
             this.courseSelected = false;
             this.showPassword = false;
+            this.customerEmail = false;
+            this.emailSubject = "";
+            this.emailMessage = "";
             this.navControl = "peopleNavButtons";
             this.spinnerHTML = "";
-            this.tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }];
+            this.tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' }, { id: "Email" }];
             this.tabPath = './';
 
             this.dataTable = datatable;
@@ -12111,12 +12179,66 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             (0, _jquery2.default)("#personStatus").val("");
         };
 
-        EditPeople.prototype.changeTab = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(el, index) {
-                var target;
+        EditPeople.prototype.cancelCustomerEmail = function cancelCustomerEmail() {
+            this.emailMessage = "";
+            this.emailSubject = "";
+        };
+
+        EditPeople.prototype.sendCustomerEmail = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+                var message, serverResponse;
                 return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
                         switch (_context11.prev = _context11.next) {
+                            case 0:
+                                if (!this.emailMessage) {
+                                    _context11.next = 6;
+                                    break;
+                                }
+
+                                message = {
+                                    id: this.people.selectedPerson._id,
+                                    message: this.emailMessage,
+                                    email: this.people.selectedPerson.email,
+                                    subject: this.emailSubject,
+                                    audit: {
+                                        property: 'Send Message',
+                                        eventDate: new Date(),
+                                        newValue: this.emailMessage,
+                                        personId: this.userObj._id
+                                    }
+                                };
+                                _context11.next = 4;
+                                return this.people.sendCustomerMessage(message);
+
+                            case 4:
+                                serverResponse = _context11.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The message was sent");
+                                }
+
+                            case 6:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
+            }));
+
+            function sendCustomerEmail() {
+                return _ref11.apply(this, arguments);
+            }
+
+            return sendCustomerEmail;
+        }();
+
+        EditPeople.prototype.changeTab = function () {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(el, index) {
+                var target;
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 (0, _jquery2.default)("#peopleFormListGroup.list-group").children().removeClass('active');
                                 target = (0, _jquery2.default)(el.target);
@@ -12125,27 +12247,27 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                                 target.parent().addClass('active');
                                 (0, _jquery2.default)(".in").removeClass('active').removeClass('in');
                                 (0, _jquery2.default)("#" + target.html() + "Tab").addClass('in').addClass('active');
-                                _context11.t0 = target.attr('id');
-                                _context11.next = _context11.t0 === 'Courses' ? 9 : 12;
+                                _context12.t0 = target.attr('id');
+                                _context12.next = _context12.t0 === 'Courses' ? 9 : 12;
                                 break;
 
                             case 9:
-                                _context11.next = 11;
+                                _context12.next = 11;
                                 return this.refreshCourses();
 
                             case 11:
-                                return _context11.abrupt('break', 12);
+                                return _context12.abrupt('break', 12);
 
                             case 12:
                             case 'end':
-                                return _context11.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee12, this);
             }));
 
             function changeTab(_x, _x2) {
-                return _ref11.apply(this, arguments);
+                return _ref12.apply(this, arguments);
             }
 
             return changeTab;
@@ -16890,7 +17012,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                         property: 'Send Message',
                                         eventDate: new Date(),
                                         oldValue: this.customerMessageText,
-                                        personId: this.app.user._id
+                                        personId: this.userObj._id
                                     }
                                 };
                                 _context8.next = 6;
@@ -28385,7 +28507,7 @@ define('text!modules/admin/customers/components/institutionsTable.html', ['modul
 define('text!modules/admin/customers/components/instPeople.html', ['module'], function(module) { module.exports = "<template>\r\n            <div class=\"col-lg-10 col-offset-lg-1\" style=\"padding:15px;\">\r\n\r\n            <table id=\"personTable2\" class=\"table table-striped table-hover\">\r\n                <thead>\r\n                    <tr>\r\n                        <th style=\"width:20rem;\">Name</th>\r\n                        <th style=\"width:15rem;\">Phone</th>\r\n                        <th style=\"width:20rem;\">eMail</th>\r\n                        <th>Role</th>\r\n                        <th>Status</th>\r\n                    </tr>\r\n                </thead>\r\n                <tbody>\r\n                    <tr repeat.for=\"person of people.peopleInstArray\" class=\"blackText\">\r\n                        <td data-title=\"name\">${person.firstName} ${person.lastName}</td>\r\n                        <td data-tile=\"phone\">${person.phone | phoneNumber}</td>\r\n                        <td data-title=\"email\">${person.email}</td>\r\n                        <td data-title=\"role\">${person.roles}</td>\r\n                        <td data-title=\"status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/is4ua.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <!-- Row 4 -->\n            <div class=\"col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                    <div class=\"col-sm-8\">\n                        <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                        </select>\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                    <div class=\"col-sm-8\">\n                        <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                        </select>\n                    </div>\n                </div>\n            </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Password.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <div class=\"panel panel-default col-md-12\">\n            <div class=\"panel-body\">\n                <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"savePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditPassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                <div class=\"form-group\">\n                    <input id=\"newPassword\" type=\"text\" placeholder=\"New Password\"\n                        class=\"form-control topMargin\"\n                        value.bind=\"newPassword\" />\n                </div>\n                <!--\n                <div class=\"form-group\">\n                    <input id=\"password_repeat\" type=\"text\" placeholder=\"Repeat Password\"\n                        class=\"form-control topMargin\"\n                        value.bind=\"newPassword_repeat\" />\n                </div>\n                -->\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
+define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"nickName\" type=\"text\" placeholder=\"Filter Nickname\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                 <td data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td data-title=\"Email\">${person.email}</td>\r\n                                <td data-title=\"Role\">${person.roles}</td>\r\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
 define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\"  value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                        <div id=\"editFiles\"></div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
@@ -28463,4 +28585,6 @@ define('text!modules/user/requests/components/requestDetails.html', ['module'], 
 define('text!modules/user/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n     <div class='row'>\n            <span class=\"leftMargin\" show.bind=\"showLockMessage\">Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n            <div class='col-lg-12'>\n                <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n                    <thead>\n                        \n                        <tr>\n                            <td colspan=\"6\">\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                            </td>\n                        </tr>\n                        <tr>\n                          <th>Product</th>\n                          <th>Status</th>\n                          <th>Date Created</th>\n                          <th>Date Required</th>\n                        </tr>\n                  </thead>\n                  <tbody>\n                    <tr  click.delegate=\"edit(product, $event, $index)\" repeat.for=\"product of dataTable.displayArray\">\n                      <td data-title=\"Product\">${product.productId | productName:products.productsArray}</td>\n                      <td data-title=\"Status\">${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n                      <td data-title=\"createdDate\">${product.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                      <td data-title=\"createdDate\">${product.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    </tr>\n                </tbody>\n            </table>\n          </div>\n        </div>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-lg-7\">\n      \n      <!-- Session Select -->\n      <div class=\"row\">\n        <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      \n    \n        <!-- Course Select -->\n        <div show.bind=\"selectedSession != ''\">\n          <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedCourse\" change.delegate=\"getRequests()\" id=\"course\"\n                    class=\"form-control\">\n              <option value=\"\">Select a course</option>\n              <option value.bind=\"config.SANDBOX_ID\">${config.SANDBOX_NAME}</option>\n              <option repeat.for=\"course of people.coursesArray\"\n                      value.bind=\"course._id\">${course.number} - ${course.name}</option>\n            </select>\n          </div>\n        </div>\n      </div>\n    \n      <div show.bind=\"showRequests\">\n        <!-- Request Table -->\n        <compose view=\"./requestsTable.html\"></compose>\n        <!-- Request Details -->\n        <compose view=\"./requestDetails.html\"></compose>\n      </div>\n  </div>\n  \n  <compose view=\"./requestDetailDetails.html\"></compose>\n \n</div>\n\n    \n</template>"; });
+define('text!modules/admin/customers/components/customerEmail.html', ['module'], function(module) { module.exports = "<template>\n\t<div show.bind=\"customerEmail\" class=\"row\">\n\t\t<fieldset class=\"form-group\">\n\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t<label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"customerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n\t\t\t  \t<Input value.bind=\"emailSubject\" placeholder=\"Email Subject\" />\n\t\t\t\t<textarea class=\"form-control\" id=\"customerEmail\" placeholder=\"Customer Message\" innerhtml.bind=\"customerEmail\"\n\t\t\t\t\trows=\"8\"></textarea>\n\t\t\t</div>\n\t\t</fieldset>\n\t</div>\n</template>"; });
+define('text!modules/admin/customers/components/Email.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<fieldset class=\"form-group\">\n\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t<label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n\t\t\t  <div class=\"col-lg-11\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<Input class=\"form-control\" value.bind=\"emailSubject\" placeholder=\"Email Subject\" />\n\t\t\t\t</div>\n\t\t\t  </div>\n\t\t\t  <div class=\"col-lg-11\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t<textarea class=\"form-control\" id=\"customerEmail\" value.bind=\"emailMessage\" placeholder=\"Customer Message\" \n\t\t\t\t\trows=\"8\"></textarea>\n\t\t\t\t</div>\n\t\t\t  </div>\n\t\t\t</div>\n\t\t</fieldset>\n\t</div>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map
