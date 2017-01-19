@@ -30,12 +30,14 @@
     "mongoose-sequence": "^3.0.2",
     "multer": "^1.1.0",
     "nodemailer": "^2.5.0",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.1.0",
     "passport-local": "^1.0.0",
     "password": "^0.1.1",
     "redis": "^2.6.0-1",
     "response-time": "^2.3.1",
-    "winston": "^2.2.0"
+    "winston": "^2.2.0",
+    "xoauth2": "^1.2.0"
   }
 }

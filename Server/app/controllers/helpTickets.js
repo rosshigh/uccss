@@ -99,18 +99,17 @@ module.exports = function (app, config) {
     helpTicket.save( function ( err, object ){
       if (err) {
         return next(err);
-      } else {
+      } else {     
         if(req.query.email == 1){
           Person.findById(object.personId, function(err, person){
             if(err){
               return next(err);
-            } else {             
+            } else {        
               var mailObj = {
                 email: person.email,
-                subject: 'Help Ticket Created',
                 type: 'help-ticket-created',
                 context: object
-              }
+              }          
               sendMail(mailObj);
             }
           })

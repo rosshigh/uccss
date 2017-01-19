@@ -198,13 +198,15 @@ console.log(options)
         return newObj;
     }
 
-    async saveRequest(){
+    async saveRequest(email){
         if(!this.selectedRequest){
             return;
         }
 
+        var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
+
         if(!this.selectedRequest._id){
-            let serverResponse = await this.data.saveObject(this.selectedRequest, this.data.CLIENT_REQUESTS_SERVICES, "post");
+            let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
             if(!serverResponse.error){
                 if(this.requestsArray){
                     this.requestsArray.push(this.selectedRequest);
@@ -212,7 +214,7 @@ console.log(options)
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedRequest, this.data.CLIENT_REQUESTS_SERVICES, "put");
+            var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
             if(!serverResponse.error){
                  if(this.requestsArray && this.editRequestIndex){
                     this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);

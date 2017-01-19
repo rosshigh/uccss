@@ -19,7 +19,6 @@ module.exports = function (app) {
 
   router.get('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Get clientRequests');
-    console.log("HERE")
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
@@ -31,61 +30,6 @@ module.exports = function (app) {
         }
       });
   });
-  
- 
-  // router.get('/api/clientRequests/person/:id', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   Model.find({personId: req.params.id})
-  //     .sort(req.query.order)
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
-
-  // router.get('/api/clientRequests/person/:id/session/:sessionId', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   Model.find({personId: req.params.id, sessionId: req.params.sessionId})
-  //     .sort(req.query.order)
-  //     .populate('requestDetails')
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
-
-  // router.get('/api/clientRequests/person/:personId/session/:sessionId/course/:courseId', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   Model.find({personId: req.params.personId, sessionId: req.params.sessionId, courseId: req.params.courseId })
-  //     .sort(req.query.order)
-  //     .populate('requestDetails')
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
-
-  // router.get('/api/clientRequests/active', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   Model.find({active: true})
-  //     .sort(req.query.order)
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
 
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
     debug('Get clientRequest [%s]', req.params.id);
@@ -111,37 +55,6 @@ module.exports = function (app) {
       });
   });
 
-//   router.get('/api/clientRequests/session/count/:number', requireAuth, function(req, res, next){
-    
-//         var Session = mongoose.model('Session');
-//         var sessionQuery = Session.find({limit: req.params.number}).sort('startDate',-1).exec()
-//         .then(function(result){
-//           if(result){
-// console.log(result)            
-//               var orString = new Array();
-//               // result.forEach(function(item){
-//               //   orString.push({'sessionId': item._id});
-//               // });
-//               var query = buildQuery(req.query, ClientRequestDetail.find({ $or:orString}));
-//               query.sort('sessionId')
-//                 .exec()
-//                 .then(function(details){
-// console.log("DETAILS")
-// console.log(details)                  
-//                   res.status(200).json(details);
-//                 })
-//                 .catch(function(err){
-//                   return next(err);
-//                 });
-//           }
-//           res.status(200).json({});
-//         })
-//         .catch(function(err){
-//             return next(err);
-//         });
-         
-//   };
-
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
     debug('Create clientRequest');
     var clientRequest = new Model(req.body);
@@ -160,7 +73,6 @@ module.exports = function (app) {
 
     Promise.all(tasks)
       .then(function(results) {
-        console.log(results)
         clientRequest.requestDetails = new Array();
         results.forEach(function (record) {
           clientRequest.requestDetails.push(record._id);
@@ -181,8 +93,7 @@ module.exports = function (app) {
                     } else {             
                       var mailObj = {
                         email: person.email,
-                        subject: 'Client Request Created',
-                        template: 'client-request-created',
+                        type: 'client-request-created',
                         context: result
                       }
                       sendMail(mailObj);

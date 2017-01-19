@@ -108,6 +108,14 @@ module.exports = function (app) {
           if (err) {
              return next(err);
           } else {
+            var mailObj = {
+                personId: object._id,
+                email: object.email,
+                subject: 'Account Created',
+                type: 'welcome',
+                context: object
+              }          
+            sendMail(mailObj);
             res.status(200).json(object);
           }
         });
@@ -116,7 +124,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/people', requireAuth, function(req, res){
-    logger.log('Update Person [%s]', req.body._id,'verbose');
+    logger.log('Update Person ' + req.body._id, 'verbose');    
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);

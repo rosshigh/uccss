@@ -23,6 +23,7 @@ export class ViewHelpTickets {
   navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
+  lockObject = new Object();
   responseContent = " ";
 
   constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
@@ -60,6 +61,8 @@ export class ViewHelpTickets {
       this.config.getConfig()
     ]);
     this.updateArray();
+
+    this.sendEmail = this.config.SEND_EMAILS;
 
     this.isUCC = this.userObj.userRole >= this.config.UCC_TECH_ROLE;
 
@@ -138,7 +141,7 @@ export class ViewHelpTickets {
   async saveResponse() {
     // if(this.validation.validate(1)){
     this._createResponse();
-    let serverResponse = await this.helpTickets.saveHelpTicketResponse();
+    let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
     if (!serverResponse.error) {
       this.updateArray()
       this.utils.showNotification("The help ticket was updated");
@@ -168,7 +171,7 @@ export class ViewHelpTickets {
   }
 
   _unLock(){
-    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
       if(this.helpTickets.selectedHelpTicket){
         this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       }    

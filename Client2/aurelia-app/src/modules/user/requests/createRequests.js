@@ -29,6 +29,7 @@ export class ViewHelpTickets {
 
   tempRequests = new Array();
   productInfo = new Array();
+  lockObject = new Object();
 
   minStartDate = "1/1/1900";
   maxStartDate = "1/1/9999";
@@ -305,32 +306,7 @@ export class ViewHelpTickets {
       {"rule":"custom","message":"Select a session",
       "valFunction":function(context){
         return !(context.sessionId == -1);
-      }},
-    //   {"rule":"custom","message":"Select a request type",
-    //   "valFunction":function(context){
-    //     return !(context.requestType == -1);
-    //   }},
-    //   {"rule":"custom","message":"Select a course",
-    //   "valFunction":function(context){
-    //     if(context.requestType === "sandboxCourse"){
-    //       return true
-    //     } else {
-    //       return !(context.courseId == -1);
-    //     }
-    //   }
-    // },
-    // {"rule":"custom","message":"Enter the number of students",
-    //   "valFunction":function(context){
-    //     if(context.requestType === "sandboxCourse"){
-    //       return true;
-    //     // } else if(($("#undergraduates").val() === "" || $("#undergraduates").val() == 0) && ($("#graduates").val() === "" || $("#graduates").val() == 0)){
-    //     } else if(context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0){
-    //       return false;
-    //     } else {
-    //       return true;
-    //     }
-    //   }
-    // }
+      }}
       
       ]);
 
@@ -376,10 +352,6 @@ export class ViewHelpTickets {
           if(context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
             return false;
           }
-          // var foo = '#requiredDate-' + i;
-          // if($(foo).val() === ""){
-          //   return false;
-          // }
         }
         return true;
       }
@@ -388,7 +360,6 @@ export class ViewHelpTickets {
       {"rule":"required","message":"Enter the course number", "value": "people.selectedCourse.number"},
       {"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"}
     ]);
-    // this.validation.addRule(5,"name",{"rule":"required","message":"Enter the course name", "value": "people.selectedCourse.name"});
   }
 
   _buildRequest(){
@@ -405,11 +376,11 @@ export class ViewHelpTickets {
   }
 
   async save(){
-    if(this.validation.validate(1, this)){
+    if(this.validation.validate(1)){
       this._buildRequest();
-        let serverResponse = await this.requests.saveRequest();
+        let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
         if (!serverResponse.status) {
-            this.utils.showNotification("System client request was updated", "", "", "", "", 5);
+            this.utils.showNotification("System client request was updated");
             this.systemSelected = false;
             // this._cleanUp();
         }
@@ -466,13 +437,13 @@ export class ViewHelpTickets {
   }
 
   async saveCourse(){
-        if(this.validation.validate(5, this)){
-          if(this.people.selectedPerson._id){
+        if(this.validation.validate(5)){
+          if(this.userObj._id){
               if(this.people.selectedCourse._id)  this.editCourseIndex = this.baseArray.length;
-              this.people.selectedCourse.personId = this.people.selectedPerson._id;
+              this.people.selectedCourse.personId = this.userObj._id;
               let serverResponse = await this.people.saveCourse();
               if (!serverResponse.status) {
-                  this.utils.showNotification("The course was updated", "", "", "", "", 5);
+                  this.utils.showNotification("The course was updated");
               }
          this.editCourse = false;
           }
@@ -502,7 +473,7 @@ export class ViewHelpTickets {
   }
 
    _unLock(){
-    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
       if(this.requests.selectedRequest._id){
         this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);

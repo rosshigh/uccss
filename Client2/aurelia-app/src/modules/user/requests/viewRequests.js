@@ -23,6 +23,7 @@ export class ViewRequests {
   navControl = "requestsNavButtons";
   spinnerHTML = "";
   commentsResponse = "";
+  lockObject = new Object();
 
   constructor(router, config, validation, people, datatable, utils, sessions, systems, products, requests) {
     this.router = router;
@@ -132,7 +133,7 @@ export class ViewRequests {
       this.requests.selectedRequest.comments = this.commentsResponse;
       if (this.validation.validate(1)) {
         if(this._buildRequest()){
-          let serverResponse = await this.requests.saveRequest();
+          let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
           if (!serverResponse.status) {
             this.utils.showNotification("The request was updated");
             this._cleanUp();
@@ -207,22 +208,12 @@ export class ViewRequests {
   }
 
    _unLock(){
-    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
       if(this.requests.selectedRequest){
          this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);
       }    
     }
   }
-
-  // changeBeginDate(){
-  //   $("#endDate").attr("min", $("#beginDate").val());
-  //   this.requests.selectedRequest.endDate = moment.max(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
-  // }
-
-  // changeEndDate(){
-  //   $("#beginDate").attr("max", $("#endDate").val());
-  //   this.requests.selectedRequest.startDate = moment.min(moment($("#beginDate").val()), moment($("#endDate").val())).format('YYYY-MM-DD');
-  // }
 
 }

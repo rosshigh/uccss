@@ -156,13 +156,14 @@ export class HelpTickets {
         return response;
     }
 
-     async saveHelpTicket(){
+     async saveHelpTicket(email){
           if(!this.selectedHelpTicket){
             return;
         }
+        var url = email ? this.data.HELP_TICKET_SERVICES + '?email=1' : this.data.HELP_TICKET_SERVICES;
 
         if(!this.selectedHelpTicket._id){
-            var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "post");
+            var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 if(this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
@@ -171,7 +172,7 @@ export class HelpTickets {
                 }
             return response;
         } else {
-            var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES, "put");
+            var response = await this.data.saveObject(this.selectedHelpTicket, url, "put");
             if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);

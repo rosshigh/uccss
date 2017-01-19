@@ -375,7 +375,7 @@ export class People {
             let serverResponse = await this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
             if (!serverResponse.error) {
                 this.coursesArray.push(this.selectedCourse);
-                this.editIneditCourseIndexdex = this.coursesArrayInternal.length - 1;
+                this.editIneditCourseIndex = this.coursesArray.length - 1;
             } else {
                 this.data.processError(response, "There was an error creating the product.");
                 }

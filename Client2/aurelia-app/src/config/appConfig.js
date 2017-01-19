@@ -4,6 +4,8 @@ import {HttpClient} from 'aurelia-http-client';
 @inject(HttpClient)
 export class AppConfig {
 
+    SEND_EMAILS = true;
+
     HOST = location.origin;
     // BASE_URL = "http://localhost:5000/api/";
     BASE_URL = this.HOST + "/api/";
@@ -18,12 +20,14 @@ export class AppConfig {
         { role: 'LEGL', label: 'Legal', UCConly: false },
         { role: 'BUSI', label: 'Billing', UCConly: false },
         { role: 'PRIM', label: 'Primary', UCConly: false },
+        { role: 'TECH', label: 'Technical', UCConly: false },
         { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true },
         { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true },
         { role: 'UCSA', label: 'UCCSS Admin', UCConly: true }];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
+    USER_ROLE = 4;
     PROV_USER = 1;
 
     //User Status

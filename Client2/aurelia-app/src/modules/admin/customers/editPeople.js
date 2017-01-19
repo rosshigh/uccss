@@ -41,10 +41,10 @@ export class EditPeople {
             this.is4ua.loadIs4ua(),
             this.config.getConfig()
         ]);
-
+         this.filteredArray = this.config.ROLES;
         this.dataTable.updateArray(this.people.peopleArray);
 
-        this.dataTable.createPageButtons(1);
+        // this.dataTable.createPageButtons(1);
     }
 
     attached() {
@@ -64,6 +64,7 @@ export class EditPeople {
         this.people.selectPerson(this.editIndex);
         this.oldEmail = this.people.selectedPerson.email;
         this.institutionId = this.people.selectedPerson.institutionId;
+        this.filterRoles();
         this.newPerson = false;
         $("#editFirstName").focus();
 
@@ -80,6 +81,24 @@ export class EditPeople {
         this.oldEmail = this.people.selectedPerson.email;
         $("#editFirstName").focus();
         this.personSelected = true;
+    }
+
+    filterRoles(){
+        this.filteredArray = this.config.ROLES.filter(item =>{
+            return this.people.selectedPerson.roles.indexOf(item.role) === -1;
+		});
+		if(this.filteredArray.length === 0) this.filteredArray.push({role: "NOROLE", label: "No Roles Remaining"});
+    }
+
+    selectRole(event, role){
+        if(role.role === 'NOROLE') return;
+        this.people.selectedPerson.roles.push(role.role);
+        this.filterRoles();
+    }
+
+    removeRole(index, role){
+        this.people.selectedPerson.roles.splice(index,1);
+        this.filterRoles();
     }
 
     buildAudit(){

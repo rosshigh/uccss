@@ -69,7 +69,6 @@ var ClientRequestDetailsSchema = new Schema({
   }]
 });
 
-//ClientRequestDetailsSchema.plugin(autoIncrement.plugin, { model: 'ClientRequestDetail', field: 'requestNo' });
 ClientRequestDetailsSchema.plugin(AutoIncrement, {inc_field: 'requestNo'});
 
 ClientRequestDetailsSchema.pre('update', function() {
@@ -79,6 +78,7 @@ ClientRequestDetailsSchema.pre('update', function() {
 module.exports = Mongoose.model('ClientRequestDetail', ClientRequestDetailsSchema);
 
 var ClientRequestSchema = new Schema({
+  clientRequestNo: { type: Number },
   courseId: { type: Schema.Types.ObjectId },
   personId: { type:  Schema.Types.ObjectId },
   sessionId: { type: Schema.Types.ObjectId, required: true },
@@ -103,6 +103,8 @@ var ClientRequestSchema = new Schema({
     personId: { type: Schema.Types.ObjectId }
   }]
 });
+
+ClientRequestSchema.plugin(AutoIncrement, {inc_field: 'clientRequestNo'});
 
 ClientRequestSchema.pre('update', function() {
   this.update({},{ $set: { modifiedDate: new Date() } });

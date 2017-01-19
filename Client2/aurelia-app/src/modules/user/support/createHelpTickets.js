@@ -19,6 +19,7 @@ import $ from 'jquery';
 export class CreateHelpTickets{
     showInfoBox = false;
     courseSelected = false;
+   
     spinnerHTML = "";
     filesSelected;
     selectedFiles;
@@ -62,6 +63,7 @@ export class CreateHelpTickets{
             this.config.getConfig()
          ]);
         this.helpTickets.selectHelpTicket();
+        this.sendEmail = this.config.SEND_EMAILS;
         this._hideTypes();
     }
 
@@ -157,9 +159,9 @@ export class CreateHelpTickets{
     async save(){
         if(this.validation.validate(this.helpTickets.selectedHelpTicket.helpTicketType)){
             await this.buldHelpTicket();
-            let serverResponse = await this.helpTickets.saveHelpTicket();
+            let serverResponse = await this.helpTickets.saveHelpTicket(this.sendEmail);
             if (!serverResponse.status) {
-                this.utils.showNotification("The help ticket was created", "", "", "", "", 5);
+                this.utils.showNotification("The help ticket was created");
                 if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files,serverResponse.content[0]._id);
             }
             this._cleanUp();
