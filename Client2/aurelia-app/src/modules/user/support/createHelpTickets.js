@@ -55,9 +55,9 @@ export class CreateHelpTickets{
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
-    async activate(){ //[or]field1|value1:value2
+    async activate(){ 
          let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate'),
+            this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig()

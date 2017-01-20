@@ -29,7 +29,7 @@ export class CurrInfo{
 		 let responses =  await Promise.all([
 		 	this.curriculum.getCurriculumCategoryArray(true, '?order=name'),
          	this.curriculum.getCurriculumArray(true, '?order=sortOrder'),
-			this.products.getProductsArray(true, '?order=name'),
+			this.products.getProductsArray('?order=name', true),
 			this.config.getConfig()
 		 ]);
 		 this.curriculum.selectCurriculumCategory(0);

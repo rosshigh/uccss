@@ -68,8 +68,9 @@ export class People {
     }
 
     selectedPersonFromId(id){
-        this.peopleArray.forEach((item) => {
+        this.peopleArray.forEach((item, index) => {
           if(item._id === id){
+            this.editIndex = index;
             this.selectedPerson = this.utils.copyObject(item);
             return;
           }

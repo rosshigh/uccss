@@ -33,14 +33,14 @@
                <div class="col-lg-2">
                   <div class="checkbox ">
                     <label>
-                      <input checked.bind="helpTickets.selectedHelpTicketContent.confidential" type="checkbox"> Confidential
+                      <input change.delegate="confidentialChecked()" checked.bind="helpTickets.selectedHelpTicketContent.confidential" id="confidentialCheckBox" type="checkbox"> Confidential
                     </label>
                   </div>
                 </div>
                 <div class="col-lg-2">
                   <div class="checkbox">
                     <label>
-                      <input change.bind="checkSendMail()" checked.bind="sendEmail" type="checkbox"> Send Email
+                      <input disabled.bind="sendMailDisable" change.bind="checkSendMail()" checked.bind="sendEmail" type="checkbox"> Send Email
                     </label>
                   </div>
                 </div>

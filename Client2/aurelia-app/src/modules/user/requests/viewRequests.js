@@ -208,8 +208,8 @@ export class ViewRequests {
   }
 
    _unLock(){
-    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
-      if(this.requests.selectedRequest){
+    if(!this.showLockMessage){
+      if(this.requests.selectedRequest._id){
          this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);
       }    

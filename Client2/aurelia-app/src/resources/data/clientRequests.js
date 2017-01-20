@@ -96,8 +96,7 @@ export class ClientRequests {
     }
 
 	//Client Request Details
-	async getClientRequestsDetailsArray(options, refresh){
-console.log(options)        
+	async getClientRequestsDetailsArray(options, refresh){      
         if (!this.requestsArray || refresh) {
           var url = this.data.CLIENT_REQUEST_DETAILS;
           url += options ? options : "";
@@ -158,7 +157,7 @@ console.log(options)
         newObj.audit = new Array();
         newObj.audit.push({
             event: 'Created',
-            eventDate: this.utils.convertUTCDateToLocalDate(new Date()),
+            eventDate: new Date(),
             personId: ""
         })
         return newObj;

@@ -75,11 +75,11 @@ export class HelpTickets {
         newHelpTicketObj.content = new Array();
         newHelpTicketObj.owner = new Array();
         newHelpTicketObj.createdDate = new Date();
-        newHelpTicketObj.modifiedDate =new Date();
+        newHelpTicketObj.modifiedDate = new Date();
         newHelpTicketObj.audit = new Array();
         newHelpTicketObj.audit.push({
             event: 'Created',
-            eventDate: this.utils.convertUTCDateToLocalDate(new Date())
+            eventDate: new Date()
         })
 
        this.selectedHelpTicket =  newHelpTicketObj;
@@ -184,12 +184,13 @@ export class HelpTickets {
         }
     }
 
-    async saveHelpTicketResponse(){
+    async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
-            var response = await this.data.saveObject(this.selectedHelpTicketContent, this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id), "put");
+            var url = email ? this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id) + '?email=1' : this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id);
+            var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);
-                    this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
+                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                 } else {
                      this.data.processError(response, "There was an error updating the help ticket.");
                 }

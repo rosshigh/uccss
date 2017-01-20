@@ -20,6 +20,7 @@ export class ViewHelpTickets {
     enterResponse = false;
     sendEmail = false;
     showLockMessage = false; 
+    sendMailDisable = false;
 
     navControl = "supportNavButtons";
     spinnerHTML = "";
@@ -59,24 +60,12 @@ export class ViewHelpTickets {
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-
-    this.dataTable.createPageButtons(1);
+    this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();
   }
 
   attached(){
         $('[data-toggle="tooltip"]').tooltip();
-
-        // $('.hover').mouseover(function(el) {
-        //   // var foo = $(el.target).children()[0];
-        //   var foo = $(el.target).next();
-        //   $(foo).css("display","block");
-        // });
-
-        // $('.hover').mouseout(function(el) {
-        //   var foo = $(el.target).children()[0];
-        //   $(foo).css("display","none");
-        // });
   }
 
   detached(){
@@ -96,6 +85,16 @@ export class ViewHelpTickets {
 
   hideComment(){
     $(".hover").css("display","none");
+  }
+
+  confidentialChecked(){
+    if( document.getElementById('confidentialCheckBox').checked ){
+       this.sendMailDisable = true;
+        this.sendEmail = false;
+    } else {
+       this.sendMailDisable = false;
+      this.sendEmail = true;
+    }
   }
   
   /*****************************************************************************************
@@ -132,10 +131,15 @@ export class ViewHelpTickets {
               personId: this.userObj._id
             });
            this.showLockMessage = false;
-           this.lockObject = {}; 
+           this.lockObject = {personId: this.userObj._id}; 
         } else {
-           this.lockObject = response[0];
-           this.showLockMessage = true;  
+          if(response[0].personId === this.userObj._id){
+            this.showLockMessage = false;
+            this.lockObject = {personId: this.userObj._id}; 
+          } else {
+             this.lockObject = response[0];
+            this.showLockMessage = true;
+          }
         }
       }
 
@@ -181,10 +185,10 @@ export class ViewHelpTickets {
   async saveResponse(){
       // if(this.validation.validate(1, this)){
         this. _createResponse();
-        let serverResponse = await this.helpTickets.saveHelpTicketResponse();
+        let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
         if (!serverResponse.status) {
           this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-          if(this.sendEmail){
+          if(this.sendEmail && !this.helpTickets.selectedHelpTicketContent.confidential){
             var obj = {
               id: this.helpTickets.selectedHelpTicket._id,
               audit: {
@@ -249,8 +253,8 @@ export class ViewHelpTickets {
   }
 
   _unLock(){
-    if(!this.showLockMessage || this.lockObject.personId && this.userObj._id === this.lockObject.personId){
-      if(this.helpTickets.selectedHelpTicket){
+    if(!this.showLockMessage){
+      if(this.helpTickets.selectedHelpTicket._id){
         this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       }    
     }
@@ -311,7 +315,6 @@ export class ViewHelpTickets {
         return (context.helpTickets.selectedHelpTicket.owner[0].personId !== context.userObj._id);
       }}]);
   }
-  
   
   _cleanUpFilters(){
       $("#helpTicketType").val("");

@@ -123,8 +123,6 @@ module.exports = function (app) {
                 .catch(error => {
                     return next(error);
                 });     
-            // sendMail(mailObj);
-            // res.status(200).json(object);
           }
         });
       }

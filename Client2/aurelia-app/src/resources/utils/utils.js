@@ -68,8 +68,8 @@ export class Utils{
      * skip - an array of properties to skip
      *************************************************************************/
     objectsEqual(obj1, obj2, skip){
-    var changes = new Array();
-    var skipArray = skip || new Array();
+      var changes = new Array();
+      var skipArray = skip || new Array();
       for (var property in obj1) {
         if (obj1.hasOwnProperty(property)) {
             if(!obj1[property] && !obj2[property] || skipArray.indexOf(property) !== -1){
@@ -217,17 +217,40 @@ export class Utils{
   /********************************************************************************
   * Format the dates in an object to be compatible with data picker controls
   ********************************************************************************/
-  formatDateForDatesPicker(obj){
-    for (var property in obj) {
-      if (property.toUpperCase().indexOf('DATE') > -1  ||  obj[property] instanceof Date){
-        if(obj[property] != null){
-          obj[property] = this.convertUTCDateToLocalDate( obj[property])
-          obj[property] = moment(obj[property]).format("YYYY-MM-DD");
-        }
-      }
-    }
+  // formatDateForDatesPicker(obj){
+  //   for (var property in obj) {
+  //     if (property.toUpperCase().indexOf('DATE') > -1  ||  obj[property] instanceof Date){
+  //       if(obj[property] != null){
+  //         obj[property] = this.convertUTCDateToLocalDate( obj[property])
+  //         obj[property] = moment(obj[property]).format("YYYY-MM-DD");
+  //       }
+  //     }
+  //   }
 
-  }
+//?filter=helpTicketRelevant|eq|true&order=name
+ //filter=field1|eq|value1	gt,lt,ge,le
+  //filter=[or]field1|value1:value2
+  //filter=[and]field1|eq|value1:field2|eq|value2
+  //filter=[in]field|list|value1:value2:value3
+  // parseURLOptions(options){
+  //   if(options){
+  //     var optionsObject = new Object();
+  //     var optionsArray = new Array();
+  //     var parseArray = options.split('&');
+  //     parseArray.forEach(item => {
+  //       if(item.indexOf('order')) {
+  //         var tempSort = item.split('=');
+  //         optionsObject.sortOrder = {
+  //           fields : tempSort.split(':') 
+  //         }
+  //       } else if(item.indexOf('filter')){
+  //         var tempFilter = item.split("=");
+
+  //       }
+
+  //     })
+  //   }
+  // }
 
   /*****************************************************************************
      * Determine users role for authorizations

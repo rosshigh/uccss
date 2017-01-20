@@ -48,6 +48,7 @@ export class ViewHelpTickets {
   detached(){
     this. _unLock();
   }
+  
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
   }
@@ -55,7 +56,7 @@ export class ViewHelpTickets {
   async activate() {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"),
-      this.sessions.getSessionsArray('?order=startDate'),
+      this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'),
       this.config.getConfig()
@@ -171,8 +172,8 @@ export class ViewHelpTickets {
   }
 
   _unLock(){
-    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
-      if(this.helpTickets.selectedHelpTicket){
+     if(!this.showLockMessage){
+      if(this.helpTickets.selectedHelpTicket._id){
         this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       }    
     }

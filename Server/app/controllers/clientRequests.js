@@ -93,10 +93,15 @@ module.exports = function (app) {
                     } else {             
                       var mailObj = {
                         email: person.email,
-                        type: 'client-request-created',
                         context: result
                       }
-                      sendMail(mailObj);
+                       requestCreated(mailObj)
+                        .then(result => {
+                            res.status(200).json(object);
+                        })
+                        .catch(error => {
+                            return next(error);
+                        });    
                     }
                   })
                 }
@@ -146,10 +151,15 @@ module.exports = function (app) {
                     } else {             
                       var mailObj = {
                         email: person.email,
-                        type: 'client-request-updated',
                         context: result
                       }
-                      sendMail(mailObj);
+                     requestUpdated(mailObj)
+                        .then(result => {
+                            res.status(200).json(object);
+                        })
+                        .catch(error => {
+                            return next(error);
+                        });  
                     }
                   })
                 }
@@ -176,7 +186,6 @@ module.exports = function (app) {
           } else {
             var obj = {
               email: req.body.toEmail,
-              type: 'client-request-customer-action',
               context: {
                 requestNo: request.requestNo,
                 product: req.body.product,
@@ -184,8 +193,13 @@ module.exports = function (app) {
                 customerMessage: req.body.customerMessage
               }
             };
-            sendMail(obj);
-            res.status(200).json(request);
+            customerAction(obj)
+             .then(result => {
+                res.status(200).json(object);
+              })
+              .catch(error => {
+                  return next(error);
+              });
           }
         })
       })
@@ -203,18 +217,6 @@ module.exports = function (app) {
     })
   });
 
-  // router.post('/api/clientRequestDetails', requireAuth, function(req, res, next){
-  //   debug('Create clientRequestDeails');
-  //   var clientRequestDetail =  new ClientRequestDetail(req.body);
-  //   clientRequestDetail.save( function ( err, object ){
-  //     if (err) {
-  //       return next(err);
-  //     } else {
-  //       res.status(200).json(object);
-  //     }
-  //   });
-  // });
-
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     debug('Get clientRequests');
     var query = buildQuery(req.query, ClientRequestDetail.find());
@@ -227,33 +229,6 @@ module.exports = function (app) {
       }
     });
   });
-
-  // router.get('/api.clientRequestsDetails/count', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   var query = buildQuery(req.query, ClientRequestDetail.find());
-  //   query.exec(function(err, object){
-  //     if (err) {
-  //       return next(err);
-  //     } else {
-  //       res.status(200).json({count: object.length});
-  //     }
-  //   });
-  // });
-
-  // router.put('/api/clientRequestsDetails', requireAuth, function(req, res, next){
-  //   debug('Get clientRequests');
-  //   var clientRequest = new Model(req.body.requestId);
-
-  //   Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body, {safe:true, multi:false}, function(err, result){
-  //     if (err) {
-  //       return next(err);
-  //     } else {
-
-  //       res.status(200).json(result);
-  //     }
-  //   })
-
-  // });
 
   //Courses Routes
   router.get('/api/courses', requireAuth, function(req, res, next){
@@ -281,29 +256,29 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/courses/active', requireAuth, function(req, res, next){
-    debug('Get courses');
-    Course.find({active: true})
-      .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
-  });
+  // router.get('/api/courses/active', requireAuth, function(req, res, next){
+  //   debug('Get courses');
+  //   Course.find({active: true})
+  //     .sort(req.query.order)
+  //     .exec(function(err, object){
+  //       if (err) {
+  //         return next(err);
+  //       } else {
+  //         res.status(200).json(object);
+  //       }
+  //     });
+  // });
 
-  router.get('/api/courses/:id', requireAuth, function(req, res, next){
-    debug('Get courses [%s]', req.params.id);
-    Course.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
-        res.status(200).json(object);
-      }
-    });
-  });
+  // router.get('/api/courses/:id', requireAuth, function(req, res, next){
+  //   debug('Get courses [%s]', req.params.id);
+  //   Course.findById(req.params.id, function(err, object){
+  //     if (err) {
+  //       return next(err);
+  //     } else {
+  //       res.status(200).json(object);
+  //     }
+  //   });
+  // });
 
   router.post('/api/courses', requireAuth, function(req, res, next){
     debug('Create courses');
@@ -318,7 +293,7 @@ module.exports = function (app) {
   });
 
   router.put('/api/courses', requireAuth, function(req, res, next){
-    debug('Update courses [%s]', req.body._id);
+    logger.log('Update courses ' + req.body._id, "verbose");
     Course.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -329,7 +304,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/courses/:id', requireAuth, function(req, res, next){
-    debug('Delete courses [%s]', req.params.id);
+    ogger.log('Delete courses ' + req.params.id, "verbose");
     Course.remove(req.params.id, function(err, result){
       if (err) {
         return next(err);
@@ -339,7 +314,7 @@ module.exports = function (app) {
     })
   });
 
-   router.get('/api/clientRequestLocks', function(req, res, next){
+  router.get('/api/clientRequestLocks', function(req, res, next){
       logger.log('Get clientRequest Locks','verbose');
       ClientRequestLock.find()
         .sort("-createdAt")
@@ -349,11 +324,11 @@ module.exports = function (app) {
         })
         .catch(function(err){
           return next(err);
-			})
+			  })
 
-    });
+  });
 
-    router.get('/api/clientRequestLocks/:id',  function(req, res, next){
+  router.get('/api/clientRequestLocks/:id',  function(req, res, next){
       logger.log('Get clientRequest Locks' + req.params.id,'verbose');
       ClientRequestLock.find({requestId: req.params.id})
         .sort("-createdAt")
@@ -369,7 +344,7 @@ module.exports = function (app) {
           return next(err);
 			})
 
-    });
+  });
 
   router.post('/api/clientRequestLocks',  function(req, res, next){
      logger.log('Create clientRequest Lock','verbose');
@@ -381,9 +356,9 @@ module.exports = function (app) {
 				.catch(function (err) {
 					return next(err);
 				});
-    });
+  });
 
-    router.delete('/api/clientRequestLocks/:id',  function(req, res, next){
+  router.delete('/api/clientRequestLocks/:id',  function(req, res, next){
       logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
 			var query = ClientRequestLock.remove({ requestId: req.params.id })
 				.exec()
@@ -394,5 +369,5 @@ module.exports = function (app) {
 					return next(err);
 				});
 
-    });
+  });
 };

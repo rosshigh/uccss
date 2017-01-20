@@ -11,6 +11,7 @@ export function configure(config) {
       './value-converters/append-products',
      './value-converters/ucc-staff',
      './value-converters/session-status-button',
+     './value-converters/person-status-button',
     './value-converters/to-uppercase',
     './value-converters/info-filter',
     './value-converters/date-format',

@@ -11,38 +11,38 @@ var config = require('../../config/config'),
 
 module.exports = function (app) {
   
-    sendMail = function(mailObject){
-      logger.log("sending email");
-      switch(mailObject.type){
-        case 'help-ticket-created':
-          helpTicketCreated(mailObject);
-          break;
-        case 'help-ticket=updated':
-          helpTicketUpdated(mailObject);
-          break;
-        case 'help-ticket-closed':
-          helpTicketClosed(mailObject);
-          break;
-        case 'welcome':
-          welcome(mailObject);
-          break;
-        case 'client-request-created':       
-          requestCreated(mailObject);
-          break;
-        case 'client-request-updated':       
-          requestUpdated(mailObject);
-          break;
-        case 'generic':       
-          genericEmail(mailObject);
-          break;
-        case 'annual-update-contact-info':
-          annualUpdateContactInfo(mailObject);
-          break;
-        case 'client-request-customer-action':        
-          customerAction(mailObject);
-          break;
-      }
-    }
+    // sendMail = function(mailObject){
+    //   logger.log("sending email");
+    //   switch(mailObject.type){
+    //     case 'help-ticket-created':
+    //       helpTicketCreated(mailObject);
+    //       break;
+    //     case 'help-ticket=updated':
+    //       helpTicketUpdated(mailObject);
+    //       break;
+    //     case 'help-ticket-closed':
+    //       helpTicketClosed(mailObject);
+    //       break;
+    //     case 'welcome':
+    //       welcome(mailObject);
+    //       break;
+    //     case 'client-request-created':       
+    //       requestCreated(mailObject);
+    //       break;
+    //     case 'client-request-updated':       
+    //       requestUpdated(mailObject);
+    //       break;
+    //     case 'generic':       
+    //       genericEmail(mailObject);
+    //       break;
+    //     case 'annual-update-contact-info':
+    //       annualUpdateContactInfo(mailObject);
+    //       break;
+    //     case 'client-request-customer-action':        
+    //       customerAction(mailObject);
+    //       break;
+    //   }
+    // }
 
 };
 
@@ -58,12 +58,14 @@ if(env === 'development'){
   var FacoCoWelcomeTemplate = fs.readFileSync(viewPath + "/facco-welcome.handlebars", 'utf-8');
   var CustomerActionTemplate = fs.readFileSync(viewPath + "/client-request-customer-action.handlebars", "utf-8");
   var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
+  var HelpTicketUpdatedTemplate = fs.readFileSync(viewPath + "/help-ticket-updated.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
   var FacoCoWelcomeTemplateCompiled = hbs.compile(FacoCoWelcomeTemplate);
   var CustomerActionTemplateCompiled = hbs.compile(CustomerActionTemplate);
   var GenericTemplateCompiled = hbs.compile(GenericTemplate);
+  var HelpTicketUpdatedTemplateCompiled = hbs.compile(HelpTicketUpdatedTemplate); 
 
   sendGrid = function(mailObject){
     var helper = require('sendgrid').mail;
@@ -164,18 +166,36 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
     logger.log("Help Ticket Created email", "verbose");
-    mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Help Ticket Created'; 
-    sendGrid(mailObject);
+    return new Promise(function(resolve, reject) {
+      mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
+      mailObject.email = mailObject.email;
+      mailObject.subject = 'Help Ticket Created'; 
+      sendGrid(mailObject)
+      .then(result => {
+              if (result.statusCode === 202) {     
+                resolve(result);
+              } else {
+                reject(Error(result));
+              }
+          })
+    });
   }
 
   helpTicketUpdated = function(mailObject){
     logger.log("Help Ticket Update email", "verbose");
-    mailObject.body = HelpTicketUpdatedTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Help Ticket Updated'; 
-    sendGrid(mailObject);
+     return new Promise(function(resolve, reject) {
+      mailObject.body = HelpTicketUpdatedTemplateCompiled(mailObject.context);
+      mailObject.email = mailObject.email;
+      mailObject.subject = 'Help Ticket Updated'; 
+      sendGrid(mailObject)
+      .then(result => {
+                if (result.statusCode === 202) {     
+                  resolve(result);
+                } else {
+                  reject(Error(result));
+                }
+            })
+    });
   }
 
   helpTicketClosed = function(mailObject){
@@ -188,26 +208,55 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
+     return new Promise(function(resolve, reject) {
       mailObject.body = "Request " + mailObject.context.clientRequestNo + " created."; 
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
-      sendGrid(mailObject);
+      sendGrid(mailObject)
+        .then(result => {
+            if (result.statusCode === 202) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+    });
   }
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Product Request Updated'; 
-    sendGrid(mailObject);
+    return new Promise(function(resolve, reject) {
+      mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
+      mailObject.to_email = mailObject.email;
+      mailObject.subject = 'Product Request Updated'; 
+       sendGrid(mailObject)
+          .then(result => {
+              if (result.statusCode === 202) {     
+                resolve(result);
+              } else {
+                reject(Error(result));
+              }
+          })
+
+      });
   }
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-    mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
-    mailObject.to_email = mailObject.email;
-    mailObject.subject = 'Customer Action Required'; 
-    sendGrid(mailObject);
+    return new Promise(function(resolve, reject) {
+      mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
+      mailObject.to_email = mailObject.email;
+      mailObject.subject = 'Customer Action Required'; 
+      sendGrid(mailObject)
+          .then(result => {
+              if (result.statusCode === 202) {     
+                resolve(result);
+              } else {
+                reject(Error(result));
+              }
+          })
+
+      });
   }
 
   genericEmail = function(mailObject){
@@ -224,7 +273,6 @@ if(env === 'development'){
               reject(Error(result));
             }
         })
-
     });
   }
 
@@ -250,13 +298,13 @@ if(env === 'development'){
   transporter.use('compile', options);
 
   nodeMailerSendMail = function(mailObject){
-     return new Promise(function(resolve, reject) {  
+     return new Promise(function(resolve, reject) {        
         transporter.sendMail(mailObject)
-        .then(result => {
+        .then(result => {       
             logger.log(result, 'verbose ');
             resolve(result);
         })
-        .catch(error => {
+        .catch(error => {         
             logger.log(error, 'error');
              reject(Error(error));
         })
@@ -328,28 +376,46 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-      var mail = {
-        from: config.emailAddress,
-        to: mailObject.email,
-        subject: 'Help Ticket Created',
-        template: 'help-ticket-created',
-        context: mailObject.context
-      };
+      return new Promise(function(resolve, reject) {
+        var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: 'Help Ticket Created',
+          template: 'help-ticket-created',
+          context: mailObject.context
+        };
 
-      nodeMailerSendMail(mail);
+        nodeMailerSendMail(mail)
+        .then(result => {      
+              if (result.rejected.length === 0) {     
+                resolve(result);
+              } else {
+                reject(Error(result));
+              }
+          })
+    });
   }
 
   helpTicketUpdated = function(mailObject){
       logger.log("Help Ticket Update email", "verbose");
-      var mail = {
-          from: config.emailAddress,
-          to: mailObject.email,
-          subject: 'Help Ticket Updated',
-          template: 'help-ticket-updated',
-          context: mailObject.context
-        };
+       return new Promise(function(resolve, reject) {
+          var mail = {
+              from: config.emailAddress,
+              to: mailObject.email,
+              subject: 'Help Ticket Updated',
+              template: 'help-ticket-updated',
+              context: mailObject.context
+            };
 
-        nodeMailerSendMail(mail);
+          nodeMailerSendMail(mail)
+          .then(result => {      
+                if (result.rejected.length === 0) {     
+                  resolve(result);
+                } else {
+                  reject(Error(result));
+                }
+            })
+       });
   }
 
   helpTicketClosed = function(mailObject){
@@ -367,41 +433,68 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-     var mail = {
-          from: config.emailAddress,
-          to: mailObject.email,
-          subject: 'Product Request Created',
-          template: 'client-request-created',
-          context: mailObject.context
-      };
+     return new Promise(function(resolve, reject) {
+      var mail = {
+            from: config.emailAddress,
+            to: mailObject.email,
+            subject: 'Product Request Created',
+            template: 'client-request-created',
+            context: mailObject.context
+        };
 
-      nodeMailerSendMail(mail);
+        nodeMailerSendMail(mail)
+          .then(result => {      
+                if (result.rejected.length === 0) {     
+                  resolve(result);
+                } else {
+                  reject(Error(result));
+                }
+            })
+    });   
   }
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    var mail = {
-        from: config.emailAddress,
-        to: mailObject.email,
-        subject: 'Product Request Updated',
-        template: 'client-request-updated',
-        context: mailObject.context
-    };
+    return new Promise(function(resolve, reject) {
+      var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: 'Product Request Updated',
+          template: 'client-request-updated',
+          context: mailObject.context
+      };
 
-    nodeMailerSendMail(mail);
+      nodeMailerSendMail(mail)
+            .then(result => {      
+                  if (result.rejected.length === 0) {     
+                    resolve(result);
+                  } else {
+                    reject(Error(result));
+                  }
+              })
+    });   
   }
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-    var mail = {
-        from: config.emailAddress,
-        to: mailObject.email,
-        subject: 'Customer Action Required',
-        template: 'client-request-customer-action',
-        context: mailObject.context
-    };
+     return new Promise(function(resolve, reject) {
+        var mail = {
+            from: config.emailAddress,
+            to: mailObject.email,
+            subject: 'Customer Action Required',
+            template: 'client-request-customer-action',
+            context: mailObject.context
+        };
 
-    nodeMailerSendMail(mail);
+        nodeMailerSendMail(mail)
+        .then(result => {      
+              if (result.rejected.length === 0) {     
+                resolve(result);
+              } else {
+                reject(Error(result));
+              }
+          })
+    });   
   }
 
   genericEmail = function(mailObject){
@@ -414,11 +507,9 @@ if(env === 'development'){
           template: 'generic',
           context: mailObject.context
       };
-
       nodeMailerSendMail(mail)
-      .then(result => {
-console.log(result);        
-            if (result.statusCode === 202) {     
+      .then(result => {      
+            if (result.rejected.length === 0) {     
               resolve(result);
             } else {
               reject(Error(result));

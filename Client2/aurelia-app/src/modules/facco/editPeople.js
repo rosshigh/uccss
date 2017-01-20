@@ -45,7 +45,7 @@ export class EditPeople {
 
     async refresh(){
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getPeopleArray(true, '?order=lastName');
+        await this.people.getPeopleArray('?order=lastName', true);
         this.people.getInstitutionPeople(this.userObj.institutionId);
         this.dataTable.updateArray(this.people.peopleArray);
         this.spinnerHTML = "";
@@ -90,6 +90,16 @@ export class EditPeople {
             this.utils.showNotification(serverResponse.firstName +  " " + serverResponse.lastName + " was updated");
         }
         this.personSelected = false;
+    }
+
+    updateStatus(person){
+        this.people.selectedPersonFromId(person._id);
+        if(this.people.selectedPerson.personStatus === '01'){
+            this.people.selectedPerson.personStatus = '02';
+        } else {
+            this.people.selectedPerson.personStatus = '01';
+        }
+        this.save();
     }
 
     cancel(){

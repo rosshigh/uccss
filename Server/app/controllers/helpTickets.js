@@ -1,15 +1,14 @@
 var express = require('express'),
-  debug = require('debug')('uccss'),
-  router = express.Router(),
-  mongoose = require('mongoose'),
-  Model = mongoose.model('HelpTicket'),
-  Person = mongoose.model('Person')
-  Content = mongoose.model('HelpTicketContent'),
-  multer = require('multer'),
-  mkdirp = require('mkdirp'),
-  passport = require('passport'),
-  HelpTicketLock = mongoose.model('HelpTicketLock'),
-  logger = require('../../config/logger');
+    router = express.Router(),
+    mongoose = require('mongoose'),
+    Model = mongoose.model('HelpTicket'),
+    Person = mongoose.model('Person')
+    Content = mongoose.model('HelpTicketContent'),
+    multer = require('multer'),
+    mkdirp = require('mkdirp'),
+    passport = require('passport'),
+    HelpTicketLock = mongoose.model('HelpTicketLock'),
+    logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -17,134 +16,155 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/helpTickets', requireAuth, function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
+    query.exec()
+    .then(object => {
+      res.status(200).json(object);
+    })
+    .catch(error => {
+       return next(error);
+    })
   });
 
   router.get('/api/helpTickets/current',requireAuth,  function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket', 'verbose');
     Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
+      .exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.get('/api/helpTickets/current/count', requireAuth, function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket');
     var query = buildQuery(req.query, Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
-    //var query = buildQuery(req.query, Model.find({ $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
-    //query.exec(function(err, object){
-    // Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
-      // .sort(req.query.order)
-      query.exec(function(err, object){
-      if (err) {
-        return next(err);
-      } else {
+      query.exec()
+      .then(object => {
         res.status(200).json(object);
-      }
-    });
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.get('/api/helpTickets/current/count/:personId', requireAuth, function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket', 'verbose');
     Model.find( { 'personId': req.params.personId, $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
+      .exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
-
+ 
   router.get('/api/helpTickets/count', requireAuth, function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket', 'verbose');
     var query = buildQuery(req.query, Model.find())
-    query.exec(function(err, object){
-      if (err) {
-          return next(err);
-        } else {
-          res.status(200).json({count: object.length});
-        }
-      });
+    query.exec()
+      .then(object => {
+        res.status(200).json({count: object.length});
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    debug('Get help ticket [%s]', req.params.id);
-    Model.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Get help ticket '+ req.params.id, 'verbose');
+    Model.findById(req.params.id)
+    .exec()
+      .then(object => {
         res.status(200).json(object);
-      }
-    });
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.post('/api/helpTickets', requireAuth, function(req, res, next){
-    debug('Create HelpTicket');
+    logger.log('Create HelpTicket', "verbose");
     var helpTicket =  new Model(req.body);
     helpTicket.save( function ( err, object ){
       if (err) {
         return next(err);
-      } else {     
-        if(req.query.email == 1){
-          Person.findById(object.personId, function(err, person){
+      } else {          
+        if(req.query.email == 1){        
+          Person.findById(object.personId, function(err, person){           
             if(err){
               return next(err);
-            } else {        
+            } else {                    
               var mailObj = {
+                name: person.fullName,
                 email: person.email,
-                type: 'help-ticket-created',
                 context: object
-              }          
-              sendMail(mailObj);
+              }             
+              helpTicketCreated(mailObj)
+                .then(result => {
+                    res.status(200).json(object);
+                })
+                .catch(error => {
+                    return next(error);
+                });            
             }
           })
-          
+        } else {
+          res.status(200).json(object);
         }
-        res.status(200).json(object);
       }
     });
   });
 
   router.put('/api/helpTickets/content/:id', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
-    Model.findById(req.params.id, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    Model.findById(req.params.id).exec()
+    .then(result => {
         var content = new Content(req.body);
         result.content.push(content);
-        result.save(function(err, result){
-          if (err) {
+        result.save(function ( err, result ){
+          if(err){
             return next(err);
           } else {
-            res.status(200).json(content);
+            if(req.query.email == 1){        
+            Person.findById(result.personId).exec()
+              .then(person => {
+                var mailObj = {
+                    email: person.email,
+                    context: {name: person.fullName, helpTicketNo: result.helpTicketNo}
+                  }             
+                  helpTicketUpdated(mailObj)
+                    .then(result => {
+                        res.status(200).json(result);
+                    })
+                    .catch(error => {
+                        return next(error);
+                    });      
+              })
+              .catch(error => {
+                return next(error);
+              })
+            } else {
+              res.status(200).json(result);
+            }
           }
-        })
-      }
+    })
+    })
+    .catch(error => {
+       return next(error);
     })
   });
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
-    Model.findById(req.params.id, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Update HelpTicket [%s'+ req.body._id, 'verbose');
+    Model.findById(req.params.id).exec()
+    .then(result => {
         if(req.body.personId != result.owner[0].personId){
           result.owner.unshift({
             personId: req.body.personId,
@@ -160,34 +180,36 @@ module.exports = function (app, config) {
         } else {
           res.status(200).json(result);
         }
-      }
-    })
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.put('/api/helpTickets/status/:id', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
-    Model.findById(req.params.id, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
+    Model.findById(req.params.id)
+    .exec()
+    .then(result => {
         result.helpTicketStatus = req.body.helpTicketStatus;
-        result.save(function(err, result){
-          if (err) {
-            return next(err);
+        result.save(function(error, result){
+          if (error) {
+            return next(error);
           } else {
             res.status(200).json(result);
           }
         })
-      }
-    })
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.put('/api/helpTickets/keywords/:id', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
-    Model.findById(req.params.id, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
+    Model.findById(req.params.id)
+    .exec()
+    .then(result => {
         result.keyWords = req.body.keyWords;
         result.save(function(err, result){
           if (err) {
@@ -196,24 +218,27 @@ module.exports = function (app, config) {
             res.status(200).json(result);
           }
         })
-      }
-    })
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.put('/api/helpTickets', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
+    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
 
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+    .exec()
+    .then(result => {
         res.status(200).json(result);
-      }
-    })
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   router.put('/api/helpTickets/sendMail/:id', requireAuth, function(req, res, next){
-    debug('Update HelpTicket [%s]', req.body._id);
+    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
     if(req.body.audit){
       Model.findById(req.params.id, function(err, result){
         if (err) {
@@ -242,14 +267,15 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    debug('Delete session [%s]', req.params.id);
-    Model.removeById(req.params.id, function(err, result){
-      if (err) {
-        return next(err);
-      } else {
+    logger.log('Delete session ' + req.params.id, 'verbose');
+    Model.removeById(req.params.id)
+    .exec()
+    .then(result => {
         res.status(204).json(result);
-      }
-    })
+      })
+      .catch(error => {
+        return next(error);
+      })
   });
 
   var storage = multer.diskStorage({
@@ -273,6 +299,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
+     logger.log('Upload File ', 'verbose');
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);
