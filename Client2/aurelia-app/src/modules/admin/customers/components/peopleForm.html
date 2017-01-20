@@ -50,6 +50,15 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
+                                <label for="editLastName" class="col-sm-3 control-label hideOnPhone">Nickname</label>
+                                <div class="col-sm-8">
+                                    <input value.bind="people.selectedPerson.nickName" id="editLastName" class="form-control " placeholder="Nickname" type="text"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
                                 <label class="control-label col-sm-3 hideOnPhone">Status *</label>
                                 <div class="col-sm-8">
                                     <select value.bind="people.selectedPerson.personStatus" id="editStatus" class="form-control " placeholder="Status">

@@ -147,6 +147,20 @@ export class DataServices {
        
     }
 
+    login(content, url){
+        return this.http.createRequest(url)
+			 .asPost()
+			 .withContent(content)
+			 .send().then(response => {
+				 this.isRequesting = false;
+                 return JSON.parse(response.response);
+             }).catch(e => {
+				 this.isRequesting = false;
+                 console.log(e);
+                 return  {error: true, code: e.statusCode, message: e.statusText};
+             });
+    }
+
     uploadFiles(files, url){
         this.isRequesting = true;
 		let formData = new FormData();

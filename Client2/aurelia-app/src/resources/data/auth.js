@@ -22,7 +22,7 @@ export class Auth {
 			'password': password
 		};
 
-		let response = await this.data.saveObject(content, this.loginUrl, 'post');
+		let response = await this.data.login(content, this.loginUrl);
 		if(!response.error){
 			response.user.userRole = this.utils.setRole(response.user.roles);
 			sessionStorage.setItem('token', response.token);

@@ -20,7 +20,7 @@ module.exports = function(app, config) {
   app.use(cors());
 
   logger.log("Loading Mongoose functionality");
-  // mongoose.set('debug', true);
+  mongoose.Promise = require('bluebird');
   mongoose.connect(config.db);
   var db = mongoose.connection;
   db.on('error', function () {
