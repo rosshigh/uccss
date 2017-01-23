@@ -15,7 +15,7 @@ var express = require('express'),
 module.exports = function (app) {
   app.use('/', router);
 
-  router.get('/api/people', requireAuth,  function(req, res){
+  router.get('/api/people', requireAuth,  function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec( function(err, object){
@@ -27,7 +27,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/institution/:id', requireAuth, function(req, res){
+  router.get('/api/people/institution/:id', requireAuth, function(req, res, next){
     logger.log('Get people','verbose');
     Model.find()
       .sort(req.query.order)
@@ -58,7 +58,7 @@ module.exports = function (app) {
       });
   });
 
-  router.get('/api/people/checkName', function(req, res){
+  router.get('/api/people/checkName', function(req, res, next){
      var query = buildQuery(req.query, Model.find())
     query.exec( function(err, object){
         if (err) {
@@ -83,9 +83,9 @@ module.exports = function (app) {
         }
       });
   });
-
-  router.post('/api/people', requireAuth, function(req, res){
-    logger.log('Create Person','verbose');
+ 
+  router.post('/api/people', requireAuth, function(req, res, next){
+    logger.log('Create Person', 'verbose');
     var person =  new Model(req.body);  
       person.save(function ( err, object ){
         if (err) {
@@ -129,7 +129,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/people', requireAuth, function(req, res){
+  router.put('/api/people', requireAuth, function(req, res, next){
     logger.log('Update Person ' + req.body._id, 'verbose');    
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
@@ -140,7 +140,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/people/password/:id', requireAuth, function(req, res){
+  router.put('/api/people/password/:id', requireAuth, function(req, res, next){
     logger.log('Update Person password [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -158,7 +158,7 @@ module.exports = function (app) {
     })
   });
 
-  router.delete('/api/people/:id', requireAuth, function(req, res){
+  router.delete('/api/people/:id', requireAuth, function(req, res, next){
     logger.log('Delete person [%s]', req.params.id,'verbose');
     Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {

@@ -46,8 +46,6 @@ export class EditPeople {
         ]);
          this.filteredArray = this.config.ROLES;
         this.dataTable.updateArray(this.people.peopleArray);
-
-        // this.dataTable.createPageButtons(1);
     }
 
     attached() {
@@ -119,7 +117,11 @@ export class EditPeople {
 
     async save() {
         if (this.validation.validate(1)) {
-            this.buildAudit();
+            if(this.people.selectedPerson._id){
+                this.buildAudit();
+            } else {
+                this.people.selectedPerson.institutionId = this.institutionId;
+            }
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.peopleArray);
@@ -189,7 +191,8 @@ export class EditPeople {
     }
 
     changeInstitution(){
-         return this.dialog.showMessage(
+        if(this.people.selectedPerson._id){
+            return this.dialog.showMessage(
                 "Are you sure you want to change the institution? This should normally only be done if the account was created in the wrong institution.  If the user has changed institutions, create a new account." ,
                 "Change Institution",
                 ['Yes', 'No']
@@ -200,6 +203,7 @@ export class EditPeople {
                     this.institutionId = this.people.selectedPerson.institutionId;
                 }
             });
+        }
     }
 
     async openEditCourseForm() {
@@ -232,14 +236,15 @@ export class EditPeople {
     }
 
     async saveCourse() {
-        if (this.validation.validate(2, this)) {
+        if (this.validation.validate(2)) {
             if (this.people.selectedPerson._id) {
                 this.people.selectedCourse.personId = this.people.selectedPerson._id;
                 let serverResponse = await this.people.saveCourse();
                 if (!serverResponse.error) {
                     this.utils.showNotification("The course was updated");
                 }
-                this.courseSelected = false;
+                this._cleanUp();
+                // this.courseSelected = false;
             }
         }
     }
@@ -274,8 +279,8 @@ export class EditPeople {
     }
 
     copyInstAddress() {
-        if (this.people.selectedPerson.institutionId) {
-            this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
+        if (this.institutionId) {
+            this.people.selectInstitutionByID(this.institutionId);
             if (this.people.selectedInstitution._id) {
                 this.people.selectedPerson.address1 = this.people.selectedInstitution.address1;
                 this.people.selectedPerson.address2 = this.people.selectedInstitution.address2;
@@ -289,6 +294,7 @@ export class EditPeople {
     }
 
     _cleanUp(){
+        this.institutionId = "";
         this.personSelected = false;
         this.newPerson = false;
         this. _cleanUpFilters();
@@ -329,7 +335,7 @@ export class EditPeople {
                     return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
                 }
             }]);
-        this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
+        this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "institutionId" }]);
         this.validation.addRule(1, "editRoles", [{
             "rule": "custom", "message": "The person must be assigned a role.",
             "valFunction": function (context) {

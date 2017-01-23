@@ -61,7 +61,7 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-3 hideOnPhone">Status *</label>
                                 <div class="col-sm-8">
-                                    <select value.bind="people.selectedPerson.personStatus" id="editStatus" class="form-control " placeholder="Status">
+                                    <select keypress.bind="setStatus($event)" value.bind="people.selectedPerson.personStatus" id="editStatus" class="form-control " placeholder="Status">
                                         <option value="">Select an option</option>
                                         <option repeat.for='status of is4ua.personStatusArray' value="${status.code}">${status.description}</option>
                                     </select>

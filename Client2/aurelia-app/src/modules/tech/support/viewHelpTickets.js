@@ -254,7 +254,7 @@ export class ViewHelpTickets {
 
   _unLock(){
     if(!this.showLockMessage){
-      if(this.helpTickets.selectedHelpTicket._id){
+      if(this.helpTickets.selectedHelpTicket && this.helpTickets.selectedHelpTicket._id){
         this.helpTickets.removeHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       }    
     }

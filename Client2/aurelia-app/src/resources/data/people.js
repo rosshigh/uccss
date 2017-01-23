@@ -225,7 +225,7 @@ export class People {
         } else {
             try {
                 this.selectedInstitution = this.utils.copyObject(this.institutionsArray[index]);
-                this.utils.formatDateForDatesPicker(this.selectedInstitution)
+                // this.utils.formatDateForDatesPicker(this.selectedInstitution)
                 this.newInstitution = false;
                 this.editInstitutionIndex = index;
             } catch (error) {

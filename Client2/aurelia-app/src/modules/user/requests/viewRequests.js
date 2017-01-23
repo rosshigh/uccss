@@ -186,6 +186,8 @@ export class ViewRequests {
 
   changeBeginDate(evt){
     this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
+    console.log(moment(this.requests.selectedRequest.startDate))
+    console.log(moment(this.requests.selectedRequest.endDate))
     this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
   }
 
@@ -209,7 +211,7 @@ export class ViewRequests {
 
    _unLock(){
     if(!this.showLockMessage){
-      if(this.requests.selectedRequest._id){
+      if(this.requests.selectedRequest && this.requests.selectedRequest._id){
          this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);
       }    

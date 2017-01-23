@@ -71,8 +71,7 @@ export class DataServices {
 				if (!response.isSuccess) {
                      return response;
                  } else {
-                     return JSON.parse(response.requestMessage.content);
-                    //  return JSON.parse(response.response);
+                     return JSON.parse(response.response);
                  }
              }).catch(e => {
 				 this.isRequesting = false;
@@ -90,8 +89,7 @@ export class DataServices {
 				if (!response.isSuccess) {
                      return response;
                  } else {
-                     return JSON.parse(response.requestMessage.content);
-                    //  return JSON.parse(response.response);
+                     return JSON.parse(response.response);
                  }
              }).catch(e => {
 				 this.isRequesting = false;
