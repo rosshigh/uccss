@@ -220,8 +220,6 @@
             "path": "../node_modules/aurelia-mask/dist",
             "main": "masked-input"
           },
-          "eonasdan-bootstrap-datetimepicker",
-          "bootstrap-datepicker",
           {
             "name": "ckeditor",
             "path": "../node_modules/ckeditor",
@@ -231,7 +229,9 @@
               "skins/moono-lisa/editor.css",
               "lang/en.js"
             ]
-          }
+          },
+          "eonasdan-bootstrap-datetimepicker",
+          "bootstrap-datepicker"
         ]
       }
     ]
