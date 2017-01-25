@@ -25,6 +25,7 @@ export class CreateHelpTickets{
     selectedFiles;
     removedFiles = new Array();
     commentsResponse = "";
+    setValue = "";
 
     showAdditionalInfo=false;
 
@@ -136,6 +137,7 @@ export class CreateHelpTickets{
     async buldHelpTicket(){
         this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
         this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
+        this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;
         this.helpTickets.selectedHelpTicketContent.content.comments =  this.commentsResponse;
 
         if(!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired){

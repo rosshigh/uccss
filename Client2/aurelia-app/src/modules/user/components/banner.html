@@ -1,0 +1,11 @@
+<template>
+	<div class="textContainer banner">
+		<h4><span show.bind="temp" class="leftMargin">${userObj.city} weather: ${temp} </h4><img src="${weatherIcon}"/>
+		<h4><span show.bind="ucctemp" class="leftMargin">UCC weather: ${ucctemp} </h4><img src="${uccweatherIcon}"/></span> 
+		<div class="pull-right">
+			<a href="#/clientRequests" class="rightMargin" if.bind="requests.customerActionRequests > 0">Requests <span class="badge">${requests.customerActionRequests}</span></a>            
+			<a href="#/support" class="rightMargin" if.bind="helpTickets.customerActionHelpTickets > 0">Help Tickets <span class="badge">${helpTickets.customerActionHelpTickets}</span></a>
+			<span class="rightMargin"><h4>Welcome ${userObj.fullName}</h4></span>
+		</div>
+	</div>
+</template>

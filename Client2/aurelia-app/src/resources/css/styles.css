@@ -22,7 +22,7 @@
     background-image: url("/img/DataCenter.jpg");
 
     /* Set a specific height */
-    min-height: 300px; 
+    min-height: 200px; 
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;

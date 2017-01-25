@@ -136,6 +136,7 @@ export class CreateHelpTickets{
     async buldHelpTicket(){
         this.helpTickets.selectedHelpTicket.owner = [{ "personId": this.userObj._id,  "date": new Date() }];
         this.helpTickets.selectedHelpTicket.personId = this.editPerson;
+        this.helpTickets.selectedHelpTicket.institutionId = this.editInstitution;
 
         if(!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired){
             this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';

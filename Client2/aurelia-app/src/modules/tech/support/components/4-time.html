@@ -4,6 +4,8 @@
   </div>
   <div class="smart-timeline-time">
     <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
+     <p><span if.bind="event.emailSent"  ><i class="fa fa-envelope" aria-hidden="true"></i></span></p>
+     <span if.bind="event.confidential"  ><i class="fa fa-user-secret" aria-hidden="true"></i></i></span>
   </div>
   <div class="smart-timeline-content borderTop leftJustify">
     <div class="form-group">

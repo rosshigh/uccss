@@ -13,6 +13,7 @@ export class EditSessions {
     navControl = "sessionNavButtons";
     showScreen = 'sessionTable';
     spinnerHTML = "";
+    isChecked = true;
 
     constructor(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
         this.router = router;
@@ -38,6 +39,7 @@ export class EditSessions {
         await this.config.getConfig();
         await this.config.getSessions();
         this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
+        this.filterOutClosed();
     }
 
     async refresh() {

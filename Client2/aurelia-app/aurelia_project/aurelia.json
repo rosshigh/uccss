@@ -221,7 +221,17 @@
             "main": "masked-input"
           },
           "eonasdan-bootstrap-datetimepicker",
-          "bootstrap-datepicker"
+          "bootstrap-datepicker",
+          {
+            "name": "ckeditor",
+            "path": "../node_modules/ckeditor",
+            "main": "ckeditor",
+            "resources": [
+              "config.js",
+              "skins/moono-lisa/editor.css",
+              "lang/en.js"
+            ]
+          }
         ]
       }
     ]

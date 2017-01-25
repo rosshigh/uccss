@@ -14,6 +14,7 @@ module.exports = Mongoose.model('HelpTicketLock', helpTicketLockSchema);
 var HelpTicketContentSchema = new Schema({
   type: { type: Number, required: true},
   createdDate: { type: Date, default: Date.now, required: true },
+  emailSent: { type: Boolean },
   files: [ {
     originalFilename: { type: String },
     fileName: { type: String },
@@ -35,12 +36,13 @@ var HelpTicketSchema = new Schema({
   helpTicketStatus: { type: Number, required: true },
   keyWords: { type: String },
   personId: { type: Schema.Types.ObjectId, ref: 'person' },
-    content: [HelpTicketContentSchema],
-    owner: [{
-      personId: { type: Schema.Types.ObjectId },
-      dateAssigned: { type: Date, default: Date.now }
-    }],
-    audit: [{
+  institutionId: { type: Schema.Types.ObjectId },
+  content: [HelpTicketContentSchema],
+  owner: [{
+    personId: { type: Schema.Types.ObjectId },
+    dateAssigned: { type: Date, default: Date.now }
+  }],
+  audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },
     oldValue: { type: Schema.Types.Mixed },

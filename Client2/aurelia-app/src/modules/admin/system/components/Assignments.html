@@ -46,7 +46,9 @@
       </div>
     </div>
     <div class="col-lg-12">
-      <label for="editProductInfo " class="control-label pull-left">Product Information</label>
+      <editor  name.bind="assignmentEditor" value.bind="productInfoEditorContent" setvalue.bind="setValue"></editor>
+      <!--
       <tiny-mce height.bind="150" value.two-way="productInfoEditorContent"></tiny-mce>
+      -->
     </div>
 </template>

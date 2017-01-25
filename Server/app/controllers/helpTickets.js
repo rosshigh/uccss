@@ -131,8 +131,8 @@ module.exports = function (app, config) {
         result.save(function ( err, result ){
           if(err){
             return next(err);
-          } else {
-            if(req.query.email == 1){        
+          } else {         
+            if(req.body.emailSent && !req.body.confidential){        
             Person.findById(result.personId).exec()
               .then(person => {
                 var mailObj = {
@@ -162,14 +162,15 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket [%s'+ req.body._id, 'verbose');
+    logger.log('Update HelpTicket owner', 'verbose');
     Model.findById(req.params.id).exec()
-    .then(result => {
+    .then(result => {   
         if(req.body.personId != result.owner[0].personId){
           result.owner.unshift({
             personId: req.body.personId,
             dateAssigned: new Date()
           });
+          result.helpTicketStatus = req.body.status;
           result.save(function(err, result){
             if (err) {
               return next(err);
@@ -332,8 +333,7 @@ module.exports = function (app, config) {
         }
       });
 
-    });
-
+  });
   
   router.get('/api/helpTicketLocks', function(req, res, next){
       logger.log('Get helpTicket Locks','verbose');
@@ -347,25 +347,25 @@ module.exports = function (app, config) {
           return next(err);
 			})
 
-    });
+  });
 
-    router.get('/api/helpTicketLocks/:id',  function(req, res, next){
-      logger.log('Get helpTicket Locks' + req.params.id,'verbose');
-      HelpTicketLock.find({helpTicketId: req.params.id})
-        .sort("-createdAt")
-        .exec()
-        .then(function(locks){         
-          if(locks.length === 0){
-            res.status(200).json({helpTicketId: 0});
-          } else {
-            res.status(200).json(locks);
-          }
-        })
-        .catch(function(err){
-          return next(err);
-			})
+  router.get('/api/helpTicketLocks/:id',  function(req, res, next){
+    logger.log('Get helpTicket Locks' + req.params.id,'verbose');
+    HelpTicketLock.find({helpTicketId: req.params.id})
+      .sort("-createdAt")
+      .exec()
+      .then(function(locks){         
+        if(locks.length === 0){
+          res.status(200).json({helpTicketId: 0});
+        } else {
+          res.status(200).json(locks);
+        }
+      })
+      .catch(function(err){
+        return next(err);
+    })
 
-    });
+  });
 
   router.post('/api/helpTicketLocks',  function(req, res, next){
      logger.log('Create helpTicket Lock','verbose');
@@ -377,29 +377,29 @@ module.exports = function (app, config) {
 				.catch(function (err) {
 					return next(err);
 				});
-    });
+  });
 
-    router.delete('/api/helpTicketLocks/:id',  function(req, res, next){
-      logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
-			var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
-				.exec()
-				.then(function (result) {
-					res.status(200).json({"message" : "Lock removed"});
-				})
-				.catch(function (err) {
-					return next(err);
-				});
+  router.delete('/api/helpTicketLocks/:id',  function(req, res, next){
+    logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+    var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
+      .exec()
+      .then(function (result) {
+        res.status(200).json({"message" : "Lock removed"});
+      })
+      .catch(function (err) {
+        return next(err);
+      });
 
-    });
+  });
 
-    router.post('/api/sendMail', function(req,res,next){
-      var mailObj = {
-                email: 'hightowe@uwm.edu',
-                subject: 'Help Ticket Created',
-                template: 'help-ticket-created',
-                context: {helpTicketNo: 5}
-              }
-              sendMail(mailObj);
-    })
+  router.post('/api/sendMail', function(req,res,next){
+    var mailObj = {
+              email: 'hightowe@uwm.edu',
+              subject: 'Help Ticket Created',
+              template: 'help-ticket-created',
+              context: {helpTicketNo: 5}
+            }
+            sendMail(mailObj);
+  })
 
 };

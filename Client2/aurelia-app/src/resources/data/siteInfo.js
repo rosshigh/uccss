@@ -54,7 +54,7 @@ export class SiteInfo {
         newItem.content = "";
         newItem.url = "";
         newItem.createdDate = new Date();
-        newItem.expiredDate = moment(new Date()).add(1, 'years');
+        newItem.expiredDate = moment(new Date()).format().add(1, 'years');
         newItem.image = "";
         newItem.priority = "INFO";
         newItem.itemType = "NEWS";

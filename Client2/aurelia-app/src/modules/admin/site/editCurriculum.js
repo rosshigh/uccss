@@ -14,7 +14,8 @@ export class EditCurriculum {
     curriculumItemSelected = false;
     // navControl = "newsNavButtons";
     spinnerHTML = "";
-    curriculumContent = " ";
+    curriculumContent = "";
+    setValue = "";
 	newItem = false;
 
     constructor(datatable, curriculum, products, config, utils, dialog, validation) {
@@ -43,7 +44,6 @@ export class EditCurriculum {
 		 ]);
         this.dataTable.updateArray(this.curriculum.curriculumArray);
 		this.filterList();
-        // this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
@@ -66,7 +66,7 @@ export class EditCurriculum {
     async edit(index, el) {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.curriculum.selectCurriculum(this.editIndex);
-        this.curriculumContent =  this.curriculum.selectedCurriculum.description ? this.curriculum.selectedCurriculum.description : " ";
+        this.setValue =  this.curriculum.selectedCurriculum.description ? this.curriculum.selectedCurriculum.description : " ";
 		this.originalCurriculumObject = this.utils.copyObject(this.curriculum.selectedCurriculum);
 		this.newItem = false;
 

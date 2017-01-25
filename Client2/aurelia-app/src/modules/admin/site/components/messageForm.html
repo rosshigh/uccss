@@ -50,8 +50,10 @@
                     <div class="form-group">
                         <label for="editContent" class="col-sm-2 control-label hideOnPhone">Content</label>
                         <div class="col-sm-8">
+                            <editor  name.bind="msgEditor" value.bind="messageContent" setvalue.bind="setValue"></editor>
+                            <!--  
                             <tiny-mce height.bind="150" value.two-way="messageContent"></tiny-mce>
-                        <!--    <textarea value.bind="siteinfo.selectedMessage.content" id="editContent" class="form-control " placeholder="Content" rows="10"></textarea> -->
+                          <textarea value.bind="siteinfo.selectedMessage.content" id="editContent" class="form-control " placeholder="Content" rows="10"></textarea> -->
                         </div>
                     </div>
                 </div>

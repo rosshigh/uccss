@@ -1,8 +1,10 @@
 <template>
     <div class="col-lg-12">
         <div class="form-group ">
-            <label for="editClientInfo " class="control-label">Client Info</label>
+             <editor name.bind="notesEditor" value.bind="notesEditorContent" setvalue.bind="setValue2"></editor>
+             <!--
             <tiny-mce height.bind="150" value.two-way="notesEditorContent"></tiny-mce>
+            -->
         </div>
     </div>
 </template>

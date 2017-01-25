@@ -23,6 +23,8 @@ export class EditProducts {
     spinnerHTML = "";
     notesEditorContent = "";
     productInfoEditorContent = "";
+    setValue = "";
+    setValue2 = "";
 
     tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
     tabPath = './';
@@ -96,8 +98,8 @@ export class EditProducts {
         }
 
         this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
-        this.notesEditorContent = this.products.selectedProduct.clientInfo || "";
-        this.productInfoEditorContent = this.products.selectedProduct.productInfo || "";
+        this.setValue2 = this.products.selectedProduct.clientInfo || "";
+        this.setValue = this.products.selectedProduct.productInfo || "";
 
         //Editing a product
         $("#editClientKey").focus();

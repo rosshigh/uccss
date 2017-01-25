@@ -1,42 +1,40 @@
 <template>
     
-    <div class="textContainer banner">
-        <h4><span show.bind="temp" class="leftMargin">${userObj.city} weather: ${temp} </h4><img src="${weatherIcon}"/>
-        <h4><span show.bind="ucctemp" class="leftMargin">UCC weather: ${ucctemp} </h4><img src="${uccweatherIcon}"/></span> 
-        <div class="pull-right">
-            <a href="#/clientRequests" class="rightMargin" if.bind="requests.customerActionRequests > 0">Requests <span class="badge">${requests.customerActionRequests}</span></a>            
-            <a href="#/support" class="rightMargin" if.bind="helpTickets.customerActionHelpTickets > 0">Help Tickets <span class="badge">${helpTickets.customerActionHelpTickets}</span></a>
-            <span class="rightMargin"><h4>Welcome ${userObj.fullName}</h4></span>
-        </div>
-    </div>
-        
+    <compose view="./components/banner.html"></compose>
+    <div class="container">
     <div class="row">
         <div class="col-lg-3 col-lg-offset-1 bigMarginTop leftMargin">
-            <h2 class="underline">Useful Information</h2>
-            <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
-                <compose view="./components/newsItem.html"></compose>
+             <div class="bigMarginTop leftMargin">
+                <compose view="./components/uccInformation.html"></compose>
             </div>
+           
             <h2 class="underline bottomMargin">Useful Links</h2>
             <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
                 <compose view="./components/homePageLinks.html"></compose> 
             </div>
         </div>
-        <div class="col-lg-8">
-            <div class="col-lg-12" style="height:700px;">
-                <compose view="./components/carousel.html"></compose>
+        <div class="col-lg-4">
+            <div class="col-lg-12">
+                <div style="height:500px;">
+                    <compose view="./components/carousel.html"></compose>
+                </div>
             </div>
-            <div class="col-lg-5">
-                <h2 class="underline">UCC and UA News</h2>
-                <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
+        </div>
+
+            <div class="col-lg-3 col-lg-offset-1">
+                <div>
+                    <h2 class="underline topMargin">UCC and UA News</h2>
+                    <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
+                        <compose view="./components/newsItem.html"></compose>
+                    </div>
+                </div>
+                <h2 class="underline topMargin">Useful Information</h2>
+                <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
                     <compose view="./components/newsItem.html"></compose>
                 </div>
             </div>
-            <div class="col-md-5 bigMarginTop leftMargin">
-                <compose view="./components/uccInformation.html"></compose>
-            </div>
         </div>
     </div>
-    
 
         <!--
         <div class="col-md-5 bigMarginTop leftMargin hidden-xs hidden-sm">

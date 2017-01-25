@@ -15,6 +15,7 @@ export class EditMessages {
     spinnerHTML = "";
     isInformationItem = false;
     messageContent = "";
+    setValue = "";
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -63,7 +64,7 @@ export class EditMessages {
         this.siteinfo.selectMessage(this.editIndex);
         
         this.originalMessage = this.utils.copyObject(this.siteinfo.selectedMessage);
-        this.messageContent = this.siteinfo.selectedMessage.content;
+        this.setValue = this.siteinfo.selectedMessage.content;
 
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');

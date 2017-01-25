@@ -55,7 +55,7 @@ export class TinyMce {
 						if(!that.value) that.value = "";
 						editor.setContent(that.value);
 					});
-					editor.on('change redo undo mouseleave', e => {
+					editor.on('change redo undo', e => {
 						if(once) that.value = editor.getContent({format: 'raw'}); 
 						once = true;
 					});

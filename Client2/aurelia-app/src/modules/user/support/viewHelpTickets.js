@@ -25,6 +25,7 @@ export class ViewHelpTickets {
   filterValues = new Array();
   lockObject = new Object();
   responseContent = " ";
+  setValue = "";
 
   constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
@@ -123,7 +124,7 @@ export class ViewHelpTickets {
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
         this.enableButton = true;
-        tinyMCE.activeEditor.focus();
+        // tinyMCE.activeEditor.focus();
      }
   }
 
@@ -137,6 +138,7 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent
+     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
   }
 
   async saveResponse() {

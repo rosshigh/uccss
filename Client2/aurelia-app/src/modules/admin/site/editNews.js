@@ -6,7 +6,6 @@ import {SiteInfo} from '../../../resources/data/siteInfo';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
 import $ from 'jquery';
-import moment from 'moment';
 
 @inject(DataTable, SiteInfo, Utils, CommonDialogs, Validation, AppConfig)
 export class EditNews {
@@ -15,6 +14,8 @@ export class EditNews {
     spinnerHTML = "";
     isInformationItem = false;
     newsContent = "";
+    setValue = "";
+    isChecked = true;
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -36,7 +37,7 @@ export class EditNews {
         await this.siteinfo.getInfoArray(true, '?order=sortOrder');
         await this.config.getConfig();
         this.dataTable.updateArray(this.siteinfo.siteArray);
-        this.dataTable.createPageButtons(1);
+        this.filterOutExpired();
     }
 
     async refresh() {
@@ -58,7 +59,7 @@ export class EditNews {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectSiteItem(this.editIndex);
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
-        this.newsContent = this.siteinfo.selectedItem.content;
+        this.setValue = this.siteinfo.selectedItem.content;
 
         //Editing a product
         $("#editTitle").focus();
