@@ -1,6 +1,6 @@
 import {inject, bindable, bindingMode} from 'aurelia-framework';
 import {ObserverLocator} from "aurelia-binding";
-import 'ckeditor';
+// import './ckeditor';
 
 @inject(Element, ObserverLocator)
 export class Editor {

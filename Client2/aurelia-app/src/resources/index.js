@@ -5,7 +5,7 @@ export function configure(config) {
     './elements/table-navigation-bar',
     './elements/numeric-input',
     './elements/tiny-mce',
-    './elements/editor',
+    './editor/editor',
     './elements/add-systems',
     './elements/date-picker',
      './elements/edit-client',
