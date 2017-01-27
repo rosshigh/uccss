@@ -90,6 +90,8 @@ export class User {
             this.sessions.getSessionsArray(false),
             this.siteinfo.getInfoArray(false, options)
             ]);
+            this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
+            this.showHelpTickets = this.helpTickets.newHelpTickets;
     } else {
         var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
         this.countHeader = "Your Institution's Recent Request History";
@@ -99,6 +101,8 @@ export class User {
             this.sessions.getSessionsArray(false),
             this.siteinfo.getInfoArray(false, options)  
         ]);
+        this.showRequests = this.requests.customerActionRequests;
+        this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
     }
     this.requestsCount = new Array();
     this.countLabels = new Array();

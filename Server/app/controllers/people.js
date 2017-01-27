@@ -2,11 +2,13 @@ var express = require('express'),
   	router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
+    PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
     logger = require('../../config/logger'),
     passportService = require('../../config/passport'),
     passport = require('passport'),
     Promise = require('bluebird'),
+    config = require('../../config/config'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
 
     var requireAuth = passport.authenticate('jwt', { session: false }),
@@ -140,7 +142,7 @@ module.exports = function (app) {
     })
   });
 
-  router.put('/api/people/password/:id', requireAuth, function(req, res, next){
+  router.put('/api/people/password/:id',  function(req, res, next){
     logger.log('Update Person password [%s]', req.params.id,'verbose');
     Model.findById(req.params.id, function(err, result){
       if (err) {
@@ -193,6 +195,64 @@ module.exports = function (app) {
               return next(error);
           });
         
+    })
+    .catch(error => {
+       return next(error);
+    })
+  });
+
+  router.post('/api/passwordReset',  function(req, res, next){
+    logger.log('Password Reset for ' + req.body.email, 'verbose');
+     Model.find({ email : req.body.email}).exec()
+     .then(person => {      
+       if(person){
+          var passwordreset = PasswordReset({personId: person[0]._id});
+          passwordreset.validationCode =  new Buffer(passwordreset._id + person[0]._id).toString('base64');       
+          passwordreset.save()
+          .then(result => {
+              var context = {fullName: person[0].fullName, result: result, host: config.corsDomain };
+              result.fullName = person[0].fullName;
+              var mailObj = {
+                email: person[0].email,
+                subject: 'Password Reset',
+                context: context
+              }     
+              passwordReset(mailObj)
+                .then(emailResult => {
+                    res.status(200).json(result);
+                })
+                .catch(error => {
+                    return next(error);
+                });  
+          })
+          .catch(error => {
+            return next(error);
+          })
+       } else {
+         res.status(404).json({message: "Email not found" });
+       }
+     })
+     .catch(error => {
+       return next(error);
+     })
+  });
+
+  router.get('/api/passwordReset/:id',  function(req, res, next){
+    logger.log('Password Reset', 'verbose');  
+    PasswordReset.findById(req.params.id).exec()
+    .then(result => {
+       if(result){
+          Model.findById(result.personId).exec()
+          .then(person => {
+            res.status(200).json(person);
+          })
+          .catch(error => {
+            res.status(404).json({message: "Couldn't find the user"});
+          })
+       } else {
+          res.status(404).json({message: "Validation code not found"});
+       }
+      
     })
     .catch(error => {
        return next(error);

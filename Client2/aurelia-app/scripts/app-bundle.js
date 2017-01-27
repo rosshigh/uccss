@@ -407,7 +407,7 @@ define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'],
             var appRouterConfig = function appRouterConfig(config) {
                 config.addPipelineStep('authorize', AuthorizeStep);
                 config.title = 'UCCSS';
-                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }]);
+                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }]);
 
                 config.mapUnknownRoutes('home');
             };
@@ -1581,7 +1581,7 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
     return Register;
   }()) || _class);
 });
-define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _moment, _jquery) {
+define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _jquery) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -1590,8 +1590,6 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
     exports.Profile = undefined;
 
     var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
 
     var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -1908,7 +1906,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
 
                                 if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
-                                    _context2.next = 11;
+                                    _context2.next = 13;
                                     break;
                                 }
 
@@ -1920,26 +1918,32 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                             case 8:
                                 responses = _context2.sent;
-                                _context2.next = 16;
+
+                                this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
+                                this.showHelpTickets = this.helpTickets.newHelpTickets;
+                                _context2.next = 20;
                                 break;
 
-                            case 11:
+                            case 13:
                                 countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
 
                                 this.countHeader = "Your Institution's Recent Request History";
-                                _context2.next = 15;
+                                _context2.next = 17;
                                 return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
 
-                            case 15:
+                            case 17:
                                 _responses = _context2.sent;
 
-                            case 16:
-                                this.requestsCount = new Array();
-                                this.countLabels = new Array();
-                                _context2.next = 20;
-                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+                                this.showRequests = this.requests.customerActionRequests;
+                                this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
 
                             case 20:
+                                this.requestsCount = new Array();
+                                this.countLabels = new Array();
+                                _context2.next = 24;
+                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+
+                            case 24:
                                 requestCountArray = _context2.sent;
 
                                 if (requestCountArray) {
@@ -1952,14 +1956,14 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 this.temp = undefined;
 
                                 if (sessionStorage.getItem('weather')) {
-                                    _context2.next = 34;
+                                    _context2.next = 38;
                                     break;
                                 }
 
-                                _context2.next = 26;
+                                _context2.next = 30;
                                 return this.siteinfo.getWeather(this.userObj.city);
 
-                            case 26:
+                            case 30:
                                 weather = _context2.sent;
 
                                 this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
@@ -1968,22 +1972,22 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 weatherObj = { temp: this.temp, url: this.weatherIcon };
 
                                 sessionStorage.setItem('weather', JSON.stringify(weatherObj));
-                                _context2.next = 37;
+                                _context2.next = 41;
                                 break;
 
-                            case 34:
+                            case 38:
                                 _weather = JSON.parse(sessionStorage.getItem('weather'));
 
                                 this.temp = _weather.temp;
                                 this.weatherIcon = _weather.url;
 
-                            case 37:
+                            case 41:
                                 uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
 
                                 this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + '\xB0 C';
                                 this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
 
-                            case 40:
+                            case 44:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -3767,6 +3771,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.CHECK_EMAIL = 'people/checkEmail';
             this.CHECK_NAME = 'people/checkName';
             this.SEND_MAIL = 'people/sendMail';
+            this.PASSWORD_RESET = 'passwordReset';
             this.CURRICULUM_SERVICE = 'curriculum';
             this.CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
             this.SESSIONS_SERVICE = "sessions";
@@ -6649,6 +6654,68 @@ define('resources/data/people',['exports', 'aurelia-framework', 'moment', './dat
                 return this.utils.objectsEqual(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
             }
         };
+
+        People.prototype.requestPasswordReset = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(obj) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                _context14.next = 2;
+                                return this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
+
+                            case 2:
+                                serverResponse = _context14.sent;
+                                return _context14.abrupt('return', serverResponse);
+
+                            case 4:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function requestPasswordReset(_x12) {
+                return _ref14.apply(this, arguments);
+            }
+
+            return requestPasswordReset;
+        }();
+
+        People.prototype.getPasswordReset = function () {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(validationCode) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                    while (1) {
+                        switch (_context15.prev = _context15.next) {
+                            case 0:
+                                _context15.next = 2;
+                                return this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+
+                            case 2:
+                                serverResponse = _context15.sent;
+
+                                if (!serverResponse.code) {
+                                    this.selectedPerson = serverResponse;
+                                }
+                                return _context15.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context15.stop();
+                        }
+                    }
+                }, _callee15, this);
+            }));
+
+            function getPasswordReset(_x13) {
+                return _ref15.apply(this, arguments);
+            }
+
+            return getPasswordReset;
+        }();
 
         return People;
     }()) || _class);
@@ -18295,6 +18362,52 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             return loginSuccess;
         }();
 
+        NavBar.prototype.requestPasswordReset = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.email) {
+                                    _context3.next = 7;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.people.requestPasswordReset({ email: this.email });
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
+                                } else if (response.status = 404) {
+                                    this.utils.showNotification("There is no registered user with that email address");
+                                } else if (response.status = 401) {
+                                    this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
+                                }
+                                _context3.next = 8;
+                                break;
+
+                            case 7:
+                                this.utils.showNotification("Please enter an email address");
+
+                            case 8:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function requestPasswordReset() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return requestPasswordReset;
+        }();
+
         return NavBar;
     }()) || _class);
 });
@@ -27688,6 +27801,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
       this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
       this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
+      this.responseContent = "";
+      this.setValue = "CLEAR_EDITOR";
       this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
     };
 
@@ -37886,6 +38001,183 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
     }
   }
 });
+define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _people, _jquery) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ResetPassword = undefined;
+
+	var _validation2 = _interopRequireDefault(_validation);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ResetPassword = exports.ResetPassword = (_dec = (0, _aureliaFramework.inject)(_people.People, _aureliaRouter.Router, _validation2.default, _utils.Utils), _dec(_class = function () {
+		function ResetPassword(people, router, validation, utils) {
+			_classCallCheck(this, ResetPassword);
+
+			this.people = people;
+			this.router = router;
+			this.validation = validation;
+			this.validation.initialize(this);
+			this._setupValidation();
+			this.utils = utils;
+			this.thresholdLength = 6;
+			this.threshold = 3;
+			this.showForm = true;
+			this.passwordReset = true;
+		}
+
+		ResetPassword.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(params) {
+				var validationCode, response;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								if (!params.id) this.router.navigate("home");
+								validationCode = atob(params.id).substring(0, 24);
+								_context.next = 4;
+								return this.people.getPasswordReset(validationCode);
+
+							case 4:
+								response = _context.sent;
+
+								if (response.code === 404) {
+									this.showForm = false;
+								}
+
+							case 6:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate(_x) {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ResetPassword.prototype.passwordComplexity = function passwordComplexity() {
+
+			var newValue = this.newPassword;
+
+			this.longPassword = newValue.length >= this.thresholdLength;
+
+			var strength = 0;
+			strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+			strength += /[a-z]+/.test(newValue) ? 1 : 0;
+			strength += /[0-9]+/.test(newValue) ? 1 : 0;
+			strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+			this.complexPassword = strength >= this.threshold && this.longPassword;
+			this.validation.validate(4);
+		};
+
+		ResetPassword.prototype.savePassword = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var obj, response;
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								if (!this.validation.validate(1)) {
+									_context2.next = 6;
+									break;
+								}
+
+								obj = {
+									password: this.newPassword
+								};
+								_context2.next = 4;
+								return this.people.updatePassword(obj);
+
+							case 4:
+								response = _context2.sent;
+
+								if (!response.error) {
+									this.utils.showNotification("The password was updated");
+									this.router.navigate("home");
+								}
+
+							case 6:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function savePassword() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return savePassword;
+		}();
+
+		ResetPassword.prototype._setupValidation = function _setupValidation() {
+			this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "newPassword" }]);
+			this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+				"valFunction": function valFunction(context) {
+					return context.newPassword === context.password_repeat;
+				} }], true);
+			this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+				"valFunction": function valFunction(context) {
+					return context.complexPassword;
+				} }]);
+		};
+
+		return ResetPassword;
+	}()) || _class);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"resources/css/styles.css\"></require>\n  <require from=\"humane-js/themes/flatty.css\"></require>\n\n  <nav-bar></nav-bar>\n\n  <div class=\"page-host\">\n     <loading-indicator loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n  </div>\n   \n</template>"; });
 define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], function(module) { module.exports = "/*!\n * Datetimepicker for Bootstrap 3\n * version : 4.17.43\n * https://github.com/Eonasdan/bootstrap-datetimepicker/\n */.bootstrap-datetimepicker-widget{list-style:none}.bootstrap-datetimepicker-widget.dropdown-menu{margin:2px 0;padding:4px;width:19em}@media (min-width:768px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:992px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:1200px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}.bootstrap-datetimepicker-widget.dropdown-menu:before,.bootstrap-datetimepicker-widget.dropdown-menu:after{content:'';display:inline-block;position:absolute}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:before{border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #ccc;border-bottom-color:rgba(0,0,0,0.2);top:-7px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:after{border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid white;top:-6px;left:8px}.bootstrap-datetimepicker-widget.dropdown-menu.top:before{border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ccc;border-top-color:rgba(0,0,0,0.2);bottom:-7px;left:6px}.bootstrap-datetimepicker-widget.dropdown-menu.top:after{border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid white;bottom:-6px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before{left:auto;right:6px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after{left:auto;right:7px}.bootstrap-datetimepicker-widget .list-unstyled{margin:0}.bootstrap-datetimepicker-widget a[data-action]{padding:6px 0}.bootstrap-datetimepicker-widget a[data-action]:active{box-shadow:none}.bootstrap-datetimepicker-widget .timepicker-hour,.bootstrap-datetimepicker-widget .timepicker-minute,.bootstrap-datetimepicker-widget .timepicker-second{width:54px;font-weight:bold;font-size:1.2em;margin:0}.bootstrap-datetimepicker-widget button[data-action]{padding:6px}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"togglePeriod\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle AM/PM\"}.bootstrap-datetimepicker-widget .btn[data-action=\"clear\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Clear the picker\"}.bootstrap-datetimepicker-widget .btn[data-action=\"today\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Set the date to today\"}.bootstrap-datetimepicker-widget .picker-switch{text-align:center}.bootstrap-datetimepicker-widget .picker-switch::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle Date and Time Screens\"}.bootstrap-datetimepicker-widget .picker-switch td{padding:0;margin:0;height:auto;width:auto;line-height:inherit}.bootstrap-datetimepicker-widget .picker-switch td span{line-height:2.5;height:2.5em;width:100%}.bootstrap-datetimepicker-widget table{width:100%;margin:0}.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{text-align:center;border-radius:4px}.bootstrap-datetimepicker-widget table th{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table th.picker-switch{width:145px}.bootstrap-datetimepicker-widget table th.disabled,.bootstrap-datetimepicker-widget table th.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table th.prev::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Previous Month\"}.bootstrap-datetimepicker-widget table th.next::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Next Month\"}.bootstrap-datetimepicker-widget table thead tr:first-child th{cursor:pointer}.bootstrap-datetimepicker-widget table thead tr:first-child th:hover{background:#eee}.bootstrap-datetimepicker-widget table td{height:54px;line-height:54px;width:54px}.bootstrap-datetimepicker-widget table td.cw{font-size:.8em;height:20px;line-height:20px;color:#777}.bootstrap-datetimepicker-widget table td.day{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table td.hour:hover,.bootstrap-datetimepicker-widget table td.minute:hover,.bootstrap-datetimepicker-widget table td.second:hover{background:#eee;cursor:pointer}.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:#777}.bootstrap-datetimepicker-widget table td.today{position:relative}.bootstrap-datetimepicker-widget table td.today:before{content:'';display:inline-block;border:solid transparent;border-width:0 0 7px 7px;border-bottom-color:#337ab7;border-top-color:rgba(0,0,0,0.2);position:absolute;bottom:4px;right:4px}.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td.active.today:before{border-bottom-color:#fff}.bootstrap-datetimepicker-widget table td.disabled,.bootstrap-datetimepicker-widget table td.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table td span{display:inline-block;width:54px;height:54px;line-height:54px;margin:2px 1.5px;cursor:pointer;border-radius:4px}.bootstrap-datetimepicker-widget table td span:hover{background:#eee}.bootstrap-datetimepicker-widget table td span.active{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td span.old{color:#777}.bootstrap-datetimepicker-widget table td span.disabled,.bootstrap-datetimepicker-widget table td span.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget.usetwentyfour td.hour{height:27px;line-height:27px}.bootstrap-datetimepicker-widget.wider{width:21em}.bootstrap-datetimepicker-widget .datepicker-decades .decade{line-height:1.8em !important}.input-group.date .input-group-addon{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}"; });
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Analytics</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
@@ -37916,7 +38208,7 @@ define('text!resources/editor/editor.html', ['module'], function(module) { modul
 define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\n                      class=\"list-group-item\">${system.sid}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\n                    class=\"list-group-item\">${system.sid}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
 define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input disabled.bind=\"disabled\" type='text' class=\"form-control\" id=\"${controlid}\"/>\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
 define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
-define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"setPassword()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
 define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!resources/elements/tiny-mce.html', ['module'], function(module) { module.exports = "<template>\n\t<textarea class=\"tinymce-host\" id.bind=\"editor_id\"></textarea>\n</template>"; });
@@ -37953,7 +38245,7 @@ define('text!modules/tech/support/archiveHelpTickets.html', ['module'], function
 define('text!modules/tech/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n            <compose view='./components/Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n            <compose view='./components/Requests.html' show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\"></compose>\n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> \n</template>"; });
 define('text!modules/tech/support/support.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Help Tickets</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n\n    <!--\n    <div class=\"navbar\">\n        <div class=\"navbar-inner\">\n            <ul class=\"nav\">\n                <li repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n            </ul>\n        </div>\n    </div>\n\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n    -->\n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/tech/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body --> \n</template>"; });
-define('text!modules/user/components/banner.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"textContainer banner\">\n\t\t<h4><span show.bind=\"temp\" class=\"leftMargin\">${userObj.city} weather: ${temp} </h4><img src=\"${weatherIcon}\"/>\n\t\t<h4><span show.bind=\"ucctemp\" class=\"leftMargin\">UCC weather: ${ucctemp} </h4><img src=\"${uccweatherIcon}\"/></span> \n\t\t<div class=\"pull-right\">\n\t\t\t<a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"requests.customerActionRequests > 0\">Requests <span class=\"badge\">${requests.customerActionRequests}</span></a>            \n\t\t\t<a href=\"#/support\" class=\"rightMargin\" if.bind=\"helpTickets.customerActionHelpTickets > 0\">Help Tickets <span class=\"badge\">${helpTickets.customerActionHelpTickets}</span></a>\n\t\t\t<span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/user/components/banner.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"textContainer banner\">\n\t\t<h4><span show.bind=\"temp\" class=\"leftMargin\">${userObj.city} weather: ${temp} </h4><img src=\"${weatherIcon}\"/>\n\t\t<h4><span show.bind=\"ucctemp\" class=\"leftMargin\">UCC weather: ${ucctemp} </h4><img src=\"${uccweatherIcon}\"/></span> \n\t\t<div class=\"pull-right\">\n\t\t\t<a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>            \n\t\t\t<a href=\"#/support\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\n\t\t\t<span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/user/components/carousel.html', ['module'], function(module) { module.exports = "<template>\n  <div id=\"carousel-example-generic\" class=\"carousel slide bigTopMargin\" data-ride=\"carousel\" style=\"width:700px;height:500px\">\n    <!-- Indicators -->\n    <ol class=\"carousel-indicators\">\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"0\" class=\"active\"></li>\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"1\"></li>\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"2\"></li>\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"3\"></li>\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"4\"></li>\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"5\"></li>\n    </ol>\n\n    <!-- Wrapper for slides -->\n    <div class=\"carousel-inner\" role=\"listbox\">\n      <div class=\"item active\">\n        <img src=\"/img/DataCenter.jpg\" style=\"height:500px\" alt=\"UCC Data Center\">\n        <div class=\"carousel-caption\">\n          <h3>UCC Data Center</h3>\n        </div>\n      </div>\n      <div class=\"item\">\n        <img src=\"/img/campus-panorama.jpg\" style=\"height:500px\" alt=\"UWM Campus\">\n        <div class=\"carousel-caption\">\n          <h3>UWM Campus</h3>\n        </div>\n      </div>\n      <div class=\"item\">\n        <img src=\"/img/chico.jpg\" style=\"height:500px\" alt=\"Chco Campus\">\n        <div class=\"carousel-caption\">\n          <h3>Cal St. Chico Campus</h3>\n        </div>\n      </div>\n      <div class=\"item\">\n        <img src=\"/img/sandy.jpg\" style=\"height:500px\" alt=\"Sandy\">\n        <div class=\"carousel-caption\">\n          <h3>Sandy prepping Spring Systems</h3>\n        </div>\n      </div>\n      <div class=\"item\">\n        <img src=\"/img/barca1.jpg\" style=\"height:500px\" alt=\"Sandy\">\n        <div class=\"carousel-caption\">\n          <h3>Sergey and Ksenia - some of our EMEA colleagues</h3>\n        </div>\n      </div>\n      <div class=\"item\">\n        <img src=\"/img/sapios.jpg\" style=\"height:500px\" alt=\"Sandy\">\n        <div class=\"carousel-caption\">\n          <h3>Looking forward to the SAP IOS SDK</h3>\n        </div>\n      </div>\n    </div>\n\n    <!-- Controls -->\n    <a class=\"left carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"prev\">\n      <span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Previous</span>\n    </a>\n    <a class=\"right carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"next\">\n      <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Next</span>\n    </a>\n  </div>\n</template>"; });
 define('text!modules/user/components/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <!--\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Unassigned</h4> <h2 style=\"margin-left:80px;\">${requests.unassignedRequests}</h2>\n    </div>\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Updated</h4> <h2 style=\"margin-left:80px;\">${requests.updatedRequests}</h2>\n    </div>\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Customer Action</h4> <h2 style=\"margin-left:110px;\">${requests.customerActionRequests}</h2>\n    </div>\n-->\n\n    <div class=\"detail-container\">\n        <div>\n          <h4>Client Requests</h4>\n           <div class=\"bigMarginTop\">\n    \t\t\t<doughnut-chart>\n    \t\t\t\t<chart-data data.bind=\"clientRequestsArray\"></chart-data>\n    \t\t\t</doughnut-chart>\n    \t\t</div>\n    \t</div>\n</template>"; });
 define('text!modules/user/components/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <!--\n    <div class=\"alert alert-info col-md-3 rightMargin\">\n        <h4>New</h4> <h2 style=\"margin-left:80px;\">${helpTickets.newHelpTickets}</h2>\n    </div>\n    <div class=\"alert alert-info col-md-3 rightMargin\">\n        <h4>Under Review</h4> <h2 style=\"margin-left:80px;\">${helpTickets.underReviewHelpTickets}</h2>\n    </div>\n    <div class=\"alert alert-info col-md-3 rightMargin\">\n        <h4>Customer Action</h4> <h2 style=\"margin-left:110px;\">${helpTickets.customerActionHelpTickets}</h2>\n    </div>\n    -->\n     \n    <div class=\"detail-container\">\n       \n    \t\t<div>\n                <h4>Help Tickets</h4>\n                <div class=\"bigMarginTop\">\n                    <doughnut-chart>\n                        <chart-data data.bind=\"helpTicketArray\"></chart-data>\n                    </doughnut-chart>\n                </div>\n    \t\t</div>\n    \t</div>\n</template>\n"; });
@@ -38062,4 +38354,7 @@ define('text!modules/user/support/components/Requests.html', ['module'], functio
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"container\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>${responseMessage}</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <!--\n            <editor  name.bind=\"viewHTEditor\" value.bind=\"responseContent\" setvalue.bind=\"setValue\"></editor>\n            -->\n            \n            <tiny-mce height.bind=\"150\" value.two-way=\"responseContent\" setvalue.two-way=\"setValue\"></tiny-mce>\n            <!--helpTickets.selectedHelpTicketContent.content.comments -->\n          </div>\n          <p>&nbsp;</p>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n            <compose view=\"./${event.type}-time.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12 col-sm-12\">\n    <div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <!--   | pageFilter:dataTable.startRecord:dataTable.take -->\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket($event, $index)\">\n                <td data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td data-title=\"Type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>\n                <td data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/user/support/resetPassword.html', ['module'], function(module) { module.exports = "<template>\n\tHERE\n</template>"; });
+define('text!modules/user/support/resetPassword.1.html', ['module'], function(module) { module.exports = "<template>\n\tHERE\n</template>"; });
+define('text!modules/user/resetPassword.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"panel panel-primary topMargin\">\n\t\t\t<div class=\"panel-body\">\n\t\t\t\t<div show.bind=\"showForm\">\n\t\t\t\t\t<form>\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<label for=\"register_password\" class=\"control-label\">Password *</label>\n\t\t\t\t\t\t\t\t<input id=\"register_password\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"newPassword\"\n\t\t\t\t\t\t\t\t\tblur.trigger=\"passwordComplexity()\" />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<label for=\"register_password_repeat\" class=\"control-label\">Repeat Password *</label>\n\t\t\t\t\t\t\t\t<input id=\"register_password_repeat\" type=\"password\" placeholder=\"Repeat Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class=\"btn btn-primary\" click.trigger=\"savePassword()\">Reset Password</button>\n\t\t\t\t\t</form>\n\t\t\t\t</div>\n\t\t\t\t<div show.bind=\"!showForm\">\n\t\t\t\t\t<h3>That validation code appears to have expired.</h2>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

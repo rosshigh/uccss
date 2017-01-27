@@ -190,6 +190,8 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
+    this.responseContent = "";
+    this.setValue = "CLEAR_EDITOR";
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
   }
 

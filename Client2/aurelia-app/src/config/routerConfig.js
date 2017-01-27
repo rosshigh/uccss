@@ -18,6 +18,7 @@ export default class {
                 { route: 'register',        moduleId: './modules/home/register',                name: 'Register',        settings: { auth: false, roles: [] }  },
                 { route: 'user',            moduleId: './modules/user/user',                    name: 'User',           settings: { auth: true, roles: [] } },
                 { route: 'profile',         moduleId: './modules/user/profile',                 name: 'Profile',         settings: { auth: true, roles: [] }  },
+                { route: 'resetPassword/:id',   moduleId: './modules/user/resetPassword',            name: 'ResetPassword',  settings: { auth: false, roles: [] }  },
                 { route: 'system',          moduleId: './modules/admin/system/system',          name: 'system',         settings: { auth: true, roles: [] }  },
                 { route: 'customers',       moduleId: './modules/admin/customers/customers',    name: 'customers',      settings: { auth: true, roles: [] }  },
                 { route: 'site',            moduleId: './modules/admin/site/site',              name: 'site',           settings: { auth: true, roles: [] } },

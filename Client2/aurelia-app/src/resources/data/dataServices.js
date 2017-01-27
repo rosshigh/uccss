@@ -222,6 +222,7 @@ export class DataServices {
     CHECK_EMAIL = 'people/checkEmail';
     CHECK_NAME = 'people/checkName';
     SEND_MAIL = 'people/sendMail';
+    PASSWORD_RESET = 'passwordReset';
     
     CURRICULUM_SERVICE = 'curriculum';
     CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';

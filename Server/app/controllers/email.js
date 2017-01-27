@@ -60,6 +60,7 @@ if(env === 'development'){
   var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
   var HelpTicketUpdatedTemplate = fs.readFileSync(viewPath + "/help-ticket-updated.handlebars", "utf-8");
   var RequestUpdatedTemplate = fs.readFileSync(viewPath + "/client-request-updated.handlebars", "utf-8");
+  var PasswordResetTemplate = fs.readFileSync(viewPath + "/password-reset.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
@@ -68,31 +69,34 @@ if(env === 'development'){
   var GenericTemplateCompiled = hbs.compile(GenericTemplate);
   var HelpTicketUpdatedTemplateCompiled = hbs.compile(HelpTicketUpdatedTemplate); 
   var RequestUpdatedTemplateCompiled = hbs.compile(RequestUpdatedTemplate);
+  var PasswordResetTemplateCompiled = hbs.compile(PasswordResetTemplate);
 
   sendGrid = function(mailObject){
-    var helper = require('sendgrid').mail;
-    var from_email = new helper.Email(config.emailAddress);
-    var to_email = new helper.Email(mailObject.email);
-    var content = new helper.Content('text/html', mailObject.body);
-    var mail = new helper.Mail(from_email, mailObject.subject, to_email, content);
+    if(mailObject.email){
+        var helper = require('sendgrid').mail;
+        var from_email = new helper.Email(config.emailAddress);
+        var to_email = new helper.Email(mailObject.email);
+        var content = new helper.Content('text/html', mailObject.body);
+        var mail = new helper.Mail(from_email, mailObject.subject, to_email, content);
+    
+        var request = sg.emptyRequest({
+          method: 'POST',
+          path: '/v3/mail/send',
+          body: mail.toJSON(),
+        });
 
-    var request = sg.emptyRequest({
-      method: 'POST',
-      path: '/v3/mail/send',
-      body: mail.toJSON(),
-    });
-
-    return new Promise(function(resolve, reject) {
-        sg.API(request)
-          .then(response => {
-              logger.log(response, "verbose");
-              resolve(response);
-          })
-          .catch(error => {
-              logger.log(error, "verbose");
-              reject(Error(result));
-          });
-    });
+        return new Promise(function(resolve, reject) {
+            sg.API(request)
+              .then(response => {
+                  logger.log(response, "verbose");
+                  resolve(response);
+              })
+              .catch(error => {
+                  logger.log(error, "verbose");
+                  reject(Error(result));
+              });
+        });
+    }
   }
 
   welcome = function(mailObject){
@@ -280,6 +284,23 @@ if(env === 'development'){
 
   annualUpdateContactInfo = function(mailObject){
      logger.log("Update Contact Info email", "verbose");   
+  }
+
+  passwordReset = function(mailObject){
+    logger.log("Password reset request", "verbose");    
+    return new Promise(function(resolve, reject) {    
+      mailObject.body = PasswordResetTemplateCompiled(mailObject.context);
+      mailObject.to_email = mailObject.email;
+      mailObject.subject = mailObject.subject;    
+      sendGrid(mailObject)
+        .then(result => {
+            if (result.statusCode === 202) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+    });
   }
 
 } else {

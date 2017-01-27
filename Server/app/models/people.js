@@ -2,6 +2,14 @@ var Mongoose = require('mongoose'),
   Schema = Mongoose.Schema,
   Bcrypt = require('bcryptjs');
 
+var PasswordResetSchema = new Schema({
+    personId: { type: Schema.Types.ObjectId },
+    createdAt: { type: Date, expires: '600s', default: Date.now },
+    validationCode: { type: String }
+});
+
+module.exports = Mongoose.model('PasswordReset', PasswordResetSchema);
+
 var PersonSchema = new Schema({
   //demographics
   firstName: { type: String, required: true },

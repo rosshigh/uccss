@@ -4,7 +4,7 @@ import Validation from '../../resources/utils/validation';
 import {Utils} from '../../resources/utils/utils';
 import {is4ua} from '../../resources/data/is4ua';
 import {People} from '../../resources/data/people';
-import moment from 'moment';
+
 import $ from 'jquery';
 
 @inject(is4ua,People, Router, Utils, Validation)

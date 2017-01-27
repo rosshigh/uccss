@@ -85,4 +85,20 @@ export class NavBar {
         }
     }
 
+    async requestPasswordReset(){
+        if(this.email){
+            let response = await this.people.requestPasswordReset({email: this.email});
+            if(!response.error){
+                this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
+            } else if(response.status = 404){
+                this.utils.showNotification("There is no registered user with that email address");
+            } else if(response.status = 401){
+                this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
+            }
+        } else {
+            this.utils.showNotification("Please enter an email address");
+        }
+        
+    }
+
 }

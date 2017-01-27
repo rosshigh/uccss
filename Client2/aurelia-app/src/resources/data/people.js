@@ -78,7 +78,7 @@ export class People {
         return null;
     }
 
-	 emptyPerson() {
+    emptyPerson() {
         var obj  = new Object();
         obj.lastName = "";
         obj.firstName = "";
@@ -381,6 +381,19 @@ export class People {
         if(this.editCourseIndex >= 0 && this.selectedCourse){
             return this.utils.objectsEqual(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
         }
+    }
+
+    async requestPasswordReset(obj){
+        let serverResponse = await this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
+        return serverResponse;
+    }
+
+    async getPasswordReset(validationCode){
+        let serverResponse = await this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+        if(!serverResponse.code){
+            this.selectedPerson = serverResponse;
+        }
+        return serverResponse;
     }
 
 }

@@ -16,7 +16,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-                <form if.bind="!isAuthenticated" class="navbar-form navbar-left" role="search">
+                <form if.bind="!isAuthenticated && !passwordReset" class="navbar-form navbar-left" role="search">
                     <div class="form-group">
                         <input value.bind="email" type="email" autofocus class="form-control" id="email" placeholder="Email"></input>
                     </div>
@@ -24,7 +24,7 @@
                         <input value.bind="password" type="password" class="form-control" id="password" placeholder="Password"></input>
                     </div>
                     <button class="btn btn-default" click.delegate='login()'>Login</button>
-                    <button class="btn btn-link" click.delegate="setPassword()">Forgot password</button>
+                    <button class="btn btn-link" click.delegate="requestPasswordReset()">Forgot password</button>
                      <label if.bind="loginError" style="color:white;">${loginError}</label>
                 </form>
                 <ul class="nav navbar-nav">
