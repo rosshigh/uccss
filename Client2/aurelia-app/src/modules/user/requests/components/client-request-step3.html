@@ -4,11 +4,11 @@
       <div  class="well well-sm col-md-10 col-sm-offset-1">${siteInfo.selectMessageByKey('CLIENT_REQUESTS_COMMENTS').content}</div>
     </div>
     <div class="form-group col-md-12">
-      <tiny-mce height.bind="150" value.two-way="commentsResponse"></tiny-mce>
-       <!--
-      <textarea readonly.bind="existingRequest" placeholder="Additional Comments" class="col-md-12 topMargin" id="comments"
-                value.bind="requests.selectedRequest.comments" class="form-control" rows="10"></textarea>
-                -->
+      <!--
+      <editor  name.bind="createRequestEditor" value.bind="commentsResponse" setvalue.bind="setValue"></editor>
+       -->
+      <tiny-mce height.bind="150" value.two-way="commentsResponse setvalue.bind="setValue""></tiny-mce>
+
     </div>
   </div>
 </template>

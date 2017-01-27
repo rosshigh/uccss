@@ -26,6 +26,7 @@ export class ViewHelpTickets {
   courseId = -1;
   requestType = -1;
   commentsResponse = "";
+  setValue = "";
 
   tempRequests = new Array();
   productInfo = new Array();
@@ -72,7 +73,7 @@ export class ViewHelpTickets {
 
   async getRequests(){
     if( this.sessionId != -1 &&  this.courseId != -1  ){
-        this._unLock();
+        // this._unLock();
         this.existingRequest = false;
         await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 
@@ -117,8 +118,8 @@ export class ViewHelpTickets {
     })
   }
 
-  detached(){
-    this. _unLock();
+  deactivate(){
+    this._unLock();
     this.updateMessages(true);
   }
 
@@ -151,8 +152,8 @@ export class ViewHelpTickets {
     this.requests.selectedRequest.endDate = this.sessions.selectedSession.endDate;
     this.minStartDate = this.sessions.selectedSession.startDate;
     this.maxStartDate = this.sessions.selectedSession.endDate;
-    this.minEndDate =this.sessions.selectedSession.startDate;
-    this.maxEndDate =this.sessions.selectedSession.endDate;
+    this.minEndDate = this.sessions.selectedSession.startDate;
+    this.maxEndDate = this.sessions.selectedSession.endDate;
 
     var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY,'days');
     this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
@@ -473,7 +474,7 @@ export class ViewHelpTickets {
   }
 
    _unLock(){
-    if(this.lockObject.personId && this.userObj._id === this.lockObject.personId){
+    if(!this.showLockMessage){
       if(this.requests.selectedRequest._id){
         this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);

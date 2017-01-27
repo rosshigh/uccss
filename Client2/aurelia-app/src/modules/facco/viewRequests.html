@@ -2,12 +2,7 @@
     <div class="panel panel-default rightMargin leftMargin">
       <div class="panel-body">
         <div class="row">
-            <div show.bind="!requestSelected">
-                <compose view="./components/viewRequestsTable.html"></compose>
-            </div> <!-- Table Div -->
-            <div show.bind="requestSelected" >
-                <compose view="./components/viewRequestsForm.html"></compose>
-            </div> <!-- Form Div -->
+            <compose view="./components/viewRequestsTable.html"></compose>
         </div> <!-- Row -->
       </div> <!-- Panel Body -->
 </template>

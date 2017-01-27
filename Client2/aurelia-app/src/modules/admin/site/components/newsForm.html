@@ -52,10 +52,11 @@
                     <div class="form-group">
                         <label for="editContent" class="col-sm-2 control-label hideOnPhone">Content</label>
                         <div class="col-sm-8">
+                            <!--
                           <editor  name.bind="newsEditor" value.bind="newsContent" setvalue.bind="setValue"></editor>
-                          <!--
-                            <tiny-mce height.bind="150" value.two-way="newsContent"></tiny-mce>
-                           <textarea value.bind="siteinfo.selectedItem.content" id="editContent" class="form-control " placeholder="Content" rows="10"></textarea>-->
+                          -->
+                            <tiny-mce height.bind="150" value.two-way="newsContent" setvalue.bind="setValue"></tiny-mce>
+                           
                         </div>
                     </div>
                 </div>

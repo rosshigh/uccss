@@ -11,7 +11,6 @@ import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 
-import moment from 'moment';
 import $ from 'jquery';
 
 @inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
@@ -21,6 +20,7 @@ export class ViewHelpTickets {
   sendEmail = false;
   showLockMessage = false;
   sendMailDisable = false;
+  responseMessage = "Click here to respond";
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -133,14 +133,17 @@ export class ViewHelpTickets {
           helpTicketId: this.helpTickets.selectedHelpTicket._id,
           personId: this.userObj._id
         });
+        this.responseMessage = "Click here to respond";
         this.showLockMessage = false;
         this.lockObject = { personId: this.userObj._id };
       } else {
         if (response[0].personId === this.userObj._id) {
           this.showLockMessage = false;
+          this.responseMessage = "Click here to respond";
           this.lockObject = { personId: this.userObj._id };
         } else {
           this.lockObject = response[0];
+           this.responseMessage = "Help Ticket is currently locked by " + this.getName();
           this.showLockMessage = true;
         }
       }
@@ -152,6 +155,13 @@ export class ViewHelpTickets {
     this.helpTicketSelected = true;
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+  }
+
+  getName(){
+    for(var i = 0; i < this.people.peopleArray.length; i++){
+      if(this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
+    }
+    return "someone";
   }
 
   /*****************************************************************************************
@@ -187,23 +197,11 @@ export class ViewHelpTickets {
   * Save the response
   *****************************************************************************************/
   async saveResponse() {
-    // if(this.validation.validate(1, this)){
+    // if(this.validation.validate(1)){
     this._createResponse();
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
-    if (!serverResponse.status) {
+    if (!serverResponse.error) {
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-      // if (this.sendEmail && !this.helpTickets.selectedHelpTicketContent.confidential) {
-      //   var obj = {
-      //     id: this.helpTickets.selectedHelpTicket._id,
-      //     audit: {
-      //       property: 'Send Response Message',
-      //       eventDate: new Date(),
-      //       oldValue: "",
-      //       personId: this.userObj._id
-      //     }
-      //   };
-      //   this.helpTickets.sendMail(obj);
-      // }
       this.utils.showNotification("The help ticket was updated");
       if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
     }

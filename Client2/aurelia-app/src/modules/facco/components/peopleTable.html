@@ -15,6 +15,7 @@
                             <tr>
                                 <th style="width:20rem;">Name <span click.trigger="dataTable.sortArray('lastName')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:15rem;">Phone</th>
+                                <th style="width:15rem;">Mobile</th>
                                 <th style="width:20rem;">eMail <span click.trigger="dataTable.sortArray('email')"><i class="fa fa-sort"></i></span></th>
                                 <th>Role</th>
                                 <th>Status</th>
@@ -26,6 +27,7 @@
                                 <th>
                                     <input input.delegate="dataTable.filterList($event)" id="lastName" type="text" placeholder="Filter Name" class="form-control">
                                 </th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th>
@@ -43,6 +45,7 @@
                             <tr  repeat.for="person of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Name">${person.fullName}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Phone">${person.phone | phoneNumber}</td>
+                                <td click.trigger="edit($index, $event)" data-title="Phone">${person.mobile | phoneNumber}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Email">${person.email}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Role">${person.roles}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Status">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>

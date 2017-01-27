@@ -26,11 +26,11 @@ export class FacCo{
             title: 'People'
         },
         {
-            route: 'editClients',
-            moduleId: './editClients',
+            route: 'viewRequests',
+            moduleId: './viewRequests',
             settings: { auth: true, roles: [] },
             nav: true,
-            name: 'editClients',
+            name: 'viewRequests',
             title: 'Clients Requests'
         }
         ]);

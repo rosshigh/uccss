@@ -17,6 +17,7 @@ export class TinyMce {
 	@bindable statusBar = false;
 	@bindable language = 'ja';
 	@bindable insertImageParams = {};
+	@bindable setvalue;
 
 	editor_id = null;
 	editor = null;
@@ -26,8 +27,17 @@ export class TinyMce {
 		this.editor_id = "tiny-mce-" + this.guid();
 		this.subscriptions = [
 			observerLocator
-					.getObserver(this, 'value')
-					.subscribe(newValue => this.editor && this.editor.setContent(newValue))
+					.getObserver(this, 'setvalue')
+					.subscribe(newValue => {
+						if(this.editor){
+							if(newValue === 'CLEAR_EDITOR'){
+								this.editor.setContent("");
+							} else {
+								this.editor.setContent(newValue);
+							}
+							
+						}
+					})
 		];
 	}
 
@@ -36,7 +46,7 @@ export class TinyMce {
 		setTimeout(function(){
 			var once = false;
 			tinymce.init({
-				selector: `#${that.editor_id}`,
+				selector: `#${that.editor_id}`, 
 				
 				plugins: [
 					"advlist autolink lists link image charmap print preview anchor",

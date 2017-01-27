@@ -62,8 +62,8 @@
               <td data-title="Course">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
               <td data-title="Status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
               <td data-title="IDs Requested">${request.requestId | idsRequested}
-                <td data-title="Product">${request.productId | productName:products.productsArray}</td>
-                <td data-title="Person">${request.requestId.personId | personName:people.peopleArray}</td>
+              <td data-title="Product">${request.productId | productName:products.productsArray}</td>
+              <td data-title="Person">${request.requestId.personId | person:people.peopleArray:"fullName"}</td>
             </tr>
           </tbody>
         </table>

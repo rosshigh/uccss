@@ -12,7 +12,7 @@ import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
-import moment from 'moment';
+
 import $ from 'jquery';
 
 @inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, CommonDialogs, People, ClientRequests, Products, Systems)

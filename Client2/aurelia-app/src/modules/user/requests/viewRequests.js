@@ -23,6 +23,7 @@ export class ViewRequests {
   navControl = "requestsNavButtons";
   spinnerHTML = "";
   commentsResponse = "";
+  setValue = "";
   lockObject = new Object();
 
   constructor(router, config, validation, people, datatable, utils, sessions, systems, products, requests) {
@@ -58,22 +59,23 @@ export class ViewRequests {
     // this._setUpValidation();
   }
 
-  detached(){
-    this. _unLock();
+  deactivate(){
+    this._unLock();
   }
 
   async getRequests() {
     if (this.selectedSession && this.selectedCourse) {
-      this._unLock();
+      // this._unLock();
       await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse, true);
       if (this.requests.requestsArray.length) {
         //Select the first request by default
         this.requests.selectRequest(0);
-         await this._lock();
+        await this._lock();
         //Update the display array
         this.updateArray();
         //Select the displayed session
         this.sessions.selectSessionById(this.selectedSession);
+        this.setValue = this.requests.selectedRequest.comments;
         //Set the date limits in the date controls
         this.setDates();
         //Save the request so we can check if it's dirty later'
@@ -91,6 +93,7 @@ export class ViewRequests {
   }
 
   async refresh() {
+    await this._unLock();
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
     await this.getRequests();
     this.spinnerHTML = "";
@@ -115,7 +118,7 @@ export class ViewRequests {
     this.requests.setSelectedRequestDetail(product);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
     this.selectedAssignmentIndex = 0;
-    this.commentsResponse = this.requests.selectedRequest.comments;
+    this.setValue = this.requests.selectedRequest.comments;
     if(this.requests.selectedRequestDetail.assignments.length){
       this.systems.selectedSystemFromId(this.requests.selectedRequestDetail.assignments[this.selectedAssignmentIndex].systemId);
       this.showRequest = true;
@@ -129,7 +132,7 @@ export class ViewRequests {
   }
 
   async save() {
-    if(!showLockMessage){
+    if(!this.showLockMessage){
       this.requests.selectedRequest.comments = this.commentsResponse;
       if (this.validation.validate(1)) {
         if(this._buildRequest()){
@@ -141,6 +144,8 @@ export class ViewRequests {
         }
       this._cleanUp();
       }
+    } else {
+      this.utils.showNotification("The request is locked and can't be saved");
     }
   }
 
@@ -186,9 +191,7 @@ export class ViewRequests {
 
   changeBeginDate(evt){
     this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
-    console.log(moment(this.requests.selectedRequest.startDate))
-    console.log(moment(this.requests.selectedRequest.endDate))
-    this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+    this.requests.selectedRequest.endDate = moment.max(moment(this.requests.selectedRequest.startDate).format("MM/DD/YYYY"), moment(this.requests.selectedRequest.endDate).format("MM/DD/YYYY")).format("MM/DD/YYYY");
   }
 
   async _lock(){

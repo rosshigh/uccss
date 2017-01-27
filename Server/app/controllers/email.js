@@ -59,6 +59,7 @@ if(env === 'development'){
   var CustomerActionTemplate = fs.readFileSync(viewPath + "/client-request-customer-action.handlebars", "utf-8");
   var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
   var HelpTicketUpdatedTemplate = fs.readFileSync(viewPath + "/help-ticket-updated.handlebars", "utf-8");
+  var RequestUpdatedTemplate = fs.readFileSync(viewPath + "/client-request-updated.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
@@ -66,6 +67,7 @@ if(env === 'development'){
   var CustomerActionTemplateCompiled = hbs.compile(CustomerActionTemplate);
   var GenericTemplateCompiled = hbs.compile(GenericTemplate);
   var HelpTicketUpdatedTemplateCompiled = hbs.compile(HelpTicketUpdatedTemplate); 
+  var RequestUpdatedTemplateCompiled = hbs.compile(RequestUpdatedTemplate);
 
   sendGrid = function(mailObject){
     var helper = require('sendgrid').mail;

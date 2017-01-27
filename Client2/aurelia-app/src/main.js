@@ -11,8 +11,6 @@ Promise.config({
   }
 });
 
-//  var CKEDITOR_BASEPATH = 'src/resources/editor/';
-
 export function configure(aurelia) {
   aurelia.use
     .standardConfiguration()

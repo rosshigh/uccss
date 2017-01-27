@@ -75,7 +75,7 @@
           <td>${item.property}</td>
           <td>${item.oldValue}</td>
           <td>${item.newValue}</td>
-          <td>${item.personId | personName:people.peopleArray}</td>
+          <td>${item.personId  | person:people.peopleArray:"fullName"}</td>
         </tr>
       </tbody>
     </table>

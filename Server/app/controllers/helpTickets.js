@@ -141,7 +141,7 @@ module.exports = function (app, config) {
                   }             
                   helpTicketUpdated(mailObj)
                     .then(result => {
-                        res.status(200).json(result);
+                        res.status(200).json(content);
                     })
                     .catch(error => {
                         return next(error);
@@ -151,7 +151,7 @@ module.exports = function (app, config) {
                 return next(error);
               })
             } else {
-              res.status(200).json(result);
+              res.status(200).json(content);
             }
           }
     })

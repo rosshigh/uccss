@@ -15,68 +15,54 @@
 							rows="10"></textarea>
 						<h5>Enter your response in the comments box below and click save</h5>
 					</div>
-					<div class="leftJustify" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
-						<div class="row">
-							<div class="col-lg-6">
-								<div class="form-group topMargin">
-									<label class="col-sm-2 form-control-label ">Undergraduates</label>
-									<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.undergradIds" id="editAddUnder" class="form-control input-sm"
-										placeholder="Undergraduates" type="number" />
-								</div>
-							</div>
+					<form class="form-horizontal topMargin">
 
-							<div class="col-lg-6">
-								<div class="form-group topMargin">
-									<label for="editAddGrad" class="col-sm-2 form-control-label ">Graduates</label>
-									<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.graduateIds" type="number" id="editAddGrad" class="form-control input-sm"
-										placeholder="Graduates" />
+					<div show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
+						<div class="row">
+							<div class="col-lg-5">
+								<div class="form-group">
+									<label for="editFirstName" class="col-sm-3 control-label hideOnPhone">Undergraduates</label>
+									<div class="col-sm-8">
+										<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.undergradIds" id="editAddUnder" class="form-control input-sm"  type="number"/>
+									</div>
 								</div>
 							</div>
-						</div>
+							<div class="col-lg-5">
+								<div class="form-group">
+									<label for="editAddGrad" class="col-sm-3 control-label hideOnPhone">Graduate</label>
+									<div class="col-sm-8">
+										<input disabled.bind="showLockMessage"  disabled.bind="showLockMessage" value.bind="requests.selectedRequest.graduateIds" type="number" id="editAddGrad" class="form-control input-sm"  />
+									</div>
+								</div>
+							</div>
+						</div> 
 					</div>
-					<div class="leftJustify">
 						<div class="row">
-							<div class="col-lg-6">
+							<div class="col-lg-5">
 								<div class="form-group topMargin">
-									<label class="col-sm-2 form-control-label ">Start Date</label>
+									<label for="startDate" class="col-sm-3 form-control-label ">Start Date</label>
+									<div class="col-sm-8">
 									<date-picker id="editStartDate" disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)"
 										startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+									</div>
 								</div>
 							</div>
-							<div class="col-lg-6">
+							<div class="col-lg-5">
 								<div class="form-group topMargin">
-									<label class="col-sm-2 form-control-label ">End Date</label>
+									<label for="endDate" class="col-sm-3 form-control-label ">End Date</label>
+									<div class="col-sm-8">
 									<date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate" startdate.bind="minEndDate"
 										enddate.bind="maxEndDate" controlid="endDate"></date-picker>
-								</div>
-							</div>
-							<!--
-							<div class="col-lg-6">
-								<div class="form-group topMargin">
-									<div class="input-group">
-										<div>
-											<label for="beginDate" class="leftJustify">Date the course begins</label>
-											<input change.trigger="changeBeginDate()" type="date" value.bind="requests.selectedRequest.startDate | datePickerDate" class="form-control"
-												id="beginDate">
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-6">
-								<div class="form-group topMargin">
-									<div class="input-group">
-										<div>
-											<label for="endDate" class="leftJustify">Date the course ends</label>
-											<input change.trigger="changeEndDate()" type="date" value.bind="requests.selectedRequest.endDate | datePickerDate" class="form-control"
-												id="endDate">
-										</div>
 									</div>
 								</div>
 							</div>
 						</div>
--->
+
 						</div>
-						<tiny-mce height.bind="150" value.two-way="commentsResponse"></tiny-mce>
+						<tiny-mce height.bind="150" value.two-way="commentsResponse" setvalue.two-way="setValue"></tiny-mce>
+						<!--
+						<editor  name.bind="assignmentEditor" value.bind="commentsResponse" setvalue.bind="setValue"></editor>
+						-->
 					</div>
 				</div>
 			</div>

@@ -11,7 +11,6 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 
-import moment from 'moment';
 import $ from 'jquery';
 
 @inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, Systems, ClientRequests)

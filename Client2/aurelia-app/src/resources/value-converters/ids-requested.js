@@ -3,6 +3,6 @@ export class IdsRequestedValueConverter {
     if(value){
       return parseInt(value.graduateIds) + parseInt(value.undergradIds);
     }
-    return array;
+    return 0;
   }
 }

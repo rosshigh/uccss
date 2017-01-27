@@ -19,6 +19,7 @@ export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
   showLockMessage = false; 
+  responseMessage = "Click here to respond";
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -46,8 +47,8 @@ export class ViewHelpTickets {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  detached(){
-    this. _unLock();
+  deactivate(){
+    this._unLock();
   }
   
   canActivate() {
@@ -102,10 +103,12 @@ export class ViewHelpTickets {
             helpTicketId: this.helpTickets.selectedHelpTicket._id,
             personId: this.userObj._id
           });
+           this.responseMessage = "Click here to respond";
           this.showLockMessage = false;
           this.lockObject = {}; 
       } else {
           this.lockObject = response[0];
+          this.responseMessage = "Help Ticket is currently locked by " + this.getName();
           this.showLockMessage = true;  
       }
     }
@@ -116,6 +119,13 @@ export class ViewHelpTickets {
     this.helpTicketSelected = true;
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
+  }
+
+  getName(){
+    for(var i = 0; i < this.people.peopleArray.length; i++){
+      if(this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
+    }
+    return "someone";
   }
 
   respond() {
@@ -137,8 +147,10 @@ export class ViewHelpTickets {
   _createResponse() {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
-    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent
-     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
+    this.responseContent = "";
+    this.setValue = "CLEAR_EDITOR";
+    this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
   }
 
   async saveResponse() {

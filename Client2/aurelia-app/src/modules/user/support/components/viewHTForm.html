@@ -1,12 +1,11 @@
 <template>
-    <div class="col-lg-12">
+    <div class="container">
 
     <!-- Buttons -->
      <div class="bottomMargin list-group-item">
         <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
         <span click.delegate="respond()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Respond"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
-        <span>Click here to respond</span>
-         <span class="pull-right" show.bind="showLockMessage">Help Ticket is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>
+        <span>${responseMessage}</span>
     </div>  
 
     <!-- Help Ticket Header -->
@@ -20,10 +19,12 @@
           </div> 
 
           <div class="col-lg-12 topMargin" style="height:300px;padding:50px;">
+            <!--
             <editor  name.bind="viewHTEditor" value.bind="responseContent" setvalue.bind="setValue"></editor>
-             <!--
-            <tiny-mce height.bind="150" value.two-way="responseContent" ></tiny-mce>
-            helpTickets.selectedHelpTicketContent.content.comments -->
+            -->
+            
+            <tiny-mce height.bind="150" value.two-way="responseContent" setvalue.two-way="setValue"></tiny-mce>
+            <!--helpTickets.selectedHelpTicketContent.content.comments -->
           </div>
           <p>&nbsp;</p>
 

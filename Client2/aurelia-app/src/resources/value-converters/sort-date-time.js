@@ -7,17 +7,21 @@ export class SortDateTimeValueConverter {
     var sortOrder = sortProp === "ASC" ? 1 : -1;
 
     var sortArray = [];
-
-    for(var i = 0; i < array.length; i++){
-      if(!tech && array[i].confidential) continue;
-      sortArray.push(array[i]);
-    }
+    var firstItem;
+    
+    array.forEach((item, index) => {
+      if( index === 0 ){
+        firstItem = item;
+      } else {
+         if(tech || (!tech && !item.confidential)) sortArray.push(item);;
+      }
+    })
 
     sortArray.sort((a,b) => {
-      // return this.sortByDateDescAndTimeAsc(a[propertyName], b[propertyName]) * sortOrder;
       return (new Date(a[propertyName]).getTime() - new Date( b[propertyName]).getTime()) * sortOrder;
     });
 
+    sortArray.unshift(firstItem);
     return sortArray;
   }
 

@@ -1,5 +1,4 @@
 var express = require('express'),
-  debug = require('debug')('uccss'),
   router = express.Router(),
   mongoose = require('mongoose'),
   Model = mongoose.model('ClientRequest'),
@@ -18,21 +17,21 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/clientRequests', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
+    logger.log('Get clientRequests');
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .exec(function(err, object){
-        if (err) {
+      .exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(err => {
           return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
+      })
   });
 
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    debug('Get clientRequest [%s]', req.params.id);
+    logger.log('Get clientRequest [%s]', req.params.id);
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -43,7 +42,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
-    debug('Get helpTicket');
+    logger.log('Get helpTicket');
     var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
       query.sort(req.query.order)
       .exec(function(err, object){
@@ -56,7 +55,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
-    debug('Create clientRequest');
+    logger.log('Create clientRequest');
     var clientRequest = new Model(req.body);
     var details = new Array();
     req.body.requestDetails.forEach(function(detail, index){
@@ -115,17 +114,17 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    debug('Update clientRequest [%s]', req.body._id);
+    logger.log('Update clientRequest [%s]', req.body._id);
     var clientRequest = new Model(req.body);
     var details = new Array();
     var tasks = new Array();
     req.body.requestDetailsToSave.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       details.push(obj._id)
-      if(detail._id){       
-        clientRequest.requestDetails.push(detail._id);
+      if(detail._id){            
+        // clientRequest.requestDetails.push(detail._id);
         tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-      } else {       
+      } else {             
         var obj = new ClientRequestDetail(detail);
         clientRequest.requestDetails.push(obj._id);
         obj.requestId = clientRequest._id;
@@ -134,14 +133,13 @@ module.exports = function (app) {
     });
 
     Promise.all(tasks)
-      .then(function(results) {
+      .then(results => {
         Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(err, result){
           if(err) {
             return next(err);
           } else {
-            if(req.query.email == 1){
-              var id = results._id;
-              var query = Model.findOne({_id: id}).populate('requestDetails').exec(function(err, result){
+            if(req.query.email == 1 && result._id){
+              var query = Model.findOne({_id: result._id}).populate('requestDetails').exec(function(err, result){
                 if(err){
                   return next(err);
                 } else {
@@ -152,24 +150,26 @@ module.exports = function (app) {
                       var mailObj = {
                         email: person.email,
                         context: result
-                      }
+                      }                    
                      requestUpdated(mailObj)
                         .then(result => {
-                            res.status(200).json(object);
+                            res.status(200).json(result);
                         })
                         .catch(error => {
-                            return next(error);
+                            return next(error); 
                         });  
                     }
                   })
                 }
               })     
-            }
-            res.status(200).json(result);
+            } else {
+              res.status(200).json(result);
+            }   
           }
         });
-      }, function (err) {
-        return next(err);
+      })
+      .catch(error =>  {
+        return next(error);
       })
 
   });
@@ -207,7 +207,7 @@ module.exports = function (app) {
   });
 
   router.delete('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    debug('Delete clientRequest [%s]', req.params.id);
+    logger.log('Delete clientRequest [%s]', req.params.id);
     Model.remove(req.params.id, function(err, result){
       if (err) {
         return next(err);
@@ -218,21 +218,37 @@ module.exports = function (app) {
   });
 
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
-    debug('Get clientRequests');
+    logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query.populate('requestId')
-    query.exec(function(err, object){
-      if (err) {
-        return next(err);
-      } else {
+    query.exec()
+      .then(object => {
         res.status(200).json(object);
-      }
-    });
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.get('/api/clientRequestsDetails/:sessionId/:institutionId', requireAuth, function(req, res, next){
+    logger.log('Get clientRequests', 'verbose');   
+    ClientRequestDetail.find()
+    .populate('requestId')
+    .exec()
+    .then(results => {    
+       var resultArray = results.filter(item => {        
+         return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId == req.params.institutionId;
+       })    
+       res.status(200).json(resultArray);
+      })
+      .catch(err => {
+        return next(err);
+      })
   });
 
   //Courses Routes
   router.get('/api/courses', requireAuth, function(req, res, next){
-    debug('Get courses');
+    logger.log('Get courses', 'verbose');
     var query = buildQuery(req.query, Course.find());
     query.exec(function(err, object){
         if (err) {
@@ -244,7 +260,7 @@ module.exports = function (app) {
   });
 
   router.get('/api/courses/person/:id', requireAuth, function(req, res, next){
-    debug('Get courses');
+    logger.log('Get courses', 'verbose');
     Course.find({personId: req.params.id})
       .sort(req.query.order)
       .exec(function(err, object){
@@ -256,32 +272,8 @@ module.exports = function (app) {
       });
   });
 
-  // router.get('/api/courses/active', requireAuth, function(req, res, next){
-  //   debug('Get courses');
-  //   Course.find({active: true})
-  //     .sort(req.query.order)
-  //     .exec(function(err, object){
-  //       if (err) {
-  //         return next(err);
-  //       } else {
-  //         res.status(200).json(object);
-  //       }
-  //     });
-  // });
-
-  // router.get('/api/courses/:id', requireAuth, function(req, res, next){
-  //   debug('Get courses [%s]', req.params.id);
-  //   Course.findById(req.params.id, function(err, object){
-  //     if (err) {
-  //       return next(err);
-  //     } else {
-  //       res.status(200).json(object);
-  //     }
-  //   });
-  // });
-
   router.post('/api/courses', requireAuth, function(req, res, next){
-    debug('Create courses');
+    logger.log('Create courses');
     var clientRequest =  new Course(req.body);
     clientRequest.save( function ( err, object ){
       if (err) {
@@ -347,7 +339,7 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequestLocks',  function(req, res, next){
-     logger.log('Create clientRequest Lock','verbose');
+     logger.log('Create clientRequest Lock', 'verbose');
       var clientRequestLock =  new ClientRequestLock(req.body);
       clientRequestLock.save()
 				.then(function (result) {

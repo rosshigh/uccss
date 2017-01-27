@@ -115,6 +115,15 @@ export class ClientRequests {
         return this.requestsDetailsArray;
     }
 
+    async getClientRequestsDetailFaccoArray(sessionId, institutionId){
+        let serverResponse = await this.data.get(this.data.CLIENT_REQUEST_DETAILS + '/' + sessionId + '/' + institutionId);
+        if (!serverResponse.error) {
+            this.requestsDetailsArray = serverResponse;
+        } else {
+            return undefined;
+        }
+    }
+
      selectRequest(index){
         if (index === undefined) {
             this.selectedRequest = this.emptyRequest();

@@ -23,7 +23,6 @@ export function configure(config) {
     './value-converters/phone-number',
     './value-converters/lookup-description',
     './value-converters/translate-status',
-    './value-converters/date-picker-date',
     './value-converters/product-name',
     './value-converters/sort-array',
     './value-converters/system-list',
