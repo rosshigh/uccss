@@ -1,0 +1,13 @@
+<template>
+  <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="comment.authorEmail | gravatarUrl:100:1">
+
+  </div>
+  <div class="smart-timeline-time">
+    <small>${comment.dateCreated | dateFormat:'YYYY-MM-DD':true}</small>
+  </div>
+  <div class="smart-timeline-content borderTop leftJustify">
+	<div class="form-group">
+     	<div innerhtml.bind="comment.comment"></div>
+    </div>
+</div>
+</template>

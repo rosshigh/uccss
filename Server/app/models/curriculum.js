@@ -15,7 +15,13 @@ var CurriculumSchema = new Schema({
 	products: [ { type: Schema.Types.ObjectId } ],
 	notes: { type: String },
 	rating: { type: Number },
+	raters: { type: Number, default: 0 },
 	comments: [ { type: String } ],
+	customerComments: [{
+		authorEmail: { type: String },
+		comment: { type: String },
+		dateCreated: { type: Date, default: Date.now}
+	}],
 	dateCreated: { type: Date, require: true, default: Date.now },
 	dateModified: { type: Date, require: true, default: Date.now },
 

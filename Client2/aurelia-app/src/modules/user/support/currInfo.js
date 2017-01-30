@@ -11,6 +11,11 @@ export class CurrInfo{
     spinnerHTML = "";
     curriculumContent = " ";
 	newItem = false;
+	curriculumSelected = false;
+	addComment = false;
+	description = "";
+	comment = "";
+	seValue = "";
 
     constructor(datatable, curriculum, products, config, utils) {
         this.dataTable = datatable;
@@ -21,9 +26,13 @@ export class CurrInfo{
         this.config = config;
     }
 
-    // attached(){
-	// 	// $('.panel-body').slideUp();
-    // }
+	attached() {
+		$('[data-toggle="tooltip"]').tooltip();
+	}
+
+	canActivate() {
+		this.userObj = JSON.parse(sessionStorage.getItem('user'));
+	}
 
     async activate() {
 		 let responses =  await Promise.all([
@@ -33,6 +42,7 @@ export class CurrInfo{
 			this.config.getConfig()
 		 ]);
 		 this.curriculum.selectCurriculumCategory(0);
+		  this.curriculum.selectCurriculum();
 		 this.filterList();
     }
 
@@ -45,6 +55,7 @@ export class CurrInfo{
 	typeChanged(index){
 		 this.curriculum.selectCurriculumCategory(index);
 		 this.filterList();
+		 this.curriculumSelected = false;
 	}
 
 	togglePanel(el){
@@ -58,5 +69,46 @@ export class CurrInfo{
 			panel.removeClass('panel-collapsed');
 			panel.find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
 		}
+	}
+
+	selectCurriculum(curriculum){
+		this.curriculum.selectCurriculumById(curriculum._id);
+		this.curriculumSelected = true;
+	}
+
+	add(){
+		this.addComment = true;
+	}
+
+	cancel(){
+		this.addComment = false;
+		this.comment = "";
+		this.setValue = "CLEAR_EDITOR";
+	}
+
+	async save(){
+		if(this.comment){
+			if(!this.curriculum.selectedCurriculum.customerComments){
+			this.curriculum.selectedCurriculum.customerComments = new Array();
+		}
+		this.curriculum.selectedCurriculum.customerComments.unshift({
+			authorEmail: this.userObj.email,
+			comment: this.comment,
+			dateCreated: new Date()
+		});
+		let serverResponse = await this.curriculum.save();
+		this.addComment = false;
+		}
+	}
+
+	back(){
+		this.curriculumSelected = false;
+	}
+
+	rateCurriculum(el){
+		this.curriculum.selectCurriculumById(el.detail.id);
+		this.curriculum.selectedCurriculum.rating = el.detail.rating;
+		this.curriculum.selectedCurriculum.raters = this.curriculum.selectedCurriculum.raters ? this.curriculum.selectedCurriculum.raters + 1 : 0;
+		let serverResponse = this.curriculum.save();
 	}
 }

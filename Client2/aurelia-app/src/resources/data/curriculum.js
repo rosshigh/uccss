@@ -66,6 +66,20 @@ export class Curriculum {
         }
     }
 
+    selectCurriculumById(id){
+        if(!id){
+            this.selectedCurriculum = this.emptyCurriculum();
+        } else {
+            for(var i = 0; i < this.curriculumArray.length; i++){
+                if(this.curriculumArray[i]._id === id){
+                    this.selectedCurriculum = this.utils.copyObject(this.curriculumArray[i]);
+                    this.editIndex = i;
+                    return;
+                }
+            }   
+        }
+    }
+
 	emptyCurriculum() {
         var obj  = new Object();
         obj.category = "";

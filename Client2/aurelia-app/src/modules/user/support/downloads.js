@@ -39,9 +39,9 @@ export class Download {
     }
 
     typeChanged(el) {
-        if (el.target.value != "") {
+        if (el.target.id != "") {
             this.filterValues = new Array();
-            this.filterValues.push({ property: "downCatcode", value: el.target.value, type: 'select-one', compare: "id" });
+            this.filterValues.push({ property: "downCatcode", value: el.target.id, type: 'select-one', compare: "id" });
             if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
             // if (this.baseArray) this.displayArray = this.dataTable.filter(this.filterValues);
 

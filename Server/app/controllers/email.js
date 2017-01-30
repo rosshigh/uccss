@@ -545,4 +545,25 @@ if(env === 'development'){
      logger.log("Update Contact Info email", "verbose");   
   }
 
+  passwordReset = function(mailObject){
+    logger.log("Password reset request", "verbose"); 
+    return new Promise(function(resolve, reject) {
+      var mail = {
+          from: config.emailAddress,
+          to: mailObject.email,
+          subject: mailObject.subject,
+          template: 'password-reset',
+          context: mailObject.context
+      };
+      nodeMailerSendMail(mail)
+      .then(result => {      
+            if (result.rejected.length === 0) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+    });      
+  }
+
 }
