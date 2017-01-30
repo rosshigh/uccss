@@ -95,6 +95,7 @@ export class EditCurriculum {
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.curriculum.curriculumArray);
                 this.utils.showNotification("The item was saved");
+                this._cleanUp();
             }
             this.curriculumItemSelected = false;
         }
@@ -225,8 +226,10 @@ export class EditCurriculum {
     }
 
     _cleanUp(){
-         this.showCategoryForm = false;
+        this.showCategoryForm = false;
         this.curriculumItemSelected = false;
+        this.curriculumContent = "";
+        this.setValue = "CLEAR_EDITOR";
     }
 
     _setupValidation(){
