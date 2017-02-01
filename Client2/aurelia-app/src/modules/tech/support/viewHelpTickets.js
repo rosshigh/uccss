@@ -58,7 +58,7 @@ export class ViewHelpTickets {
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('', true),
-      this.people.getInstitutionsArray(),
+      this.people.getInstitutionsArray('?order=name'),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -181,6 +181,8 @@ export class ViewHelpTickets {
     this.response = new Object();
     this.isUnchanged = true;
     this.enterResponse = false;
+    this.responseContent = "";
+    this.setValue = "CLEAR_EDITOR";
   }
 
   /*****************************************************************************************

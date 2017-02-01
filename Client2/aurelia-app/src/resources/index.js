@@ -11,6 +11,8 @@ export function configure(config) {
     './elements/date-picker',
      './elements/edit-client',
      './value-converters/format-digits',
+      './value-converters/overlap',
+       './value-converters/request-number',
       './value-converters/append-products',
      './value-converters/ucc-staff',
      './value-converters/session-status-button',

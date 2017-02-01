@@ -10,6 +10,7 @@ export class TinyMce {
 	 */
 	@bindable value = "";
 	@bindable height = 250;
+	@bindable width = 1000;
 	@bindable convertUrls = false;	// i.e. convert-urls.bind="true"
 	@bindable menuBar = false;
 	@bindable toolBar = "undo redo | styleselect | bold forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent"; // | link plugin_sample insert_image
@@ -58,6 +59,7 @@ export class TinyMce {
 				toolbar: that.toolBar,
 				contextmenu: that.contextMenu,
 				height: that.height,
+				width: that.width,
 				convert_urls: that.convertUrls,
 				setup: editor => {
 					editor.on('init', e => {
@@ -66,8 +68,7 @@ export class TinyMce {
 						editor.setContent(that.value);
 					});
 					editor.on('change redo undo', e => {
-						if(once) that.value = editor.getContent({format: 'raw'}); 
-						once = true;
+						that.value = editor.getContent({format: 'raw'}); 
 					});
 				}
 			});

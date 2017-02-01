@@ -26,7 +26,7 @@
            
           
                 <div>
-                    <h2 class="underline topMargin">UCC and UA News</h2>
+                    <h2 show.bind="siteinfo.siteArray | infoFilter:'NEWS':true" class="underline topMargin">UCC and UA News</h2>
                     <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
                         <compose view="./components/newsItem.html"></compose>
                     </div>

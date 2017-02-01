@@ -294,12 +294,16 @@ export class DataTable{
           case 'date':
           switch(filters[i].compare){
             case 'after':
-              var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-              keep = moment(dt).isAfter(filters[i].value);
+              if(item[filters[i].property]){
+                var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+                keep = moment(dt).isAfter(filters[i].value);
+              }
               break;
             default:
-              var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-              keep = moment(dt).isSame(filters[i].value);
+              if(item[filters[i].property]){
+                var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+                keep = moment(dt).isSame(filters[i].value);
+              }
           }
         }
         if(!keep) break;
