@@ -47,7 +47,6 @@ export class ArchiveHelpTickets {
       this.sessions.getSessionsArray('?order=startDate', true),
       this.products.getProductsArray('?order=name'),
       this.people.getInstitutionsArray('?order=name'),
-      // this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('?order=lastName', true),
       this.config.getConfig()
     ]);
@@ -201,20 +200,6 @@ export class ArchiveHelpTickets {
      $('#elementsToOperateOn :input').removeAttr('disabled');
   }
 
-  // async refresh() {
-  //   this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-  //   this.helpTickets.getHelpTicketArray(true, "?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
-  //   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-  //   this._cleanUpFilters()
-  //   this.spinnerHTML = "";
-  // }
-
-  // filterInsList(el) {
-  //   this.selectInstitutions = this.institutions.filter(function (obj) {
-  //     return obj.name.toUpperCase().indexOf(this.instSearch.toUpperCase()) > -1
-  //   });
-  // }
-
   /*****************************************************************************************
   * User selected a help ticket
   * el - event object
@@ -237,106 +222,9 @@ export class ArchiveHelpTickets {
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
   }
 
-  /*****************************************************************************************
-  * Open the response form and create an empty help ticket content object
-  *****************************************************************************************/
-  // respond() {
-  //   this.helpTickets.selectHelpTicketContent();
-  //   this.enterResponse = true;
-  //   this.enableButton = true;
-  // }
-
-  // cancelResponse() {
-  //   this.response = new Object();
-  //   this.isUnchanged = true;
-  //   this.enterResponse = false;
-  // }
-
-  /*****************************************************************************************
-  * Create the response object
-  *****************************************************************************************/
-  // _createResponse() {
-  //   this.helpTickets.selectedHelpTicketContent.personId = this.app.user._id;
-  //   this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_RESPONSE_TYPE;
-  // }
-
-  /*****************************************************************************************
-  * Save the response
-  *****************************************************************************************/
-  // async saveResponse() {
-  //   // if(this.validation.validate(1, this)){
-  //   this._createResponse();
-  //   let serverResponse = await this.helpTickets.saveHelpTicketResponse();
-  //   if (!serverResponse.status) {
-  //     this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-  //     if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
-  //   }
-  //   this._cleanUp();
-  //   // }
-  // }
-
-  /*****************************************************************************************
-  * Update the helpticket status
-  *****************************************************************************************/
-  // async updateStatus() {
-  //   // if(this.validation.validate(1, this)){
-  //   let serverResponse = await this.helpTickets.updateStatus();
-  //   if (!serverResponse.status) {
-  //     this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-  //   }
-  //   this._cleanUp();
-  //   // }
-  // }
-
-  /*****************************************************************************************
-  * Update the help ticket keywords
-  *****************************************************************************************/
-  // async updateKeywords() {
-  //   // if(this.validation.validate(1, this)){
-  //   let serverResponse = await this.helpTickets.updateKeywords();
-  //   if (!serverResponse.status) {
-  //     this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-  //   }
-  //   this._cleanUp();
-  //   // }
-  // }
-
-  /*****************************************************************************************
-  * Update the help ticket ownder
-  *****************************************************************************************/
-  // async own() {
-  //   if (this.validation.validate(9, this)) {
-  //     var obj = {
-  //       personId: this.app.user._id
-  //     }
-  //     let serverResponse = await this.helpTickets.updateOwner(obj);
-  //     if (!serverResponse.status) {
-  //       this.utils.showNotification("The help ticket was updated", "", "", "", "", 5);
-  //     }
-  //     this._cleanUp();
-  //   }
-  // }
-
   _cleanUp() {
     this.enterResponse = false;
   }
-
-  /*****************************************************************************************
-  * Retrieve a person's courses
-  *****************************************************************************************/
-  // async getCourses(){
-  //   let courseResponse = await this.data.getAllObjects(this.data.PERSON_COURSES + this.coursePerson);
-  //   this.courses = courseResponse;
-  // }
-
-  // changeFiles() {
-  //   var foo = "";
-  //   for (var i = 0; i < this.files.length; i++) {
-  //     foo += this.files[i].name;
-  //     if (i < this.files.length - 1) foo += ", ";
-  //   }
-  //   this.filesSelected = foo;
-  // }
 
   back() {
     this.searchResults = false;
@@ -346,91 +234,10 @@ export class ArchiveHelpTickets {
     this.helpTicketSelected = false;
   }
 
-  // _setUpValidation() {
-  //   this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
-  //   this.validation.addRule("00", "client", [{
-  //     "rule": "required", "message": "You must select a client",
-  //     "valFunction": function (context) {
-  //       return (context.helpTicket.clientId !== undefined);
-  //     }
-  //   }]);
-  //   this.validation.addRule("01", "resetPasswordUserIDs", [{ "rule": "required", "message": "You must enter the passwords to reset" }]);
-  //   this.validation.addRule("01", "client", [{
-  //     "rule": "required", "message": "You must enter the passwords to reset",
-  //     "valFunction": function (context) {
-  //       return (context.helpTicket.clientId !== undefined);
-  //     }
-  //   }]);
-  //   this.validation.addRule("02", "application", [{
-  //     "rule": "required", "message": "You must select the application",
-  //     "valFunction": function (context) {
-  //       return (context.content.application !== undefined);
-  //     }
-  //   }]);
-  //   this.validation.addRule("9", "owner", [{
-  //     "rule": "required", "message": "You are already the owner",
-  //     "valFunction": function (context) {
-  //       return (context.helpTickets.selectedHelpTicket.owner[0].personId !== context.app.user._id);
-  //     }
-  //   }]);
-  // }
-
-  // _cleanUpNewHelpTicket(){
-  //   this.newHelpTicket = {}
-  //   this.newHelpTicket.sessionId = ""
-  //   this.newHelpTicket.courseId = ""
-  //   this.content = {}
-  //   this.clients = []
-  // }
-
-  // async _cleanUp(){
-  //   if(this.isTech()){
-  //     this.getTechData();
-  //   } else {
-  //     this.getData();
-  //   }
-
-  //   this._cleanUpNewHelpTicket()
-  //   this._hideTypes();
-  //   if(this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
-  //   this.showAdditionalInfo = false;
-  //   this.enableButton = false;
-  //   if(this.files.length !== 0 && this.files !== null) {
-  //     $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
-  //     $("#uploadFiles").unwrap();
-  //     this.files = [];
-  //   }
-  //   this.filesSelected="";
-  // }
-
-
-  // async _cleanUpResponse(){
-  //   this.enterResponse = false;
-  //   this.responseContent = undefined;
-  // }
-
-  // _cleanUpFiles(){
-  //   if (this.files.length !== 0 && this.cleanUpFiles) {
-  //     for(var i = 0; i<this.files.length; i++){
-  //       this.fileList.push(this.files[i])
-  //     }
-  //     $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
-  //     $("#uploadFiles").unwrap();
-  //     this.files = [];
-  //     this.filesSelected = "";
-  //   }
-  // }
-
   _cleanUpFilters() {
     $("#type").val("");
     $("#status").val("");
     $("#personStatus").val("");
   }
 
-  // async changeTab(el, index){
-  //       $(".list-group").children().removeClass('active');
-  //       $(el.target).parent().addClass('active');
-  //       $(".in").removeClass('active').removeClass('in');
-  //       $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-  //   }
 }
