@@ -112,23 +112,17 @@ export class EditProducts {
     }
 
     cancel() {
-        if (this.editIndex == -1) {
-            this.aNewProduct();
-        } else {
-            this.products.selectProduct(this.editIndex);
-        }
-        // for(var i=0; i<this.removedFiles.length; i++){
-        //     this.products.selectedProduct.files.push(this.removedFiles[i][0]);
-        // }
-        // this.selectedFiles = new Array();
-        // this.files = undefined;
 
-         this.editSystemsString = "";
-        if(this.products.selectedProduct.systems){
-            for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
-                this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
-            }
-        }
+        this.products.selectProduct(this.editIndex);
+         
+        this.setValue2 = this.products.selectedProduct.clientInfo || "CLEAR_EDITOR";
+        this.setValue = this.products.selectedProduct.productInfo || "CLEAR_EDITOR";
+        // this.editSystemsString = "";
+        // if(this.products.selectedProduct.systems){
+        //     for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
+        //         this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
+        //     }
+        // }
     }
 
     async save() {
@@ -184,6 +178,8 @@ export class EditProducts {
         this.systemChanges = new Array();
         this.notesEditorContent = "";
         this.productInfoEditorContent = "";
+        this.setValue = "CLEAR_EDITOR";
+        this.setValue2 = "CLEAR_EDITOR";
         this._cleanUpFilters();
         this.validation.makeAllValid(1);
     }

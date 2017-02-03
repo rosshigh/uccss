@@ -14,7 +14,7 @@ export class TinyMce {
 	@bindable convertUrls = false;	// i.e. convert-urls.bind="true"
 	@bindable menuBar = false;
 	@bindable toolBar = "undo redo | styleselect | bold forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent"; // | link plugin_sample insert_image
-	@bindable contextMenu = "copy paste | link image inserttable | cell row column deletetable";
+	@bindable contextMenu = "copy paste | link inserttable | cell row column deletetable";
 	@bindable statusBar = false;
 	@bindable language = 'ja';
 	@bindable insertImageParams = {};
@@ -50,14 +50,16 @@ export class TinyMce {
 				selector: `#${that.editor_id}`, 
 				
 				plugins: [
-					"advlist autolink lists link image charmap print preview anchor",
+					"advlist autolink lists print preview anchor",
 					"searchreplace visualblocks code fullscreen",
-					"textcolor table contextmenu paste"
+					"textcolor table paste"
 				],
 				menubar: that.menuBar,
 				statusbar: that.statusBar,
 				toolbar: that.toolBar,
-				contextmenu: that.contextMenu,
+				contextmenu: false, //that.contextMenu,
+				browser_spellcheck: true,
+				gecko_spellcheck : true,
 				height: that.height,
 				width: that.width,
 				convert_urls: that.convertUrls,

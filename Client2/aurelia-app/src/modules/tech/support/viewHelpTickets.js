@@ -64,6 +64,10 @@ export class ViewHelpTickets {
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();
+    this.helpTicketTypes = this.config.HELP_TICKET_STATUSES.filter(item => {
+       return item.code !== this.config.CLOSED_RESOLVED_HELPTICKET_STATUS;
+    })
+
   }
 
   attached() {

@@ -1,0 +1,5 @@
+<template>
+	<select value.bind="value" multiple ref="select" class="selectpicker">
+    	<option repeat.for="option of options" value.bind="option.code">${option.description}</option>
+  	</select>
+</template>

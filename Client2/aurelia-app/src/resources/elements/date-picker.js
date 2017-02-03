@@ -18,21 +18,26 @@ export class DatePicker {
     }
 
     valueChanged(newValue, oldValue){ 
-		if(this.datePicker && newValue !== oldValue){
-			 this.datePicker.data("DateTimePicker").date(moment(newValue).format(this.format));
-		}
+      if(this.datePicker && newValue !== oldValue){
+        if(newValue === ""){
+          $("#input-" + this.controlid).val("");
+        } else {
+          this.datePicker.data("DateTimePicker").date(moment(newValue).format(this.format));
+        }
+        
+      }
     }
 
     startdateChanged(newValue, oldValue) {
-		if(this.datePicker){
-        	this.datePicker.data("DateTimePicker").minDate(moment(newValue).format(this.format));
-		}
+      if(this.datePicker){
+            this.datePicker.data("DateTimePicker").minDate(moment(newValue).format(this.format));
+      }
      }
 
     enddateChanged(newValue, oldValue) {
-		if(this.datePicker){
-        	this.datePicker.data("DateTimePicker").maxDate(moment(newValue).format(this.format));
-		}
+      if(this.datePicker){
+            this.datePicker.data("DateTimePicker").maxDate(moment(newValue).format(this.format));
+      }
      }
 
     attached(){

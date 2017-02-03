@@ -120,6 +120,14 @@
           "extend",
           "eonasdan-bootstrap-datetimepicker",
           {
+            "name": "bootstrap-select",
+            "path": "../node_modules/bootstrap-select/dist/",
+            "main": "js/bootstrap-select",
+            "resources": [
+              "css/bootstrap-select.css"
+            ]
+          },
+          {
             "name": "text",
             "path": "../scripts/text"
           },

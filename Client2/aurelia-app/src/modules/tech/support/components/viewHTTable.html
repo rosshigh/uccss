@@ -36,7 +36,7 @@
               <th>
                 <select value.bind="selectedStatus" change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketStatus">
                         <option value=""></option>
-                        <option repeat.for="status of config.HELP_TICKET_STATUSES"
+                        <option repeat.for="status of helpTicketTypes"
                                 value.bind="status.code">${status.description}</option>
                       </select>
               </th>
@@ -53,10 +53,13 @@
                 <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-nickName" type="text" compare="lookup" class="form-control" ref="nickNameFilter"/>
               </th>
               <th>
+                <input input.delegate="dataTable.filterList($event, people.institutionsArray)" id="institutionId-name" type="text" compare="lookup" class="form-control" ref="institutionFilter"/>
+                <!--
                 <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionId" compare="id">
                     <option value=""></option>
                     <option repeat.for="institution of people.institutionsArray" value="${institution._id}">${institution.name}</option>
                 </select>
+                -->
               </th>
             </tr>
             <tr>
@@ -101,8 +104,8 @@
                 <td data-title="Nickname" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"nickName"}</td>
                 <td style="width:10rem;" data-title="Insitution">${helpTicket.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
                 <td style="width:10rem;" data-title="Email" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"email"}</td>
-                <td style="width:10rem;" data-title="Phone" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"phone"}</td>
-                 <td style="width:10rem;" data-title="Phone" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"mobile"}</td>
+                <td style="width:10rem;" data-title="Phone" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"phone" | formatPhone}</td>
+                 <td style="width:10rem;" data-title="Phone" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"mobile" | formatPhone}</td>
             </tr>
           </tbody>
         </table>

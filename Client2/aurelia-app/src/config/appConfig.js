@@ -173,11 +173,7 @@ export class AppConfig {
         },
         {
             "code": this.CLOSED_RESOLVED_HELPTICKET_STATUS,
-            "description": "Closed/Resolved"
-        },
-        {
-            "code": this.CLOSED_UNRESOLVED_HELPTICKET_STATUS,
-            "description": "Closed/Unresolved"
+            "description": "Closed"
         }
     ];
 

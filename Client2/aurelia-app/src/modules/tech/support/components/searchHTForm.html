@@ -1,0 +1,180 @@
+<template>
+	<div>
+		<div class="row">
+			<div class="bottomMargin list-group-item  leftMargin rightMargin">
+				<span click.delegate="search()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+					title="" data-original-title="Search"><i class="fa fa-search fa-lg fa-border" aria-hidden="true"></i></span>
+				<span  click.delegate="clearCriteria()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" 
+					title="" data-original-title="Clear Criteria"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3">
+				<div class="form-group">
+					<div class="col-lg-6">
+						<label>Help Ticket Number</label>
+						<input input.delegate="helpTicketNoEntered()" class="form-control" value.bind="helpTicketNo" type="text" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="elementsToOperateOn">
+			<div class="row">
+				<div class="col-lg-3 topMargin">
+					<div class="form-group">
+						<div class="col-lg-6">
+							<label>Date From</label>
+							<date-picker value.two-way="dateFrom" controlid="dateFrom"></date-picker>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 topMargin">
+					<div class="form-group">
+						<div class="col-lg-6">
+							<label>Date To</label>
+							<date-picker value.two-way="dateTo" controlid="dateTo"></date-picker>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 topMargin">
+					<div class="form-group">
+						<div class="col-lg-6">
+							<label>Status</label>
+							<multiselect options.bind="config.HELP_TICKET_STATUSES" value.bind="selectedStatus"></multiselect>
+						</div>
+					</div>
+				</div>				
+			</div>
+			<div class="row">
+				<div class="col-lg-3 topMargin">
+					<div class="form-group">
+						<div class="col-lg-6">
+							<label>KeyWords</label>
+							<input class="form-control" value.bind="keyWords" type="text" />
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 topMargin">
+					<div class="form-group">
+						<div class="col-lg-6">
+							<label>Content</label>
+							<input class="form-control" value.bind="content" type="text" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-1 topMargin">
+                  <div class="checkbox ">
+                    <label>
+                      <input checked.bind="searchProduct"  type="checkbox"> Search by Product
+                    </label>
+                  </div>
+                </div>
+				<div class="col-md-12" show.bind="searchProduct">
+					<div class="col-md-5 topMargin">
+						<label id="productList">Available Products</label>
+						<div class="well well2 overFlow" style="height:400px;">
+							<input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products" />
+							<ul class="list-group">
+								<button click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray" id="${product._id}"
+									class="list-group-item">${product.name}</button>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md-5 col-md-offset-1 topMargin">
+						<label id="requestProductsLabel">Requested Products</label>
+						<div class="well well2 overflow" style="height:400px;">
+							<ul class="list-group">
+								<button click.trigger="removeProduct($event)" type="button" repeat.for="product of selectedProducts"
+									id="${product}" class="list-group-item">${product | productName:products.productsArray}</button>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-1 topMargin">
+                  <div class="checkbox ">
+                    <label>
+                      <input checked.bind="searchPeople"  type="checkbox"> Search by Person
+                    </label>
+                  </div>
+                </div>
+				<div class="col-md-12" show.bind="searchPeople">
+					<div class="col-md-5 topMargin">
+						<label id="productList">Available People</label>
+						<div class="well well2 overFlow" style="height:400px;">
+							<input class="form-control" value.bind="peopleFilter" input.trigger="filterPeopleList()" placeholder="Filter people" />
+							<ul class="list-group">
+								<button click.trigger="selectPerson($event)" type="button" repeat.for="person of filteredPersonArray" id="${person._id}"
+									class="list-group-item">${person.fullName}</button>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md-5 col-md-offset-1 topMargin">
+						<label >Requested Person</label>
+						<div class="well well2 overflow" style="height:400px;">
+							<ul class="list-group">
+								<button click.trigger="removePerson($event)" type="button" repeat.for="person of selectedPeople"
+									id="${person}" class="list-group-item">${person | person:people.peopleArray:"fullName"}</button>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="col-lg-2 topMargin">
+                  <div class="checkbox ">
+                    <label>
+                      <input checked.bind="searchInstitution"  type="checkbox"> Search by Institution
+                    </label>
+                  </div>
+                </div>
+				<div class="col-md-12" show.bind="searchInstitution">
+					<div class="col-md-5 topMargin">
+						<label id="productList">Available Institutions</label>
+						<div class="well well2 overFlow" style="height:400px;">
+							<input class="form-control" value.bind="institutionsFilter" input.trigger="filterInstitutionsList()" placeholder="Filter institutions" />
+							<ul class="list-group">
+								<button click.trigger="selectInstitution($event)" type="button" repeat.for="institution of filteredInstitutionArray" id="${institution._id}"
+									class="list-group-item">${institution.name}</button>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md-5 col-md-offset-1 topMargin">
+						<label >Requested Institution</label>
+						<div class="well well2 overflow" style="height:400px;">
+							<ul class="list-group">
+								<button click.trigger="removeInstitution($event)" type="button" repeat.for="institution of selectedInstitutions"
+									id="${institution}" class="list-group-item">${institution | lookupValue:people.institutionsArray:"_id":"name"}</button>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>			
+			<div class="row">
+				<div class="panel panel-default topMargin leftMargin rightMargin">
+					<div class="panel-body">
+						<div class="col-lg-3">
+							<div class="form-group">
+								<div class="col-lg-6">
+									<label>Type</label>
+									<select change.delegate="typeChanged()" value.bind="selectedType" id="helpTicketPurpose" class="form-control">
+													<option value="-1">Nothing selected</option>
+													<option repeat.for="types of config.HELP_TICKET_TYPES" value.bind="types.code">${types.description}</option>
+												</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-8 topMargin" show.bind="showAdditionalInfo">
+							<compose repeat.for="helpTicket of config.HELP_TICKET_TYPES" show.bind="helpTicket.show" view="./help-ticket-${helpTicket.code}.html"></compose>
+						</div>
+					</div>
+				</div>
+			</div>		
+		</div>
+	</div>
+</template>

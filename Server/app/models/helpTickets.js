@@ -28,6 +28,7 @@ var HelpTicketContentSchema = new Schema({
 module.exports = Mongoose.model('HelpTicketContent', HelpTicketContentSchema);
 
 var HelpTicketSchema = new Schema({
+  productId: {type: Schema.Types.ObjectId },
   createdDate: { type: Date, default: Date.now, required: true },
   modifiedDate: { type: Date, default: Date.now, required: true },
   sessionId: {type: Schema.Types.ObjectId },

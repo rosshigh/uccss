@@ -144,6 +144,7 @@ export class CreateHelpTickets{
             this.helpTickets.selectedHelpTicketContent.requestId = this.clientRequest._id;
             this.helpTickets.selectedHelpTicketContent.systemId = this.clientRequest.systemId;
             this.helpTickets.selectedHelpTicketContent.clientId = this.clientRequest.clientId;
+            this.helpTickets.selectedHelpTicket.productId = this.clientRequest.productId;
         }
 
         this.helpTickets.selectedHelpTicketContent.personId = this.editPerson;
