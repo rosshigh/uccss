@@ -15,7 +15,6 @@ export class CurrInfo{
 	addComment = false;
 	description = "";
 	comment = "";
-	seValue = "";
 
     constructor(datatable, curriculum, products, config, utils) {
         this.dataTable = datatable;
@@ -83,7 +82,6 @@ export class CurrInfo{
 	cancel(){
 		this.addComment = false;
 		this.comment = "";
-		this.setValue = "CLEAR_EDITOR";
 	}
 
 	async save(){

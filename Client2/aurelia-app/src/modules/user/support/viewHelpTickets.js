@@ -7,6 +7,7 @@ import { Products } from '../../../resources/data/products';
 import { Downloads } from '../../../resources/data/downloads';
 import { AppConfig } from '../../../config/appConfig';
 import { Utils } from '../../../resources/utils/utils';
+import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 import { People } from '../../../resources/data/people';
 
 import Validation from '../../../resources/utils/validation';
@@ -14,7 +15,7 @@ import Validation from '../../../resources/utils/validation';
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products, CommonDialogs)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
@@ -25,10 +26,8 @@ export class ViewHelpTickets {
   spinnerHTML = "";
   filterValues = new Array();
   lockObject = new Object();
-  responseContent = " ";
-  setValue = "";
 
-  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products) {
+  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialog) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -41,6 +40,7 @@ export class ViewHelpTickets {
     this.sessions = sessions;
     this.apps = apps;
     this.products = products;
+    this.dialog = dialog;
   };
 
   attached() {
@@ -130,11 +130,9 @@ export class ViewHelpTickets {
 
   respond() {
      if(!this.showLockMessage){
-        this.responseContent = "";
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
         this.enableButton = true;
-        // tinyMCE.activeEditor.focus();
      }
   }
 
@@ -147,9 +145,6 @@ export class ViewHelpTickets {
   _createResponse() {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
-    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
-    this.responseContent = "";
-    this.setValue = "CLEAR_EDITOR";
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
   }
 
@@ -164,6 +159,52 @@ export class ViewHelpTickets {
     }
     this._cleanUp();
     // }
+  }
+
+  closeHelpTicket(helpTicket){
+     return this.dialog.showMessage(
+          "Are you sure you want to close the help ticket?",
+          "Close Help Ticket",
+          ['Yes', 'No']
+      ).then(response => {
+          if (!response.wasCancelled) {
+              this.closeTicket(helpTicket);
+          } else {
+              this._cleanUp();
+          }
+      });
+  }
+
+  async closeTicket(helpTicket){
+    this.helpTickets.selectHelpTicketByID(helpTicket._id);
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if (!response.error) {
+        if (response.helpTicketId === 0) {
+          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
+          let serverResponse = await this.helpTickets.updateStatus();
+          if (!serverResponse.error) {
+            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.utils.showNotification("The help ticket was updated");
+          }
+          this._cleanUp();
+        }
+    }
+  }
+
+  async openHelpTicket(helpTicket){
+    this.helpTickets.selectHelpTicketByID(helpTicket._id);
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if (!response.error) {
+        if (response.helpTicketId === 0) {
+          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
+          let serverResponse = await this.helpTickets.updateStatus();
+          if (!serverResponse.error) {
+            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.utils.showNotification("The help ticket was updated");
+          }
+          this._cleanUp();
+        }
+    }
   }
 
   /*****************************************************************************************
@@ -224,7 +265,6 @@ export class ViewHelpTickets {
 
   async _cleanUpResponse() {
     this.enterResponse = false;
-    this.responseContent = undefined;
   }
 
   _cleanUpFilters() {
@@ -233,10 +273,4 @@ export class ViewHelpTickets {
     $("#personStatus").val("");
   }
 
-  async changeTab(el, index) {
-    $(".list-group").children().removeClass('active');
-    $(el.target).parent().addClass('active');
-    $(".in").removeClass('active').removeClass('in');
-    $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-  }
 }

@@ -13,8 +13,6 @@ export class EditNews {
     navControl = "newsNavButtons";
     spinnerHTML = "";
     isInformationItem = false;
-    newsContent = "";
-    setValue = "";
     isChecked = true;
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
@@ -50,7 +48,6 @@ export class EditNews {
     async new() {
         this.editIndex = -1;
         this.siteinfo.selectSiteItem(this.editIndex);
-        this.newsContent = "";
         $("#editTitle").focus();
         this.newsItemSelected = true;
     }
@@ -59,7 +56,6 @@ export class EditNews {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectSiteItem(this.editIndex);
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
-        this.setValue = this.siteinfo.selectedItem.content;
 
         //Editing a product
         $("#editTitle").focus();
@@ -81,7 +77,6 @@ export class EditNews {
 
     async save() {
         if(this.validation.validate(1)){
-            this.siteinfo.selectedItem.content = this.newsContent;
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.siteinfo.siteArray);

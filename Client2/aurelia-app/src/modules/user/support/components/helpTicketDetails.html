@@ -14,14 +14,11 @@
         <!-- Additional Information Panel -->
         <div class="col-lg-12 topMargin" id="descriptionGroup">
             <div class="form-group">
-            <label for="descriptionID">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>
-            <p>&nbsp;</p>
-             <!--
-            <editor  name.bind="createHTEditor" value.bind="commentsResponse" setvalue.bind="setValue"></editor>
-               -->
-            <tiny-mce height.bind="150" value.two-way="commentsResponse" setvalue.bind="setValue"></tiny-mce>
-        
+                <label for="descriptionID">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>
+                <p>&nbsp;</p>
+                <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
             </div>
+            <label>Use the control below to upload files other than images.  You can insert images directly into the editor.</label>
 
             <div class="panel panel-default">
                 <div class="input-group">

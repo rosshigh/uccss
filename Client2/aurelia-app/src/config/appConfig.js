@@ -7,8 +7,8 @@ export class AppConfig {
     SEND_EMAILS = true;
 
     HOST = location.origin;
-    // BASE_URL = "http://localhost:5000/api/";
-    BASE_URL = this.HOST + "/api/";
+    BASE_URL = "http://localhost:5000/api/";
+    // BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -148,11 +148,11 @@ export class AppConfig {
     ];
 
     NEW_HELPTICKET_STATUS = 1; 
-    UNDER_REVIEW_HELPTICKET_STATUS = 2;
-    CUSTOMER_ACTION_HELPTICKET_STATUS = 3;
-    FOLLOW_UP_HELPTICKET_STATUS = 4;
-    CLOSED_RESOLVED_HELPTICKET_STATUS = 5;
-    CLOSED_UNRESOLVED_HELPTICKET_STATUS = 6;
+    REVIEW_HELPTICKET_STATUS = 2;
+    IN_PROCESS_HELPTICKET_STATUS = 3;
+    CUSTOMER_ACTION_HELPTICKET_STATUS = 4;
+    REPLIED_HELPTICKET_STATUS = 5;
+    CLOSED_HELPTICKET_STATUS = 6;
 
     HELP_TICKET_STATUSES = [
         {
@@ -160,19 +160,23 @@ export class AppConfig {
             "description": "New"
         },
         {
-            "code": this.UNDER_REVIEW_HELPTICKET_STATUS,
+            "code": this.REVIEW_HELPTICKET_STATUS,
             "description": "Review"
+        },
+        {
+            "code": this.IN_PROCESS_HELPTICKET_STATUS,
+            "description": "In Process"
         },
         {
             "code": this.CUSTOMER_ACTION_HELPTICKET_STATUS,
             "description": "Customer Action"
         },
         {
-            "code": this.FOLLOW_UP_HELPTICKET_STATUS,
-            "description": "Follow Up"
+            "code": this.REPLIED_HELPTICKET_STATUS,
+            "description": "Replied"
         },
         {
-            "code": this.CLOSED_RESOLVED_HELPTICKET_STATUS,
+            "code": this.CLOSED_HELPTICKET_STATUS,
             "description": "Closed"
         }
     ];

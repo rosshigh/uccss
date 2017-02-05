@@ -21,10 +21,6 @@ export class EditProducts {
     selectedFiles;
     removedFiles = new Array();
     spinnerHTML = "";
-    notesEditorContent = "";
-    productInfoEditorContent = "";
-    setValue = "";
-    setValue2 = "";
 
     tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
     tabPath = './';
@@ -98,8 +94,6 @@ export class EditProducts {
         }
 
         this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
-        this.setValue2 = this.products.selectedProduct.clientInfo || "";
-        this.setValue = this.products.selectedProduct.productInfo || "";
 
         //Editing a product
         $("#editClientKey").focus();
@@ -112,24 +106,11 @@ export class EditProducts {
     }
 
     cancel() {
-
         this.products.selectProduct(this.editIndex);
-         
-        this.setValue2 = this.products.selectedProduct.clientInfo || "CLEAR_EDITOR";
-        this.setValue = this.products.selectedProduct.productInfo || "CLEAR_EDITOR";
-        // this.editSystemsString = "";
-        // if(this.products.selectedProduct.systems){
-        //     for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
-        //         this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
-        //     }
-        // }
     }
 
     async save() {
         if(this.validation.validate(1)){
-
-            this.products.selectedProduct.clientInfo = this.notesEditorContent;
-            this.products.selectedProduct.productInfo = this.productInfoEditorContent;
             let serverResponse = await this.products.saveProduct();
             if (!serverResponse.error) {
                 if(this.systemChanges.length > 0) {                  
@@ -176,10 +157,6 @@ export class EditProducts {
         this.newProduct = false; 
         this.productSelected = false;
         this.systemChanges = new Array();
-        this.notesEditorContent = "";
-        this.productInfoEditorContent = "";
-        this.setValue = "CLEAR_EDITOR";
-        this.setValue2 = "CLEAR_EDITOR";
         this._cleanUpFilters();
         this.validation.makeAllValid(1);
     }

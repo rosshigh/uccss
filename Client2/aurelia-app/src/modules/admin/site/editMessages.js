@@ -14,8 +14,6 @@ export class EditMessages {
     navControl = "newsNavButtons";
     spinnerHTML = "";
     isInformationItem = false;
-    messageContent = "";
-    setValue = "";
 
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -53,18 +51,15 @@ export class EditMessages {
         this.editIndex = -1; 
         this.siteinfo.selectMessage(this.editIndex);
         this.siteinfo.selectedMessage.category = this.config.MESSAGE_TYPES[0];
-        this.messageContent = "";
-
         $("#editKey").focus();
         this.messageItemSelected = true;
     }
 
     async edit(index, el) {
-         this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectMessage(this.editIndex);
         
         this.originalMessage = this.utils.copyObject(this.siteinfo.selectedMessage);
-        this.setValue = this.siteinfo.selectedMessage.content;
 
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -83,7 +78,6 @@ export class EditMessages {
 
     async save() {
         if(this.validation.validate(1)){
-             this.siteinfo.selectedMessage.content = this.messageContent;
             let serverResponse = await this.siteinfo.saveMessageItem();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.siteinfo.messageArray);

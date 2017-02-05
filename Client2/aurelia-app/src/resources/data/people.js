@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import moment from 'moment';
+// import moment from 'moment';
 
 import {DataServices} from './dataServices';
 import {Utils} from '../utils/utils';
@@ -250,7 +250,8 @@ export class People {
 
     emptyInstitution() {
         var newInstitution = new Object();
-        newInstitution.joinDate =  moment(this.utils.convertUTCDateToLocalDate(new Date().toString(0,10))).format("YYYY-MM-DD");
+        newInstitution.joinDate =  new Date();
+        // moment(this.utils.convertUTCDateToLocalDate(new Date().toString(0,10))).format("YYYY-MM-DD");
 
         newInstitution.name = "";
         return newInstitution;

@@ -24,8 +24,6 @@ export class CreateHelpTickets{
     filesSelected;
     selectedFiles;
     removedFiles = new Array();
-    commentsResponse = "";
-    setValue = "";
 
     showAdditionalInfo=false;
 
@@ -138,7 +136,7 @@ export class CreateHelpTickets{
         this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
         this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
         this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;
-        this.helpTickets.selectedHelpTicketContent.content.comments =  this.commentsResponse;
+        // this.helpTickets.selectedHelpTicketContent.content.comments =  this.commentsResponse;
 
         if(!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired){
             //If the help ticket type doesn't require a course, insert a dummy courseId
@@ -305,7 +303,7 @@ export class CreateHelpTickets{
          this.validation.addRule(this.config.HELP_TICKET_TYPES[0].code,"curriculumTitle",[{"rule":"required","message":"Curriculum title is required", "value": "helpTickets.selectedHelpTicketContent.content.curriculumTitle"}]);
          this.validation.addRule(this.config.HELP_TICKET_TYPES[1].code,"resetPasswordUserIDs",[{"rule":"required","message":"The user IDs to reset are required", "value": "helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs"}]);
          this.validation.addRule(this.config.HELP_TICKET_TYPES[2].code,"application",[{"rule":"required","message":"Choose an application", "value": "helpTickets.selectedHelpTicketContent.content.applicationId"}]);
-         this.validation.addRule(this.config.HELP_TICKET_TYPES[3].code,"descriptionID",[{"rule":"required","message":"Enter a description", "value": "commentsResponse"}]);
+         this.validation.addRule(this.config.HELP_TICKET_TYPES[3].code,"descriptionID",[{"rule":"required","message":"Enter a description", "value": "helpTickets.selectedHelpTicketContent.content.comments"}]);
          this.validation.addRule(99,"number",[{"rule":"required","message":"Course number is required", "value": "people.selectedCourse.number"}]);
          this.validation.addRule(99,"name",[{"rule":"required","message":"Course name is required", "value": "people.selectedCourse.name"}]);
 

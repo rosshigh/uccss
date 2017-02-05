@@ -5,6 +5,7 @@ import 'bootstrap-select'
 export class MultiselectCustomElement {
   
   @bindable options;
+  @bindable label;
   @bindable({ defaultBindingMode: bindingMode.twoWay }) value = [];
   
   constructor(taskQueue) {

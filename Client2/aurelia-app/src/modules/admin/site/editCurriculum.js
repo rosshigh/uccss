@@ -14,8 +14,6 @@ export class EditCurriculum {
     curriculumItemSelected = false;
     // navControl = "newsNavButtons";
     spinnerHTML = "";
-    curriculumContent = "";
-    setValue = "";
 	newItem = false;
 
     constructor(datatable, curriculum, products, config, utils, dialog, validation) {
@@ -57,7 +55,6 @@ export class EditCurriculum {
 		this.editIndex = -1;
         this.curriculum.selectCurriculum();
         this.curriculumItemSelected = "";
-        this.curriculumContent = "";
         $("#editTitle").focus();
         this.curriculumItemSelected = true;
 		this.newItem = true;
@@ -66,7 +63,6 @@ export class EditCurriculum {
     async edit(index, el) {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.curriculum.selectCurriculum(this.editIndex);
-        this.setValue =  this.curriculum.selectedCurriculum.description ? this.curriculum.selectedCurriculum.description : " ";
 		this.originalCurriculumObject = this.utils.copyObject(this.curriculum.selectedCurriculum);
 		this.newItem = false;
 
@@ -90,7 +86,6 @@ export class EditCurriculum {
 
     async save() {
         if(this.validation.validate(1)){
-            this.curriculum.selectedCurriculum.description = this.curriculumContent;
             let serverResponse = await this.curriculum.save();
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.curriculum.curriculumArray);
@@ -228,8 +223,6 @@ export class EditCurriculum {
     _cleanUp(){
         this.showCategoryForm = false;
         this.curriculumItemSelected = false;
-        this.curriculumContent = "";
-        this.setValue = "CLEAR_EDITOR";
     }
 
     _setupValidation(){

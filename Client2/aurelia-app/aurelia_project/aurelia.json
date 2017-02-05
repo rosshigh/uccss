@@ -216,6 +216,11 @@
             "exports": "Chart"
           },
           {
+            "name": "summernote",
+            "path": "../node_modules/summernote/dist/",
+            "main": "summernote"
+          },
+          {
             "name": "fuelux",
             "path": "../node_modules/fuelux/dist",
             "main": "js/fuelux.min",

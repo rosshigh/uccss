@@ -22,8 +22,6 @@ export class ViewRequests {
 
   navControl = "requestsNavButtons";
   spinnerHTML = "";
-  commentsResponse = "";
-  setValue = "";
   lockObject = new Object();
 
   constructor(router, config, validation, people, datatable, utils, sessions, systems, products, requests) {
@@ -47,7 +45,7 @@ export class ViewRequests {
 
   async activate() {
     $("#infoBox").fadeOut();
-    $("#existingRequestInfo").fadeOut();
+    $("#existingRequestInfo").fadeOut(); 
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate',true ),
       this.people.getPeopleArray(),
@@ -65,7 +63,6 @@ export class ViewRequests {
 
   async getRequests() {
     if (this.selectedSession && this.selectedCourse) {
-      // this._unLock();
       await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse, true);
       if (this.requests.requestsArray.length) {
         //Select the first request by default
@@ -75,7 +72,6 @@ export class ViewRequests {
         this.updateArray();
         //Select the displayed session
         this.sessions.selectSessionById(this.selectedSession);
-        this.setValue = this.requests.selectedRequest.comments;
         //Set the date limits in the date controls
         this.setDates();
         //Save the request so we can check if it's dirty later'
@@ -118,7 +114,6 @@ export class ViewRequests {
     this.requests.setSelectedRequestDetail(product);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
     this.selectedAssignmentIndex = 0;
-    this.setValue = this.requests.selectedRequest.comments;
     if(this.requests.selectedRequestDetail.assignments.length){
       this.systems.selectedSystemFromId(this.requests.selectedRequestDetail.assignments[this.selectedAssignmentIndex].systemId);
       this.showRequest = true;
@@ -133,7 +128,6 @@ export class ViewRequests {
 
   async save() {
     if(!this.showLockMessage){
-      this.requests.selectedRequest.comments = this.commentsResponse;
       if (this.validation.validate(1)) {
         if(this._buildRequest()){
           let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);

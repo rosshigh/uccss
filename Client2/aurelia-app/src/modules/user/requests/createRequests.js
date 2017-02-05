@@ -25,8 +25,6 @@ export class ViewHelpTickets {
   spinnerHTML="";
   courseId = -1;
   requestType = -1;
-  commentsResponse = "";
-  setValue = "";
 
   tempRequests = new Array();
   productInfo = new Array();
@@ -80,7 +78,6 @@ export class ViewHelpTickets {
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
             await this._lock();
-            this.commentsResponse = this.requests.selectedRequest.comments || "";
             this.existingRequest = true;
             this.updateMessages(false);
         } else{
@@ -367,7 +364,6 @@ export class ViewHelpTickets {
     if(this.existingRequest){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
     }
-    this.requests.selectedRequest.comments = this.commentsResponse;
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;
     this.requests.selectedRequest.institutionId = this.userObj.institutionId;
     this.requests.selectedRequest.sessionId = this.sessionId;

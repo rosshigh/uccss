@@ -19,12 +19,7 @@
           </div> 
 
           <div class="col-lg-12 topMargin" style="height:300px;padding:50px;">
-            <!--
-            <editor  name.bind="viewHTEditor" value.bind="responseContent" setvalue.bind="setValue"></editor>
-            -->
-            
-            <tiny-mce height.bind="150" value.two-way="responseContent" setvalue.two-way="setValue"></tiny-mce>
-            <!--helpTickets.selectedHelpTicketContent.content.comments -->
+            <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
           </div>
           <p>&nbsp;</p>
 

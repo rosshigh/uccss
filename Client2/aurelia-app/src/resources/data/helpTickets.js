@@ -63,7 +63,7 @@ export class HelpTickets {
         }
     }
 
-     selectHelpTicketByID(id){
+    selectHelpTicketByID(id){
         this.helpTicketsArray.forEach((item, index) => {
           if(item._id === id){
             this.selectedHelpTicket = this.utils.copyObject(item);
@@ -82,7 +82,7 @@ export class HelpTickets {
         newHelpTicketObj.courseId = "";
         newHelpTicketObj.personId = "";
         newHelpTicketObj.helpTicketType = "";
-        newHelpTicketObj.helpTicketStatus = 1;
+        newHelpTicketObj.helpTicketStatus = this.config.NEW_HELPTICKET_STATUS;
         newHelpTicketObj.content = new Array();
         newHelpTicketObj.owner = new Array();
         newHelpTicketObj.createdDate = new Date();
@@ -133,9 +133,6 @@ export class HelpTickets {
         if (!response.error) {
             this.selectedHelpTicket = this.utils.copyObject(response);
             this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
-            
-            // this.selectedHelpTicket.owner =  response.owner;
-            // this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].owner = response.owner;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -149,7 +146,7 @@ export class HelpTickets {
 
          var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
-            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].helpTicketStatus = response.helpTicketStatus;
+            this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -163,7 +160,7 @@ export class HelpTickets {
 
          var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
-            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex].keyWords = response.keyWords;
+            this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
             }
@@ -189,7 +186,7 @@ export class HelpTickets {
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "put");
             if (!response.error) {
                 this.selectedHelpTicket = this.utils.copyObject(response);
-                this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
+                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
 
             } else {
                  this.data.processError(response, "There was an error updating the help ticket.");

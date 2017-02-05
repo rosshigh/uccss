@@ -20,14 +20,12 @@ export class ViewHelpTickets {
   sendEmail = false;
   showLockMessage = false;
   sendMailDisable = false;
-  responseMessage = "Click here to respond";
+  responseMessage = "";
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
-  responseContent = "";
   commentShown = "";
-  setValue = "";
 
   constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
     this.router = router;
@@ -54,7 +52,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async activate() {
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
+      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('', true),
@@ -65,7 +63,7 @@ export class ViewHelpTickets {
     this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();
     this.helpTicketTypes = this.config.HELP_TICKET_STATUSES.filter(item => {
-       return item.code !== this.config.CLOSED_RESOLVED_HELPTICKET_STATUS;
+       return item.code !== this.config.CLOSED_HELPTICKET_STATUS;
     })
 
   }
@@ -108,7 +106,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.FOLLOW_UP_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
+    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.spinnerHTML = "";
     this._cleanUpFilters()
@@ -137,13 +135,13 @@ export class ViewHelpTickets {
           helpTicketId: this.helpTickets.selectedHelpTicket._id,
           personId: this.userObj._id
         });
-        this.responseMessage = "Click here to respond";
+        this.responseMessage = "";
         this.showLockMessage = false;
         this.lockObject = { personId: this.userObj._id };
       } else {
         if (response[0].personId === this.userObj._id) {
           this.showLockMessage = false;
-          this.responseMessage = "Click here to respond";
+          this.responseMessage = "";
           this.lockObject = { personId: this.userObj._id };
         } else {
           this.lockObject = response[0];
@@ -168,14 +166,27 @@ export class ViewHelpTickets {
     return "someone";
   }
 
+  async save(){
+     this.helpTickets.selectHelpTicketByID(helpTicket._id);
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if (!response.error) {
+        if (response.helpTicketId === 0) {
+          let serverResponse = await this.helpTickets.saveHelpTicket(false);
+          if (!serverResponse.error) {
+            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.utils.showNotification("The help ticket was updated");
+          }
+          this._cleanUp();
+        }
+    }
+  }
+
   /*****************************************************************************************
   * Open the response form and create an empty help ticket content object
   *****************************************************************************************/
   respond() {
     if (!this.showLockMessage) {
       this.helpTickets.selectHelpTicketContent();
-      this.responseContent = this.helpTickets.selectedHelpTicketContent.content.comments;
-      this.responseContent = "";
       this.enterResponse = true;
       this.enableButton = true;
     }
@@ -185,8 +196,6 @@ export class ViewHelpTickets {
     this.response = new Object();
     this.isUnchanged = true;
     this.enterResponse = false;
-    this.responseContent = "";
-    this.setValue = "CLEAR_EDITOR";
   }
 
   /*****************************************************************************************
@@ -195,9 +204,6 @@ export class ViewHelpTickets {
   _createResponse() {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
-    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseContent;
-    this.responseContent = "";
-    this.setValue = "CLEAR_EDITOR";
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
   }
 
@@ -251,7 +257,7 @@ export class ViewHelpTickets {
       if (!this.showLockMessage) {
         var obj = {
           personId: this.userObj._id,
-          status: this.config.UNDER_REVIEW_HELPTICKET_STATUS
+          status: this.helpTickets.selectedHelpTicket.helpTicketStatus
         }
         let serverResponse = await this.helpTickets.updateOwner(obj);
         if (!serverResponse.error) {
@@ -271,7 +277,7 @@ export class ViewHelpTickets {
         if (response.helpTicketId === 0) {
           var obj = {
             personId: this.userObj._id,
-            status: this.config.UNDER_REVIEW_HELPTICKET_STATUS
+            status: this.config.REVIEW_HELPTICKET_STATUS
           }
           let serverResponse = await this.helpTickets.updateOwner(obj);
           if (!serverResponse.error) {
@@ -281,6 +287,22 @@ export class ViewHelpTickets {
           this._cleanUp();
         }
       }
+    }
+  }
+
+  async changeToInProcess(helpTicket){
+    this.helpTickets.selectHelpTicketByID(helpTicket._id);
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if (!response.error) {
+        if (response.helpTicketId === 0) {
+          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.IN_PROCESS_HELPTICKET_STATUS;
+          let serverResponse = await this.helpTickets.updateStatus();
+          if (!serverResponse.error) {
+            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.utils.showNotification("The help ticket was updated");
+          }
+          this._cleanUp();
+        }
     }
   }
 
