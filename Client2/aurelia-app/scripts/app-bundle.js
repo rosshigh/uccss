@@ -202,9 +202,130 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.MESSAGE_TYPES = ['CLIENT_REQUESTS', 'HELP_TICKETS'];
             this.HELP_TICKET_OTHER_TYPE = 4;
             this.HELP_TICKET_APP_TYPE = 3;
-            this.HELP_TICKET_RESET_TYPE = 2;
+            this.HELP_TICKET_PASSWORD_RESET_TYPE = 2;
             this.HELP_TICKET_CURRICULUM_TYPE = 1;
+            this.HELP_TICKET_PRODUCT_REQUESTS = 0;
+            this.HELP_TICKET_CLIENT_REFRESH_TYPE = 5;
+            this.HELP_TICKET_LOGON_TYPE = 6;
+            this.HELP_TICKET_CLIENT_OTHER_TYPE = 7;
+            this.HELP_TICKET_APP_ERROR_TYPE = 8;
+            this.HELP_TICKET_APP_LICENSE_TYPE = 9;
+            this.HELP_TICKET_APP_OTHER_TYPE = 10;
+            this.HELP_TICKET_OTHER_UA_TYPE = 11;
+            this.HELP_TICKET_OTHER_UCCSS_TYPE = 12;
+            this.HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
+            this.HELP_TICKET_OTHER_TYPE = 99;
+            this.REFRESH_KEYWORDS = ["ERPSIM"];
             this.HELP_TICKET_TYPES = [{
+                "code": 0,
+                "description": "Help with My Product Requests",
+                "message": "This includes any problems with requested or assigned products in current sessions. </p>",
+                "showSubtypes": true,
+                "subtypes": [{
+                    "code": this.HELP_TICKET_CURRICULUM_TYPE,
+                    "description": "Issues with curriculum exercises",
+                    "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
+                    "clientRequired": true,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_PASSWORD_RESET_TYPE,
+                    "description": "Reset Passwords",
+                    "message": "Select the product and enter the user ids of the passwords you need reset.<br><br><p>If the user ids are on a ERP system, you can reset passwords and unlock user accounts in transaction SU01.</p>",
+                    "clientRequired": true,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_LOGON_TYPE,
+                    "description": "Other logon or connection problems",
+                    "message": "Select the product and describe the problem as thouroughly as possible.",
+                    "clientRequired": true,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_CLIENT_REFRESH_TYPE,
+                    "description": "Refresh an ERPSim client",
+                    "message": "Select the client to refresh",
+                    "clientRequired": true,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_CLIENT_OTHER_TYPE,
+                    "description": "Other",
+                    "message": "Select the product request and enter a description of the problem.",
+                    "clientRequired": true,
+                    "appsRequired": false,
+                    "show": false
+                }]
+            }, {
+                "code": 1,
+                "description": "Desktop Application Help",
+                "message": "This includes applications other than those hosted at the UCC.  Select the product from the drop down list and provide as much information about the error as possible.<br><br><p>If possible upload screen shots that show the problem.</p>",
+                "clientRequired": false,
+                "appsRequired": true,
+                "show": false,
+                "showSubtypes": false,
+                "subtypes": [{
+                    "code": this.HELP_TICKET_APP_ERROR_TYPE,
+                    "description": "Application or Installation problems",
+                    "message": "Select the application software and provide as many details as possible.",
+                    "clientRequired": false,
+                    "appsRequired": true,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_APP_LICENSE_TYPE,
+                    "description": "License keys for analytics software",
+                    "message": "Select the application software.",
+                    "clientRequired": false,
+                    "appsRequired": true,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_APP_OTHER_TYPE,
+                    "description": "Other issuew with software",
+                    "message": "Select the application software.",
+                    "clientRequired": false,
+                    "appsRequired": true,
+                    "show": false
+                }]
+            }, {
+                "code": 2,
+                "description": "Other",
+                "message": "Use this for any issue that doesn't fall easily into one of the other categories.",
+                "clientRequired": false,
+                "appsRequired": false,
+                "show": false,
+                "showSubtypes": false,
+                "subtypes": [{
+                    "code": this.HELP_TICKET_OTHER_UA_TYPE,
+                    "description": "Questions about the UA or UA Learning Hub",
+                    "message": "Select the application software and provide as many details as possible.",
+                    "clientRequired": false,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_OTHER_UCCSS_TYPE,
+                    "description": "Questions about the UCCSS or faculy accounts",
+                    "message": "Select the application software.",
+                    "clientRequired": false,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_OTHER_CURRICULUM_TYPE,
+                    "description": "General questions on UA curriculum",
+                    "message": "Select the application software.",
+                    "clientRequired": false,
+                    "appsRequired": false,
+                    "show": false
+                }, {
+                    "code": this.HELP_TICKET_OTHER_TYPE,
+                    "description": "Other questions",
+                    "message": "Select the application software.",
+                    "clientRequired": false,
+                    "appsRequired": false,
+                    "show": false
+                }]
+            }];
+            this.HELP_TICKET_SUB_TYPES = [{
                 "code": this.HELP_TICKET_CURRICULUM_TYPE,
                 "description": "Curriculum Help",
                 "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
@@ -407,7 +528,7 @@ define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'],
             var appRouterConfig = function appRouterConfig(config) {
                 config.addPipelineStep('authorize', AuthorizeStep);
                 config.title = 'UCCSS';
-                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }]);
+                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'notes', moduleId: './modules/admin/notes/notes', name: 'notes', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }]);
 
                 config.mapUnknownRoutes('home');
             };
@@ -447,7 +568,7 @@ define('resources/index',['exports'], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {
-    config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/tiny-mce', './editor/editor', './elements/add-systems', './elements/rate-it', './elements/date-picker', './elements/edit-client', './elements/multiselect', './value-converters/format-digits', './value-converters/overlap', './value-converters/request-number', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/session-status-button', './value-converters/person-status-button', './value-converters/to-uppercase', './value-converters/format-phone', './value-converters/info-filter', './value-converters/date-format', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
+    config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/tiny-mce', './editor/editor', './elements/add-systems', './elements/rate-it', './elements/date-picker', './elements/edit-client', './elements/multiselect', './value-converters/format-digits', './value-converters/overlap', './value-converters/request-number', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/erpsim', './value-converters/session-status-button', './value-converters/person-status-button', './value-converters/to-uppercase', './value-converters/format-phone', './value-converters/session-name', './value-converters/info-filter', './value-converters/date-format', './value-converters/help-ticket-type', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
   }
 });
 define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
@@ -2689,8 +2810,8 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             return getClientRequestsArray;
         }();
 
-        ClientRequests.prototype.getPersonClientRequestsArray = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options, refresh) {
+        ClientRequests.prototype.getActiveClientRequestsArray = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(personId, sessions) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -2698,7 +2819,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                             case 0:
                                 url = this.data.CLIENT_REQUESTS_SERVICES;
 
-                                url += options ? options : "";
+                                url += "/" + personId + "/" + sessions;
                                 _context2.prev = 2;
                                 _context2.next = 5;
                                 return this.data.get(url);
@@ -2740,65 +2861,79 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee2, this, [[2, 13]]);
             }));
 
-            function getPersonClientRequestsArray(_x4, _x5) {
+            function getActiveClientRequestsArray(_x4, _x5) {
                 return _ref2.apply(this, arguments);
+            }
+
+            return getActiveClientRequestsArray;
+        }();
+
+        ClientRequests.prototype.getPersonClientRequestsArray = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                url = this.data.CLIENT_REQUESTS_SERVICES;
+
+                                url += options ? options : "";
+                                _context3.prev = 2;
+                                _context3.next = 5;
+                                return this.data.get(url);
+
+                            case 5:
+                                serverResponse = _context3.sent;
+
+                                if (serverResponse.error) {
+                                    _context3.next = 10;
+                                    break;
+                                }
+
+                                this.requestsArray = serverResponse;
+                                _context3.next = 11;
+                                break;
+
+                            case 10:
+                                return _context3.abrupt('return', undefined);
+
+                            case 11:
+                                _context3.next = 17;
+                                break;
+
+                            case 13:
+                                _context3.prev = 13;
+                                _context3.t0 = _context3['catch'](2);
+
+                                console.log(_context3.t0);
+                                return _context3.abrupt('return', undefined);
+
+                            case 17:
+                                return _context3.abrupt('return', this.requestsArray);
+
+                            case 18:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this, [[2, 13]]);
+            }));
+
+            function getPersonClientRequestsArray(_x6, _x7) {
+                return _ref3.apply(this, arguments);
             }
 
             return getPersonClientRequestsArray;
         }();
 
         ClientRequests.prototype.getCurrentCount = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(options) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                url = this.data.CLIENT_REQUESTS_SERVICES + '/current/count';
-
-                                url += options ? options : "";
-                                _context3.next = 4;
-                                return this.data.get(url);
-
-                            case 4:
-                                response = _context3.sent;
-
-                                if (response.error) {
-                                    _context3.next = 12;
-                                    break;
-                                }
-
-                                this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_CLIENT_REQUEST, 'requestStatus', response);
-                                this.updatedRequests = this.utils.countItems(this.config.UPDATED_CLIENT_REQUEST, 'requestStatus', response);
-                                this.customerActionRequests = this.utils.countItems(this.config.CUSTOMER_ACTION_CLIENT_REQUEST, 'requestStatus', response);
-                                return _context3.abrupt('return', response.count);
-
-                            case 12:
-                                return _context3.abrupt('return', null);
-
-                            case 13:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function getCurrentCount(_x6) {
-                return _ref3.apply(this, arguments);
-            }
-
-            return getCurrentCount;
-        }();
-
-        ClientRequests.prototype.getSessionCount = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(sessionArray, numSessions, options, requestStatus) {
-                var url, response, sessions, sessionCount, i;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                url = this.data.CLIENT_REQUESTS_SERVICES;
+                                url = this.data.CLIENT_REQUESTS_SERVICES + '/current/count';
 
                                 url += options ? options : "";
                                 _context4.next = 4;
@@ -2808,7 +2943,51 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 response = _context4.sent;
 
                                 if (response.error) {
-                                    _context4.next = 13;
+                                    _context4.next = 12;
+                                    break;
+                                }
+
+                                this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_CLIENT_REQUEST, 'requestStatus', response);
+                                this.updatedRequests = this.utils.countItems(this.config.UPDATED_CLIENT_REQUEST, 'requestStatus', response);
+                                this.customerActionRequests = this.utils.countItems(this.config.CUSTOMER_ACTION_CLIENT_REQUEST, 'requestStatus', response);
+                                return _context4.abrupt('return', response.count);
+
+                            case 12:
+                                return _context4.abrupt('return', null);
+
+                            case 13:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function getCurrentCount(_x8) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return getCurrentCount;
+        }();
+
+        ClientRequests.prototype.getSessionCount = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(sessionArray, numSessions, options, requestStatus) {
+                var url, response, sessions, sessionCount, i;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                url = this.data.CLIENT_REQUESTS_SERVICES;
+
+                                url += options ? options : "";
+                                _context5.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                response = _context5.sent;
+
+                                if (response.error) {
+                                    _context5.next = 13;
                                     break;
                                 }
 
@@ -2835,124 +3014,164 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                         }
                                     }
                                 });
-                                return _context4.abrupt('return', sessionCount);
+                                return _context5.abrupt('return', sessionCount);
 
                             case 13:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
-            function getSessionCount(_x7, _x8, _x9, _x10) {
-                return _ref4.apply(this, arguments);
+            function getSessionCount(_x9, _x10, _x11, _x12) {
+                return _ref5.apply(this, arguments);
             }
 
             return getSessionCount;
         }();
 
         ClientRequests.prototype.getClientRequestsDetailsArray = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options, refresh) {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 if (!(!this.requestsArray || refresh)) {
-                                    _context5.next = 18;
+                                    _context6.next = 18;
                                     break;
                                 }
 
                                 url = this.data.CLIENT_REQUEST_DETAILS;
 
                                 url += options ? options : "";
-                                _context5.prev = 3;
-                                _context5.next = 6;
+                                _context6.prev = 3;
+                                _context6.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context5.sent;
+                                serverResponse = _context6.sent;
 
                                 if (serverResponse.error) {
-                                    _context5.next = 11;
+                                    _context6.next = 11;
                                     break;
                                 }
 
                                 this.requestsDetailsArray = serverResponse;
-                                _context5.next = 12;
+                                _context6.next = 12;
                                 break;
 
                             case 11:
-                                return _context5.abrupt('return', undefined);
+                                return _context6.abrupt('return', undefined);
 
                             case 12:
-                                _context5.next = 18;
+                                _context6.next = 18;
                                 break;
 
                             case 14:
-                                _context5.prev = 14;
-                                _context5.t0 = _context5['catch'](3);
+                                _context6.prev = 14;
+                                _context6.t0 = _context6['catch'](3);
 
-                                console.log(_context5.t0);
-                                return _context5.abrupt('return', undefined);
+                                console.log(_context6.t0);
+                                return _context6.abrupt('return', undefined);
 
                             case 18:
-                                return _context5.abrupt('return', this.requestsDetailsArray);
+                                return _context6.abrupt('return', this.requestsDetailsArray);
 
                             case 19:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this, [[3, 14]]);
+                }, _callee6, this, [[3, 14]]);
             }));
 
-            function getClientRequestsDetailsArray(_x11, _x12) {
-                return _ref5.apply(this, arguments);
+            function getClientRequestsDetailsArray(_x13, _x14) {
+                return _ref6.apply(this, arguments);
             }
 
             return getClientRequestsDetailsArray;
         }();
 
         ClientRequests.prototype.getClientRequestsDetailFaccoArray = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(sessionId, institutionId) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(sessionId, institutionId) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
-                                _context6.next = 2;
+                                _context7.next = 2;
                                 return this.data.get(this.data.CLIENT_REQUEST_DETAILS + '/' + sessionId + '/' + institutionId);
 
                             case 2:
-                                serverResponse = _context6.sent;
+                                serverResponse = _context7.sent;
 
                                 if (serverResponse.error) {
-                                    _context6.next = 7;
+                                    _context7.next = 7;
                                     break;
                                 }
 
                                 this.requestsDetailsArray = serverResponse;
-                                _context6.next = 8;
+                                _context7.next = 8;
                                 break;
 
                             case 7:
-                                return _context6.abrupt('return', undefined);
+                                return _context7.abrupt('return', undefined);
 
                             case 8:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
-            function getClientRequestsDetailFaccoArray(_x13, _x14) {
-                return _ref6.apply(this, arguments);
+            function getClientRequestsDetailFaccoArray(_x15, _x16) {
+                return _ref7.apply(this, arguments);
             }
 
             return getClientRequestsDetailFaccoArray;
+        }();
+
+        ClientRequests.prototype.getClientRequest = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(id) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                _context8.next = 2;
+                                return this.data.get(this.data.CLIENT_REQUEST_DETAILS + '/' + id);
+
+                            case 2:
+                                serverResponse = _context8.sent;
+
+                                if (serverResponse.error) {
+                                    _context8.next = 7;
+                                    break;
+                                }
+
+                                this.selectedRequest = serverResponse;
+                                _context8.next = 8;
+                                break;
+
+                            case 7:
+                                return _context8.abrupt('return', undefined);
+
+                            case 8:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function getClientRequest(_x17) {
+                return _ref8.apply(this, arguments);
+            }
+
+            return getClientRequest;
         }();
 
         ClientRequests.prototype.selectRequest = function selectRequest(index) {
@@ -3003,13 +3222,13 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.selectRequestDetails = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(index) {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(index) {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 if (!this.selectedRequest._id) {
-                                    _context7.next = 3;
+                                    _context9.next = 3;
                                     break;
                                 }
 
@@ -3019,18 +3238,18 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                     this.selectedRequestDetail = this.selectedRequest.requestDetails[index];
                                     this.requestDetailIndex = index;
                                 }
-                                return _context7.abrupt('return', this.selectedRequestDetail);
+                                return _context9.abrupt('return', this.selectedRequestDetail);
 
                             case 3:
                             case 'end':
-                                return _context7.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee9, this);
             }));
 
-            function selectRequestDetails(_x15) {
-                return _ref7.apply(this, arguments);
+            function selectRequestDetails(_x18) {
+                return _ref9.apply(this, arguments);
             }
 
             return selectRequestDetails;
@@ -3059,65 +3278,65 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.saveRequest = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(email) {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
                 var url, _serverResponse, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 if (this.selectedRequest) {
-                                    _context8.next = 2;
+                                    _context10.next = 2;
                                     break;
                                 }
 
-                                return _context8.abrupt('return');
+                                return _context10.abrupt('return');
 
                             case 2:
                                 url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
 
                                 if (this.selectedRequest._id) {
-                                    _context8.next = 11;
+                                    _context10.next = 11;
                                     break;
                                 }
 
-                                _context8.next = 6;
+                                _context10.next = 6;
                                 return this.data.saveObject(this.selectedRequest, url, "post");
 
                             case 6:
-                                _serverResponse = _context8.sent;
+                                _serverResponse = _context10.sent;
 
                                 if (!_serverResponse.error) {
                                     if (this.requestsArray) {
                                         this.requestsArray.push(this.selectedRequest);
                                     }
                                 }
-                                return _context8.abrupt('return', _serverResponse);
+                                return _context10.abrupt('return', _serverResponse);
 
                             case 11:
-                                _context8.next = 13;
+                                _context10.next = 13;
                                 return this.data.saveObject(this.selectedRequest, url, "put");
 
                             case 13:
-                                serverResponse = _context8.sent;
+                                serverResponse = _context10.sent;
 
                                 if (!serverResponse.error) {
                                     if (this.requestsArray && this.editRequestIndex) {
                                         this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
                                     }
                                 }
-                                return _context8.abrupt('return', serverResponse);
+                                return _context10.abrupt('return', serverResponse);
 
                             case 16:
                             case 'end':
-                                return _context8.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee10, this);
             }));
 
-            function saveRequest(_x16) {
-                return _ref8.apply(this, arguments);
+            function saveRequest(_x19) {
+                return _ref10.apply(this, arguments);
             }
 
             return saveRequest;
@@ -3163,29 +3382,29 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.sendCustomerMessage = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(message) {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(message) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
-                                _context9.next = 2;
+                                _context11.next = 2;
                                 return this.data.saveObject(message, this.data.CUSTOMER_ACTION, "put");
 
                             case 2:
-                                serverResponse = _context9.sent;
-                                return _context9.abrupt('return', serverResponse);
+                                serverResponse = _context11.sent;
+                                return _context11.abrupt('return', serverResponse);
 
                             case 4:
                             case 'end':
-                                return _context9.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee11, this);
             }));
 
-            function sendCustomerMessage(_x17) {
-                return _ref9.apply(this, arguments);
+            function sendCustomerMessage(_x20) {
+                return _ref11.apply(this, arguments);
             }
 
             return sendCustomerMessage;
@@ -3198,38 +3417,38 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getRequestLock = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(id) {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(id) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
-                                _context10.next = 2;
+                                _context12.next = 2;
                                 return this.data.get(this.data.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
 
                             case 2:
-                                response = _context10.sent;
+                                response = _context12.sent;
 
                                 if (response.error) {
-                                    _context10.next = 7;
+                                    _context12.next = 7;
                                     break;
                                 }
 
-                                return _context10.abrupt('return', response);
+                                return _context12.abrupt('return', response);
 
                             case 7:
                                 this.data.processError(response, "There was an error retrieving the help ticket lock.");
 
                             case 8:
                             case 'end':
-                                return _context10.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee12, this);
             }));
 
-            function getRequestLock(_x18) {
-                return _ref10.apply(this, arguments);
+            function getRequestLock(_x21) {
+                return _ref12.apply(this, arguments);
             }
 
             return getRequestLock;
@@ -3976,6 +4195,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.CHECK_NAME = 'people/checkName';
             this.SEND_MAIL = 'people/sendMail';
             this.PASSWORD_RESET = 'passwordReset';
+            this.NOTES_SERVICE = "notes";
             this.CURRICULUM_SERVICE = 'curriculum';
             this.CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
             this.SESSIONS_SERVICE = "sessions";
@@ -3987,8 +4207,9 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.INFO_SERVICES = "site";
             this.MESSAGE_SERVICES = 'messages';
             this.HELP_TICKET_SERVICES = 'helpTickets';
-            this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
+            this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
             this.HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
+            this.HELP_TICKET_TYPES = "helpTicketsTypes";
             this.DOWNLOADS_SERVICE = "apps";
             this.APPLICATION_CATEGORY_SERVICE = "appsCategory";
             this.DOCUMENTS_SERVICE = "documents";
@@ -5452,6 +5673,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             newHelpTicketContent.confidential = false;
             newHelpTicketContent.personId = "";
             newHelpTicketContent.content = {};
+            newHelpTicketContent.content.comments = "";
             this.selectedHelpTicketContent = newHelpTicketContent;
         };
 
@@ -5586,7 +5808,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         }();
 
         HelpTickets.prototype.saveHelpTicket = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(email) {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var url, response;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
@@ -5600,7 +5822,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 return _context6.abrupt('return');
 
                             case 2:
-                                url = email ? this.data.HELP_TICKET_SERVICES + '?email=1' : this.data.HELP_TICKET_SERVICES;
+                                url = this.data.HELP_TICKET_SERVICES;
 
                                 if (this.selectedHelpTicket._id) {
                                     _context6.next = 11;
@@ -5644,7 +5866,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee6, this);
             }));
 
-            function saveHelpTicket(_x5) {
+            function saveHelpTicket() {
                 return _ref6.apply(this, arguments);
             }
 
@@ -5663,7 +5885,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     break;
                                 }
 
-                                url = email ? this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id) + '?email=1' : this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id);
+                                url = this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
                                 _context7.next = 4;
                                 return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
 
@@ -5686,7 +5908,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee7, this);
             }));
 
-            function saveHelpTicketResponse(_x6) {
+            function saveHelpTicketResponse(_x5) {
                 return _ref7.apply(this, arguments);
             }
 
@@ -5731,7 +5953,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee8, this);
             }));
 
-            function uploadFile(_x7, _x8) {
+            function uploadFile(_x6, _x7) {
                 return _ref8.apply(this, arguments);
             }
 
@@ -5775,7 +5997,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                 }, _callee9, this);
             }));
 
-            function getHelpTicketLock(_x9) {
+            function getHelpTicketLock(_x8) {
                 return _ref9.apply(this, arguments);
             }
 
@@ -5878,6 +6100,69 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
             return resultArray;
         };
+
+        HelpTickets.prototype.getHelpTicketTypes = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                if (!(!this.helpTicketTypesArray || refresh)) {
+                                    _context10.next = 18;
+                                    break;
+                                }
+
+                                url = this.data.HELP_TICKET_TYPES;
+
+                                url += options ? options : "";
+                                _context10.prev = 3;
+                                _context10.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context10.sent;
+
+                                if (serverResponse.error) {
+                                    _context10.next = 11;
+                                    break;
+                                }
+
+                                this.helpTicketTypesArray = serverResponse;
+                                _context10.next = 12;
+                                break;
+
+                            case 11:
+                                return _context10.abrupt('return', undefined);
+
+                            case 12:
+                                _context10.next = 18;
+                                break;
+
+                            case 14:
+                                _context10.prev = 14;
+                                _context10.t0 = _context10['catch'](3);
+
+                                console.log(_context10.t0);
+                                return _context10.abrupt('return', undefined);
+
+                            case 18:
+                                return _context10.abrupt('return', this.helpTicketTypesArray);
+
+                            case 19:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this, [[3, 14]]);
+            }));
+
+            function getHelpTicketTypes(_x9, _x10) {
+                return _ref10.apply(this, arguments);
+            }
+
+            return getHelpTicketTypes;
+        }();
 
         return HelpTickets;
     }()) || _class);
@@ -7001,6 +7286,200 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             }
 
             return getPasswordReset;
+        }();
+
+        People.prototype.getNotesArray = function () {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                    while (1) {
+                        switch (_context16.prev = _context16.next) {
+                            case 0:
+                                if (!(!this.notesArray || refresh)) {
+                                    _context16.next = 19;
+                                    break;
+                                }
+
+                                url = this.data.NOTES_SERVICE;
+
+                                url += options ? options : "";
+                                _context16.prev = 3;
+                                _context16.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context16.sent;
+
+                                if (serverResponse.error) {
+                                    _context16.next = 11;
+                                    break;
+                                }
+
+                                this.notesArray = serverResponse;
+                                _context16.next = 13;
+                                break;
+
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context16.abrupt('return', undefined);
+
+                            case 13:
+                                _context16.next = 19;
+                                break;
+
+                            case 15:
+                                _context16.prev = 15;
+                                _context16.t0 = _context16['catch'](3);
+
+                                console.log(_context16.t0);
+                                return _context16.abrupt('return', undefined);
+
+                            case 19:
+                                return _context16.abrupt('return', this.peopleArray);
+
+                            case 20:
+                            case 'end':
+                                return _context16.stop();
+                        }
+                    }
+                }, _callee16, this, [[3, 15]]);
+            }));
+
+            function getNotesArray(_x14, _x15) {
+                return _ref16.apply(this, arguments);
+            }
+
+            return getNotesArray;
+        }();
+
+        People.prototype.selectNote = function selectNote(index) {
+            if (index === undefined) {
+                this.selectedNote = this.emptyNote();
+            } else {
+                try {
+                    this.selectedNote = this.utils.copyObject(this.notesArray[index]);
+                    this.editNoteIndex = index;
+                } catch (error) {
+                    console.log(error);
+                    this.selectedNote = this.emptyNote();
+                }
+            }
+        };
+
+        People.prototype.emptyNote = function emptyNote() {
+            var obj = new Object();
+            obj.note = "";
+            obj.dateCreated = new Date();
+            obj.category = "";
+            return obj;
+        };
+
+        People.prototype.saveNote = function () {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
+                var _serverResponse2, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                    while (1) {
+                        switch (_context17.prev = _context17.next) {
+                            case 0:
+                                if (this.selectedNote) {
+                                    _context17.next = 2;
+                                    break;
+                                }
+
+                                return _context17.abrupt('return');
+
+                            case 2:
+                                if (this.selectedNote._id) {
+                                    _context17.next = 10;
+                                    break;
+                                }
+
+                                _context17.next = 5;
+                                return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse2 = _context17.sent;
+
+                                if (!_serverResponse2.error) {
+                                    if (this.notesArray) {
+                                        this.notesArray.push(this.selectedNote);
+                                        this.editNoteIndex = this.notesArray.length - 1;
+                                    }
+                                } else {
+                                    this.data.processError(response, "There was an error creating the note.");
+                                }
+                                return _context17.abrupt('return', _serverResponse2);
+
+                            case 10:
+                                _context17.next = 12;
+                                return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context17.sent;
+
+                                if (!serverResponse.error) {
+                                    this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the course.");
+                                }
+                                return _context17.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context17.stop();
+                        }
+                    }
+                }, _callee17, this);
+            }));
+
+            function saveNote() {
+                return _ref17.apply(this, arguments);
+            }
+
+            return saveNote;
+        }();
+
+        People.prototype.deleteNote = function () {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                    while (1) {
+                        switch (_context18.prev = _context18.next) {
+                            case 0:
+                                if (this.selectedNote) {
+                                    _context18.next = 2;
+                                    break;
+                                }
+
+                                return _context18.abrupt('return');
+
+                            case 2:
+                                _context18.next = 4;
+                                return this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+
+                            case 4:
+                                serverResponse = _context18.sent;
+
+                                if (!serverResponse.error) {
+                                    this.notesArray.splice(this.editNoteIndex, 1);
+                                    this.editNoteIndex = -1;
+                                }
+                                return _context18.abrupt('return', serverResponse);
+
+                            case 7:
+                            case 'end':
+                                return _context18.stop();
+                        }
+                    }
+                }, _callee18, this);
+            }));
+
+            function deleteNote() {
+                return _ref18.apply(this, arguments);
+            }
+
+            return deleteNote;
         }();
 
         return People;
@@ -8503,6 +8982,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
             this.selectedClient = null;
             for (var i = 0, x = this.systemsArray.length; i < x; i++) {
                 if (this.systemsArray[i]._id === systemId) {
+                    this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
                     for (var j = 0; j < this.systemsArray[i].clients.length; j++) {
                         if (this.systemsArray[i].clients[j]._id === clientId) {
                             this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
@@ -8652,7 +9132,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
         return Systems;
     }()) || _class);
 });
-define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog) {
+define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog', './note-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog, _noteDialog) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8672,6 +9152,8 @@ define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aure
     function CommonDialogs(dialogService) {
       _classCallCheck(this, CommonDialogs);
 
+      this.noteBody = "";
+
       this.dialogService = dialogService;
     }
 
@@ -8680,6 +9162,14 @@ define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aure
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
 
       return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
+    };
+
+    CommonDialogs.prototype.showNote = function showNote() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Enter Note';
+      var note = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _noteDialog.NoteDialog, model: { title: title, note: note, options: options } });
     };
 
     return CommonDialogs;
@@ -8754,6 +9244,49 @@ define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia
     };
 
     return MessageDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
+});
+define('resources/dialogs/note-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NoteDialog = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var NoteDialog = exports.NoteDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+    function NoteDialog(dialogController) {
+      _classCallCheck(this, NoteDialog);
+
+      this.dialogController = dialogController;
+    }
+
+    NoteDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    NoteDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(this.model);
+      }
+    };
+
+    return NoteDialog;
   }()) || _class);
 
 
@@ -8891,7 +9424,7 @@ define('resources/editor/editor',["exports", "aurelia-framework", "aurelia-bindi
 		}), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "toolbar", [_aureliaFramework.bindable], {
 				enumerable: true,
 				initializer: function initializer() {
-						return [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['picture', 'link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen']]];
+						return [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen']]];
 				}
 		})), _class2)) || _class);
 });
@@ -9004,7 +9537,6 @@ define('resources/elements/add-systems',['exports', '../data/dataServices', 'aur
       _initDefineProp(this, 'systemchanges', _descriptor5, this);
 
       this.data = data;
-      this.systemsArray = this.systemsarray;
     }
 
     AddSystems.prototype.filterList = function filterList() {
@@ -9640,7 +10172,7 @@ define('resources/elements/multiselect',['exports', 'aurelia-framework', 'bootst
     }
   })), _class2)) || _class);
 });
-define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig) {
+define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig', '../dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig, _commonDialogs) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -9685,8 +10217,8 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
 
     var _dec, _class;
 
-    var NavBar = exports.NavBar = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaEventAggregator.EventAggregator, _aureliaFramework.BindingEngine, _auth.Auth, _utils.Utils, _people.People, _appConfig.AppConfig), _dec(_class = function () {
-        function NavBar(router, eventAggregator, bindingEngine, auth, utils, people, config) {
+    var NavBar = exports.NavBar = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaEventAggregator.EventAggregator, _aureliaFramework.BindingEngine, _auth.Auth, _utils.Utils, _people.People, _appConfig.AppConfig, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function NavBar(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog) {
             _classCallCheck(this, NavBar);
 
             this.isAuthenticated = false;
@@ -9699,6 +10231,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             this.utils = utils;
             this.people = people;
             this.config = config;
+            this.dialog = dialog;
 
             this.isAuthenticated = this.auth.isAuthenticated();
             this.userObj = JSON.parse(sessionStorage.getItem('user'));
@@ -9865,6 +10398,55 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             }
 
             return requestPasswordReset;
+        }();
+
+        NavBar.prototype.enterNote = function enterNote() {
+            var _this2 = this;
+
+            var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
+            return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.saveNote(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+        };
+
+        NavBar.prototype.saveNote = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(note) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this.people.selectNote();
+                                this.people.selectedNote.personId = this.userObj._id;
+                                this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+                                this.people.selectedNote.note = note.note.noteBody;
+                                _context4.next = 6;
+                                return this.people.saveNote();
+
+                            case 6:
+                                response = _context4.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification('The note was saved');
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function saveNote(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return saveNote;
         }();
 
         return NavBar;
@@ -11302,6 +11884,7 @@ define('resources/value-converters/course-name',["exports"], function (exports) 
 
     CourseNameValueConverter.prototype.toView = function toView(value, array) {
       if (value && array) {
+        if (value === 'a1a1a1a1a1a1a1a1a1a1a1a1') return "Sandbox";
         for (var i = 0; i < array.length; i++) {
           if (value === array[i]._id) {
             return array[i].name;
@@ -11356,6 +11939,36 @@ define('resources/value-converters/date-format',["exports", "moment"], function 
 
     return DateFormatValueConverter;
   }();
+});
+define('resources/value-converters/erpsim',["exports"], function (exports) {
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var ErpsimValueConverter = exports.ErpsimValueConverter = function () {
+		function ErpsimValueConverter() {
+			_classCallCheck(this, ErpsimValueConverter);
+		}
+
+		ErpsimValueConverter.prototype.toView = function toView(array, erpSimId) {
+			if (array === undefined || erpSimId === undefined) return;
+			var newArray = new Array();
+			array.forEach(function (item) {
+				if (item.productId === erpSimId) newArray.push(item);
+			});
+			return newArray;
+		};
+
+		return ErpsimValueConverter;
+	}();
 });
 define('resources/value-converters/file-type',["exports", "aurelia-framework", "../../config/appConfig"], function (exports, _aureliaFramework, _appConfig) {
   "use strict";
@@ -11519,7 +12132,7 @@ define('resources/value-converters/gravatar-url-id',['exports'], function (expor
     GravatarUrlIdValueConverter.prototype.toView = function toView(id, array, size, alt) {
       var email = "";
       if (id !== undefined && array !== undefined) {
-        for (var i = 0; i < array.length - 1; i++) {
+        for (var i = 0; i < array.length; i++) {
           if (id === array[i]._id) {
             email = array[i].email;
             break;
@@ -11570,6 +12183,38 @@ define('resources/value-converters/gravatar-url',['exports'], function (exports)
 
     return GravatarUrlValueConverter;
   }();
+});
+define('resources/value-converters/help-ticket-type',["exports"], function (exports) {
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var HelpTicketTypeValueConverter = exports.HelpTicketTypeValueConverter = function () {
+		function HelpTicketTypeValueConverter() {
+			_classCallCheck(this, HelpTicketTypeValueConverter);
+		}
+
+		HelpTicketTypeValueConverter.prototype.toView = function toView(value, array) {
+			if (value === undefined || array === undefined) return;
+
+			for (var j = 0; j < array.length; j++) {
+				for (var i = 0; i < array[j].subtypes.length; i++) {
+					if (array[j].subtypes[i].type === value) return array[j].subtypes[i].description;
+				}
+			}
+			return undefined;
+		};
+
+		return HelpTicketTypeValueConverter;
+	}();
 });
 define('resources/value-converters/ids-requested',["exports"], function (exports) {
   "use strict";
@@ -11983,6 +12628,37 @@ define('resources/value-converters/sandbox',["exports"], function (exports) {
     return SandboxValueConverter;
   }();
 });
+define('resources/value-converters/session-name',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var SessionNameValueConverter = exports.SessionNameValueConverter = function () {
+    function SessionNameValueConverter() {
+      _classCallCheck(this, SessionNameValueConverter);
+    }
+
+    SessionNameValueConverter.prototype.toView = function toView(value, array) {
+      if (value === undefined || array === undefined) return;
+      for (var i = 0; i < array.length; i++) {
+        if (value === array[i]._id) {
+          return array[i].session + " " + array[i].year;
+        }
+      }
+      return "Unknown";
+    };
+
+    return SessionNameValueConverter;
+  }();
+});
 define('resources/value-converters/session-status-button',['exports'], function (exports) {
 	'use strict';
 
@@ -12331,6 +13007,443 @@ define('resources/value-converters/ucc-staff',['exports'], function (exports) {
 
     return UccStaffValueConverter;
   }();
+});
+define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _commonDialogs, _validation, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Documents = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
+        function Documents(router, datatable, documents, people, utils, config, dialog, validation) {
+            _classCallCheck(this, Documents);
+
+            this.navControl = "documentssNavButtons";
+            this.spinnerHTML = "";
+            this.filterValues = new Array();
+            this.typeSelected = "";
+            this.categoryForm = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+            this.displayTitle = "";
+
+            this.router = router;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.documents = documents;
+            this.config = config;
+            this.people = people;
+            this.dialog = dialog;
+            this.validation = validation;
+            this.validation.initialize(this);
+        }
+
+        Documents.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        Documents.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.documents.getDocumentsCategoriesArray(), this.people.getPeopleArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+
+                                this.dataTable.updateArray(this.documents.docCatsArray);
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Documents.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+            this._setupValidation();
+        };
+
+        Documents.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.documents.getDocumentsArray(true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.documents.docCatsArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        Documents.prototype.editDocument = function editDocument(index, el) {
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+
+            this.documents.selectDocument(this.editIndex);
+            this.displayTitle = "Files";
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        Documents.prototype.filterList = function filterList() {
+            if (this.filter) {
+                var thisFilter = this.filter;
+                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
+                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+                });
+            } else {
+                this.filteredDocumentArray = this.documents.docCatsArray;
+            }
+        };
+
+        Documents.prototype.typeChanged = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, el) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context3.next = 12;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context3.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.dataTable.updateArray(this.documents.documentsArray);
+                                this.showDocuments = true;
+                                this.showDocumentForm = false;
+                                this.displayTitle = "Documents";
+
+                                if (this.selectedRow) this.selectedRow.removeClass('info');
+                                this.selectedRow = (0, _jquery2.default)(el.target);
+                                this.selectedRow.addClass('info');
+
+                            case 12:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function typeChanged(_x, _x2) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        Documents.prototype.new = function _new() {
+            this.editIndex = "";
+            this.showDocumentForm = true;
+            this.documents.selectDocument();
+        };
+
+        Documents.prototype.back = function back() {
+            this.displayTitle = "Documents";
+            this.showDocumentForm = false;
+        };
+
+        Documents.prototype.cancel = function cancel() {
+            this.documents.selectDocument(this.editIndex);
+        };
+
+        Documents.prototype.delete = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
+                                    if (!response.wasCancelled) {
+                                        _this.deleteDocument();
+                                    }
+                                }));
+
+                            case 1:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function _delete() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return _delete;
+        }();
+
+        Documents.prototype.deleteDocument = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                _context5.next = 2;
+                                return this.documents.deleteDocument();
+
+                            case 2:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("The document was deleted");
+                                    this.showDocumentForm = false;
+                                }
+                                this._cleanUp();
+
+                            case 5:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteDocument() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteDocument;
+        }();
+
+        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
+            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
+        };
+
+        Documents.prototype.deleteFile = function deleteFile(index) {
+            var _this2 = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the file?", "Delete File", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.documents.deleteFile(index);
+                }
+            });
+        };
+
+        Documents.prototype.buildDocument = function buildDocument() {
+            if (!this.documents.selectedDocument._id) {
+                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
+                this.documents.selectedDocument.dateCreated = new Date();
+            }
+            if (this.files && this.files.length > 0) {
+                var version = 1;
+                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
+                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
+                        version++;
+                    }
+                }
+                var newFile = {
+                    personId: this.userObj._id,
+                    originalFilename: this.files[0].name,
+                    fileName: this.files[0].name + " - version " + version,
+                    dateUploaded: new Date(),
+                    active: true,
+                    version: version
+                };
+                this.documents.selectedDocument.files.unshift(newFile);
+            }
+        };
+
+        Documents.prototype.save = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                this.buildDocument();
+
+                                if (!this.validation.validate(1)) {
+                                    _context6.next = 16;
+                                    break;
+                                }
+
+                                _context6.next = 4;
+                                return this.documents.saveDocument();
+
+                            case 4:
+                                serverResponse = _context6.sent;
+
+                                if (serverResponse.error) {
+                                    _context6.next = 14;
+                                    break;
+                                }
+
+                                this.dataTable.updateArray(this.documents.documentsArray);
+                                this.utils.showNotification("The document was saved");
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+
+                                if (!(this.files && this.files.length > 0)) {
+                                    _context6.next = 12;
+                                    break;
+                                }
+
+                                _context6.next = 12;
+                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
+
+                            case 12:
+                                this.spinnerHTML = "";
+                                (0, _jquery2.default)("#spinner").toggle().toggle();
+
+                            case 14:
+                                this._cleanUp();
+                                this.selectedFile = "";
+
+                            case 16:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Documents.prototype.changeFiles = function changeFiles() {
+            this.selectedFile = this.files[0].name;
+            this.filesSelected = this.documents.selectedDocument ? true : false;
+        };
+
+        Documents.prototype.newCategory = function newCategory() {
+            this.categoryForm = true;
+            this.documents.selectCategory();
+        };
+
+        Documents.prototype.editCategory = function editCategory() {
+            this.categoryForm = true;
+        };
+
+        Documents.prototype.saveCategory = function saveCategory() {
+            var serverResponse = this.documents.saveCategory();
+            if (!serverResponse.status) {
+                this.utils.showNotification("Category Saved");
+                this.categoryForm = false;
+            }
+        };
+
+        Documents.prototype._cleanUp = function _cleanUp() {
+            document.getElementById("uploadFiles").value = "";
+            this.selectedFiles = undefined;
+            this.files = undefined;
+        };
+
+        Documents.prototype.backCategory = function backCategory() {
+            this.categoryForm = false;
+        };
+
+        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
+            this.documents.selectCategory();
+        };
+
+        Documents.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Document name is required", "value": "documents.selectedDocument.name" }]);
+            this.validation.addRule(1, "editDescription", [{ "rule": "required", "message": "Document description is required", "value": "documents.selectedDocument.description" }]);
+            this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
+        };
+
+        return Documents;
+    }()) || _class);
 });
 define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
     'use strict';
@@ -13502,442 +14615,298 @@ define('modules/admin/customers/test',["exports"], function (exports) {
     _classCallCheck(this, Test);
   };
 });
-define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/documents', '../../../resources/data/people', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _appConfig, _utils, _documents, _people, _commonDialogs, _validation, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Documents = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Documents = exports.Documents = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _dataTable.DataTable, _documents.DocumentsServices, _people.People, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
-        function Documents(router, datatable, documents, people, utils, config, dialog, validation) {
-            _classCallCheck(this, Documents);
-
-            this.navControl = "documentssNavButtons";
-            this.spinnerHTML = "";
-            this.filterValues = new Array();
-            this.typeSelected = "";
-            this.categoryForm = false;
-            this.showDocumentForm = false;
-            this.showDocuments = false;
-            this.displayTitle = "";
-
-            this.router = router;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.documents = documents;
-            this.config = config;
-            this.people = people;
-            this.dialog = dialog;
-            this.validation = validation;
-            this.validation.initialize(this);
-        }
-
-        Documents.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        Documents.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.documents.getDocumentsCategoriesArray(), this.people.getPeopleArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.filteredDocumentArray = this.documents.docCatsArray;
-
-                                this.dataTable.updateArray(this.documents.docCatsArray);
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        Documents.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-            this._setupValidation();
-        };
-
-        Documents.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.documents.getDocumentsArray(true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.documents.docCatsArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        Documents.prototype.editDocument = function editDocument(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-
-            this.documents.selectDocument(this.editIndex);
-            this.displayTitle = "Files";
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showDocumentForm = true;
-        };
-
-        Documents.prototype.filterList = function filterList() {
-            if (this.filter) {
-                var thisFilter = this.filter;
-                this.filteredDocumentArray = this.documents.docCatsArray.filter(function (item) {
-                    return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
-                });
-            } else {
-                this.filteredDocumentArray = this.documents.docCatsArray;
-            }
-        };
-
-        Documents.prototype.typeChanged = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index, el) {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!(index >= 0)) {
-                                    _context3.next = 12;
-                                    break;
-                                }
-
-                                this.categoryIndex = index;
-                                this.documents.selectCategory(index);
-                                _context3.next = 5;
-                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-
-                            case 5:
-                                this.dataTable.updateArray(this.documents.documentsArray);
-                                this.showDocuments = true;
-                                this.showDocumentForm = false;
-                                this.displayTitle = "Documents";
-
-                                if (this.selectedRow) this.selectedRow.removeClass('info');
-                                this.selectedRow = (0, _jquery2.default)(el.target);
-                                this.selectedRow.addClass('info');
-
-                            case 12:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function typeChanged(_x, _x2) {
-                return _ref3.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        Documents.prototype.new = function _new() {
-            this.editIndex = "";
-            this.showDocumentForm = true;
-            this.documents.selectDocument();
-        };
-
-        Documents.prototype.back = function back() {
-            this.displayTitle = "Documents";
-            this.showDocumentForm = false;
-        };
-
-        Documents.prototype.cancel = function cancel() {
-            this.documents.selectDocument(this.editIndex);
-        };
-
-        Documents.prototype.delete = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var _this = this;
-
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                return _context4.abrupt('return', this.dialog.showMessage("This will delete the document from the database and remove all the files.  <br>Are you sure you want to delete the document?", "Delete Document", ['Yes', 'No']).then(function (response) {
-                                    if (!response.wasCancelled) {
-                                        _this.deleteDocument();
-                                    }
-                                }));
-
-                            case 1:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function _delete() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return _delete;
-        }();
-
-        Documents.prototype.deleteDocument = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                _context5.next = 2;
-                                return this.documents.deleteDocument();
-
-                            case 2:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("The document was deleted");
-                                    this.showDocumentForm = false;
-                                }
-                                this._cleanUp();
-
-                            case 5:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteDocument() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteDocument;
-        }();
-
-        Documents.prototype.toggleFileActive = function toggleFileActive(index) {
-            this.documents.selectedDocument.files[index].active = !this.documents.selectedDocument.files[index].active;
-        };
-
-        Documents.prototype.deleteFile = function deleteFile(index) {
-            var _this2 = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the file?", "Delete File", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.documents.deleteFile(index);
-                }
-            });
-        };
-
-        Documents.prototype.buildDocument = function buildDocument() {
-            if (!this.documents.selectedDocument._id) {
-                this.documents.selectedDocument.categoryCode = this.documents.selectedCat.code;
-                this.documents.selectedDocument.dateCreated = new Date();
-            }
-            if (this.files && this.files.length > 0) {
-                var version = 1;
-                for (var i = 0; i < this.documents.selectedDocument.files.length; i++) {
-                    if (this.documents.selectedDocument.files[i].originalFilename == this.files[0].name) {
-                        version++;
-                    }
-                }
-                var newFile = {
-                    personId: this.userObj._id,
-                    originalFilename: this.files[0].name,
-                    fileName: this.files[0].name + " - version " + version,
-                    dateUploaded: new Date(),
-                    active: true,
-                    version: version
-                };
-                this.documents.selectedDocument.files.unshift(newFile);
-            }
-        };
-
-        Documents.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                this.buildDocument();
-
-                                if (!this.validation.validate(1)) {
-                                    _context6.next = 16;
-                                    break;
-                                }
-
-                                _context6.next = 4;
-                                return this.documents.saveDocument();
-
-                            case 4:
-                                serverResponse = _context6.sent;
-
-                                if (serverResponse.error) {
-                                    _context6.next = 14;
-                                    break;
-                                }
-
-                                this.dataTable.updateArray(this.documents.documentsArray);
-                                this.utils.showNotification("The document was saved");
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-
-                                if (!(this.files && this.files.length > 0)) {
-                                    _context6.next = 12;
-                                    break;
-                                }
-
-                                _context6.next = 12;
-                                return this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
-
-                            case 12:
-                                this.spinnerHTML = "";
-                                (0, _jquery2.default)("#spinner").toggle().toggle();
-
-                            case 14:
-                                this._cleanUp();
-                                this.selectedFile = "";
-
-                            case 16:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        Documents.prototype.changeFiles = function changeFiles() {
-            this.selectedFile = this.files[0].name;
-            this.filesSelected = this.documents.selectedDocument ? true : false;
-        };
-
-        Documents.prototype.newCategory = function newCategory() {
-            this.categoryForm = true;
-            this.documents.selectCategory();
-        };
-
-        Documents.prototype.editCategory = function editCategory() {
-            this.categoryForm = true;
-        };
-
-        Documents.prototype.saveCategory = function saveCategory() {
-            var serverResponse = this.documents.saveCategory();
-            if (!serverResponse.status) {
-                this.utils.showNotification("Category Saved");
-                this.categoryForm = false;
-            }
-        };
-
-        Documents.prototype._cleanUp = function _cleanUp() {
-            document.getElementById("uploadFiles").value = "";
-            this.selectedFiles = undefined;
-            this.files = undefined;
-        };
-
-        Documents.prototype.backCategory = function backCategory() {
-            this.categoryForm = false;
-        };
-
-        Documents.prototype.cancelEditCategory = function cancelEditCategory() {
-            this.documents.selectCategory();
-        };
-
-        Documents.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Document name is required", "value": "documents.selectedDocument.name" }]);
-            this.validation.addRule(1, "editDescription", [{ "rule": "required", "message": "Document description is required", "value": "documents.selectedDocument.description" }]);
-            this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
-        };
-
-        return Documents;
-    }()) || _class);
+define('modules/admin/notes/notes',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/people', '../../../resources/utils/utils'], function (exports, _aureliaFramework, _dataTable, _appConfig, _people, _utils) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Notes = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var Notes = exports.Notes = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils), _dec(_class = function () {
+		function Notes(dataTable, config, people, utils) {
+			_classCallCheck(this, Notes);
+
+			this.noteSelected = false;
+			this.showCategoryForm = false;
+			this.spinnerHTML = "";
+
+			this.dataTable = dataTable;
+			this.config = config;
+			this.people = people;
+			this.utils = utils;
+		}
+
+		Notes.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		Notes.prototype.canActivate = function canActivate() {
+			this.userObj = JSON.parse(sessionStorage.getItem('user'));
+		};
+
+		Notes.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray(), this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true), this.config.getConfig()]);
+
+							case 2:
+								responses = _context.sent;
+
+								this.dataTable.updateArray(this.people.notesArray);
+
+							case 4:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		Notes.prototype.refresh = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+								_context2.next = 3;
+								return this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true);
+
+							case 3:
+								this.dataTable.updateArray(this.people.notesArray);
+								this.spinnerHTML = "";
+
+							case 5:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function refresh() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return refresh;
+		}();
+
+		Notes.prototype.new = function _new() {
+			this.noteSelected = true;
+			this.people.selectNote();
+			this.editIndex = undefined;
+			this.people.selectedNote.personId = this.userObj._id;
+		};
+
+		Notes.prototype.edit = function edit(index, el) {
+			this.editIndex = this.dataTable.getOriginalIndex(index);
+			this.people.selectNote(this.editIndex);
+
+			if (this.selectedRow) this.selectedRow.children().removeClass('info');
+			this.selectedRow = $(el.target).closest('tr');
+			this.selectedRow.children().addClass('info');
+			this.noteSelected = true;
+		};
+
+		Notes.prototype.save = function () {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+					while (1) {
+						switch (_context3.prev = _context3.next) {
+							case 0:
+								_context3.next = 2;
+								return this.people.saveNote();
+
+							case 2:
+								response = _context3.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The note was saved');
+									this.dataTable.updateArray(this.people.notesArray);
+									this.noteSelected = false;
+								}
+
+							case 4:
+							case 'end':
+								return _context3.stop();
+						}
+					}
+				}, _callee3, this);
+			}));
+
+			function save() {
+				return _ref3.apply(this, arguments);
+			}
+
+			return save;
+		}();
+
+		Notes.prototype.delete = function () {
+			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee4$(_context4) {
+					while (1) {
+						switch (_context4.prev = _context4.next) {
+							case 0:
+								_context4.next = 2;
+								return this.people.deleteNote();
+
+							case 2:
+								response = _context4.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The note was deleted');
+									this.dataTable.updateArray(this.people.notesArray);
+									this.noteSelected = false;
+								}
+
+							case 4:
+							case 'end':
+								return _context4.stop();
+						}
+					}
+				}, _callee4, this);
+			}));
+
+			function _delete() {
+				return _ref4.apply(this, arguments);
+			}
+
+			return _delete;
+		}();
+
+		Notes.prototype.back = function back() {
+			this.noteSelected = false;
+		};
+
+		Notes.prototype.cancel = function cancel() {
+			this.people.selectNote(this.editIndex);
+		};
+
+		Notes.prototype.openEditCatForm = function openEditCatForm(newOrEdit) {
+			if (newOrEdit === 'new') {
+				;
+				this.categoryDescription = "";
+				this.showCategoryForm = true;
+				this.editCategoryFlag = false;
+			} else {
+				this.categoryDescription = this.people.selectedNote.category;
+				this.editCategoryIndex = this.userObj.noteCategories.indexOf(this.categoryDescription);
+				this.showCategoryForm = true;
+				this.editCategoryFlag = true;
+			}
+		};
+
+		Notes.prototype.saveCategory = function () {
+			var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+				return regeneratorRuntime.wrap(function _callee5$(_context5) {
+					while (1) {
+						switch (_context5.prev = _context5.next) {
+							case 0:
+								this.people.selectedPersonFromId(this.userObj._id);
+								if (this.editCategoryFlag) {
+									this.userObj.noteCategories[this.editCategoryIndex] = this.categoryDescription;
+									this.people.selectedPerson.noteCategories[this.editCategoryIndex] = this.categoryDescription;
+								} else {
+									this.userObj.noteCategories.push(this.categoryDescription);
+									this.people.selectedPerson.noteCategories.push(this.categoryDescription);
+								}
+
+								_context5.next = 4;
+								return this.people.savePerson();
+
+							case 4:
+								sessionStorage.setItem('user', JSON.stringify(this.userObj));
+								this.showCategoryForm = false;
+
+							case 6:
+							case 'end':
+								return _context5.stop();
+						}
+					}
+				}, _callee5, this);
+			}));
+
+			function saveCategory() {
+				return _ref5.apply(this, arguments);
+			}
+
+			return saveCategory;
+		}();
+
+		Notes.prototype.deleteCat = function () {
+			var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+				return regeneratorRuntime.wrap(function _callee6$(_context6) {
+					while (1) {
+						switch (_context6.prev = _context6.next) {
+							case 0:
+							case 'end':
+								return _context6.stop();
+						}
+					}
+				}, _callee6, this);
+			}));
+
+			function deleteCat() {
+				return _ref6.apply(this, arguments);
+			}
+
+			return deleteCat;
+		}();
+
+		return Notes;
+	}()) || _class);
 });
 define('modules/admin/site/editConfig',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/config', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _config, _jquery) {
     'use strict';
@@ -15992,7 +16961,6 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
 
         EditProducts.prototype.edit = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
-                var i, x;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -16001,12 +16969,7 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                                 this.products.selectProduct(this.editIndex);
                                 this.newProduct = false;
 
-                                this.editSystemsString = "";
-                                if (this.products.selectedProduct.systems) {
-                                    for (i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
-                                        this.editSystemsString += this.products.selectedProduct.systems[i].sid + " ";
-                                    }
-                                }
+                                if (!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
 
                                 this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
 
@@ -16017,7 +16980,7 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
                                 this.selectedRow.children().addClass('info');
                                 this.productSelected = true;
 
-                            case 11:
+                            case 10:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -19250,7 +20213,7 @@ define('modules/tech/support/support',["exports", "aurelia-framework", "aurelia-
         return Support;
     }()) || _class);
 });
-define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _people, _validation, _commonDialogs, _jquery) {
+define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _systems, _products, _downloads, _appConfig, _utils, _people, _validation, _commonDialogs, _jquery) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -19305,8 +20268,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
   var _dec, _class;
 
-  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products), _dec(_class = function () {
-    function ViewHelpTickets(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
+  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _systems.Systems, _downloads.Downloads, _products.Products), _dec(_class = function () {
+    function ViewHelpTickets(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products) {
       _classCallCheck(this, ViewHelpTickets);
 
       this.helpTicketSelected = false;
@@ -19314,11 +20277,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.sendEmail = false;
       this.showLockMessage = false;
       this.sendMailDisable = false;
-      this.responseMessage = "";
+      this.lockMessage = "";
       this.navControl = "supportNavButtons";
       this.spinnerHTML = "";
       this.filterValues = new Array();
       this.commentShown = "";
+      this.responseMessage = "";
 
       this.router = router;
       this.config = config;
@@ -19330,8 +20294,10 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.utils = utils;
       this.helpTickets = helpTickets;
       this.sessions = sessions;
+      this.systems = systems;
       this.apps = apps;
       this.products = products;
+      this.dialog = dialog;
     }
 
     ViewHelpTickets.prototype.canActivate = function canActivate() {
@@ -19348,7 +20314,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('', true), this.people.getInstitutionsArray('?order=name'), this.config.getConfig()]);
+                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('', true), this.people.getInstitutionsArray('?order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;
@@ -19415,7 +20381,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context2.prev = _context2.next) {
               case 0:
                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true), this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                 this.spinnerHTML = "";
                 this._cleanUpFilters();
 
@@ -19444,19 +20410,14 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
                 this.helpTickets.selectHelpTicket(this.editIndex);
 
-                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-                  _context3.next = 5;
-                  break;
-                }
+                _context3.next = 4;
+                return this.getDetails();
 
-                _context3.next = 5;
-                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
-
-              case 5:
-                _context3.next = 7;
+              case 4:
+                _context3.next = 6;
                 return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
-              case 7:
+              case 6:
                 response = _context3.sent;
 
                 if (!response.error) {
@@ -19465,17 +20426,17 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                       helpTicketId: this.helpTickets.selectedHelpTicket._id,
                       personId: this.userObj._id
                     });
-                    this.responseMessage = "";
+                    this.lockMessage = "";
                     this.showLockMessage = false;
                     this.lockObject = { personId: this.userObj._id };
                   } else {
                     if (response[0].personId === this.userObj._id) {
                       this.showLockMessage = false;
-                      this.responseMessage = "";
+                      this.lockMessage = "";
                       this.lockObject = { personId: this.userObj._id };
                     } else {
                       this.lockObject = response[0];
-                      this.responseMessage = "Help Ticket is currently locked by " + this.getName();
+                      this.lockMessage = "Help Ticket is currently locked by " + this.getName();
                       this.showLockMessage = true;
                     }
                   }
@@ -19488,7 +20449,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
 
-              case 14:
+              case 13:
               case 'end':
                 return _context3.stop();
             }
@@ -19503,6 +20464,62 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       return selectHelpTicket;
     }();
 
+    ViewHelpTickets.prototype.getDetails = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var i;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this.showRequestDetails = false;
+
+                if (!this.helpTickets.selectedHelpTicket.requestId) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                if (!this.helpTickets.selectedHelpTicket.systemId) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                this.showRequestDetails = true;
+                i = 0;
+
+              case 5:
+                if (!(i < this.systems.systemsArray.length)) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                if (!(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId)) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
+                return _context4.abrupt('break', 12);
+
+              case 9:
+                i++;
+                _context4.next = 5;
+                break;
+
+              case 12:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function getDetails() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return getDetails;
+    }();
+
     ViewHelpTickets.prototype.getName = function getName() {
       for (var i = 0; i < this.people.peopleArray.length; i++) {
         if (this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
@@ -19511,34 +20528,49 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.save = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-        var response, serverResponse;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        var _this2 = this;
+
+        var changes, response, serverResponse;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                this.helpTickets.selectHelpTicketByID(helpTicket._id);
-                _context4.next = 3;
+                changes = this.helpTickets.isHelpTicketDirty();
+
+                if (changes && changes.length > 0) {
+                  changes.forEach(function (item) {
+                    _this2.helpTickets.selectedHelpTicket.audit.push({
+                      property: item.property,
+                      oldValue: item.oldValue,
+                      newValue: item.newValue,
+                      eventDate: new Date(),
+                      personId: _this2.userObj._id
+                    });
+                  });
+                }
+
+                _context5.next = 4;
                 return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
-              case 3:
-                response = _context4.sent;
+              case 4:
+                response = _context5.sent;
 
                 if (response.error) {
-                  _context4.next = 11;
+                  _context5.next = 12;
                   break;
                 }
 
-                if (!(response.helpTicketId === 0)) {
-                  _context4.next = 11;
+                if (!(response.helpTicketId === 0 || response[0].personId === this.userObj._id)) {
+                  _context5.next = 12;
                   break;
                 }
 
-                _context4.next = 8;
+                _context5.next = 9;
                 return this.helpTickets.saveHelpTicket(false);
 
-              case 8:
-                serverResponse = _context4.sent;
+              case 9:
+                serverResponse = _context5.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -19546,16 +20578,16 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 11:
+              case 12:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function save() {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       }
 
       return save;
@@ -19563,6 +20595,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.respond = function respond() {
       if (!this.showLockMessage) {
+        this.responseMessage = "";
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
         this.enableButton = true;
@@ -19579,21 +20612,23 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
       this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
       this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+      this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
     };
 
     ViewHelpTickets.prototype.saveResponse = function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(status) {
         var serverResponse;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
+                this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
                 this._createResponse();
-                _context5.next = 3;
+                _context6.next = 4;
                 return this.helpTickets.saveHelpTicketResponse(this.sendEmail);
 
-              case 3:
-                serverResponse = _context5.sent;
+              case 4:
+                serverResponse = _context6.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -19602,40 +20637,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 6:
-              case 'end':
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function saveResponse() {
-        return _ref5.apply(this, arguments);
-      }
-
-      return saveResponse;
-    }();
-
-    ViewHelpTickets.prototype.updateStatus = function () {
-      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-        var serverResponse;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
-                return this.helpTickets.updateStatus();
-
-              case 2:
-                serverResponse = _context6.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 5:
+              case 7:
               case 'end':
                 return _context6.stop();
             }
@@ -19643,121 +20645,40 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee6, this);
       }));
 
-      function updateStatus() {
+      function saveResponse(_x3) {
         return _ref6.apply(this, arguments);
       }
 
-      return updateStatus;
+      return saveResponse;
     }();
 
-    ViewHelpTickets.prototype.updateKeywords = function () {
-      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-        var serverResponse;
+    ViewHelpTickets.prototype.ownHelpTicket = function () {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(helpTicket) {
+        var response, obj, serverResponse;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                _context7.next = 2;
-                return this.helpTickets.updateKeywords();
-
-              case 2:
-                serverResponse = _context7.sent;
-
-                if (!serverResponse.status) {
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 5:
-              case 'end':
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function updateKeywords() {
-        return _ref7.apply(this, arguments);
-      }
-
-      return updateKeywords;
-    }();
-
-    ViewHelpTickets.prototype.own = function () {
-      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-        var obj, serverResponse;
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                if (!(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id)) {
-                  _context8.next = 8;
-                  break;
-                }
-
-                if (this.showLockMessage) {
-                  _context8.next = 8;
-                  break;
-                }
-
-                obj = {
-                  personId: this.userObj._id,
-                  status: this.helpTickets.selectedHelpTicket.helpTicketStatus
-                };
-                _context8.next = 5;
-                return this.helpTickets.updateOwner(obj);
-
-              case 5:
-                serverResponse = _context8.sent;
-
-                if (!serverResponse.error) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 8:
-              case 'end':
-                return _context8.stop();
-            }
-          }
-        }, _callee8, this);
-      }));
-
-      function own() {
-        return _ref8.apply(this, arguments);
-      }
-
-      return own;
-    }();
-
-    ViewHelpTickets.prototype.ownHelpTicket = function () {
-      var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(helpTicket) {
-        var response, obj, serverResponse;
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
                 this.helpTickets.selectHelpTicketByID(helpTicket._id);
 
                 if (!(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id)) {
-                  _context9.next = 13;
+                  _context7.next = 13;
                   break;
                 }
 
-                _context9.next = 4;
+                _context7.next = 4;
                 return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
               case 4:
-                response = _context9.sent;
+                response = _context7.sent;
 
                 if (response.error) {
-                  _context9.next = 13;
+                  _context7.next = 13;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0)) {
-                  _context9.next = 13;
+                  _context7.next = 13;
                   break;
                 }
 
@@ -19765,11 +20686,11 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   personId: this.userObj._id,
                   status: this.config.REVIEW_HELPTICKET_STATUS
                 };
-                _context9.next = 10;
+                _context7.next = 10;
                 return this.helpTickets.updateOwner(obj);
 
               case 10:
-                serverResponse = _context9.sent;
+                serverResponse = _context7.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -19779,49 +20700,58 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 13:
               case 'end':
-                return _context9.stop();
+                return _context7.stop();
             }
           }
-        }, _callee9, this);
+        }, _callee7, this);
       }));
 
-      function ownHelpTicket(_x3) {
-        return _ref9.apply(this, arguments);
+      function ownHelpTicket(_x4) {
+        return _ref7.apply(this, arguments);
       }
 
       return ownHelpTicket;
     }();
 
-    ViewHelpTickets.prototype.changeToInProcess = function () {
-      var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(helpTicket) {
-        var response, serverResponse;
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+    ViewHelpTickets.prototype.changeStatus = function () {
+      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(helpTicket, status) {
+        var response, obj, serverResponse;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 this.helpTickets.selectHelpTicketByID(helpTicket._id);
-                _context10.next = 3;
+                _context8.next = 3;
                 return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
               case 3:
-                response = _context10.sent;
+                response = _context8.sent;
 
                 if (response.error) {
-                  _context10.next = 12;
+                  _context8.next = 14;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0)) {
-                  _context10.next = 12;
+                  _context8.next = 14;
                   break;
                 }
 
-                this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.IN_PROCESS_HELPTICKET_STATUS;
-                _context10.next = 9;
-                return this.helpTickets.updateStatus();
+                obj = {
+                  property: "helpTicketStatus",
+                  oldValue: this.helpTickets.selectedHelpTicket.helpTicketStatus,
+                  newValue: status,
+                  personId: this.userObj._id,
+                  date: new Date()
+                };
 
-              case 9:
-                serverResponse = _context10.sent;
+                this.helpTickets.selectedHelpTicket.audit.push(obj);
+                this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
+                _context8.next = 11;
+                return this.helpTickets.saveHelpTicket();
+
+              case 11:
+                serverResponse = _context8.sent;
 
                 if (!serverResponse.error) {
                   this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -19829,19 +20759,19 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 12:
+              case 14:
               case 'end':
-                return _context10.stop();
+                return _context8.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee8, this);
       }));
 
-      function changeToInProcess(_x4) {
-        return _ref10.apply(this, arguments);
+      function changeStatus(_x5, _x6) {
+        return _ref8.apply(this, arguments);
       }
 
-      return changeToInProcess;
+      return changeStatus;
     }();
 
     ViewHelpTickets.prototype._unLock = function _unLock() {
@@ -19856,7 +20786,59 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.enterResponse = false;
       this.files = new Array();
       this.filesSelected = "";
+      this.helpTicketSelected = false;
+      this._unLock();
     };
+
+    ViewHelpTickets.prototype.flag = function flag() {
+      var _this3 = this;
+
+      var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
+      return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).then(function (response) {
+        if (!response.wasCancelled) {
+          _this3.saveNote(response.output);
+        } else {
+          console.log("Cancelled");
+        }
+      });
+    };
+
+    ViewHelpTickets.prototype.saveNote = function () {
+      var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(note) {
+        var response;
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                this.people.selectNote();
+                this.people.selectedNote.personId = this.userObj._id;
+                this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+                this.people.selectedNote.note = note.note.noteBody;
+                this.people.selectedNote.reference = this.helpTickets.selectedHelpTicket._id;
+                _context9.next = 7;
+                return this.people.saveNote();
+
+              case 7:
+                response = _context9.sent;
+
+                if (!response.error) {
+                  this.utils.showNotification('The note was saved');
+                }
+
+              case 9:
+              case 'end':
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function saveNote(_x7) {
+        return _ref9.apply(this, arguments);
+      }
+
+      return saveNote;
+    }();
 
     ViewHelpTickets.prototype.changeFiles = function changeFiles() {
       var foo = "";
@@ -19868,9 +20850,20 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.back = function back() {
-      this.helpTicketSelected = false;
-      this._cleanUp();
-      this._unLock();
+      var _this4 = this;
+
+      var changes = this.helpTickets.isHelpTicketDirty();
+      if (this.helpTickets.isHelpTicketDirty().length) {
+        return this.dialog.showMessage("The help ticket has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+          if (!response.wasCancelled) {
+            _this4.save();
+          } else {
+            _this4._cleanUp();
+          }
+        });
+      } else {
+        this._cleanUp();
+      }
     };
 
     ViewHelpTickets.prototype._setUpValidation = function _setUpValidation() {
@@ -21225,6 +22218,12 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
             this.showInfoBox = false;
             this.courseSelected = false;
+            this.showHelpTicketDescription = false;
+            this.showInputForm = false;
+            this.showRequests = false;
+            this.inputForm = -1;
+            this.showTypes = false;
+            this.inputHTML = "";
             this.spinnerHTML = "";
             this.removedFiles = new Array();
             this.showAdditionalInfo = false;
@@ -21263,16 +22262,15 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
+                                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
 
                                 this.helpTickets.selectHelpTicket();
                                 this.sendEmail = this.config.SEND_EMAILS;
-                                this._hideTypes();
 
-                            case 6:
+                            case 5:
                             case 'end':
                                 return _context.stop();
                         }
@@ -21287,23 +22285,93 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
             return activate;
         }();
 
-        CreateHelpTickets.prototype._hideTypes = function _hideTypes() {
-            for (var i = 0; i < this.config.HELP_TICKET_TYPES.length; i++) {
-                this.config.HELP_TICKET_TYPES[i].show = false;
+        CreateHelpTickets.prototype.categoryChanged = function categoryChanged() {
+            if (this.helpTickets.selectedHelpTicket.helpTicketCategory > -1) {
+                this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
+
+                if (!this.showTypes) {
+                    this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message;
+                    this.showRequests = false;
+                    this.showHelpTicketDescription = true;
+                    this.showAdditionalInfo = true;
+                    this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
+                } else {
+                    this.inputForm = -1;
+                    this.showAdditionalInfo = false;
+                    this.showHelpTicketDescription = false;
+                    this.showRequests = false;
+                }
+            } else {
+                this.inputForm = -1;
+                this.showTypes = false;
+                this.showAdditionalInfo = false;
+                this.showHelpTicketDescription = false;
+                this.showRequests = false;
             }
         };
 
-        CreateHelpTickets.prototype.sessionChanged = function () {
+        CreateHelpTickets.prototype.typeChanged = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(el) {
+                var _this = this;
+
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 this.clearTables();
-                                _context2.next = 3;
-                                return this.clientRequests.getClientRequestsArray('?filter=[and]sessionId|eq|' + this.helpTickets.selectedHelpTicket.sessionId + ':personId|eq|' + this.userObj._id, true);
 
-                            case 3:
+                                if (!(this.helpTickets.selectedHelpTicket.helpTicketType > -1)) {
+                                    _context2.next = 15;
+                                    break;
+                                }
+
+                                this.selectedHelpTicketType = this.getIndex();
+
+                                this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message;
+                                this.showHelpTicketDescription = true;
+                                this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
+
+                                _context2.next = 8;
+                                return this.products.getProductsArray('?fields=_id name');
+
+                            case 8:
+                                if (!this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) {
+                                    _context2.next = 11;
+                                    break;
+                                }
+
+                                _context2.next = 11;
+                                return this.getActiveRequests();
+
+                            case 11:
+                                this.showAdditionalInfo = false;
+
+                                if (this.helpTickets.selectedHelpTicket.helpTicketType == this.config.HELP_TICKET_CLIENT_REFRESH_TYPE) {
+                                    (function () {
+                                        var refreshProductArray = new Array();
+                                        _this.products.productsArray.forEach(function (item) {
+                                            var foo = item.name.toUpperCase();
+                                            for (var i = 0; i < _this.config.REFRESH_KEYWORDS.length; i++) {
+                                                if (foo.indexOf(_this.config.REFRESH_KEYWORDS[i]) > -1) {
+                                                    refreshProductArray.push(item._id);
+                                                }
+                                            }
+                                        });
+                                        _this.clientRequestsArray = _this.clientRequestsArray.filter(function (item) {
+                                            return refreshProductArray.indexOf(item.productId) > -1 && item.systemId;
+                                        });
+                                    })();
+                                }
+                                _context2.next = 19;
+                                break;
+
+                            case 15:
+                                this.inputForm = -1;
+                                this.showAdditionalInfo = false;
+                                this.showHelpTicketDescription = false;
+                                this.showRequests = false;
+
+                            case 19:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -21311,62 +22379,73 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                 }, _callee2, this);
             }));
 
-            function sessionChanged(_x) {
+            function typeChanged(_x) {
                 return _ref2.apply(this, arguments);
             }
 
-            return sessionChanged;
+            return typeChanged;
         }();
 
-        CreateHelpTickets.prototype.typeChanged = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el) {
-                var index;
+        CreateHelpTickets.prototype.getIndex = function getIndex() {
+            var _this2 = this;
+
+            var returnIndex;
+            this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes.forEach(function (item, index) {
+                if (item.type === _this2.helpTickets.selectedHelpTicket.helpTicketType) {
+                    returnIndex = index;
+                }
+            });
+            return returnIndex;
+        };
+
+        CreateHelpTickets.prototype.getActiveRequests = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var _this3 = this;
+
+                var sessions;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                this._hideTypes();
-                                this.clearTables();
+                                sessions = "";
 
-                                if (!this.helpTickets.selectedHelpTicket.helpTicketType) {
-                                    _context3.next = 17;
-                                    break;
-                                }
+                                this.sessions.sessionsArray.forEach(function (item) {
+                                    sessions += item._id + ":";
+                                });
+                                sessions = sessions.substring(0, sessions.length - 1);
+                                _context3.next = 5;
+                                return this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
 
-                                index = parseInt(this.helpTickets.selectedHelpTicket.helpTicketType) - 1;
-
-                                this.config.HELP_TICKET_TYPES[index].show = true;
-
-                                if (!(this.config.HELP_TICKET_TYPES[index].appsRequired || !this.config.HELP_TICKET_TYPES[index].clientRequired)) {
-                                    _context3.next = 11;
-                                    break;
-                                }
-
-                                _context3.next = 8;
-                                return this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true');
+                            case 5:
+                                this.clientRequestsArray = new Array();
+                                this.clientRequests.requestsArray.forEach(function (item) {
+                                    item.requestDetails.forEach(function (item2) {
+                                        if (item2.assignments && item2.assignments.length > 0) {
+                                            item2.assignments.forEach(function (assign) {
+                                                _this3.clientRequestsArray.push({
+                                                    productId: item2.productId,
+                                                    sessionId: item.sessionId,
+                                                    requestStatus: item2.requestStatus,
+                                                    systemId: assign.systemId,
+                                                    courseId: item.courseId,
+                                                    client: assign.client,
+                                                    clientId: assign.clientId,
+                                                    _id: item2._id
+                                                });
+                                            });
+                                        } else {
+                                            _this3.clientRequestsArray.push({
+                                                productId: item2.productId,
+                                                sessionId: item.sessionId,
+                                                requestStatus: item2.requestStatus,
+                                                courseId: item.courseId
+                                            });
+                                        }
+                                    });
+                                });
+                                if (this.clientRequestsArray.length > 0) this.showRequests = true;
 
                             case 8:
-                                this.showAdditionalInfo = true;
-                                _context3.next = 17;
-                                break;
-
-                            case 11:
-                                _context3.next = 13;
-                                return this.products.getProductsArray('?fields=_id name');
-
-                            case 13:
-                                if (!this.config.HELP_TICKET_TYPES[index].clientRequired) {
-                                    _context3.next = 16;
-                                    break;
-                                }
-
-                                _context3.next = 16;
-                                return this.refreshCourses();
-
-                            case 16:
-                                this.showAdditionalInfo = false;
-
-                            case 17:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -21374,28 +22453,28 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                 }, _callee3, this);
             }));
 
-            function typeChanged(_x2) {
+            function getActiveRequests() {
                 return _ref3.apply(this, arguments);
             }
 
-            return typeChanged;
+            return getActiveRequests;
         }();
 
         CreateHelpTickets.prototype.requestChosen = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el, product) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el, index) {
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 this.showAdditionalInfo = true;
-
-                                this.clientRequest = product;
+                                this.SelectedClientRequest = this.clientRequestsArray[index];
+                                this.selectedSessionId = this.clientRequestsArray[index].sessionId;
 
                                 if (this.selectedProductRow) this.selectedProductRow.children().removeClass('info');
                                 this.selectedProductRow = (0, _jquery2.default)(el.target).closest('tr');
                                 this.selectedProductRow.children().addClass('info');
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -21403,7 +22482,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                 }, _callee4, this);
             }));
 
-            function requestChosen(_x3, _x4) {
+            function requestChosen(_x2, _x3) {
                 return _ref4.apply(this, arguments);
             }
 
@@ -21412,8 +22491,11 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
         CreateHelpTickets.prototype.cancel = function cancel() {
             this.helpTickets.selectHelpTicket();
+            this.helpTickets.selectHelpTicketContent();
+            this.showHelpTicketDescription = false;
             this.courseSelected = false;
             this.showAdditionalInfo = false;
+            this.showRequests = false;
         };
 
         CreateHelpTickets.prototype.buldHelpTicket = function () {
@@ -21424,16 +22506,18 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                             case 0:
                                 this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
                                 this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
-                                this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;
+                                this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;;
+                                this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
+                                this.helpTickets.selectedHelpTicket.helpTicketType = this.inputForm;
 
-
-                                if (!this.config.HELP_TICKET_TYPES[this.helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired) {
+                                if (!this.showTypes) {
                                     this.helpTickets.selectedHelpTicket.courseId = 'b1b1b1b1b1b1b1b1b1b1b1b1';
                                 } else {
-                                    this.helpTickets.selectedHelpTicketContent.requestId = this.clientRequest._id;
-                                    this.helpTickets.selectedHelpTicketContent.systemId = this.clientRequest.systemId;
-                                    this.helpTickets.selectedHelpTicketContent.clientId = this.clientRequest.clientId;
-                                    this.helpTickets.selectedHelpTicket.productId = this.clientRequest.productId;
+                                    this.helpTickets.selectedHelpTicket.requestId = this.SelectedClientRequest._id;
+                                    this.helpTickets.selectedHelpTicket.systemId = this.SelectedClientRequest.systemId;
+                                    this.helpTickets.selectedHelpTicket.clientId = this.SelectedClientRequest.clientId;
+                                    this.helpTickets.selectedHelpTicket.productId = this.SelectedClientRequest.productId;
+                                    this.helpTickets.selectedHelpTicket.courseId = this.SelectedClientRequest.courseId;
                                 }
 
                                 this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
@@ -21441,7 +22525,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
                                 this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
 
-                            case 7:
+                            case 10:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -21500,8 +22584,13 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
         }();
 
         CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
+            this.inputForm = -1;
+            this.showTypes = false;
+            this.showHelpTicketDescription = false;
+            this.showRequests = false;
             this.showAdditionalInfo = false;
             this.helpTickets.selectHelpTicket();
+            this.helpTickets.selectHelpTicketContent();
             this.clearTables();
             this.filesSelected = "";
         };
@@ -21524,174 +22613,11 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
             }
         };
 
-        CreateHelpTickets.prototype.openEditCourseForm = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                if (this.showCourses) {
-                                    _context7.next = 3;
-                                    break;
-                                }
-
-                                _context7.next = 3;
-                                return this.refreshCourses();
-
-                            case 3:
-                                this.showCourses = !this.showCourses;
-
-                            case 4:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function openEditCourseForm() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return openEditCourseForm;
-        }();
-
-        CreateHelpTickets.prototype.refreshCourses = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                _context8.next = 2;
-                                return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number');
-
-                            case 2:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function refreshCourses() {
-                return _ref8.apply(this, arguments);
-            }
-
-            return refreshCourses;
-        }();
-
-        CreateHelpTickets.prototype.selectCourse = function selectCourse(index, el) {
-            var _this = this;
-
-            if (index === this.config.SANDBOX_ID) {
-                this.helpTickets.selectedHelpTicket.courseId = this.config.SANDBOX_ID;
-            } else {
-                this.editCourseIndex = index;
-
-                this.people.selectCourse(this.editCourseIndex);
-                this.helpTickets.selectedHelpTicket.courseId = this.people.selectedCourse._id;
-
-                if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
-                this.selectedCourseRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedCourseRow.children().addClass('info');
-            }
-
-            var myArray = this.clientRequests.requestsArray.filter(function (item) {
-                return item.courseId == _this.helpTickets.selectedHelpTicket.courseId;
-            });
-
-            if (myArray.length > 0) {
-                this.clientRequestsArray = new Array();
-                myArray[0].requestDetails.forEach(function (item) {
-                    if (item.assignments.length > 0) {
-                        item.assignments.forEach(function (assign) {
-                            _this.clientRequestsArray.push({
-                                productId: item.productId,
-                                requestStatus: item.requestStatus,
-                                systemId: assign.systemId,
-                                client: assign.client,
-                                clientId: assign.clientId,
-                                _id: item._id
-                            });
-                        });
-                    } else {
-                        _this.clientRequestsArray.push({
-                            productId: item.productId,
-                            requestStatus: item.requestStatus
-                        });
-                    }
-                });
-            }
-        };
-
-        CreateHelpTickets.prototype.editACourse = function editACourse(index, el) {
-            if (this.people.selectedCourse) {
-                (0, _jquery2.default)("#number").focus();
-                this.courseSelected = true;
-            }
-        };
-
-        CreateHelpTickets.prototype.newCourse = function newCourse() {
-            this.editCourseIndex = -1;
-            this.people.selectCourse();
-            (0, _jquery2.default)("#number").focus();
-            this.courseSelected = true;
-        };
-
-        CreateHelpTickets.prototype.saveCourse = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                if (!this.validation.validate(99, this)) {
-                                    _context9.next = 8;
-                                    break;
-                                }
-
-                                if (!this.userObj._id) {
-                                    _context9.next = 8;
-                                    break;
-                                }
-
-                                this.people.selectedCourse.personId = this.userObj._id;
-                                _context9.next = 5;
-                                return this.people.saveCourse();
-
-                            case 5:
-                                serverResponse = _context9.sent;
-
-                                if (!serverResponse.status) {
-                                    this.utils.showNotification("The course was updated");
-                                }
-                                this.courseSelected = false;
-
-                            case 8:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-
-            function saveCourse() {
-                return _ref9.apply(this, arguments);
-            }
-
-            return saveCourse;
-        }();
-
-        CreateHelpTickets.prototype.cancelEditCourse = function cancelEditCourse() {
-            this.courseSelected = false;
-            showAdditionalInfo = false;
-        };
-
         CreateHelpTickets.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[0].code, "curriculumTitle", [{ "rule": "required", "message": "Curriculum title is required", "value": "helpTickets.selectedHelpTicketContent.content.curriculumTitle" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[1].code, "resetPasswordUserIDs", [{ "rule": "required", "message": "The user IDs to reset are required", "value": "helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[2].code, "application", [{ "rule": "required", "message": "Choose an application", "value": "helpTickets.selectedHelpTicketContent.content.applicationId" }]);
-            this.validation.addRule(this.config.HELP_TICKET_TYPES[3].code, "descriptionID", [{ "rule": "required", "message": "Enter a description", "value": "helpTickets.selectedHelpTicketContent.content.comments" }]);
+            this.validation.addRule(this.config.HELP_TICKET_OTHER_CURRICULUM_TYPE, "curriculumTitle", [{ "rule": "required", "message": "Curriculum title is required", "value": "helpTickets.selectedHelpTicketContent.content.curriculumTitle" }]);
+            this.validation.addRule(this.config.HELP_TICKET_PASSWORD_RESET_TYPE, "resetPasswordUserIDs", [{ "rule": "required", "message": "The user IDs to reset are required", "value": "helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs" }]);
+            this.validation.addRule(this.config.HELP_TICKET_APP_ERROR_TYPE, "application", [{ "rule": "required", "message": "Choose an application", "value": "helpTickets.selectedHelpTicketContent.content.applicationId" }]);
+            this.validation.addRule(this.config.HELP_TICKET_OTHER_TYPE, "descriptionID", [{ "rule": "required", "message": "Enter a description", "value": "helpTickets.selectedHelpTicketContent.content.comments" }]);
             this.validation.addRule(99, "number", [{ "rule": "required", "message": "Course number is required", "value": "people.selectedCourse.number" }]);
             this.validation.addRule(99, "name", [{ "rule": "required", "message": "Course name is required", "value": "people.selectedCourse.name" }]);
         };
@@ -22253,7 +23179,7 @@ define('modules/user/support/usefulInfo',['exports', 'aurelia-framework', 'aurel
         return UsefulInfo;
     }()) || _class);
 });
-define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/dialogs/common-dialogs', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _products, _downloads, _appConfig, _utils, _commonDialogs, _people, _validation, _moment, _jquery) {
+define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/helpTickets', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../resources/data/downloads', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/dialogs/common-dialogs', '../../../resources/data/people', '../../../resources/utils/validation', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _helpTickets, _sessions, _systems, _products, _clientRequests, _downloads, _appConfig, _utils, _commonDialogs, _people, _validation, _moment, _jquery) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -22310,8 +23236,8 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
   var _dec, _class;
 
-  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _downloads.Downloads, _products.Products, _commonDialogs.CommonDialogs), _dec(_class = function () {
-    function ViewHelpTickets(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialog) {
+  var ViewHelpTickets = exports.ViewHelpTickets = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _dataTable.DataTable, _utils.Utils, _helpTickets.HelpTickets, _sessions.Sessions, _systems.Systems, _downloads.Downloads, _products.Products, _clientRequests.ClientRequests, _commonDialogs.CommonDialogs), _dec(_class = function () {
+    function ViewHelpTickets(router, config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog) {
       _classCallCheck(this, ViewHelpTickets);
 
       this.helpTicketSelected = false;
@@ -22333,8 +23259,10 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
       this.utils = utils;
       this.helpTickets = helpTickets;
       this.sessions = sessions;
+      this.systems = systems;
       this.apps = apps;
       this.products = products;
+      this.requests = requests;
       this.dialog = dialog;
     }
 
@@ -22358,7 +23286,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"), this.sessions.getSessionsArray('?order=startDate', true), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'), this.config.getConfig()]);
+                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"), this.sessions.getSessionsArray('?order=startDate', true), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;
@@ -22433,19 +23361,14 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
                 this.helpTickets.selectHelpTicket(this.editIndex);
 
-                if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-                  _context3.next = 5;
-                  break;
-                }
+                _context3.next = 4;
+                return this.getDetails();
 
-                _context3.next = 5;
-                return this.sytems.getSystem(this.helpTickets.content.content.systemId);
-
-              case 5:
-                _context3.next = 7;
+              case 4:
+                _context3.next = 6;
                 return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
-              case 7:
+              case 6:
                 response = _context3.sent;
 
                 if (!response.error) {
@@ -22471,7 +23394,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
 
-              case 14:
+              case 13:
               case 'end':
                 return _context3.stop();
             }
@@ -22484,6 +23407,62 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
       }
 
       return selectHelpTicket;
+    }();
+
+    ViewHelpTickets.prototype.getDetails = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var i;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this.showRequestDetails = false;
+
+                if (!this.helpTickets.selectedHelpTicket.requestId) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                if (!this.helpTickets.selectedHelpTicket.systemId) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                this.showRequestDetails = true;
+                i = 0;
+
+              case 5:
+                if (!(i < this.systems.systemsArray.length)) {
+                  _context4.next = 12;
+                  break;
+                }
+
+                if (!(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId)) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
+                return _context4.abrupt('break', 12);
+
+              case 9:
+                i++;
+                _context4.next = 5;
+                break;
+
+              case 12:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function getDetails() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return getDetails;
     }();
 
     ViewHelpTickets.prototype.getName = function getName() {
@@ -22508,24 +23487,25 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype._createResponse = function _createResponse() {
+      this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REPLIED_HELPTICKET_STATUS;
       this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
       this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
       this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
     };
 
     ViewHelpTickets.prototype.saveResponse = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var serverResponse;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 this._createResponse();
-                _context4.next = 3;
+                _context5.next = 3;
                 return this.helpTickets.saveHelpTicketResponse(this.sendEmail);
 
               case 3:
-                serverResponse = _context4.sent;
+                serverResponse = _context5.sent;
 
                 if (!serverResponse.error) {
                   this.updateArray();
@@ -22536,14 +23516,14 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
               case 6:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function saveResponse() {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       }
 
       return saveResponse;
@@ -22562,58 +23542,6 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.closeTicket = function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(helpTicket) {
-        var response, serverResponse;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                this.helpTickets.selectHelpTicketByID(helpTicket._id);
-                _context5.next = 3;
-                return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-
-              case 3:
-                response = _context5.sent;
-
-                if (response.error) {
-                  _context5.next = 12;
-                  break;
-                }
-
-                if (!(response.helpTicketId === 0)) {
-                  _context5.next = 12;
-                  break;
-                }
-
-                this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
-                _context5.next = 9;
-                return this.helpTickets.updateStatus();
-
-              case 9:
-                serverResponse = _context5.sent;
-
-                if (!serverResponse.error) {
-                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-                  this.utils.showNotification("The help ticket was updated");
-                }
-                this._cleanUp();
-
-              case 12:
-              case 'end':
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function closeTicket(_x3) {
-        return _ref5.apply(this, arguments);
-      }
-
-      return closeTicket;
-    }();
-
-    ViewHelpTickets.prototype.openHelpTicket = function () {
       var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(helpTicket) {
         var response, serverResponse;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -22637,7 +23565,7 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   break;
                 }
 
-                this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
+                this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
                 _context6.next = 9;
                 return this.helpTickets.updateStatus();
 
@@ -22658,8 +23586,60 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee6, this);
       }));
 
-      function openHelpTicket(_x4) {
+      function closeTicket(_x3) {
         return _ref6.apply(this, arguments);
+      }
+
+      return closeTicket;
+    }();
+
+    ViewHelpTickets.prototype.openHelpTicket = function () {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(helpTicket) {
+        var response, serverResponse;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                this.helpTickets.selectHelpTicketByID(helpTicket._id);
+                _context7.next = 3;
+                return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+
+              case 3:
+                response = _context7.sent;
+
+                if (response.error) {
+                  _context7.next = 12;
+                  break;
+                }
+
+                if (!(response.helpTicketId === 0)) {
+                  _context7.next = 12;
+                  break;
+                }
+
+                this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
+                _context7.next = 9;
+                return this.helpTickets.updateStatus();
+
+              case 9:
+                serverResponse = _context7.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                this._cleanUp();
+
+              case 12:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function openHelpTicket(_x4) {
+        return _ref7.apply(this, arguments);
       }
 
       return openHelpTicket;
@@ -22718,23 +23698,23 @@ define('modules/user/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype._cleanUpResponse = function () {
-      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 this.enterResponse = false;
 
               case 1:
               case 'end':
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee8, this);
       }));
 
       function _cleanUpResponse() {
-        return _ref7.apply(this, arguments);
+        return _ref8.apply(this, arguments);
       }
 
       return _cleanUpResponse;
@@ -29988,10 +30968,10 @@ define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], functi
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Analytics</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!resources/css/bootstrap-select.css', ['module'], function(module) { module.exports = "/*!\r\n * Bootstrap-select v1.12.2 (http://silviomoreto.github.io/bootstrap-select)\r\n *\r\n * Copyright 2013-2017 bootstrap-select\r\n * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\r\n */\r\n\r\nselect.bs-select-hidden,\nselect.selectpicker {\n  display: none !important;\n}\n.bootstrap-select {\n  width: 220px \\0;\n  /*IE9 and below*/\n}\n.bootstrap-select > .dropdown-toggle {\n  width: 100%;\n  padding-right: 25px;\n  z-index: 1;\n}\n.bootstrap-select > .dropdown-toggle.bs-placeholder,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:hover,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:focus,\n.bootstrap-select > .dropdown-toggle.bs-placeholder:active {\n  color: #999;\n}\n.bootstrap-select > select {\n  position: absolute !important;\n  bottom: 0;\n  left: 50%;\n  display: block !important;\n  width: 0.5px !important;\n  height: 100% !important;\n  padding: 0 !important;\n  opacity: 0 !important;\n  border: none;\n}\n.bootstrap-select > select.mobile-device {\n  top: 0;\n  left: 0;\n  display: block !important;\n  width: 100% !important;\n  z-index: 2;\n}\n.has-error .bootstrap-select .dropdown-toggle,\n.error .bootstrap-select .dropdown-toggle {\n  border-color: #b94a48;\n}\n.bootstrap-select.fit-width {\n  width: auto !important;\n}\n.bootstrap-select:not([class*=\"col-\"]):not([class*=\"form-control\"]):not(.input-group-btn) {\n  width: 220px;\n}\n.bootstrap-select .dropdown-toggle:focus {\n  outline: thin dotted #333333 !important;\n  outline: 5px auto -webkit-focus-ring-color !important;\n  outline-offset: -2px;\n}\n.bootstrap-select.form-control {\n  margin-bottom: 0;\n  padding: 0;\n  border: none;\n}\n.bootstrap-select.form-control:not([class*=\"col-\"]) {\n  width: 100%;\n}\n.bootstrap-select.form-control.input-group-btn {\n  z-index: auto;\n}\n.bootstrap-select.form-control.input-group-btn:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.bootstrap-select.btn-group:not(.input-group-btn),\n.bootstrap-select.btn-group[class*=\"col-\"] {\n  float: none;\n  display: inline-block;\n  margin-left: 0;\n}\n.bootstrap-select.btn-group.dropdown-menu-right,\n.bootstrap-select.btn-group[class*=\"col-\"].dropdown-menu-right,\n.row .bootstrap-select.btn-group[class*=\"col-\"].dropdown-menu-right {\n  float: right;\n}\n.form-inline .bootstrap-select.btn-group,\n.form-horizontal .bootstrap-select.btn-group,\n.form-group .bootstrap-select.btn-group {\n  margin-bottom: 0;\n}\n.form-group-lg .bootstrap-select.btn-group.form-control,\n.form-group-sm .bootstrap-select.btn-group.form-control {\n  padding: 0;\n}\n.form-group-lg .bootstrap-select.btn-group.form-control .dropdown-toggle,\n.form-group-sm .bootstrap-select.btn-group.form-control .dropdown-toggle {\n  height: 100%;\n  font-size: inherit;\n  line-height: inherit;\n  border-radius: inherit;\n}\n.form-inline .bootstrap-select.btn-group .form-control {\n  width: 100%;\n}\n.bootstrap-select.btn-group.disabled,\n.bootstrap-select.btn-group > .disabled {\n  cursor: not-allowed;\n}\n.bootstrap-select.btn-group.disabled:focus,\n.bootstrap-select.btn-group > .disabled:focus {\n  outline: none !important;\n}\n.bootstrap-select.btn-group.bs-container {\n  position: absolute;\n  height: 0 !important;\n  padding: 0 !important;\n}\n.bootstrap-select.btn-group.bs-container .dropdown-menu {\n  z-index: 1060;\n}\n.bootstrap-select.btn-group .dropdown-toggle .filter-option {\n  display: inline-block;\n  overflow: hidden;\n  width: 100%;\n  text-align: left;\n}\n.bootstrap-select.btn-group .dropdown-toggle .caret {\n  position: absolute;\n  top: 50%;\n  right: 12px;\n  margin-top: -2px;\n  vertical-align: middle;\n}\n.bootstrap-select.btn-group[class*=\"col-\"] .dropdown-toggle {\n  width: 100%;\n}\n.bootstrap-select.btn-group .dropdown-menu {\n  min-width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select.btn-group .dropdown-menu.inner {\n  position: static;\n  float: none;\n  border: 0;\n  padding: 0;\n  margin: 0;\n  border-radius: 0;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li {\n  position: relative;\n}\n.bootstrap-select.btn-group .dropdown-menu li.active small {\n  color: #fff;\n}\n.bootstrap-select.btn-group .dropdown-menu li.disabled a {\n  cursor: not-allowed;\n}\n.bootstrap-select.btn-group .dropdown-menu li a {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li a.opt {\n  position: relative;\n  padding-left: 2.25em;\n}\n.bootstrap-select.btn-group .dropdown-menu li a span.check-mark {\n  display: none;\n}\n.bootstrap-select.btn-group .dropdown-menu li a span.text {\n  display: inline-block;\n}\n.bootstrap-select.btn-group .dropdown-menu li small {\n  padding-left: 0.5em;\n}\n.bootstrap-select.btn-group .dropdown-menu .notify {\n  position: absolute;\n  bottom: 5px;\n  width: 96%;\n  margin: 0 2%;\n  min-height: 26px;\n  padding: 3px 5px;\n  background: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);\n  pointer-events: none;\n  opacity: 0.9;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bootstrap-select.btn-group .no-results {\n  padding: 3px;\n  background: #f5f5f5;\n  margin: 0 5px;\n  white-space: nowrap;\n}\n.bootstrap-select.btn-group.fit-width .dropdown-toggle .filter-option {\n  position: static;\n}\n.bootstrap-select.btn-group.fit-width .dropdown-toggle .caret {\n  position: static;\n  top: auto;\n  margin-top: -1px;\n}\n.bootstrap-select.btn-group.show-tick .dropdown-menu li.selected a span.check-mark {\n  position: absolute;\n  display: inline-block;\n  right: 15px;\n  margin-top: 5px;\n}\n.bootstrap-select.btn-group.show-tick .dropdown-menu li a span.text {\n  margin-right: 34px;\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle {\n  z-index: 1061;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle:before {\n  content: '';\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-bottom: 7px solid rgba(204, 204, 204, 0.2);\n  position: absolute;\n  bottom: -4px;\n  left: 9px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow .dropdown-toggle:after {\n  content: '';\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  border-bottom: 6px solid white;\n  position: absolute;\n  bottom: -4px;\n  left: 10px;\n  display: none;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle:before {\n  bottom: auto;\n  top: -3px;\n  border-top: 7px solid rgba(204, 204, 204, 0.2);\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.dropup .dropdown-toggle:after {\n  bottom: auto;\n  top: -3px;\n  border-top: 6px solid white;\n  border-bottom: 0;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:before {\n  right: 12px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.pull-right .dropdown-toggle:after {\n  right: 13px;\n  left: auto;\n}\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle:before,\n.bootstrap-select.show-menu-arrow.open > .dropdown-toggle:after {\n  display: block;\n}\n.bs-searchbox,\n.bs-actionsbox,\n.bs-donebutton {\n  padding: 4px 8px;\n}\n.bs-actionsbox {\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-actionsbox .btn-group button {\n  width: 50%;\n}\n.bs-donebutton {\n  float: left;\n  width: 100%;\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n.bs-donebutton .btn-group button {\n  width: 100%;\n}\n.bs-searchbox + .bs-actionsbox {\n  padding: 0 8px 4px;\n}\n.bs-searchbox .form-control {\n  margin-bottom: 0;\n  width: 100%;\n  float: none;\n}\n/*# sourceMappingURL=bootstrap-select.css.map */"; });
 define('text!modules/analytics/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\">\n                <compose view=\"./components/requestsByInstitution.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"requestSelected\" >\n                <!--\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n                -->\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
-define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Help Tickets</h1>\n</template>"; });
 define('text!resources/css/bootstrap.min.css', ['module'], function(module) { module.exports = "@import url(\"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700\");/*!\n * bootswatch v3.3.7\n * Homepage: http://bootswatch.com\n * Copyright 2012-2016 Thomas Park\n * Licensed under MIT\n * Based on Bootstrap\n*//*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}dfn{font-style:italic}h1{font-size:2em;margin:0.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace, monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=\"button\"],input[type=\"reset\"],input[type=\"submit\"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=\"checkbox\"],input[type=\"radio\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=\"number\"]::-webkit-inner-spin-button,input[type=\"number\"]::-webkit-outer-spin-button{height:auto}input[type=\"search\"]{-webkit-appearance:textfield;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}input[type=\"search\"]::-webkit-search-cancel-button,input[type=\"search\"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:0.35em 0.625em 0.75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:bold}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,*:before,*:after{background:transparent !important;color:#000 !important;-webkit-box-shadow:none !important;box-shadow:none !important;text-shadow:none !important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}p,h2,h3{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000 !important}.label{border:1px solid #000}.table{border-collapse:collapse !important}.table td,.table th{background-color:#fff !important}.table-bordered th,.table-bordered td{border:1px solid #ddd !important}}@font-face{font-family:'Glyphicons Halflings';src:url('../fonts/glyphicons-halflings-regular.eot');src:url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'),url('../fonts/glyphicons-halflings-regular.woff') format('woff'),url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:normal;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-euro:before,.glyphicon-eur:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*:before,*:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;color:#222222;background-color:#ffffff}input,button,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#008cba;text-decoration:none}a:hover,a:focus{color:#008cba;text-decoration:underline}a:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.img-responsive,.thumbnail>img,.thumbnail a>img,.carousel-inner>.item>img,.carousel-inner>.item>a>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:0}.img-thumbnail{padding:4px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out;display:inline-block;max-width:100%;height:auto}.img-circle{border-radius:50%}hr{margin-top:21px;margin-bottom:21px;border:0;border-top:1px solid #dddddd}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=\"button\"]{cursor:pointer}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-weight:300;line-height:1.1;color:inherit}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small,.h1 small,.h2 small,.h3 small,.h4 small,.h5 small,.h6 small,h1 .small,h2 .small,h3 .small,h4 .small,h5 .small,h6 .small,.h1 .small,.h2 .small,.h3 .small,.h4 .small,.h5 .small,.h6 .small{font-weight:normal;line-height:1;color:#999999}h1,.h1,h2,.h2,h3,.h3{margin-top:21px;margin-bottom:10.5px}h1 small,.h1 small,h2 small,.h2 small,h3 small,.h3 small,h1 .small,.h1 .small,h2 .small,.h2 .small,h3 .small,.h3 .small{font-size:65%}h4,.h4,h5,.h5,h6,.h6{margin-top:10.5px;margin-bottom:10.5px}h4 small,.h4 small,h5 small,.h5 small,h6 small,.h6 small,h4 .small,.h4 .small,h5 .small,.h5 .small,h6 .small,.h6 .small{font-size:75%}h1,.h1{font-size:39px}h2,.h2{font-size:32px}h3,.h3{font-size:26px}h4,.h4{font-size:19px}h5,.h5{font-size:15px}h6,.h6{font-size:13px}p{margin:0 0 10.5px}.lead{margin-bottom:21px;font-size:17px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:22.5px}}small,.small{font-size:80%}mark,.mark{background-color:#fcf8e3;padding:.2em}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#999999}.text-primary{color:#008cba}a.text-primary:hover,a.text-primary:focus{color:#006687}.text-success{color:#43ac6a}a.text-success:hover,a.text-success:focus{color:#358753}.text-info{color:#5bc0de}a.text-info:hover,a.text-info:focus{color:#31b0d5}.text-warning{color:#e99002}a.text-warning:hover,a.text-warning:focus{color:#b67102}.text-danger{color:#f04124}a.text-danger:hover,a.text-danger:focus{color:#d32a0e}.bg-primary{color:#fff;background-color:#008cba}a.bg-primary:hover,a.bg-primary:focus{background-color:#006687}.bg-success{background-color:#dff0d8}a.bg-success:hover,a.bg-success:focus{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:hover,a.bg-info:focus{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:hover,a.bg-warning:focus{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:hover,a.bg-danger:focus{background-color:#e4b9b9}.page-header{padding-bottom:9.5px;margin:42px 0 21px;border-bottom:1px solid #dddddd}ul,ol{margin-top:0;margin-bottom:10.5px}ul ul,ol ul,ul ol,ol ol{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;list-style:none;margin-left:-5px}.list-inline>li{display:inline-block;padding-left:5px;padding-right:5px}dl{margin-top:0;margin-bottom:21px}dt,dd{line-height:1.4}dt{font-weight:bold}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[title],abbr[data-original-title]{cursor:help;border-bottom:1px dotted #999999}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10.5px 21px;margin:0 0 21px;font-size:18.75px;border-left:5px solid #dddddd}blockquote p:last-child,blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}blockquote footer,blockquote small,blockquote .small{display:block;font-size:80%;line-height:1.4;color:#6f6f6f}blockquote footer:before,blockquote small:before,blockquote .small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;border-right:5px solid #dddddd;border-left:0;text-align:right}.blockquote-reverse footer:before,blockquote.pull-right footer:before,.blockquote-reverse small:before,blockquote.pull-right small:before,.blockquote-reverse .small:before,blockquote.pull-right .small:before{content:''}.blockquote-reverse footer:after,blockquote.pull-right footer:after,.blockquote-reverse small:after,blockquote.pull-right small:after,.blockquote-reverse .small:after,blockquote.pull-right .small:after{content:'\\00A0 \\2014'}address{margin-bottom:21px;font-style:normal;line-height:1.4}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:0}kbd{padding:2px 4px;font-size:90%;color:#ffffff;background-color:#333333;border-radius:0;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.25)}kbd kbd{padding:0;font-size:100%;font-weight:bold;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:10px;margin:0 0 10.5px;font-size:14px;line-height:1.4;word-break:break-all;word-wrap:break-word;color:#333333;background-color:#f5f5f5;border:1px solid #cccccc;border-radius:0}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{margin-right:auto;margin-left:auto;padding-left:15px;padding-right:15px}.row{margin-left:-15px;margin-right:-15px}.col-xs-1,.col-sm-1,.col-md-1,.col-lg-1,.col-xs-2,.col-sm-2,.col-md-2,.col-lg-2,.col-xs-3,.col-sm-3,.col-md-3,.col-lg-3,.col-xs-4,.col-sm-4,.col-md-4,.col-lg-4,.col-xs-5,.col-sm-5,.col-md-5,.col-lg-5,.col-xs-6,.col-sm-6,.col-md-6,.col-lg-6,.col-xs-7,.col-sm-7,.col-md-7,.col-lg-7,.col-xs-8,.col-sm-8,.col-md-8,.col-lg-8,.col-xs-9,.col-sm-9,.col-md-9,.col-lg-9,.col-xs-10,.col-sm-10,.col-md-10,.col-lg-10,.col-xs-11,.col-sm-11,.col-md-11,.col-lg-11,.col-xs-12,.col-sm-12,.col-md-12,.col-lg-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0%}@media (min-width:768px){.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0%}}@media (min-width:992px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0%}}@media (min-width:1200px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0%}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#999999;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:21px}.table>thead>tr>th,.table>tbody>tr>th,.table>tfoot>tr>th,.table>thead>tr>td,.table>tbody>tr>td,.table>tfoot>tr>td{padding:8px;line-height:1.4;vertical-align:top;border-top:1px solid #dddddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #dddddd}.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>th,.table>caption+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>td,.table>thead:first-child>tr:first-child>td{border-top:0}.table>tbody+tbody{border-top:2px solid #dddddd}.table .table{background-color:#ffffff}.table-condensed>thead>tr>th,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>tbody>tr>td,.table-condensed>tfoot>tr>td{padding:5px}.table-bordered{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>tbody>tr>td,.table-bordered>tfoot>tr>td{border:1px solid #dddddd}.table-bordered>thead>tr>th,.table-bordered>thead>tr>td{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=\"col-\"]{position:static;float:none;display:table-column}table td[class*=\"col-\"],table th[class*=\"col-\"]{position:static;float:none;display:table-cell}.table>thead>tr>td.active,.table>tbody>tr>td.active,.table>tfoot>tr>td.active,.table>thead>tr>th.active,.table>tbody>tr>th.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>tbody>tr.active>td,.table>tfoot>tr.active>td,.table>thead>tr.active>th,.table>tbody>tr.active>th,.table>tfoot>tr.active>th{background-color:#f5f5f5}.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover,.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr.active:hover>th{background-color:#e8e8e8}.table>thead>tr>td.success,.table>tbody>tr>td.success,.table>tfoot>tr>td.success,.table>thead>tr>th.success,.table>tbody>tr>th.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>tbody>tr.success>td,.table>tfoot>tr.success>td,.table>thead>tr.success>th,.table>tbody>tr.success>th,.table>tfoot>tr.success>th{background-color:#dff0d8}.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover,.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr.success:hover>th{background-color:#d0e9c6}.table>thead>tr>td.info,.table>tbody>tr>td.info,.table>tfoot>tr>td.info,.table>thead>tr>th.info,.table>tbody>tr>th.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>tbody>tr.info>td,.table>tfoot>tr.info>td,.table>thead>tr.info>th,.table>tbody>tr.info>th,.table>tfoot>tr.info>th{background-color:#d9edf7}.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover,.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr.info:hover>th{background-color:#c4e3f3}.table>thead>tr>td.warning,.table>tbody>tr>td.warning,.table>tfoot>tr>td.warning,.table>thead>tr>th.warning,.table>tbody>tr>th.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>tbody>tr.warning>td,.table>tfoot>tr.warning>td,.table>thead>tr.warning>th,.table>tbody>tr.warning>th,.table>tfoot>tr.warning>th{background-color:#fcf8e3}.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover,.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr.warning:hover>th{background-color:#faf2cc}.table>thead>tr>td.danger,.table>tbody>tr>td.danger,.table>tfoot>tr>td.danger,.table>thead>tr>th.danger,.table>tbody>tr>th.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>tbody>tr.danger>td,.table>tfoot>tr.danger>td,.table>thead>tr.danger>th,.table>tbody>tr.danger>th,.table>tfoot>tr.danger>th{background-color:#f2dede}.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover,.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr.danger:hover>th{background-color:#ebcccc}.table-responsive{overflow-x:auto;min-height:0.01%}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15.75px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #dddddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>thead>tr>th,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tfoot>tr>td{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>thead>tr>th:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.table-responsive>.table-bordered>thead>tr>th:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>th,.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>td{border-bottom:0}}fieldset{padding:0;margin:0;border:0;min-width:0}legend{display:block;width:100%;padding:0;margin-bottom:21px;font-size:22.5px;line-height:inherit;color:#333333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:bold}input[type=\"search\"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=\"radio\"],input[type=\"checkbox\"]{margin:4px 0 0;margin-top:1px \\9;line-height:normal}input[type=\"file\"]{display:block}input[type=\"range\"]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=\"file\"]:focus,input[type=\"radio\"]:focus,input[type=\"checkbox\"]:focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:9px;font-size:15px;line-height:1.4;color:#6f6f6f}.form-control{display:block;width:100%;height:39px;padding:8px 12px;font-size:15px;line-height:1.4;color:#6f6f6f;background-color:#ffffff;background-image:none;border:1px solid #cccccc;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6)}.form-control::-moz-placeholder{color:#999999;opacity:1}.form-control:-ms-input-placeholder{color:#999999}.form-control::-webkit-input-placeholder{color:#999999}.form-control::-ms-expand{border:0;background-color:transparent}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eeeeee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=\"search\"]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=\"date\"].form-control,input[type=\"time\"].form-control,input[type=\"datetime-local\"].form-control,input[type=\"month\"].form-control{line-height:39px}input[type=\"date\"].input-sm,input[type=\"time\"].input-sm,input[type=\"datetime-local\"].input-sm,input[type=\"month\"].input-sm,.input-group-sm input[type=\"date\"],.input-group-sm input[type=\"time\"],.input-group-sm input[type=\"datetime-local\"],.input-group-sm input[type=\"month\"]{line-height:36px}input[type=\"date\"].input-lg,input[type=\"time\"].input-lg,input[type=\"datetime-local\"].input-lg,input[type=\"month\"].input-lg,.input-group-lg input[type=\"date\"],.input-group-lg input[type=\"time\"],.input-group-lg input[type=\"datetime-local\"],.input-group-lg input[type=\"month\"]{line-height:60px}}.form-group{margin-bottom:15px}.radio,.checkbox{position:relative;display:block;margin-top:10px;margin-bottom:10px}.radio label,.checkbox label{min-height:21px;padding-left:20px;margin-bottom:0;font-weight:normal;cursor:pointer}.radio input[type=\"radio\"],.radio-inline input[type=\"radio\"],.checkbox input[type=\"checkbox\"],.checkbox-inline input[type=\"checkbox\"]{position:absolute;margin-left:-20px;margin-top:4px \\9}.radio+.radio,.checkbox+.checkbox{margin-top:-5px}.radio-inline,.checkbox-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;vertical-align:middle;font-weight:normal;cursor:pointer}.radio-inline+.radio-inline,.checkbox-inline+.checkbox-inline{margin-top:0;margin-left:10px}input[type=\"radio\"][disabled],input[type=\"checkbox\"][disabled],input[type=\"radio\"].disabled,input[type=\"checkbox\"].disabled,fieldset[disabled] input[type=\"radio\"],fieldset[disabled] input[type=\"checkbox\"]{cursor:not-allowed}.radio-inline.disabled,.checkbox-inline.disabled,fieldset[disabled] .radio-inline,fieldset[disabled] .checkbox-inline{cursor:not-allowed}.radio.disabled label,.checkbox.disabled label,fieldset[disabled] .radio label,fieldset[disabled] .checkbox label{cursor:not-allowed}.form-control-static{padding-top:9px;padding-bottom:9px;margin-bottom:0;min-height:36px}.form-control-static.input-lg,.form-control-static.input-sm{padding-left:0;padding-right:0}.input-sm{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-sm{height:36px;line-height:36px}textarea.input-sm,select[multiple].input-sm{height:auto}.form-group-sm .form-control{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.form-group-sm select.form-control{height:36px;line-height:36px}.form-group-sm textarea.form-control,.form-group-sm select[multiple].form-control{height:auto}.form-group-sm .form-control-static{height:36px;min-height:33px;padding:9px 12px;font-size:12px;line-height:1.5}.input-lg{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-lg{height:60px;line-height:60px}textarea.input-lg,select[multiple].input-lg{height:auto}.form-group-lg .form-control{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.form-group-lg select.form-control{height:60px;line-height:60px}.form-group-lg textarea.form-control,.form-group-lg select[multiple].form-control{height:auto}.form-group-lg .form-control-static{height:60px;min-height:40px;padding:17px 20px;font-size:19px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:48.75px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:39px;height:39px;line-height:39px;text-align:center;pointer-events:none}.input-lg+.form-control-feedback,.input-group-lg+.form-control-feedback,.form-group-lg .form-control+.form-control-feedback{width:60px;height:60px;line-height:60px}.input-sm+.form-control-feedback,.input-group-sm+.form-control-feedback,.form-group-sm .form-control+.form-control-feedback{width:36px;height:36px;line-height:36px}.has-success .help-block,.has-success .control-label,.has-success .radio,.has-success .checkbox,.has-success .radio-inline,.has-success .checkbox-inline,.has-success.radio label,.has-success.checkbox label,.has-success.radio-inline label,.has-success.checkbox-inline label{color:#43ac6a}.has-success .form-control{border-color:#43ac6a;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-success .form-control:focus{border-color:#358753;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #85d0a1}.has-success .input-group-addon{color:#43ac6a;border-color:#43ac6a;background-color:#dff0d8}.has-success .form-control-feedback{color:#43ac6a}.has-warning .help-block,.has-warning .control-label,.has-warning .radio,.has-warning .checkbox,.has-warning .radio-inline,.has-warning .checkbox-inline,.has-warning.radio label,.has-warning.checkbox label,.has-warning.radio-inline label,.has-warning.checkbox-inline label{color:#e99002}.has-warning .form-control{border-color:#e99002;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-warning .form-control:focus{border-color:#b67102;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #febc53}.has-warning .input-group-addon{color:#e99002;border-color:#e99002;background-color:#fcf8e3}.has-warning .form-control-feedback{color:#e99002}.has-error .help-block,.has-error .control-label,.has-error .radio,.has-error .checkbox,.has-error .radio-inline,.has-error .checkbox-inline,.has-error.radio label,.has-error.checkbox label,.has-error.radio-inline label,.has-error.checkbox-inline label{color:#f04124}.has-error .form-control{border-color:#f04124;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);box-shadow:inset 0 1px 1px rgba(0,0,0,0.075)}.has-error .form-control:focus{border-color:#d32a0e;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 6px #f79483}.has-error .input-group-addon{color:#f04124;border-color:#f04124;background-color:#f2dede}.has-error .form-control-feedback{color:#f04124}.has-feedback label~.form-control-feedback{top:26px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#626262}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn,.form-inline .input-group .form-control{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .radio,.form-inline .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .radio label,.form-inline .checkbox label{padding-left:0}.form-inline .radio input[type=\"radio\"],.form-inline .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .radio,.form-horizontal .checkbox,.form-horizontal .radio-inline,.form-horizontal .checkbox-inline{margin-top:0;margin-bottom:0;padding-top:9px}.form-horizontal .radio,.form-horizontal .checkbox{min-height:30px}.form-horizontal .form-group{margin-left:-15px;margin-right:-15px}@media (min-width:768px){.form-horizontal .control-label{text-align:right;margin-bottom:0;padding-top:9px}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:17px;font-size:19px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:9px;font-size:12px}}.btn{display:inline-block;margin-bottom:0;font-weight:normal;text-align:center;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid transparent;white-space:nowrap;padding:8px 12px;font-size:15px;line-height:1.4;border-radius:0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.btn:focus,.btn:active:focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn.active.focus{outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn:hover,.btn:focus,.btn.focus{color:#333333;text-decoration:none}.btn:active,.btn.active{outline:0;background-image:none;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;opacity:0.65;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333333;background-color:#e7e7e7;border-color:#cccccc}.btn-default:focus,.btn-default.focus{color:#333333;background-color:#cecece;border-color:#8c8c8c}.btn-default:hover{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{color:#333333;background-color:#cecece;border-color:#adadad}.btn-default:active:hover,.btn-default.active:hover,.open>.dropdown-toggle.btn-default:hover,.btn-default:active:focus,.btn-default.active:focus,.open>.dropdown-toggle.btn-default:focus,.btn-default:active.focus,.btn-default.active.focus,.open>.dropdown-toggle.btn-default.focus{color:#333333;background-color:#bcbcbc;border-color:#8c8c8c}.btn-default:active,.btn-default.active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled:hover,.btn-default[disabled]:hover,fieldset[disabled] .btn-default:hover,.btn-default.disabled:focus,.btn-default[disabled]:focus,fieldset[disabled] .btn-default:focus,.btn-default.disabled.focus,.btn-default[disabled].focus,fieldset[disabled] .btn-default.focus{background-color:#e7e7e7;border-color:#cccccc}.btn-default .badge{color:#e7e7e7;background-color:#333333}.btn-primary{color:#ffffff;background-color:#008cba;border-color:#0079a1}.btn-primary:focus,.btn-primary.focus{color:#ffffff;background-color:#006687;border-color:#001921}.btn-primary:hover{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{color:#ffffff;background-color:#006687;border-color:#004b63}.btn-primary:active:hover,.btn-primary.active:hover,.open>.dropdown-toggle.btn-primary:hover,.btn-primary:active:focus,.btn-primary.active:focus,.open>.dropdown-toggle.btn-primary:focus,.btn-primary:active.focus,.btn-primary.active.focus,.open>.dropdown-toggle.btn-primary.focus{color:#ffffff;background-color:#004b63;border-color:#001921}.btn-primary:active,.btn-primary.active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled:hover,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary:hover,.btn-primary.disabled:focus,.btn-primary[disabled]:focus,fieldset[disabled] .btn-primary:focus,.btn-primary.disabled.focus,.btn-primary[disabled].focus,fieldset[disabled] .btn-primary.focus{background-color:#008cba;border-color:#0079a1}.btn-primary .badge{color:#008cba;background-color:#ffffff}.btn-success{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.btn-success:focus,.btn-success.focus{color:#ffffff;background-color:#358753;border-color:#183e26}.btn-success:hover{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{color:#ffffff;background-color:#358753;border-color:#2b6e44}.btn-success:active:hover,.btn-success.active:hover,.open>.dropdown-toggle.btn-success:hover,.btn-success:active:focus,.btn-success.active:focus,.open>.dropdown-toggle.btn-success:focus,.btn-success:active.focus,.btn-success.active.focus,.open>.dropdown-toggle.btn-success.focus{color:#ffffff;background-color:#2b6e44;border-color:#183e26}.btn-success:active,.btn-success.active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled:hover,.btn-success[disabled]:hover,fieldset[disabled] .btn-success:hover,.btn-success.disabled:focus,.btn-success[disabled]:focus,fieldset[disabled] .btn-success:focus,.btn-success.disabled.focus,.btn-success[disabled].focus,fieldset[disabled] .btn-success.focus{background-color:#43ac6a;border-color:#3c9a5f}.btn-success .badge{color:#43ac6a;background-color:#ffffff}.btn-info{color:#ffffff;background-color:#5bc0de;border-color:#46b8da}.btn-info:focus,.btn-info.focus{color:#ffffff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{color:#ffffff;background-color:#31b0d5;border-color:#269abc}.btn-info:active:hover,.btn-info.active:hover,.open>.dropdown-toggle.btn-info:hover,.btn-info:active:focus,.btn-info.active:focus,.open>.dropdown-toggle.btn-info:focus,.btn-info:active.focus,.btn-info.active.focus,.open>.dropdown-toggle.btn-info.focus{color:#ffffff;background-color:#269abc;border-color:#1b6d85}.btn-info:active,.btn-info.active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled:hover,.btn-info[disabled]:hover,fieldset[disabled] .btn-info:hover,.btn-info.disabled:focus,.btn-info[disabled]:focus,fieldset[disabled] .btn-info:focus,.btn-info.disabled.focus,.btn-info[disabled].focus,fieldset[disabled] .btn-info.focus{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#ffffff}.btn-warning{color:#ffffff;background-color:#e99002;border-color:#d08002}.btn-warning:focus,.btn-warning.focus{color:#ffffff;background-color:#b67102;border-color:#513201}.btn-warning:hover{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{color:#ffffff;background-color:#b67102;border-color:#935b01}.btn-warning:active:hover,.btn-warning.active:hover,.open>.dropdown-toggle.btn-warning:hover,.btn-warning:active:focus,.btn-warning.active:focus,.open>.dropdown-toggle.btn-warning:focus,.btn-warning:active.focus,.btn-warning.active.focus,.open>.dropdown-toggle.btn-warning.focus{color:#ffffff;background-color:#935b01;border-color:#513201}.btn-warning:active,.btn-warning.active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled:hover,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning:hover,.btn-warning.disabled:focus,.btn-warning[disabled]:focus,fieldset[disabled] .btn-warning:focus,.btn-warning.disabled.focus,.btn-warning[disabled].focus,fieldset[disabled] .btn-warning.focus{background-color:#e99002;border-color:#d08002}.btn-warning .badge{color:#e99002;background-color:#ffffff}.btn-danger{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.btn-danger:focus,.btn-danger.focus{color:#ffffff;background-color:#d32a0e;border-color:#731708}.btn-danger:hover{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{color:#ffffff;background-color:#d32a0e;border-color:#b1240c}.btn-danger:active:hover,.btn-danger.active:hover,.open>.dropdown-toggle.btn-danger:hover,.btn-danger:active:focus,.btn-danger.active:focus,.open>.dropdown-toggle.btn-danger:focus,.btn-danger:active.focus,.btn-danger.active.focus,.open>.dropdown-toggle.btn-danger.focus{color:#ffffff;background-color:#b1240c;border-color:#731708}.btn-danger:active,.btn-danger.active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled:hover,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger:hover,.btn-danger.disabled:focus,.btn-danger[disabled]:focus,fieldset[disabled] .btn-danger:focus,.btn-danger.disabled.focus,.btn-danger[disabled].focus,fieldset[disabled] .btn-danger.focus{background-color:#f04124;border-color:#ea2f10}.btn-danger .badge{color:#f04124;background-color:#ffffff}.btn-link{color:#008cba;font-weight:normal;border-radius:0}.btn-link,.btn-link:active,.btn-link.active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:hover,.btn-link:focus,.btn-link:active{border-color:transparent}.btn-link:hover,.btn-link:focus{color:#008cba;text-decoration:underline;background-color:transparent}.btn-link[disabled]:hover,fieldset[disabled] .btn-link:hover,.btn-link[disabled]:focus,fieldset[disabled] .btn-link:focus{color:#999999;text-decoration:none}.btn-lg,.btn-group-lg>.btn{padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}.btn-sm,.btn-group-sm>.btn{padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}.btn-xs,.btn-group-xs>.btn{padding:4px 6px;font-size:12px;line-height:1.5;border-radius:0}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=\"submit\"].btn-block,input[type=\"reset\"].btn-block,input[type=\"button\"].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity 0.15s linear;-o-transition:opacity 0.15s linear;transition:opacity 0.15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-property:height, visibility;-o-transition-property:height, visibility;transition-property:height, visibility;-webkit-transition-duration:0.35s;-o-transition-duration:0.35s;transition-duration:0.35s;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid \\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropup,.dropdown{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;list-style:none;font-size:15px;text-align:left;background-color:#ffffff;border:1px solid #cccccc;border:1px solid rgba(0,0,0,0.15);border-radius:0;-webkit-box-shadow:0 6px 12px rgba(0,0,0,0.175);box-shadow:0 6px 12px rgba(0,0,0,0.175);-webkit-background-clip:padding-box;background-clip:padding-box}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:rgba(0,0,0,0.2)}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.4;color:#555555;white-space:nowrap}.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus{text-decoration:none;color:#262626;background-color:#eeeeee}.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus{color:#ffffff;text-decoration:none;outline:0;background-color:#008cba}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{color:#999999}.dropdown-menu>.disabled>a:hover,.dropdown-menu>.disabled>a:focus{text-decoration:none;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);cursor:not-allowed}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{left:auto;right:0}.dropdown-menu-left{left:0;right:auto}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.4;color:#999999;white-space:nowrap}.dropdown-backdrop{position:fixed;left:0;right:0;bottom:0;top:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{border-top:0;border-bottom:4px dashed;border-bottom:4px solid \\9;content:\"\"}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{left:auto;right:0}.navbar-right .dropdown-menu-left{left:0;right:auto}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group>.btn,.btn-group-vertical>.btn{position:relative;float:left}.btn-group>.btn:hover,.btn-group-vertical>.btn:hover,.btn-group>.btn:focus,.btn-group-vertical>.btn:focus,.btn-group>.btn:active,.btn-group-vertical>.btn:active,.btn-group>.btn.active,.btn-group-vertical>.btn.active{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-bottom-left-radius:0;border-top-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-top-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-bottom-left-radius:0;border-top-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-left:8px;padding-right:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-left:12px;padding-right:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,0.125);box-shadow:inset 0 3px 5px rgba(0,0,0,0.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-right-radius:0;border-top-left-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{float:none;display:table-cell;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=\"buttons\"]>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"radio\"],[data-toggle=\"buttons\"]>.btn input[type=\"checkbox\"],[data-toggle=\"buttons\"]>.btn-group>.btn input[type=\"checkbox\"]{position:absolute;clip:rect(0, 0, 0, 0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=\"col-\"]{float:none;padding-left:0;padding-right:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:60px;padding:16px 20px;font-size:19px;line-height:1.3333333;border-radius:0}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:60px;line-height:60px}textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn,select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:36px;padding:8px 12px;font-size:12px;line-height:1.5;border-radius:0}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:36px;line-height:36px}textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn,select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn{height:auto}.input-group-addon,.input-group-btn,.input-group .form-control{display:table-cell}.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child),.input-group .form-control:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:8px 12px;font-size:15px;font-weight:normal;line-height:1;color:#6f6f6f;text-align:center;background-color:#eeeeee;border:1px solid #cccccc;border-radius:0}.input-group-addon.input-sm{padding:8px 12px;font-size:12px;border-radius:0}.input-group-addon.input-lg{padding:16px 20px;font-size:19px;border-radius:0}.input-group-addon input[type=\"radio\"],.input-group-addon input[type=\"checkbox\"]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle),.input-group-btn:last-child>.btn-group:not(:last-child)>.btn{border-bottom-right-radius:0;border-top-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:first-child>.btn-group:not(:first-child)>.btn{border-bottom-left-radius:0;border-top-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:hover,.input-group-btn>.btn:focus,.input-group-btn>.btn:active{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{margin-bottom:0;padding-left:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:hover,.nav>li>a:focus{text-decoration:none;background-color:#eeeeee}.nav>li.disabled>a{color:#999999}.nav>li.disabled>a:hover,.nav>li.disabled>a:focus{color:#999999;text-decoration:none;background-color:transparent;cursor:not-allowed}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{background-color:#eeeeee;border-color:#008cba}.nav .nav-divider{height:1px;margin:9.5px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #dddddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.4;border:1px solid transparent;border-radius:0 0 0 0}.nav-tabs>li>a:hover{border-color:#eeeeee #eeeeee #dddddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:hover,.nav-tabs>li.active>a:focus{color:#6f6f6f;background-color:#ffffff;border:1px solid #dddddd;border-bottom-color:transparent;cursor:default}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:hover,.nav-tabs.nav-justified>.active>a:focus{border-bottom-color:#ffffff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:0}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:hover,.nav-pills>li.active>a:focus{color:#ffffff;background-color:#008cba}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{text-align:center;margin-bottom:5px}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border:1px solid #dddddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #dddddd;border-radius:0 0 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:hover,.nav-tabs-justified>.active>a:focus{border-bottom-color:#ffffff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-right-radius:0;border-top-left-radius:0}.navbar{position:relative;min-height:45px;margin-bottom:21px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:0}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{overflow-x:visible;padding-right:15px;padding-left:15px;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);-webkit-overflow-scrolling:touch}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block !important;height:auto !important;padding-bottom:0;overflow:visible !important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{padding-left:0;padding-right:0}}.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-top .navbar-collapse,.navbar-fixed-bottom .navbar-collapse{max-height:200px}}.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container>.navbar-header,.container-fluid>.navbar-header,.container>.navbar-collapse,.container-fluid>.navbar-collapse{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-top,.navbar-fixed-bottom{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-top,.navbar-fixed-bottom{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;padding:12px 15px;font-size:19px;line-height:21px;height:45px}.navbar-brand:hover,.navbar-brand:focus{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;margin-right:15px;padding:9px 10px;margin-top:5.5px;margin-bottom:5.5px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:0}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:6px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:21px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu>li>a,.navbar-nav .open .dropdown-menu .dropdown-header{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:21px}.navbar-nav .open .dropdown-menu>li>a:hover,.navbar-nav .open .dropdown-menu>li>a:focus{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:12px;padding-bottom:12px}}.navbar-form{margin-left:-15px;margin-right:-15px;padding:10px 15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 1px 0 rgba(255,255,255,0.1);margin-top:3px;margin-bottom:3px}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn,.navbar-form .input-group .form-control{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .radio,.navbar-form .checkbox{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .radio label,.navbar-form .checkbox label{padding-left:0}.navbar-form .radio input[type=\"radio\"],.navbar-form .checkbox input[type=\"checkbox\"]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;border:0;margin-left:0;margin-right:0;padding-top:0;padding-bottom:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-right-radius:0;border-top-left-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-right-radius:0;border-top-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:3px;margin-bottom:3px}.navbar-btn.btn-sm{margin-top:4.5px;margin-bottom:4.5px}.navbar-btn.btn-xs{margin-top:11.5px;margin-bottom:11.5px}.navbar-text{margin-top:12px;margin-bottom:12px}@media (min-width:768px){.navbar-text{float:left;margin-left:15px;margin-right:15px}}@media (min-width:768px){.navbar-left{float:left !important}.navbar-right{float:right !important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#333333;border-color:#222222}.navbar-default .navbar-brand{color:#ffffff}.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-default .navbar-text{color:#ffffff}.navbar-default .navbar-nav>li>a{color:#ffffff}.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:hover,.navbar-default .navbar-nav>.disabled>a:focus{color:#cccccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:transparent}.navbar-default .navbar-toggle:hover,.navbar-default .navbar-toggle:focus{background-color:transparent}.navbar-default .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#222222}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:hover,.navbar-default .navbar-nav>.open>a:focus{background-color:#272727;color:#ffffff}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#272727}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#cccccc;background-color:transparent}}.navbar-default .navbar-link{color:#ffffff}.navbar-default .navbar-link:hover{color:#ffffff}.navbar-default .btn-link{color:#ffffff}.navbar-default .btn-link:hover,.navbar-default .btn-link:focus{color:#ffffff}.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:hover,.navbar-default .btn-link[disabled]:focus,fieldset[disabled] .navbar-default .btn-link:focus{color:#cccccc}.navbar-inverse{background-color:#008cba;border-color:#006687}.navbar-inverse .navbar-brand{color:#ffffff}.navbar-inverse .navbar-brand:hover,.navbar-inverse .navbar-brand:focus{color:#ffffff;background-color:transparent}.navbar-inverse .navbar-text{color:#ffffff}.navbar-inverse .navbar-nav>li>a{color:#ffffff}.navbar-inverse .navbar-nav>li>a:hover,.navbar-inverse .navbar-nav>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:hover,.navbar-inverse .navbar-nav>.disabled>a:focus{color:#444444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:transparent}.navbar-inverse .navbar-toggle:hover,.navbar-inverse .navbar-toggle:focus{background-color:transparent}.navbar-inverse .navbar-toggle .icon-bar{background-color:#ffffff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#007196}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a:focus{background-color:#006687;color:#ffffff}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#ffffff}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus{color:#ffffff;background-color:#006687}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus{color:#444444;background-color:transparent}}.navbar-inverse .navbar-link{color:#ffffff}.navbar-inverse .navbar-link:hover{color:#ffffff}.navbar-inverse .btn-link{color:#ffffff}.navbar-inverse .btn-link:hover,.navbar-inverse .btn-link:focus{color:#ffffff}.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:hover,.navbar-inverse .btn-link[disabled]:focus,fieldset[disabled] .navbar-inverse .btn-link:focus{color:#444444}.breadcrumb{padding:8px 15px;margin-bottom:21px;list-style:none;background-color:#f5f5f5;border-radius:0}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{content:\"/\\00a0\";padding:0 5px;color:#999999}.breadcrumb>.active{color:#333333}.pagination{display:inline-block;padding-left:0;margin:21px 0;border-radius:0}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:8px 12px;line-height:1.4;text-decoration:none;color:#008cba;background-color:transparent;border:1px solid transparent;margin-left:-1px}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-bottom-left-radius:0;border-top-left-radius:0}.pagination>li:last-child>a,.pagination>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination>li>a:hover,.pagination>li>span:hover,.pagination>li>a:focus,.pagination>li>span:focus{z-index:2;color:#008cba;background-color:#eeeeee;border-color:transparent}.pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus{z-index:3;color:#ffffff;background-color:#008cba;border-color:transparent;cursor:default}.pagination>.disabled>span,.pagination>.disabled>span:hover,.pagination>.disabled>span:focus,.pagination>.disabled>a,.pagination>.disabled>a:hover,.pagination>.disabled>a:focus{color:#999999;background-color:#ffffff;border-color:transparent;cursor:not-allowed}.pagination-lg>li>a,.pagination-lg>li>span{padding:16px 20px;font-size:19px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pagination-sm>li>a,.pagination-sm>li>span{padding:8px 12px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-bottom-left-radius:0;border-top-left-radius:0}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-bottom-right-radius:0;border-top-right-radius:0}.pager{padding-left:0;margin:21px 0;list-style:none;text-align:center}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:transparent;border:1px solid transparent;border-radius:3px}.pager li>a:hover,.pager li>a:focus{text-decoration:none;background-color:#eeeeee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:hover,.pager .disabled>a:focus,.pager .disabled>span{color:#999999;background-color:transparent;cursor:not-allowed}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:bold;line-height:1;color:#ffffff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:hover,a.label:focus{color:#ffffff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#999999}.label-default[href]:hover,.label-default[href]:focus{background-color:#808080}.label-primary{background-color:#008cba}.label-primary[href]:hover,.label-primary[href]:focus{background-color:#006687}.label-success{background-color:#43ac6a}.label-success[href]:hover,.label-success[href]:focus{background-color:#358753}.label-info{background-color:#5bc0de}.label-info[href]:hover,.label-info[href]:focus{background-color:#31b0d5}.label-warning{background-color:#e99002}.label-warning[href]:hover,.label-warning[href]:focus{background-color:#b67102}.label-danger{background-color:#f04124}.label-danger[href]:hover,.label-danger[href]:focus{background-color:#d32a0e}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:bold;color:#ffffff;line-height:1;vertical-align:middle;white-space:nowrap;text-align:center;background-color:#008cba;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-xs .badge,.btn-group-xs>.btn .badge{top:0;padding:1px 5px}a.badge:hover,a.badge:focus{color:#ffffff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#008cba;background-color:#ffffff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#fafafa}.jumbotron h1,.jumbotron .h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:23px;font-weight:200}.jumbotron>hr{border-top-color:#e1e1e1}.container .jumbotron,.container-fluid .jumbotron{border-radius:0;padding-left:15px;padding-right:15px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-left:60px;padding-right:60px}.jumbotron h1,.jumbotron .h1{font-size:68px}}.thumbnail{display:block;padding:4px;margin-bottom:21px;line-height:1.4;background-color:#ffffff;border:1px solid #dddddd;border-radius:0;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail>img,.thumbnail a>img{margin-left:auto;margin-right:auto}a.thumbnail:hover,a.thumbnail:focus,a.thumbnail.active{border-color:#008cba}.thumbnail .caption{padding:9px;color:#222222}.alert{padding:15px;margin-bottom:21px;border:1px solid transparent;border-radius:0}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:bold}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{background-color:#43ac6a;border-color:#3c9a5f;color:#ffffff}.alert-success hr{border-top-color:#358753}.alert-success .alert-link{color:#e6e6e6}.alert-info{background-color:#5bc0de;border-color:#3db5d8;color:#ffffff}.alert-info hr{border-top-color:#2aabd2}.alert-info .alert-link{color:#e6e6e6}.alert-warning{background-color:#e99002;border-color:#d08002;color:#ffffff}.alert-warning hr{border-top-color:#b67102}.alert-warning .alert-link{color:#e6e6e6}.alert-danger{background-color:#f04124;border-color:#ea2f10;color:#ffffff}.alert-danger hr{border-top-color:#d32a0e}.alert-danger .alert-link{color:#e6e6e6}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{overflow:hidden;height:21px;margin-bottom:21px;background-color:#f5f5f5;border-radius:0;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);box-shadow:inset 0 1px 2px rgba(0,0,0,0.1)}.progress-bar{float:left;width:0%;height:100%;font-size:12px;line-height:21px;color:#ffffff;text-align:center;background-color:#008cba;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);-webkit-transition:width 0.6s ease;-o-transition:width 0.6s ease;transition:width 0.6s ease}.progress-striped .progress-bar,.progress-bar-striped{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress.active .progress-bar,.progress-bar.active{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#43ac6a}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-warning{background-color:#e99002}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.progress-bar-danger{background-color:#f04124}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:-o-linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{zoom:1;overflow:hidden}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-left,.media-right,.media-body{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{margin-bottom:20px;padding-left:0}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#ffffff;border:1px solid #dddddd}.list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:0;border-bottom-left-radius:0}a.list-group-item,button.list-group-item{color:#555555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333333}a.list-group-item:hover,button.list-group-item:hover,a.list-group-item:focus,button.list-group-item:focus{text-decoration:none;color:#555555;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:hover,.list-group-item.disabled:focus{background-color:#eeeeee;color:#999999;cursor:not-allowed}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text{color:#999999}.list-group-item.active,.list-group-item.active:hover,.list-group-item.active:focus{z-index:2;color:#ffffff;background-color:#008cba;border-color:#008cba}.list-group-item.active .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>.small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:hover .list-group-item-text,.list-group-item.active:focus .list-group-item-text{color:#87e1ff}.list-group-item-success{color:#43ac6a;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#43ac6a}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:hover,button.list-group-item-success:hover,a.list-group-item-success:focus,button.list-group-item-success:focus{color:#43ac6a;background-color:#d0e9c6}a.list-group-item-success.active,button.list-group-item-success.active,a.list-group-item-success.active:hover,button.list-group-item-success.active:hover,a.list-group-item-success.active:focus,button.list-group-item-success.active:focus{color:#fff;background-color:#43ac6a;border-color:#43ac6a}.list-group-item-info{color:#5bc0de;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#5bc0de}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:hover,button.list-group-item-info:hover,a.list-group-item-info:focus,button.list-group-item-info:focus{color:#5bc0de;background-color:#c4e3f3}a.list-group-item-info.active,button.list-group-item-info.active,a.list-group-item-info.active:hover,button.list-group-item-info.active:hover,a.list-group-item-info.active:focus,button.list-group-item-info.active:focus{color:#fff;background-color:#5bc0de;border-color:#5bc0de}.list-group-item-warning{color:#e99002;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#e99002}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:hover,button.list-group-item-warning:hover,a.list-group-item-warning:focus,button.list-group-item-warning:focus{color:#e99002;background-color:#faf2cc}a.list-group-item-warning.active,button.list-group-item-warning.active,a.list-group-item-warning.active:hover,button.list-group-item-warning.active:hover,a.list-group-item-warning.active:focus,button.list-group-item-warning.active:focus{color:#fff;background-color:#e99002;border-color:#e99002}.list-group-item-danger{color:#f04124;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#f04124}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:hover,button.list-group-item-danger:hover,a.list-group-item-danger:focus,button.list-group-item-danger:focus{color:#f04124;background-color:#ebcccc}a.list-group-item-danger.active,button.list-group-item-danger.active,a.list-group-item-danger.active:hover,button.list-group-item-danger.active:hover,a.list-group-item-danger.active:focus,button.list-group-item-danger.active:focus{color:#fff;background-color:#f04124;border-color:#f04124}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:21px;background-color:#ffffff;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.05);box-shadow:0 1px 1px rgba(0,0,0,0.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-right-radius:-1;border-top-left-radius:-1}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:17px;color:inherit}.panel-title>a,.panel-title>small,.panel-title>.small,.panel-title>small>a,.panel-title>.small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #dddddd;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-right-radius:-1;border-top-left-radius:-1}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-right-radius:0;border-top-left-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.table,.panel>.table-responsive>.table,.panel>.panel-collapse>.table{margin-bottom:0}.panel>.table caption,.panel>.table-responsive>.table caption,.panel>.panel-collapse>.table caption{padding-left:15px;padding-right:15px}.panel>.table:first-child,.panel>.table-responsive:first-child>.table:first-child{border-top-right-radius:-1;border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child{border-top-left-radius:-1;border-top-right-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child{border-top-left-radius:-1}.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child{border-top-right-radius:-1}.panel>.table:last-child,.panel>.table-responsive:last-child>.table:last-child{border-bottom-right-radius:-1;border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-left-radius:-1;border-bottom-right-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:-1}.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:-1}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #dddddd}.panel>.table>tbody:first-child>tr:first-child th,.panel>.table>tbody:first-child>tr:first-child td{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child{border-left:0}.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child{border-right:0}.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{border:0;margin-bottom:0}.panel-group{margin-bottom:21px}.panel-group .panel{margin-bottom:0;border-radius:0}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.panel-body,.panel-group .panel-heading+.panel-collapse>.list-group{border-top:1px solid #dddddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #dddddd}.panel-default{border-color:#dddddd}.panel-default>.panel-heading{color:#333333;background-color:#f5f5f5;border-color:#dddddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#dddddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#dddddd}.panel-primary{border-color:#008cba}.panel-primary>.panel-heading{color:#ffffff;background-color:#008cba;border-color:#008cba}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#008cba}.panel-primary>.panel-heading .badge{color:#008cba;background-color:#ffffff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#008cba}.panel-success{border-color:#3c9a5f}.panel-success>.panel-heading{color:#ffffff;background-color:#43ac6a;border-color:#3c9a5f}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3c9a5f}.panel-success>.panel-heading .badge{color:#43ac6a;background-color:#ffffff}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3c9a5f}.panel-info{border-color:#3db5d8}.panel-info>.panel-heading{color:#ffffff;background-color:#5bc0de;border-color:#3db5d8}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#3db5d8}.panel-info>.panel-heading .badge{color:#5bc0de;background-color:#ffffff}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#3db5d8}.panel-warning{border-color:#d08002}.panel-warning>.panel-heading{color:#ffffff;background-color:#e99002;border-color:#d08002}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d08002}.panel-warning>.panel-heading .badge{color:#e99002;background-color:#ffffff}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d08002}.panel-danger{border-color:#ea2f10}.panel-danger>.panel-heading{color:#ffffff;background-color:#f04124;border-color:#ea2f10}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ea2f10}.panel-danger>.panel-heading .badge{color:#f04124;background-color:#ffffff}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ea2f10}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive iframe,.embed-responsive embed,.embed-responsive object,.embed-responsive video{position:absolute;top:0;left:0;bottom:0;height:100%;width:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#fafafa;border:1px solid #e8e8e8;border-radius:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);box-shadow:inset 0 1px 1px rgba(0,0,0,0.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,0.15)}.well-lg{padding:24px;border-radius:0}.well-sm{padding:9px;border-radius:0}.close{float:right;font-size:22.5px;font-weight:bold;line-height:1;color:#ffffff;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.close:hover,.close:focus{color:#ffffff;text-decoration:none;cursor:pointer;opacity:0.5;filter:alpha(opacity=50)}button.close{padding:0;cursor:pointer;background:transparent;border:0;-webkit-appearance:none}.modal-open{overflow:hidden}.modal{display:none;overflow:hidden;position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transform:translate(0, -25%);-ms-transform:translate(0, -25%);-o-transform:translate(0, -25%);transform:translate(0, -25%);-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out}.modal.in .modal-dialog{-webkit-transform:translate(0, 0);-ms-transform:translate(0, 0);-o-transform:translate(0, 0);transform:translate(0, 0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#ffffff;border:1px solid #999999;border:1px solid rgba(0,0,0,0.2);border-radius:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,0.5);box-shadow:0 3px 9px rgba(0,0,0,0.5);-webkit-background-clip:padding-box;background-clip:padding-box;outline:0}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000000}.modal-backdrop.fade{opacity:0;filter:alpha(opacity=0)}.modal-backdrop.in{opacity:0.5;filter:alpha(opacity=50)}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.4}.modal-body{position:relative;padding:20px}.modal-footer{padding:20px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-left:5px;margin-bottom:0}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,0.5);box-shadow:0 5px 15px rgba(0,0,0,0.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:12px;opacity:0;filter:alpha(opacity=0)}.tooltip.in{opacity:0.9;filter:alpha(opacity=90)}.tooltip.top{margin-top:-3px;padding:5px 0}.tooltip.right{margin-left:3px;padding:0 5px}.tooltip.bottom{margin-top:3px;padding:5px 0}.tooltip.left{margin-left:-3px;padding:0 5px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#ffffff;text-align:center;background-color:#333333;border-radius:0}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-left .tooltip-arrow{bottom:0;right:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#333333}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#333333}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#333333}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#333333}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Open Sans\",\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-style:normal;font-weight:normal;letter-spacing:normal;line-break:auto;line-height:1.4;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;font-size:15px;background-color:#333333;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #333333;border:1px solid transparent;border-radius:0;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2)}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{margin:0;padding:8px 14px;font-size:15px;background-color:#333333;border-bottom:1px solid #262626;border-radius:-1 -1 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{border-width:10px;content:\"\"}.popover.top>.arrow{left:50%;margin-left:-11px;border-bottom-width:0;border-top-color:#000000;border-top-color:rgba(0,0,0,0.05);bottom:-11px}.popover.top>.arrow:after{content:\" \";bottom:1px;margin-left:-10px;border-bottom-width:0;border-top-color:#333333}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-left-width:0;border-right-color:#000000;border-right-color:rgba(0,0,0,0.05)}.popover.right>.arrow:after{content:\" \";left:1px;bottom:-10px;border-left-width:0;border-right-color:#333333}.popover.bottom>.arrow{left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#000000;border-bottom-color:rgba(0,0,0,0.05);top:-11px}.popover.bottom>.arrow:after{content:\" \";top:1px;margin-left:-10px;border-top-width:0;border-bottom-color:#333333}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#000000;border-left-color:rgba(0,0,0,0.05)}.popover.left>.arrow:after{content:\" \";right:1px;border-right-width:0;border-left-color:#333333;bottom:-10px}.carousel{position:relative}.carousel-inner{position:relative;overflow:hidden;width:100%}.carousel-inner>.item{display:none;position:relative;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>img,.carousel-inner>.item>a>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.next,.carousel-inner>.item.active.right{-webkit-transform:translate3d(100%, 0, 0);transform:translate3d(100%, 0, 0);left:0}.carousel-inner>.item.prev,.carousel-inner>.item.active.left{-webkit-transform:translate3d(-100%, 0, 0);transform:translate3d(-100%, 0, 0);left:0}.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right,.carousel-inner>.item.active{-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0);left:0}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;left:0;bottom:0;width:15%;opacity:0.5;filter:alpha(opacity=50);font-size:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6);background-color:rgba(0,0,0,0)}.carousel-control.left{background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.0001)));background-image:linear-gradient(to right, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.0001) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1)}.carousel-control.right{left:auto;right:0;background-image:-webkit-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-o-linear-gradient(left, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-image:-webkit-gradient(linear, left top, right top, from(rgba(0,0,0,0.0001)), to(rgba(0,0,0,0.5)));background-image:linear-gradient(to right, rgba(0,0,0,0.0001) 0, rgba(0,0,0,0.5) 100%);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1)}.carousel-control:hover,.carousel-control:focus{outline:0;color:#ffffff;text-decoration:none;opacity:0.9;filter:alpha(opacity=90)}.carousel-control .icon-prev,.carousel-control .icon-next,.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right{position:absolute;top:50%;margin-top:-10px;z-index:5;display:inline-block}.carousel-control .icon-prev,.carousel-control .glyphicon-chevron-left{left:50%;margin-left:-10px}.carousel-control .icon-next,.carousel-control .glyphicon-chevron-right{right:50%;margin-right:-10px}.carousel-control .icon-prev,.carousel-control .icon-next{width:20px;height:20px;line-height:1;font-family:serif}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;margin-left:-30%;padding-left:0;list-style:none;text-align:center}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;border:1px solid #ffffff;border-radius:10px;cursor:pointer;background-color:#000 \\9;background-color:rgba(0,0,0,0)}.carousel-indicators .active{margin:0;width:12px;height:12px;background-color:#ffffff}.carousel-caption{position:absolute;left:15%;right:15%;bottom:20px;z-index:10;padding-top:20px;padding-bottom:20px;color:#ffffff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-prev,.carousel-control .icon-next{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{left:20%;right:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.clearfix:before,.clearfix:after,.dl-horizontal dd:before,.dl-horizontal dd:after,.container:before,.container:after,.container-fluid:before,.container-fluid:after,.row:before,.row:after,.form-horizontal .form-group:before,.form-horizontal .form-group:after,.btn-toolbar:before,.btn-toolbar:after,.btn-group-vertical>.btn-group:before,.btn-group-vertical>.btn-group:after,.nav:before,.nav:after,.navbar:before,.navbar:after,.navbar-header:before,.navbar-header:after,.navbar-collapse:before,.navbar-collapse:after,.pager:before,.pager:after,.panel-body:before,.panel-body:after,.modal-header:before,.modal-header:after,.modal-footer:before,.modal-footer:after{content:\" \";display:table}.clearfix:after,.dl-horizontal dd:after,.container:after,.container-fluid:after,.row:after,.form-horizontal .form-group:after,.btn-toolbar:after,.btn-group-vertical>.btn-group:after,.nav:after,.navbar:after,.navbar-header:after,.navbar-collapse:after,.pager:after,.panel-body:after,.modal-header:after,.modal-footer:after{clear:both}.center-block{display:block;margin-left:auto;margin-right:auto}.pull-right{float:right !important}.pull-left{float:left !important}.hide{display:none !important}.show{display:block !important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none !important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-xs,.visible-sm,.visible-md,.visible-lg{display:none !important}.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block{display:none !important}@media (max-width:767px){.visible-xs{display:block !important}table.visible-xs{display:table !important}tr.visible-xs{display:table-row !important}th.visible-xs,td.visible-xs{display:table-cell !important}}@media (max-width:767px){.visible-xs-block{display:block !important}}@media (max-width:767px){.visible-xs-inline{display:inline !important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block !important}table.visible-sm{display:table !important}tr.visible-sm{display:table-row !important}th.visible-sm,td.visible-sm{display:table-cell !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline !important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block !important}table.visible-md{display:table !important}tr.visible-md{display:table-row !important}th.visible-md,td.visible-md{display:table-cell !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline !important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block !important}}@media (min-width:1200px){.visible-lg{display:block !important}table.visible-lg{display:table !important}tr.visible-lg{display:table-row !important}th.visible-lg,td.visible-lg{display:table-cell !important}}@media (min-width:1200px){.visible-lg-block{display:block !important}}@media (min-width:1200px){.visible-lg-inline{display:inline !important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block !important}}@media (max-width:767px){.hidden-xs{display:none !important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none !important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none !important}}@media (min-width:1200px){.hidden-lg{display:none !important}}.visible-print{display:none !important}@media print{.visible-print{display:block !important}table.visible-print{display:table !important}tr.visible-print{display:table-row !important}th.visible-print,td.visible-print{display:table-cell !important}}.visible-print-block{display:none !important}@media print{.visible-print-block{display:block !important}}.visible-print-inline{display:none !important}@media print{.visible-print-inline{display:inline !important}}.visible-print-inline-block{display:none !important}@media print{.visible-print-inline-block{display:inline-block !important}}@media print{.hidden-print{display:none !important}}.navbar{border:none;font-size:13px;font-weight:300}.navbar .navbar-toggle:hover .icon-bar{background-color:#b3b3b3}.navbar-collapse{border-top-color:rgba(0,0,0,0.2);-webkit-box-shadow:none;box-shadow:none}.navbar .btn{padding-top:6px;padding-bottom:6px}.navbar-form{margin-top:7px;margin-bottom:5px}.navbar-form .form-control{height:auto;padding:4px 6px}.navbar-text{margin:12px 15px;line-height:21px}.navbar .dropdown-menu{border:none}.navbar .dropdown-menu>li>a,.navbar .dropdown-menu>li>a:focus{background-color:transparent;font-size:13px;font-weight:300}.navbar .dropdown-header{color:rgba(255,255,255,0.5)}.navbar-default .dropdown-menu{background-color:#333333}.navbar-default .dropdown-menu>li>a,.navbar-default .dropdown-menu>li>a:focus{color:#ffffff}.navbar-default .dropdown-menu>li>a:hover,.navbar-default .dropdown-menu>.active>a,.navbar-default .dropdown-menu>.active>a:hover{background-color:#272727}.navbar-inverse .dropdown-menu{background-color:#008cba}.navbar-inverse .dropdown-menu>li>a,.navbar-inverse .dropdown-menu>li>a:focus{color:#ffffff}.navbar-inverse .dropdown-menu>li>a:hover,.navbar-inverse .dropdown-menu>.active>a,.navbar-inverse .dropdown-menu>.active>a:hover{background-color:#006687}.btn{padding:8px 12px}.btn-lg{padding:16px 20px}.btn-sm{padding:8px 12px}.btn-xs{padding:4px 6px}.btn-group .btn~.dropdown-toggle{padding-left:16px;padding-right:16px}.btn-group .dropdown-menu{border-top-width:0}.btn-group.dropup .dropdown-menu{border-top-width:1px;border-bottom-width:0;margin-bottom:0}.btn-group .dropdown-toggle.btn-default~.dropdown-menu{background-color:#e7e7e7;border-color:#cccccc}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a{color:#333333}.btn-group .dropdown-toggle.btn-default~.dropdown-menu>li>a:hover{background-color:#d3d3d3}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu{background-color:#008cba;border-color:#0079a1}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-primary~.dropdown-menu>li>a:hover{background-color:#006d91}.btn-group .dropdown-toggle.btn-success~.dropdown-menu{background-color:#43ac6a;border-color:#3c9a5f}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-success~.dropdown-menu>li>a:hover{background-color:#388f58}.btn-group .dropdown-toggle.btn-info~.dropdown-menu{background-color:#5bc0de;border-color:#46b8da}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-info~.dropdown-menu>li>a:hover{background-color:#39b3d7}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu{background-color:#e99002;border-color:#d08002}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-warning~.dropdown-menu>li>a:hover{background-color:#c17702}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu{background-color:#f04124;border-color:#ea2f10}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a{color:#ffffff}.btn-group .dropdown-toggle.btn-danger~.dropdown-menu>li>a:hover{background-color:#dc2c0f}.lead{color:#6f6f6f}cite{font-style:italic}blockquote{border-left-width:1px;color:#6f6f6f}blockquote.pull-right{border-right-width:1px}blockquote small{font-size:12px;font-weight:300}table{font-size:12px}label,.control-label,.help-block,.checkbox,.radio{font-size:12px;font-weight:normal}input[type=\"radio\"],input[type=\"checkbox\"]{margin-top:1px}.nav .open>a,.nav .open>a:hover,.nav .open>a:focus{border-color:transparent}.nav-tabs>li>a{background-color:#e7e7e7;color:#222222}.nav-tabs .caret{border-top-color:#222222;border-bottom-color:#222222}.nav-pills{font-weight:300}.breadcrumb{border:1px solid #dddddd;border-radius:3px;font-size:10px;font-weight:300;text-transform:uppercase}.pagination{font-size:12px;font-weight:300;color:#999999}.pagination>li>a,.pagination>li>span{margin-left:4px;color:#999999}.pagination>.active>a,.pagination>.active>span{color:#fff}.pagination>li>a,.pagination>li:first-child>a,.pagination>li:last-child>a,.pagination>li>span,.pagination>li:first-child>span,.pagination>li:last-child>span{border-radius:3px}.pagination-lg>li>a,.pagination-lg>li>span{padding-left:22px;padding-right:22px}.pagination-sm>li>a,.pagination-sm>li>span{padding:0 5px}.pager{font-size:12px;font-weight:300;color:#999999}.list-group{font-size:12px;font-weight:300}.close{opacity:0.4;text-decoration:none;text-shadow:none}.close:hover,.close:focus{opacity:1}.alert{font-size:12px;font-weight:300}.alert .alert-link{font-weight:normal;color:#fff;text-decoration:underline}.label{padding-left:1em;padding-right:1em;border-radius:0;font-weight:300}.label-default{background-color:#e7e7e7;color:#333333}.badge{font-weight:300}.progress{height:22px;padding:2px;background-color:#f6f6f6;border:1px solid #ccc;-webkit-box-shadow:none;box-shadow:none}.dropdown-menu{padding:0;margin-top:0;font-size:12px}.dropdown-menu>li>a{padding:12px 15px}.dropdown-header{padding-left:15px;padding-right:15px;font-size:9px;text-transform:uppercase}.popover{color:#fff;font-size:12px;font-weight:300}.panel-heading,.panel-footer{border-top-right-radius:0;border-top-left-radius:0}.panel-default .close{color:#222222}.modal .close{color:#222222}"; });
+define('text!modules/analytics/helpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Help Tickets</h1>\n</template>"; });
 define('text!modules/facco/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      \n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div> \n      </div> \n</template>"; });
-define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\n\nfieldset, label { margin: 0; padding: 0; }\nbody{ margin: 20px; }\nh1 { font-size: 1.5em; margin: 10px; }\n\n/****** Style Star Rating Widget *****/\n\n.rating { \n  border: none;\n  float: left;\n}\n\n.rating > span > input { display: none; } \n.rating > span > label:before { \n  margin: 5px;\n  font-size: 1.25em;\n  font-family: FontAwesome;\n  display: inline-block;\n  content: \"\\f005\";\n}\n\n.rating > span > .half:before { \n  content: \"\\f089\";\n  position: absolute;\n}\n\n.rating > span > label { \n    color: #ddd; \n    float: right; \n}\n\n/***** CSS Magic to Highlight Stars on Hover *****/\n\n.rating > span > input:checked ~ label, /* show gold star when clicked */\n.rating:not(:checked) > span > label:hover, /* hover current star */\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\n\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\n.rating > span >  input:checked ~ label:hover,\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\n\n.subMenu{\n    position: relative;\n    top: -5px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/campus-panorama.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/DataCenter.jpg\");\n\n    /* Set a specific height */\n    min-height: 200px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.center-text {\n     text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\nai-dialog-header {\n    background-color: SlateBlue ;\n    color: white;\n}\n\n.banner {\n    margin-top: 40px;\n    height: 50px;\n    width: 100%;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.browse .textContainer { \n    height: 430px; \n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.detail-container .header {\n    background: #f2f2f2;\n    box-shadow: none;\n    height: 64px;\n}\n\n.detail-container .header i {\n    float: left;\n    font-size: 42px;\n    padding: 8px 10px;\n}\n\n.detail-container .header i.separator {\n    float: none;\n    font-size: 8px;\n    padding: 0 8px;\n    position: relative;\n    top: -2px;\n}\n\n.detail-container .header .content {\n    display: inline-block;\n    margin-top: 12px;\n}\n\n.detail-container .header .content .title {\n    font-size: 16px;\n    font-weight: bold;\n}\n\n.detail-container .header .content .description {\n    color: #7a7a7a;\n    font-size: 12px;\n    margin-left: 2px;\n}\n\n.detail-container h2.select-from-list {\n  text-align: center;\n}\n\n\n.bar-chart {\n    position: absolute;\n    top: 300px;\n}\n\n.doughnut-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.doughnut-legend{\n    list-style: none !important;    \n}\n\n.pie-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.pie-legend {\n    list-style: none !important;    \n}\n\ndonut-chart, bar-chart {\n  display: inline-block;\n  margin: 40px;\n}\n\nchart-data {\n  display: none;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.largeFont {\n    font-size: 1.5em;\n}\n\n.page-host {\n    margin-top: 5rem;\n}\n\ntextarea {\n  overflow-y:scroll;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.rowSelected{\n  background-color: lightgrey;\n}\n\n.newsTitle {\n  font-size: large;\n  font-weight: bold;\n  border-bottom: thin solid;\n}\n\n.newsUrl{\n  color: blue;\n  float: right;\n}\n\n.centerText{\n  text-align: center;\n}\n\n.btn-file {\n    position: relative;\n    overflow: hidden;\n}\n.btn-file input[type=file] {\n    position: absolute;\n    top: 0;\n    right: 0;\n    min-width: 100%;\n    min-height: 100%;\n    font-size: 100px;\n    text-align: right;\n    filter: alpha(opacity=0);\n    opacity: 0;\n    outline: none;\n    background: white;\n    cursor: inherit;\n    display: block;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n.hover_img a { position:relative; }\n.hover_img a span { position:absolute; display:none; z-index:99; }\n.hover_img a:hover span { display:block; }\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 600px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n}\n\n.borderTop {\n  border-style: solid;\n  border-top: thin double #ff0000;\n  border-bottom: none;\n  border-right: none;\n  border-left: none;\n  padding-top: 6px;\n}\n\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n \n\t/*\n\tLabel the data\n\t*/\n\t#no-more-tables td:before { content: attr(data-title); }\n"; });
+define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\n\n/* Dropdown Button */\n.dropbtn {\n    border: none;\n    cursor: pointer;\n}\n\n/* The container <div> - needed to position the dropdown content */\n.dropdown {\n    position: relative;\n    display: inline-block;\n}\n\n/* Dropdown Content (Hidden by Default) */\n.dropdown-content {\n    display: none;\n    position: absolute;\n    background-color: #f9f9f9;\n    min-width: 160px;\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\n    z-index: 1;\n}\n\n/* Links inside the dropdown */\n.dropdown-content a {\n    color: black;\n    padding: 12px 16px;\n    text-decoration: none;\n    display: block;\n}\n\n/* Change color of dropdown links on hover */\n.dropdown-content a:hover {background-color: #f1f1f1}\n\n/* Show the dropdown menu on hover */\n.dropdown:hover .dropdown-content {\n    display: block;\n}\n\n/* Change the background color of the dropdown button when the dropdown content is shown */\n.dropdown:hover .dropbtn {\n    background-color: #3e8e41;\n}\n\n\nfieldset, label { margin: 0; padding: 0; }\nbody{ margin: 20px; }\nh1 { font-size: 1.5em; margin: 10px; }\n\n/****** Style Star Rating Widget *****/\n\n.rating { \n  border: none;\n  float: left;\n}\n\n.rating > span > input { display: none; } \n.rating > span > label:before { \n  margin: 5px;\n  font-size: 1.25em;\n  font-family: FontAwesome;\n  display: inline-block;\n  content: \"\\f005\";\n}\n\n.rating > span > .half:before { \n  content: \"\\f089\";\n  position: absolute;\n}\n\n.rating > span > label { \n    color: #ddd; \n    float: right; \n}\n\n/***** CSS Magic to Highlight Stars on Hover *****/\n\n.rating > span > input:checked ~ label, /* show gold star when clicked */\n.rating:not(:checked) > span > label:hover, /* hover current star */\n.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */\n\n.rating > span > input:checked + label:hover, /* hover current star when changing rating */\n.rating > span >  input:checked ~ label:hover,\n.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */\n.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }\n\n.subMenu{\n    position: relative;\n    top: -5px;\n}\n\n.parallax1 {\n    /* The image used */\n    background-image: url(\"/img/campus-panorama.jpg\");\n\n    /* Set a specific height */\n    min-height: 300px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.parallax2 {\n    /* The image used */\n    background-image: url(\"/img/DataCenter.jpg\");\n\n    /* Set a specific height */\n    min-height: 200px; \n\n    /* Create the parallax scrolling effect */\n    background-attachment: fixed;\n    background-position: center;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n.caption {\n  position: absolute;\n  left: 0;\n  top: 25%;\n  width: 100%;\n  text-align: center;\n  color: #000;\n}\n\n.caption span.border {\n    background-color: #111;\n    color: #fff;\n    padding: 18px;\n    font-size: 25px;\n    letter-spacing: 10px;\n}\n\n.center-text {\n     text-align: center;\n}\n\n.home-page-header{\n    text-align: center;\n    font-size: 30px;\n}\n\nai-dialog-header {\n    background-color: SlateBlue ;\n    color: white;\n}\n\n.banner {\n    margin-top: 40px;\n    height: 50px;\n    width: 100%;\n    border-bottom-style: solid;\n    border-bottom-width: 1px;\n}\n\n.browse .textContainer { \n    height: 430px; \n    line-height: 400px;\n}\n\n.textContainer h4 {\n    vertical-align: middle;\n    display: inline-block;\n}\n\n.detail-container .header {\n    background: #f2f2f2;\n    box-shadow: none;\n    height: 64px;\n}\n\n.detail-container .header i {\n    float: left;\n    font-size: 42px;\n    padding: 8px 10px;\n}\n\n.detail-container .header i.separator {\n    float: none;\n    font-size: 8px;\n    padding: 0 8px;\n    position: relative;\n    top: -2px;\n}\n\n.detail-container .header .content {\n    display: inline-block;\n    margin-top: 12px;\n}\n\n.detail-container .header .content .title {\n    font-size: 16px;\n    font-weight: bold;\n}\n\n.detail-container .header .content .description {\n    color: #7a7a7a;\n    font-size: 12px;\n    margin-left: 2px;\n}\n\n.detail-container h2.select-from-list {\n  text-align: center;\n}\n\n\n.bar-chart {\n    position: absolute;\n    top: 300px;\n}\n\n.doughnut-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.doughnut-legend{\n    list-style: none !important;    \n}\n\n.pie-legend li span {\n    width: 1em;\n    height: 1em;\n    display: inline-block;\n    margin-right: 5px;\n}\n\n.pie-legend {\n    list-style: none !important;    \n}\n\ndonut-chart, bar-chart {\n  display: inline-block;\n  margin: 40px;\n}\n\nchart-data {\n  display: none;\n}\n\n.topMargin {\n    margin-top: 25px;\n}\n\n.bottomMargin {\n    margin-bottom: 25px;\n}\n\n.leftMargin {\n    margin-left: 25px;\n}\n\n.rightMargin {\n  margin-right: 25px;\n}\n\n.smallLeftMargin {\n    margin-left: 10px;\n}\n\n.bigTopMargin {\n    margin-top: 50px;\n}\n\n.smallMarginRight {\n    margin-right: 10px;\n}\n\n.largeFont {\n    font-size: 1.5em;\n}\n\n.page-host {\n    margin-top: 5rem;\n}\n\ntextarea {\n  overflow-y:scroll;\n}\n\n.overFlow {\n    overflow-y:scroll;\n}\n\n.underline {\n    text-decoration: underline;\n}\n\n.rowSelected{\n  background-color: lightgrey;\n}\n\n.newsTitle {\n  font-size: large;\n  font-weight: bold;\n  border-bottom: thin solid;\n}\n\n.newsUrl{\n  color: blue;\n  float: right;\n}\n\n.centerText{\n  text-align: center;\n}\n\n.btn-file {\n    position: relative;\n    overflow: hidden;\n}\n.btn-file input[type=file] {\n    position: absolute;\n    top: 0;\n    right: 0;\n    min-width: 100%;\n    min-height: 100%;\n    font-size: 100px;\n    text-align: right;\n    filter: alpha(opacity=0);\n    opacity: 0;\n    outline: none;\n    background: white;\n    cursor: inherit;\n    display: block;\n}\n\n.smart-timeline{position:relative}\n.smart-timeline-list{list-style:none;margin:0;padding:0}\n.smart-timeline-list:after{content:\" \";background-color:#eee;position:absolute;display:block;width:2px;top:0;left:95px;bottom:0;z-index:1}\n.smart-timeline-list li{position:relative;margin:0;padding:15px 0}\n.smart-timeline-list>li:hover{background-color:#f4f4f4}\n.smart-timeline-hover li:hover{background-color:#f9f9f9}\n.smart-timeline-icon{background:#3276b1;color:#fff;border-radius:50%;position:absolute;width:32px;height:32px;line-height:28px;font-size:14px;text-align:center;left:80px;top:10px;z-index:100;padding:2px}\n.smart-timeline-icon>img{height:32px;width:32px;border-radius:50%;margin-top:-2px;margin-left:-2px;border:2px solid #3276b1}\n.smart-timeline-time{float:left;width:70px;text-align:right}\n.smart-timeline-time>small{font-style:italic}\n.smart-timeline-content{margin-left:123px}\n\n.hover_img a { position:relative; }\n.hover_img a span { position:absolute; display:none; z-index:99; }\n.hover_img a:hover span { display:block; }\n\n.hover {\n    position:absolute;\n    height: 200px;\n    width: 600px;\n    z-index:99;\n    display:none;\n    box-shadow: 10px 10px 5px #888888;\n    overflow: hidden;\n    background-color: white;\n    padding: 10px;\n}\n\n.borderTop {\n  border-style: solid;\n  border-top: thin double #ff0000;\n  border-bottom: none;\n  border-right: none;\n  border-left: none;\n  padding-top: 6px;\n}\n\n\n@media only screen and (max-width: 800px) {\n    \n    /* Force table to not be like tables anymore */\n\t#no-more-tables table, \n\t#no-more-tables thead, \n\t#no-more-tables tbody, \n\t#no-more-tables th, \n\t#no-more-tables td, \n\t#no-more-tables tr { \n\t\tdisplay: block; \n\t}\n \n\t/* Hide table headers (but not display: none;, for accessibility) */\n\t#no-more-tables thead tr { \n\t\tposition: absolute;\n\t\ttop: -9999px;\n\t\tleft: -9999px;\n\t}\n \n\t#no-more-tables tr { border: 1px solid #ccc; }\n \n\t#no-more-tables td { \n\t\t/* Behave  like a \"row\" */\n\t\tborder: none;\n\t\tborder-bottom: 1px solid #eee; \n\t\tposition: relative;\n\t\tpadding-left: 50%; \n\t\twhite-space: normal;\n\t\ttext-align:left;\n\t}\n \n\t#no-more-tables td:before { \n\t\t/* Now like a table header */\n\t\tposition: absolute;\n\t\t/* Top/left values mimic padding */\n\t\ttop: 6px;\n\t\tleft: 6px;\n\t\twidth: 45%; \n\t\tpadding-right: 10px; \n\t\twhite-space: nowrap;\n\t\ttext-align:left;\n\t\tfont-weight: bold;\n\t}\n\n    .clickable{\n        cursor: pointer;   \n    }\n \n\t/*\n\tLabel the data\n\t*/\n\t#no-more-tables td:before { content: attr(data-title); }\n"; });
 define('text!modules/facco/facco.html', ['module'], function(module) { module.exports = "<template>\n        <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Faculty Coordinator</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li  class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!resources/editor/skins/moono-lisa/dialog.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_dialog{visibility:visible}.cke_dialog_body{z-index:1;background:#fff}.cke_dialog strong{font-weight:bold}.cke_dialog_title{font-weight:bold;font-size:12px;cursor:move;position:relative;color:#484848;border-bottom:1px solid #d1d1d1;padding:12px 19px 12px 12px;background:#f8f8f8;letter-spacing:.3px}.cke_dialog_spinner{border-radius:50%;width:12px;height:12px;overflow:hidden;text-indent:-9999em;border:2px solid rgba(102,102,102,0.2);border-left-color:rgba(102,102,102,1);-webkit-animation:dialog_spinner 1s infinite linear;animation:dialog_spinner 1s infinite linear}.cke_browser_ie8 .cke_dialog_spinner,.cke_browser_ie9 .cke_dialog_spinner{background:url(images/spinner.gif) center top no-repeat;width:16px;height:16px;border:0}@-webkit-keyframes dialog_spinner{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes dialog_spinner{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.cke_dialog_contents{background-color:#fff;overflow:auto;padding:15px 10px 5px 10px;margin-top:43px;border-top:1px solid #d1d1d1}.cke_dialog_contents_body{overflow:auto;padding:9px 10px 5px 10px;margin-top:22px}.cke_dialog_footer{text-align:right;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_rtl .cke_dialog_footer{text-align:left}.cke_hc .cke_dialog_footer{outline:0;border-top:1px solid #fff}.cke_dialog .cke_resizer{margin-top:22px}.cke_dialog .cke_resizer_rtl{margin-left:5px}.cke_dialog .cke_resizer_ltr{margin-right:5px}.cke_dialog_tabs{height:33px;display:inline-block;margin:9px 0 0;position:absolute;z-index:2;left:11px}.cke_rtl .cke_dialog_tabs{left:auto;right:11px}a.cke_dialog_tab{height:25px;padding:4px 8px;display:inline-block;cursor:pointer;line-height:26px;outline:0;color:#484848;border:1px solid #d1d1d1;border-radius:3px 3px 0 0;background:#f8f8f8;min-width:90px;text-align:center;margin-left:-1px;letter-spacing:.3px}a.cke_dialog_tab:hover{background-color:#fff}a.cke_dialog_tab:focus{border:2px solid #139ff7;border-bottom-color:#d1d1d1;padding:3px 7px;position:relative;z-index:1}a.cke_dialog_tab_selected{background:#fff;border-bottom-color:#fff;cursor:default;filter:none}a.cke_dialog_tab_selected:hover,a.cke_dialog_tab_selected:focus{border-bottom-color:#fff}.cke_hc a.cke_dialog_tab:hover,.cke_hc a.cke_dialog_tab:focus,.cke_hc a.cke_dialog_tab_selected{border:3px solid;padding:2px 6px}a.cke_dialog_tab_disabled{color:#bababa;cursor:default}.cke_single_page .cke_dialog_tabs{display:none}.cke_single_page .cke_dialog_contents{padding-top:5px;margin-top:0;border-top:0}a.cke_dialog_close_button{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:16px;width:16px;top:11px;z-index:5;opacity:.7;filter:alpha(opacity = 70)}.cke_rtl .cke_dialog_close_button{left:12px}.cke_ltr .cke_dialog_close_button{right:12px}.cke_hc a.cke_dialog_close_button{background-image:none}.cke_hidpi a.cke_dialog_close_button{background-image:url(images/hidpi/close.png);background-size:16px}a.cke_dialog_close_button:hover{opacity:1;filter:alpha(opacity = 100)}a.cke_dialog_close_button span{display:none}.cke_hc a.cke_dialog_close_button span{display:inline;cursor:pointer;font-weight:bold;position:relative;top:3px}div.cke_disabled .cke_dialog_ui_labeled_content div *{background-color:#ddd;cursor:default}.cke_dialog_ui_vbox table,.cke_dialog_ui_hbox table{margin:auto}.cke_dialog_ui_vbox_child{padding:5px 0}.cke_dialog_ui_hbox{width:100%;margin-top:12px}.cke_dialog_ui_hbox_first,.cke_dialog_ui_hbox_child,.cke_dialog_ui_hbox_last{vertical-align:top}.cke_ltr .cke_dialog_ui_hbox_first,.cke_ltr .cke_dialog_ui_hbox_child{padding-right:10px}.cke_rtl .cke_dialog_ui_hbox_first,.cke_rtl .cke_dialog_ui_hbox_child{padding-left:10px}.cke_ltr .cke_dialog_footer_buttons .cke_dialog_ui_hbox_first,.cke_ltr .cke_dialog_footer_buttons .cke_dialog_ui_hbox_child{padding-right:5px}.cke_rtl .cke_dialog_footer_buttons .cke_dialog_ui_hbox_first,.cke_rtl .cke_dialog_footer_buttons .cke_dialog_ui_hbox_child{padding-left:5px;padding-right:0}.cke_hc div.cke_dialog_ui_input_text,.cke_hc div.cke_dialog_ui_input_password,.cke_hc div.cke_dialog_ui_input_textarea,.cke_hc div.cke_dialog_ui_input_select,.cke_hc div.cke_dialog_ui_input_file{border:1px solid}textarea.cke_dialog_ui_input_textarea{overflow:auto;resize:none}input.cke_dialog_ui_input_text,input.cke_dialog_ui_input_password,textarea.cke_dialog_ui_input_textarea{background-color:#fff;border:1px solid #bcbcbc;padding:4px 6px;outline:0;width:100%;*width:95%;box-sizing:border-box;border-radius:2px;min-height:28px;margin-left:1px}input.cke_dialog_ui_input_text:hover,input.cke_dialog_ui_input_password:hover,textarea.cke_dialog_ui_input_textarea:hover{border:1px solid #aeb3b9}input.cke_dialog_ui_input_text:focus,input.cke_dialog_ui_input_password:focus,textarea.cke_dialog_ui_input_textarea:focus,select.cke_dialog_ui_input_select:focus{outline:0;border:2px solid #139ff7}input.cke_dialog_ui_input_text:focus{padding-left:5px}textarea.cke_dialog_ui_input_textarea:focus{padding:3px 5px}select.cke_dialog_ui_input_select:focus{margin:0;width:100%!important}input.cke_dialog_ui_checkbox_input,input.cke_dialog_ui_radio_input{margin-left:1px;margin-right:2px}input.cke_dialog_ui_checkbox_input:focus,input.cke_dialog_ui_checkbox_input:active,input.cke_dialog_ui_radio_input:focus,input.cke_dialog_ui_radio_input:active{border:0;outline:2px solid #139ff7}a.cke_dialog_ui_button{display:inline-block;*display:inline;*zoom:1;padding:4px 1px;margin:0;text-align:center;color:#484848;vertical-align:middle;cursor:pointer;border:1px solid #bcbcbc;border-radius:2px;background:#f8f8f8;letter-spacing:.3px;line-height:18px;box-sizing:border-box}.cke_hc a.cke_dialog_ui_button{border-width:3px}span.cke_dialog_ui_button{padding:0 10px;cursor:pointer}a.cke_dialog_ui_button:hover{background:#fff}a.cke_dialog_ui_button:focus,a.cke_dialog_ui_button:active{border:2px solid #139ff7;outline:0;padding:3px 0}.cke_hc a.cke_dialog_ui_button:hover,.cke_hc a.cke_dialog_ui_button:focus,.cke_hc a.cke_dialog_ui_button:active{border:3px solid}.cke_dialog_footer_buttons a.cke_dialog_ui_button span{color:inherit;font-size:12px;font-weight:bold;padding:0 12px}a.cke_dialog_ui_button_ok{color:#fff;background:#09863e;border:1px solid #09863e}.cke_hc a.cke_dialog_ui_button{border:3px solid #bcbcbc}a.cke_dialog_ui_button_ok:hover{background:#53aa78;border-color:#53aa78}a.cke_dialog_ui_button_ok:focus{box-shadow:inset 0 0 0 2px #FFF}a.cke_dialog_ui_button_ok:focus,a.cke_dialog_ui_button_ok:active{border-color:#139ff7}.cke_hc a.cke_dialog_ui_button_ok:hover,.cke_hc a.cke_dialog_ui_button_ok:focus,.cke_hc a.cke_dialog_ui_button_ok:active{border-color:#484848}a.cke_dialog_ui_button_ok.cke_disabled{background:#d1d1d1;border-color:#d1d1d1;cursor:default}a.cke_dialog_ui_button_ok.cke_disabled span{cursor:default}.cke_dialog_footer_buttons{display:inline-table;margin:5px;width:auto;position:relative;vertical-align:middle}div.cke_dialog_ui_input_select{display:table}select.cke_dialog_ui_input_select{height:28px;line-height:28px;background-color:#fff;border:1px solid #bcbcbc;padding:3px 3px 3px 6px;outline:0;border-radius:2px;margin:0 1px;box-sizing:border-box;width:calc(100% - 2px)!important}.cke_dialog_ui_input_file{width:100%;height:25px}.cke_hc .cke_dialog_ui_labeled_content input:focus,.cke_hc .cke_dialog_ui_labeled_content select:focus,.cke_hc .cke_dialog_ui_labeled_content textarea:focus{outline:1px dotted}.cke_dialog_ui_labeled_label{margin-left:1px}.cke_dialog .cke_dark_background{background-color:transparent}.cke_dialog .cke_light_background{background-color:#ebebeb}.cke_dialog .cke_centered{text-align:center}.cke_dialog a.cke_btn_reset{float:right;background:url(images/refresh.png) top left no-repeat;width:16px;height:16px;border:1px none;font-size:1px}.cke_hidpi .cke_dialog a.cke_btn_reset{background-size:16px;background-image:url(images/hidpi/refresh.png)}.cke_rtl .cke_dialog a.cke_btn_reset{float:left}.cke_dialog a.cke_btn_locked,.cke_dialog a.cke_btn_unlocked{float:left;width:16px;height:16px;background-repeat:no-repeat;border:none 1px;font-size:1px}.cke_dialog a.cke_btn_locked,.cke_dialog a.cke_btn_unlocked,.cke_dialog a.cke_btn_reset{margin:2px}.cke_dialog a.cke_btn_locked{background-image:url(images/lock.png)}.cke_dialog a.cke_btn_unlocked{background-image:url(images/lock-open.png)}.cke_rtl .cke_dialog a.cke_btn_locked,.cke_rtl .cke_dialog a.cke_btn_unlocked{float:right}.cke_hidpi .cke_dialog a.cke_btn_unlocked,.cke_hidpi .cke_dialog a.cke_btn_locked{background-size:16px}.cke_hidpi .cke_dialog a.cke_btn_locked{background-image:url(images/hidpi/lock.png)}.cke_hidpi .cke_dialog a.cke_btn_unlocked{background-image:url(images/hidpi/lock-open.png)}.cke_dialog a.cke_btn_locked .cke_icon{display:none}.cke_dialog a.cke_btn_over,.cke_dialog a.cke_btn_locked:hover,.cke_dialog a.cke_btn_locked:focus,.cke_dialog a.cke_btn_locked:active,.cke_dialog a.cke_btn_unlocked:hover,.cke_dialog a.cke_btn_unlocked:focus,.cke_dialog a.cke_btn_unlocked:active,.cke_dialog a.cke_btn_reset:hover,.cke_dialog a.cke_btn_reset:focus,.cke_dialog a.cke_btn_reset:active{cursor:pointer;outline:0;margin:0;border:2px solid #139ff7}.cke_dialog fieldset{border:1px solid #bcbcbc}.cke_dialog fieldset legend{padding:0 6px}.cke_dialog_ui_checkbox,.cke_dialog fieldset .cke_dialog_ui_vbox .cke_dialog_ui_checkbox{display:inline-block}.cke_dialog fieldset .cke_dialog_ui_vbox .cke_dialog_ui_checkbox{padding-top:5px}.cke_dialog_ui_checkbox .cke_dialog_ui_checkbox_input,.cke_dialog_ui_checkbox .cke_dialog_ui_checkbox_input+label,.cke_dialog fieldset .cke_dialog_ui_vbox .cke_dialog_ui_checkbox .cke_dialog_ui_checkbox_input,.cke_dialog fieldset .cke_dialog_ui_vbox .cke_dialog_ui_checkbox .cke_dialog_ui_checkbox_input+label{vertical-align:middle}.cke_dialog .ImagePreviewBox{border:1px ridge #bcbcbc;overflow:scroll;height:200px;width:300px;padding:2px;background-color:white}.cke_dialog .ImagePreviewBox table td{white-space:normal}.cke_dialog .ImagePreviewLoader{position:absolute;white-space:normal;overflow:hidden;height:160px;width:230px;margin:2px;padding:2px;opacity:.9;filter:alpha(opacity = 90);background-color:#e4e4e4}.cke_dialog .FlashPreviewBox{white-space:normal;border:1px solid #bcbcbc;overflow:auto;height:160px;width:390px;padding:2px;background-color:white}.cke_dialog .cke_pastetext{width:346px;height:170px}.cke_dialog .cke_pastetext textarea{width:340px;height:170px;resize:none}.cke_dialog iframe.cke_pasteframe{width:346px;height:130px;background-color:white;border:1px solid #aeb3b9;border-radius:3px}.cke_dialog .cke_hand{cursor:pointer}.cke_disabled{color:#a0a0a0}.cke_dialog_body .cke_label{display:none}.cke_dialog_body label{display:inline;cursor:default;letter-spacing:.3px}.cke_dialog_body label+.cke_dialog_ui_labeled_content{margin-top:2px}.cke_dialog_contents_body .cke_dialog_ui_text,.cke_dialog_contents_body .cke_dialog_ui_select,.cke_dialog_contents_body .cke_dialog_ui_hbox_last>a.cke_dialog_ui_button{margin-top:4px}a.cke_smile{overflow:hidden;display:block;text-align:center;padding:.3em 0}a.cke_smile img{vertical-align:middle}a.cke_specialchar{cursor:inherit;display:block;height:1.25em;padding:.2em .3em;text-align:center}a.cke_smile,a.cke_specialchar{border:2px solid transparent}a.cke_smile:hover,a.cke_smile:focus,a.cke_smile:active,a.cke_specialchar:hover,a.cke_specialchar:focus,a.cke_specialchar:active{background:#fff;outline:0}a.cke_smile:hover,a.cke_specialchar:hover{border-color:#888}a.cke_smile:focus,a.cke_smile:active,a.cke_specialchar:focus,a.cke_specialchar:active{border-color:#139ff7}.cke_dialog_contents a.colorChooser{display:block;margin-top:6px;margin-left:10px;width:80px}.cke_rtl .cke_dialog_contents a.colorChooser{margin-right:10px}.cke_iframe_shim{display:block;position:absolute;top:0;left:0;z-index:-1;filter:alpha(opacity = 0);width:100%;height:100%}.cke_dialog_contents_body .cke_accessibility_legend{margin:2px 7px 2px 2px}.cke_dialog_contents_body .cke_accessibility_legend:focus,.cke_dialog_contents_body .cke_accessibility_legend:active{outline:0;border:2px solid #139ff7;margin:0 5px 0 0}.cke_dialog_contents_body input[type=file]:focus,.cke_dialog_contents_body input[type=file]:active{border:2px solid #139ff7}.cke_dialog_find_fieldset{margin-top:10px!important}.cke_dialog_image_ratiolock{margin-top:52px!important}.cke_dialog_forms_select_order label.cke_dialog_ui_labeled_label{margin-left:0}.cke_dialog_forms_select_order div.cke_dialog_ui_input_select{width:100%}.cke_dialog_forms_select_order_txtsize .cke_dialog_ui_hbox_last{padding-top:4px}.cke_dialog_image_url .cke_dialog_ui_hbox_last,.cke_dialog_flash_url .cke_dialog_ui_hbox_last{vertical-align:bottom}a.cke_dialog_ui_button.cke_dialog_image_browse{margin-top:10px}.cke_dialog_contents_body .cke_tpl_list{border:#bcbcbc 1px solid;margin:1px}.cke_dialog_contents_body .cke_tpl_list:focus,.cke_dialog_contents_body .cke_tpl_list:active{outline:0;margin:0;border:2px solid #139ff7}.cke_dialog_contents_body .cke_tpl_list a:focus,.cke_dialog_contents_body .cke_tpl_list a:active{outline:0}.cke_dialog_contents_body .cke_tpl_list a:focus .cke_tpl_item,.cke_dialog_contents_body .cke_tpl_list a:active .cke_tpl_item{border:2px solid #139ff7;padding:6px}"; });
 define('text!modules/facco/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <compose view=\"./components/viewRequestsTable.html\"></compose>\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
@@ -30011,12 +30991,13 @@ define('text!resources/editor/skins/moono-lisa/editor_ie8.css', ['module'], func
 define('text!resources/dialogs/confirm-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <div tabindex=\"-1\" role=\"dialog\">\n        <div class=\"modal-dialog\">\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <button type=\"button\" click.trigger=\"controller.cancel()\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                    <h4 class=\"modal-title\">${header}</h4>\n                </div>\n                <div class=\"modal-body\">\n                   ${message}?\n                </div>\n                <div class=\"modal-footer\">\n                    <button type=\"button\" class=\"btn btn-default\" click.trigger=\"controller.cancel()\">No!</button>\n                    <button type=\"button\" class=\"btn btn-danger\" click.trigger=\"controller.ok()\">Yes</button>\n                </div>\n            </div><!-- /.modal-content  -->\n        </div><!-- /.modal-dialog -->\n    </div><!-- /.modal -->\n</template>"; });
 define('text!resources/editor/skins/moono-lisa/editor_iequirks.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.cke_top,.cke_contents,.cke_bottom{width:100%}.cke_button_arrow{font-size:0}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_button,.cke_rtl .cke_button *,.cke_rtl .cke_combo,.cke_rtl .cke_combo *,.cke_rtl .cke_path_item,.cke_rtl .cke_path_item *,.cke_rtl .cke_path_empty{float:none}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_combo_button,.cke_rtl .cke_combo_button *,.cke_rtl .cke_button,.cke_rtl .cke_button_icon{display:inline-block;vertical-align:top}.cke_rtl .cke_button_icon{float:none}.cke_resizer{width:10px}.cke_source{white-space:normal}.cke_bottom{position:static}.cke_colorbox{font-size:0}"; });
 define('text!resources/dialogs/message-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ai-dialog style=\"max-width: 325px\">\n    <ai-dialog-header>${model.title}</ai-dialog-header>\n\n    <ai-dialog-body>\n      ${model.message}\n    </ai-dialog-body>\n\n    <ai-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ai-dialog-footer>\n  </ai-dialog>\n</template>"; });
+define('text!resources/dialogs/note-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ai-dialog style=\"max-width: 600px\">\n    <ai-dialog-header>${model.title}</ai-dialog-header>\n\n    <ai-dialog-body>\n\t\t<select class=\"form-control\" value.bind=\"model.selectedCategory\">\n\t\t\t<option repeat.for=\"option of model.note.noteCategories\" model.bind=\"$index\">${option}</option>\n\t\t</select>\n      \t<editor value.bind=\"model.note.noteBody\" height=\"250\"></editor>\n    </ai-dialog-body>\n\n    <ai-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ai-dialog-footer>\n  </ai-dialog>\n</template>"; });
 define('text!resources/editor/editor.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"summernote-host\" id.bind=\"editorId\" ref=\"editor\"></div>\n</template>"; });
 define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\n                      class=\"list-group-item\">${system.sid}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\n                    class=\"list-group-item\">${system.sid}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
 define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input disabled.bind=\"disabled\" type='text' class=\"form-control\" id=\"input-${controlid}\"/>\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
 define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
 define('text!resources/elements/multiselect.html', ['module'], function(module) { module.exports = "<template>\n\t<label>${label}</label><br/>\n\t<select value.bind=\"value\" multiple ref=\"select\" class=\"selectpicker\">\n    \t<option repeat.for=\"option of options\" value.bind=\"option.code\">${option.description}</option>\n  \t</select>\n</template>"; });
-define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a click.trigger=\"enterNote()\" href=\"#\">Note</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
 define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
 define('text!resources/elements/rate-it.html', ['module'], function(module) { module.exports = "<template>\n    <fieldset class=\"rating\">\n\t\t<span repeat.for=\"rate of rates\" >\n\t\t\t<input  type=\"radio\" name=\"${rate.name}\" id=\"${rate.id}\" title=\"${rate.title}\" />\n\t\t\t<label click.delegate=\"rateIt(rate.value, $index)\" class=\"${rate.class}\" for=\"${rate.title}\" title=\"${rate.title}\"></label>\n\t\t</span>\n    </fieldset>\n\n\t<!--\n\t<fieldset class=\"rating\">\n\t\t<input click.trigger=\"rateIt(5)\" id=\"star5\" type=\"radio\"  name=\"rating\" value=\"5\" /><label class=\"full\" for=\"star5\"\n\t\t\ttitle=\"Awesome - 5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4.5)\" type=\"radio\" id=\"star4half\" name=\"rating\" value=\"4 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star4half\" title=\"Pretty good - 4.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4)\" type=\"radio\" id=\"star4\" name=\"rating\" value=\"4\" /><label class=\"full\" for=\"star4\"\n\t\t\ttitle=\"Pretty good - 4 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3.5)\" type=\"radio\" id=\"star3half\" name=\"rating\" value=\"3 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star3half\" title=\"Meh - 3.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3)\" type=\"radio\" id=\"star3\" name=\"rating\" value=\"3\" /><label class=\"full\" for=\"star3\"\n\t\t\ttitle=\"Meh - 3 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2.5)\" type=\"radio\" id=\"star2half\" name=\"rating\" value=\"2 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star2half\" title=\"Kinda bad - 2.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2)\" type=\"radio\" id=\"star2\" name=\"rating\" value=\"2\" /><label class=\"full\" for=\"star2\"\n\t\t\ttitle=\"Kinda bad - 2 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1.5)\" type=\"radio\" id=\"star1half\" name=\"rating\" value=\"1 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star1half\" title=\"Meh - 1.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1)\" type=\"radio\" id=\"star1\" name=\"rating\" value=\"1\" /><label class=\"full\" for=\"star1\"\n\t\t\ttitle=\"Sucks big time - 1 star\"></label>\n\t\t<input click.trigger=\"rateIt(.5)\" type=\"radio\" id=\"starhalf\" name=\"rating\" value=\"half\" /><label class=\"half\" for=\"starhalf\"\n\t\t\ttitle=\"Sucks big time - 0.5 stars\"></label>\n\t</fieldset>\n\t-->\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
@@ -30026,6 +31007,7 @@ define('text!modules/admin/customers/editInstitutions.html', ['module'], functio
 define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/test.html', ['module'], function(module) { module.exports = "<template>Test</template>"; });
 define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n        <div class=\"container-fluid\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Documents</a>\r\n            </div>\r\n    </nav>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
+define('text!modules/admin/notes/notes.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Notes</a>\n            </div>\n    </nav>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!noteSelected\">\n                <compose view=\"./components/notesTable.html\"></compose>\n            </div> \n            <div show.bind=\"noteSelected\" >\n                <compose view=\"./components/notesForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>"; });
 define('text!modules/admin/site/editConfig.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div  class=\"col-lg-12\">\n                <compose view=\"./components/configTable.html\"></compose>\n            </div> <!-- Table Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/editCurriculum.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!curriculumItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/curriculumTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"curriculumItemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/curriculumForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/site/editDownloads.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!downloadSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/downloadTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"downloadSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/downloadForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
@@ -30066,7 +31048,7 @@ define('text!modules/user/components/userHelpTickets.html', ['module'], function
 define('text!modules/user/requests/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Product Requests</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    <div class=\"topMargin leftMargin\" style=\"display: none;\" id=\"infoBox\"></div>\n    <div class=\"topMargin leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n    <!--\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n\n        <div class=\"topMargin\" style=\"display: none;\" id=\"infoBox\"></div>\n        <div class=\"topMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/user/requests/createRequests.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"fuelux/css/fuelux.min.css\"></require>\n<div class=\"row\">\n <span  show.bind=\"showLockMessage\" class=\"leftMargin bottomMargin\" >Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n</div>\n  <div class=\"fuelux col-md-7 blackText\">\n    <div class=\"wizard\" data-initialize=\"wizard\" id=\"myWizard\">\n      <div class=\"steps-container\">\n        <ul class=\"steps\">\n          <li data-step=\"1\"  data-target=\"#step1\" class=\"active\">\n            <span class=\"badge badge-info\">1</span>Step 1<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"2\" data-target=\"#step2\">\n            <span class=\"badge\">2</span>Step 2<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"3\" data-target=\"#step3\">\n            <span class=\"badge\">3</span>Step 3<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"4\" data-target=\"#step4\">\n            <span class=\"badge\">4</span>Step 4<span class=\"chevron\"></span>\n          </li>\n        </ul>\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn btn-default btn-prev btn-md\">\n           <span><i class=\"fa fa-chevron-left\" aria-hidden=\"true\"></i></span>Prev</button>\n        <button type=\"button\" class=\"btn btn-primary btn-next btn-md\" data-last=\"Complete\">Next\n          <span><i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i></span>\n        </button>\n      </div>\n      <div class=\"step-content\">\n\n        <div class=\"step-pane active\" id=\"step1\" data-step=\"1\">\n          <h3><strong>Step 1 </strong> - Course Information</h3>\n          <compose view=\"./components/client-request-step1.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step2\"  data-step=\"2\">\n          <h3><strong>Step 2 </strong> - Products</h3>\n\n          <compose view=\"./components/client-request-step2.html\"></compose>\n\n        </div>\n\n        <div class=\"step-pane\" id=\"step3\"  data-step=\"3\">\n          <h3><strong>Step 3 </strong> - Additional Comments</h3>\n          <compose view=\"./components/client-request-step3.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step4\"  data-step=\"4\">\n          <h3><strong>Step 4 </strong> - Requested Dates!</h3>\n          <compose view=\"./components/client-request-step4.html\"></compose>\n        </div>\n\n      </div>\n    </div>\n  </div>\n  <div class=\"topMargin col-lg-5 pull-right\" repeat.for=\"product of productInfo\" >\n    <div class=\"panel panel-default\" >\n      <div class=\"panel-heading\">${product.header}</div>\n        <div class=\"panel-body\" innerhtml.bind=\"product.info\"> \n          \n        </div>\n      </div>\n    </div>\n  </div>\n  \n\n\n</template>\n"; });
 define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n        </div>\n      </div> \n      \n</template>"; });
-define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n            <compose view='./components/Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n            <compose view='./components/Requests.html' show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\"></compose>\n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n           <!-- \n            <compose view='./components/Courses.html' show.bind=\"helpTickets.helpTicketTypesArray[helpTicketType].subtypes[selectedHelpTicketType].clientRequired\"></compose>\n         -->\n            <compose view='./components/Requests.html' show.bind=\"showRequests\"></compose>\n           \n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/user/support/currInfo.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-3\">\n\t\t<h4>Curriculum Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"category of curriculum.curriculumCatArray\"\n\t\t\t\t\tid=\"${category.name}\" class=\"list-group-item\">${category.name}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n\t<div class=\"col-lg-9\">\n\t\t<div show.bind=\"typeSelected != '' && !curriculumSelected\" style='padding:15px;'>\n\t\t\t<div class='row'>\n\t\t\t\t<div class='col-lg-12 bottomMargin'>\n\t\t\t\t\t<table id=\"newsTable\" class=\"table table-striped table-hover\">\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td colspan='4'>\n\t\t\t\t\t\t\t\t\t<compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th>Title </th>\n\t\t\t\t\t\t\t\t<th>Rating</th>\n\t\t\t\t\t\t\t\t<th>Rate It</th>\n\t\t\t\t\t\t\t\t<th>Products</th>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr repeat.for=\"curriculum of curriculumArray\">\n\t\t\t\t\t\t\t\t<td click.delegate=\"selectCurriculum(curriculum)\" data-title=\"Title\" class=\"col-lg-6\">${curriculum.title}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\">${curriculum.rating | formatDigits:2}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\" class=\"col-lg-2\">\n\t\t\t\t\t\t\t\t\t<rate-it id=\"${curriculum._id}\" change.delegate=\"rateCurriculum($event)\" rating.two-way=\"curriculum.rating\" raters.bind=\"curriculum.raters\"></rate-it>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Products\" class=\"col-lg-4\">\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<li repeat.for=\"product of curriculum.products\" class=\"list-group-item\">${product | productName:products.productsArray}</li>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t</table>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div show.bind=\"curriculumSelected\">\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"add()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Add Comment\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"panel panel-default leftMargin rightMargin\">\n\t\t\t\t <div class=\"panel-heading\">\n\t\t\t\t\t<h3 class=\"panel-title\">${curriculum.selectedCurriculum.title}</h3>\n\t\t\t\t</div>\n\t\t\t\t\t<div show.bind=\"curriculum.selectedCurriculum.description.length > 0\" class=\"panel-body\" innerhtml.bind=\"curriculum.selectedCurriculum.description\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"addComment\">\n\t\t\t\t<h3>Comments are not anonymous</h3>\n\t\t\t\t <editor value.bind=\"comment\" height=\"250\"></editor>\n\t\t\t</div>\n\t\t\t<div class=\"well well-sm topMargin leftMargin rightMargin\" show.bind=\"curriculum.selectedCurriculum.customerComments.length > 0\">\n\t\t\t\t<!-- Timeline Content -->\n\t\t\t\t<div class=\"smart-timeline\">\n\t\t\t\t\t<ul class=\"smart-timeline-list\">\n\t\t\t\t\t\t<li  repeat.for=\"comment of curriculum.selectedCurriculum.customerComments\">\n\t\t\t\t\t\t\t<compose view=\"./components/comment.html\"></compose>\n\t\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n</template>"; });
 define('text!modules/user/support/downloads.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n          <div class=\"col-lg-3\">\n\t\t<h4>Curriculum Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($event, $index)\" type=\"button\" repeat.for=\"type of downloads.appCatsArray\" id=\"${type.downCatcode}\"\n\t\t\t\t\tclass=\"list-group-item\">${type.description}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n       \n\n        <div show.bind=\"typeSelected != ''\" class=\"col-lg-9\" style='padding:15px;'>\n            <div class='row'>\n                <div class='col-lg-12 bottomMargin'>\n                    <table id=\"newsTable\" class=\"table table-striped table-hover\">\n                        <thead>\n                            <tr>\n                                <td colspan='3'>\n                                    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th >Name </th>\n                                <th>File</th>\n                                <th >Decription</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"name\" class=\"col-md-2\">${item.name}</td>\n                                <td data-title=\"originalFilename\" class=\"col-md-2\">\n                                    <a href=\"${config.DOWNLOAD_FILE_DOWNLOAD_URL}/${typeSelected}/${item.file.originalFilename}\" target=\"_blank\">${item.file.originalFilename}</a>\n                                </td>\n                                <td data-title=\"description\" class=\"col-md-8\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n   </div>\n</template>"; });
 define('text!modules/user/support/support.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div>\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Support</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </div>\n    </nav>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
@@ -30089,6 +31071,8 @@ define('text!modules/admin/customers/components/peopleTable.html', ['module'], f
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
 define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\"  value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                        <div id=\"editFiles\"></div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n\t\t\t\t\t\t\t<a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\"\n                                aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\t\t\t<div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\">\n                    <div class=\"panel-body\">\n                        <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n                            <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"col-sm-12 col-lg-12\">\n                                <div class=\"form-group\">\n                                    <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                                    <div class=\"col-sm-8\">\n                                        <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\"\n                                            type=\"text\" />\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\t\t\t <div class=\"col-lg-8  col-lg-offset-2\">\n\t\t\t \t<editor value.bind=\"people.selectedNote.note\" height=\"250\"></editor>\n\t\t\t </div>\n\t\t</form>\n\t</div>\t\n</template>"; });
+define('text!modules/admin/notes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Category <span click.trigger=\"dataTable.sortArray('title')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Note <span click.trigger=\"dataTable.sortArray('expiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                   <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"\"></option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n\t\t\t\t\t\t\t\t\t</select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"dateCreated\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"note\" type=\"text\" placeholder=\"Filter note\" class=\"form-control\"\n                                    />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Category\">${item.category}</td>\n                                <td data-title=\"Date Created\" style=\"width: 75px\">\n                                    <div>${item.dateCreated | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td data-title=\"Type\">${item.note}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/configForm.html', ['module'], function(module) { module.exports = "<template>\n\t\n</template>"; });
 define('text!modules/admin/site/components/configTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>   \n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:200px;\">Parameter <span click.trigger=\"dataTable.sortArray('parameter')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:300px;\">Description</th>\n                                <th style=\"width:100px;\">Value</th>\n\t\t\t\t\t\t\t\t<th style=\"width:200px;\">Date Modified</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"parameter\" type=\"text\" placeholder=\"Filter Parameter\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Parameter\">${item.parameter}</td>\n                                <td data-title=\"Description\">${item.description}</td>\n                                <td data-title=\"Value\"><input readonly.bind=\"item.readOnly\" value.bind=\"item.value\" id=\"editValue\" class=\"form-control\" type=\"text\" /></td>\n                                <td data-title=\"Modified Date\"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/curriculumForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"!newItem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Category</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"curriculum.selectedCurriculum.category\" class=\"form-control\" id=\"itemType\">\n\t\t\t\t\t\t\t\t<option value=\"\">--- Choose a Category ---</option>\n                                <option value=\"${category.name}\" repeat.for=\"category of curriculum.curriculumCatArray\">${category.name}</optionp>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"curriculum.selectedCurriculum.category == ''\" click.trigger=\"openEditCatForm('edit')\"\n                                aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div show.bind=\"showCategoryForm\" class=\"row\">\n                <div class=\"panel panel-default\">\n                    <div class=\"panel-body\">\n                        <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n                            <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"col-sm-12 col-lg-12\">\n                                <div class=\"form-group\">\n                                    <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                                    <div class=\"col-sm-8\">\n                                        <input value.bind=\"curriculum.selectedCurriculumCategory.name\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Name\"\n                                            type=\"text\" />\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"col-sm-12 col-lg-12\">\n                                <div class=\"form-group\">\n                                    <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                                    <div class=\"col-sm-8\">\n                                        <tiny-mce height.bind=\"150\" value.two-way=\"categoryDescription\"></tiny-mce>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"curriculum.selectedCurriculum.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\"\n                            />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                        <div class=\"col-sm-8\">\n                            <editor value.bind=\"curriculum.selectedCurriculum.description\" height=\"250\"></editor>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-md-12\">\n                <div class=\"col-md-5 topMargin\">\n                    <label>Available Products</label>\n                    <div class=\"well well2 overFlow\" style=\"height:400px;\">\n                        <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\" />\n                        <ul class=\"list-group\">\n                            <button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                                class=\"list-group-item\">${product.name}</button>\n                        </ul>\n                    </div>\n                </div>\n                <div class=\"col-md-5 col-md-offset-1 topMargin\">\n                    <label id=\"requestProductsLabel\">Requested Products</label>\n                    <div class=\"well well2 overflow\" style=\"height:400px;\">\n                        <ul class=\"list-group\">\n                            <button click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of curriculum.selectedCurriculum.products\"\n                                id=\"${product}\" class=\"list-group-item\">${product | productName:products.productsArray}</button>\n                        </ul>\n                    </div>\n                </div>\n            </div>\n        </form>\n\n    </div>\n</template>"; });
@@ -30119,10 +31103,11 @@ define('text!modules/tech/requests/components/requestsTable.html', ['module'], f
 define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerAction()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"row\">\n        <div class=\"col-lg-2\">\n          <h3>Request No: ${requests.selectedRequestDetail.requestNo}</h3>\n        </div>\n        <div class=\"col-lg-10\">\n          <span show.bind=\"facultyDetails\">\n            <div class=\"row\">\n              <div class=\"col-lg-3\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-4\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-lg-3\">\n                <h5>Phone: ${people.selectedPerson.phone}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Mobile: ${people.selectedPerson.mobile}</h5>\n              </div>\n            </div>\n          </span>\n          <div class=\"row\">\n            <div class=\"col-lg-3\">\n                <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n              </div>\n            <div class=\"col-lg-5\">\n                <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n            </div>\n          </div>\n\n          <div class=\"row\">\n            <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n            </div>\n             <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n            </div>\n             <div class=\"col-lg-3 topMargin\">\n                <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n            </div>\n          </div>\n      </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin rightMargin\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default col-lg-12 leftMargin\">\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"form-group col-lg-2\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-2\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n          <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-2x fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-2x fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n      </div>\n    </div>\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th class=\"col-sm-1\">System</th>\n          <th class=\"col-sm-1\">Client</th>\n          <th class=\"col-sm-1\">Assigned IDs</th>\n          <th>Student IDs</th>\n          <th>Student Password</th>\n          <th>Faculty IDs</th>\n          <th>Faculty Password</th>\n          <th>Assigned Date</th>\n          <th>Status</th>\n          <th></th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n          <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n          <td>${client.client}</td>\n          <td>${client.idsAssigned}</td>\n          <td>${client.studentUserIds}</td>\n          <td>${client.studentPassword}</td>\n          <td>${client.facultyUserIds}</td>\n          <td>${client.facultyPassword}</td>\n          <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${client.notValid | overlap}\n          <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12\">\n                    <div class=\"panel-body\">\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control input-lg\"/>\n                        </div>\n                    </div>\n                    <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-2x\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-2x\" aria-hidden=\"true\"></i></span>\n                    </div>\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <textarea innerhtml.bind=\"requests.selectedRequestDetail.techComments\" class=\"form-control\" rows=\"10\"></textarea>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <textarea readonly class=\"topMargin form-control\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" rows=\"10\"></textarea>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n          \n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
 define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n          <!--\n          <div class=\"col-lg-6\">\n             Request Details\n            <compose view=\"./requestDetails.html\"></compose>\n          </div>\n          -->\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/tech/support/components/-time.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
-define('text!modules/tech/support/components/1-time.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n    </div>\n    <div class=\"smart-timeline-time\">\n        <small>${event.dateEntered | dateFormat:'YYYY-MM-DD':true}</small>\n        <p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n        <span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span>\n    </div>\n    <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n        <p>${event.personId | person:people.peopleArray:\"fullName\"}</p>\n        <label>Curriculum Title: ${event.content.curriculumTitle}</label>\n        <label class=\"col-sm-offset-1\">Exercise Module: ${event.content.exerciseModule}</label>\n        <label class=\"col-sm-offset-1\">Page: ${event.content.pageNumber}</label>\n        <label class=\"col-sm-offset-1\">User IDs: ${event.content.UserIDsaffected}</label>\n        <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n        </div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.referenceNo:'helpTickets'\"></a>\n      </div>\n    </div>\n\n    </div>\n</template>"; });
+define('text!modules/tech/support/components/13-time.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"form-group\">\n        <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n        <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <h3>Curriculum</h4>\n                <h4 class=\"col-sm-11 topMargin\">Curriculum Title: ${event.content.curriculumTitle}</h4>\n                <h4 class=\"col-sm-11 \">Exercise Module: ${event.content.exerciseModule}</h4>\n                <h4 class=\"col-sm-11 \">Page: ${event.content.pageNumber}</h4>\n                <h4 class=\"col-sm-11 \">User IDs: ${event.content.UserIDsaffected}</h4>\n            </div>\n            <div class=\"col-lg-4\">\n                <h3>Client Assignment</h4>\n                <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n                <h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n            </div>\n        </div>\n        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n      \n    </div>\n</template>"; });
 define('text!modules/tech/support/components/2-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.dateEntered | dateFormat:'YYYY-MM-DD':true}</small>\n     <p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n     <span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span>    \n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:\"fullName\"}</p>\n      <h4>User Ids: ${event.content.resetPasswordUserIDs}</h4>\n      <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comment.length > 0\" innerhtml.bind=\"event.content.comment\"></div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"hover_img\" repeat.for=\"file of event.files\">\n          <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n            target=\"_blank\"\n            innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.referenceNo:'helpTickets'\"></a>\n        </div>\n      </div>\n    </div>\n\n\n  </div>\n\n</template>\n"; });
 define('text!modules/tech/support/components/3-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n     <p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n     <span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span>    \n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:\"fullName\"}</p>\n      <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>\n      <div class=\"row\">\n        <div class=\"col-lg-4\" show.bind=\"event.content.osWindows || event.content.osMac\">\n          <h4>Operating System</h4>\n          <label show.bind=\"event.content.osWindows\">Windows versions: ${event.content.windowsVersion}</label>\n          <label show.bind=\"event.content.osWindows32bit\">32-bit</label>\n          <label show.bind=\"event.content.osWindows64bit\">64-bit</label>\n          <label show.bind=\"event.content.osMac\">Mac versions: ${event.content.macVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.officeInvolved\">\n          <h4>Microsoft Office</h4>\n          <label show.bind=\"event.content.officeVersion\">Office versions: ${event.content.officeVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.wiredNetwork || event.content.wirelessNetwork || event.content.campusNetwork || event.content.personalNetwork\">\n          <h4>Network</h4>\n          <label show.bind=\"event.content.wiredNetwork\">Wired</label>\n          <label show.bind=\"event.content.wirelessNetwork\">Wireless</label>\n          <label show.bind=\"event.content.campusNetwork\">Campus</label>\n          <label show.bind=\"event.content.personalNetwork\">Personal/Private Network</label>\n        </div>\n      </div>\n      <div class=\"row\">\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.referenceNo:'helpTickets'\"></a>\n      </div>\n    </div>\n   \n  </div>\n</template>"; });
 define('text!modules/tech/support/components/4-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n     <p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n     <span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:\"fullName\"}</p>\n\n      <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n  </div>\n</template>\n"; });
+define('text!modules/tech/support/components/5-time.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-4\">\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n\t\t\t<h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n\t\t</div>\n\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t</div>\n</template>"; });
 define('text!modules/tech/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"editACourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Course\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"sandBoxRow\" click.delegate=\"selectCourse('a1a1a1a1a1a1a1a1a1a1a1a1')\">\n                    <td>${config.SANDBOX_NAME}</td>\n                    <td>${config.SANDBOX_NAME}</td>\n                </tr>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"number\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"courseSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div> \n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/help-ticket-1.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\" col-md-12\" id=\"curriculumHelp\">\n    <div class=\"form-group\">\n      <!--        <label for=\"curriculumTitle\">Enter the curriculum title</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.curriculumTitle\" class=\"form-control \"\n             id=\"curriculumTitle\" placeholder=\"Curriculum Title\">\n    </div>\n    <div class=\"form-group\">\n      <!--         <label for=\"ExerciseModule\">Enter the specfic module</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.ExerciseModule\" class=\"form-control \"\n             id=\"ExerciseModule\" placeholder=\"Exercise/Module\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"PageNumber\">Enter the page number</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.PageNumber\" class=\"form-control \"\n             id=\"PageNumber\" placeholder=\"Page Number\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"UserIDsaffected\">Enter the user IDs affected</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.UserIDsaffected\" class=\"form-control \"\n             id=\"UserIDsaffected\" placeholder=\"User IDs affected\">\n    </div>\n  </div>\n</template>"; });
@@ -30135,9 +31120,9 @@ define('text!modules/tech/support/components/Requests.html', ['module'], functio
 define('text!modules/tech/support/components/searchHTForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"bottomMargin list-group-item  leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"search()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Search\"><i class=\"fa fa-search fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span  click.delegate=\"clearCriteria()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \n\t\t\t\t\ttitle=\"\" data-original-title=\"Clear Criteria\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-3 col-lg-offset-1\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<label>Help Ticket Number</label>\n\t\t\t\t\t\t<input input.delegate=\"helpTicketNoEntered()\" class=\"form-control\" value.bind=\"helpTicketNo\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"elementsToOperateOn\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-lg-3 col-lg-offset-1\">\n\t\t\t\t\t<div class=\"panel panel-primary topMargin\">\n\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t<h5>Date Created</h5>\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12  topMargin\">\n\t\t\t\t\t\t\t\t\t<label>Date From</label>\n\t\t\t\t\t\t\t\t\t<date-picker value.two-way=\"dateFrom\" controlid=\"dateFrom\"></date-picker>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12  topMargin\">\n\t\t\t\t\t\t\t\t\t<label>Date To</label>\n\t\t\t\t\t\t\t\t\t<date-picker value.two-way=\"dateTo\" controlid=\"dateTo\"></date-picker>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-3  col-lg-offset-1\">\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-lg-8\">\n\t\t\t\t\t\t\t\t<label>KeyWords</label>\n\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"keyWords\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-lg-8\">\n\t\t\t\t\t\t\t\t<label>Content</label>\n\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"content\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t\t<multiselect label=\"Status\" options.bind=\"config.HELP_TICKET_STATUSES\" value.bind=\"selectedStatus\"></multiselect>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t\n\t\t\t</div>\n\t\t\t<div class=\"col-lg-9 col-lg-offset-1\">\n\t\t\t\t<div class=\"panel-group\" id=\"accordion\">\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseOne\">Search by Product</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseOne\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Products</label>\n\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\" />\n\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${product.name}</button>\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t\t\t<label id=\"requestProductsLabel\">Requested Products</label>\n\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of selectedProducts\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tid=\"${product}\" class=\"list-group-item\">${product | productName:products.productsArray}</button>\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseTwo\">Search by Customer</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseTwo\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t<label id=\"productList\">Available People</label>\n\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"peopleFilter\" input.trigger=\"filterPeopleList()\" placeholder=\"Filter people\" />\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectPerson($event)\" type=\"button\" repeat.for=\"person of filteredPersonArray\" id=\"${person._id}\"\n\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${person.fullName}</button>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t<label >Requested Person</label>\n\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removePerson($event)\" type=\"button\" repeat.for=\"person of selectedPeople\"\n\t\t\t\t\t\t\t\t\t\t\tid=\"${person}\" class=\"list-group-item\">${person | person:people.peopleArray:\"fullName\"}</button>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseThree\">Search by Institution</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseThree\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Institutions</label>\n\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"institutionsFilter\" input.trigger=\"filterInstitutionsList()\" placeholder=\"Filter institutions\" />\n\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectInstitution($event)\" type=\"button\" repeat.for=\"institution of filteredInstitutionArray\" id=\"${institution._id}\"\n\t\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${institution.name}</button>\n\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t\t<label >Requested Institution</label>\n\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeInstitution($event)\" type=\"button\" repeat.for=\"institution of selectedInstitutions\"\n\t\t\t\t\t\t\t\t\t\t\t\tid=\"${institution}\" class=\"list-group-item\">${institution | lookupValue:people.institutionsArray:\"_id\":\"name\"}</button>\n\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\t\t\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-lg-9 col-lg-offset-1\">\n\t\t\t\t\t<div class=\"panel panel-primary topMargin leftMargin rightMargin\">\n\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t\t\t\t<label>Type</label>\n\t\t\t\t\t\t\t\t\t\t<select change.delegate=\"typeChanged()\" value.bind=\"selectedType\" id=\"helpTicketPurpose\" class=\"form-control\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"-1\">Nothing selected</option>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option repeat.for=\"types of config.HELP_TICKET_TYPES\" value.bind=\"types.code\">${types.description}</option>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-8 topMargin\" show.bind=\"showAdditionalInfo\">\n\t\t\t\t\t\t\t\t<compose repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" show.bind=\"helpTicket.show\" view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\t\t\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/tech/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/support/components/viewHelpTicketTableFilters.html', ['module'], function(module) { module.exports = "<template \"containerless\">\n\t<th></th>\n              <th class=\"col-md-1\">\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\"\n                  class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\"\n                  class=\"form-control\" />\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\"\n                  class=\"form-control\" />\n              </th>\n              <th class=\"col-lg-1\">\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\n                    <option value=\"\"></option>\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                </select>\n              </th>\n</template>"; });
-define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"own()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${responseMessage}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\n\n          <div class=\"col-md-12 topMargin\">\n            <span  click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n           <div class=\"row\">\n               <div class=\"col-lg-1 topMargin\">\n                  <div class=\"checkbox \">\n                    <label>\n                      <input change.delegate=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\n                    </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-2 topMargin\">\n                  <div class=\"checkbox\">\n                    <label>\n                      <input disabled.bind=\"sendMailDisable\" change.bind=\"checkSendMail()\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </div>\n            </div>\n\n          <div class=\"col-md-12 topMargin\">\n            <div class=\"row\">\n                <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n              <p>&nbsp;</p>\n            </div>\n           \n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId| person:people.peopleArray:\"fullName\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>\n                  </div>\n                </div>\n               \n              </div>\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group col-lg-11\">\n                  <!--\n                    <span class=\"input-group-btn\">\n                        <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-file btn-fill\" placeholder=\"Change status\"\n                                click.delegate=\"updateStatus()\" type=\"button\">Save Status</button>\n                    </span>\n                    -->\n                    <label>Status</label>\n                    <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control\">\n                      <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\n                    </select>\n                  </div>\n                </div>\n\n                <!-- Add keywords -->\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group col-lg-11\">\n                    <!--\n                    <span class=\"input-group-btn\">\n                      <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-fill\" placeholder=\"Enter keywords\"\n                              click.delegate=\"updateKeywords()\" type=\"button\">Save Keywords</button>\n                    </span>\n                    -->\n                    <label>Keywords</label>\n                    <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control\">\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"well well-sm topMargin\">\n          <!-- Timeline Content -->\n          <div class=\"smart-timeline\">\n            <ul class=\"smart-timeline-list\">\n              <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':1:isUCC\">\n                <compose view=\"./${event.type}-time.html\"></compose>\n              </li>\n            </ul>\n          </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"own()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${lockMessage}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\n\n          <div class=\"col-md-12 topMargin\">\n            <span  click.delegate=\"saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span  click.delegate=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span  click.delegate=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n           <div class=\"row\">\n               <div class=\"col-lg-1 topMargin\">\n                  <div class=\"checkbox \">\n                    <label>\n                      <input change.delegate=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\n                    </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-2 topMargin\">\n                  <div class=\"checkbox\">\n                    <label>\n                      <input disabled.bind=\"sendMailDisable\" change.bind=\"checkSendMail()\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </div>\n            </div>\n\n          <div class=\"col-md-12 topMargin\">\n            <div class=\"row\">\n                <editor value.bind=\"responseMessage\" height=\"250\"></editor>\n              <p>&nbsp;</p>\n            </div>\n           \n          </div>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId| person:people.peopleArray:\"fullName\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>\n                  </div>\n                </div>\n               \n              </div>\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group col-lg-11\">\n                  <!--\n                    <span class=\"input-group-btn\">\n                        <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-file btn-fill\" placeholder=\"Change status\"\n                                click.delegate=\"updateStatus()\" type=\"button\">Save Status</button>\n                    </span>\n                    -->\n                    <label>Status</label>\n                    <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control\">\n                      <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\n                    </select>\n                  </div>\n                </div>\n\n                <!-- Add keywords -->\n                <div class=\"form-group col-lg-6\">\n                  <div class=\"input-group col-lg-11\">\n                    <!--\n                    <span class=\"input-group-btn\">\n                      <button disabled.bind=\"showLockMessage\" class=\"btn btn-primary btn-fill\" placeholder=\"Enter keywords\"\n                              click.delegate=\"updateKeywords()\" type=\"button\">Save Keywords</button>\n                    </span>\n                    -->\n                    <label>Keywords</label>\n                    <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control\">\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n        <div class=\"well well-sm topMargin\">\n          <!-- Timeline Content -->\n          <div class=\"smart-timeline\">\n            <ul class=\"smart-timeline-list\">\n              <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':1:isUCC\">\n                <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <compose view=\"./${event.type}-time.html\"></compose>\n                <div class=\"form-group\">\n                  <div class=\"hover_img\" repeat.for=\"file of event.files\">\n                    <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                      target=\"_blank\"\n                      innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n                  </div>\n                </div>\n              </div>\n              </li>\n            </ul>\n          </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"!searchResults\">\n    <div class=\"row\">\n        <div class=\"bottomMargin list-group-item\">\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div> \n    </div>\n\t<div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan='13'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n              </td>\n            </tr>\n            <tr>\n              <td colspan='13'>\n                <span click.delegate=\"refresh()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\" ref=\"ownerFilter\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nickNameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n            </tr>\n            <tr>\n              <th>\n                Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th class=\"col-lg-1\">\n                Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th>Institution</th>\n              <th>Email</th>\n              <th>Phone</th>\n              <th>Mobile</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket(helpTicket, $event)\">\n              <td style=\"width:6rem;\" data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td style=\"width:15rem;\" mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" \n                data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}\n                <td style=\"width:15rem;\" data-title=\"Owner\" >${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td>\n                <td style=\"width:5rem;\" data-title=\"Update\" click.trigger=\"ownHelpTicket(helpTicket)\"><span bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span></td>\n                <td data-title=\"Status\" >${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Modified Date\" >${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Customer\" >${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n                <td data-title=\"Nickname\" >${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Email\" >${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Phone\" >${helpTicket.personId | person:people.peopleArray:\"phone\" | formatPhone}</td>\n                 <td style=\"width:10rem;\" data-title=\"Phone\">${helpTicket.personId | person:people.peopleArray:\"mobile\" | formatPhone}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n\t</div>\n  </div>\n  <div class=\"row\" show.bind=\"searchResults\">\n    <compose view=\"./viewHTForm.html\"></compose>\n  </div>\n\t\n</template>"; });
-define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class='row'>\n      <div class='bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan='14'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n              </td>\n            </tr>\n            <tr>\n              <td colspan='14'>\n                <span click.delegate=\"refresh()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n               <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\" ref=\"ownerFilter\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nickNameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n                <!--\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\n                    <option value=\"\"></option>\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                </select>\n                -->\n              </th>\n            </tr>\n            <tr>\n              <th>\n                No <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th>\n                Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th>\n                Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th>\n                Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th>Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th>Institution</th>\n              <th>Email</th>\n              <th>Phone</th>\n              <th>Mobile</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n              <td style=\"width:4rem;\" data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td style=\"width:11rem;\" mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.delegate=\"selectHelpTicket($event, $index)\"\n                data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}\n              <td style=\"width:5rem;\" data-title=\"Update\">\n                    <span show.bind=\"helpTicket.owner[0].personId != userObj._id\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\n              </td>\n              <td style=\"width:12rem;\" data-title=\"Owner\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td>\n              <td style=\"width:2rem;\" data-title=\"Update\" click.trigger=\"changeToInProcess(helpTicket)\">\n                <span show.bind=\"helpTicket.helpTicketStatus == config.REVIEW_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"In Proces\"><i class=\"fa fa-truck fa-lg\" aria-hidden=\"true\"></i></span>\n              </td>\n              <td style=\"width:7rem;\" data-title=\"Status\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n              <td style=\"width:9rem;\" data-title=\"Created Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              <td style=\"width:9rem;\" data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              <td style=\"width:10rem;\" data-title=\"Customer\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Nickname\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Email\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Phone\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"phone\" | formatPhone}</td>\n                <td style=\"width:10rem;\" data-title=\"Phone\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"mobile\" | formatPhone}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n      <div class=\"row\" show.bind=\"helpTicketSelected\">\n        <compose view=\"./viewHTForm.html\"></compose>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class='row'>\n      <div class='bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan='14'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n              </td>\n            </tr>\n            <tr>\n              <td colspan='14'>\n                <span click.delegate=\"refresh()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n               <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\" ref=\"ownerFilter\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nickNameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n                <!--\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\n                    <option value=\"\"></option>\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                </select>\n                -->\n              </th>\n            </tr>\n            <tr>\n              <th>\n                No <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th>\n                Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th>\n                Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th>\n                Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th>Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th>Institution</th>\n              <th>Email</th>\n              <th>Phone</th>\n              <th>Mobile</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n              <td style=\"width:4rem;\" data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td style=\"width:11rem;\" mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.delegate=\"selectHelpTicket($event, $index)\"\n                data-title=\"type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\n              <td style=\"width:5rem;\" data-title=\"Update\">\n                    <span show.bind=\"helpTicket.owner[0].personId != userObj._id\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\n              </td>\n              <td style=\"width:12rem;\" data-title=\"Owner\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td>\n              <td style=\"width:2rem;\">\n                <div class=\"dropdown\">\n                  <span  class=\"dropbtn\" show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\"><i class=\"fa fa-hand-spock-o fa-lg\" aria-hidden=\"true\"></i>\n                  <div class=\"dropdown-content\">\n                    <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code)\" repeat.for=\"status of config.HELP_TICKET_STATUSES\">${status.description}</a>\n                  </div>\n                  </span>\n              </td>\n              <!--\n              <td style=\"width:2rem;\" data-title=\"Update\" click.trigger=\"changeToInProcess(helpTicket)\">\n                <span show.bind=\"helpTicket.helpTicketStatus == config.REVIEW_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"In Proces\"><i class=\"fa fa-truck fa-lg\" aria-hidden=\"true\"></i></span>\n              </td>\n              -->\n              <td style=\"width:7rem;\" data-title=\"Status\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n              <td style=\"width:9rem;\" data-title=\"Created Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              <td style=\"width:9rem;\" data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              <td style=\"width:10rem;\" data-title=\"Customer\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Nickname\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Email\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n              <td style=\"width:10rem;\" data-title=\"Phone\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"phone\" | formatPhone}</td>\n                <td style=\"width:10rem;\" data-title=\"Phone\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.personId | person:people.peopleArray:\"mobile\" | formatPhone}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n      <div class=\"row\" show.bind=\"helpTicketSelected\">\n        <compose view=\"./viewHTForm.html\"></compose>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
 define('text!modules/user/requests/components/client-request-step1.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Term Select -->\n  <div class=\"row\">\n    <div class=\"col-sm-12\">\n      <div class=\"form-group leftJustify\">\n        <select value.bind=\"sessionId\" class=\"form-control\" change.delegate=\"changeSession($event)\" id=\"session\">\n          <option value=\"-1\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n\n  <div class=\"row\">\n    <div show.bind=\"sessionSelected\" class=\"col-sm-12\">\n      <div class=\"form-group\">\n        <select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\n          <option value=\"-1\">Choose the Type of The Request</option>\n           <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\n           <option value=\"regularCourse\">Regular Course</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n  <compose show.bind=\"regularClient && sessionSelected\" view='./Courses.html'></compose>\n\n  <!-- Number of students -->\n  <div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected\">\n    <div class=\"col-sm-6\">\n      <div class=\"form-group topMargin\">\n        <div class=\"input-group\">\n          <div >\n            <label for=\"undergraduates\" class=\"leftJustify\">Number of Undergraduates</label>\n            <input readonly.bind=\"existingRequest\" id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\n                   class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\"/>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-sm-6\">\n      <div class=\"form-group topMargin\">\n        <div class=\"input-group\">\n          <div  class=\"form-group\">\n            <label for=\"graduates\" class=\"leftJustify\">Number of Graduates</label>\n            <input readonly.bind=\"existingRequest\" id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\n                   class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\"/>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Begin and End Date -->\n  <div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\n      <div class=\"col-lg-6\">\n        <div class=\"form-group topMargin\">\n           <label class=\"col-sm-2 form-control-label \">Start Date</label>\n           <date-picker disabled.bind=\"showLockMessage\" value.two-way=\"requests.selectedRequest.startDate\" changedate.delegate=\"changeBeginDate($event)\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\" controlid=\"startDate\"></date-picker>\n        </div>\n      </div>\n      <div class=\"col-lg-6\">\n        <div class=\"form-group topMargin\">\n          <label class=\"col-sm-2 form-control-label \">End Date</label>\n          <date-picker disabled.bind=\"showLockMessage\" value.two-way=\"requests.selectedRequest.endDate\"  startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\" controlid=\"endDate\"></date-picker>\n        </div>\n      </div>\n    </div>\n\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step2.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\"  >\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content}</div>\n    </div>\n    \n    <div class=\"col-md-12\" >\n      <div class=\"col-md-5 topMargin\">\n        <label id=\"productList\">Available Products</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    class=\"list-group-item\">${product.name}</button>\n          </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 col-md-offset-1 topMargin\">\n        <label id=\"requestProductsLabel\">Requested Products</label>\n        <div class=\"well well2 overflow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button  click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                    class=\"list-group-item\">${product.productId | productName:products.productsArray}</button>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step3.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('CLIENT_REQUESTS_COMMENTS').content}</div>\n    </div>\n    <div class=\"form-group col-md-12\">\n      <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n    </div>\n  </div>\n</template>"; });
@@ -30149,21 +31134,28 @@ define('text!modules/user/requests/components/requestsTable.html', ['module'], f
 define('text!modules/user/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-lg-7\">\n      \n      <!-- Session Select -->\n      <div class=\"row\">\n        <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      \n    \n        <!-- Course Select -->\n        <div show.bind=\"selectedSession != ''\">\n          <div class=\"form-group topMargin col-lg-5\">\n            <select value.bind=\"selectedCourse\" change.delegate=\"getRequests()\" id=\"course\"\n                    class=\"form-control\">\n              <option value=\"\">Select a course</option>\n              <option value.bind=\"config.SANDBOX_ID\">${config.SANDBOX_NAME}</option>\n              <option repeat.for=\"course of people.coursesArray\"\n                      value.bind=\"course._id\">${course.number} - ${course.name}</option>\n            </select>\n          </div>\n        </div>\n      </div>\n    \n      <div show.bind=\"showRequests\">\n        <!-- Request Table -->\n        <compose view=\"./requestsTable.html\"></compose>\n        <!-- Request Details -->\n        <compose view=\"./requestDetails.html\"></compose>\n      </div>\n  </div>\n  \n  <compose view=\"./requestDetailDetails.html\"></compose>\n \n</div>\n\n    \n</template>"; });
 define('text!modules/user/support/components/-time.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
-define('text!modules/user/support/components/1-time.html', ['module'], function(module) { module.exports = "<template>\n<!-- Curriculum Help -->\n    <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n    </div>\n    <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n    </div>\n    <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n        <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n        <label>Curriculum Title: ${event.content.curriculumTitle}</label>\n        <label class=\"col-sm-offset-1\">Exercise Module: ${event.content.exerciseModule}</label>\n        <label class=\"col-sm-offset-1\">Page: ${event.content.pageNumber}</label>\n        <label class=\"col-sm-offset-1\">User IDs: ${event.content.UserIDsaffected}</label>\n        <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n        </div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n    </div>\n\n    </div>\n</template>"; });
-define('text!modules/user/support/components/2-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <h4>User Ids: ${event.content.resetPasswordUserIDs}</h4>\n      <div class=\"form-group\">\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">System: ${client.sid}</label>\n        <label if.bind=\"client.status==='01'\" class=\"col-md-6\">Client: ${client.sid}</label>\n        <label if.bind=\"client.status==='02'\" class=\"col-md-6\">Client not assigned</label>\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"hover_img\" repeat.for=\"file of event.files\">\n          <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n            target=\"_blank\"\n            innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n        </div>\n      </div>\n    </div>\n\n\n  </div>\n\n</template>\n"; });
-define('text!modules/user/support/components/3-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>\n      <div class=\"row\">\n        <div class=\"col-lg-4\" show.bind=\"event.content.osWindows || event.content.osMac\">\n          <h4>Operating System</h4>\n          <label show.bind=\"event.content.osWindows\">Windows versions: ${event.content.windowsVersion}</label>\n          <label show.bind=\"event.content.osWindows32bit\">32-bit</label>\n          <label show.bind=\"event.content.osWindows64bit\">64-bit</label>\n          <label show.bind=\"event.content.osMac\">Mac versions: ${event.content.macVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.officeInvolved\">\n          <h4>Microsoft Office</h4>\n          <label show.bind=\"event.content.officeVersion\">Office versions: ${event.content.officeVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.wiredNetwork || event.content.wirelessNetwork || event.content.campusNetwork || event.content.personalNetwork\">\n          <h4>Network</h4>\n          <label show.bind=\"event.content.wiredNetwork\">Wired</label>\n          <label show.bind=\"event.content.wirelessNetwork\">Wireless</label>\n          <label show.bind=\"event.content.campusNetwork\">Campus</label>\n          <label show.bind=\"event.content.personalNetwork\">Personal/Private Network</label>\n        </div>\n      </div>\n      <div class=\"row\">\n        <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n      </div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n    </div>\n   \n  </div>\n</template>"; });
-define('text!modules/user/support/components/4-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n\n      <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HOST}/${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n  </div>\n</template>\n"; });
+define('text!modules/user/support/components/13-time.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"form-group\">\n        <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n        <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <h4 class=\"col-sm-11 col-sm-offset-1 topMargin\">Curriculum Title: ${event.content.curriculumTitle}</h4>\n                <h4 class=\"col-sm-11 col-sm-offset-1 \">Exercise Module: ${event.content.exerciseModule}</h4>\n                <h4 class=\"col-sm-11 col-sm-offset-1 \">Page: ${event.content.pageNumber}</h4>\n                <h4 class=\"col-sm-11 col-sm-offset-1 \">User IDs: ${event.content.UserIDsaffected}</h4>\n            </div>\n            <div class=\"col-lg-4\">\n                <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n                <h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n            </div>\n        </div>\n        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n      \n    </div>\n</template>"; });
+define('text!modules/user/support/components/2-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"form-group\">\n    <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n    <h4 class=\"topMargin\">User Ids: ${event.content.resetPasswordUserIDs}</h4>\n    <label show.bind=\"showRequestDetails\" class=\"topMargin\">System: ${systems.selectedSystem.sid}</label>\n    <label show.bind=\"showRequestDetails\" class=\"topMargin\">Client: ${systems.selectedClient.client}</label>\n    <label show.bind=\"!showRequestDetails\" class=\"topMargin\">Client not assigned</label>\n    <div class=\"topMargin\" if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n  </div>\n</template>\n"; });
+define('text!modules/user/support/components/5-time.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-4\">\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n\t\t\t<h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n\t\t</div>\n\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t</div>\n</template>"; });
+define('text!modules/user/support/components/6-time.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t</div>\n</template>"; });
+define('text!modules/user/support/components/7-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n    <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n\n      <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n    </div>\n    <div class=\"form-group\">\n      <div class=\"hover_img\" repeat.for=\"file of event.files\">\n        <a href=\"${config.HOST}/${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n           target=\"_blank\"\n           innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n      </div>\n  </div>\n</template>\n"; });
+define('text!modules/user/support/components/8-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>\n      <div class=\"row\">\n        <div class=\"col-lg-4\" show.bind=\"event.content.osWindows || event.content.osMac\">\n          <h4>Operating System</h4>\n          <label show.bind=\"event.content.osWindows\">Windows versions: ${event.content.windowsVersion}</label>\n          <label show.bind=\"event.content.osWindows32bit\">32-bit</label>\n          <label show.bind=\"event.content.osWindows64bit\">64-bit</label>\n          <label show.bind=\"event.content.osMac\">Mac versions: ${event.content.macVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.officeInvolved\">\n          <h4>Microsoft Office</h4>\n          <label show.bind=\"event.content.officeVersion\">Office versions: ${event.content.officeVersion}</label>\n        </div>\n        <div class=\"col-lg-4\" show.bind=\"event.content.wiredNetwork || event.content.wirelessNetwork || event.content.campusNetwork || event.content.personalNetwork\">\n          <h4>Network</h4>\n          <label show.bind=\"event.content.wiredNetwork\">Wired</label>\n          <label show.bind=\"event.content.wirelessNetwork\">Wireless</label>\n          <label show.bind=\"event.content.campusNetwork\">Campus</label>\n          <label show.bind=\"event.content.personalNetwork\">Personal/Private Network</label>\n        </div>\n      </div>\n       <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div>\n</template>"; });
 define('text!modules/user/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/user/support/components/comment.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"comment.authorEmail | gravatarUrl:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${comment.dateCreated | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n\t<div class=\"form-group\">\n     \t<div innerhtml.bind=\"comment.comment\"></div>\n    </div>\n</div>\n</template>"; });
-define('text!modules/user/support/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"editACourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"sandBoxRow\" click.delegate=\"selectCourse('a1a1a1a1a1a1a1a1a1a1a1a1')\">\n                    <td>${config.SANDBOX_NAME}</td>\n                    <td>${config.SANDBOX_NAME}</td>\n                </tr>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"number\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"courseSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div> \n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/user/support/components/help-ticket-1.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\" col-md-12\" id=\"curriculumHelp\">\n    <div class=\"form-group\">\n      <!--        <label for=\"curriculumTitle\">Enter the curriculum title</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.curriculumTitle\" class=\"form-control \"\n             id=\"curriculumTitle\" placeholder=\"Curriculum Title\">\n    </div>\n    <div class=\"form-group\">\n      <!--         <label for=\"ExerciseModule\">Enter the specfic module</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.ExerciseModule\" class=\"form-control \"\n             id=\"ExerciseModule\" placeholder=\"Exercise/Module\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"PageNumber\">Enter the page number</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.PageNumber\" class=\"form-control \"\n             id=\"PageNumber\" placeholder=\"Page Number\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"UserIDsaffected\">Enter the user IDs affected</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.UserIDsaffected\" class=\"form-control \"\n             id=\"UserIDsaffected\" placeholder=\"User IDs affected\">\n    </div>\n  </div>\n</template>"; });
+define('text!modules/user/support/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"sandBoxRow\" click.delegate=\"selectCourse('a1a1a1a1a1a1a1a1a1a1a1a1')\">\n                    <td>${config.SANDBOX_NAME}</td>\n                    <td>${config.SANDBOX_NAME}</td>\n                </tr>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"number\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n</template>"; });
+define('text!modules/user/support/components/help-ticket-13.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\" col-md-12\" id=\"curriculumHelp\">\n    <div class=\"form-group\">\n      <!--        <label for=\"curriculumTitle\">Enter the curriculum title</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.curriculumTitle\" class=\"form-control \"\n             id=\"curriculumTitle\" placeholder=\"Curriculum Title\">\n    </div>\n    <div class=\"form-group\">\n      <!--         <label for=\"ExerciseModule\">Enter the specfic module</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.ExerciseModule\" class=\"form-control \"\n             id=\"ExerciseModule\" placeholder=\"Exercise/Module\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"PageNumber\">Enter the page number</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.PageNumber\" class=\"form-control \"\n             id=\"PageNumber\" placeholder=\"Page Number\">\n    </div>\n    <div class=\"form-group\">\n      <!--        <label for=\"UserIDsaffected\">Enter the user IDs affected</label> -->\n      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicketContent.content.UserIDsaffected\" class=\"form-control \"\n             id=\"UserIDsaffected\" placeholder=\"User IDs affected\">\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/help-ticket-2.html', ['module'], function(module) { module.exports = "<template>\n   <div class=\"col-lg-12\" id=\"resetPassword\">\n    <label for=\"resetPasswordUserIDs\">You can enter a range of user IDs or a list separated by commas.</label>\n    <input id=\"resetPasswordUserIDs\" value.bind=\"helpTickets.selectedHelpTicketContent.content.resetPasswordUserIDs\" type=\"text\" class=\"form-control\" placeholder=\"User IDs\">\n  </div>\n</template>"; });
-define('text!modules/user/support/components/help-ticket-3.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\" col-md-12\" id=\"appHelp\">\n      <div class=\"row\">\n        <div class=\"topMargin\">\n          <label class=\"control-label\">Application</label>\n          <select value.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" id=\"application\" class=\"form-control\">\n            <option value=\"\">Select an application</option>\n            <option repeat.for=\"app of apps.appDownloadsArray\" \n                    value.bind=\"app._id\">${app.name}</option>\n          </select>\n        </div>\n      </div>\n      <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"row topMargin\">\n         <label class=\"control-label\">Describe the Operating System</label>\n         <div class=\"panel panel-default\">\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" type=\"checkbox\"> Windows\n                  </label>\n                  <input show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" value.bind=\"helpTickets.selectedHelpTicketContent.content.windowsVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Windows 8, 8.1, 10, etc.\" type=\"text\" />\n                  <div class=\"row\"  show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\">\n                    <div class=\"checkbox col-lg-6\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows32bit\" type=\"checkbox\"> 32-bit\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows64bit\" type=\"checkbox\"> 64-bit\n                      </label>\n                    </div>\n                </div>\n                </div>\n              </div>  \n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" type=\"checkbox\"> Mac OS\n                  </label>\n                  <input  show.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" value.bind=\"helpTickets.selectedHelpTicketContent.content.macVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Mac OS Versions\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n              \n            </div>\n          </div>\n        </div>\n        \n        <div class=\"row\">\n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Other Software Involved</label>\n              <div class=\"panel panel-default\">\n                <div class=\"panel-body\">\n                  <div class=\"row\">\n                    <div class=\"col-lg-6\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\" type=\"checkbox\"> Is Microsoft Office involved?\n                        </label>\n                        <input show.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\"  value.bind=\"helpTickets.selectedHelpTicketContent.content.officeVersion\" id=\"editJoinDate\" class=\"form-control\" placeholder=\"2007, 2010, 2013, etc.\" type=\"text\" />\n                      </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        \n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Describe the Network Connection</label>\n            <div class=\"panel panel-default\">\n              <div class=\"panel-body\">\n                <div class=\"row\">\n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wiredNetwork\" type=\"checkbox\"> Wired\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wirelessNetwork\" type=\"checkbox\"> Wireless\n                      </label>\n                    </div>\n                  </div>\n                  <div class=\"row\">  \n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.campusNetwork\" type=\"checkbox\"> Campus\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.personalNetwork\" type=\"checkbox\"> Personal/Private Network\n                      </label>\n                    </div>\n                  </div>\n                </div>\n                  \n              </div>\n            </div>\n        </div>\n      \n  </div>\n</template>"; });
-define('text!modules/user/support/components/help-ticket-4.html', ['module'], function(module) { module.exports = "<template>\n\n</template>"; });
-define('text!modules/user/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div> \n    \n     <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n                <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n                <p>&nbsp;</p>\n                <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n            </div>\n            <label>Use the control below to upload files other than images.  You can insert images directly into the editor.</label>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"form-group topMargin\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.sessionId\" change.delegate=\"sessionChanged($event)\" id=\"session\" class=\"form-control\">\n          <option value=\"\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n\n      <!-- Type Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.sessionId !== ''\" class=\"form-group\">\n        <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"typeChanged($event)\"\n                id=\"helpTicketPurpose\" class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of config.HELP_TICKET_TYPES\"\n                  value.bind=\"types.code\">${types.description}</option>\n        </select>\n      </div>\n\n      <div show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message !== undefined\">\n        <div  class=\"well well-sm\" innerhtml.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message\" ></div>\n      </div>\n</template>"; });
-define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div >\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, product)\">\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/user/support/components/help-ticket-5.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
+define('text!modules/user/support/components/help-ticket-6.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
+define('text!modules/user/support/components/help-ticket-7.html', ['module'], function(module) { module.exports = "<template>\n\n</template>"; });
+define('text!modules/user/support/components/help-ticket-8.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\" col-md-12\" id=\"appHelp\">\n      <div class=\"row\">\n        <div class=\"topMargin\">\n          <label class=\"control-label\">Application</label>\n          <select value.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" id=\"application\" class=\"form-control\">\n            <option value=\"\">Select an application</option>\n            <option repeat.for=\"app of apps.appDownloadsArray\" \n                    value.bind=\"app._id\">${app.name}</option>\n          </select>\n        </div>\n      </div>\n      <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"row topMargin\">\n         <label class=\"control-label\">Describe the Operating System</label>\n         <div class=\"panel panel-default\">\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input id=\"osWindowsUsed\" checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" type=\"checkbox\"> Windows\n                  </label>\n                  <input show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" value.bind=\"helpTickets.selectedHelpTicketContent.content.windowsVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Windows 8, 8.1, 10, etc.\" type=\"text\" />\n                  <div class=\"row\"  show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\">\n                    <div class=\"checkbox col-lg-6\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows32bit\" type=\"checkbox\"> 32-bit\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows64bit\" type=\"checkbox\"> 64-bit\n                      </label>\n                    </div>\n                </div>\n                </div>\n              </div>  \n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" type=\"checkbox\"> Mac OS\n                  </label>\n                  <input  show.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" value.bind=\"helpTickets.selectedHelpTicketContent.content.macVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Mac OS Versions\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n              \n            </div>\n          </div>\n        </div>\n        \n        <div class=\"row\">\n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Other Software Involved</label>\n              <div class=\"panel panel-default\">\n                <div class=\"panel-body\">\n                  <div class=\"row\">\n                    <div class=\"col-lg-6\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\" type=\"checkbox\"> Is Microsoft Office involved?\n                        </label>\n                        <input show.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\"  value.bind=\"helpTickets.selectedHelpTicketContent.content.officeVersion\" id=\"editJoinDate\" class=\"form-control\" placeholder=\"2007, 2010, 2013, etc.\" type=\"text\" />\n                      </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        \n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Describe the Network Connection</label>\n            <div class=\"panel panel-default\">\n              <div class=\"panel-body\">\n                <div class=\"row\">\n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wiredNetwork\" type=\"checkbox\"> Wired\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wirelessNetwork\" type=\"checkbox\"> Wireless\n                      </label>\n                    </div>\n                  </div>\n                  <div class=\"row\">  \n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.campusNetwork\" type=\"checkbox\"> Campus\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.personalNetwork\" type=\"checkbox\"> Personal/Private Network\n                      </label>\n                    </div>\n                  </div>\n                </div>\n                  \n              </div>\n            </div>\n        </div>\n      \n  </div>\n</template>"; });
+define('text!modules/user/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div> \n    \n     <div class=\"col-lg-12\">\n      \n        <compose if.bind=\"inputForm > -1\" view=\"./help-ticket-${inputForm}.html\"></compose>\n\n        <!-- Additional Information Panel -->\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n                <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n                <p>&nbsp;</p>\n                <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n\n   <!-- Category Select -->\n  <div class=\"form-group\">\n    <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketCategory\" change.delegate=\"categoryChanged()\" id=\"helpTicketCategory\" class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray\" \n                  model.bind=\"types.category\">${types.description}</option>\n        </select>\n  </div>\n\n   <!-- Type Select -->\n  <div class=\"form-group\">\n    <select show.bind=\"showTypes\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"typeChanged($event)\" id=\"helpTicketPurpose\"\n      class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes\"\n                  model.bind=\"types.type\">${types.description}</option>\n        </select>\n  </div>\n\n  <div show.bind=\"showHelpTicketDescription\">\n    <div class=\"well well-sm\" innerhtml.bind=\"helpTicketTypeMessage\"></div>\n  </div>\n  \n</template>"; });
+define('text!modules/user/support/components/inputForm.html', ['module'], function(module) { module.exports = "<template>\n\t${config.VIEW_FILE_DOWNLOAD_URL}\n\t${helpTickets.helpTicketTypesArray[helpTicketType].subtypes[0].inputForm}\n\t<!--\n\t<div innerhtml='http://localhost:5000/views/${helpTickets.helpTicketTypesArray[helpTicketType].subtypes[0].inputForm}'></div>\n\t-->\n\t\n</template>"; });
+define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div>\n        <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\n        <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Course</th>\n            <th>Session</th>\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, $index)\">\n              <td>${product.courseId | courseName:people.coursesArray}</td>\n              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"container\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>${responseMessage}</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n          </div>\n          <p>&nbsp;</p>\n\n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n              </span>\n              <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li  repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n            <compose view=\"./${event.type}-time.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
-define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class='row'>\n      <div class='bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                 <th></th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <!--   | pageFilter:dataTable.startRecord:dataTable.take -->\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</td>\n                <td style=\"width:2rem;\" data-title=\"Update\">\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\n                  <span click.trigger=\"openHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus == config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Reopen Help Ticket\"><i class=\"fa fa-folder-open fa-lg\" aria-hidden=\"true\"></i></span>\n                </td>  \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>              \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"container\">\n\n    <!-- Buttons -->\n     <div class=\"bottomMargin list-group-item\">\n        <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span>${responseMessage}</span>\n    </div>  \n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div> \n\n          <div class=\"col-lg-12 topMargin\" style=\"height:300px;padding:50px;\">\n            <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n          </div>\n          <p>&nbsp;</p>\n\n          \n          <div class=\"topMargin\">\n            <div class=\"input-group\">\n              \n                <span class=\"input-group-btn\">\n                  <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                    Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                  </span>\n                </span>\n                <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n            </div>\n          </div>\n           <label>Use the control above to upload files other than images.  You can insert images directly into the editor.</label>\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n        <div class=\"panel panel-default col-md-12\">\n\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n              <div class=\"form-group col-md-10\">\n                <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n              </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-6\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n    </div>\n\n    <div class=\"well well-sm topMargin\">\n      <!-- Timeline Content -->\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC\">\n              <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people.peopleArray:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <compose view=\"./${event.type}-time.html\"></compose>\n                <div class=\"form-group\">\n                  <div class=\"hover_img\" repeat.for=\"file of event.files\">\n                    <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                      target=\"_blank\"\n                      innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'\"></a>\n                  </div>\n                </div>\n              </div>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
+define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class='row'>\n      <div class='bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th></th>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                 <th>Owner</th>\n                <th></th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\n                <td style=\"width:12rem;\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td> \n                <td style=\"width:2rem;\" data-title=\"Update\">\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\n                  <span click.trigger=\"openHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus == config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Reopen Help Ticket\"><i class=\"fa fa-folder-open fa-lg\" aria-hidden=\"true\"></i></span>\n                </td>  \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>             \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/tech/support/components/99-time.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n\t\t\t<h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n\t\t</div>\n\t\t<div class=\"topMargin bottomMargin col-lg-8\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t</div>\n</template>"; });
+define('text!modules/user/support/components/99-time.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n\t\t\t<h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n\t\t\t<h4 show.bind=\"!showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n\t\t</div>\n\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t</div>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

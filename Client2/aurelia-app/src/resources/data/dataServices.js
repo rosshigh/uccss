@@ -223,6 +223,7 @@ export class DataServices {
     CHECK_NAME = 'people/checkName';
     SEND_MAIL = 'people/sendMail';
     PASSWORD_RESET = 'passwordReset';
+    NOTES_SERVICE = "notes";
     
     CURRICULUM_SERVICE = 'curriculum';
     CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
@@ -251,8 +252,9 @@ export class DataServices {
 
     // //Help Tickets
     HELP_TICKET_SERVICES = 'helpTickets';
-    HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID";
+    HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
     HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
+    HELP_TICKET_TYPES = "helpTicketsTypes";
 
     // //Downloads
     DOWNLOADS_SERVICE = "apps";

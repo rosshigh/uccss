@@ -38,6 +38,7 @@ var PersonSchema = new Schema({
   language: { type: String },
   POBox: { type: String },
   institutionId: { type: Schema.Types.ObjectId, required: true },
+  noteCategories: [{ type: String }],
 
   //Site Status
   roles: [{ type: String }],

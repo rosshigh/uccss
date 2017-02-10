@@ -3,7 +3,9 @@ import { Router } from "aurelia-router";
 import { DataTable } from '../../../resources/utils/dataTable';
 import { HelpTickets } from '../../../resources/data/helpTickets';
 import { Sessions } from '../../../resources/data/sessions';
+import { Systems } from '../../../resources/data/systems';
 import { Products } from '../../../resources/data/products';
+import { ClientRequests } from '../../../resources/data/clientRequests';
 import { Downloads } from '../../../resources/data/downloads';
 import { AppConfig } from '../../../config/appConfig';
 import { Utils } from '../../../resources/utils/utils';
@@ -15,7 +17,7 @@ import Validation from '../../../resources/utils/validation';
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Downloads, Products, CommonDialogs)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, ClientRequests, CommonDialogs)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
@@ -27,7 +29,7 @@ export class ViewHelpTickets {
   filterValues = new Array();
   lockObject = new Object();
 
-  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, apps, products, dialog) {
+  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -38,8 +40,10 @@ export class ViewHelpTickets {
     this.utils = utils;
     this.helpTickets = helpTickets;
     this.sessions = sessions;
+    this.systems = systems;
     this.apps = apps;
     this.products = products;
+    this.requests = requests;
     this.dialog = dialog;
   };
 
@@ -57,10 +61,12 @@ export class ViewHelpTickets {
 
   async activate() {
     let responses = await Promise.all([
+      this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'),
+      this.systems.getSystemsArray(),
       this.config.getConfig()
     ]);
     this.updateArray();
@@ -91,9 +97,7 @@ export class ViewHelpTickets {
     this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
 
-    if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-      await this.sytems.getSystem(this.helpTickets.content.content.systemId);
-    }
+    await this.getDetails();
 
     var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
     if(!response.error){
@@ -103,7 +107,7 @@ export class ViewHelpTickets {
             helpTicketId: this.helpTickets.selectedHelpTicket._id,
             personId: this.userObj._id
           });
-           this.responseMessage = "Click here to respond";
+          this.responseMessage = "Click here to respond";
           this.showLockMessage = false;
           this.lockObject = {}; 
       } else {
@@ -119,6 +123,24 @@ export class ViewHelpTickets {
     this.helpTicketSelected = true;
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
+  }
+
+  async getDetails(){
+    this.showRequestDetails = false;
+    // this.helpTickets.selectedHelpTicket.content[0].comments = this.helpTickets.selectedHelpTicket.content[0].comments ? this.helpTickets.selectedHelpTicket.content[0].comments : " ";
+    if(this.helpTickets.selectedHelpTicket.requestId){
+      // await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
+      if(this.helpTickets.selectedHelpTicket.systemId){
+        this.showRequestDetails = true;
+        for(var i = 0; i < this.systems.systemsArray.length; i++){
+          if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+            // this.systems.selectedSystemFromId(this.helpTickets.selectedHelpTicket.systemId);
+            this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
+            break;
+          }
+        }
+      }
+    }
   }
 
   getName(){
@@ -141,8 +163,9 @@ export class ViewHelpTickets {
     this.isUnchanged = true;
     this.enterResponse = false;
   }
-
+ 
   _createResponse() {
+    this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REPLIED_HELPTICKET_STATUS;
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;

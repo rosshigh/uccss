@@ -23,6 +23,7 @@ export default class {
                 { route: 'customers',       moduleId: './modules/admin/customers/customers',    name: 'customers',      settings: { auth: true, roles: [] }  },
                 { route: 'site',            moduleId: './modules/admin/site/site',              name: 'site',           settings: { auth: true, roles: [] } },
                 { route: 'documents',       moduleId: './modules/admin/documents/documents',    name: 'documents',      settings: { auth: true, roles: [] } },
+                { route: 'notes',           moduleId: './modules/admin/notes/notes',            name: 'notes',          settings: { auth: true, roles: [] } },
                 { route: 'logout',          moduleId: './modules/home/logout',                  name: 'logout',        settings: { auth: true, roles: [] } },
                 { route: 'facco',           moduleId: './modules/facco/facco',                  name: 'facco',          settings: { auth: true, roles: [] } },
                 { route: 'support',         moduleId: './modules/user/support/support',         name: 'support',        settings: { auth: true, roles: [] } },

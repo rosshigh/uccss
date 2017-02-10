@@ -86,12 +86,16 @@ export class EditProducts {
         this.products.selectProduct(this.editIndex);
          this.newProduct = false;
 
-        this.editSystemsString = "";
-        if(this.products.selectedProduct.systems){
-            for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
-                this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
-            }
-        }
+        // this.editSystemsString = "";
+        // if(this.products.selectedProduct.systems){
+        //     for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
+        //         this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
+        //     }
+        // } else {
+        //     this.products.selectedProduct.systems
+        // }
+
+        if(!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
 
         this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
 

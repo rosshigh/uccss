@@ -30,8 +30,27 @@ module.exports = function (app) {
       })
   });
 
+  router.get('/api/clientRequests/:id/:sessions', requireAuth, function(req, res, next){
+    logger.log('Get customers active clientRequests');
+     var activeSessions = req.params.sessions.split(":");
+
+    Model.find()
+      .where('personId').eq(req.params.id)
+      .where('sessionId').in(activeSessions)
+      .sort(req.query.order)
+      .populate('requestDetails')
+      .exec()
+      .then(object => {      
+        res.status(200).json(object);
+      })
+      .catch(err => {
+          return next(err);
+      })
+      
+  });
+
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
-    logger.log('Get clientRequest [%s]', req.params.id);
+    logger.log('Get clientRequest' + req.params.id, 'verbose');
     Model.findById(req.params.id, function(err, object){
       if (err) {
         return next(err);
@@ -222,6 +241,19 @@ module.exports = function (app) {
     var query = buildQuery(req.query, ClientRequestDetail.find());
     query.populate('requestId')
     query.exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.get('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
+    logger.log('Get clientRequests', 'verbose');
+    ClientRequestDetail.findById(req.params.id)
+      .populate('requestId')
+      .exec()
       .then(object => {
         res.status(200).json(object);
       })

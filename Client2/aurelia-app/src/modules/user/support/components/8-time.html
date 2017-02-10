@@ -1,12 +1,5 @@
 <template>
-  <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId | gravatarUrlId:people.peopleArray:100:1">
-
-  </div>
-  <div class="smart-timeline-time">
-    <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
-  </div>
-  <div class="smart-timeline-content borderTop leftJustify">
-    <div class="form-group">
+  <div class="form-group">
       <p>${event.personId | person:people.peopleArray:'fullName'}</p>
       <h4>Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>
       <div class="row">
@@ -29,17 +22,5 @@
           <label show.bind="event.content.personalNetwork">Personal/Private Network</label>
         </div>
       </div>
-      <div class="row">
-        <div class="topMargin" if.bind="event.content.comments.length > 0" innerhtml.bind="event.content.comments"></div>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="hover_img" repeat.for="file of event.files">
-        <a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
-           target="_blank"
-           innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'"></a>
-      </div>
-    </div>
-   
-  </div>
+       <div if.bind="event.content.comments.length > 0" innerhtml.bind="event.content.comments"></div>
 </template>

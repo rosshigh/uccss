@@ -1,8 +1,11 @@
 <template>
-      <div >
-        <table id="clientTable" class="table table-bordered table-responsive" style="background:white;">
+      <div>
+        <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
           <thead>
           <tr class="header">
+            <th>Course</th>
+            <th>Session</th>
             <th>Product</th>
             <th>System</th>
             <th>Client</th>
@@ -12,7 +15,9 @@
           <tbody>
             <tr id="${product.id}" productId="${product.productId}" 
                 repeat.for="product of clientRequestsArray"
-                click.trigger="requestChosen($event, product)">
+                click.trigger="requestChosen($event, $index)">
+              <td>${product.courseId | courseName:people.coursesArray}</td>
+              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>
               <td>${product.productId | productName:products.productsArray}</td>
               <td>${product.systemId | lookupSid:systems.systemsArray}</td>
               <td>${product.client}</td>

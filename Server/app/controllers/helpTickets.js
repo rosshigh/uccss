@@ -8,6 +8,7 @@ var express = require('express'),
     mkdirp = require('mkdirp'),
     passport = require('passport'),
     HelpTicketLock = mongoose.model('HelpTicketLock'),
+    HelpTicketTypes = mongoose.model('HelpTicketTypes'),
     logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
@@ -122,13 +123,14 @@ module.exports = function (app, config) {
     });
   });
 
-  router.put('/api/helpTickets/content/:id', requireAuth, function(req, res, next){
+  router.put('/api/helpTickets/content/:id/:status', requireAuth, function(req, res, next){
     logger.log('Update HelpTicket ' + req.body._id, 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {
         var content = new Content(req.body);
         result.content.push(content);
-        result.save(function ( err, result ){
+        result.helpTicketStatus = req.params.status;
+        result.save(function ( err, result ){ 
           if(err){
             return next(err);
           } else {         
@@ -138,14 +140,24 @@ module.exports = function (app, config) {
                 var mailObj = {
                     email: person.email,
                     context: {name: person.fullName, helpTicketNo: result.helpTicketNo}
-                  }             
-                  helpTicketUpdated(mailObj)
-                    .then(result => {
-                        res.status(200).json(content);
-                    })
-                    .catch(error => {
-                        return next(error);
-                    });      
+                  }       
+                  if(req.params.status == 6){
+                     helpTicketClosed(mailObj)
+                      .then(result => {
+                          res.status(200).json(content);
+                      })
+                      .catch(error => {
+                          return next(error);
+                      });  
+                  } else {
+                     helpTicketUpdated(mailObj)
+                      .then(result => {
+                          res.status(200).json(content);
+                      })
+                      .catch(error => {
+                          return next(error);
+                      });  
+                  }     
               })
               .catch(error => {
                 return next(error);
@@ -401,5 +413,42 @@ module.exports = function (app, config) {
             }
             sendMail(mailObj);
   })
+
+   router.get('/api/helpTicketsTypes', requireAuth, function(req, res, next){
+    logger.log('Get helpTicketypes','verbose');
+    var query = buildQuery(req.query, HelpTicketTypes.find())
+      query.exec()
+      .then(object => {
+        res.status(200).json(object);
+      })
+      .catch(error => {
+        return next(error);
+      })
+  });
+
+  router.post('/api/helpTicketsTypes', requireAuth, function(req, res, next){
+    logger.log('Create HelpTicketTypes', "verbose");
+    var helpTicketType =  new HelpTicketTypes(req.body);
+    helpTicketType.save( function ( err, object ){
+      if (err) {
+        return next(err);
+      } else {          
+          res.status(200).json(object);
+      }
+    });
+  });
+
+  router.put('/api/helpTicketsTypes', requireAuth, function(req, res, next){
+    logger.log('Update HelpTicket Type '+ req.body._id, 'verbose');
+
+    HelpTicketTypes.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(error => {
+        return next(error);
+      })
+  });
 
 };

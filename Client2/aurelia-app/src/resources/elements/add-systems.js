@@ -10,7 +10,7 @@ export class AddSystems{
   selectedproduct;
 
   @bindable
-  systemsarray;
+  systemsarray; 
 
   @bindable
   filteredsystemsarray;
@@ -23,7 +23,7 @@ export class AddSystems{
 
   constructor(data){
     this.data = data;
-     this.systemsArray = this.systemsarray;
+    //  this.systemsArray = this.systemsarray;
   }
 
   filterList(){

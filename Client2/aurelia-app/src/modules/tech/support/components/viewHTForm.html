@@ -11,7 +11,8 @@
           <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="respond()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Respond"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="own()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg fa-border" aria-hidden="true"></i></span>
-          <span class="pull-right">${responseMessage}</span>
+          <span click.delegate="flag()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Flag"><i class="fa fa-flag fa-lg fa-border" aria-hidden="true"></i></span>
+          <span class="pull-right">${lockMessage}</span>
       </div> 
     </div>
     
@@ -21,7 +22,9 @@
         <div show.bind="enterResponse" class="topMargin bottomMargin ">
 
           <div class="col-md-12 topMargin">
-            <span  click.delegate="saveResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Response"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+            <span  click.delegate="saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+            <span  click.delegate="saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Customer Action"><i class="fa fa-users fa-lg fa-border" aria-hidden="true"></i></span>
+            <span  click.delegate="saveResponse(config.CLOSED_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Close"><i class="fa fa-window-close-o fa-lg fa-border" aria-hidden="true"></i></span>
             <span  click.delegate="cancelResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
           </div>
            <div class="row">
@@ -43,7 +46,7 @@
 
           <div class="col-md-12 topMargin">
             <div class="row">
-                <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
+                <editor value.bind="responseMessage" height="250"></editor>
               <p>&nbsp;</p>
             </div>
            
@@ -147,7 +150,20 @@
           <div class="smart-timeline">
             <ul class="smart-timeline-list">
               <li  repeat.for="event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':1:isUCC">
+                <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId | gravatarUrlId:people.peopleArray:100:1"></div>
+              <div class="smart-timeline-time">
+                <small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
+              </div>
+              <div class="smart-timeline-content borderTop leftJustify">
                 <compose view="./${event.type}-time.html"></compose>
+                <div class="form-group">
+                  <div class="hover_img" repeat.for="file of event.files">
+                    <a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
+                      target="_blank"
+                      innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'"></a>
+                  </div>
+                </div>
+              </div>
               </li>
             </ul>
           </div>

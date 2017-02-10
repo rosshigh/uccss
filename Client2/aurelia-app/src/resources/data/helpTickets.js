@@ -118,8 +118,9 @@ export class HelpTickets {
         newHelpTicketContent.helpTicketId = "";
         newHelpTicketContent.files = new Array();
         newHelpTicketContent.confidential = false;
-        newHelpTicketContent.personId = "";
+        newHelpTicketContent.personId = ""; 
         newHelpTicketContent.content = {};
+        newHelpTicketContent.content.comments = "";
         this.selectedHelpTicketContent = newHelpTicketContent;
 
     }
@@ -167,11 +168,11 @@ export class HelpTickets {
         return response;
     }
 
-     async saveHelpTicket(email){
+     async saveHelpTicket(){
           if(!this.selectedHelpTicket){
             return;
         }
-        var url = email ? this.data.HELP_TICKET_SERVICES + '?email=1' : this.data.HELP_TICKET_SERVICES;
+        var url = this.data.HELP_TICKET_SERVICES;
 
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
@@ -197,7 +198,8 @@ export class HelpTickets {
 
     async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
-            var url = email ? this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id) + '?email=1' : this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id);
+            // var url = email ? this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id) + '?email=1' : this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id);
+            var url = this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);
@@ -345,6 +347,25 @@ export class HelpTickets {
 
          
          return resultArray;
+    }
+
+    async getHelpTicketTypes(options, refresh){
+         if (!this.helpTicketTypesArray || refresh) {
+           var url = this.data.HELP_TICKET_TYPES;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.helpTicketTypesArray = serverResponse;
+                } else {
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+        return this.helpTicketTypesArray;
     }
 
 }

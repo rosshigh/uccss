@@ -189,7 +189,6 @@ export class People {
         }
     }
 
-
     //Institutions
 	async getInstitutionsArray(options, refresh) {
         if (!this.institutionsArray || refresh) {
@@ -328,7 +327,7 @@ export class People {
         }
     }
 
-     selectCourse(index) {
+    selectCourse(index) {
         if (index === undefined) {
             this.selectedCourse = this.emptyCourse();
         } else {
@@ -375,7 +374,6 @@ export class People {
             }
             return serverResponse;
         }
-
     }
 
     isCourseDirty(){
@@ -395,6 +393,90 @@ export class People {
             this.selectedPerson = serverResponse;
         }
         return serverResponse;
+    }
+
+    async getNotesArray(options, refresh){
+        if (!this.notesArray || refresh) {
+            var url = this.data.NOTES_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.notesArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+        return this.peopleArray;
+    }
+
+    selectNote(index) {
+        if (index === undefined) {
+            this.selectedNote = this.emptyNote();
+        } else {
+            try {
+                this.selectedNote = this.utils.copyObject(this.notesArray[index]);
+                this.editNoteIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedNote = this.emptyNote();
+            }
+
+        }
+    }
+
+    emptyNote() {
+        var obj  = new Object();
+        obj.note = "";
+        obj.dateCreated = new Date();
+        obj.category = "";
+        return obj;
+    }
+
+    async saveNote(){
+        if(!this.selectedNote){
+            return;
+        }
+
+        if(!this.selectedNote._id){
+            let serverResponse = await this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
+            if (!serverResponse.error) {
+                if(this.notesArray){
+                     this.notesArray.push(this.selectedNote);
+                    this.editNoteIndex = this.notesArray.length - 1;
+                }
+            } else {
+                this.data.processError(response, "There was an error creating the note.");
+                }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "put");
+            if (!serverResponse.error) {
+                this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
+            } else {
+                this.data.processError(response, "There was an error updating the course.");
+            }
+            return serverResponse;
+        }
+    }
+
+    async deleteNote(){
+        if(!this.selectedNote){
+            return;
+        }
+
+        let serverResponse = await this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+        if (!serverResponse.error) {
+            this.notesArray.splice(this.editNoteIndex, 1);
+            this.editNoteIndex = - 1;
+        }
+        return serverResponse;
+
     }
 
 }

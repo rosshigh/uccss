@@ -2,6 +2,7 @@ var express = require('express'),
   	router = express.Router(),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
+    Note = mongoose.model('Note'),
     PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
     logger = require('../../config/logger'),
@@ -261,4 +262,51 @@ module.exports = function (app) {
 
   router.route('/api/users/login')
     .post(requireLogin, login);
+
+  router.get('/api/notes', requireAuth,  function(req, res, next){
+    logger.log('Get note','verbose');
+    var query = buildQuery(req.query, Note.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          res.status(200).json(object);
+        }
+      });
+  });
+
+  router.post('/api/notes', requireAuth, function(req, res, next){
+    logger.log('Create Note', 'verbose');
+    var note =  new Note(req.body);  
+      note.save(function ( err, object ){
+        if (err) {
+           return next(err);
+        } else {
+          res.status(200).json(object);
+        }
+      });
+  });
+
+  router.put('/api/notes', requireAuth, function(req, res, next){
+    logger.log('Update note ' + req.body._id, 'verbose');    
+    Note.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(person);
+      }
+    })
+  });
+
+  router.delete('/api/notes/:id', requireAuth, function(req, res, next){
+    logger.log('Delete note ' + req.params.id,'verbose');
+    Note.remove({ _id: req.params.id }, function(err, result){
+      if (err) {
+         return next(err);
+      } else {
+        res.status(200).json({msg: "Note Deleted"});
+      }
+    })
+  });
+
 };

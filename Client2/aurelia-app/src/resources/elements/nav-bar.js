@@ -5,16 +5,17 @@ import {Auth} from '../data/auth';
 import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import {AppConfig} from "../../config/appConfig";
+import { CommonDialogs } from '../dialogs/common-dialogs';
 
 
 // @inject(Router, AuthService, People, AppState, Utils, AppConfig, BindingEngine)
-@inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig)
+@inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig, CommonDialogs)
 export class NavBar {
 
     isAuthenticated = false;
     subscription = {};
 
-    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config){
+    constructor(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog){
         this.eventAggregator = eventAggregator;
         this.router = router;
         this.bindingEngine = bindingEngine;
@@ -22,6 +23,7 @@ export class NavBar {
         this.utils = utils;
         this.people = people;
         this.config = config;
+        this.dialog = dialog;
 
         this.isAuthenticated = this.auth.isAuthenticated();
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
@@ -99,6 +101,34 @@ export class NavBar {
             this.utils.showNotification("Please enter an email address");
         }
         
+    }
+
+    enterNote(){
+        var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
+         return this.dialog.showNote(
+                "Save Changes",
+                note,
+                ['Submit', 'Cancel']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.saveNote(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+    }
+
+    async saveNote(note){
+        this.people.selectNote();
+        this.people.selectedNote.personId = this.userObj._id;
+        this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+        this.people.selectedNote.note = note.note.noteBody;
+        let response = await this.people.saveNote();
+            if(!response.error){
+                this.utils.showNotification('The note was saved');
+            }
+        // console.log(note.note.noteBody);
+        // console.log(note.selectedCategory);
     }
 
 }

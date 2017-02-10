@@ -1,23 +1,26 @@
 <template>
-     <div class="form-group topMargin">
-        <select value.bind="helpTickets.selectedHelpTicket.sessionId" change.delegate="sessionChanged($event)" id="session" class="form-control">
-          <option value="">Select a session</option>
-          <option repeat.for="session of sessions.sessionsArray"
-                  value.bind="session._id">Session ${session.session} - ${session.year}</option>
-        </select>
-      </div>
 
-      <!-- Type Select -->
-      <div show.bind="helpTickets.selectedHelpTicket.sessionId !== ''" class="form-group">
-        <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="typeChanged($event)"
-                id="helpTicketPurpose" class="form-control">
+   <!-- Category Select -->
+  <div class="form-group">
+    <select value.bind="helpTickets.selectedHelpTicket.helpTicketCategory" change.delegate="categoryChanged()" id="helpTicketCategory" class="form-control">
           <option value="-1">Select the type of help ticket</option>
-          <option repeat.for="types of config.HELP_TICKET_TYPES"
-                  value.bind="types.code">${types.description}</option>
+          <option repeat.for="types of helpTickets.helpTicketTypesArray" 
+                  model.bind="types.category">${types.description}</option>
         </select>
-      </div>
+  </div>
 
-      <div show.bind="config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message !== undefined">
-        <div  class="well well-sm" innerhtml.bind="config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].message" ></div>
-      </div>
+   <!-- Type Select -->
+  <div class="form-group">
+    <select show.bind="showTypes" value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
+      class="form-control">
+          <option value="-1">Select the type of help ticket</option>
+          <option repeat.for="types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes"
+                  model.bind="types.type">${types.description}</option>
+        </select>
+  </div>
+
+  <div show.bind="showHelpTicketDescription">
+    <div class="well well-sm" innerhtml.bind="helpTicketTypeMessage"></div>
+  </div>
+  
 </template>

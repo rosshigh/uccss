@@ -14,7 +14,7 @@ export class Editor {
 		['color', ['color']],
 		['font', ['strikethrough', 'superscript', 'subscript']],
 		['layout', ['ul', 'ol', 'paragraph']],
-		['insert', ['picture', 'link', 'table', 'hello']],
+		['insert', [ 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen']]
 	];
 

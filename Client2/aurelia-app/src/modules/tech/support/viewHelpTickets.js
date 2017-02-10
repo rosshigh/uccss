@@ -3,6 +3,7 @@ import { Router } from "aurelia-router";
 import { DataTable } from '../../../resources/utils/dataTable';
 import { HelpTickets } from '../../../resources/data/helpTickets';
 import { Sessions } from '../../../resources/data/sessions';
+import { Systems } from '../../../resources/data/systems';
 import { Products } from '../../../resources/data/products';
 import { Downloads } from '../../../resources/data/downloads';
 import { AppConfig } from '../../../config/appConfig';
@@ -13,21 +14,22 @@ import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
   sendEmail = false;
   showLockMessage = false;
   sendMailDisable = false;
-  responseMessage = "";
+  lockMessage = "";
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
   commentShown = "";
+  responseMessage = "";
 
-  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, apps, products) {
+  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -38,8 +40,10 @@ export class ViewHelpTickets {
     this.utils = utils;
     this.helpTickets = helpTickets;
     this.sessions = sessions;
+    this.systems = systems;
     this.apps = apps;
     this.products = products;
+    this.dialog = dialog;
   };
 
   canActivate() {
@@ -52,11 +56,13 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async activate() {
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
+      this.helpTickets.getHelpTicketTypes('?order=category'),
+      this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('', true),
       this.people.getInstitutionsArray('?order=name'),
+      this.systems.getSystemsArray(),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -106,7 +112,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   async refresh() {
     this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lte|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
+    this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.spinnerHTML = "";
     this._cleanUpFilters()
@@ -122,10 +128,7 @@ export class ViewHelpTickets {
     this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
 
-    //If the help ticket has a systemId, retrieve the system from the server
-    if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-      await this.sytems.getSystem(this.helpTickets.content.content.systemId);
-    }
+     await this.getDetails();
 
     var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
     if (!response.error) {
@@ -135,17 +138,17 @@ export class ViewHelpTickets {
           helpTicketId: this.helpTickets.selectedHelpTicket._id,
           personId: this.userObj._id
         });
-        this.responseMessage = "";
+        this.lockMessage = "";
         this.showLockMessage = false;
         this.lockObject = { personId: this.userObj._id };
       } else {
         if (response[0].personId === this.userObj._id) {
           this.showLockMessage = false;
-          this.responseMessage = "";
+          this.lockMessage = "";
           this.lockObject = { personId: this.userObj._id };
         } else {
           this.lockObject = response[0];
-           this.responseMessage = "Help Ticket is currently locked by " + this.getName();
+           this.lockMessage = "Help Ticket is currently locked by " + this.getName();
           this.showLockMessage = true;
         }
       }
@@ -159,6 +162,24 @@ export class ViewHelpTickets {
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
   }
 
+  async getDetails(){
+    this.showRequestDetails = false;
+    // this.helpTickets.selectedHelpTicket.content[0].comments = this.helpTickets.selectedHelpTicket.content[0].comments ? this.helpTickets.selectedHelpTicket.content[0].comments : " ";
+    if(this.helpTickets.selectedHelpTicket.requestId){
+      // await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
+      if(this.helpTickets.selectedHelpTicket.systemId){
+        this.showRequestDetails = true;
+        for(var i = 0; i < this.systems.systemsArray.length; i++){
+          if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+            // this.systems.selectedSystemFromId(this.helpTickets.selectedHelpTicket.systemId);
+            this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
+            break;
+          }
+        }
+      }
+    }
+  } 
+
   getName(){
     for(var i = 0; i < this.people.peopleArray.length; i++){
       if(this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
@@ -167,10 +188,22 @@ export class ViewHelpTickets {
   }
 
   async save(){
-     this.helpTickets.selectHelpTicketByID(helpTicket._id);
+    var changes = this.helpTickets.isHelpTicketDirty();
+     if(changes && changes.length > 0){
+       changes.forEach(item => {
+         this.helpTickets.selectedHelpTicket.audit.push({
+           property: item.property,
+           oldValue: item.oldValue,
+           newValue: item.newValue,
+           eventDate: new  Date(),
+           personId: this.userObj._id
+         })
+       })
+     }
+
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
-        if (response.helpTicketId === 0) {
+        if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
           let serverResponse = await this.helpTickets.saveHelpTicket(false);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -186,6 +219,7 @@ export class ViewHelpTickets {
   *****************************************************************************************/
   respond() {
     if (!this.showLockMessage) {
+      this.responseMessage = "";
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
       this.enableButton = true;
@@ -205,13 +239,15 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+    this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
   }
 
   /*****************************************************************************************
   * Save the response
   *****************************************************************************************/
-  async saveResponse() {
+  async saveResponse(status) {
     // if(this.validation.validate(1)){
+    this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
     this._createResponse();
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
     if (!serverResponse.error) {
@@ -221,52 +257,6 @@ export class ViewHelpTickets {
     }
     this._cleanUp();
     // }
-  }
-
-  /*****************************************************************************************
-  * Update the helpticket status
-  *****************************************************************************************/
-  async updateStatus() {
-    // if(this.validation.validate(1, this)){
-    let serverResponse = await this.helpTickets.updateStatus();
-    if (!serverResponse.status) {
-      this.utils.showNotification("The help ticket was updated");
-    }
-    this._cleanUp();
-    // }
-  }
-
-  /*****************************************************************************************
-  * Update the help ticket keywords
-  *****************************************************************************************/
-  async updateKeywords() {
-    // if(this.validation.validate(1, this)){
-    let serverResponse = await this.helpTickets.updateKeywords();
-    if (!serverResponse.status) {
-      this.utils.showNotification("The help ticket was updated");
-    }
-    this._cleanUp();
-    // }
-  }
-
-  /*****************************************************************************************
-  * Update the help ticket ownder
-  *****************************************************************************************/
-  async own() {
-    if(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id){
-      if (!this.showLockMessage) {
-        var obj = {
-          personId: this.userObj._id,
-          status: this.helpTickets.selectedHelpTicket.helpTicketStatus
-        }
-        let serverResponse = await this.helpTickets.updateOwner(obj);
-        if (!serverResponse.error) {
-          this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
-          this.utils.showNotification("The help ticket was updated");
-        }
-        this._cleanUp();
-      }
-    }
   }
 
   async ownHelpTicket(helpTicket) {
@@ -290,13 +280,21 @@ export class ViewHelpTickets {
     }
   }
 
-  async changeToInProcess(helpTicket){
+  async changeStatus(helpTicket, status){
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
         if (response.helpTicketId === 0) {
-          this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.IN_PROCESS_HELPTICKET_STATUS;
-          let serverResponse = await this.helpTickets.updateStatus();
+          var obj = {
+            property: "helpTicketStatus",
+            oldValue: this.helpTickets.selectedHelpTicket.helpTicketStatus,
+            newValue: status,
+            personId: this.userObj._id,
+            date: new Date
+          }
+          this.helpTickets.selectedHelpTicket.audit.push(obj);
+          this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
+          let serverResponse = await this.helpTickets.saveHelpTicket();
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -318,16 +316,38 @@ export class ViewHelpTickets {
     this.enterResponse = false;
     this.files = new Array();
     this.filesSelected = "";
+    this.helpTicketSelected = false;
+    this._unLock();
   }
 
-  /*****************************************************************************************
-  * Retrieve a person's courses
-  *****************************************************************************************/
-  // async getCourses(){
-  //   let courseResponse = await this.data.getAllObjects(this.data.PERSON_COURSES + this.coursePerson);
-  //   this.courses = courseResponse;
-  // }
+  flag(){
 
+     var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
+         return this.dialog.showNote(
+                "Save Changes",
+                note,
+                ['Submit', 'Cancel']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.saveNote(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+    }
+
+    async saveNote(note){
+        this.people.selectNote();
+        this.people.selectedNote.personId = this.userObj._id;
+        this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+        this.people.selectedNote.note = note.note.noteBody;
+        this.people.selectedNote.reference = this.helpTickets.selectedHelpTicket._id;
+        let response = await this.people.saveNote();
+            if(!response.error){
+                this.utils.showNotification('The note was saved');
+            }
+    }
+    
   /*****************************************************************************************
   * COnstruct the string to display the files chosen
   *****************************************************************************************/
@@ -341,9 +361,22 @@ export class ViewHelpTickets {
   }
 
   back() {
-    this.helpTicketSelected = false;
-    this._cleanUp();
-    this._unLock();
+     var changes = this.helpTickets.isHelpTicketDirty();
+     if (this.helpTickets.isHelpTicketDirty().length) {
+            return this.dialog.showMessage(
+                "The help ticket has been changed. Do you want to save your changes?",
+                "Save Changes",
+                ['Yes', 'No']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.save();
+                } else {
+                    this._cleanUp();
+                }
+            });
+        } else {
+            this._cleanUp();
+        }
   }
 
   /*****************************************************************************************

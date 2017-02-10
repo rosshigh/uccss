@@ -6,7 +6,7 @@ var Mongoose = require('mongoose'),
 var helpTicketLockSchema = new Schema({
   helpTicketId: { type: Schema.Types.ObjectId },
   personId: { type: Schema.Types.ObjectId },
-  createdAt: { type: Date, expires: '1800s', default: Date.now }
+  createdAt: { type: Date, expires: '900s', default: Date.now }
 });
 
 module.exports = Mongoose.model('HelpTicketLock', helpTicketLockSchema);
@@ -33,11 +33,15 @@ var HelpTicketSchema = new Schema({
   modifiedDate: { type: Date, default: Date.now, required: true },
   sessionId: {type: Schema.Types.ObjectId },
   courseId: {type: Schema.Types.ObjectId },
-  helpTicketType: { type: String, required: true },
+  helpTicketType: { type: Number },
+  helpTicketCategory: { type: Number },
   helpTicketStatus: { type: Number, required: true },
   keyWords: { type: String },
   personId: { type: Schema.Types.ObjectId, ref: 'person' },
   institutionId: { type: Schema.Types.ObjectId },
+  requestId: { type: Schema.Types.ObjectId },
+  systemId: {type: Schema.Types.ObjectId },
+  clientId: {type: Schema.Types.ObjectId },
   content: [HelpTicketContentSchema],
   owner: [{
     personId: { type: Schema.Types.ObjectId },
@@ -46,6 +50,7 @@ var HelpTicketSchema = new Schema({
   audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },
+    newValue: { type: Schema.Types.Mixed },
     oldValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.ObjectId }
   }]

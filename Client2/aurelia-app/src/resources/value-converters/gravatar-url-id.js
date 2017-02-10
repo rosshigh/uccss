@@ -2,7 +2,7 @@ export class GravatarUrlIdValueConverter {
   toView(id, array, size, alt) {
     var email = "";
     if(id !== undefined && array !== undefined){
-      for(var i = 0; i<array.length-1; i++){
+      for(var i = 0; i<array.length; i++){
         if(id === array[i]._id) {
           email = array[i].email;
           break;
