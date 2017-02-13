@@ -7,14 +7,14 @@
     
      <div class="col-lg-12">
       
-        <compose if.bind="inputForm > -1" view="./help-ticket-${inputForm}.html"></compose>
+        <compose if.bind="inputForm" view="../../../../resources/htTimeline/help-ticket-${inputForm}.html"></compose>
 
         <!-- Additional Information Panel -->
         <div class="col-lg-12 topMargin" id="descriptionGroup">
             <div class="form-group">
                 <label for="descriptionID">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>
                 <p>&nbsp;</p>
-                <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
+                <editor id="comments" value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
             </div>
 
             <div class="panel panel-default">

@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export class DateFormatValueConverter {
   
-  toView(value, format, fromNow) {
+  toView(value, format ='MMM Do YYYY', fromNow) {
     if(value === undefined || value === null){
       return;
     }

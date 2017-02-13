@@ -81,6 +81,24 @@ export class Products {
         return newProduct;
     }
 
+    getProductInfo(id){
+        if(!id) return null;
+        for(var i = 0; i < this.productsArray.length; i++){
+            if(this.productsArray[i]._id === id){
+                if(this.productsArray[i].productInfo) {
+                    return {
+                                info: this.productsArray[i].productInfo,
+                                productId: id,
+                                header: this.productsArray[i].name
+                            }
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
     async saveProduct() {
         if(!this.selectedProduct){
             return;

@@ -169,6 +169,7 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
+    this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
   }
 
   async saveResponse() {

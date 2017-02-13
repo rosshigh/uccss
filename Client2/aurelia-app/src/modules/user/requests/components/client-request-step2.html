@@ -11,6 +11,7 @@
           <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products"/>
           <ul class="list-group">
             <button click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray" id="${product._id}"
+                    mouseover.delegate="showCurriculum(product, $event)" mouseout.delegate="hideCurriculum()"
                     class="list-group-item">${product.name}</button>
           </ul>
         </div>

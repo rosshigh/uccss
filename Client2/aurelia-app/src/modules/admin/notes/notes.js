@@ -1,16 +1,18 @@
 import {inject} from 'aurelia-framework';
+import { Router } from "aurelia-router";
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {People} from '../../../resources/data/people';
 import {Utils} from '../../../resources/utils/utils';
 
-@inject(DataTable, AppConfig, People, Utils)
+@inject(Router, DataTable, AppConfig, People, Utils)
 export class Notes{
 	noteSelected = false;
 	showCategoryForm = false;
 	spinnerHTML = "";
     
-    constructor(dataTable, config, people, utils){
+    constructor(router, dataTable, config, people, utils){
+		this.router = router;
 		this.dataTable = dataTable;
 		this.config = config;
 		this.people = people;
@@ -115,6 +117,10 @@ export class Notes{
 
 	async deleteCat(){
 
+	}
+
+	navigateToHelpTicket(note){
+		this.router.navigate("htNote/" + note.reference);
 	}
    
 }

@@ -70,14 +70,16 @@ export class ViewHelpTickets {
   }
 
   async getRequests(){
+    await this._unLock();
     if( this.sessionId != -1 &&  this.courseId != -1  ){
-        // this._unLock();
+        this.ILockedIt = false;
         this.existingRequest = false;
         await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
             await this._lock();
+            this.ILockedIt = true;
             this.existingRequest = true;
             this.updateMessages(false);
         } else{
@@ -125,20 +127,16 @@ export class ViewHelpTickets {
    * el - event object
    ******************************************************************/
   async changeSession(el){
-    if(!this.sessionId ){
+    if(!this.sessionId){
       //Drop down list changed to no session selected
       this.sessionSelected = false;
     } else {
+        this._unLock();
         this.sessionSelected = true;
         //Select a session
         this.sessions.selectSession(el.target.selectedIndex - 1);
-        //Format the dates for the date pickers
-        // this.utils.formatDateForDatesPicker(this.sessions.selectedSession);
-
         this.setDates();
-
         this.validation.makeValid( $(el.target));
-
         this.updateMessages(false);
         await this.getRequests();
     }
@@ -159,7 +157,7 @@ export class ViewHelpTickets {
 
   }
 
-  changeCourse(el){
+  async changeCourse(el){
     var courseId = el.target.options[el.target.selectedIndex].value;
     this.selectedCourseIndex = el.target.selectedIndex;
     if(courseId === ""){
@@ -168,7 +166,7 @@ export class ViewHelpTickets {
       this.courseSelected = true;
       this.courseName = this.courses[el.target.selectedIndex - 1].number + " - " + this.courses[el.target.selectedIndex - 1].name;
       this.validation.makeValid( $(el.target));
-      this.getClients();
+      await this.getRequests();
     }
   }
 
@@ -197,17 +195,18 @@ export class ViewHelpTickets {
   async changeRequestType(el){
     switch(el.target.value){
       case 'sandboxCourse':
-        this.courseSelected = false;
-        this.sandBoxClient = true;
-        this.regularClient = false;
-        this.courseId = this.config.SANDBOX_ID;
-        await this.getRequests();
-         this.validation.makeValid( $(el.target));
-        break;
+          this.courseSelected = false;
+          this.sandBoxClient = true;
+          this.regularClient = false;
+          this.courseId = this.config.SANDBOX_ID;
+          await this.getRequests();
+          this.validation.makeValid( $(el.target));
+          break;
       case 'regularCourse':
-       this.regularClient = true;
+        this.regularClient = true;
+        this.sandBoxClient = false;
         this.validation.makeValid( $(el.target));
-       await this.getRequests();
+        await this.getRequests();
     }
   }
 
@@ -299,6 +298,17 @@ export class ViewHelpTickets {
     }
   }
 
+  showCurriculum(product, $event){
+    this.productInfoObject = this.products.getProductInfo(product._id);
+    // $(".hover").css("top", el.clientY - 100);
+    // $(".hover").css("left", el.clientX + 10);
+    if(this.productInfoObject)  $("#curriculumInfo").css("display", "block");
+  }
+
+  hideCurriculum() {
+    $("#curriculumInfo").css("display", "none");
+  }
+
   _setUpValidation(){
     this.validation.addRule(1,"session",[
       {"rule":"custom","message":"Select a session",
@@ -375,12 +385,11 @@ export class ViewHelpTickets {
   async save(){
     if(this.validation.validate(1)){
       this._buildRequest();
-        let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
-        if (!serverResponse.status) {
-            this.utils.showNotification("System client request was updated");
-            this.systemSelected = false;
-            // this._cleanUp();
-        }
+      let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
+      if (!serverResponse.status) {
+          this.utils.showNotification("The product rerqeust was updated");
+          this.systemSelected = false;
+      }
     }
 
     this._cleanUp();
@@ -422,8 +431,10 @@ export class ViewHelpTickets {
   }
 
   editACourse(){
-    this.editCourse = true;
-    $("#number").focus();
+    if(this.courseId != -1) {
+      this.editCourse = true;
+      $("#number").focus();
+    }
   }
 
   newCourse(){
@@ -470,7 +481,7 @@ export class ViewHelpTickets {
   }
 
    _unLock(){
-    if(!this.showLockMessage){
+    if(this.ILockedIt){
       if(this.requests.selectedRequest._id){
         this.showLockMessage = false;
         this.requests.removeRequestLock(this.requests.selectedRequest._id);

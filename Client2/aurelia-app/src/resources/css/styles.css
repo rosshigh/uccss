@@ -359,6 +359,10 @@ textarea {
     padding: 10px;
 }
 
+#curriculumInfo{
+     display:none;
+}
+
 .borderTop {
   border-style: solid;
   border-top: thin double #ff0000;
@@ -416,7 +420,11 @@ textarea {
     .clickable{
         cursor: pointer;   
     }
- 
+
+    .smallFont{
+        font-size: small;
+    }
+
 	/*
 	Label the data
 	*/

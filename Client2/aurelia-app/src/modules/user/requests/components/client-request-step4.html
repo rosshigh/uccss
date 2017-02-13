@@ -13,8 +13,8 @@
       <h4 class="col-md-5 topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>
     </div>
     <div class="row">
-      <h4 class="col-md-5 topMargin">Course Begins: <b>${requests.selectedRequest.startDate }</b></h4>
-      <h4 class="col-md-5 topMargin">Course Ends: <b>${requests.selectedRequest.endDate }</b></h4>
+      <h4 class="col-md-5 topMargin">Course Begins: <b>${requests.selectedRequest.startDate | dateFormat:'YYYY-MM-DD'}</b></h4>
+      <h4 class="col-md-5 topMargin">Course Ends: <b>${requests.selectedRequest.endDate | dateFormat:'YYYY-MM-DD'}</b></h4>
     </div>
     <div class="col-md-12"></div>
     <div class="row" id="productListTable">
@@ -41,7 +41,7 @@
       <div class="col-sm-12">
         <div class="form-group" show.bind="comments !== ''">
           <label >Comments:</label>
-          <div class="textareaDiv topMargin" style="height:100px;" innerhtml.bind="commentsResponse"></div>
+          <div class="textareaDiv topMargin" style="height:100px;" innerhtml.bind="requests.selectedRequest.comments"></div>
         </div>
       </div>
     </div>

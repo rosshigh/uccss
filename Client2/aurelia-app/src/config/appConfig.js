@@ -7,8 +7,8 @@ export class AppConfig {
     SEND_EMAILS = true;
 
     HOST = location.origin;
-    // BASE_URL = "http://localhost:5000/api/";
-    BASE_URL = this.HOST + "/api/";
+    BASE_URL = "http://localhost:5000/api/";
+    // BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -23,7 +23,8 @@ export class AppConfig {
         { role: 'TECH', label: 'Technical', UCConly: false },
         { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true },
         { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true },
-        { role: 'UCSA', label: 'UCCSS Admin', UCConly: true }];
+        { role: 'UCSA', label: 'UCCSS Admin', UCConly: true },
+        { role: 'BLOG', label: 'Blog Author', UCConly: false }];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
@@ -107,15 +108,15 @@ export class AppConfig {
     MESSAGE_TYPES = ['CLIENT_REQUESTS', 'HELP_TICKETS'];
 
         //Help Ticket parameters
-    HELP_TICKET_OTHER_TYPE = 4;
+    HELP_TICKET_OTHER_TYPE = "2";
     HELP_TICKET_APP_TYPE = 3;
-    HELP_TICKET_PASSWORD_RESET_TYPE = 2;
-    HELP_TICKET_CURRICULUM_TYPE = 1;
+    HELP_TICKET_PASSWORD_RESET_TYPE = "02";
+    HELP_TICKET_CURRICULUM_TYPE = "01";
     HELP_TICKET_PRODUCT_REQUESTS = 0;
     HELP_TICKET_CLIENT_REFRESH_TYPE = 5;
     HELP_TICKET_LOGON_TYPE = 6;
     HELP_TICKET_CLIENT_OTHER_TYPE = 7;
-    HELP_TICKET_APP_ERROR_TYPE = 8;
+    HELP_TICKET_APP_ERROR_TYPE = "1";
     HELP_TICKET_APP_LICENSE_TYPE = 9;
     HELP_TICKET_APP_OTHER_TYPE = 10;
     HELP_TICKET_OTHER_UA_TYPE = 11;
@@ -255,76 +256,6 @@ export class AppConfig {
         }
     ];
 
-
-    HELP_TICKET_SUB_TYPES = [
-        {
-            "code": this.HELP_TICKET_CURRICULUM_TYPE,
-            "description": "Curriculum Help",
-            "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
-            "clientRequired": true,
-            "appsRequired": false,
-            "show": false
-        },
-        {
-            "code": this.HELP_TICKET_RESET_TYPE,
-            "description": "Reset Passwords",
-            "message": "Select the product and enter the user ids of the passwords you need reset.<br><br><p>If the user ids are on a ERP system, you can reset passwords and unlock user accounts in transaction SU01.</p>",
-            "clientRequired": true,
-            "appsRequired": false,
-            "show": false
-        },
-        {
-            "code": this.HELP_TICKET_APP_TYPE,
-            "description": "Application Help",
-            "message": "This includes applications other than those hosted at the UCC.  Select the product from the drop down list and provide as much information about the error as possible.<br><br><p>If possible upload screen shots that show the problem.</p>",
-            "clientRequired": false,
-            "appsRequired": true,
-            "show": false
-        },
-        {
-            "code": this.HELP_TICKET_OTHER_TYPE,
-            "description": "Other",
-            "message": "Use this for any issue that doesn't fall easily into one of the other categories.",
-            "clientRequired": false,
-            "appsRequired": false,
-            "show": false
-        }
-    ];
-
-    // HELP_TICKET_TYPES = [
-    //     {
-    //         "code": this.HELP_TICKET_CURRICULUM_TYPE,
-    //         "description": "Curriculum Help",
-    //         "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
-    //         "clientRequired": true,
-    //         "appsRequired": false,
-    //         "show": false
-    //     },
-    //     {
-    //         "code": this.HELP_TICKET_RESET_TYPE,
-    //         "description": "Reset Passwords",
-    //         "message": "Select the product and enter the user ids of the passwords you need reset.<br><br><p>If the user ids are on a ERP system, you can reset passwords and unlock user accounts in transaction SU01.</p>",
-    //         "clientRequired": true,
-    //         "appsRequired": false,
-    //         "show": false
-    //     },
-    //     {
-    //         "code": this.HELP_TICKET_APP_TYPE,
-    //         "description": "Application Help",
-    //         "message": "This includes applications other than those hosted at the UCC.  Select the product from the drop down list and provide as much information about the error as possible.<br><br><p>If possible upload screen shots that show the problem.</p>",
-    //         "clientRequired": false,
-    //         "appsRequired": true,
-    //         "show": false
-    //     },
-    //     {
-    //         "code": this.HELP_TICKET_OTHER_TYPE,
-    //         "description": "Other",
-    //         "message": "Use this for any issue that doesn't fall easily into one of the other categories.",
-    //         "clientRequired": false,
-    //         "appsRequired": false,
-    //         "show": false
-    //     }
-    // ];
 
     NEW_HELPTICKET_STATUS = 1; 
     REVIEW_HELPTICKET_STATUS = 2;

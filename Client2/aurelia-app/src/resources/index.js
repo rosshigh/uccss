@@ -24,6 +24,7 @@ export function configure(config) {
      './value-converters/session-name',
     './value-converters/info-filter',
     './value-converters/date-format',
+    './value-converters/one-line',
      './value-converters/help-ticket-type',
     './value-converters/session-type',
     './value-converters/lookup-value',

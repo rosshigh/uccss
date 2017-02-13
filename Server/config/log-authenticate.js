@@ -7,7 +7,7 @@ var logDir = 'log-auth';
 
 	// Create the log directory if it does not exist
 	if (!fs.existsSync(logDir)) {
-	fs.mkdirSync(logDir);
+		fs.mkdirSync(logDir);
 	}
 
 	var  logger = new (winston.Logger)({

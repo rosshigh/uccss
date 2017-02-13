@@ -35,7 +35,6 @@
                             <li><a href="#/customers">Customers</a></li>
                             <li><a href="#/site">Site</a></li>
                             <li><a href="#/documents">Documents</a></li>
-                            <li><a href="#/notes">Notes</a></li>
                         </ul>
                     </li>
                      <li class="dropdown">
@@ -45,6 +44,7 @@
                             <li><a href="#/techHt">Help Tickets</a></li>
                         </ul>
                     </li>
+                    <li if.bind="isAuthenticated"><a href="#/social">Social</a></li>
                     <li if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
                     <li if.bind="isAuthenticated"><a href="#/support">Support</a></li>
                     <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
@@ -52,14 +52,21 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li if.bind="isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE"><a click.trigger="enterNote()" href="#">Note</a></li>
+                     <li class="dropdown">
+                        <a if.bind="userObj.userRole >= config.UCC_ROLE" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a click.trigger="enterNote()" href="#">Enter Note</a></li>
+                            <li><a href="#/notes">Notes</a></li>
+                        </ul>
+                    </li>  
+                   
                     <li if.bind="!isAuthenticated"><a href="#/register">Register</a></li>
                     <li if.bind="isAuthenticated"><a href="#/profile">Profile</a></li>
                     <li if.bind="!isAuthenticated"><a href="#/contact">Contact Us</a></li>
                     <li if.bind="isAuthenticated" click.trigger="logout()"><a href="#">Logout</a></li>
                 </ul>
             </div>
-            <!-- /.navbar-collapse -->
+            <!-- /.navbar-collapse if.bind="isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE"-->
         </div>
         <!-- /.container-fluid -->
     </nav>

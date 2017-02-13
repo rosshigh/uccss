@@ -21,9 +21,10 @@ export class ViewHelpTickets {
   sendEmail = false;
   showLockMessage = false;
   sendMailDisable = false;
+  notesHistory = false;
   lockMessage = "";
 
-  navControl = "supportNavButtons";
+  // navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
   commentShown = "";
@@ -54,7 +55,7 @@ export class ViewHelpTickets {
   * Retrieve the help tickets, sessions, downloads and people
   * Only active help tickets are retrieved
   *****************************************************************************************/
-  async activate() {
+  async activate(params) {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true),
@@ -72,6 +73,12 @@ export class ViewHelpTickets {
        return item.code !== this.config.CLOSED_HELPTICKET_STATUS;
     })
 
+    if(params.id) {
+      this.notesHistory = true;
+      this.helpTickets.selectHelpTicketByID(params.id);
+      this.openHelpTicket();
+    }
+      
   }
 
   attached() {
@@ -127,39 +134,46 @@ export class ViewHelpTickets {
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
-
-     await this.getDetails();
-
-    var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-    if (!response.error) {
-      if (response.helpTicketId === 0) {
-        //Lock help ticket
-        this.helpTickets.lockHelpTicket({
-          helpTicketId: this.helpTickets.selectedHelpTicket._id,
-          personId: this.userObj._id
-        });
-        this.lockMessage = "";
-        this.showLockMessage = false;
-        this.lockObject = { personId: this.userObj._id };
-      } else {
-        if (response[0].personId === this.userObj._id) {
-          this.showLockMessage = false;
-          this.lockMessage = "";
-          this.lockObject = { personId: this.userObj._id };
-        } else {
-          this.lockObject = response[0];
-           this.lockMessage = "Help Ticket is currently locked by " + this.getName();
-          this.showLockMessage = true;
-        }
-      }
-    }
+    this.openHelpTicket();
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
     this.selectedRow.children().addClass('info')
-    this.helpTicketSelected = true;
 
-    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+  }
+
+  async openHelpTicket(){
+    if(this.helpTickets.selectedHelpTicket._id.length){
+      await this.getDetails();
+      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
+      if (!response.error) {
+        if (response.helpTicketId === 0) {
+          //Lock help ticket
+          this.helpTickets.lockHelpTicket({
+            helpTicketId: this.helpTickets.selectedHelpTicket._id,
+            personId: this.userObj._id
+          });
+          this.lockMessage = "";
+          this.showLockMessage = false;
+          this.lockObject = { personId: this.userObj._id };
+        } else {
+          if (response[0].personId === this.userObj._id) {
+            this.showLockMessage = false;
+            this.lockMessage = "";
+            this.lockObject = { personId: this.userObj._id };
+          } else {
+            this.lockObject = response[0];
+            this.lockMessage = "Help Ticket is currently locked by " + this.getName();
+            this.showLockMessage = true;
+          }
+        }
+      }
+      this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+      this.helpTicketSelected = true;
+    } else {
+      this.utils.showNotification('Help Ticket not found')
+    }
+   
   }
 
   async getDetails(){
@@ -240,6 +254,7 @@ export class ViewHelpTickets {
     this.helpTickets.selectedHelpTicketContent.type = this.config.HELP_TICKET_OTHER_TYPE;
     this.helpTickets.selectedHelpTicketContent.emailSent = this.sendEmail;
     this.helpTickets.selectedHelpTicketContent.content.comments = this.responseMessage;
+    this.helpTickets.selectedHelpTicketContent.displayForm = this.config.HELP_TICKET_OTHER_TYPE;
   }
 
   /*****************************************************************************************
@@ -316,8 +331,12 @@ export class ViewHelpTickets {
     this.enterResponse = false;
     this.files = new Array();
     this.filesSelected = "";
-    this.helpTicketSelected = false;
     this._unLock();
+    if(this.notesHistory){
+      this.router.navigateToRoute('notes');
+    } else {
+      this.helpTicketSelected = false;
+    }
   }
 
   flag(){

@@ -351,7 +351,7 @@ export class People {
         return newObj;
     }
 
-     async saveCourse() {
+    async saveCourse() {
         if(!this.selectedCourse){
             return;
         }
@@ -359,7 +359,8 @@ export class People {
         if(!this.selectedCourse._id){
             let serverResponse = await this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
             if (!serverResponse.error) {
-                this.coursesArray.push(this.selectedCourse);
+                this.selectedCourse = this.utils.copyObject(serverResponse);
+                if(this.coursesArray) this.coursesArray.push(this.selectedCourse);
                 this.editIneditCourseIndex = this.coursesArray.length - 1;
             } else {
                 this.data.processError(response, "There was an error creating the product.");
@@ -368,6 +369,7 @@ export class People {
         } else {
             var serverResponse = await this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "put");
             if (!serverResponse.error) {
+                this.selectedCourse = this.utils.copyObject(serverResponse);
                 this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
             } else {
                 this.data.processError(response, "There was an error updating the course.");

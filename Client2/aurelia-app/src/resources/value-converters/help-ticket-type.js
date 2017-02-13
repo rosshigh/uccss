@@ -3,9 +3,14 @@ export class HelpTicketTypeValueConverter {
 		if(value === undefined || array === undefined) return;
 
 		for(var j = 0; j < array.length; j++){
-			for(var i = 0; i < array[j].subtypes.length; i++){
-				if(array[j].subtypes[i].type === value) return array[j].subtypes[i].description;
+			if(array[j].showSubtypes){
+				for(var i = 0; i < array[j].subtypes.length; i++){
+					if(array[j].subtypes[i].type === value) return array[j].subtypes[i].description;
+				}
+			} else {
+				return array[j].description;
 			}
+			
 		}
 		return undefined;
 	}

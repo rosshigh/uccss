@@ -170,4 +170,9 @@ export default class {
 
     }
 
+    clearRules(){
+      this.ruleGroups = [];
+      this.rules = [];
+    }
+
 }
