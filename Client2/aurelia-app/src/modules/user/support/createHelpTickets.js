@@ -85,7 +85,7 @@ export class CreateHelpTickets{
             if(!this.showTypes){
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.selectedHelpTicket.helpTicketCategory;
+                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
                 this.showRequests = false; 
                 this.showHelpTicketDescription = true;
                 this.showAdditionalInfo = true;
