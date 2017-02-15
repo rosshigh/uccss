@@ -20,10 +20,11 @@
               <th></th>
               <th>
                 <select change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketType">
-                        <option value=""></option>
-                        <option repeat.for="type of config.HELP_TICKET_TYPES"
-                                value.bind="type.code">${type.description}</option>
-                      </select>
+                    <option value=""></option>
+                    <option repeat.for="type of helpTickets.helpTicketTypesArray | helpTicketSubtypes"
+                            value.bind="type.type">${type.description}</option>
+                    
+                </select>
               </th>
                <th></th>
               <th>
@@ -55,12 +56,6 @@
               </th>
               <th>
                 <input input.delegate="dataTable.filterList($event, people.institutionsArray)" id="institutionId-name" type="text" compare="lookup" class="form-control" ref="institutionFilter"/>
-                <!--
-                <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionId" compare="id">
-                    <option value=""></option>
-                    <option repeat.for="institution of people.institutionsArray" value="${institution._id}">${institution.name}</option>
-                </select>
-                -->
               </th>
             </tr>
             <tr>

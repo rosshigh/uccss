@@ -79,7 +79,7 @@ export class ViewHelpTickets {
       this.openHelpTicket();
     }
 
-      this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
+    this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
       
   }
 

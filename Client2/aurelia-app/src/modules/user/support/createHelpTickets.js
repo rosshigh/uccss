@@ -84,6 +84,7 @@ export class CreateHelpTickets{
             this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
             if(!this.showTypes){
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message);
+                this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.selectedHelpTicket.helpTicketCategory;
                 this.showRequests = false; 
                 this.showHelpTicketDescription = true;
@@ -109,6 +110,7 @@ export class CreateHelpTickets{
         for(var i = 0; i< this.site.messageArray.length; i++){
             if(this.site.messageArray[i].key === messageKey) return this.site.messageArray[i].content
         }
+        return "";
     }
 
     // /*****************************************************************************************

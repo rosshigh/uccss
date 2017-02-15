@@ -5,10 +5,15 @@
         <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
     </div> 
     
-     <div class="col-lg-12">
-      
-        <compose if.bind="inputForm" view="../../../../resources/htTimeline/help-ticket-${inputForm}.html"></compose>
+    <div class="topMargin bottomMargin leftMargin list-group-item" show.bind="resources && resources.length > 0">
+        <h5>Here are some resources that may be of help.</h5>
+        <ul>
+            <li style="list-style-type: none" repeat.for="file of resources"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryName}/${file.fileName}">${file.fileName}</a></li>
+        </ul>
+    </div>
 
+     <div class="col-lg-12">  
+        <compose if.bind="inputForm" view="../../../../resources/htTimeline/help-ticket-${inputForm}.html"></compose>
         <!-- Additional Information Panel -->
         <div class="col-lg-12 topMargin" id="descriptionGroup">
             <div class="form-group">
@@ -17,8 +22,8 @@
                 <editor id="comments" value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
             </div>
 
-            <h5>Upload screenshots or other files that will help us solve you problem</h5>
-             <label>If you want to upload multiple files, hold the control key while selecting files</label>
+            <div innerhtml.bind="fileUploadMessage"></div>
+          
             <div class="panel panel-default">
                 <div class="input-group">
                     <span class="input-group-btn">

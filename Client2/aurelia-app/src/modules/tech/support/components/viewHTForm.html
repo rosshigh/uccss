@@ -23,7 +23,7 @@
         <div show.bind="enterResponse" class="topMargin bottomMargin ">
 
           <div class="col-md-12 topMargin">
-            <span  click.delegate="saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+            <span  click.delegate="saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Response"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
             <span  click.delegate="saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Customer Action"><i class="fa fa-users fa-lg fa-border" aria-hidden="true"></i></span>
             <span  click.delegate="saveResponse(config.CLOSED_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Close"><i class="fa fa-window-close-o fa-lg fa-border" aria-hidden="true"></i></span>
             <span  click.delegate="cancelResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
@@ -93,11 +93,6 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <h5 class="col-md-offset-1">Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h5>
-                  </div>
-                </div>
                  <div class="col-md-3">
                   <div class="form-group">
                     <h5 class="col-md-offset-1">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>
@@ -113,34 +108,29 @@
                     <h5 class="col-md-offset-1">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>
                   </div>
                 </div>
-               
               </div>
-                <div class="form-group col-lg-6">
-                  <div class="input-group col-lg-11">
-                  <!--
-                    <span class="input-group-btn">
-                        <button disabled.bind="showLockMessage" class="btn btn-primary btn-file btn-fill" placeholder="Change status"
-                                click.delegate="updateStatus()" type="button">Save Status</button>
-                    </span>
-                    -->
-                    <label>Status</label>
-                    <select id="helpTicketStatus" value.bind="helpTickets.selectedHelpTicket.helpTicketStatus" class="form-control">
-                      <option repeat.for="status of config.HELP_TICKET_STATUSES" model.bind="status.code">${status.description}</option>
-                    </select>
+              <div class="row">
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class=" col-md-offset-1">Type:</label>
+                      <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="dataTable.filterList($event)" class="form-control col-md-offset-1" id="helpTicketType">
+                          <option repeat.for="type of helpTickets.helpTicketTypesArray | helpTicketSubtypes" value.bind="type.type">${type.description}</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
-
-                <!-- Add keywords -->
-                <div class="form-group col-lg-6">
-                  <div class="input-group col-lg-11">
-                    <!--
-                    <span class="input-group-btn">
-                      <button disabled.bind="showLockMessage" class="btn btn-primary btn-fill" placeholder="Enter keywords"
-                              click.delegate="updateKeywords()" type="button">Save Keywords</button>
-                    </span>
-                    -->
-                    <label>Keywords</label>
-                    <input type="text" value.bind="helpTickets.selectedHelpTicket.keyWords" class="form-control">
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Status</label>
+                      <select id="helpTicketStatus" value.bind="helpTickets.selectedHelpTicket.helpTicketStatus" class="form-control col-md-offset-1">
+                        <option repeat.for="status of config.HELP_TICKET_STATUSES" model.bind="status.code">${status.description}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Keywords</label>
+                      <input type="text" value.bind="helpTickets.selectedHelpTicket.keyWords" class="form-control col-md-offset-1">
+                    </div>
                   </div>
                 </div>
             </div>

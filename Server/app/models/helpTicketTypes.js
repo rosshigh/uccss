@@ -16,6 +16,12 @@ var helpTicketTypesSchema = new Schema({
       clientRequired: { type: Boolean },
       appsRequired:{ type: Boolean },
       public: { type: Boolean },
+      documents: [{
+        categoryCode: { type: Number },
+        categoryName: { type: String },
+        fileName: { type: String },
+        default: { type: Boolean, default: true } 
+      }],
       validation: [
         {
           rule: { type: String },

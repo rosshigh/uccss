@@ -21,6 +21,7 @@ export function configure(config) {
      './value-converters/person-status-button',
     './value-converters/to-uppercase',
     './value-converters/help-ticket-statuses',
+    './value-converters/help-ticket-subtypes',
     './value-converters/format-phone',
      './value-converters/session-name',
     './value-converters/info-filter',
