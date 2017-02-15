@@ -77,7 +77,7 @@
                             <td data-title="Name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}">${item.originalFilename}</a></td>
                             <td data-title="Version">${item.version}</td>
                             <td data-title="Date Uploaded">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>
-                            <td data-title="Person">${item.personId | personName:people.peopleArray}</td>
+                            <td data-title="Person">${item.personId | person:people.peopleArray:"fullName"}</td>
                             <td data-title="Active" click.trigger="toggleFileActive($index)" innerhtml.bind='item.active | checkBox'></td>
                             <td data-title="Delete" click.trigger="deleteFile($index)"><i class="fa fa-trash"></i></td>
                         </tr>

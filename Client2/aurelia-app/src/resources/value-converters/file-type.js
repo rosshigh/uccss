@@ -15,7 +15,7 @@ export class FileTypeValueConverter {
       case "GIF":
       case "PNG":
       case "JPG":
-            html = file + "<span><img src='" + this.config.HOST +  this.config.FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
+            html = file + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
             break;
       default:
         html = file;

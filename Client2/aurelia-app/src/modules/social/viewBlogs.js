@@ -1,14 +1,16 @@
 import {inject} from 'aurelia-framework';
 import {Social} from '../../resources/data/social';
 import {People} from '../../resources/data/people';
+import {AppConfig} from '../../config/appConfig';
 
-@inject(Social, People)
-export class EditBlogs{
+@inject(Social, People, AppConfig)
+export class ViewBlogs{
 	blogSelected = false;
 
-	constructor(social, people){
+	constructor(social, people, config){
 		this.social = social;
 		this.people = people;
+		this.config = config;
 	}
 
 	attached(){
@@ -23,16 +25,18 @@ export class EditBlogs{
 	}
 
 	selectBlog(index){
+		this.selectedIndex = index;
+		this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
 		this.social.selectBlog(index);
+		this.social.saveBlog();
 		this.blogSelected = true;
 		
 	}
 
 	like(index){
-		this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes++ : 1;;
+		if(index === 999) index = this.selectedIndex;
+		this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
 		this.social.selectBlog(index);
-		// this.social.selectedBlog.likes += 1;
-		
 		this.social.saveBlog();
 	}
 

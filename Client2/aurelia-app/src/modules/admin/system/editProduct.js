@@ -202,6 +202,7 @@ export class EditProducts {
         }
         var newDoc = {
             categoryCode: this.documents.selectedDocument.categoryCode,
+            categoryName: this.documents.selectedDocument.name,
             fileName: this.documents.selectedDocument.files[index].fileName,
             default: true
         }

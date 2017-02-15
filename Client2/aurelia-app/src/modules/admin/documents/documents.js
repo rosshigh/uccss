@@ -235,6 +235,6 @@ export class Documents {
     _setupValidation(){
          this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Document name is required", "value": "documents.selectedDocument.name" }]);
          this.validation.addRule(1, "editDescription", [{ "rule": "required", "message": "Document description is required", "value": "documents.selectedDocument.description" }]);
-         this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
+        //  this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
     }
 }

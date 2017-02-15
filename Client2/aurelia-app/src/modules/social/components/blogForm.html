@@ -1,0 +1,35 @@
+<template>
+	<div class="container">
+		<div class="bottomMargin list-group-item">
+			<span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+				title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+			<span show.bind="!newItem" click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+				title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+		</div>
+		<div class="topMargin">
+			<div class="row">
+				<div class="col-sm-12 col-lg-12">
+					<div class="form-group">
+						<label for="editTitle" class="control-label hideOnPhone">Title</label>
+						<input value.bind="social.selectedBlog.title" id="editTitle" class="form-control " placeholder="Title" type="text" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 col-lg-12">
+					<div class="form-group">
+						<label for="editTeaser" class="control-label hideOnPhone">Teaser</label>
+						<textarea value.bind="social.selectedBlog.teaser" id="editTeaser" rows="5" class="form-control" placeholder="Teaser" type="text" ></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="topMargin">
+				<editor id="blogContent" value.bind="social.selectedBlog.text" height="800"></editor>
+			</div>
+		</div>
+	</div>
+</template>

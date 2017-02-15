@@ -21,6 +21,7 @@ export default class {
                 { route: 'resetPassword/:id',   moduleId: './modules/user/resetPassword',            name: 'ResetPassword',  settings: { auth: false, roles: [] }  },
                 { route: 'system',          moduleId: './modules/admin/system/system',          name: 'system',         settings: { auth: true, roles: [] }  },
                 { route: 'customers',       moduleId: './modules/admin/customers/customers',    name: 'customers',      settings: { auth: true, roles: [] }  },
+                { route: 'inventory',       moduleId: './modules/admin/inventory/editInventory',    name: 'inventory',      settings: { auth: true, roles: [] }  },
                 { route: 'site',            moduleId: './modules/admin/site/site',              name: 'site',           settings: { auth: true, roles: [] } },
                 { route: 'documents',       moduleId: './modules/admin/documents/documents',    name: 'documents',      settings: { auth: true, roles: [] } },
                 { route: 'notes',           moduleId: './modules/admin/notes/notes',            name: 'notes',          settings: { auth: true, roles: [] } },

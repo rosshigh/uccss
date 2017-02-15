@@ -12,6 +12,7 @@ var ProductSchema = new Schema({
   idsAvailable: { type: Number },
   documents: [{
     categoryCode: { type: Number },
+    categoryName: { type: String },
     fileName: { type: String },
     default: { type: Boolean, default: true } 
   }],

@@ -1,16 +1,19 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
+import {AppConfig} from '../../config/appConfig';
 
-@inject(Router)
+@inject(Router, AppConfig)
 export class Social{
     
-    constructor(router){
+    constructor(router, config){
         this.router = router;
+        this.config = config;
     }
 
     canActivate(){
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
         this.blogAuthor = this.userObj.roles.indexOf('BLOG') > -1;
+        this.uccStaff = this.userObj.roles.indexOf('BLOG') > -1;
     }
 
     attached(){
@@ -24,15 +27,15 @@ export class Social{
         config.map([
         {
             route: ['', 'blogs'],
-            moduleId: './editBlogs',
+            moduleId: './viewBlogs',
             settings: { auth: false, roles: [] },
             nav: true,
             name: 'blogs',
             title: 'Blogs'
         },
         {
-            route: 'forumus',
-            moduleId: './editForums',
+            route: 'forums',
+            moduleId: './viewForums',
             settings: { auth: false, roles: [] },
             nav: true,
             name: 'forums',
@@ -45,6 +48,14 @@ export class Social{
             nav: false,
             name: 'writeBlog',
             title: 'writeBlog'
+        },
+        {
+            route: 'editBlog',
+            moduleId: './editBlog',
+            settings: { auth: false, roles: [] },
+            nav: false,
+            name: 'editBlog',
+            title: 'editBlog'
         }
         ]);
 

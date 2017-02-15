@@ -30,6 +30,19 @@ module.exports = function (app) {
       })
   });
 
+  router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
+    logger.log('Get helpTicket');
+    var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
+      query.sort(req.query.order)
+      .exec(function(err, object){
+        if (err) {
+          return next(err);
+        } else {
+          res.status(200).json(object);
+        }
+      });
+  });
+
   router.get('/api/clientRequests/:id/:sessions', requireAuth, function(req, res, next){
     logger.log('Get customers active clientRequests');
      var activeSessions = req.params.sessions.split(":");
@@ -58,19 +71,6 @@ module.exports = function (app) {
         res.status(200).json(object);
       }
     });
-  });
-
-  router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket');
-    var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))
-      query.sort(req.query.order)
-      .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
   });
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){

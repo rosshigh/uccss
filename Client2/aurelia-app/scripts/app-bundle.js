@@ -160,6 +160,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.UCC_TECH_ROLE = 8;
             this.USER_ROLE = 4;
             this.PROV_USER = 1;
+            this.systemTypes = ['Switch', 'Router', 'Server', 'Storage', 'Other'];
             this.ACTIVE_PERSON = "01";
             this.INACTIVE_PERSON = "02";
             this.INSTITUTIONS_ACTIVE = '01';
@@ -499,7 +500,7 @@ define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'],
             var appRouterConfig = function appRouterConfig(config) {
                 config.addPipelineStep('authorize', AuthorizeStep);
                 config.title = 'UCCSS';
-                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'notes', moduleId: './modules/admin/notes/notes', name: 'notes', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }, { route: 'social', moduleId: './modules/social/social', name: 'social', settings: { auth: true, roles: [] } }, { route: 'htNote/:id', moduleId: './modules/tech/support/support', name: 'htNote', settings: { auth: true, roles: [] } }]);
+                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'inventory', moduleId: './modules/admin/inventory/editInventory', name: 'inventory', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'notes', moduleId: './modules/admin/notes/notes', name: 'notes', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }, { route: 'social', moduleId: './modules/social/social', name: 'social', settings: { auth: true, roles: [] } }, { route: 'htNote/:id', moduleId: './modules/tech/support/support', name: 'htNote', settings: { auth: true, roles: [] } }]);
 
                 config.mapUnknownRoutes('home');
             };
@@ -539,7 +540,7 @@ define('resources/index',['exports'], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {
-    config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/tiny-mce', './editor/editor', './elements/add-systems', './elements/rate-it', './elements/date-picker', './elements/edit-client', './elements/multiselect', './value-converters/format-digits', './value-converters/overlap', './value-converters/request-number', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/erpsim', './value-converters/session-status-button', './value-converters/person-status-button', './value-converters/to-uppercase', './value-converters/format-phone', './value-converters/session-name', './value-converters/info-filter', './value-converters/date-format', './value-converters/one-line', './value-converters/help-ticket-type', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
+    config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/tiny-mce', './editor/editor', './elements/add-systems', './elements/rate-it', './elements/date-picker', './elements/edit-client', './elements/multiselect', './value-converters/format-digits', './value-converters/overlap', './value-converters/request-number', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/erpsim', './value-converters/session-status-button', './value-converters/person-status-button', './value-converters/to-uppercase', './value-converters/format-phone', './value-converters/session-name', './value-converters/info-filter', './value-converters/date-format', './value-converters/help-ticket-type', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
   }
 });
 define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
@@ -11999,7 +12000,7 @@ define('resources/value-converters/file-type',["exports", "aurelia-framework", "
         case "GIF":
         case "PNG":
         case "JPG":
-          html = file + "<span><img src='" + this.config.HOST + this.config.FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
+          html = file + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
           break;
         default:
           html = file;
@@ -13442,7 +13443,6 @@ define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aur
         Documents.prototype._setupValidation = function _setupValidation() {
             this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Document name is required", "value": "documents.selectedDocument.name" }]);
             this.validation.addRule(1, "editDescription", [{ "rule": "required", "message": "Document description is required", "value": "documents.selectedDocument.description" }]);
-            this.validation.addRule(1, "editFiles", [{ "rule": "required", "message": "Document description is required", "value": "files" }]);
         };
 
         return Documents;
@@ -17176,6 +17176,7 @@ define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../.
             }
             var newDoc = {
                 categoryCode: this.documents.selectedDocument.categoryCode,
+                categoryName: this.documents.selectedDocument.name,
                 fileName: this.documents.selectedDocument.files[index].fileName,
                 default: true
             };
@@ -31059,7 +31060,7 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
     }
   }
 });
-define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
+define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -31075,16 +31076,18 @@ define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router'
 
     var _dec, _class;
 
-    var Social = exports.Social = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function Social(router) {
+    var Social = exports.Social = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig), _dec(_class = function () {
+        function Social(router, config) {
             _classCallCheck(this, Social);
 
             this.router = router;
+            this.config = config;
         }
 
         Social.prototype.canActivate = function canActivate() {
             this.userObj = JSON.parse(sessionStorage.getItem('user'));
             this.blogAuthor = this.userObj.roles.indexOf('BLOG') > -1;
+            this.uccStaff = this.userObj.roles.indexOf('BLOG') > -1;
         };
 
         Social.prototype.attached = function attached() {
@@ -31097,14 +31100,14 @@ define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router'
         Social.prototype.configureRouter = function configureRouter(config, router) {
             config.map([{
                 route: ['', 'blogs'],
-                moduleId: './editBlogs',
+                moduleId: './viewBlogs',
                 settings: { auth: false, roles: [] },
                 nav: true,
                 name: 'blogs',
                 title: 'Blogs'
             }, {
-                route: 'forumus',
-                moduleId: './editForums',
+                route: 'forums',
+                moduleId: './viewForums',
                 settings: { auth: false, roles: [] },
                 nav: true,
                 name: 'forums',
@@ -31116,6 +31119,13 @@ define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router'
                 nav: false,
                 name: 'writeBlog',
                 title: 'writeBlog'
+            }, {
+                route: 'editBlog',
+                moduleId: './editBlog',
+                settings: { auth: false, roles: [] },
+                nav: false,
+                name: 'editBlog',
+                title: 'editBlog'
             }]);
 
             this.router = router;
@@ -31212,15 +31222,15 @@ define('modules/social/editBlogs',['exports', 'aurelia-framework', '../../resour
 		}();
 
 		EditBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
 			this.social.selectBlog(index);
+			this.social.saveBlog();
 			this.blogSelected = true;
 		};
 
 		EditBlogs.prototype.like = function like(index) {
-			this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes++ : 1;;
+			this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
 			this.social.selectBlog(index);
-
-
 			this.social.saveBlog();
 		};
 
@@ -31298,6 +31308,8 @@ define('resources/data/social',['exports', 'aurelia-framework', './dataServices'
             _classCallCheck(this, Social);
 
             this.BLOGS_SERVICES = 'blogs';
+            this.FORUMS_SERVICES = 'forums';
+            this.FORUMS_MESSAGES_SERVICES = 'forumMessages';
 
             this.data = data;
             this.utils = utils;
@@ -31448,6 +31460,300 @@ define('resources/data/social',['exports', 'aurelia-framework', './dataServices'
             return saveBlog;
         }();
 
+        Social.prototype.getForumArray = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(!this.forumArray || refresh)) {
+                                    _context3.next = 18;
+                                    break;
+                                }
+
+                                url = this.FORUMS_SERVICES;
+
+                                url += options ? options : "";
+                                _context3.prev = 3;
+                                _context3.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context3.sent;
+
+                                if (serverResponse.error) {
+                                    _context3.next = 11;
+                                    break;
+                                }
+
+                                this.forumArray = serverResponse;
+                                _context3.next = 12;
+                                break;
+
+                            case 11:
+                                return _context3.abrupt('return', undefined);
+
+                            case 12:
+                                _context3.next = 18;
+                                break;
+
+                            case 14:
+                                _context3.prev = 14;
+                                _context3.t0 = _context3['catch'](3);
+
+                                console.log(_context3.t0);
+                                return _context3.abrupt('return', undefined);
+
+                            case 18:
+                                return _context3.abrupt('return', this.forumArray);
+
+                            case 19:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this, [[3, 14]]);
+            }));
+
+            function getForumArray(_x3, _x4) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return getForumArray;
+        }();
+
+        Social.prototype.selectForum = function selectForum(index) {
+            if (!index && index !== 0) {
+                this.selectedForum = this.emptyForum();
+            } else {
+                this.selectedForum = this.utils.copyObject(this.forumArray[index]);
+            }
+        };
+
+        Social.prototype.emptyForum = function emptyForum() {
+            var obj = new Object();
+            obj.title = "";
+            obj.text = "";
+            obj.personId = "";
+            obj.type = "General";
+            return obj;
+        };
+
+        Social.prototype.saveForum = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (this.selectedForum) {
+                                    _context4.next = 2;
+                                    break;
+                                }
+
+                                return _context4.abrupt('return');
+
+                            case 2:
+                                url = this.FORUMS_SERVICES;
+
+                                if (this.selectedForum._id) {
+                                    _context4.next = 11;
+                                    break;
+                                }
+
+                                _context4.next = 6;
+                                return this.data.saveObject(this.selectedForum, url, "post");
+
+                            case 6:
+                                response = _context4.sent;
+
+                                if (!response.error) {
+                                    this.selectedForum = this.utils.copyObject(response);
+                                    if (this.forumArray) this.forumArray.push(this.selectedForum);
+                                } else {
+                                    this.data.processError(response, "There was an error creating the blog.");
+                                }
+                                return _context4.abrupt('return', response);
+
+                            case 11:
+                                _context4.next = 13;
+                                return this.data.saveObject(this.selectedForum, url, "put");
+
+                            case 13:
+                                response = _context4.sent;
+
+                                if (!response.error) {
+                                    this.selectedForum = this.utils.copyObject(response);
+                                    this.forumArray[this.editIndex] = this.utils.copyObject(this.selectedForum, this.forumArray[this.editIndex]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the blog.");
+                                }
+                                return _context4.abrupt('return', response);
+
+                            case 16:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function saveForum() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return saveForum;
+        }();
+
+        Social.prototype.getForumMessages = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!(!this.forumMessageArray || refresh)) {
+                                    _context5.next = 18;
+                                    break;
+                                }
+
+                                url = this.FORUMS_MESSAGES_SERVICES;
+
+                                url += options ? options : "";
+                                _context5.prev = 3;
+                                _context5.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.error) {
+                                    _context5.next = 11;
+                                    break;
+                                }
+
+                                this.forumMessageArray = serverResponse;
+                                _context5.next = 12;
+                                break;
+
+                            case 11:
+                                return _context5.abrupt('return', undefined);
+
+                            case 12:
+                                _context5.next = 18;
+                                break;
+
+                            case 14:
+                                _context5.prev = 14;
+                                _context5.t0 = _context5['catch'](3);
+
+                                console.log(_context5.t0);
+                                return _context5.abrupt('return', undefined);
+
+                            case 18:
+                                return _context5.abrupt('return', this.forumMessageArray);
+
+                            case 19:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this, [[3, 14]]);
+            }));
+
+            function getForumMessages(_x5, _x6) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return getForumMessages;
+        }();
+
+        Social.prototype.selectForumTopic = function selectForumTopic(index) {
+            if (!index && index !== 0) {
+                this.selectedForumTopic = this.emptyForumTopic();
+            } else {
+                this.selectedForumTopic = this.utils.copyObject(this.forumMessageArray[index]);
+            }
+        };
+
+        Social.prototype.emptyForumTopic = function emptyForumTopic() {
+            var obj = new Object();
+            obj.discussionId = this.selectedForum._id;
+            obj.title = "";
+            obj.text = "";
+            obj.personId = "";
+            obj.parentId = "";
+            obj.level = 0;
+            return obj;
+        };
+
+        Social.prototype.saveForumTopic = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (this.selectedForumTopic) {
+                                    _context6.next = 2;
+                                    break;
+                                }
+
+                                return _context6.abrupt('return');
+
+                            case 2:
+                                url = this.FORUMS_MESSAGES_SERVICES;
+
+                                if (this.selectedForumTopic._id) {
+                                    _context6.next = 11;
+                                    break;
+                                }
+
+                                _context6.next = 6;
+                                return this.data.saveObject(this.selectedForumTopic, url, "post");
+
+                            case 6:
+                                response = _context6.sent;
+
+                                if (!response.error) {
+                                    this.selectedForumTopic = this.utils.copyObject(response);
+                                    if (this.forumMessageArray) this.forumArray.push(this.selectedForumTopic);
+                                } else {
+                                    this.data.processError(response, "There was an error creating the blog.");
+                                }
+                                return _context6.abrupt('return', response);
+
+                            case 11:
+                                _context6.next = 13;
+                                return this.data.saveObject(this.selectedForumTopic, url, "put");
+
+                            case 13:
+                                response = _context6.sent;
+
+                                if (!response.error) {
+                                    this.selectedForumTopic = this.utils.copyObject(response);
+                                    this.forumMessageArray[this.editIndex] = this.utils.copyObject(this.selectedForumTopic, this.forumMessageArray[this.editIndex]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the blog.");
+                                }
+                                return _context6.abrupt('return', response);
+
+                            case 16:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function saveForumTopic() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return saveForumTopic;
+        }();
+
         return Social;
     }()) || _class);
 });
@@ -31537,7 +31843,7 @@ define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resour
 		function WriteBlogs(social, people, validation, utils) {
 			_classCallCheck(this, WriteBlogs);
 
-			this.blogContent = "";
+			this.blogSelected = false;
 
 			this.social = social;
 			this.people = people;
@@ -31563,7 +31869,7 @@ define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resour
 						switch (_context.prev = _context.next) {
 							case 0:
 								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray('', true), this.social.getBlogArray('?order=-dateCreated', true)]);
+								return Promise.all([this.people.getPeopleArray('', true), this.social.getBlogArray('?order=-dateCreated', true), this.social.getBlogArray("?filter=personId|eq|" + this.userObj._id + "&order=-dateCreated", true)]);
 
 							case 2:
 								responses = _context.sent;
@@ -31584,6 +31890,11 @@ define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resour
 
 			return activate;
 		}();
+
+		WriteBlogs.prototype.new = function _new() {
+			this.social.selectBlog();
+			this.blogSelected = true;
+		};
 
 		WriteBlogs.prototype.save = function () {
 			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
@@ -31623,13 +31934,1011 @@ define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resour
 			return save;
 		}();
 
+		WriteBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.social.selectBlog(index);
+			this.blogSelected = true;
+		};
+
+		WriteBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
 		WriteBlogs.prototype._setupValidation = function _setupValidation() {
-			this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "social.selectedBlog.text" }]);
+			this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "social.selectedBlog.title" }]);
+			this.validation.addRule(1, "editTeaser", [{ "rule": "required", "message": "Teaser is required", "value": "social.selectedBlog.teaser" }]);
 			this.validation.addRule(1, "blogContent", [{ "rule": "required", "message": "Content is required", "value": "social.selectedBlog.text" }]);
 		};
 
 		return WriteBlogs;
 	}()) || _class);
+});
+define('modules/social/viewBlogs',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ViewBlogs = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ViewBlogs = exports.ViewBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function ViewBlogs(social, people, config) {
+			_classCallCheck(this, ViewBlogs);
+
+			this.blogSelected = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+		}
+
+		ViewBlogs.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		ViewBlogs.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray('', true), this.social.getBlogArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ViewBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.selectedIndex = index;
+			this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
+			this.social.selectBlog(index);
+			this.social.saveBlog();
+			this.blogSelected = true;
+		};
+
+		ViewBlogs.prototype.like = function like(index) {
+			if (index === 999) index = this.selectedIndex;
+			this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
+			this.social.selectBlog(index);
+			this.social.saveBlog();
+		};
+
+		ViewBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
+		return ViewBlogs;
+	}()) || _class);
+});
+define('modules/social/editBlog',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.EditBlogs = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var EditBlogs = exports.EditBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function EditBlogs(social, people, config) {
+			_classCallCheck(this, EditBlogs);
+
+			this.blogSelected = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+		}
+
+		EditBlogs.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		EditBlogs.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray('', true), this.social.getBlogArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		EditBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.social.selectBlog(index);
+			this.blogSelected = true;
+		};
+
+		EditBlogs.prototype.toggleActivation = function toggleActivation() {
+			this.social.selectedBlog.active = !this.social.selectedBlog.active;
+			this.social.saveBlog();
+		};
+
+		EditBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
+		return EditBlogs;
+	}()) || _class);
+});
+define('modules/social/viewForums',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig', '../../resources/utils/utils'], function (exports, _aureliaFramework, _social, _people, _appConfig, _utils) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ViewForums = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ViewForums = exports.ViewForums = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig, _utils.Utils), _dec(_class = function () {
+		function ViewForums(social, people, config, utils) {
+			_classCallCheck(this, ViewForums);
+
+			this.forumSelected = false;
+			this.openNewForumForm = false;
+			this.openNewTopicForm = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+			this.utils = utils;
+		}
+
+		ViewForums.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		ViewForums.prototype.canActivate = function canActivate() {
+			this.userObj = JSON.parse(sessionStorage.getItem('user'));
+		};
+
+		ViewForums.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray('', true), this.social.getForumArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ViewForums.prototype.selectForum = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								this.selectedIndex = index;
+								this.social.selectForum(index);
+								_context2.next = 4;
+								return this.social.getForumMessages('?filter=discusssionId|eq|' + this.social.selectedForum._id + '&order=-dateCreated', true);
+
+							case 4:
+								this.forumSelected = true;
+
+							case 5:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function selectForum(_x) {
+				return _ref2.apply(this, arguments);
+			}
+
+			return selectForum;
+		}();
+
+		ViewForums.prototype.newForum = function newForum() {
+			this.social.selectForum();
+			this.openNewForumForm = true;
+		};
+
+		ViewForums.prototype.saveForum = function () {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+					while (1) {
+						switch (_context3.prev = _context3.next) {
+							case 0:
+								this.social.selectedForum.title = this.title;
+								this.social.selectedForum.text = this.text;
+								this.social.selectedForum.personId = this.userObj._id;
+								_context3.next = 5;
+								return this.social.saveForum();
+
+							case 5:
+								response = _context3.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The forum was saved');
+									this._cleanUp();
+								}
+
+							case 7:
+							case 'end':
+								return _context3.stop();
+						}
+					}
+				}, _callee3, this);
+			}));
+
+			function saveForum() {
+				return _ref3.apply(this, arguments);
+			}
+
+			return saveForum;
+		}();
+
+		ViewForums.prototype._cleanUp = function _cleanUp() {
+			this.openNewForumForm = false;
+			this.openNewTopicForm = false;
+		};
+
+		ViewForums.prototype.cancel = function cancel() {
+			this.text = "";
+			this.title = "";
+		};
+
+		ViewForums.prototype.newForumTopic = function newForumTopic() {
+			this.social.selectForumTopic();
+			this.openNewTopicForm = true;
+		};
+
+		ViewForums.prototype.saveForumTopic = function () {
+			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee4$(_context4) {
+					while (1) {
+						switch (_context4.prev = _context4.next) {
+							case 0:
+								this.social.selectedForumTopic.title = this.FormTopicTitle;
+								this.social.selectedForumTopic.text = this.ForumTopicText;
+								this.social.selectedForumTopic.personId = this.userObj._id;
+								this.social.selectedForumTopic.parentId = this.social.selectedForum._id;
+								_context4.next = 6;
+								return this.social.saveForumTopic();
+
+							case 6:
+								response = _context4.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The forum was saved');
+									this._cleanUp();
+								}
+
+							case 8:
+							case 'end':
+								return _context4.stop();
+						}
+					}
+				}, _callee4, this);
+			}));
+
+			function saveForumTopic() {
+				return _ref4.apply(this, arguments);
+			}
+
+			return saveForumTopic;
+		}();
+
+		ViewForums.prototype.back = function back() {
+			this.forumSelected = false;
+			this.openNewTopicForm = false;
+		};
+
+		return ViewForums;
+	}()) || _class);
+});
+define('resources/data/inventory',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Inventory = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Inventory = exports.Inventory = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function Inventory(data, utils, config) {
+            _classCallCheck(this, Inventory);
+
+            this.INVENTORY_SERVICE = 'inventory';
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        Inventory.prototype.getInventoryArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.inventoryArray || refresh)) {
+                                    _context.next = 18;
+                                    break;
+                                }
+
+                                url = this.INVENTORY_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (serverResponse.error) {
+                                    _context.next = 11;
+                                    break;
+                                }
+
+                                this.inventoryArray = serverResponse;
+                                _context.next = 12;
+                                break;
+
+                            case 11:
+                                return _context.abrupt('return', undefined);
+
+                            case 12:
+                                _context.next = 18;
+                                break;
+
+                            case 14:
+                                _context.prev = 14;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+                                return _context.abrupt('return', undefined);
+
+                            case 18:
+                                return _context.abrupt('return', this.inventoryArray);
+
+                            case 19:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 14]]);
+            }));
+
+            function getInventoryArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getInventoryArray;
+        }();
+
+        Inventory.prototype.selectInventory = function selectInventory(index) {
+            if (!index && index != 0) {
+                this.selectedInventory = this.emptyInventory();
+            } else {
+                try {
+                    this.selectedInventory = this.utils.copyObject(this.inventoryArray[index]);
+                    this.selectedIndex = index;
+                } catch (error) {
+                    this.selectedInventory = this.emptyInventory();
+                }
+            }
+        };
+
+        Inventory.prototype.emptyInventory = function emptyInventory() {
+            var newObj = new Object();
+            newObj.IPAddress = new Array();
+            return newObj;
+        };
+
+        Inventory.prototype.saveInventory = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _serverResponse, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (this.selectedInventory) {
+                                    _context2.next = 2;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return');
+
+                            case 2:
+                                if (this.selectedInventory._id) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                _context2.next = 5;
+                                return this.data.saveObject(this.selectedInventory, this.INVENTORY_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse = _context2.sent;
+
+                                if (!_serverResponse.error) {
+                                    this.selectedInventory = _serverResponse;
+                                    this.inventoryArray.push(this.selectedInventory);
+                                    this.selectedIndex = this.inventoryArray.length - 1;
+                                }
+                                return _context2.abrupt('return', _serverResponse);
+
+                            case 10:
+                                _context2.next = 12;
+                                return this.data.saveObject(this.selectedInventory, this.INVENTORY_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    this.inventoryArray[this.selectedIndex] = this.utils.copyObject(this.selectedInventory, this.inventoryArray[this.selectedIndex]);
+                                }
+                                return _context2.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function saveInventory() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return saveInventory;
+        }();
+
+        Inventory.prototype.isDirty = function isDirty(obj) {
+            if (this.selectedInventory) {
+                if (!obj) {
+                    var obj = this.emptyInventory();
+                }
+                var skip = ['file'];
+                return this.utils.objectsEqual(this.selectedInventory, obj, skip);
+            }
+            return new Array();
+        };
+
+        return Inventory;
+    }()) || _class);
+});
+define('modules/admin/inventory/inventory',[], function () {});
+define('modules/admin/inventory/editInventory',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/utils', '../../../resources/data/inventory', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/documents', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _utils, _inventory, _validation, _dataTable, _appConfig, _documents, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditInventory = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditInventory = exports.EditInventory = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _inventory.Inventory, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _documents.DocumentsServices), _dec(_class = function () {
+        function EditInventory(router, inventory, validation, utils, datatable, config, dialog, documents) {
+            _classCallCheck(this, EditInventory);
+
+            this.systemSelected = false;
+            this.spinnerHTML = "";
+            this.addressSelected = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+            this.address = "";
+            this.description = "";
+            this.tabs = [{ id: 'Maintenance', title: 'Maintenance' }, { id: 'Purchase', title: 'Purchase' }, { id: 'Technical', title: "Technical" }, { id: 'Documents', title: "Documents" }];
+            this.tabPath = './';
+
+            this.router = router;
+            this.inventory = inventory;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.documents = documents;
+        }
+
+        EditInventory.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditInventory.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.inventory.getInventoryArray('?order=systemName', true), this.config.getConfig(), this.documents.getDocumentsCategoriesArray(), this.config.getSessions()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.inventory.inventoryArray);
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditInventory.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.systems.getInventoryArray('?order=systemName', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.inventory.inventoryArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditInventory.prototype.new = function _new() {
+            this.editIndex = -1;
+            this.inventory.selectInventory();
+            (0, _jquery2.default)("#editSystemName").focus();
+            this.systemSelected = true;
+        };
+
+        EditInventory.prototype.edit = function edit(index, el) {
+            this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+            this.inventory.selectInventory(this.editIndex);
+            this.systemSelected = true;
+            (0, _jquery2.default)("#editSystemName").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        EditInventory.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                response = this.inventory.saveInventory();
+
+                                if (!response.error) {
+                                    this.utils.showNotification('The system was saved');
+                                }
+                                this._cleanUp();
+
+                            case 3:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditInventory.prototype._cleanUp = function _cleanUp() {
+            this.systemSelected = false;
+        };
+
+        EditInventory.prototype.cancel = function cancel() {};
+
+        EditInventory.prototype.back = function back() {
+            this.systemSelected = false;
+        };
+
+        EditInventory.prototype.newIP = function newIP() {
+            this.address = "";
+            this.description = "";
+            this.selectedAddress = -1;
+            this.addressSelected = true;
+        };
+
+        EditInventory.prototype.editIP = function editIP(index, event) {
+            this.selectedAddress = index;
+            this.address = this.inventory.selectedInventory.IPAddress[index].address;
+            this.description = this.inventory.selectedInventory.IPAddress[index].description;
+        };
+
+        EditInventory.prototype.saveAddress = function saveAddress() {
+            if (this.selectedAddress > -1) {
+                this.inventory.selectedInventory.IPAddress[this.selectedAddress].address = this.address;
+                this.inventory.selectedInventory.IPAddress[this.selectedAddress].description = this.description;
+            } else {
+                this.inventory.selectedInventory.IPAddress.push({
+                    "address": this.address,
+                    "description": this.description
+                });
+            }
+            this.addressSelected = false;
+        };
+
+        EditInventory.prototype.cancelEditAddress = function cancelEditAddress() {
+            if (this.selectedAddress > -1) {
+                this.address = this.inventory.selectedInventory.IPAddress[this.selectedAddress].address;
+                this.description = this.inventory.selectedInventory.IPAddress[this.selectedAddress].description;
+            } else {
+                this.address = "";
+                this.description = "";
+            }
+        };
+
+        EditInventory.prototype.addDocument = function addDocument(index) {
+            if (!this.inventory.selectedInventory.documents) this.inventory.selectedInventory.documents = new Array();
+            for (var i = 0; i < this.inventory.selectedInventory.documents.length; i++) {
+                if (this.inventory.selectedInventory.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
+                    return;
+                }
+            }
+            var newDoc = {
+                categoryCode: this.documents.selectedDocument.categoryCode,
+                categoryName: this.documents.selectedDocument.name,
+                fileName: this.documents.selectedDocument.files[index].fileName,
+                default: true
+            };
+            this.inventory.selectedInventory.documents.push(newDoc);
+        };
+
+        EditInventory.prototype.chooseDocument = function chooseDocument(index, event) {
+            this.documents.selectDocument(index);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(event.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        EditInventory.prototype.toggleDefault = function toggleDefault(index) {
+            this.inventory.selectedInventory.documents[index].default = !this.inventory.selectedInventory.documents[index].default;
+        };
+
+        EditInventory.prototype.removeDocument = function removeDocument(index) {
+            this.inventory.selectedInventory.documents.splice(index, 1);
+        };
+
+        EditInventory.prototype.typeChanged = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context4.next = 6;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context4.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.showDocuments = true;
+
+                            case 6:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function typeChanged(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        EditInventory.prototype.changeTab = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(el, index) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                (0, _jquery2.default)("#invFormListGroup.list-group").children().removeClass('active');
+                                (0, _jquery2.default)(el.target).parent().addClass('active');
+                                (0, _jquery2.default)(".in").removeClass('active').removeClass('in');
+                                (0, _jquery2.default)("#" + el.target.id + "Tab").addClass('in').addClass('active');
+
+                            case 4:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function changeTab(_x2, _x3) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return changeTab;
+        }();
+
+        return EditInventory;
+    }()) || _class);
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"resources/css/styles.css\"></require>\n  <require from=\"humane-js/themes/flatty.css\"></require>\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\n\n  <nav-bar></nav-bar>\n\n  <div class=\"page-host\">\n     <loading-indicator loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n  </div>\n   \n</template>"; });
 define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], function(module) { module.exports = "/*!\n * Datetimepicker for Bootstrap 3\n * version : 4.17.43\n * https://github.com/Eonasdan/bootstrap-datetimepicker/\n */.bootstrap-datetimepicker-widget{list-style:none}.bootstrap-datetimepicker-widget.dropdown-menu{margin:2px 0;padding:4px;width:19em}@media (min-width:768px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:992px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:1200px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}.bootstrap-datetimepicker-widget.dropdown-menu:before,.bootstrap-datetimepicker-widget.dropdown-menu:after{content:'';display:inline-block;position:absolute}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:before{border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #ccc;border-bottom-color:rgba(0,0,0,0.2);top:-7px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:after{border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid white;top:-6px;left:8px}.bootstrap-datetimepicker-widget.dropdown-menu.top:before{border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ccc;border-top-color:rgba(0,0,0,0.2);bottom:-7px;left:6px}.bootstrap-datetimepicker-widget.dropdown-menu.top:after{border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid white;bottom:-6px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before{left:auto;right:6px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after{left:auto;right:7px}.bootstrap-datetimepicker-widget .list-unstyled{margin:0}.bootstrap-datetimepicker-widget a[data-action]{padding:6px 0}.bootstrap-datetimepicker-widget a[data-action]:active{box-shadow:none}.bootstrap-datetimepicker-widget .timepicker-hour,.bootstrap-datetimepicker-widget .timepicker-minute,.bootstrap-datetimepicker-widget .timepicker-second{width:54px;font-weight:bold;font-size:1.2em;margin:0}.bootstrap-datetimepicker-widget button[data-action]{padding:6px}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"togglePeriod\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle AM/PM\"}.bootstrap-datetimepicker-widget .btn[data-action=\"clear\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Clear the picker\"}.bootstrap-datetimepicker-widget .btn[data-action=\"today\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Set the date to today\"}.bootstrap-datetimepicker-widget .picker-switch{text-align:center}.bootstrap-datetimepicker-widget .picker-switch::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle Date and Time Screens\"}.bootstrap-datetimepicker-widget .picker-switch td{padding:0;margin:0;height:auto;width:auto;line-height:inherit}.bootstrap-datetimepicker-widget .picker-switch td span{line-height:2.5;height:2.5em;width:100%}.bootstrap-datetimepicker-widget table{width:100%;margin:0}.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{text-align:center;border-radius:4px}.bootstrap-datetimepicker-widget table th{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table th.picker-switch{width:145px}.bootstrap-datetimepicker-widget table th.disabled,.bootstrap-datetimepicker-widget table th.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table th.prev::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Previous Month\"}.bootstrap-datetimepicker-widget table th.next::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Next Month\"}.bootstrap-datetimepicker-widget table thead tr:first-child th{cursor:pointer}.bootstrap-datetimepicker-widget table thead tr:first-child th:hover{background:#eee}.bootstrap-datetimepicker-widget table td{height:54px;line-height:54px;width:54px}.bootstrap-datetimepicker-widget table td.cw{font-size:.8em;height:20px;line-height:20px;color:#777}.bootstrap-datetimepicker-widget table td.day{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table td.hour:hover,.bootstrap-datetimepicker-widget table td.minute:hover,.bootstrap-datetimepicker-widget table td.second:hover{background:#eee;cursor:pointer}.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:#777}.bootstrap-datetimepicker-widget table td.today{position:relative}.bootstrap-datetimepicker-widget table td.today:before{content:'';display:inline-block;border:solid transparent;border-width:0 0 7px 7px;border-bottom-color:#337ab7;border-top-color:rgba(0,0,0,0.2);position:absolute;bottom:4px;right:4px}.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td.active.today:before{border-bottom-color:#fff}.bootstrap-datetimepicker-widget table td.disabled,.bootstrap-datetimepicker-widget table td.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table td span{display:inline-block;width:54px;height:54px;line-height:54px;margin:2px 1.5px;cursor:pointer;border-radius:4px}.bootstrap-datetimepicker-widget table td span:hover{background:#eee}.bootstrap-datetimepicker-widget table td span.active{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td span.old{color:#777}.bootstrap-datetimepicker-widget table td span.disabled,.bootstrap-datetimepicker-widget table td span.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget.usetwentyfour td.hour{height:27px;line-height:27px}.bootstrap-datetimepicker-widget.wider{width:21em}.bootstrap-datetimepicker-widget .datepicker-decades .decade{line-height:1.8em !important}.input-group.date .input-group-addon{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}"; });
@@ -31665,7 +32974,7 @@ define('text!resources/elements/add-systems.html', ['module'], function(module) 
 define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input disabled.bind=\"disabled\" type='text' class=\"form-control\" id=\"input-${controlid}\"/>\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
 define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
 define('text!resources/elements/multiselect.html', ['module'], function(module) { module.exports = "<template>\n\t<label>${label}</label><br/>\n\t<select value.bind=\"value\" multiple ref=\"select\" class=\"selectpicker\">\n    \t<option repeat.for=\"option of options\" value.bind=\"option.code\">${option.description}</option>\n  \t</select>\n</template>"; });
-define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>  \n                   \n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"-->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                             <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>  \n                   \n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"-->\n        </div>\n        <!-- /.container-fluid -->\n    </nav>\n</template>"; });
 define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
 define('text!resources/elements/rate-it.html', ['module'], function(module) { module.exports = "<template>\n    <fieldset class=\"rating\">\n\t\t<span repeat.for=\"rate of rates\" >\n\t\t\t<input  type=\"radio\" name=\"${rate.name}\" id=\"${rate.id}\" title=\"${rate.title}\" />\n\t\t\t<label click.delegate=\"rateIt(rate.value, $index)\" class=\"${rate.class}\" for=\"${rate.title}\" title=\"${rate.title}\"></label>\n\t\t</span>\n    </fieldset>\n\n\t<!--\n\t<fieldset class=\"rating\">\n\t\t<input click.trigger=\"rateIt(5)\" id=\"star5\" type=\"radio\"  name=\"rating\" value=\"5\" /><label class=\"full\" for=\"star5\"\n\t\t\ttitle=\"Awesome - 5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4.5)\" type=\"radio\" id=\"star4half\" name=\"rating\" value=\"4 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star4half\" title=\"Pretty good - 4.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4)\" type=\"radio\" id=\"star4\" name=\"rating\" value=\"4\" /><label class=\"full\" for=\"star4\"\n\t\t\ttitle=\"Pretty good - 4 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3.5)\" type=\"radio\" id=\"star3half\" name=\"rating\" value=\"3 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star3half\" title=\"Meh - 3.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3)\" type=\"radio\" id=\"star3\" name=\"rating\" value=\"3\" /><label class=\"full\" for=\"star3\"\n\t\t\ttitle=\"Meh - 3 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2.5)\" type=\"radio\" id=\"star2half\" name=\"rating\" value=\"2 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star2half\" title=\"Kinda bad - 2.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2)\" type=\"radio\" id=\"star2\" name=\"rating\" value=\"2\" /><label class=\"full\" for=\"star2\"\n\t\t\ttitle=\"Kinda bad - 2 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1.5)\" type=\"radio\" id=\"star1half\" name=\"rating\" value=\"1 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star1half\" title=\"Meh - 1.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1)\" type=\"radio\" id=\"star1\" name=\"rating\" value=\"1\" /><label class=\"full\" for=\"star1\"\n\t\t\ttitle=\"Sucks big time - 1 star\"></label>\n\t\t<input click.trigger=\"rateIt(.5)\" type=\"radio\" id=\"starhalf\" name=\"rating\" value=\"half\" /><label class=\"half\" for=\"starhalf\"\n\t\t\ttitle=\"Sucks big time - 0.5 stars\"></label>\n\t</fieldset>\n\t-->\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
@@ -31737,7 +33046,7 @@ define('text!modules/admin/customers/components/Password.html', ['module'], func
 define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select keypress.bind=\"setStatus($event)\" value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='6'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"nickName\" type=\"text\" placeholder=\"Filter Nickname\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"person of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                 <td data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td data-title=\"Email\">${person.email}</td>\r\n                                <td data-title=\"Role\">${person.roles}</td>\r\n                                <td data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
-define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\"  value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                        <div id=\"editFiles\"></div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | personName:people.peopleArray}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>  \r\n\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <div class=\"checkbox\">\r\n                                    <label class=\"pull-left\">\r\n                                        <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                    </label>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-sm-12 col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-6 col-lg-offset-2\">\r\n                    <div class=\"panel panel-default\">\r\n                        <div class=\"input-group\">\r\n                            <span class=\"input-group-btn\">\r\n                                <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\r\n                                Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\r\n                                </span>\r\n                            </span>\r\n                            <input type=\"text\"  value.bind=\"selectedFile\" class=\"form-control\" readonly/>\r\n                        </div>\r\n                    </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-6 col-lg-offset-2\">\r\n                        <div id=\"editFiles\"></div>\r\n                </div>\r\n            </form>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name</th>\r\n                            <th>Version</th>\r\n                            <th>Date Uploaded</th>\r\n                            <th>Uploaded By</th>\r\n                            <th>Status</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                            <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                            <td data-title=\"Version\">${item.version}</td>\r\n                            <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                            <td data-title=\"Person\">${item.personId | person:people.peopleArray:\"fullName\"}</td>\r\n                            <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                            <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n\t\t\t\t\t\t\t<a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\"\n                                aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\t\t\t<div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\">\n                    <div class=\"panel-body\">\n                        <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n                            <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                        </div>\n                        <div class=\"row\">\n                            <div class=\"col-sm-12 col-lg-12\">\n                                <div class=\"form-group\">\n                                    <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                                    <div class=\"col-sm-8\">\n                                        <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\"\n                                            type=\"text\" />\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\t\t\t <div class=\"col-lg-8  col-lg-offset-2\">\n\t\t\t \t<editor value.bind=\"people.selectedNote.note\" height=\"250\"></editor>\n\t\t\t </div>\n\t\t</form>\n\t</div>\t\n</template>"; });
 define('text!modules/admin/notes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='4'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Category <span click.trigger=\"dataTable.sortArray('title')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Note <span click.trigger=\"dataTable.sortArray('expiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                   <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"\"></option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n\t\t\t\t\t\t\t\t\t</select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"dateCreated\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"note\" type=\"text\" placeholder=\"Filter note\" class=\"form-control\"\n                                    />\n                                </th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"item of dataTable.displayArray\">\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Category\">${item.category}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Date Created\" style=\"width: 75px\">\n                                    <div>${item.dateCreated | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\">${item.note}</td>\n                                <td style=\"width:5rem;\">\n                                    <span show.bind=\"item.reference\" click.trigger=\"navigateToHelpTicket(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View\"><i class=\"fa fa-eye fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
@@ -31852,11 +33161,32 @@ define('text!resources/htTimeline/help-ticket-99.html', ['module'], function(mod
 define('text!resources/htTimeline/11-time.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <div class=\"row\">\n        <div class=\"col-lg-3\">\n          <h4 class=\"topMargin\">Application: ${event.content.applicationId | productName:apps.appDownloadsArray}</h4>\n          <div show.bind=\"event.content.osWindows || event.content.osMac\">\n            <h4 class=\"topMargin\">Operating System</h4>\n            <label show.bind=\"event.content.osWindows\">Windows versions: ${event.content.windowsVersion}</label>\n            <label show.bind=\"event.content.osWindows32bit\">32-bit</label>\n            <label show.bind=\"event.content.osWindows64bit\">64-bit</label>\n            <label show.bind=\"event.content.osMac\">Mac versions: ${event.content.macVersion}</label>\n          </div>\n          <div show.bind=\"event.content.officeInvolved\">\n            <h4 class=\"topMargin\">Microsoft Office</h4>\n            <label show.bind=\"event.content.officeVersion\">Office versions: ${event.content.officeVersion}</label>\n          </div>\n          <div show.bind=\"event.content.wiredNetwork || event.content.wirelessNetwork || event.content.campusNetwork || event.content.personalNetwork\">\n            <h4 class=\"topMargin\">Network</h4>\n            <label show.bind=\"event.content.wiredNetwork\">Wired</label>\n            <label show.bind=\"event.content.wirelessNetwork\">Wireless</label>\n            <label show.bind=\"event.content.campusNetwork\">Campus</label>\n            <label show.bind=\"event.content.personalNetwork\">Personal/Private Network</label>\n          </div>\n        </div>\n        <div class=\"col-lg-8\">\n          <div if.bind=\"event.content.comments.length > 0\" innerhtml.bind=\"event.content.comments\"></div> \n        </div>\n       </div>\n</template>"; });
 define('text!resources/htTimeline/help-ticket-11.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\" col-md-12\" id=\"appHelp\">\n      <div class=\"row\">\n        <div class=\"topMargin\">\n          <label class=\"control-label\">Application</label>\n          <select value.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" id=\"application\" class=\"form-control\">\n            <option value=\"\">Select an application</option>\n            <option repeat.for=\"app of apps.appDownloadsArray\" \n                    value.bind=\"app._id\">${app.name}</option>\n          </select>\n        </div>\n      </div>\n      <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"row topMargin\">\n         <label class=\"control-label\">Describe the Operating System</label>\n         <div class=\"panel panel-default\">\n          <div class=\"panel-body\">\n            <div class=\"row\">\n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input id=\"osWindowsUsed\" checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" type=\"checkbox\"> Windows\n                  </label>\n                  <input show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\" value.bind=\"helpTickets.selectedHelpTicketContent.content.windowsVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Windows 8, 8.1, 10, etc.\" type=\"text\" />\n                  <div class=\"row\"  show.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows\">\n                    <div class=\"checkbox col-lg-6\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows32bit\" type=\"checkbox\"> 32-bit\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osWindows64bit\" type=\"checkbox\"> 64-bit\n                      </label>\n                    </div>\n                </div>\n                </div>\n              </div>  \n              <div class=\"col-lg-6\">\n                <div class=\"checkbox\">\n                  <label>\n                    <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" type=\"checkbox\"> Mac OS\n                  </label>\n                  <input  show.bind=\"helpTickets.selectedHelpTicketContent.content.osMac\" value.bind=\"helpTickets.selectedHelpTicketContent.content.macVersion\" id=\"editDropDate\" class=\"form-control\" placeholder=\"Mac OS Versions\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n              \n            </div>\n          </div>\n        </div>\n        \n        <div class=\"row\">\n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Other Software Involved</label>\n              <div class=\"panel panel-default\">\n                <div class=\"panel-body\">\n                  <div class=\"row\">\n                    <div class=\"col-lg-6\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\" type=\"checkbox\"> Is Microsoft Office involved?\n                        </label>\n                        <input show.bind=\"helpTickets.selectedHelpTicketContent.content.officeInvolved\"  value.bind=\"helpTickets.selectedHelpTicketContent.content.officeVersion\" id=\"editJoinDate\" class=\"form-control\" placeholder=\"2007, 2010, 2013, etc.\" type=\"text\" />\n                      </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        \n          <div show.bind=\"helpTickets.selectedHelpTicketContent.content.applicationId\" class=\"topMargin col-lg-6\">\n            <label class=\"control-label\">Describe the Network Connection</label>\n            <div class=\"panel panel-default\">\n              <div class=\"panel-body\">\n                <div class=\"row\">\n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wiredNetwork\" type=\"checkbox\"> Wired\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.wirelessNetwork\" type=\"checkbox\"> Wireless\n                      </label>\n                    </div>\n                  </div>\n                  <div class=\"row\">  \n                    <div class=\"checkbox col-lg-12\">\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.campusNetwork\" type=\"checkbox\"> Campus\n                      </label>\n                      <label class=\"checkbox-inline\">\n                        <input checked.bind=\"helpTickets.selectedHelpTicketContent.content.personalNetwork\" type=\"checkbox\"> Personal/Private Network\n                      </label>\n                    </div>\n                  </div>\n                </div>\n                  \n              </div>\n            </div>\n        </div>\n      \n  </div>\n</template>"; });
 define('text!resources/htTimeline/98-time.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"form-group\">\n      <p>${event.personId | person:people.peopleArray:'fullName'}</p>\n      <div class=\"row\">\n        <div class=\"col-lg-3\">\n          <h4 show.bind=\"showRequestDetails\" class=\"topMargin\">System: ${systems.selectedSystem.sid}</h4>\n          <h4 show.bind=\"showRequestDetails\">Client: ${systems.selectedClient.client}</h4>\n          <h4 show.bind=\"!showRequestDetails\" class=\"topMargin\">Client not assigned</h4>\n        </div>\n        <div class=\"col-lg-8\">\n          <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n        </div>\n      </div>\n\t </div>\n</template>\n"; });
-define('text!modules/social/social.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Social</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\"  repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n\t\t\t\t\t<li if.bind=\"blogAuthor\" class=\"${row.isActive ? 'active' : ''}\"><a href=\"#/social/writeBlog\">Write a Blog</a></li>\n                </ul>\n            </div>\n    </nav>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
+define('text!modules/social/social.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Social</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\"  repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n\t\t\t\t\t<li if.bind=\"blogAuthor\" class=\"${row.isActive ? 'active' : ''}\"><a href=\"#/social/writeBlog\">Write a Blog</a></li>\n\t\t\t\t\t<li if.bind=\"userObj.userRole >= config.UCC_ROLE\" class=\"${row.isActive ? 'active' : ''}\"><a href=\"#/social/editBlog\">Edit Blogs</a></li>\n                </ul>\n            </div>\n    </nav>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/social/editBlogs.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/blogList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogPage.html\"></compose>\n            </div> \n      </div> \n</template>\n"; });
 define('text!modules/social/editForums.html', ['module'], function(module) { module.exports = "<template>\n\tForums\n</template>"; });
-define('text!modules/social/components/blogList.html', ['module'], function(module) { module.exports = "<template>\n\t<ul>\n\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${blog.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${blog.teaser}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span click.trigger=\"like($index)\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\t\tdata-original-title=\"Like\"><i class=\"fa fa-thumbs-o-up fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t${blog.likes}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/social/components/blogList.html', ['module'], function(module) { module.exports = "<template>\n\t<ul>\n\t\t<li show.bind=\"blog.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${blog.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${blog.teaser}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\n\t\t\t\t\t<span click.trigger=\"like($index)\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\t\tdata-original-title=\"Like\"><i class=\"fa fa-thumbs-o-up fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
 define('text!modules/social/components/blogPost.html', ['module'], function(module) { module.exports = ""; });
-define('text!modules/social/components/blogPage.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"col-lg-2 topMargin\" innerhtml='${social.selectedBlog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t<div class=\"col-lg-10\">\n\t\t\t<h3>${social.selectedBlog.title}</h3>\n\t\t\t<div class=\"topMargin\" innerhtml.bind=\"social.selectedBlog.text\"></div>\n\t\t</div>\n\t</div>\n</template> "; });
-define('text!modules/social/writeBlog.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"!newItem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"social.selectedBlog.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Teaser</label>\n\t\t\t\t\t\t<textarea value.bind=\"social.selectedBlog.teaser\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Teaser\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<editor id=\"blogContent\" value.bind=\"social.selectedBlog.text\" height=\"800\"></editor>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/social/components/blogPage.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"col-lg-2 topMargin\" innerhtml='${social.selectedBlog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t<div class=\"col-lg-10\">\n\t\t\t<h3>${social.selectedBlog.title}</h3>\n\t\t\t<span>${social.selectedBlog.dateCreated | dateFormat}</span>\n\t\t\t<span class=\"leftMargin\">Likes: ${social.selectedBlog.likes}</span>\n\t\t\t<span click.trigger=\"like(999)\" class=\"smallMarginLeft\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Like\"><i class=\"fa fa-thumbs-o-up fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"social.selectedBlog.views > 0\" class=\"leftMargin\">Views: ${social.selectedBlog.views}</span>\n\t\t\t<div class=\"topMargin\" innerhtml.bind=\"social.selectedBlog.text\"></div>\n\t\t</div>\n\t</div>\n</template> "; });
+define('text!modules/social/writeBlog.html', ['module'], function(module) { module.exports = "<template>\n\t\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/writeBlogList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogForm.html\"></compose>\n            </div> \n      </div> \n</template>"; });
+define('text!modules/social/viewBlogs.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/blogList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogPage.html\"></compose>\n            </div> \n      </div> \n</template>\n"; });
+define('text!modules/social/editBlog.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/blogListUCC.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogPageUCC.html\"></compose>\n            </div> \n      </div> \n</template>"; });
+define('text!modules/social/components/blogListUCC.html', ['module'], function(module) { module.exports = "<template>\n\t<ul>\n\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${blog.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${blog.teaser}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Active: ${blog.active}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/social/components/blogPageUCC.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"!social.selectedBlog.active\" click.delegate=\"toggleActivation()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Activate\"><i class=\"fa fa-eye fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"social.selectedBlog.active\" click.delegate=\"toggleActivation()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Inactivate\"><i class=\"fa fa-eye-slash fa-lg fa-border\" aria-hidden=\"true\"></i></span>\t\t\t\t\n\t\t</div>\n\t\t<div class=\"col-lg-2 topMargin\" innerhtml='${social.selectedBlog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t<div class=\"col-lg-10\">\n\t\t\t<h3>${social.selectedBlog.title}</h3>\n\t\t\t<div class=\"topMargin\" innerhtml.bind=\"social.selectedBlog.text\"></div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/social/components/blogForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"!newItem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"social.selectedBlog.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Teaser</label>\n\t\t\t\t\t\t<textarea value.bind=\"social.selectedBlog.teaser\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Teaser\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<editor id=\"blogContent\" value.bind=\"social.selectedBlog.text\" height=\"800\"></editor>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/social/components/writeBlogList.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"New\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t</div>\n\t<ul>\n\t\t<li show.bind=\"blog.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${blog.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${blog.teaser}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/social/viewForums.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!forumSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/forumList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"forumSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/forumPage.html\"></compose>\n            </div> \n      </div> \n</template>"; });
+define('text!modules/social/components/ForumList.html', ['module'], function(module) { module.exports = "<template>\n\t<ul>\n\t\t<li show.bind=\"forum.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumArray\">\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${forum.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${forum.text}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${forum.topics}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${forum.posts}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/social/components/forumPage.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"list-group-item\" style=\"margin-top:5px;\">\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<h4>${social.selectedForum.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<span>${social.selectedForum.text}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${social.selectedForum.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${social.selectedForum.topics}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${social.selectedForum.posts}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"bottomMargin topMargin list-group-item\">\n\t\t\t<span click.delegate=\"newForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum Topic\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div show.bind=\"openNewTopicForm\">\n\t\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t\t<span click.delegate=\"saveForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancelFormTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"FormTopicTitle\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t<textarea value.bind=\"ForumTopicText\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div>\n\t\t<ul>\n\t\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumMessageArray\">\n\t\t\t\t<div class=\"media-body\">\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t\t<h4>${forum.title}</h4>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t\t<span>${forum.text}</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</li>\n\t\t</ul>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/social/components/forumList.html', ['module'], function(module) { module.exports = "<template>\n\t<div>\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"newForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div show.bind=\"openNewForumForm\">\n\t\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t\t<span click.delegate=\"saveForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t<textarea value.bind=\"text\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<ul>\n\t\t<li show.bind=\"forum.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumArray\">\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${forum.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${forum.text}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${forum.topics}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${forum.posts}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/admin/inventory/inventory.html', ['module'], function(module) { module.exports = "<template>\n\t    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
+define('text!modules/admin/inventory/components/inventoryTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <div id=\"no-more-tables\">\n                    <table id=\"productsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr colspan='4'>\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n\t\t\t\t\t\t\t</tr>                           \n                            <tr>\n                                <td colspan='4'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th>System<span click.trigger=\"dataTable.sortArray('systemName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>System<span click.trigger=\"dataTable.sortArray('serialNumber')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>System<span click.trigger=\"dataTable.sortArray('modelNumber')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>System<span click.trigger=\"dataTable.sortArray('type')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"systemName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                 <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"serialNumber\" type=\"text\" placeholder=\"Filter Serial\" class=\"form-control\">\n                                </th>\n                                 <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"modelNumber\" type=\"text\" placeholder=\"Filter Model\" class=\"form-control\">\n                                </th>\n                                 <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"type\" compare=\"status\">\n                                        <option value=\"\"></option>\n                                        <option repeat.for=\"type of config.systemTypes\" value=\"${type}\">${type}</option>\n                                    </select>\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"system of dataTable.displayArray\">\n                                <td data-title=\"Name\">${system.systemName}</td>\n                                <td data-title=\"Name\">${system.serialNumber}</td>\n                                <td data-title=\"Name\">${system.modelNumber}</td>\n                                <td data-title=\"Name\">${system.type}</td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/inventory/components/inventoryForm.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"fluid-container\">\n\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"!inventory.selectedInventory._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <div class=\"topMargin leftMargin\">\n            <form class=\"form-horizontal topMargin\">\n\t\t\t\t<div class=\"row\">\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t\t<label>Name *</label>\n\t\t\t\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.systemName\" id=\"editSystemName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t\t<label>Description *</label>\n\t\t\t\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.description\" id=\"editDescription\" class=\"form-control\" placeholder=\"Description\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t\t<label>Date Created</label>\n\t\t\t\t\t\t\t\t<date-picker value.two-way=\"inventory.selectedInventory.dateCreated\"  controlid=\"createdDate\"></date-picker>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<table id=\"coursesTable\" class=\"table table-striped table-hover\">\n\t\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<th>Document </th>\n\t\t\t\t\t\t\t\t\t<th>Default</th>\n\t\t\t\t\t\t\t\t\t<th></th>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t<tr repeat.for=\"document of inventory.selectedInventory.documents\">\n\t\t\t\t\t\t\t\t\t<td data-title=\"name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryName}/${document.fileName}\">${document.fileName}</a></td>\n\t\t\t\t\t\t\t\t\t<td data-title=\"default\" click.trigger=\"toggleDefault($index)\" innerhtml.bind='document.default | checkBox'></td>\n\t\t\t\t\t\t\t\t\t<td  click.trigger=\"removeDocument($index)\"><i class=\"fa fa-trash\"></i></td>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"row\">\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t\t<label>Serial Number</label>\n\t\t\t\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.serialNumber\" class=\"form-control\" placeholder=\"Serial Number\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t\t<label>Model Number</label>\n\t\t\t\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.modelNumber\" class=\"form-control\" placeholder=\"Model Number\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\"> \n                            <div class=\"col-sm-10\">\n                                <label class=\"left\">Type *</label>\n                                <select value.bind=\"inventory.selectedInventory.type\" class=\"form-control\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"type of config.systemTypes\" value.bind=\"type\">${type}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n\t\t\t\t</div>\n\t\t\t</form>\n        </div>\n\n\t\t<div class=\"row topMargin leftMargin\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"panel panel-default\">\n\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t<div class=\"col-lg-2\">\n\t\t\t\t\t\t\t<div id=\"invFormListGroup\" class=\"list-group\">\n\t\t\t\t\t\t\t\t<a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\n\t\t\t\t\t\t\t\t\t<h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.title}</h4>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"col-lg-10\">\n\t\t\t\t\t\t\t<div class=\"tab-content\">\n\t\t\t\t\t\t\t\t<div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\n\t\t\t\t\t\t\t\t\t<compose view=\"${tabPath + tab.id + '.html'}\"></compose>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t\n\t </div>\n</template>"; });
+define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\n\t    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
+define('text!modules/admin/inventory/components/Miantenance.html', ['module'], function(module) { module.exports = "<template>\n</template>"; });
+define('text!modules/admin/inventory/components/Purchase.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Name</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorName\"  class=\"form-control\" placeholder=\"Vendor Name\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Date Purchased</label>\n\t\t\t\t\t<date-picker value.two-way=\"inventory.selectedInventory.datePurchased\"  controlid=\"createdDate\"></date-picker>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>PO Number</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.poNumber\"  class=\"form-control\" placeholder=\"PO Number\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Contact </label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorContact\"  class=\"form-control\" placeholder=\"Contact Name\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Phone</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorPhone\"  class=\"form-control\" placeholder=\"Phone\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Email</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorEmail\"  class=\"form-control\" placeholder=\"Email\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/admin/inventory/components/Technical.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Admin User ID</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.adminUserId\"  class=\"form-control\" placeholder=\"Admin User ID\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Admin Password</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.adminPassword\"  class=\"form-control\" placeholder=\"Admin Password\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>System URL</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.systemUrl\"  class=\"form-control\" placeholder=\"System URL\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"topMargin\">\n        <table  class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"newIP()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">IP </th>\n                    <th style=\"width:30rem;\">Description</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"editIP($index, $event)\"  repeat.for=\"address of inventory.selectedInventory.IPAddress\">\n                    <td data-title=\"Address\">${address.address} </td>\n                    <td data-title=\"Descriptino\">${address.description}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"addressSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"saveAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"address\" ref=\"ipAddress\" type=\"text\" placeholder=\"Address\" class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"description\" ref=\"ipDescription\" type=\"text\" placeholder=\"Description\" class=\"form-control\"/>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/inventory/components/Maintenance.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Name</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceProvider\"  class=\"form-control\" placeholder=\"Vendor Name\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Contract Number</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceContract\"  class=\"form-control\" placeholder=\"Contract Number\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Customer Number</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceCustomerNumber\"  class=\"form-control\" placeholder=\"Customer Number\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Email</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceContact\"  class=\"form-control\" placeholder=\"Contact\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Phone</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenancePhone\"  class=\"form-control\" placeholder=\"Phone\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Email</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceEmail\"  class=\"form-control\" placeholder=\"Vendor Email\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>URL</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenanceUrl\"  class=\"form-control\" placeholder=\"Contract URL\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>User ID</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenaceUserId\"  class=\"form-control\" placeholder=\"User ID\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\t\n\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Password</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.maintenancePassword\"  class=\"form-control\" placeholder=\"Password\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Date Created</label>\n\t\t\t\t\t<date-picker value.two-way=\"inventory.selectedInventory.maintenanceStartDate\"  controlid=\"maintenanceStartDate\"></date-picker>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>End Date</label>\n\t\t\t\t\t<date-picker value.two-way=\"inventory.selectedInventory.maintenanceEndDate\"  controlid=\"maintenanceEndDate\"></date-picker>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!modules/admin/inventory/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
+define('text!modules/admin/inventory/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n\r\n     <div class=\"col-lg-6\">\r\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\r\n            <thead>\r\n                <tr>\r\n                    <th>Document </th>\r\n                    <th>Default</th>\r\n                    <th></th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"document of inventory.selectedInventory.documents\">\r\n                    <td data-title=\"name\">${document.fileName} </td>\r\n                    <td data-title=\"default\" click.trigger=\"toggleDefault($index)\" innerhtml.bind='document.default | checkBox'></td>\r\n                    <td  click.trigger=\"removeDocument($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/inventory/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

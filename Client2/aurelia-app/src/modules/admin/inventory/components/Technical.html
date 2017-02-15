@@ -1,0 +1,69 @@
+<template>
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Admin User ID</label>
+					<input value.bind="inventory.selectedInventory.adminUserId"  class="form-control" placeholder="Admin User ID" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Admin Password</label>
+					<input value.bind="inventory.selectedInventory.adminPassword"  class="form-control" placeholder="Admin Password" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>System URL</label>
+					<input value.bind="inventory.selectedInventory.systemUrl"  class="form-control" placeholder="System URL" type="text" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="topMargin">
+        <table  class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <td colspan='6'>
+                        <span click.delegate="newIP()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Course"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                        <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width:20rem;">IP </th>
+                    <th style="width:30rem;">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="selectCourse" click.delegate="editIP($index, $event)"  repeat.for="address of inventory.selectedInventory.IPAddress">
+                    <td data-title="Address">${address.address} </td>
+                    <td data-title="Descriptino">${address.description}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row" show.bind="addressSelected">
+            <div class="panel panel-default col-md-12">
+                <div class="panel-body">
+                    <div class="bottomMargin">
+                        <div class="bottomMargin list-group-item">
+                            <span click.delegate="saveAddress()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+                            <span click.delegate="cancelEditAddress()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+                        </div>  
+                    </div>
+                    <div class="form-group">
+                        <input id="number" value.bind="address" ref="ipAddress" type="text" placeholder="Address" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <input id="name" value.bind="description" ref="ipDescription" type="text" placeholder="Description" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

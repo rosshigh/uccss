@@ -6,6 +6,7 @@ var express = require('express'),
 	mkdirp = require('mkdirp'),
   	Blog = mongoose.model('Blog'),
 	Forum = mongoose.model('Forum'),
+	ForumMessage = mongoose.model('ForumMessage'),
 	logger = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
@@ -52,7 +53,7 @@ module.exports = function (app) {
 	router.put('/api/blogs', requireAuth, function(req, res, next){
 		logger.log('Update blog '+ req.body._id, 'verbose');
 
-		Blog.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+		Blog.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
 		.exec()
 		.then(result => {
 			res.status(200).json(result);
@@ -90,28 +91,11 @@ module.exports = function (app) {
 	});
 
 	router.post('/api/forums', requireAuth, function(req, res, next){
-		logger.log('Create blog', "verbose");
+		logger.log('Create forum', "verbose");
 		var forum =  new Forum(req.body);
 		forum.save()
-			.then(item => {			
-				if(item.parentId){
-					Forum.findById(item.parentId)
-					.then(parent => {
-						if(parent){
-							parent.children = parent.children ? parent.children : new Array();
-							parent.children.push(item._id);
-							parent.save()
-							.then(parentModified => {
-								res.status(200).json(item);
-							})
-							.catch(error => {
-								return next(error);
-							})
-						} else {
-							res.status(200).json(item);
-						}
-					})
-				}
+			.then(item => {	
+				res.status(200).json(item);		
 			}) 
 			.catch(error => {
 				return next(err);
@@ -122,6 +106,58 @@ module.exports = function (app) {
 		logger.log('Update forum '+ req.body._id, 'verbose');
 
 		Forum.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+		.exec()
+		.then(result => {
+			res.status(200).json(result);
+		})
+		.catch(error => {
+			return next(error);
+		})
+	});
+
+	router.get('/api/forumMessages', function(req, res, next){
+		logger.log('Get Blogs', 'verbose');
+		var query = buildQuery(req.query, ForumMessage.find())
+		query
+			.sort('dateCreated')
+      		.populate('children')
+			.exec(function(err, object){
+				if (err) {
+					return next(err);
+				} else {
+					res.status(200).json(object);
+				}
+			});
+	});
+
+	router.get('/api/forumMessages/:id', requireAuth, function(req, res, next){
+		logger.log('Get blog '+ req.params.id, 'verbose');
+		ForumMessage.findById(req.params.id)
+		.exec()
+		.then(object => {
+			res.status(200).json(object);
+		})
+		.catch(error => {
+			return next(error);
+		})
+	});
+
+	router.post('/api/forumMessages', requireAuth, function(req, res, next){
+		logger.log('Create blog', "verbose");
+		var forum =  new ForumMessage(req.body);
+		forum.save()
+			.then(item => {		
+				res.status(200).json(item);	
+			}) 
+			.catch(error => {
+				return next(error);
+			})
+	});
+
+	router.put('/api/forumMessages', requireAuth, function(req, res, next){
+		logger.log('Update forum '+ req.body._id, 'verbose');
+
+		ForumMessage.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
 		.exec()
 		.then(result => {
 			res.status(200).json(result);

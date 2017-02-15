@@ -31,6 +31,8 @@ export class AppConfig {
     USER_ROLE = 4;
     PROV_USER = 1;
 
+    systemTypes = ['Switch','Router','Server','Storage','Other'];
+
     //User Status
     ACTIVE_PERSON = "01";
     INACTIVE_PERSON = "02";

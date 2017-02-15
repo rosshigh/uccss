@@ -1,0 +1,96 @@
+<template>
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Vendor Name</label>
+					<input value.bind="inventory.selectedInventory.maintenanceProvider"  class="form-control" placeholder="Vendor Name" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Contract Number</label>
+					<input value.bind="inventory.selectedInventory.maintenanceContract"  class="form-control" placeholder="Contract Number" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Customer Number</label>
+					<input value.bind="inventory.selectedInventory.maintenanceCustomerNumber"  class="form-control" placeholder="Customer Number" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Email</label>
+					<input value.bind="inventory.selectedInventory.maintenanceContact"  class="form-control" placeholder="Contact" type="text" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Phone</label>
+					<input value.bind="inventory.selectedInventory.maintenancePhone"  class="form-control" placeholder="Phone" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Email</label>
+					<input value.bind="inventory.selectedInventory.maintenanceEmail"  class="form-control" placeholder="Vendor Email" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>URL</label>
+					<input value.bind="inventory.selectedInventory.maintenanceUrl"  class="form-control" placeholder="Contract URL" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>User ID</label>
+					<input value.bind="inventory.selectedInventory.maintenaceUserId"  class="form-control" placeholder="User ID" type="text" />
+				</div>
+			</div>
+		</div>	
+	</div>
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Password</label>
+					<input value.bind="inventory.selectedInventory.maintenancePassword"  class="form-control" placeholder="Password" type="text" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Date Created</label>
+					<date-picker value.two-way="inventory.selectedInventory.maintenanceStartDate"  controlid="maintenanceStartDate"></date-picker>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>End Date</label>
+					<date-picker value.two-way="inventory.selectedInventory.maintenanceEndDate"  controlid="maintenanceEndDate"></date-picker>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
