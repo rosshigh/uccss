@@ -59,6 +59,7 @@ if(env === 'development'){
   var CustomerActionTemplate = fs.readFileSync(viewPath + "/client-request-customer-action.handlebars", "utf-8");
   var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
   var HelpTicketUpdatedTemplate = fs.readFileSync(viewPath + "/help-ticket-updated.handlebars", "utf-8");
+  var HelpTicketClosedTemplate = fs.readFileSync(viewPath + "/help-ticket-closed.handlebars", "utf-8");
   var RequestUpdatedTemplate = fs.readFileSync(viewPath + "/client-request-updated.handlebars", "utf-8");
   var PasswordResetTemplate = fs.readFileSync(viewPath + "/password-reset.handlebars", "utf-8");
 
@@ -70,6 +71,7 @@ if(env === 'development'){
   var HelpTicketUpdatedTemplateCompiled = hbs.compile(HelpTicketUpdatedTemplate); 
   var RequestUpdatedTemplateCompiled = hbs.compile(RequestUpdatedTemplate);
   var PasswordResetTemplateCompiled = hbs.compile(PasswordResetTemplate);
+  var HelpTicketClosedTemplateCompiled = hbs.compile(HelpTicketClosedTemplate);
 
   sendGrid = function(mailObject){
     if(mailObject.email){
@@ -206,10 +208,19 @@ if(env === 'development'){
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
+     return new Promise(function(resolve, reject) {
     mailObject.body = HelpTicketClosedTemplateCompiled(mailObject.context);
     mailObject.to_email = mailObject.email;
     mailObject.subject = 'Help Ticket Closed'; 
-    sendGrid(mailObject);
+    sendGrid(mailObject)
+     .then(result => {
+          if (result.statusCode === 202) {     
+              resolve(result);
+            } else {
+              reject(Error(result));
+            }
+        })
+    });
   }
 
   requestCreated = function(mailObject){
@@ -443,6 +454,7 @@ if(env === 'development'){
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
+     return new Promise(function(resolve, reject) {
      var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -451,7 +463,15 @@ if(env === 'development'){
           context: mailObject.context
       };
 
-      nodeMailerSendMail(mail);
+      nodeMailerSendMail(mail)
+      .then(result => {      
+                if (result.rejected.length === 0) {     
+                  resolve(result);
+                } else {
+                  reject(Error(result));
+                }
+            })
+    });   
   }
 
   requestCreated = function(mailObject){

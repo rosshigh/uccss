@@ -110,9 +110,9 @@ export class SiteInfo {
     }
 
     //Messages
-    async getMessageArray(refresh, options){
+    async getMessageArray(options, refresh){
         if (!this.messageArray || refresh) {
-            var url = this.data. MESSAGE_SERVICES;
+            var url = this.data.MESSAGE_SERVICES;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);

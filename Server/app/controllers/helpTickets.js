@@ -240,7 +240,7 @@ module.exports = function (app, config) {
   router.put('/api/helpTickets', requireAuth, function(req, res, next){
     logger.log('Update HelpTicket '+ req.body._id, 'verbose');
 
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
     .then(result => {
         res.status(200).json(result);
@@ -414,7 +414,7 @@ module.exports = function (app, config) {
             sendMail(mailObj);
   })
 
-   router.get('/api/helpTicketsTypes', requireAuth, function(req, res, next){
+  router.get('/api/helpTicketsTypes', requireAuth, function(req, res, next){
     logger.log('Get helpTicketypes','verbose');
     var query = buildQuery(req.query, HelpTicketTypes.find())
       query.exec()

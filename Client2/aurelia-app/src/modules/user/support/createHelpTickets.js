@@ -11,11 +11,12 @@ import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
+import {SiteInfo} from '../../../resources/data/siteInfo';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, People, ClientRequests, Products, Systems)
+@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, People, ClientRequests, Products, Systems, SiteInfo)
 export class CreateHelpTickets{
     showInfoBox = false;
     courseSelected = false;
@@ -33,7 +34,7 @@ export class CreateHelpTickets{
 
     showAdditionalInfo=false;
 
-     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems) {
+     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site) {
         this.router = router;
         this.sessions = sessions;
         this.apps = apps;
@@ -48,6 +49,7 @@ export class CreateHelpTickets{
         this.clientRequests = clientRequests;
         this.products = products;
         this.systems = systems;
+        this.site = site;
     };
 
     attached(){
@@ -65,17 +67,23 @@ export class CreateHelpTickets{
             this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id + '&order=number'),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
             this.systems.getSystemsArray(),
-            this.config.getConfig()
+            this.config.getConfig(),
+            this.site.getMessageArray('?filter=category|eq|HELP_TICKETS', true)
          ]);
         this.helpTickets.selectHelpTicket();
         this.sendEmail = this.config.SEND_EMAILS;
+        this.appsArray = this.apps.appDownloadsArray.filter(item => {
+            return item.helpTicketRelevant;
+        })
+        this.editorMessage = this.getMessage('EDITOR_DESCRIPTION_MESSAGE');
+        this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
     }
 
     categoryChanged(){
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
             if(!this.showTypes){
-                this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message;
+                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message);
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.selectedHelpTicket.helpTicketCategory;
                 this.showRequests = false; 
                 this.showHelpTicketDescription = true;
@@ -94,6 +102,12 @@ export class CreateHelpTickets{
             this.showAdditionalInfo = false;
             this.showHelpTicketDescription = false;
             this.showRequests = false;
+        }
+    }
+
+    getMessage(messageKey){
+        for(var i = 0; i< this.site.messageArray.length; i++){
+            if(this.site.messageArray[i].key === messageKey) return this.site.messageArray[i].content
         }
     }
 
@@ -121,7 +135,8 @@ export class CreateHelpTickets{
 
             // this.inputHTML = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
 
-            this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message;
+            // this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message;
+            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message);
             this.showHelpTicketDescription = true;
             this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
             this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);

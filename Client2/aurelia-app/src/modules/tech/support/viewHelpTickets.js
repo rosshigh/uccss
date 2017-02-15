@@ -78,6 +78,8 @@ export class ViewHelpTickets {
       this.helpTickets.selectHelpTicketByID(params.id);
       this.openHelpTicket();
     }
+
+      this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
       
   }
 
@@ -266,6 +268,7 @@ export class ViewHelpTickets {
     this._createResponse();
     let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
     if (!serverResponse.error) {
+      if(status = this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
       if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);

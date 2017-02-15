@@ -33,7 +33,7 @@ export class EditMessages {
 
     async activate() {
          let responses = await Promise.all([
-            this.siteinfo.getMessageArray(true),
+            this.siteinfo.getMessageArray('',true),
             this.config.getConfig()
          ]);
         this.dataTable.updateArray(this.siteinfo.messageArray);
@@ -42,7 +42,7 @@ export class EditMessages {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.siteinfo.getMessageArray(true);
+        await this.siteinfo.getMessageArray('',true);
        this.dataTable.updateArray(this.siteinfo.messageArray);
         this.spinnerHTML = "";
     }

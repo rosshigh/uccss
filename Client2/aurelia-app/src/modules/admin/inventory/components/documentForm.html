@@ -21,23 +21,4 @@
             </tbody>
         </table>
     </div>
-
-     <div class="col-lg-6">
-        <table id="coursesTable" class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Document </th>
-                    <th>Default</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr repeat.for="document of inventory.selectedInventory.documents">
-                    <td data-title="name">${document.fileName} </td>
-                    <td data-title="default" click.trigger="toggleDefault($index)" innerhtml.bind='document.default | checkBox'></td>
-                    <td  click.trigger="removeDocument($index)"><i class="fa fa-trash"></i></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 </template>

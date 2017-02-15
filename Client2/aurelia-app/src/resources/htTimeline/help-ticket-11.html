@@ -5,7 +5,7 @@
           <label class="control-label">Application</label>
           <select value.bind="helpTickets.selectedHelpTicketContent.content.applicationId" id="application" class="form-control">
             <option value="">Select an application</option>
-            <option repeat.for="app of apps.appDownloadsArray" 
+            <option repeat.for="app of appsArray" 
                     value.bind="app._id">${app.name}</option>
           </select>
         </div>

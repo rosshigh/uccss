@@ -57,12 +57,6 @@ export class AppConfig {
 
      //Session parameters
     SESSION_TERM = "Session";
-    // SESSION_PARAMS = [
-    //     { "session": "A", "startMonth": "01", "startDay": "04", "endMonth": "06", "endDay": "30", "openMonth": "12", "openDay": "01" },
-    //     { "session": "B", "startMonth": "05", "startDay": "01", "endMonth": "09", "endDay": "30", "openMonth": "04", "openDay": "01" },
-    //     { "session": "C", "startMonth": "08", "startDay": "01", "endMonth": "12", "endDay": "24", "openMonth": "07", "openDay": "01" },
-    //     { "session": "D", "startMonth": "11", "startDay": "01", "endMonth": "03", "endDay": "31", "openMonth": "10", "openDay": "01" }
-    // ];
 
     //Client parametrs
     CLIENT_INCREMENT_INTERVAL = 1;

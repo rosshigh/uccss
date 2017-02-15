@@ -105,7 +105,7 @@
                 <div class="dropdown">
                   <span  class="dropbtn" show.bind="helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS"><i class="fa fa-hand-spock-o fa-lg" aria-hidden="true"></i>
                   <div class="dropdown-content">
-                    <a href="#" click.trigger="changeStatus(helpTicket, status.code)" repeat.for="status of config.HELP_TICKET_STATUSES">${status.description}</a>
+                    <a href="#" click.trigger="changeStatus(helpTicket, status.code)" repeat.for="status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus">${status.description}</a>
                   </div>
                   </span>
               </td>
