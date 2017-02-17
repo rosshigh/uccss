@@ -1,4 +1,4 @@
-import {inject} from 'aurelia-framework';
+import {inject, TemplatingEngine} from 'aurelia-framework';
 import {Router} from "aurelia-router";
 import {Utils} from '../../../resources/utils/utils';
 import {Sessions} from '../../../resources/data/sessions';
@@ -13,10 +13,9 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {SiteInfo} from '../../../resources/data/siteInfo';
 
-import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, People, ClientRequests, Products, Systems, SiteInfo)
+@inject(Router, Sessions, Downloads, HelpTickets, Validation, Utils, DataTable, AppConfig, People, ClientRequests, Products, Systems, SiteInfo, TemplatingEngine)
 export class CreateHelpTickets{
     showInfoBox = false;
     courseSelected = false;
@@ -34,7 +33,7 @@ export class CreateHelpTickets{
 
     showAdditionalInfo=false;
 
-     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site) {
+     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site, templatingEngine) {
         this.router = router;
         this.sessions = sessions;
         this.apps = apps;
@@ -50,6 +49,7 @@ export class CreateHelpTickets{
         this.products = products;
         this.systems = systems;
         this.site = site;
+        this.templatingEngine = templatingEngine;
     };
 
     attached(){
@@ -83,13 +83,14 @@ export class CreateHelpTickets{
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
             if(!this.showTypes){
-                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].message);
+                this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
                 this.showRequests = false; 
                 this.showHelpTicketDescription = true;
                 this.showAdditionalInfo = true;
-                this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
+                this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
+                // this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
             } else {
                 this.inputForm = null;
@@ -113,6 +114,22 @@ export class CreateHelpTickets{
         return "";
     }
 
+    createInputForm(html){
+        $('#container').html(html);
+        let extendedInput = $('.extend');
+        for(let i = 0; i < extendedInput.length; i++){
+            this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
+        }
+
+        let el = document.getElementById('container');
+
+        if (el) {
+            if (!el.querySelectorAll('.au-target').length) {
+                this.templatingEngine.enhance({element: el, bindingContext: this});
+            }
+        }
+    }
+
     // /*****************************************************************************************
     // * User selected a helpticket type
     // * el - event object
@@ -121,24 +138,11 @@ export class CreateHelpTickets{
         //Reset the interface
         this.clearTables();
         //Make sure the user selected a help ticket type
-        if(this.helpTicketType > -1){
+        if(this.helpTicketType !== "NULL"){
             this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
             this.selectedHelpTicketType = this.getIndex()
-
-            // this.inputFormCode = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm.split("|");            
-            // this.inputFormProcess = JSON.parse(this.inputFormCode[1]);
-            // this.inputFormProcess.forEach(item => {
-            //     if(item.required){
-            //         var field = "helpTickets.selectedHelpTicketContent.content." + item.id;
-            //         this.validation.addRule(this.helpTickets.selectedHelpTicket.helpTicketType,item.id,[{"rule":"required","message":item.message, "value": field}]);
-            //     }
-            // });
-            
-
-            // this.inputHTML = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
-
-            // this.helpTicketTypeMessage = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message;
-            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].message);
+            this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm)
+            this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
             this.showHelpTicketDescription = true;
             this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
             this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
@@ -147,14 +151,13 @@ export class CreateHelpTickets{
             if( this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) await this.getActiveRequests();
             this.showAdditionalInfo = false;
 
-            if(this.helpTickets.selectedHelpTicket.helpTicketType == this.config.HELP_TICKET_CLIENT_REFRESH_TYPE){
+            if(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords){
+                let keyWords = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords;
                 let refreshProductArray = new Array();
                 this.products.productsArray.forEach(item => {
                     var foo = item.name.toUpperCase();
-                    for(var i = 0; i < this.config.REFRESH_KEYWORDS.length; i++){
-                        if(foo.indexOf( this.config.REFRESH_KEYWORDS[i]) > -1) {
-                            refreshProductArray.push(item._id);
-                        }
+                    if(foo.indexOf(keyWords) > -1) {
+                        refreshProductArray.push(item._id);
                     }
                 });
                  this.clientRequestsArray = this.clientRequestsArray.filter(item => {
@@ -226,6 +229,7 @@ export class CreateHelpTickets{
     // * The user selected a request
     // *****************************************************************************************/
     async requestChosen(el, index){
+
         this.showAdditionalInfo = true;
         this.SelectedClientRequest = this.clientRequestsArray[index];
         this.selectedSessionId = this.clientRequestsArray[index].sessionId;

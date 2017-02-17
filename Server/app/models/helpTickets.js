@@ -12,7 +12,7 @@ var helpTicketLockSchema = new Schema({
 module.exports = Mongoose.model('HelpTicketLock', helpTicketLockSchema);
 
 var HelpTicketContentSchema = new Schema({
-  type: { type: Number, required: true},
+  type: { type: String, required: true},
   createdDate: { type: Date, default: Date.now, required: true },
   emailSent: { type: Boolean },
   files: [ {

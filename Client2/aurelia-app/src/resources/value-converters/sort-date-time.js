@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export class SortDateTimeValueConverter {
-  toView(array, propertyName, sortProp, tech) {
+  toView(array, propertyName, sortProp, tech, trim) {
     if(array === undefined) return;
 
     var sortOrder = sortProp === "ASC" ? 1 : -1;
@@ -21,7 +21,7 @@ export class SortDateTimeValueConverter {
       return (new Date(a[propertyName]).getTime() - new Date( b[propertyName]).getTime()) * sortOrder;
     });
 
-    sortArray.unshift(firstItem);
+    if(!trim) sortArray.unshift(firstItem);
     return sortArray;
   }
 

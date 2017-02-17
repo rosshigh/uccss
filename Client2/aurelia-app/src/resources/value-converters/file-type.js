@@ -8,7 +8,7 @@ export class FileTypeValueConverter {
     this.config = appconfig;
   }
 
-  toView(file, number, type) {
+  toView(file, number, type='helpTickets') {
     var ext = file.substr(file.indexOf('.') + 1);
     var html = "";
     switch(ext.toUpperCase()){

@@ -37,8 +37,10 @@ export class DataTable{
 
   pageOne(){
     setTimeout(() => {
-        $("#" + this.context.navControl).children().removeClass('active');
-        $($("#" + this.context.navControl).children()[1]).addClass('active');
+        $(".pagination").children().removeClass('active');
+        $($(".pagination").children()[1]).addClass('active');
+        // $("#" + this.context.navControl).children().removeClass('active');
+        // $($("#" + this.context.navControl).children()[1]).addClass('active');
     },100);
   }
 
@@ -76,13 +78,15 @@ export class DataTable{
   }
 
   forward(){
-    $("#" + this.context.navControl).children().removeClass('active');
+     $(".pagination").children().removeClass('active');
+    // $("#" + this.context.navControl).children().removeClass('active');
     this.currentPageElement = this.currentPageElement < this.pageButtons.length-1 ? this.currentPageElement += 1 : this.currentPageElement;
     if (this.pageButtons[this.currentPageElement] == "...") {
       this.createPageButtons(this.pageButtons[0] + 1)
       this.currentPageElement -= 1
     }
-    $($("#" + this.context.navControl).children()[this.currentPageElement + 1]).addClass('active');
+     $($(".pagination").children()[this.currentPageElement + 1]).addClass('active');
+    // $($("#" + this.context.navControl).children()[this.currentPageElement + 1]).addClass('active');
     var start = parseInt(this.startRecord);
     var tk = parseInt(this.take);
     this.startRecord = start + tk > this.baseArray.length ? start : start + tk;
@@ -94,11 +98,13 @@ export class DataTable{
 
 
   createPage(){
-    $($("." + this.context.navControl)[this.currentPage - 1]).addClass('active');
+      $($(".pagination")[this.currentPage - 1]).addClass('active');
+    // $($("." + this.context.navControl)[this.currentPage - 1]).addClass('active');
   }
 
   backward(){
-    $("#" + this.context.navControl).children().removeClass('active');
+      $(".pagination").children().removeClass('active');
+    // $("#" + this.context.navControl).children().removeClass('active');
     this.currentPageElement = this.currentPageElement > 0 ? this.currentPageElement -= 1 : this.currentPageElement;
     if(this.currentPageElement == 0 && this.pageButtons[this.currentPageElement] != 1){
       this.createPageButtons(this.pageButtons[0] - 1)
@@ -108,7 +114,8 @@ export class DataTable{
       this.createPageButtons(start)
       //this.context.currentPageElement = 1
     }
-    $($("#" + this.context.navControl).children()[this.currentPageElement + 1]).addClass('active');
+    $($(".pagination").children()[this.currentPageElement + 1]).addClass('active');
+    //  $($("#" + this.context.navControl).children()[this.currentPageElement + 1]).addClass('active');
     var start = parseInt(this.startRecord);
     var tk = parseInt(this.take);
     this.startRecord = start - tk < 0 ?
@@ -120,7 +127,8 @@ export class DataTable{
   }
 
   pageButton(index, el){
-    $("#" + this.context.navControl).children().removeClass('active');
+    $(".pagination").children().removeClass('active');
+    //  $("#" + this.context.navControl).children().removeClass('active');
     $(el.target).closest('li').addClass('active');
     this.currentPageElement = index;
     var start = parseInt(this.startRecord);

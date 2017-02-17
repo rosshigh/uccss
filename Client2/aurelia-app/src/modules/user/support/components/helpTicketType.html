@@ -13,7 +13,7 @@
   <div class="form-group">
     <select show.bind="showTypes" value.bind="helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
       class="form-control">
-          <option value="-1">Select the type of help ticket</option>
+          <option value="NULL">Select the type of help ticket</option>
           <option repeat.for="types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes"
                   model.bind="types.type">${types.description}</option>
         </select>

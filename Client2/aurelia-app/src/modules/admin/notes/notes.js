@@ -10,10 +10,12 @@ export class Notes{
 	noteSelected = false;
 	showCategoryForm = false;
 	spinnerHTML = "";
+	navControl = "notesNavButtons";
     
     constructor(router, dataTable, config, people, utils){
 		this.router = router;
 		this.dataTable = dataTable;
+		this.dataTable.initialize(this);
 		this.config = config;
 		this.people = people;
 		this.utils = utils;
@@ -31,7 +33,7 @@ export class Notes{
 		 let responses = await Promise.all([
 			this.people.getPeopleArray(),
 			this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true),
-			 this.config.getConfig()
+			this.config.getConfig()
 		 ]);
         this.dataTable.updateArray(this.people.notesArray);
     }
@@ -48,6 +50,7 @@ export class Notes{
 		this.people.selectNote();
 		this.editIndex = undefined;
 		this.people.selectedNote.personId = this.userObj._id;
+		this.people.selectedNote.category = this.userObj.noteCategories[0];
 	}
 
 	edit(index, el){
@@ -70,12 +73,15 @@ export class Notes{
 		}
 	}
 
-	async delete(){
-		let response = await this.people.deleteNote();
-		if(!response.error){
-			this.utils.showNotification('The note was deleted');
-			this.dataTable.updateArray(this.people.notesArray);
-			this.noteSelected = false;
+	async delete(note){
+		if(note) this.people.selectNoteById(note._id);
+		if(this.people.selectedNote._id){
+			let response = await this.people.deleteNote();
+			if(!response.error){
+				this.utils.showNotification('The note was deleted');
+				this.dataTable.updateArray(this.people.notesArray);
+				this.noteSelected = false;
+			}
 		}
 	}
 

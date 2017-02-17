@@ -59,7 +59,7 @@ export class ViewHelpTickets {
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
       this.products.getProductsArray('?order=name'),
       this.people.getPeopleArray(),
-      this.siteInfo.getMessageArray(true, '?filter=category|eq|CLIENT_REQUESTS'),
+      this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS',true),
       this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' ),
       this.config.getConfig()
     ]);

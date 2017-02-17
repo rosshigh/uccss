@@ -12,10 +12,12 @@ var helpTicketTypesSchema = new Schema({
       description: { type: String },
       message: { type: String },
       inputForm: { type: String },
-      displayForm: { type: String },
+      outputForm: { type: String },
+      active: { type: Boolean, default: true },
       clientRequired: { type: Boolean },
       appsRequired:{ type: Boolean },
       public: { type: Boolean },
+      requestKeywords: { type: String },
       documents: [{
         categoryCode: { type: Number },
         categoryName: { type: String },

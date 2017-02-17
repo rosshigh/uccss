@@ -1,4 +1,4 @@
-import { inject } from 'aurelia-framework';
+import {inject, TemplatingEngine} from 'aurelia-framework';
 import { Router } from "aurelia-router";
 import { DataTable } from '../../../resources/utils/dataTable';
 import { HelpTickets } from '../../../resources/data/helpTickets';
@@ -17,19 +17,20 @@ import Validation from '../../../resources/utils/validation';
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, ClientRequests, CommonDialogs)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, ClientRequests, CommonDialogs, TemplatingEngine)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
   showLockMessage = false; 
   responseMessage = "Click here to respond";
+  TEMPLATE = " <div class='smart-timeline-icon bottomMarginLg' innerhtml.bind='helpTickets.selectedHelpTicket[0].personId | gravatarUrlId:people.peopleArray:100:1'></div><div class='smart-timeline-time'><small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small></div><div class='smart-timeline-content borderTop leftJustify'>CONTENT <div class='form-group'><div class='hover_img' repeat.for='file of helpTickets.selectedHelpTicket.files'><a href='${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}' target='_blank' innerhtml.bind='file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo></a></div></div></div>"
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
   lockObject = new Object();
 
-  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog) {
+  constructor(router, config, validation, people, datatable, utils, helpTickets, sessions, systems, apps, products, requests, dialog, templatingEngine) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -45,6 +46,7 @@ export class ViewHelpTickets {
     this.products = products;
     this.requests = requests;
     this.dialog = dialog;
+    this.templatingEngine = templatingEngine;
   };
 
   attached() {
@@ -117,12 +119,35 @@ export class ViewHelpTickets {
       }
     }
 
+    let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+    this.createOutputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[subTypeIndex].outputForm)
+
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
     this.selectedRow.children().addClass('info')
     this.helpTicketSelected = true;
 
     this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
+  }
+
+  getIndex(subtypes, type){
+    for(let i = 0; i < subtypes.length; i++){
+      if(subtypes[i].type === type){
+        return i;
+      }
+    }
+    return null;
+  }
+
+  createOutputForm(html){
+    $('#container').html(html);
+    let el = document.getElementById('container');
+
+    if (el) {
+        if (!el.querySelectorAll('.au-target').length) {
+            this.templatingEngine.enhance({element: el, bindingContext: this});
+        }
+    }
   }
 
   async getDetails(){

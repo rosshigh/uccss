@@ -432,6 +432,18 @@ export class People {
         }
     }
 
+    selectNoteById(id){
+        if(!id) return;
+        for(let i = 0; i < this.notesArray.length; i++){
+            if(this.notesArray[i]._id === id){
+                this.selectedNote = this.utils.copyObject(this.notesArray[i]);
+                this.editNoteIndex = i;
+                return;
+            }
+        }
+        this.selectedNote = this.emptyNote();
+    }
+
     emptyNote() {
         var obj  = new Object();
         obj.note = "";
