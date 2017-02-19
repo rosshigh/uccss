@@ -43,6 +43,7 @@ export class ArchiveHelpTickets {
 
   async activate() {
     let responses = await Promise.all([
+      this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("",true),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.products.getProductsArray('?order=name'),

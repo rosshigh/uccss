@@ -146,9 +146,8 @@ export class ClientRequests {
          let serverResponse = await this.data.get(this.data.CLIENT_REQUEST_DETAILS + '/' + id);
         if (!serverResponse.error) {
             this.selectedRequest = serverResponse;
-        } else {
-            return undefined;
-        }
+        } 
+        return serverResponse;
     }
 
     selectRequest(index){

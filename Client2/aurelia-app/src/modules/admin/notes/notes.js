@@ -4,21 +4,23 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {People} from '../../../resources/data/people';
 import {Utils} from '../../../resources/utils/utils';
+import {HelpTickets} from '../../../resources/data/helpTickets';
 
-@inject(Router, DataTable, AppConfig, People, Utils)
+@inject(Router, DataTable, AppConfig, People, Utils, HelpTickets)
 export class Notes{
-	noteSelected = false;
+	noteSelected = "No";
 	showCategoryForm = false;
 	spinnerHTML = "";
 	navControl = "notesNavButtons";
     
-    constructor(router, dataTable, config, people, utils){
+    constructor(router, dataTable, config, people, utils, helpTickets){
 		this.router = router;
 		this.dataTable = dataTable;
 		this.dataTable.initialize(this);
 		this.config = config;
 		this.people = people;
 		this.utils = utils;
+		this.helpTickets = helpTickets;
     }
 
 	attached(){
@@ -46,7 +48,7 @@ export class Notes{
     }
 
 	new(){
-		this.noteSelected = true;
+		this.noteSelected = 'Yes';
 		this.people.selectNote();
 		this.editIndex = undefined;
 		this.people.selectedNote.personId = this.userObj._id;
@@ -61,7 +63,7 @@ export class Notes{
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
-        this.noteSelected = true;
+        this.noteSelected = 'Yes';
 	}
 
 	async save(){
@@ -69,7 +71,7 @@ export class Notes{
 		if(!response.error){
 			this.utils.showNotification('The note was saved');
 			this.dataTable.updateArray(this.people.notesArray);
-			this.noteSelected = false;
+			this.noteSelected = 'No';
 		}
 	}
 
@@ -80,13 +82,13 @@ export class Notes{
 			if(!response.error){
 				this.utils.showNotification('The note was deleted');
 				this.dataTable.updateArray(this.people.notesArray);
-				this.noteSelected = false;
+				this.noteSelected = 'No';
 			}
 		}
 	}
 
 	back(){
-		this.noteSelected = false;
+		this.noteSelected = 'No';
 	}
 
 	cancel(){
@@ -125,8 +127,18 @@ export class Notes{
 
 	}
 
-	navigateToHelpTicket(note){
-		this.router.navigate("htNote/" + note.reference);
+	backHelpTicket(){
+		this.noteSelected = "No";
+	}
+
+	async navigateToHelpTicket(note){
+		let response = await this.helpTickets.getHelpTicket(note.reference);
+		if(!response.error){
+			this.noteSelected = "helpTicket";
+		} else {
+			this.utils.showNotification("Help Ticket not found");
+		}
+		
 	}
    
 }

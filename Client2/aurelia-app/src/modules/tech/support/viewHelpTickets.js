@@ -1,4 +1,4 @@
-import { inject } from 'aurelia-framework';
+import {inject, TemplatingEngine} from 'aurelia-framework';
 import { Router } from "aurelia-router";
 import { DataTable } from '../../../resources/utils/dataTable';
 import { HelpTickets } from '../../../resources/data/helpTickets';
@@ -11,10 +11,11 @@ import { Utils } from '../../../resources/utils/utils';
 import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
+import {ClientRequests} from '../../../resources/data/clientRequests';
 
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, TemplatingEngine, ClientRequests)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
@@ -30,7 +31,7 @@ export class ViewHelpTickets {
   commentShown = "";
   responseMessage = "";
 
-  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products) {
+  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products, templatingEngine, requests) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -45,6 +46,8 @@ export class ViewHelpTickets {
     this.apps = apps;
     this.products = products;
     this.dialog = dialog;
+    this.templatingEngine = templatingEngine;
+    this.requests = requests;
   };
 
   canActivate() {
@@ -138,10 +141,39 @@ export class ViewHelpTickets {
     this.helpTickets.selectHelpTicket(this.editIndex);
     this.openHelpTicket();
 
+    let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
+    let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
+     this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
+    this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
+
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
-    this.selectedRow.children().addClass('info')
+    this.selectedRow.children().addClass('info');
 
+    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
+    this.helpTicketSelected = true;
+
+  }
+
+
+  getIndex(subtypes, type){
+    for(let i = 0; i < subtypes.length; i++){
+      if(subtypes[i].type === type){
+        return i;
+      }
+    }
+    return null;
+  }
+
+  createOutputForm(html){    
+    let el = document.getElementById('container');
+    el.innerHTML = html;
+
+    if (el) {
+        if (!el.querySelectorAll('.au-target').length) {
+            this.templatingEngine.enhance({element: el, bindingContext: this});
+        }
+    }
   }
 
   async openHelpTicket(){
@@ -170,8 +202,6 @@ export class ViewHelpTickets {
           }
         }
       }
-      this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
-      this.helpTicketSelected = true;
     } else {
       this.utils.showNotification('Help Ticket not found')
     }
@@ -179,17 +209,31 @@ export class ViewHelpTickets {
   }
 
   async getDetails(){
+    this.requestDetailsUpdated = false;
     this.showRequestDetails = false;
-    // this.helpTickets.selectedHelpTicket.content[0].comments = this.helpTickets.selectedHelpTicket.content[0].comments ? this.helpTickets.selectedHelpTicket.content[0].comments : " ";
     if(this.helpTickets.selectedHelpTicket.requestId){
-      // await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
       if(this.helpTickets.selectedHelpTicket.systemId){
         this.showRequestDetails = true;
         for(var i = 0; i < this.systems.systemsArray.length; i++){
           if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
-            // this.systems.selectedSystemFromId(this.helpTickets.selectedHelpTicket.systemId);
             this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
-            break;
+            return;
+          }
+        }
+      } else {
+        let response = await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
+        if(!response.error){
+          if(this.requests.selectedRequest.assignments && this.requests.selectedRequest.assignments.length > 0){
+            this.requestDetailsUpdated = true;
+            this.helpTickets.selectedHelpTicket.systemId = this.requests.selectedRequest.assignments[0].systemId;
+            this.helpTickets.selectedHelpTicket.clientId = this.requests.selectedRequest.assignments[0].clientId;
+             this.showRequestDetails = true;
+            for(var i = 0; i < this.systems.systemsArray.length; i++){
+              if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+                this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
+                return;
+              }
+            }
           }
         }
       }
@@ -278,11 +322,11 @@ export class ViewHelpTickets {
   }
 
   async ownHelpTicket(helpTicket) {
-    this.helpTickets.selectHelpTicketByID(helpTicket._id);
+    if(helpTicket) {
+      this.helpTickets.selectHelpTicketByID(helpTicket._id);
+    }
     if(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id){
-      var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
-      if (!response.error) {
-        if (response.helpTicketId === 0) {
+      if(!this.showLockMessage){
           var obj = {
             personId: this.userObj._id,
             status: this.config.REVIEW_HELPTICKET_STATUS
@@ -292,8 +336,9 @@ export class ViewHelpTickets {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
           }
-          this._cleanUp();
-        }
+          if(helpTicket){
+            this._cleanUp();
+          }
       }
     }
   }
@@ -343,7 +388,6 @@ export class ViewHelpTickets {
   }
 
   flag(){
-
      var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
          return this.dialog.showNote(
                 "Save Changes",
@@ -364,6 +408,7 @@ export class ViewHelpTickets {
         this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
         this.people.selectedNote.note = note.note.noteBody;
         this.people.selectedNote.reference = this.helpTickets.selectedHelpTicket._id;
+        this.people.selectedNote.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
         let response = await this.people.saveNote();
             if(!response.error){
                 this.utils.showNotification('The note was saved');
@@ -385,20 +430,26 @@ export class ViewHelpTickets {
   back() {
      var changes = this.helpTickets.isHelpTicketDirty();
      if (this.helpTickets.isHelpTicketDirty().length) {
-            return this.dialog.showMessage(
-                "The help ticket has been changed. Do you want to save your changes?",
-                "Save Changes",
-                ['Yes', 'No']
-            ).then(response => {
-                if (!response.wasCancelled) {
-                    this.save();
-                } else {
-                    this._cleanUp();
-                }
-            });
+       let that = this;
+        if(this.requestDetailsUpdated) { 
+          this.message = "The product assignment details were updated.  Do you want to save the changes?"
         } else {
-            this._cleanUp();
+          this.message = "The help ticket has been changed. Do you want to save your changes?"
         }
+          return this.dialog.showMessage(
+              that.message,
+              "Save Changes",
+              ['Yes', 'No']
+          ).then(response => {
+              if (!response.wasCancelled) {
+                  this.save();
+              } else {
+                  this._cleanUp();
+              }
+          });
+      } else {
+          this._cleanUp();
+      }
   }
 
   /*****************************************************************************************

@@ -10,7 +10,7 @@
           <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="respond()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Respond"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
-          <span click.delegate="own()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg fa-border" aria-hidden="true"></i></span>
+          <span click.delegate="ownHelpTicket()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="flag()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Flag"><i class="fa fa-flag fa-lg fa-border" aria-hidden="true"></i></span>
           <span show.bind="showLockMessage" click.delegate="_unlock()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Unlock"><i class="fa fa-unlock-alt fa-lg fa-border" aria-hidden="true"></i></span>
           <span class="pull-right">${lockMessage}</span>
@@ -50,7 +50,6 @@
                 <editor value.bind="responseMessage" height="250"></editor>
               <p>&nbsp;</p>
             </div>
-           
           </div>
 
           <div class="topMargin">
@@ -63,7 +62,6 @@
               <input type="text" value.bind="filesSelected" class="form-control topMargin bottomMargin" readonly/>
             </div>
           </div>
-
         </div>
 
         <!-- widget content -->

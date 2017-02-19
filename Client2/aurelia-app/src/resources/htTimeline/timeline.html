@@ -15,7 +15,7 @@
                       <span id="container"></span>
                       <h4 show.bind="showRequestDetails" class="col-sm-11 col-sm-offset-1 topMargin">System: ${systems.selectedSystem.sid}</h4>
                       <h4 show.bind="showRequestDetails" class="col-sm-11 col-sm-offset-1 ">Client: ${systems.selectedClient.client}</h4>
-                      <h4 show.bind="!showRequestDetails" class="col-sm-11 col-sm-offset-1 topMargin">Client not assigned</h4>
+                      <h4 show.bind="!showRequestDetails && clientRequired" class="col-sm-11 col-sm-offset-1 topMargin">Client not assigned</h4>
                     </div>
                     <div class="col-lg-7">
                         <div class="topMargin bottomMargin"  innerhtml.bind="helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' "></div>
@@ -30,6 +30,9 @@
                   </div>
                 </div>
               </div>
+          </li>
+          <li repeat.for="event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true">
+            <compose view="./response.html"></compose>
           </li>
         </ul>
       </div>

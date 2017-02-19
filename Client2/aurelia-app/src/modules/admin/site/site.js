@@ -56,6 +56,14 @@ export class Site{
             nav: true,
             name: 'curriculum',
             title: 'Curriculum'
+        },
+        {
+            route: 'helptickets',
+            moduleId: './editHelpTickets',
+            settings: { auth: false, roles: [] },
+            nav: true,
+            name: 'helptickets',
+            title: 'Help Tickets'
         }
         ]);
 

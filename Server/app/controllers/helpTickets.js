@@ -83,7 +83,12 @@ module.exports = function (app, config) {
     Model.findById(req.params.id)
     .exec()
       .then(object => {
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "Not Found"});
+        }
+        
       })
       .catch(error => {
         return next(error);

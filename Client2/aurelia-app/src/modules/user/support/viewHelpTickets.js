@@ -23,7 +23,6 @@ export class ViewHelpTickets {
   enterResponse = false;
   showLockMessage = false; 
   responseMessage = "Click here to respond";
-  TEMPLATE = " <div class='smart-timeline-icon bottomMarginLg' innerhtml.bind='helpTickets.selectedHelpTicket[0].personId | gravatarUrlId:people.peopleArray:100:1'></div><div class='smart-timeline-time'><small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small></div><div class='smart-timeline-content borderTop leftJustify'>CONTENT <div class='form-group'><div class='hover_img' repeat.for='file of helpTickets.selectedHelpTicket.files'><a href='${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}' target='_blank' innerhtml.bind='file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo></a></div></div></div>"
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -73,7 +72,7 @@ export class ViewHelpTickets {
     ]);
     this.updateArray();
 
-    this.sendEmail = this.config.SEND_EMAILS;
+    this.sendEmail = false;;
 
     this.isUCC = this.userObj.userRole >= this.config.UCC_TECH_ROLE;
 
@@ -140,8 +139,8 @@ export class ViewHelpTickets {
   }
 
   createOutputForm(html){
-    $('#container').html(html);
     let el = document.getElementById('container');
+    el.innerHTML = html;
 
     if (el) {
         if (!el.querySelectorAll('.au-target').length) {

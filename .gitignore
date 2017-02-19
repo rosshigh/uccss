@@ -1,4 +1,7 @@
 Client/node_modules/
 Server/node_modules/
+twitterBot/node_modules/
+twitterBot/public
 UCCSS/
 Server/log/
+Server/log-auth

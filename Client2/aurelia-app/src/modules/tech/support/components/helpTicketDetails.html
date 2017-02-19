@@ -5,10 +5,7 @@
     </div> 
     
      <div class="col-lg-12 topMargin">
-        <!-- Help Panel -->
-        <compose  repeat.for="helpTicket of config.HELP_TICKET_TYPES" 
-            show.bind="helpTicket.show"     
-            view="./help-ticket-${helpTicket.code}.html"></compose>
+          <div id="container" ></div>
             
         <!-- Additional Information Panel -->
         <div class="col-lg-12 topMargin" id="descriptionGroup">

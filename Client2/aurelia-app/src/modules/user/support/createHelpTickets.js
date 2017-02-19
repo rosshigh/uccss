@@ -37,7 +37,7 @@ export class CreateHelpTickets{
         this.router = router;
         this.sessions = sessions;
         this.apps = apps;
-        this.helpTickets = helpTickets;
+        this.helpTickets = helpTickets; 
         this.people = people;
         this.utils = utils;
         this.validation = validation;
@@ -197,9 +197,13 @@ export class CreateHelpTickets{
         sessions = sessions.substring(0, sessions.length-1);
         await this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
         this.clientRequestsArray = new Array();
+        //Cycle through request array
         this.clientRequests.requestsArray.forEach(item => {
+            //Cycle through details of request
             item.requestDetails.forEach(item2 => {
+                //If there are assignments
                 if(item2.assignments && item2.assignments.length > 0){
+                    //Cycle through the assignments
                     item2.assignments.forEach((assign) => {
                         this.clientRequestsArray.push({
                             productId: item2.productId,
@@ -218,6 +222,7 @@ export class CreateHelpTickets{
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
                         courseId: item.courseId,
+                        _id: item2._id
                     })
                 }
             }) 
@@ -256,7 +261,6 @@ export class CreateHelpTickets{
         this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
         this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;;
         this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
-        // this.helpTickets.selectedHelpTicket.helpTicketType = this.inputForm;
        
         if(!this.showTypes){
             //If the help ticket type doesn't require a course, insert a dummy courseId
@@ -269,10 +273,8 @@ export class CreateHelpTickets{
             this.helpTickets.selectedHelpTicket.courseId = this.SelectedClientRequest.courseId;
         }
 
-        // this.helpTickets.selectedHelpTicketContent.content = this.processInputForm();
-
         this.helpTickets.selectedHelpTicketContent.personId = this.userObj._id;
-        this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;//  this.helpTickets.selectedHelpTicket.helpTicketType;
+        this.helpTickets.selectedHelpTicketContent.type = this.helpTickets.selectedHelpTicket.helpTicketType;
         this.helpTickets.selectedHelpTicketContent.displayForm = this.inputForm;
         this.helpTickets.selectedHelpTicket.content.push( this.helpTickets.selectedHelpTicketContent);
     }

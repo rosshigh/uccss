@@ -18,7 +18,8 @@
                                 <th style="width:150px;">Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Note <span click.trigger="dataTable.sortArray('note')"><i class="fa fa-sort"></i></span></th>
                                 <th></th>
-                                 <th></th>
+                                <th>Help Ticket No</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -39,6 +40,7 @@
                                 </th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                             <tr  repeat.for="item of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Category">${item.category}</td>
@@ -49,6 +51,7 @@
                                 <td style="width:5rem;">
                                     <span show.bind="item.reference" click.trigger="navigateToHelpTicket(item)" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="View"><i class="fa fa-eye fa-lg" aria-hidden="true"></i></span>
                                 </td>
+                                <td style="width:5rem;" click.trigger="edit($index, $event)">${item.helpTicketNo}</td>
                                 <td style="width:5rem;">
                                     <span  click.trigger="delete(item)" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg" aria-hidden="true"></i></span>
                                 </td>

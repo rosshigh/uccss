@@ -173,15 +173,17 @@
 									<div class="col-lg-12">
 										<label>Type</label>
 										<select change.delegate="typeChanged()" value.bind="selectedType" id="helpTicketPurpose" class="form-control">
-														<option value="-1">Nothing selected</option>
-														<option repeat.for="types of config.HELP_TICKET_TYPES" value.bind="types.code">${types.description}</option>
-													</select>
+											<option value="-1">Nothing selected</option>
+											<option repeat.for="types of helpTickets.helpTicketTypesArray | helpTicketSubtypes" value.bind="types.type">${types.description}</option>
+										</select>
 									</div>
 								</div>
 							</div>
+							<!--
 							<div class="col-lg-8 topMargin" show.bind="showAdditionalInfo">
-								<compose repeat.for="helpTicket of config.HELP_TICKET_TYPES" show.bind="helpTicket.show" view="./help-ticket-${helpTicket.code}.html"></compose>
+								<compose repeat.for="helpTicket of helpTickets.helpTicketTypesArray" show.bind="helpTicket.show" view="./help-ticket-${helpTicket.code}.html"></compose>
 							</div>
+							-->
 						</div>
 					</div>
 				</div>

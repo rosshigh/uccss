@@ -33,6 +33,22 @@ export class HelpTickets {
         }
         return this.helpTicketsArray;
     }
+
+    async getHelpTicket(id){
+        if(id){
+            try {
+                let serverResponse = await this.data.get(this.data.HELP_TICKET_SERVICES + "/" + id );
+                if (!serverResponse.error) {
+                    this.selectedHelpTicket = serverResponse;
+                }
+                return serverResponse;
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+           
+        }
+    }
     
     async getCurrentCount(options){
         var url = this.data.HELP_TICKET_SERVICES +'/current/count';
@@ -107,7 +123,6 @@ export class HelpTickets {
                 console.log(error);
                 this.emptyHelpTicketContent();
             }
-
         }
     }
 
@@ -317,7 +332,6 @@ export class HelpTickets {
             }         
             //Type
             if(searchObj.type && searchObj.type != -1){
-                searchObj.type = parseInt(searchObj.type);
                 resultArray = resultArray.filter(item => {
                     return searchObj.type == item.helpTicketType;
                 });
@@ -366,6 +380,24 @@ export class HelpTickets {
             }
         }
         return this.helpTicketTypesArray;
+    }
+
+    selectHelpTicketTypeCategory(index){
+        if (!index && index != 0) {
+            this.selectedHelpTicketType = this.emptyHelpTicketType();
+        } else {
+            try {
+                this.selectedHelpTicketType = this.utils.copyObject(this.helpTicketTypesArray[index]);
+                this.editTypeIndex = index;
+            } catch (error) {
+                this.selectedHelpTicket = this.emptyHelpTicketType();
+            }
+        }
+    }
+
+    emptyHelpTicketType(){
+        let obj = new Object();
+        return obj;
     }
 
 }
