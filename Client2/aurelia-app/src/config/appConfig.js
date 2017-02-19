@@ -7,8 +7,8 @@ export class AppConfig {
     SEND_EMAILS = true;
 
     HOST = location.origin;
-    // BASE_URL = "http://localhost:5000/api/";
-    BASE_URL = this.HOST + "/api/";
+    BASE_URL = "http://localhost:5000/api/";
+    // BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -76,19 +76,19 @@ export class AppConfig {
     SITE_INFO_TYPES = [
         {
             'type': 'INFO',
-            'description': 'Information'
+            'description': 'Session Information'
         },
         {
             'type': 'NEWS',
-            'description': 'News'
+            'description': 'UCC and UA News'
         },
         {
             'type': 'ILNK',
-            'description': 'Inside Link'
+            'description': 'Useful Links - Useful Info Page'
         },
         {
             'type': 'OLNK',
-            'description': 'Outside Link'
+            'description': 'Useful Links - Home Page'
         },
         {
             'type': 'SYST',
@@ -96,7 +96,7 @@ export class AppConfig {
         },
         {
             'type': "DLNK",
-            'description': 'Dashboard Link'
+            'description': 'Useful Information - Home Page'
         }
     ];
 

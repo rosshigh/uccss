@@ -115,8 +115,8 @@
               -->
               <td style="width:7rem;" data-title="Status">
                 <div class="dropdown">
-                  <span  class="dropbtn" show.bind="helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS"> ${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}
-                  <div class="dropdown-content">
+                  <span  class="dropbtn"> ${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}
+                  <div show.bind="helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS" class="dropdown-content">
                     <a href="#" click.trigger="changeStatus(helpTicket, status.code)" repeat.for="status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus">${status.description}</a>
                   </div>
                   </span>

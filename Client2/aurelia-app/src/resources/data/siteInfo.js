@@ -14,7 +14,7 @@ export class SiteInfo {
         this.config = config;
     }
 
-     async getInfoArray(refresh, options){
+    async getInfoArray(refresh, options){
         if (!this.siteArray || refresh) {
             var url = this.data.INFO_SERVICES;
             url += options ? options : "";

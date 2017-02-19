@@ -15,11 +15,12 @@ export class FileTypeValueConverter {
       case "GIF":
       case "PNG":
       case "JPG":
-            html = file + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + type + "/" + number + "/" + file + "' /></span>";
+            html = file + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + number + "/" + file + "' /></span>";
+            // ${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}
             break;
       default:
         html = file;
     }
     return html;
-  }
+  } 
 }
