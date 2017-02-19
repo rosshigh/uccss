@@ -150,7 +150,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.SEND_EMAILS = true;
             this.HOST = location.origin;
-            this.BASE_URL = this.HOST + "/api/";
+            this.BASE_URL = "http://localhost:5000/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -2877,7 +2877,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 this.countHeader = "Recent Request History";
                                 _context2.next = 8;
-                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(true, options)]);
 
                             case 8:
                                 responses = _context2.sent;
@@ -2892,7 +2892,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 this.countHeader = "Your Institution's Recent Request History";
                                 _context2.next = 17;
-                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(false, options)]);
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(true, options)]);
 
                             case 17:
                                 _responses = _context2.sent;
@@ -18439,7 +18439,8 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                this.editIndex = this.dataTable.getOriginalIndex(index);
+                                this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+
                                 this.siteinfo.selectSiteItem(this.editIndex);
                                 this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
 

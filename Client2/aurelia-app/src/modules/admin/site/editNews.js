@@ -53,7 +53,8 @@ export class EditNews {
     }
 
     async edit(index, el) {
-        this.editIndex = this.dataTable.getOriginalIndex(index);
+         this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+        // this.editIndex = this.dataTable.getOriginalIndex(index);
         this.siteinfo.selectSiteItem(this.editIndex);
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
 
