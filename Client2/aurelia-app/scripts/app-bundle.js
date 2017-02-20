@@ -22190,7 +22190,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", "", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('', true), this.people.getInstitutionsArray('?order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
+                return Promise.all([this.helpTickets.getHelpTicketTypes('?order=category'), this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true), this.sessions.getSessionsArray('?order=startDate'), this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'), this.people.getPeopleArray('', true), this.people.getInstitutionsArray('?order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;
