@@ -49,7 +49,7 @@ export class EditHelpTickets {
 	}
 
 	typeSelected(){
-		if(this.this.selectedSubtype > -1){
+		if(this.selectedSubtype > -1){
 			this.htSubTypeSelected = true;
 		} else {
 			this.htTypeSelected = false;

@@ -8,6 +8,9 @@ import moment from 'moment';
 export class SiteInfo {
     editIndex;              //Index of selected product
 
+    SITE_SERVICES = 'site';
+    MESSAGE_SERVICES = 'messages';
+
     constructor(data, utils, config) {
         this.data = data;
         this.utils = utils;
@@ -16,7 +19,7 @@ export class SiteInfo {
 
     async getInfoArray(refresh, options){
         if (!this.siteArray || refresh) {
-            var url = this.data.INFO_SERVICES;
+            var url = this.SITE_SERVICES;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -68,13 +71,13 @@ export class SiteInfo {
         }
 
         if(!this.selectedItem._id){
-            let serverResponse = await this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "post");
+            let serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "post");
             if(!serverResponse.error){
                  this.siteArray.push(serverResponse);
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "put");
+            var serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "put");
             if(!serverResponse.error){
                 this.siteArray[this.editIndex] = this.utils.copyObject(this.selectedItem, this.siteArray[this.editIndex]);
             }
@@ -83,14 +86,14 @@ export class SiteInfo {
     }
     
     async uploadFile(files){
-       let response = await this.data.upLoadFiles(files, this.data.SITE_SERVICES + '/upload/' + this.selectedItem._id);
+       let response = await this.data.uploadFiles(files, this.SITE_SERVICES + '/upload/' + this.selectedItem._id);
        if(!response.error){
             this.siteArray[this.editIndex] = this.utils.copyObject(response, this.siteArray[this.editIndex]);
        }
     }
 
     async deleteItem(){
-         let serverResponse = await this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedItem._id);
+         let serverResponse = await this.data.deleteObject(this.SITE_SERVICES + '/' + this.selectedItem._id);
             if (!serverResponse.error) {
                 this.siteArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
@@ -112,7 +115,7 @@ export class SiteInfo {
     //Messages
     async getMessageArray(options, refresh){
         if (!this.messageArray || refresh) {
-            var url = this.data.MESSAGE_SERVICES;
+            var url = this.MESSAGE_SERVICES;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -165,13 +168,13 @@ export class SiteInfo {
         }
 
         if(!this.selectedMessage._id){
-            let serverResponse = await this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "post");
+            let serverResponse = await this.data.saveObject(this.selectedMessage, this.MESSAGE_SERVICES, "post");
             if(!serverResponse.error){
                  this.messageArray.push(this.selectedMessage);
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "put");
+            var serverResponse = await this.data.saveObject(this.selectedMessage, this.MESSAGE_SERVICES, "put");
             if(!serverResponse.error){
                 this.messageArray[this.editMessageIndex] = this.utils.copyObject(this.selectedMessage, this.messageArray[this.editMessageIndex]);
             }
@@ -190,7 +193,7 @@ export class SiteInfo {
     }
 
     async deleteMessage(){
-         let serverResponse = await this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedMessage._id);
+         let serverResponse = await this.data.deleteObject(this.SITE_SERVICES + '/' + this.selectedMessage._id);
             if (!serverResponse.error) {
                 this.messageArray.splice(this.editMessageIndex, 1);
                 this.editMessageIndex = - 1;

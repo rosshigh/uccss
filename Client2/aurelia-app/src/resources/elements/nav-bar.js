@@ -106,7 +106,7 @@ export class NavBar {
     enterNote(){
         var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
          return this.dialog.showNote(
-                "Save Changes",
+                "Enter Note",
                 note,
                 ['Submit', 'Cancel']
             ).then(response => {

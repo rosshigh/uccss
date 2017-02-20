@@ -246,9 +246,7 @@ export class DataServices {
     // //Products Services
     PRODUCTS_SERVICE = 'products';
 
-    // //Misc Services
-    INFO_SERVICES = "site";
-    MESSAGE_SERVICES = 'messages';
+
 
     // //Help Tickets
     HELP_TICKET_SERVICES = 'helpTickets';

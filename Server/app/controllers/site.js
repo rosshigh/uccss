@@ -172,7 +172,7 @@ module.exports = function (app) {
   var upload = multer({ storage: storage });
 
   router.post('/api/site/upload/:id', upload.any(), function(req, res, next){
-      Site.findById(req.params.id, function(err, site){
+      Model.findById(req.params.id, function(err, site){
         if(err){
           return next(err);
         } else {

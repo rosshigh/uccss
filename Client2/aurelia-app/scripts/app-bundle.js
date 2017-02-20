@@ -150,7 +150,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.SEND_EMAILS = true;
             this.HOST = location.origin;
-            this.BASE_URL = this.HOST + "/api/";
+            this.BASE_URL = "http://localhost:5000/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -4849,8 +4849,6 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.CLIENTS_SERVICE = 'clients';
             this.DELETE_ALL_CLIENTS = 'clients/system/SYSTEMID';
             this.PRODUCTS_SERVICE = 'products';
-            this.INFO_SERVICES = "site";
-            this.MESSAGE_SERVICES = 'messages';
             this.HELP_TICKET_SERVICES = 'helpTickets';
             this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
             this.HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
@@ -9062,6 +9060,9 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
         function SiteInfo(data, utils, config) {
             _classCallCheck(this, SiteInfo);
 
+            this.SITE_SERVICES = 'site';
+            this.MESSAGE_SERVICES = 'messages';
+
             this.data = data;
             this.utils = utils;
             this.config = config;
@@ -9079,7 +9080,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                                     break;
                                 }
 
-                                url = this.data.INFO_SERVICES;
+                                url = this.SITE_SERVICES;
 
                                 url += options ? options : "";
                                 _context.prev = 3;
@@ -9180,7 +9181,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                                 }
 
                                 _context2.next = 5;
-                                return this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "post");
+                                return this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "post");
 
                             case 5:
                                 _serverResponse = _context2.sent;
@@ -9192,7 +9193,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
 
                             case 10:
                                 _context2.next = 12;
-                                return this.data.saveObject(this.selectedItem, this.data.INFO_SERVICES, "put");
+                                return this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "put");
 
                             case 12:
                                 serverResponse = _context2.sent;
@@ -9225,7 +9226,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 _context3.next = 2;
-                                return this.data.upLoadFiles(files, this.data.SITE_SERVICES + '/upload/' + this.selectedItem._id);
+                                return this.data.uploadFiles(files, this.SITE_SERVICES + '/upload/' + this.selectedItem._id);
 
                             case 2:
                                 response = _context3.sent;
@@ -9257,7 +9258,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 _context4.next = 2;
-                                return this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedItem._id);
+                                return this.data.deleteObject(this.SITE_SERVICES + '/' + this.selectedItem._id);
 
                             case 2:
                                 serverResponse = _context4.sent;
@@ -9306,7 +9307,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                                     break;
                                 }
 
-                                url = this.data.MESSAGE_SERVICES;
+                                url = this.MESSAGE_SERVICES;
 
                                 url += options ? options : "";
                                 _context5.prev = 3;
@@ -9408,7 +9409,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                                 }
 
                                 _context6.next = 5;
-                                return this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "post");
+                                return this.data.saveObject(this.selectedMessage, this.MESSAGE_SERVICES, "post");
 
                             case 5:
                                 _serverResponse2 = _context6.sent;
@@ -9420,7 +9421,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
 
                             case 10:
                                 _context6.next = 12;
-                                return this.data.saveObject(this.selectedMessage, this.data.MESSAGE_SERVICES, "put");
+                                return this.data.saveObject(this.selectedMessage, this.MESSAGE_SERVICES, "put");
 
                             case 12:
                                 serverResponse = _context6.sent;
@@ -9463,7 +9464,7 @@ define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataService
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 _context7.next = 2;
-                                return this.data.deleteObject(this.data.INFO_SERVICES + '/' + this.selectedMessage._id);
+                                return this.data.deleteObject(this.SITE_SERVICES + '/' + this.selectedMessage._id);
 
                             case 2:
                                 serverResponse = _context7.sent;
@@ -11856,7 +11857,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             var _this2 = this;
 
             var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
-            return this.dialog.showNote("Save Changes", note, ['Submit', 'Cancel']).then(function (response) {
+            return this.dialog.showNote("Enter Note", note, ['Submit', 'Cancel']).then(function (response) {
                 if (!response.wasCancelled) {
                     _this2.saveNote(response.output);
                 } else {
@@ -33221,7 +33222,7 @@ define('modules/admin/site/editHelpTickets',['exports', 'aurelia-framework', '..
 		};
 
 		EditHelpTickets.prototype.typeSelected = function typeSelected() {
-			if (this.this.selectedSubtype > -1) {
+			if (this.selectedSubtype > -1) {
 				this.htSubTypeSelected = true;
 			} else {
 				this.htTypeSelected = false;
