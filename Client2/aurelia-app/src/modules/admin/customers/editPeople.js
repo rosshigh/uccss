@@ -272,7 +272,8 @@ export class EditPeople {
             let response = await this.people.updatePassword(obj);
             if (!response.error) {
                 this.utils.showNotification("The password was updated");
-                $("#newPassword").val("")
+                $("#newPassword").val("");
+                this.newPassword = "";
             }
             this.showPassword = false;
         }

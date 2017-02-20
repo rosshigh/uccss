@@ -1,5 +1,17 @@
 <template>
-	    <div class="panel panel-info">
+    <nav class="navbar navbar-inverse subMenu">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">Inventory</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="${row.isActive ? 'active' : ''}" repeat.for="row of router.navigation"><a href.bind="row.href">${row.title}</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="panel panel-info">
       <div class="panel-body">
         <div class="row">
             <div show.bind="!systemSelected" class="col-lg-12">

@@ -63,7 +63,7 @@ export class ViewHelpTickets {
   async activate() {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
-      this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC"),
+      this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray('?order=lastName&fields=firstName lastName email phone fullName'),

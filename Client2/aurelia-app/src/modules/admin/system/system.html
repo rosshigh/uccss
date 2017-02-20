@@ -1,5 +1,5 @@
 <template>
-        <nav class="navbar navbar-inverse subMenu">
+    <nav class="navbar navbar-inverse subMenu">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand">System</a>
@@ -8,19 +8,10 @@
                 <ul class="nav navbar-nav">
                     <li class="${row.isActive ? 'active' : ''}" repeat.for="row of router.navigation"><a href.bind="row.href">${row.title}</a></li>
                 </ul>
-
             </div>
-    </nav>
-    <!--
-    <div class="col-lg-2">
-         <h4 class="leftMargin">Systems Administration</h4>
-        <div class="list-group">
-            <a  class="${row.isActive ? 'active' : ''} list-group-item"  repeat.for="row of router.navigation" href.bind="row.href" class="list-group-item">
-                <h4 class="list-group-item-heading">${row.title}</h4>
-            </a>
         </div>
-    </div>
--->
+    </nav>
+   
     <div class="col-lg-12">
         <router-view></router-view>
     </div>
