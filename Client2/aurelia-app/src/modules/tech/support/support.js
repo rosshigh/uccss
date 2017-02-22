@@ -11,14 +11,11 @@ export class Support{
         this.router = router;
     }
 
+    canActivate(){
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    }
+
     attached(){
-        // var url = window.location.href.split("#");
-        // if(url[1].substr(url[1].length-1) !== '/'){
-        //      $(".first").addClass('active');
-        // } else {
-        //     $("[href='" + window.location.hash + "']").parent().addClass('active');
-        // }
-       
         $(".nav a").on("click", function(){
             $(".nav").find(".active").removeClass("active");
             $(this).parent().addClass("active");

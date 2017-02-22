@@ -26,7 +26,7 @@
                   <div class="hover_img" repeat.for="file of helpTickets.selectedHelpTicket.content[0].files">
                     <a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
                       target="_blank"
-                      innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets'"></a>
+                      innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename"></a>
                   </div>
                 </div>
               </div>

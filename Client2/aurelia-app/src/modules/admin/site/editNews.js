@@ -78,11 +78,14 @@ export class EditNews {
 
     async save() {
         if(this.validation.validate(1)){
+
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
                  this.dataTable.updateArray(this.siteinfo.siteArray);
                 this.utils.showNotification("The item was saved");
-                if (this.files && this.files.length > 0) this.siteinfo.uploadFile(this.files);
+                if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.siteinfo.uploadFile(this.filesToUpload);
+                }
             }
             this.newsItemSelected = false;
             this._cleanUp();
@@ -90,8 +93,13 @@ export class EditNews {
     }
     
     changeFiles(){
-        this.selectedFile = this.files[0].name;
-        this.filesSelected = this.siteinfo.selectedItem ? true : false;
+        this.filesToUpload = new Array(); 
+        // this.selectedFile = this.files[0].name;
+        // this.filesSelected = this.siteinfo.selectedItem ? true : false;
+        this.filesToUpload.push(this.files[0]);
+        this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
+        this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+        console.log(this.filesToUpload)
     }
 
     delete(){
@@ -139,6 +147,7 @@ export class EditNews {
 
     _cleanUp(){
         this._cleanUpFilters();
+        this.filesToUpload = new Array();
         this.selectedFiles = undefined;
         this.files = undefined;
     }

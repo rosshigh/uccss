@@ -203,7 +203,7 @@ export class ViewHelpTickets {
     if (!serverResponse.error) {
       this.updateArray()
       this.utils.showNotification("The help ticket was updated");
-      if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
     // }
@@ -272,6 +272,7 @@ export class ViewHelpTickets {
     this.enterResponse = false;
     this.files = new Array();
     this.filesSelected = "";
+    this.filesToUpload = new Array();
   }
 
   _unLock(){
@@ -320,5 +321,20 @@ export class ViewHelpTickets {
     $("#status").val("");
     $("#personStatus").val("");
   }
+
+  changeFiles() {
+        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
+        for(var i = 0; i < this.files.length; i++){
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if(item.name === this.files[i].name) addFile = false;
+            })
+            if(addFile) this.filesToUpload.push(this.files[i]);
+        }
+    }
+
+    removeFile(index){
+        this.filesToUpload.splice(index,1);
+    }
 
 }

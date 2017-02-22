@@ -251,6 +251,7 @@ export class CreateHelpTickets{
         this.courseSelected = false;
         this.showAdditionalInfo = false;
         this.showRequests = false;
+         this.filesToUpload = new Array();
     }
 
     // /*****************************************************************************************
@@ -288,7 +289,9 @@ export class CreateHelpTickets{
             let serverResponse = await this.helpTickets.saveHelpTicket(this.sendEmail);
             if (!serverResponse.status) {
                 this.utils.showNotification("The help ticket was created");
-                if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files,serverResponse.content[0]._id);
+                if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.helpTickets.uploadFile(this.filesToUpload,serverResponse.content[0]._id);
+                }
             }
             this._cleanUp();
         }
@@ -302,7 +305,7 @@ export class CreateHelpTickets{
         this.helpTickets.selectHelpTicket();
         this.helpTickets.selectHelpTicketContent();
         this.clearTables();
-        this.filesSelected = "";
+        this.filesToUpload = new Array();
     }
 
     // /*****************************************************************************************
@@ -316,19 +319,25 @@ export class CreateHelpTickets{
     // /*****************************************************************************************
     // * Upload files
     // *****************************************************************************************/
-    uploadFiles() {
-        this.helpTickets.uploadFile(this.files);
-    }
+    // uploadFiles() {
+    //     this.helpTickets.uploadFile(this.filesToUpload);
+    // }
 
     // /*****************************************************************************************
     // * THe user selected files to upload to update the ineterface with the file names
     // *****************************************************************************************/
     changeFiles() {
-        this.filesSelected = "";
-        this.selectedFiles = new Array();
-        for(var i = 0; i<this.files.length; i++){
-             this.selectedFiles.push(this.files[i].name);
-             this.filesSelected += this.files[i].name + " ";
+        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
+        for(var i = 0; i < this.files.length; i++){
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if(item.name === this.files[i].name) addFile = false;
+            })
+            if(addFile) this.filesToUpload.push(this.files[i]);
         }
+    }
+
+    removeFile(index){
+        this.filesToUpload.splice(index,1);
     }
 }

@@ -8,6 +8,11 @@ export class Support {
         this.router = router;
     }
 
+    canActivate(){
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    }
+
+
     attached(){
         $(".nav a").on("click", function(){
             $(".nav").find(".active").removeClass("active");

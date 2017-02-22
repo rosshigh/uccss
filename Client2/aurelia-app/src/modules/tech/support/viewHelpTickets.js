@@ -315,7 +315,7 @@ export class ViewHelpTickets {
       if(status = this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
       this.utils.showNotification("The help ticket was updated");
-      if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse._id);
+      if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
     // }
@@ -377,14 +377,11 @@ export class ViewHelpTickets {
 
   _cleanUp() {
     this.enterResponse = false;
+    this.filesToUpload = new Array();
     this.files = new Array();
     this.filesSelected = "";
     this._unLock();
-    if(this.notesHistory){
-      this.router.navigateToRoute('notes');
-    } else {
-      this.helpTicketSelected = false;
-    }
+    this.helpTicketSelected = false;
   }
 
   flag(){
@@ -418,14 +415,14 @@ export class ViewHelpTickets {
   /*****************************************************************************************
   * COnstruct the string to display the files chosen
   *****************************************************************************************/
-  changeFiles() {
-    var foo = "";
-    for (var i = 0; i < this.files.length; i++) {
-      foo += this.files[i].name;
-      if (i < this.files.length - 1) foo += ", ";
-    }
-    this.filesSelected = foo;
-  }
+  // changeFiles() {
+  //   var foo = "";
+  //   for (var i = 0; i < this.files.length; i++) {
+  //     foo += this.files[i].name;
+  //     if (i < this.files.length - 1) foo += ", ";
+  //   }
+  //   this.filesSelected = foo;
+  // }
 
   back() {
      var changes = this.helpTickets.isHelpTicketDirty();
@@ -496,5 +493,20 @@ export class ViewHelpTickets {
   checkSendMail() {
     this.sendMail = !this.sendMail;
   }
+
+  changeFiles() {
+        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
+        for(var i = 0; i < this.files.length; i++){
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if(item.name === this.files[i].name) addFile = false;
+            })
+            if(addFile) this.filesToUpload.push(this.files[i]);
+        }
+  }
+
+  removeFile(index){
+      this.filesToUpload.splice(index,1);
+    }
 
 }

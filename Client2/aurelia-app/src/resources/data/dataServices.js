@@ -163,9 +163,12 @@ export class DataServices {
         this.isRequesting = true;
 		let formData = new FormData();
 
-		for (var i = 0; i < files.length; i++) {
-			formData.append("file" + i, files[0]);
-		}
+		files.forEach((item, index) => {
+            formData.append("file" + index, item);
+        })
+        // for (var i = 0; i < files.length; i++) {
+		// 	formData.append("file" + i, files[0]);
+		// }
 
 		return this.http.createRequest(url)
 			.asPost()

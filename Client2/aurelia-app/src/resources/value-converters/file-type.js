@@ -8,18 +8,18 @@ export class FileTypeValueConverter {
     this.config = appconfig;
   }
 
-  toView(file, number, type='helpTickets') {
+  toView(file, number, type='helpTickets', orignalFilename) {
     var ext = file.substr(file.indexOf('.') + 1);
     var html = "";
     switch(ext.toUpperCase()){
       case "GIF":
       case "PNG":
       case "JPG":
-            html = file + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + number + "/" + file + "' /></span>";
+            html = orignalFilename + "<span><img src='" + this.config.HELPTICKET_FILE_DOWNLOAD_URL + "/" + number + "/" + file + "' /></span>";
             // ${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}
             break;
       default:
-        html = file;
+        html = file; 
     }
     return html;
   } 

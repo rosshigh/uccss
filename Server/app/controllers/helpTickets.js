@@ -317,7 +317,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
-     logger.log('Upload File ', 'verbose');
+     logger.log('Upload File ', 'verbose');    
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);
@@ -327,7 +327,7 @@ module.exports = function (app, config) {
           
             var content = helpticket.content.id(id);   
             if(content){
-              for(var i = 0, x = req.files.length; i<x; i++){
+              for(var i = 0, x = req.files.length; i<x; i++){            
                 var file =  {
                   originalFilename: req.files[i].originalname,
                   fileName: req.files[i].filename,

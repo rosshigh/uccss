@@ -121,8 +121,8 @@
                 <div class="col-sm-12 col-lg-12">
                   <div class="form-group">
                       <label for="editFile" class="col-sm-2 control-label hideOnPhone topMargin">File</label>
-                      <div class="col-sm-3 topMargin" show.bind="siteinfo.selectedItem.file.fileName != undefined">
-                          <a href.bind="selectedURL" innerhtml.bind='siteinfo.selectedItem.file.fileName' target='_blank'></a>
+                      <div class="col-sm-3 topMargin" >
+                          <a href.bind="siteinfo.selectedItem.url" target='_blank'>${siteinfo.selectedItem.file.fileName}</a>
                       </div>
                   </div>
                 </div>
@@ -134,10 +134,10 @@
                       <div class="input-group">
                           <span class="input-group-btn">
                               <span class="btn btn-primary btn-fill btn-wd btn-file">
-                              Browse...<input change.delegate="changeFiles()" id="uploadFiles" files.bind="files" type="file" multiple=true>
+                              Browse...<input change.delegate="changeFiles()" id="uploadFiles" files.bind="files" type="file" >
                               </span>
                           </span>
-                          <input type="text" value.bind="selectedFile" class="form-control" readonly/>
+                          <input type="text" value.bind="siteinfo.selectedItem.file.fileName" class="form-control" readonly/>
                       </div>
                   </div>
                 </div>

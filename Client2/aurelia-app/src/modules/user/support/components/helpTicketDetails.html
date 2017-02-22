@@ -14,9 +14,6 @@
 
      <div class="col-lg-12">  
          <div id="container" ></div>
-         <!--
-        <compose if.bind="inputForm" view="../../../../resources/htTimeline/help-ticket-${inputForm}.html"></compose>
-        -->
         <!-- Additional Information Panel -->
         <div class="col-lg-12 topMargin" id="descriptionGroup">
             <div class="form-group">
@@ -26,7 +23,7 @@
             </div>
 
             <div innerhtml.bind="fileUploadMessage"></div>
-          
+          <!--
             <div class="panel panel-default">
                 <div class="input-group">
                     <span class="input-group-btn">
@@ -37,6 +34,20 @@
                     <input type="text" value.bind="filesSelected" class="form-control" readonly/>
                 </div>
             </div>
+            -->
+            <div class="col-lg-2">
+                <label class="btn btn-primary">
+                    Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
+                </label>
+            </div>
+            <div class="col-lg-6">
+                <ul>
+                    <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                </ul>
+            </div>
+<!--
+                <input change.delegate="changeFiles()" id="uploadFiles" files.bind="files" type="file" multiple=true>
+                -->
         </div>
     </div>
 </template>

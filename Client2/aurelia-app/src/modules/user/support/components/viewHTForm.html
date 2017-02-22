@@ -22,10 +22,26 @@
             title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
         </div>
 
-        <div class="col-lg-12">
+        <div class="row leftMargin rightMargin">
           <editor value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
+  
+          <p>&nbsp;</p>
+          <div class="row">
+            <h4>Upload screenshots or other files that will help us solve you problem</h4>
+              <div class="col-lg-2">
+                  <label class="btn btn-primary">
+                      Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
+                  </label>
+              </div>
+              <div class="col-lg-6">
+                  <ul>
+                      <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                  </ul>
+              </div>
+          </div>
         </div>
-        <p>&nbsp;</p>
+      </div>
+<!--
           <div class="input-group">
             <span class="input-group-btn">
                 <span class="btn btn-primary btn-file topMargin bottomMargin">
@@ -35,7 +51,7 @@
             <input type="text" value.bind="filesSelected" class="form-control topMargin bottomMargin" readonly/>
           </div>
       </div>
-
+-->
       <div class="row">
         <div class="list-group-item leftMargin rightMargin">
             <div class="row">
