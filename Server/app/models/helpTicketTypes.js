@@ -6,6 +6,7 @@ var helpTicketTypesSchema = new Schema({
   description: { type: String },
   message: { type: String },
   showSubtypes: { type: Boolean },
+  requestsRequired: { type: Boolean },
   subtypes: [
     {
       type: { type: String },

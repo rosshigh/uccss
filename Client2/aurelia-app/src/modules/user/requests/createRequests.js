@@ -65,7 +65,6 @@ export class ViewHelpTickets {
     ]);
     this.requests.selectRequest()
     this.filterList();
-    this.updateMessages(true);
     this._setUpValidation();
   }
 
@@ -81,17 +80,18 @@ export class ViewHelpTickets {
             await this._lock();
             this.ILockedIt = true;
             this.existingRequest = true;
-            this.updateMessages(false);
+            this.updateMessages("EXISTING_REQUEST_MESSAGE");
         } else{
-          this.existingRequest = false;
-          this.updateMessages(false);
-          this.requests.selectRequest();
-          this.requests.selectedRequest.sessionId = this.sessionId;
+            this.existingRequest = false;
+            this.updateMessages(false);
+            this.requests.selectRequest();
+            this.requests.selectedRequest.sessionId = this.sessionId;
         }
         this.setDates();
     } else {
       this.existingRequest = false;
-      this.updateMessages(true);
+      let msg = this.sessionSelected ? "SESSION_SELECTED" : "CLIENT_REQUEST_START"
+      this.updateMessages(msg);
     }
   }
 
@@ -115,11 +115,12 @@ export class ViewHelpTickets {
         }
       }
     })
+      this.updateMessages("CLIENT_REQUEST_START");
   }
 
   deactivate(){
     this._unLock();
-    this.updateMessages(true);
+    this.updateMessages("CLIENT_REQUEST_START");
   }
 
   /*******************************************************************
@@ -137,7 +138,7 @@ export class ViewHelpTickets {
         this.sessions.selectSession(el.target.selectedIndex - 1);
         this.setDates();
         this.validation.makeValid( $(el.target));
-        this.updateMessages(false);
+        this.updateMessages("SESSION_SELECTED");
         await this.getRequests();
     }
   }
@@ -212,24 +213,45 @@ export class ViewHelpTickets {
 
   /*****************************************************************************************
   * Update the screen messages
-  * clean - if true erase all messages except the start message
+  * message - The key of he message to display
   *****************************************************************************************/
-  updateMessages(clean){
+  updateMessages(message){
     $("#existingRequestInfo").empty().hide();
     $("#infoBox").empty().hide();
-    if(!clean) {
-      this.productInfo = new Array();
-      if(this.regularClient){
-        $("#infoBox").html(this.siteInfo.selectMessageByKey('REGULAR_CLIENT_MESSAGE').content).fadeIn();
-      } else if(this.sandBoxClient){
-        $("#infoBox").html(this.siteInfo.selectMessageByKey('SANDBOX_MESSAGE').content).fadeIn();
-      }
-      if(this.existingRequest){
-        $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', moment(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
-      }
-    } else {
-      $("#infoBox").html(this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START').content).fadeIn();
+    switch(message){
+      case "CLIENT_REQUEST_START":
+      case "SESSION_SELECTED":
+      case "REGULAR_CLIENT_MESSAGE":
+        this.productInfo = new Array();
+      case "SANDBOX_MESSAGE":
+      case "EXISTING_REQUEST_MESSAGE":
+        //  this.productInfo = new Array();
+        if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
+          $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', moment(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
+        }
     }
+     $("#infoBox").html(this.siteInfo.selectMessageByKey(message).content).fadeIn();
+
+    // if(!clean) {
+    //   this.productInfo = new Array();
+    //   if(this.regularClient){
+    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('REGULAR_CLIENT_MESSAGE').content).fadeIn();
+    //   } else if(this.sandBoxClient){
+    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('SANDBOX_MESSAGE').content).fadeIn();
+    //   }
+    //   if(this.existingRequest){
+    //     $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', moment(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
+    //   }
+    // } else {
+    //   if(!this.sessionSelected) {
+    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START').content).fadeIn();
+    //   }
+    //   if(this.sessionSelected){
+    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('SESSION_SELECTED').content).fadeIn();
+    //   }
+      
+    // }
+    
   }
 
   _cleanRequest(){
@@ -401,7 +423,7 @@ export class ViewHelpTickets {
     this.sessionSelected = false;
     this.sandBoxClient = false;
     this.courseSelected = false;
-    this.updateMessages(true);
+    this.updateMessages('CLIENT_REQUEST_START');
     this.sessionId = -1;
     $('.wizard').wizard('selectedItem', {
       step: 1

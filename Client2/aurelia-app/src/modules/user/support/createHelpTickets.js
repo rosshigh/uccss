@@ -79,32 +79,42 @@ export class CreateHelpTickets{
         this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
     }
 
-    categoryChanged(){
+    async categoryChanged(){
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
+            this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
+            if(this.requestsRequired) await this.getActiveRequests();
             this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
             if(!this.showTypes){
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
-                this.showRequests = false; 
-                this.showHelpTicketDescription = true;
+                // this.showRequests = true; 
                 this.showAdditionalInfo = true;
+                //  this.showHelpTicketDescription = true;
                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
                 // this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
             } else {
+                this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
+                // this.showHelpTicketDescription = true;
                 this.inputForm = null;
                 this.showAdditionalInfo = false;
-                this.showHelpTicketDescription = false;
-                this.showRequests = false;
+                // this.helpTicketTypeMessage = undefined;
+                // this.showHelpTicketDescription = false;
+                // this.showRequests = false;
             }
+            // let message = this.getMessage("CURRENT_PRODUCT_REQUESTS");
+            // this.helpTicketTypeMessage = message.replace("NUMBER",  this.clientRequestsArray.length);
+
         } else {
             this.inputForm = null;
             this.showTypes = false;
             this.showAdditionalInfo = false;
-            this.showHelpTicketDescription = false;
-            this.showRequests = false;
+            this.helpTicketTypeMessage = undefined;
+            // this.showHelpTicketDescription = false;
+            // this.showRequests = false;
         }
+         $("#helpTicketPurpose").addClass('focus');
     }
 
     getMessage(messageKey){
@@ -143,12 +153,12 @@ export class CreateHelpTickets{
             this.selectedHelpTicketType = this.getIndex()
             this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm)
             this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-            this.showHelpTicketDescription = true;
+            // this.showHelpTicketDescription = true;
             this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
             this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
           
             await this.products.getProductsArray('?fields=_id name');
-            if( this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) await this.getActiveRequests();
+            // if( this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) await this.getActiveRequests();
             this.showAdditionalInfo = false;
 
             if(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords){
@@ -160,15 +170,22 @@ export class CreateHelpTickets{
                         refreshProductArray.push(item._id);
                     }
                 });
-                 this.clientRequestsArray = this.clientRequestsArray.filter(item => {
+                 this.clientRequestsArray = this.originalClientRequestsArray.filter(item => {
                     return refreshProductArray.indexOf(item.productId) > -1 && item.systemId;
                 });
+                
+            } else {
+                if(this.originalClientRequestsArray && this.originalClientRequestsArray.length !== this.clientRequestsArray.length){
+                     this.originalClientRequestsArray.forEach(item => {
+                        this.clientRequestsArray.push(item);
+                    })
+                }
             }
         } else {
+            this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
             this.inputForm = null;
             this.showAdditionalInfo = false;
-            this.showHelpTicketDescription = false;
-            this.showRequests = false;
+            // this.showRequests = false;
         }
     }
 
@@ -196,6 +213,7 @@ export class CreateHelpTickets{
         });
         sessions = sessions.substring(0, sessions.length-1);
         await this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
+        this.originalClientRequestsArray = new Array();
         this.clientRequestsArray = new Array();
         //Cycle through request array
         this.clientRequests.requestsArray.forEach(item => {
@@ -205,7 +223,7 @@ export class CreateHelpTickets{
                 if(item2.assignments && item2.assignments.length > 0){
                     //Cycle through the assignments
                     item2.assignments.forEach((assign) => {
-                        this.clientRequestsArray.push({
+                        this.originalClientRequestsArray.push({
                             productId: item2.productId,
                             sessionId: item.sessionId,
                             requestStatus: item2.requestStatus,
@@ -217,7 +235,7 @@ export class CreateHelpTickets{
                         })
                     })
                 } else {
-                    this.clientRequestsArray.push({
+                    this.originalClientRequestsArray.push({
                         productId: item2.productId,
                         sessionId: item.sessionId,
                         requestStatus: item2.requestStatus,
@@ -227,7 +245,10 @@ export class CreateHelpTickets{
                 }
             }) 
         });
-        if(this.clientRequestsArray.length > 0) this.showRequests = true;
+        this.originalClientRequestsArray.forEach(item => {
+            this.clientRequestsArray.push(item);
+        })
+        // if(this.clientRequestsArray.length > 0) this.showRequests = true;
     }
 
     // /*****************************************************************************************
@@ -247,11 +268,13 @@ export class CreateHelpTickets{
     cancel() {
         this.helpTickets.selectHelpTicket();
         this.helpTickets.selectHelpTicketContent();
-        this.showHelpTicketDescription = false;
+        this.helpTicketTypeMessage = undefined;
+        // this.showHelpTicketDescription = false;
         this.courseSelected = false;
         this.showAdditionalInfo = false;
-        this.showRequests = false;
-         this.filesToUpload = new Array();
+        // this.showRequests = false;
+        this.filesToUpload = new Array();
+        this.clientRequests = new Array();
     }
 
     // /*****************************************************************************************
@@ -299,8 +322,10 @@ export class CreateHelpTickets{
 
     _cleanUp(){
         this.showTypes = false;
-        this.showHelpTicketDescription = false;
-        this.showRequests = false;
+        this.helpTicketTypeMessage = undefined;
+        // this.showHelpTicketDescription = false;
+        this.clientRequests = new Array();
+        // this.showRequests = false;
         this.showAdditionalInfo = false;
         this.helpTickets.selectHelpTicket();
         this.helpTickets.selectHelpTicketContent();

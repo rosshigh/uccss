@@ -11756,6 +11756,8 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
 
         NavBar.prototype.loginSuccess = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _this2 = this;
+
                 var instObj;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -11764,7 +11766,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                                 this.userObj = JSON.parse(sessionStorage.getItem('user'));
 
                                 if (!this.userObj) {
-                                    _context2.next = 8;
+                                    _context2.next = 19;
                                     break;
                                 }
 
@@ -11774,27 +11776,40 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                             case 4:
                                 instObj = _context2.sent;
 
-                                if (instObj.institutionStatus !== this.config.INSTITUTIONS_ACTIVE) {
-                                    this.utils.showNotification("You must belong to an active institution to access the web site");
-                                    this.logout();
-                                } else {
-                                    if (this.userObj.personStatus !== this.config.ACTIVE_PERSON) {
-                                        this.utils.showNotification("You must have an active account to access the web site");
-                                        this.logout();
-                                    } else {
-                                        if (!this.userObj.userRole) this.logout();
-                                        sessionStorage.setItem('role', this.userObj.userRole);
-                                        this.router.navigate("user");
-                                    }
+                                if (!(instObj.institutionStatus !== this.config.INSTITUTIONS_ACTIVE)) {
+                                    _context2.next = 10;
+                                    break;
                                 }
-                                _context2.next = 10;
+
+                                this.utils.showNotification("You must belong to an active institution to access the web site");
+                                this.logout();
+                                _context2.next = 17;
                                 break;
 
-                            case 8:
+                            case 10:
+                                if (!(this.userObj.personStatus !== this.config.ACTIVE_PERSON)) {
+                                    _context2.next = 14;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return', this.dialog.showMessage("You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.", "Account Not Active", ['OK']).then(function (response) {
+                                    _this2.logout();
+                                }));
+
+                            case 14:
+                                if (!this.userObj.userRole) this.logout();
+                                sessionStorage.setItem('role', this.userObj.userRole);
+                                this.router.navigate("user");
+
+                            case 17:
+                                _context2.next = 21;
+                                break;
+
+                            case 19:
                                 this.utils.showNotification("There was a problem validating your account");
                                 this.router.navigate("home");
 
-                            case 10:
+                            case 21:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -11856,12 +11871,12 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
         }();
 
         NavBar.prototype.enterNote = function enterNote() {
-            var _this2 = this;
+            var _this3 = this;
 
             var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
             return this.dialog.showNote("Enter Note", note, ['Submit', 'Cancel']).then(function (response) {
                 if (!response.wasCancelled) {
-                    _this2.saveNote(response.output);
+                    _this3.saveNote(response.output);
                 } else {
                     console.log("Cancelled");
                 }
@@ -23102,10 +23117,9 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
                 this.requests.selectRequest();
                 this.filterList();
-                this.updateMessages(true);
                 this._setUpValidation();
 
-              case 7:
+              case 6:
               case 'end':
                 return _context.stop();
             }
@@ -23122,6 +23136,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.getRequests = function () {
       var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        var msg;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -23153,7 +23168,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
               case 11:
                 this.ILockedIt = true;
                 this.existingRequest = true;
-                this.updateMessages(false);
+                this.updateMessages("EXISTING_REQUEST_MESSAGE");
                 _context2.next = 20;
                 break;
 
@@ -23165,14 +23180,16 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
               case 20:
                 this.setDates();
-                _context2.next = 25;
+                _context2.next = 26;
                 break;
 
               case 23:
                 this.existingRequest = false;
-                this.updateMessages(true);
+                msg = this.sessionSelected ? "SESSION_SELECTED" : "CLIENT_REQUEST_START";
 
-              case 25:
+                this.updateMessages(msg);
+
+              case 26:
               case 'end':
                 return _context2.stop();
             }
@@ -23229,11 +23246,12 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
           }
         }
       });
+      this.updateMessages("CLIENT_REQUEST_START");
     };
 
     ViewHelpTickets.prototype.deactivate = function deactivate() {
       this._unLock();
-      this.updateMessages(true);
+      this.updateMessages("CLIENT_REQUEST_START");
     };
 
     ViewHelpTickets.prototype.changeSession = function () {
@@ -23258,7 +23276,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
                 this.sessions.selectSession(el.target.selectedIndex - 1);
                 this.setDates();
                 this.validation.makeValid($(el.target));
-                this.updateMessages(false);
+                this.updateMessages("SESSION_SELECTED");
                 _context4.next = 12;
                 return this.getRequests();
 
@@ -23393,22 +23411,21 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       return changeRequestType;
     }();
 
-    ViewHelpTickets.prototype.updateMessages = function updateMessages(clean) {
+    ViewHelpTickets.prototype.updateMessages = function updateMessages(message) {
       $("#existingRequestInfo").empty().hide();
       $("#infoBox").empty().hide();
-      if (!clean) {
-        this.productInfo = new Array();
-        if (this.regularClient) {
-          $("#infoBox").html(this.siteInfo.selectMessageByKey('REGULAR_CLIENT_MESSAGE').content).fadeIn();
-        } else if (this.sandBoxClient) {
-          $("#infoBox").html(this.siteInfo.selectMessageByKey('SANDBOX_MESSAGE').content).fadeIn();
-        }
-        if (this.existingRequest) {
-          $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', (0, _moment2.default)(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
-        }
-      } else {
-        $("#infoBox").html(this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START').content).fadeIn();
+      switch (message) {
+        case "CLIENT_REQUEST_START":
+        case "SESSION_SELECTED":
+        case "REGULAR_CLIENT_MESSAGE":
+          this.productInfo = new Array();
+        case "SANDBOX_MESSAGE":
+        case "EXISTING_REQUEST_MESSAGE":
+          if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
+            $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', (0, _moment2.default)(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
+          }
       }
+      $("#infoBox").html(this.siteInfo.selectMessageByKey(message).content).fadeIn();
     };
 
     ViewHelpTickets.prototype._cleanRequest = function _cleanRequest() {
@@ -23593,7 +23610,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       this.sessionSelected = false;
       this.sandBoxClient = false;
       this.courseSelected = false;
-      this.updateMessages(true);
+      this.updateMessages('CLIENT_REQUEST_START');
       this.sessionId = -1;
       $('.wizard').wizard('selectedItem', {
         step: 1
@@ -24361,33 +24378,71 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
             return activate;
         }();
 
-        CreateHelpTickets.prototype.categoryChanged = function categoryChanged() {
-            if (this.helpTickets.selectedHelpTicket.helpTicketCategory > -1) {
-                this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
-                if (!this.showTypes) {
-                    this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
-                    this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                    this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
-                    this.showRequests = false;
-                    this.showHelpTicketDescription = true;
-                    this.showAdditionalInfo = true;
-                    this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm);
+        CreateHelpTickets.prototype.categoryChanged = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1)) {
+                                    _context2.next = 9;
+                                    break;
+                                }
 
-                    this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
-                } else {
-                    this.inputForm = null;
-                    this.showAdditionalInfo = false;
-                    this.showHelpTicketDescription = false;
-                    this.showRequests = false;
-                }
-            } else {
-                this.inputForm = null;
-                this.showTypes = false;
-                this.showAdditionalInfo = false;
-                this.showHelpTicketDescription = false;
-                this.showRequests = false;
+                                this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
+
+                                if (!this.requestsRequired) {
+                                    _context2.next = 5;
+                                    break;
+                                }
+
+                                _context2.next = 5;
+                                return this.getActiveRequests();
+
+                            case 5:
+                                this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
+                                if (!this.showTypes) {
+                                    this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
+                                    this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
+                                    this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+
+                                    this.showAdditionalInfo = true;
+
+                                    this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm);
+
+                                    this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
+                                } else {
+                                    this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
+
+                                    this.inputForm = null;
+                                    this.showAdditionalInfo = false;
+                                }
+                                _context2.next = 13;
+                                break;
+
+                            case 9:
+                                this.inputForm = null;
+                                this.showTypes = false;
+                                this.showAdditionalInfo = false;
+                                this.helpTicketTypeMessage = undefined;
+
+                            case 13:
+                                (0, _jquery2.default)("#helpTicketPurpose").addClass('focus');
+
+                            case 14:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function categoryChanged() {
+                return _ref2.apply(this, arguments);
             }
-        };
+
+            return categoryChanged;
+        }();
 
         CreateHelpTickets.prototype.getMessage = function getMessage(messageKey) {
             for (var i = 0; i < this.site.messageArray.length; i++) {
@@ -24413,17 +24468,17 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
         };
 
         CreateHelpTickets.prototype.typeChanged = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(el) {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el) {
                 var _this = this;
 
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
                                 this.clearTables();
 
                                 if (!(this.helpTicketType !== "NULL")) {
-                                    _context2.next = 18;
+                                    _context3.next = 14;
                                     break;
                                 }
 
@@ -24431,23 +24486,14 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.selectedHelpTicketType = this.getIndex();
                                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm);
                                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-                                this.showHelpTicketDescription = true;
+
                                 this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
                                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
 
-                                _context2.next = 11;
+                                _context3.next = 10;
                                 return this.products.getProductsArray('?fields=_id name');
 
-                            case 11:
-                                if (!this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) {
-                                    _context2.next = 14;
-                                    break;
-                                }
-
-                                _context2.next = 14;
-                                return this.getActiveRequests();
-
-                            case 14:
+                            case 10:
                                 this.showAdditionalInfo = false;
 
                                 if (this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords) {
@@ -24460,30 +24506,35 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                                 refreshProductArray.push(item._id);
                                             }
                                         });
-                                        _this.clientRequestsArray = _this.clientRequestsArray.filter(function (item) {
+                                        _this.clientRequestsArray = _this.originalClientRequestsArray.filter(function (item) {
                                             return refreshProductArray.indexOf(item.productId) > -1 && item.systemId;
                                         });
                                     })();
+                                } else {
+                                    if (this.originalClientRequestsArray && this.originalClientRequestsArray.length !== this.clientRequestsArray.length) {
+                                        this.originalClientRequestsArray.forEach(function (item) {
+                                            _this.clientRequestsArray.push(item);
+                                        });
+                                    }
                                 }
-                                _context2.next = 22;
+                                _context3.next = 17;
                                 break;
 
-                            case 18:
+                            case 14:
+                                this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
                                 this.inputForm = null;
                                 this.showAdditionalInfo = false;
-                                this.showHelpTicketDescription = false;
-                                this.showRequests = false;
 
-                            case 22:
+                            case 17:
                             case 'end':
-                                return _context2.stop();
+                                return _context3.stop();
                         }
                     }
-                }, _callee2, this);
+                }, _callee3, this);
             }));
 
             function typeChanged(_x) {
-                return _ref2.apply(this, arguments);
+                return _ref3.apply(this, arguments);
             }
 
             return typeChanged;
@@ -24511,13 +24562,13 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
         };
 
         CreateHelpTickets.prototype.getActiveRequests = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
                 var _this4 = this;
 
                 var sessions;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 sessions = "";
 
@@ -24525,17 +24576,18 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                     sessions += item._id + ":";
                                 });
                                 sessions = sessions.substring(0, sessions.length - 1);
-                                _context3.next = 5;
+                                _context4.next = 5;
                                 return this.clientRequests.getActiveClientRequestsArray(this.userObj._id, sessions);
 
                             case 5:
+                                this.originalClientRequestsArray = new Array();
                                 this.clientRequestsArray = new Array();
 
                                 this.clientRequests.requestsArray.forEach(function (item) {
                                     item.requestDetails.forEach(function (item2) {
                                         if (item2.assignments && item2.assignments.length > 0) {
                                             item2.assignments.forEach(function (assign) {
-                                                _this4.clientRequestsArray.push({
+                                                _this4.originalClientRequestsArray.push({
                                                     productId: item2.productId,
                                                     sessionId: item.sessionId,
                                                     requestStatus: item2.requestStatus,
@@ -24547,7 +24599,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                                 });
                                             });
                                         } else {
-                                            _this4.clientRequestsArray.push({
+                                            _this4.originalClientRequestsArray.push({
                                                 productId: item2.productId,
                                                 sessionId: item.sessionId,
                                                 requestStatus: item2.requestStatus,
@@ -24557,28 +24609,30 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                         }
                                     });
                                 });
-                                if (this.clientRequestsArray.length > 0) this.showRequests = true;
+                                this.originalClientRequestsArray.forEach(function (item) {
+                                    _this4.clientRequestsArray.push(item);
+                                });
 
-                            case 8:
+                            case 9:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this);
             }));
 
             function getActiveRequests() {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return getActiveRequests;
         }();
 
         CreateHelpTickets.prototype.requestChosen = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(el, index) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(el, index) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
 
                                 this.showAdditionalInfo = true;
@@ -24591,14 +24645,14 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
                             case 6:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function requestChosen(_x2, _x3) {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return requestChosen;
@@ -24607,18 +24661,20 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
         CreateHelpTickets.prototype.cancel = function cancel() {
             this.helpTickets.selectHelpTicket();
             this.helpTickets.selectHelpTicketContent();
-            this.showHelpTicketDescription = false;
+            this.helpTicketTypeMessage = undefined;
+
             this.courseSelected = false;
             this.showAdditionalInfo = false;
-            this.showRequests = false;
+
             this.filesToUpload = new Array();
+            this.clientRequests = new Array();
         };
 
         CreateHelpTickets.prototype.buldHelpTicket = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
                                 this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
@@ -24642,40 +24698,40 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
                             case 10:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee6, this);
             }));
 
             function buldHelpTicket() {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return buldHelpTicket;
         }();
 
         CreateHelpTickets.prototype.save = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context6.next = 8;
+                                    _context7.next = 8;
                                     break;
                                 }
 
-                                _context6.next = 3;
+                                _context7.next = 3;
                                 return this.buldHelpTicket();
 
                             case 3:
-                                _context6.next = 5;
+                                _context7.next = 5;
                                 return this.helpTickets.saveHelpTicket(this.sendEmail);
 
                             case 5:
-                                serverResponse = _context6.sent;
+                                serverResponse = _context7.sent;
 
                                 if (!serverResponse.status) {
                                     this.utils.showNotification("The help ticket was created");
@@ -24687,14 +24743,14 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
                             case 8:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, this);
+                }, _callee7, this);
             }));
 
             function save() {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             }
 
             return save;
@@ -24702,8 +24758,10 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
         CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
             this.showTypes = false;
-            this.showHelpTicketDescription = false;
-            this.showRequests = false;
+            this.helpTicketTypeMessage = undefined;
+
+            this.clientRequests = new Array();
+
             this.showAdditionalInfo = false;
             this.helpTickets.selectHelpTicket();
             this.helpTickets.selectHelpTicketContent();
@@ -33479,7 +33537,7 @@ define('text!modules/user/components/userHelpTickets.html', ['module'], function
 define('text!modules/user/requests/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"container-fluid\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Product Requests</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n\n            </div>\n    </nav>\n    \n    <!--\n    <div class=\"topMargin leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n    <div class=\"col-lg-2\">\n        <div class=\"list-group\">\n            <a  class=\"${row.isActive ? 'active' : ''} list-group-item\"  repeat.for=\"row of router.navigation\" href.bind=\"row.href\" class=\"list-group-item\">\n                <h4 class=\"list-group-item-heading\">${row.title}</h4>\n            </a>\n        </div>\n\n        <div class=\"topMargin\" style=\"display: none;\" id=\"infoBox\"></div>\n        <div class=\"topMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n    </div>\n-->\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/user/requests/createRequests.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"fuelux/css/fuelux.min.css\"></require>\n<div class=\"row\">\n <span  show.bind=\"showLockMessage\" class=\"leftMargin bottomMargin\" >Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n \n</div>\n  <div class=\"fuelux col-lg-7 blackText\">\n    <div class=\"wizard\" data-initialize=\"wizard\" id=\"myWizard\">\n      <div class=\"steps-container\">\n        <ul class=\"steps\">\n          <li data-step=\"1\"  data-target=\"#step1\" class=\"active\">\n            <span class=\"badge badge-info\">1</span>Step 1<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"2\" data-target=\"#step2\">\n            <span class=\"badge\">2</span>Step 2<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"3\" data-target=\"#step3\">\n            <span class=\"badge\">3</span>Step 3<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"4\" data-target=\"#step4\">\n            <span class=\"badge\">4</span>Step 4<span class=\"chevron\"></span>\n          </li>\n        </ul>\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn btn-default btn-prev btn-md\">\n           <span><i class=\"fa fa-chevron-left\" aria-hidden=\"true\"></i></span>Prev</button>\n        <button type=\"button\" class=\"btn btn-primary btn-next btn-md\" data-last=\"Complete\">Next\n          <span><i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i></span>\n        </button>\n      </div>\n      <div class=\"step-content\">\n\n        <div class=\"step-pane active\" id=\"step1\" data-step=\"1\">\n          <h3><strong>Step 1 </strong> - Course Information</h3>\n          <compose view=\"./components/client-request-step1.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step2\"  data-step=\"2\">\n          <h3><strong>Step 2 </strong> - Products</h3>\n\n          <compose view=\"./components/client-request-step2.html\"></compose>\n\n        </div>\n\n        <div class=\"step-pane\" id=\"step3\"  data-step=\"3\">\n          <h3><strong>Step 3 </strong> - Additional Comments</h3>\n          <compose view=\"./components/client-request-step3.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step4\"  data-step=\"4\">\n          <h3><strong>Step 4 </strong> - Requested Dates!</h3>\n          <compose view=\"./components/client-request-step4.html\"></compose>\n        </div>\n\n      </div>\n    </div>\n  </div>\n  <div class=\"topMargin col-lg-4 leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n\n  <div id=\"curriculumInfo\" class=\"topMargin col-lg-4 leftMargin\" >\n    <div class=\"panel panel-default\" >\n      <div class=\"panel-heading\">${productInfoObject.header}</div>\n      <div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\n    </div>\n  </div>\n</div>\n  \n</template>\n"; });
 define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n        </div>\n      </div> \n      \n</template>"; });
-define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n           <!-- \n            <compose view='./components/Courses.html' show.bind=\"helpTickets.helpTicketTypesArray[helpTicketType].subtypes[selectedHelpTicketType].clientRequired\"></compose>\n         -->\n            <compose view='./components/Requests.html' show.bind=\"showRequests\"></compose>\n           \n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n           <!-- \n            <compose view='./components/Courses.html' show.bind=\"helpTickets.helpTicketTypesArray[helpTicketType].subtypes[selectedHelpTicketType].clientRequired\"></compose>\n         -->\n            <compose view='./components/Requests.html' show.bind=\"requestsRequired\"></compose>\n           \n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/user/support/currInfo.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-3\">\n\t\t<h4>Curriculum Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"category of curriculum.curriculumCatArray\"\n\t\t\t\t\tid=\"${category.name}\" class=\"list-group-item\">${category.name}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n\t<div class=\"col-lg-9\">\n\t\t<div show.bind=\"typeSelected != '' && !curriculumSelected\" style='padding:15px;'>\n\t\t\t<div class='row'>\n\t\t\t\t<div class='col-lg-12 bottomMargin'>\n\t\t\t\t\t<table id=\"newsTable\" class=\"table table-striped table-hover\">\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td colspan='4'>\n\t\t\t\t\t\t\t\t\t<compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th>Title </th>\n\t\t\t\t\t\t\t\t<th>Rating</th>\n\t\t\t\t\t\t\t\t<th>Rate It</th>\n\t\t\t\t\t\t\t\t<th>Products</th>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr repeat.for=\"curriculum of curriculumArray\">\n\t\t\t\t\t\t\t\t<td click.delegate=\"selectCurriculum(curriculum)\" data-title=\"Title\" class=\"col-lg-6\">${curriculum.title}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\">${curriculum.rating | formatDigits:2}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\" class=\"col-lg-2\">\n\t\t\t\t\t\t\t\t\t<rate-it id=\"${curriculum._id}\" change.delegate=\"rateCurriculum($event)\" rating.two-way=\"curriculum.rating\" raters.bind=\"curriculum.raters\"></rate-it>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Products\" class=\"col-lg-4\">\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<li repeat.for=\"product of curriculum.products\" class=\"list-group-item\">${product | productName:products.productsArray}</li>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t</table>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div show.bind=\"curriculumSelected\">\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"add()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Add Comment\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"panel panel-default leftMargin rightMargin\">\n\t\t\t\t <div class=\"panel-heading\">\n\t\t\t\t\t<h3 class=\"panel-title\">${curriculum.selectedCurriculum.title}</h3>\n\t\t\t\t</div>\n\t\t\t\t\t<div show.bind=\"curriculum.selectedCurriculum.description.length > 0\" class=\"panel-body\" innerhtml.bind=\"curriculum.selectedCurriculum.description\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"addComment\">\n\t\t\t\t<h3>Comments are not anonymous</h3>\n\t\t\t\t <editor value.bind=\"comment\" height=\"250\"></editor>\n\t\t\t</div>\n\t\t\t<div class=\"well well-sm topMargin leftMargin rightMargin\" show.bind=\"curriculum.selectedCurriculum.customerComments.length > 0\">\n\t\t\t\t<!-- Timeline Content -->\n\t\t\t\t<div class=\"smart-timeline\">\n\t\t\t\t\t<ul class=\"smart-timeline-list\">\n\t\t\t\t\t\t<li  repeat.for=\"comment of curriculum.selectedCurriculum.customerComments\">\n\t\t\t\t\t\t\t<compose view=\"./components/comment.html\"></compose>\n\t\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n</template>"; });
 define('text!modules/user/support/downloads.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n          <div class=\"col-lg-3\">\n\t\t<h4>Curriculum Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($event, $index)\" type=\"button\" repeat.for=\"type of downloads.appCatsArray\" id=\"${type.downCatcode}\"\n\t\t\t\t\tclass=\"list-group-item\">${type.description}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n       \n\n        <div show.bind=\"typeSelected != ''\" class=\"col-lg-9\" style='padding:15px;'>\n            <div class='row'>\n                <div class='col-lg-12 bottomMargin'>\n                    <table id=\"newsTable\" class=\"table table-striped table-hover\">\n                        <thead>\n                            <tr>\n                                <td colspan='3'>\n                                    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th >Name </th>\n                                <th>File</th>\n                                <th >Decription</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"name\" class=\"col-md-2\">${item.name}</td>\n                                <td data-title=\"originalFilename\" class=\"col-md-2\">\n                                    <a href=\"${config.DOWNLOAD_FILE_DOWNLOAD_URL}/${typeSelected}/${item.file.originalFilename}\" target=\"_blank\">${item.file.originalFilename}</a>\n                                </td>\n                                <td data-title=\"description\" class=\"col-md-8\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n   </div>\n</template>"; });
 define('text!modules/user/support/support.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-inverse subMenu\">\n        <div class=\"navbar-header\">\n            <a class=\"navbar-brand\">Support</a>\n        </div>\n        <div class=\"collapse navbar-collapse col-lg-8\" id=\"bs-example-navbar-collapse-1\">\n            <ul class=\"nav navbar-nav\">\n                <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n            </ul>\n        </div>\n        <div class=\"pull-right\">\n            <h5 class=\"rightMargin\" style=\"color:white;\">${userObj.fullName}</h5>\n        </div>\n    </nav>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
@@ -33564,8 +33622,8 @@ define('text!modules/user/requests/components/viewRequestsTable.html', ['module'
 define('text!modules/user/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/user/support/components/comment.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"comment.authorEmail | gravatarUrl:100:1\">\n\n  </div>\n  <div class=\"smart-timeline-time\">\n    <small>${comment.dateCreated | dateFormat:'YYYY-MM-DD':true}</small>\n  </div>\n  <div class=\"smart-timeline-content borderTop leftJustify\">\n\t<div class=\"form-group\">\n     \t<div innerhtml.bind=\"comment.comment\"></div>\n    </div>\n</div>\n</template>"; });
 define('text!modules/user/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Submit Help Ticket\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div> \n    \n    <div class=\"topMargin bottomMargin leftMargin list-group-item\" show.bind=\"resources && resources.length > 0\">\n        <h5>Here are some resources that may be of help.</h5>\n        <ul>\n            <li style=\"list-style-type: none\" repeat.for=\"file of resources\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryName}/${file.fileName}\">${file.fileName}</a></li>\n        </ul>\n    </div>\n\n     <div class=\"col-lg-12\">  \n         <div id=\"container\" ></div>\n        <!-- Additional Information Panel -->\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n                <div innerhtml.bind=\"editorMessage\"></div>\n                <p>&nbsp;</p>\n                <editor id=\"comments\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n            </div>\n\n            <div innerhtml.bind=\"fileUploadMessage\"></div>\n          <!--\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n            -->\n            <div class=\"col-lg-2\">\n                <label class=\"btn btn-primary\">\n                    Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                </label>\n            </div>\n            <div class=\"col-lg-6\">\n                <ul>\n                    <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                </ul>\n            </div>\n<!--\n                <input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                -->\n        </div>\n    </div>\n</template>"; });
-define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n\n   <!-- Category Select -->\n  <div class=\"form-group\">\n    <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketCategory\" change.delegate=\"categoryChanged()\" id=\"helpTicketCategory\" class=\"form-control\">\n          <option value=\"-1\">Select the type of help ticket</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray\" \n                  model.bind=\"types.category\">${types.description}</option>\n        </select>\n  </div>\n\n   <!-- Type Select -->\n  <div class=\"form-group\">\n    <select show.bind=\"showTypes\" value.bind=\"helpTicketType\" change.delegate=\"typeChanged($event)\" id=\"helpTicketPurpose\"\n      class=\"form-control\">\n          <option value=\"NULL\">Select the type of help ticket</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes\"\n                  model.bind=\"types.type\">${types.description}</option>\n        </select>\n  </div>\n\n  <div show.bind=\"showHelpTicketDescription\">\n    <div class=\"well well-sm\" innerhtml.bind=\"helpTicketTypeMessage\"></div>\n  </div>\n  \n</template>"; });
-define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div>\n        <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\n        <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Course</th>\n            <th>Session</th>\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, $index)\">\n              <td>${product.courseId | courseName:people.coursesArray}</td>\n              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/user/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n\n   <!-- Category Select -->\n  <div class=\"form-group\">\n    <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketCategory\" change.delegate=\"categoryChanged()\" id=\"helpTicketCategory\" class=\"form-control\">\n          <option value=\"-1\">Select the help ticket category</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray\" \n                  model.bind=\"types.category\">${types.description}</option>\n        </select>\n  </div>\n\n   <!-- Type Select -->\n  <div class=\"form-group\">\n    <select show.bind=\"showTypes && clientRequestsArray.length > 0\" value.bind=\"helpTicketType\" change.delegate=\"typeChanged($event)\" id=\"helpTicketPurpose\"\n      class=\"form-control\">\n          <option value=\"NULL\">Select the help ticket type</option>\n          <option repeat.for=\"types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes\"\n                  model.bind=\"types.type\">${types.description}</option>\n        </select>\n  </div>\n\n  <div show.bind=\"helpTicketTypeMessage\">\n    <div class=\"well well-sm\" innerhtml.bind=\"helpTicketTypeMessage\"></div>\n  </div>\n  \n</template>"; });
+define('text!modules/user/support/components/Requests.html', ['module'], function(module) { module.exports = "<template>\n      <div class=\"topMargin\">\n        <h5 show.bind=\"clientRequestsArray.length === 0\">You have no product requests that apply to this type of help ticket.</h5>\n        <table id=\"clientTable\" show.bind=\"clientRequestsArray.length > 0\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Course</th>\n            <th>Session</th>\n            <th>Product</th>\n            <th>System</th>\n            <th>Client</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n            <tr id=\"${product.id}\" productId=\"${product.productId}\" \n                repeat.for=\"product of clientRequestsArray\"\n                click.trigger=\"requestChosen($event, $index)\">\n              <td>${product.courseId | courseName:people.coursesArray}</td>\n              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>\n              <td>${product.productId | productName:products.productsArray}</td>\n              <td>${product.systemId | lookupSid:systems.systemsArray}</td>\n              <td>${product.client}</td>\n              <td>${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"fluid-container\">\n\n    <!-- Buttons -->\n    <div class=\"bottomMargin list-group-item\">\n      <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n      <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n        title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n      <span>${responseMessage}</span>\n    </div>\n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n      <!-- Enter Response -->\n      <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n          <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <div class=\"row leftMargin rightMargin\">\n          <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n  \n          <p>&nbsp;</p>\n          <div class=\"row\">\n            <h4>Upload screenshots or other files that will help us solve you problem</h4>\n              <div class=\"col-lg-2\">\n                  <label class=\"btn btn-primary\">\n                      Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                  </label>\n              </div>\n              <div class=\"col-lg-6\">\n                  <ul>\n                      <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                  </ul>\n              </div>\n          </div>\n        </div>\n      </div>\n<!--\n          <div class=\"input-group\">\n            <span class=\"input-group-btn\">\n                <span class=\"btn btn-primary btn-file topMargin bottomMargin\">\n                  Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                </span>\n            </span>\n            <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control topMargin bottomMargin\" readonly/>\n          </div>\n      </div>\n-->\n      <div class=\"row\">\n        <div class=\"list-group-item leftMargin rightMargin\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\n                    | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n        </div>\n      </div>\n    </div>\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n</div>\n</template>"; });
 define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class='row'>\n      <div class='bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n                </th>\n                <th></th>\n                <th></th>\n                <th class=\"hasinput\">\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th class=\"hasinput\">\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                 <th>Owner</th>\n                <th></th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\n                <td style=\"width:12rem;\">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td> \n                <td style=\"width:2rem;\" data-title=\"Update\">\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\n                  <span click.trigger=\"openHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus == config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Reopen Help Ticket\"><i class=\"fa fa-folder-open fa-lg\" aria-hidden=\"true\"></i></span>\n                </td>  \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>             \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });

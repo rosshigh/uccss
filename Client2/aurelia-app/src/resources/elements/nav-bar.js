@@ -73,8 +73,15 @@ export class NavBar {
                 this.logout();
             } else {
                 if (this.userObj.personStatus !== this.config.ACTIVE_PERSON) {
-                    this.utils.showNotification("You must have an active account to access the web site");
-                     this.logout();
+                     return this.dialog.showMessage(
+                        "You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.",
+                        "Account Not Active",
+                        ['OK']
+                    ).then(response => {
+                          this.logout();
+                    });
+                    // this.utils.showNotification("You must have an active account to access the web site");
+                    //  this.logout();
                 } else {
                     if (!this.userObj.userRole)  this.logout();
                     sessionStorage.setItem('role',this.userObj.userRole)
