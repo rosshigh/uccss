@@ -24,6 +24,7 @@ export function configure(config) {
     './value-converters/help-ticket-subtypes',
     './value-converters/format-phone',
      './value-converters/session-name',
+      './value-converters/get-array-value',
     './value-converters/info-filter',
     './value-converters/date-format',
      './value-converters/help-ticket-type',

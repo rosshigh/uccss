@@ -11,6 +11,15 @@
             <li style="list-style-type: none" repeat.for="file of resources"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryName}/${file.fileName}">${file.fileName}</a></li>
         </ul>
     </div>
+    <div class='col-lg-12'>
+        <div class='topMargin bottomMargin'>
+            <label for="prioritySelect" class='control-label'>Priority</label>
+            <select class="bottomMargin form-control" id="prioritySelect" value.bind="helpTickets.selectedHelpTicket.priority">
+                <option repeat.for = "priority of config.HELP_TICKET_PRIORITIES" value.bind="$index">${priority.priority}</option>
+            </select>
+        </div>
+        <span>${config.HELP_TICKET_PRIORITIES[helpTickets.selectedHelpTicket.priority].message}</span>
+    </div>
 
      <div class="col-lg-12">  
          <div id="container" ></div>
@@ -22,19 +31,14 @@
                 <editor id="comments" value.bind="helpTickets.selectedHelpTicketContent.content.comments" height="250"></editor>
             </div>
 
-            <div innerhtml.bind="fileUploadMessage"></div>
-          <!--
-            <div class="panel panel-default">
-                <div class="input-group">
-                    <span class="input-group-btn">
-                        <span class="btn btn-primary btn-fill btn-wd btn-file">
-                        Browse...<input change.delegate="changeFiles()" id="uploadFiles" files.bind="files" type="file" multiple=true>
-                        </span>
-                    </span>
-                    <input type="text" value.bind="filesSelected" class="form-control" readonly/>
-                </div>
+             <div class="form-group topMargin">
+                <div innerhtml.bind="stepsMessage"></div>
+                <p>&nbsp;</p>
+                <editor id="steps" value.bind="helpTickets.selectedHelpTicketContent.content.steps" height="250"></editor>
             </div>
-            -->
+
+            <div innerhtml.bind="fileUploadMessage"></div>
+
             <div class="col-lg-2">
                 <label class="btn btn-primary">
                     Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
@@ -45,9 +49,7 @@
                     <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
                 </ul>
             </div>
-<!--
-                <input change.delegate="changeFiles()" id="uploadFiles" files.bind="files" type="file" multiple=true>
-                -->
+
         </div>
     </div>
 </template>

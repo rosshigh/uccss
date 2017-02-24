@@ -89,7 +89,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr repeat.for="helpTicket of dataTable.displayArray">
+            <tr repeat.for="helpTicket of dataTable.displayArray" class="${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}">
               <td style="width:4rem;" data-title="referenceNo">${helpTicket.helpTicketNo}</td>
               <td style="width:11rem;" mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" click.delegate="selectHelpTicket($event, $index)"
                 data-title="type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}

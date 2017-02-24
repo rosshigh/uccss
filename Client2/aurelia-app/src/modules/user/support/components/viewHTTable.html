@@ -35,6 +35,10 @@
                   <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" placeholder="Filter Date" class="form-control datepicker"
                     data-dateformat="yy/mm/dd">
                 </th>
+                 <th class="hasinput">
+                  <input change.delegate="dataTable.filterList($event)" id="modifiedDate" type="date" placeholder="Filter Date" class="form-control datepicker"
+                    data-dateformat="yy/mm/dd">
+                </th>
               </tr>
               <tr>
                 <th>
@@ -51,6 +55,9 @@
                 <th>
                   Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span>
                 </th>
+                <th>
+                  Date Modified <span click.trigger="dataTable.sortArray('modifiedDate')"><i class="fa fa-sort"></i></span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -64,6 +71,7 @@
                 </td>  
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Status">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>             
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Created Date">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+                <td data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               </tr>
             </tbody>
           </table>

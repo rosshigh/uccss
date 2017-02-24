@@ -99,6 +99,7 @@ export class HelpTickets {
         newHelpTicketObj.personId = "";
         newHelpTicketObj.helpTicketType = "";
         newHelpTicketObj.helpTicketStatus = this.config.NEW_HELPTICKET_STATUS;
+        newHelpTicketObj.priority = 0;
         newHelpTicketObj.content = new Array();
         newHelpTicketObj.owner = new Array();
         newHelpTicketObj.createdDate = new Date();

@@ -77,6 +77,7 @@ export class CreateHelpTickets{
         })
         this.editorMessage = this.getMessage('EDITOR_DESCRIPTION_MESSAGE');
         this.fileUploadMessage = this.getMessage('FILE_UPLOAD_DESCRIPTION');
+        this.stepsMessage = this.getMessage('RECREATE_STEPS');
     }
 
     async categoryChanged(){

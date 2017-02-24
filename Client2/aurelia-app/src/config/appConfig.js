@@ -121,6 +121,8 @@ export class AppConfig {
     HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
     HELP_TICKET_OTHER_TYPE = 99;
 
+    HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Who cares", status: ""},{priority: "Medium", message: "Whenever", status: "info"},{priority: "Critical", message:"Need NOW!  Walked into class without testing",status: "danger"}];
+
     REFRESH_KEYWORDS = ["ERPSIM"];
 
     HELP_TICKET_TYPES = [

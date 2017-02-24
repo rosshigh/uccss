@@ -43,6 +43,7 @@ var HelpTicketSchema = new Schema({
   requestId: { type: Schema.Types.ObjectId },
   systemId: {type: Schema.Types.ObjectId },
   clientId: {type: Schema.Types.ObjectId },
+  priority: { type: Number },
   content: [HelpTicketContentSchema],
   owner: [{
     personId: { type: Schema.Types.ObjectId },
