@@ -22,7 +22,7 @@ export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
   showLockMessage = false; 
-  responseMessage = "Click here to respond";
+  responseMessage = "";
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -108,7 +108,7 @@ export class ViewHelpTickets {
             helpTicketId: this.helpTickets.selectedHelpTicket._id,
             personId: this.userObj._id
           });
-          this.responseMessage = "Click here to respond";
+          this.responseMessage = "";
           this.showLockMessage = false;
           this.lockObject = {}; 
       } else {
@@ -126,7 +126,7 @@ export class ViewHelpTickets {
     this.selectedRow.children().addClass('info')
     this.helpTicketSelected = true;
 
-    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.referenceNo;
+    this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
   }
 
   getIndex(subtypes, type){
@@ -175,7 +175,7 @@ export class ViewHelpTickets {
   }
 
   respond() {
-     if(!this.showLockMessage){
+     if(!this.showLockMessage && !this.enterResponse){
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
         this.enableButton = true;

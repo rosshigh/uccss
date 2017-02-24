@@ -278,7 +278,7 @@ export class ViewHelpTickets {
   * Open the response form and create an empty help ticket content object
   *****************************************************************************************/
   respond() {
-    if (!this.showLockMessage) {
+    if (!this.showLockMessage && !this.enterResponse) {
       this.responseMessage = "";
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
