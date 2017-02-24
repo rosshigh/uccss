@@ -2878,7 +2878,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 this.countHeader = "Recent Request History";
                                 _context2.next = 8;
-                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(true, options)]);
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options)]);
 
                             case 8:
                                 responses = _context2.sent;
@@ -2893,7 +2893,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 this.countHeader = "Your Institution's Recent Request History";
                                 _context2.next = 17;
-                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray(false), this.siteinfo.getInfoArray(true, options)]);
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options)]);
 
                             case 17:
                                 _responses = _context2.sent;

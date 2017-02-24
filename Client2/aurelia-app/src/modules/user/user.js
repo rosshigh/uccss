@@ -98,7 +98,7 @@ export class User {
             this.helpTickets.getCurrentCount(),
             this.requests.getCurrentCount(),  
             this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true),
-            this.sessions.getSessionsArray(false),
+            this.sessions.getSessionsArray('?order=startDate'),
             this.siteinfo.getInfoArray(true, options)
             ]);
             this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
@@ -109,7 +109,7 @@ export class User {
         let responses = await Promise.all([
             this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.userObj._id),
             this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id),
-            this.sessions.getSessionsArray(false),
+            this.sessions.getSessionsArray('?order=startDate'),
             this.siteinfo.getInfoArray(true, options)  
         ]);
         this.showRequests = this.requests.customerActionRequests;
