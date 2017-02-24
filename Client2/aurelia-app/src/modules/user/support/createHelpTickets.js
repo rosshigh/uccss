@@ -185,7 +185,7 @@ export class CreateHelpTickets{
             this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
             this.inputForm = null;
             this.showAdditionalInfo = false;
-            this.requestsRequired = false;
+            // this.requestsRequired = false;
             // this.showRequests = false;
         }
     }

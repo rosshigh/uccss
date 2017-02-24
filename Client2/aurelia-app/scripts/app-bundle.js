@@ -24517,16 +24517,15 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                         });
                                     }
                                 }
-                                _context3.next = 18;
+                                _context3.next = 17;
                                 break;
 
                             case 14:
                                 this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
                                 this.inputForm = null;
                                 this.showAdditionalInfo = false;
-                                this.requestsRequired = false;
 
-                            case 18:
+                            case 17:
                             case 'end':
                                 return _context3.stop();
                         }
