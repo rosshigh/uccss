@@ -122,8 +122,8 @@
                   </span>
                
                 </td>
-              <td style="width:9rem;" data-title="Created Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
-              <td style="width:9rem;" data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
+              <td style="width:9rem;" data-title="Created Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+              <td style="width:9rem;" data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               <td style="width:10rem;" data-title="Customer" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"fullName"}</td>
               <td style="width:10rem;" data-title="Nickname" click.delegate="selectHelpTicket($event, $index)">${helpTicket.personId | person:people.peopleArray:"nickName"}</td>
               <td style="width:10rem;" data-title="Insitution">${helpTicket.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
