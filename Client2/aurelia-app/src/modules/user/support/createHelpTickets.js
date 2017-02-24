@@ -83,7 +83,7 @@ export class CreateHelpTickets{
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
             if(this.requestsRequired) await this.getActiveRequests();
-            this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes;
+            this.showTypes = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].showSubtypes && this.clientRequestsArray.length;
             if(!this.showTypes){
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
@@ -185,6 +185,7 @@ export class CreateHelpTickets{
             this.helpTicketTypeMessage = this.getMessage('SELECT_TYPE');
             this.inputForm = null;
             this.showAdditionalInfo = false;
+            this.requestsRequired = false;
             // this.showRequests = false;
         }
     }

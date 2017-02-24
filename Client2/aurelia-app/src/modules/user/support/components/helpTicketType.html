@@ -11,7 +11,7 @@
 
    <!-- Type Select -->
   <div class="form-group">
-    <select show.bind="showTypes && clientRequestsArray.length > 0" value.bind="helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
+    <select show.bind="showTypes" value.bind="helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
       class="form-control">
           <option value="NULL">Select the help ticket type</option>
           <option repeat.for="types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes"
