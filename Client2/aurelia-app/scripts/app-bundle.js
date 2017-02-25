@@ -12767,11 +12767,11 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
             case 'text':
               switch (filters[i].compare) {
                 case 'array':
-                  var _array = eval("item." + filters[i].property);
+                  var array = eval("item." + filters[i].property);
                   keep = false;
-                  if (_array) {
-                    for (var l = 0; l < _array.length; l++) {
-                      if (_array[l].indexOf(filters[i].value.toUpperCase()) > -1) {
+                  if (array) {
+                    for (var l = 0; l < array.length; l++) {
+                      if (array[l].indexOf(filters[i].value.toUpperCase()) > -1) {
                         keep = true;
                         break;
                       }
@@ -12781,11 +12781,11 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
                 case 'obj-array':
                   if (filters[i].property.indexOf('.') > -1) {
                     var properties = filters[i].property.split('.');
-                    var _array = eval("item." + properties[0]);
+                    var array = eval("item." + properties[0]);
                     keep = false;
-                    if (_array) {
-                      for (var l = 0; l < _array.length; l++) {
-                        if (_array[l][properties[1]].indexOf(filters[i].value.toUpperCase()) > -1) {
+                    if (array) {
+                      for (var l = 0; l < array.length; l++) {
+                        if (array[l][properties[1]].indexOf(filters[i].value.toUpperCase()) > -1) {
                           keep = true;
                           break;
                         }
@@ -12794,15 +12794,15 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
                   }
                   break;
                 case 'lookup':
-                  var _array = filters[i].property.split('-');
-                  var _value = _this.lookup(item[_array[0]][_array[1]], _array[1], lookupArray);
+                  var arrayToLookup = filters[i].property.split('-');
+                  var _value = _this.lookup(item[arrayToLookup[0]], arrayToLookup[1], lookupArray);
                   if (_value) {
                     keep = _value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                   }
                   break;
                 case 'lookup-array-item':
-                  var _array = filters[i].property.split('-');
-                  var _value = _this.lookup(item[_array[0]][_array[2]][_array[3]], _array[1], lookupArray);
+                  var array = filters[i].property.split('-');
+                  var _value = _this.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
                   if (_value) {
                     keep = _value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                   }

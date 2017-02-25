@@ -269,8 +269,8 @@ export class DataTable{
                 break;
               case 'lookup':
                 // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
-                let array = filters[i].property.split('-');
-                let value = this.lookup(item[array[0]][array[1]], array[1], lookupArray);
+                var arrayToLookup = filters[i].property.split('-');
+                let value = this.lookup(item[arrayToLookup[0]], arrayToLookup[1], lookupArray);
                 if(value){
                    keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                 }
