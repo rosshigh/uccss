@@ -5,6 +5,8 @@
 		<div class="pull-right">
 			<a href="#/clientRequests" class="rightMargin" if.bind="showRequests > 0" style="text-decoration: none;">Requests <span class="badge">${showRequests}</span></a>            
 			<a href="#/support" class="rightMargin" if.bind="showHelpTickets > 0" style="text-decoration: none;">Help Tickets <span class="badge">${showHelpTickets}</span></a>
+			<span show.bind="alertIndex > -1" click.delegate="openAlert(siteinfo.siteArray[alertIndex])" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+        		title="" data-original-title="Alerts"><i class="fa fa-bell-o fa-border" aria-hidden="true"></i></span>
 			<span class="rightMargin"><h4>Welcome ${userObj.fullName}</h4></span>
 		</div>
 	</div>

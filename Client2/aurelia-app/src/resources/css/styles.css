@@ -359,6 +359,18 @@ textarea {
     padding: 10px;
 }
 
+.hoverProfile {
+ position:absolute;
+    height: 250px;
+    width: 500px;
+    z-index:99;
+    display:none;
+    box-shadow: 10px 10px 5px #888888;
+    overflow: hidden;
+    background-color: white;
+    padding: 10px;
+}
+
 #curriculumInfo{
      display:none;
 }

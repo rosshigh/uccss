@@ -98,6 +98,10 @@ export class AppConfig {
         {
             'type': "DLNK",
             'description': 'Useful Information - Home Page'
+        },
+        {
+            'type': "ALRT",
+            'description': 'Alerts'
         }
     ];
 
@@ -105,21 +109,21 @@ export class AppConfig {
     MESSAGE_TYPES = ['CLIENT_REQUESTS', 'HELP_TICKETS'];
 
         //Help Ticket parameters
-    HELP_TICKET_OTHER_TYPE = "2";
-    HELP_TICKET_APP_TYPE = 3;
-    HELP_TICKET_PASSWORD_RESET_TYPE = "02";
-    HELP_TICKET_CURRICULUM_TYPE = "01";
-    HELP_TICKET_PRODUCT_REQUESTS = 0;
-    HELP_TICKET_CLIENT_REFRESH_TYPE = 5;
-    HELP_TICKET_LOGON_TYPE = 6;
-    HELP_TICKET_CLIENT_OTHER_TYPE = 7;
-    HELP_TICKET_APP_ERROR_TYPE = "1";
-    HELP_TICKET_APP_LICENSE_TYPE = 9;
-    HELP_TICKET_APP_OTHER_TYPE = 10;
-    HELP_TICKET_OTHER_UA_TYPE = 11;
-    HELP_TICKET_OTHER_UCCSS_TYPE = 12;
-    HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
-    HELP_TICKET_OTHER_TYPE = 99;
+    // HELP_TICKET_OTHER_TYPE = "2";
+    // HELP_TICKET_APP_TYPE = 3;
+    // HELP_TICKET_PASSWORD_RESET_TYPE = "02";
+    // HELP_TICKET_CURRICULUM_TYPE = "01";
+    // HELP_TICKET_PRODUCT_REQUESTS = 0;
+    // HELP_TICKET_CLIENT_REFRESH_TYPE = 5;
+    // HELP_TICKET_LOGON_TYPE = 6;
+    // HELP_TICKET_CLIENT_OTHER_TYPE = 7;
+    // HELP_TICKET_APP_ERROR_TYPE = "1";
+    // HELP_TICKET_APP_LICENSE_TYPE = 9;
+    // HELP_TICKET_APP_OTHER_TYPE = 10;
+    // HELP_TICKET_OTHER_UA_TYPE = 11;
+    // HELP_TICKET_OTHER_UCCSS_TYPE = 12;
+    // HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
+    // HELP_TICKET_OTHER_TYPE = 99;
 
     HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Who cares", status: ""},{priority: "Medium", message: "Whenever", status: "info"},{priority: "Critical", message:"Need NOW!  Walked into class without testing",status: "danger"}];
 

@@ -45,10 +45,10 @@
                                     />
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="itemType" compare="id">
-                                    <option value=""></option>
-                                    <option value="${type.type}" repeat.for="type of config.SITE_INFO_TYPES">${type.description}</optionp>
-                                </select>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="itemType" compare="id" ref="itemTypes">
+                                        <option value=""></option>
+                                        <option value="${type.type}" repeat.for="type of config.SITE_INFO_TYPES">${type.description}</optionp>
+                                    </select>
                                 </th>
                                 <th>
                                     <input input.delegate="dataTable.filterList($event)" id="url" type="text" placeholder="Filter URL" class="form-control" />

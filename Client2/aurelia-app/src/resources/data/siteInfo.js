@@ -62,6 +62,7 @@ export class SiteInfo {
         newItem.priority = "INFO";
         newItem.itemType = "NEWS";
         newItem.sortOrder = 0;
+        newItem.file = new Object();
         return newItem;
     }
 
@@ -73,12 +74,14 @@ export class SiteInfo {
         if(!this.selectedItem._id){
             let serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "post");
             if(!serverResponse.error){
-                 this.siteArray.push(serverResponse);
+                this.selectedItem = this.utils.copyObject(serverResponse);
+                this.siteArray.push(serverResponse);
             }
             return serverResponse;
         } else {
             var serverResponse = await this.data.saveObject(this.selectedItem, this.SITE_SERVICES, "put");
             if(!serverResponse.error){
+                this.selectedItem = this.utils.copyObject(serverResponse);
                 this.siteArray[this.editIndex] = this.utils.copyObject(this.selectedItem, this.siteArray[this.editIndex]);
             }
             return serverResponse;

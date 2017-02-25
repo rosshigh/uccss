@@ -6,6 +6,7 @@ var express = require('express'),
   passport = require('passport'),
   multer = require('multer'),
   mkdirp = require('mkdirp'),
+  logger = require('../../config/logger'),
   Model = mongoose.model('Site');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
@@ -49,7 +50,8 @@ module.exports = function (app) {
   });
 
   router.post('/api/site', requireAuth, function(req, res, next){
-    debug('Create Site');
+    logger.log('Create Site Info', 'verbose');
+
     var item =  new Model(req.body);
     item.save( function ( err, object ){
       if (err) {
@@ -62,7 +64,7 @@ module.exports = function (app) {
 
   router.put('/api/site', requireAuth, function(req, res, next){
     debug('Update Site [%s]', req.body._id);
-    Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, result){
+    Model.findOneAndUpdate({_id: req.body._id}, req.body, {new: true, safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
       } else {
@@ -152,7 +154,7 @@ module.exports = function (app) {
     });
   });
 
-   var storage = multer.diskStorage({
+  var storage = multer.diskStorage({
     destination: function (req, file, cb) {
       var path = config.uploads + '/site';
       

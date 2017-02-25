@@ -23,6 +23,7 @@ export class ViewHelpTickets {
   enterResponse = false;
   showLockMessage = false; 
   responseMessage = "";
+  isChecked = true;
 
   navControl = "supportNavButtons";
   spinnerHTML = "";
@@ -49,7 +50,7 @@ export class ViewHelpTickets {
   };
 
   attached() {
-    $('[data-toggle="tooltip"]').tooltip();
+    this.toolTips();
   }
 
   deactivate(){
@@ -58,6 +59,7 @@ export class ViewHelpTickets {
   
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
+     this.isUCC = this.userObj.roles.indexOf('UCC');
   }
 
   async activate() {
@@ -72,13 +74,19 @@ export class ViewHelpTickets {
     ]);
     this.updateArray();
 
+    this.filterOutClosed();
+
     this.sendEmail = false;;
 
-    this.isUCC = this.userObj.userRole >= this.config.UCC_TECH_ROLE;
+    this.helpTicketTypeLookupArray = new Array();
+    this.helpTickets.helpTicketTypesArray.forEach(item => {
+      item.subtypes.forEach(item2 => {
+        this.helpTicketTypeLookupArray.push({helpTicketType: item2.type, description: item2.description});
+      })
+    })
 
-    this.dataTable.createPageButtons(1);
-    this.filterValues.push({ property: "helpTicketStatus", value: this.config.NEW_HELPTICKET_STATUS, type: 'select-one' });
-    if (this.dataTable.active) this.dataTable.filter(this.filterValues);
+    // this.filterValues.push({ property: "helpTicketStatus", value: this.config.NEW_HELPTICKET_STATUS, type: 'select-one' });
+    // if (this.dataTable.active) this.dataTable.filter(this.filterValues);
     this._setUpValidation();
   }
 
@@ -112,9 +120,11 @@ export class ViewHelpTickets {
           this.showLockMessage = false;
           this.lockObject = {}; 
       } else {
+        if(response[0].personId !== this.userObj._id){
           this.lockObject = response[0];
           this.responseMessage = "Help Ticket is currently locked by " + this.getName();
           this.showLockMessage = true;  
+        }
       }
     }
 
@@ -289,6 +299,17 @@ export class ViewHelpTickets {
     this._unLock();
   }
 
+  filterOutClosed() {
+        if (this.isChecked) {
+            var filterValues = new Array();
+            filterValues.push({ property: "helpTicketStatus", value: this.config.CLOSED_HELPTICKET_STATUS, type: 'text', compare: 'not-number' });
+            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+        } else {
+            this.updateArray();
+        }
+        this.toolTips();
+  }
+
   _setUpValidation() {
     this.validation.addRule("00", "curriculumTitle", [{ "rule": "required", "message": "Curriculum Title is required" }]);
     this.validation.addRule("00", "client", [{
@@ -331,10 +352,14 @@ export class ViewHelpTickets {
             })
             if(addFile) this.filesToUpload.push(this.files[i]);
         }
-    }
+  }
 
-    removeFile(index){
-        this.filesToUpload.splice(index,1);
-    }
+  removeFile(index){
+      this.filesToUpload.splice(index,1);
+  }
+
+  toolTips(){
+      $('[data-toggle="tooltip"]').tooltip();
+  }
 
 }

@@ -1,6 +1,6 @@
 export class SessionStatusButtonValueConverter {
 	toView(value){
-		if(!value) return;
+		if(!value) return; 
 
 		switch(value){
 			case 'Active':

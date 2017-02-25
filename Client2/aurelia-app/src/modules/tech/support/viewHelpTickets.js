@@ -25,6 +25,8 @@ export class ViewHelpTickets {
   notesHistory = false;
   lockMessage = "";
 
+  colSpan = 10;
+
   // navControl = "supportNavButtons";
   spinnerHTML = "";
   filterValues = new Array();
@@ -52,6 +54,7 @@ export class ViewHelpTickets {
 
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
+    this.isUCC = this.userObj.roles.indexOf('UCC');
   }
 
   /*****************************************************************************************
@@ -82,6 +85,13 @@ export class ViewHelpTickets {
       this.openHelpTicket();
     }
 
+    this.helpTicketTypeLookupArray = new Array();
+    this.helpTickets.helpTicketTypesArray.forEach(item => {
+      item.subtypes.forEach(item2 => {
+        this.helpTicketTypeLookupArray.push({helpTicketType: item2.type, description: item2.description});
+      })
+    })
+
     this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
       
   }
@@ -107,6 +117,56 @@ export class ViewHelpTickets {
 
   hideComment() {
     $(".hover").css("display", "none");
+  }
+
+  showProfile(helpTicket, el){
+      this.profileHelpTicket = helpTicket;
+      this.people.selectedPersonFromId(helpTicket.personId);
+      $(".hoverProfile").css("top", el.clientY - 175);
+      $(".hoverProfile").css("left", el.clientX - 100);
+      $(".hoverProfile").css("display", "block");
+  }
+
+  hideProfile(){
+     $(".hoverProfile").css("display", "none");
+  }
+
+  sendAnEmail(){
+    let email = {emailBody: "", emailSubject: "", emailEmail: this.profileHelpTicket.personId};
+    return this.dialog.showEmail(
+          "Enter Email",
+          email,
+          ['Submit', 'Cancel']
+      ).then(response => {
+          if (!response.wasCancelled) {
+              this.sendTheEmail(response.output);
+          } else {
+              console.log("Cancelled");
+          }
+      });
+  }
+
+  async sendTheEmail(email){
+    console.log( email.email.emailBody);
+    if(email){
+        var message = {
+            id: this.profileHelpTicket.personId,
+            message : email.email.emailBody,
+            email: this.people.selectedPerson.email,
+            subject: email.email.emailSubject,
+            audit: {
+                property: 'Send Message',
+                eventDate: new Date(),
+                newValue: email.email.emailBody,
+                personId: this.userObj._id
+            }
+        };     
+        let serverResponse = await this.people.sendCustomerMessage(message);
+        if (!serverResponse.error) {
+            this.utils.showNotification("The message was sent");
+            this.hideProfile();
+        }
+    } 
   }
 
   confidentialChecked() {
@@ -196,9 +256,11 @@ export class ViewHelpTickets {
             this.lockMessage = "";
             this.lockObject = { personId: this.userObj._id };
           } else {
-            this.lockObject = response[0];
-            this.lockMessage = "Help Ticket is currently locked by " + this.getName();
-            this.showLockMessage = true;
+             if(response[0].personId !== this.userObj._id){
+              this.lockObject = response[0];
+              this.lockMessage = "Help Ticket is currently locked by " + this.getName();
+              this.showLockMessage = true;
+             }
           }
         }
       }
@@ -397,9 +459,9 @@ export class ViewHelpTickets {
                     console.log("Cancelled");
                 }
             });
-    }
+  }
 
-    async saveNote(note){
+  async saveNote(note){
         this.people.selectNote();
         this.people.selectedNote.personId = this.userObj._id;
         this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
@@ -410,20 +472,8 @@ export class ViewHelpTickets {
             if(!response.error){
                 this.utils.showNotification('The note was saved');
             }
-    }
+  }
     
-  /*****************************************************************************************
-  * COnstruct the string to display the files chosen
-  *****************************************************************************************/
-  // changeFiles() {
-  //   var foo = "";
-  //   for (var i = 0; i < this.files.length; i++) {
-  //     foo += this.files[i].name;
-  //     if (i < this.files.length - 1) foo += ", ";
-  //   }
-  //   this.filesSelected = foo;
-  // }
-
   back() {
      var changes = this.helpTickets.isHelpTicketDirty();
      if (this.helpTickets.isHelpTicketDirty().length) {
@@ -482,12 +532,11 @@ export class ViewHelpTickets {
   }
 
   _cleanUpFilters() {
-    $("#helpTicketType").val("");
-    $("#helpTicketStatus").val("");
+    $("#helpTicketType-description").val("");
     $(this.ownerFilter).val("");
     $(this.nameFilter).val("");
-    $(this.nickNameFilter).val("");
-    $("#institutionId").val("");
+    $("#helpTicketStatus").val("");
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
   }
 
   checkSendMail() {
@@ -495,14 +544,14 @@ export class ViewHelpTickets {
   }
 
   changeFiles() {
-        this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
-        for(var i = 0; i < this.files.length; i++){
-            let addFile = true;
-            this.filesToUpload.forEach(item => {
-                if(item.name === this.files[i].name) addFile = false;
-            })
-            if(addFile) this.filesToUpload.push(this.files[i]);
-        }
+      this.filesToUpload = this.filesToUpload ? this.filesToUpload : new Array(); 
+      for(var i = 0; i < this.files.length; i++){
+          let addFile = true;
+          this.filesToUpload.forEach(item => {
+              if(item.name === this.files[i].name) addFile = false;
+          })
+          if(addFile) this.filesToUpload.push(this.files[i]);
+      }
   }
 
   removeFile(index){

@@ -135,38 +135,39 @@ module.exports = function (app, config) {
         var content = new Content(req.body);
         result.content.push(content);
         result.helpTicketStatus = req.params.status;
+        result.modifiedDate = new Date();
         result.save(function ( err, result ){ 
           if(err){
             return next(err);
           } else {         
             if(req.body.emailSent && !req.body.confidential){        
-            Person.findById(result.personId).exec()
-              .then(person => {
-                var mailObj = {
-                    email: person.email,
-                    context: {name: person.fullName, helpTicketNo: result.helpTicketNo}
-                  }       
-                  if(req.params.status == 6){
-                     helpTicketClosed(mailObj)
-                      .then(result => {
-                          res.status(200).json(content);
-                      })
-                      .catch(error => {
-                          return next(error);
-                      });  
-                  } else {
-                     helpTicketUpdated(mailObj)
-                      .then(result => {
-                          res.status(200).json(content);
-                      })
-                      .catch(error => {
-                          return next(error);
-                      });  
-                  }     
-              })
-              .catch(error => {
-                return next(error);
-              })
+              Person.findById(result.personId).exec()
+                .then(person => {
+                  var mailObj = {
+                      email: person.email,
+                      context: {name: person.fullName, helpTicketNo: result.helpTicketNo}
+                    }       
+                    if(req.params.status == 6){
+                      helpTicketClosed(mailObj)
+                        .then(result => {
+                            res.status(200).json(content);
+                        })
+                        .catch(error => {
+                            return next(error);
+                        });  
+                    } else {
+                      helpTicketUpdated(mailObj)
+                        .then(result => {
+                            res.status(200).json(content);
+                        })
+                        .catch(error => {
+                            return next(error);
+                        });  
+                    }     
+                })
+                .catch(error => {
+                  return next(error);
+                })
             } else {
               res.status(200).json(content);
             }

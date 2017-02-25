@@ -234,6 +234,7 @@ export class DataTable{
                 keep = eval(filters[i].value) === eval(item[filters[i].property]);
                 break;
               default:
+                // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId" compare="obj" ref="ownerFilter">
                 keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
             }
             break;
@@ -267,10 +268,29 @@ export class DataTable{
                 }
                 break;
               case 'lookup':
-                var array = filters[i].property.split('-');
-                var value = this.lookup(item[array[0]], array[1], lookupArray);
+                // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+                let array = filters[i].property.split('-');
+                let value = this.lookup(item[array[0]][array[1]], array[1], lookupArray);
                 if(value){
                    keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+                }
+                break;
+              case 'lookup-array-item':
+                //<input input.delegate="dataTable.filterList($event, people.peopleArray)" id="owner-fullName-0-personId" type="text" compare="lookup-array-item" class="form-control" ref="ownerFilter"/>
+                var array = filters[i].property.split('-');
+                var value = this.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
+                if(value){
+                   keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+                }
+                break;
+              case 'lookup-array':
+                //<input input.delegate="dataTable.filterList($event, helpTicketTypeLookupArray)" id="helpTicketType-description" type="text" compare="lookup-array" class="form-control" ref="typeFilter"/>
+                let arrayLookup = filters[i].property.split('-');
+                for(var index = 0; index < lookupArray.length; index++){
+                  if(lookupArray[index][arrayLookup[0]] === item[arrayLookup[0]]){
+                    keep = lookupArray[index][arrayLookup[1]].toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+                    break;
+                  }
                 }
                 break;
               case 'not':
@@ -283,6 +303,18 @@ export class DataTable{
                     keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
                   } else {
                     keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
+                  }
+                 break;
+              case 'not-number':
+                 if(filters[i].property.indexOf('.') > -1){
+                    var properties = filters[i].property.split('.')
+                    var condition = "item"
+                    for(var j = 0; j<properties.length; j++){
+                      condition += "['" + properties[j] + "']"
+                    }
+                    keep = eval(condition) !== filters[i].value
+                  } else {
+                    keep = item[filters[i].property] !== filters[i].value;
                   }
                  break;
               default:
@@ -300,19 +332,19 @@ export class DataTable{
             }
             break;
           case 'date':
-          switch(filters[i].compare){
-            case 'after':
-              if(item[filters[i].property]){
-                var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-                keep = moment(dt).isAfter(filters[i].value);
-              }
-              break;
-            default:
-              if(item[filters[i].property]){
-                var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-                keep = moment(dt).isSame(filters[i].value);
-              }
-          }
+            switch(filters[i].compare){
+              case 'after':
+                if(item[filters[i].property]){
+                  var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+                  keep = moment(dt).isAfter(filters[i].value);
+                }
+                break;
+              default:
+                if(item[filters[i].property]){
+                  var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+                  keep = moment(dt).isSame(filters[i].value);
+                }
+            }
         }
         if(!keep) break;
       }

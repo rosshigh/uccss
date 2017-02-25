@@ -3,6 +3,7 @@ import {DialogService} from 'aurelia-dialog';
 import {ConfirmDialog} from './confirm-dialog';
 import {MessageDialog} from './message-dialog';
 import {NoteDialog} from './note-dialog';
+import {EmailDialog} from './email-dialog';
 
 @inject(DialogService)
 export class CommonDialogs {
@@ -18,6 +19,10 @@ export class CommonDialogs {
 
   showNote( title = 'Enter Note', note, options){
     return this.dialogService.open({ viewModel: NoteDialog, model: { title, note, options } })
+  }
+
+  showEmail( title = 'Enter Email', email, options){
+    return this.dialogService.open({ viewModel: EmailDialog, model: { title, email, options } })
   }
 
 }

@@ -40,6 +40,7 @@ export class NavBar {
                 }
            }
         }, 6000000);
+
     }
 
     async login(){

@@ -81,21 +81,20 @@ export class EditNews {
 
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
-                 this.dataTable.updateArray(this.siteinfo.siteArray);
+                this.dataTable.updateArray(this.siteinfo.siteArray);
                 this.utils.showNotification("The item was saved");
                 if (this.filesToUpload && this.filesToUpload.length > 0) {
                     this.siteinfo.uploadFile(this.filesToUpload);
                 }
+            } else {
+                 this.utils.showNotification("There was a problem saving the item");
             }
-            this.newsItemSelected = false;
             this._cleanUp();
         }
     }
     
     changeFiles(){
         this.filesToUpload = new Array(); 
-        // this.selectedFile = this.files[0].name;
-        // this.filesSelected = this.siteinfo.selectedItem ? true : false;
         this.filesToUpload.push(this.files[0]);
         this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
         this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
@@ -123,6 +122,7 @@ export class EditNews {
         this.newsItemSelected = false;
         this.selectedFiles = undefined;
         this.files = undefined;
+         this._cleanUpFilters();
     }
  
     back() {
@@ -142,7 +142,7 @@ export class EditNews {
         } else {
             this.newsItemSelected = false;
         }
-
+        this. _cleanUpFilters()
     }
 
     _cleanUp(){
@@ -150,14 +150,16 @@ export class EditNews {
         this.filesToUpload = new Array();
         this.selectedFiles = undefined;
         this.files = undefined;
+        this.newsItemSelected = false;
     }
 
     _cleanUpFilters(){
         $("#title").val("");
         $("#createdDate").val("");
         $("#expiredDate").val("");
-        $("#itemType").val("");
+        $(this.itemTypes).val("");
         $("#url").val("");
+         this.dataTable.updateArray(this.siteinfo.siteArray);
     }
 
     _setupValidation(){

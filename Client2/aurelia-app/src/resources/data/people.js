@@ -186,6 +186,8 @@ export class People {
         if(message.email){
             var serverResponse = await this.data.saveObject(message, this.data.SEND_MAIL, "put");
             return serverResponse;
+        } else {
+            return {error: "no email"};
         }
     }
 

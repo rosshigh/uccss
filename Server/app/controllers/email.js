@@ -74,13 +74,13 @@ if(env === 'development'){
   var HelpTicketClosedTemplateCompiled = hbs.compile(HelpTicketClosedTemplate);
 
   sendGrid = function(mailObject){
+    mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>');
     if(mailObject.email){
         var helper = require('sendgrid').mail;
         var from_email = new helper.Email(config.emailAddress);
         var to_email = new helper.Email(mailObject.email);
         var content = new helper.Content('text/html', mailObject.body);
         var mail = new helper.Mail(from_email, mailObject.subject, to_email, content);
-    
         var request = sg.emptyRequest({
           method: 'POST',
           path: '/v3/mail/send',

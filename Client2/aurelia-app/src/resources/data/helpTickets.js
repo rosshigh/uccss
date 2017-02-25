@@ -9,6 +9,11 @@ export class HelpTickets {
     newHelpTicket = false;      //Is the selected product a new product
     editIndex;                  //Index of selected product
 
+    HELP_TICKET_SERVICES = 'helpTickets';
+    HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
+    HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
+    HELP_TICKET_TYPES = "helpTicketsTypes";
+
     constructor(data, utils, config) {
         this.data = data;
         this.utils = utils;
@@ -214,8 +219,7 @@ export class HelpTickets {
 
     async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
-            // var url = email ? this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id) + '?email=1' : this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id);
-            var url = this.data.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);

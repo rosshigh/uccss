@@ -31,7 +31,7 @@ export class EditSessions {
     };
 
     attached() {
-        $('[data-toggle="tooltip"]').tooltip();
+        this.toolTips();
     }
 
     async activate() {
@@ -143,6 +143,7 @@ export class EditSessions {
         } else {
             this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         }
+        this.toolTips();
     }
 
     cancel() {
@@ -184,6 +185,10 @@ export class EditSessions {
         this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
         this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
         this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
+    }
+
+    toolTips(){
+        $('[data-toggle="tooltip"]').tooltip();
     }
 
 }

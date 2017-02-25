@@ -7,7 +7,16 @@
           <table class="table table-striped table-hover cf">
             <thead class="cf">
               <tr>
-                <td colspan='6'>
+                <td colspan='7'>
+                    <div class="checkbox">
+                        <label>
+                            <input checked.bind="isChecked" change.trigger="filterOutClosed()" type="checkbox"> Hide closed help tickets
+                        </label>
+                    </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan='7'>
                   <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
                     title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
                   <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
@@ -15,27 +24,24 @@
               </tr>
               <tr>
                 <th></th>
-                <th class="hasinput">
-                  <select change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketType">
-                        <option value=""></option>
-                        <option repeat.for="type of config.HELP_TICKET_TYPES"
-                                value.bind="type.code">${type.description}</option>
-                      </select>
+                <th>
+                  <input input.delegate="dataTable.filterList($event, helpTicketTypeLookupArray)" id="helpTicketType-description" type="text" compare="lookup-array" class="form-control" ref="typeFilter"/>
+
                 </th>
                 <th></th>
                 <th></th>
-                <th class="hasinput">
+                <th>
                   <select value.bind="selectedStatus" change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketStatus">
                         <option value=""></option>
                         <option repeat.for="status of config.HELP_TICKET_STATUSES"
                                 value.bind="status.code">${status.description}</option>
                       </select>
                 </th>
-                <th class="hasinput">
+                <th>
                   <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" placeholder="Filter Date" class="form-control datepicker"
                     data-dateformat="yy/mm/dd">
                 </th>
-                 <th class="hasinput">
+                 <th>
                   <input change.delegate="dataTable.filterList($event)" id="modifiedDate" type="date" placeholder="Filter Date" class="form-control datepicker"
                     data-dateformat="yy/mm/dd">
                 </th>
