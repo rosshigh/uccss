@@ -6,7 +6,7 @@ export class AppConfig {
 
     SEND_EMAILS = true;
 
-    HOST = location.origin;
+    // HOST = location.origin;
     // BASE_URL = "http://localhost:5000/api/";
     BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
@@ -125,7 +125,7 @@ export class AppConfig {
     // HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
     // HELP_TICKET_OTHER_TYPE = 99;
 
-    HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Who cares", status: ""},{priority: "Medium", message: "Whenever", status: "info"},{priority: "Critical", message:"Need NOW!  Walked into class without testing",status: "danger"}];
+    HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Who cares", status: ""},{priority: "Medium", message: "Whenever", status: "warning"},{priority: "Critical", message:"Need NOW!  Walked into class without testing",status: "danger"}];
 
     REFRESH_KEYWORDS = ["ERPSIM"];
 

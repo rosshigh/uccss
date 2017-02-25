@@ -149,7 +149,6 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             _classCallCheck(this, AppConfig);
 
             this.SEND_EMAILS = true;
-            this.HOST = location.origin;
             this.BASE_URL = this.HOST + "/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -205,7 +204,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
                 'description': 'Alerts'
             }];
             this.MESSAGE_TYPES = ['CLIENT_REQUESTS', 'HELP_TICKETS'];
-            this.HELP_TICKET_PRIORITIES = [{ priority: "Low", message: "Who cares", status: "" }, { priority: "Medium", message: "Whenever", status: "info" }, { priority: "Critical", message: "Need NOW!  Walked into class without testing", status: "danger" }];
+            this.HELP_TICKET_PRIORITIES = [{ priority: "Low", message: "Who cares", status: "" }, { priority: "Medium", message: "Whenever", status: "warning" }, { priority: "Critical", message: "Need NOW!  Walked into class without testing", status: "danger" }];
             this.REFRESH_KEYWORDS = ["ERPSIM"];
             this.HELP_TICKET_TYPES = [{
                 "code": 0,
