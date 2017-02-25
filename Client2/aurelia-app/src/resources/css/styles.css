@@ -1,5 +1,9 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+span i {
+    cursor: pointer;
+}
+
 /* Dropdown Button */
 .dropbtn {
     border: none;
