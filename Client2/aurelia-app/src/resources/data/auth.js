@@ -36,6 +36,7 @@ export class Auth {
 		this.data.saveObject({email: email}, this.logoutUrl,'post');
 		sessionStorage.removeItem('token');
 		sessionStorage.removeItem('user');
+		sessionStorage.removeItem('role');
 	}
 
 	isAuthenticated() {

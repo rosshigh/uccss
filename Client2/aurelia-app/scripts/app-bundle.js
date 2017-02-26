@@ -3572,6 +3572,7 @@ define('resources/data/auth',['exports', 'aurelia-framework', 'aurelia-event-agg
 			this.data.saveObject({ email: email }, this.logoutUrl, 'post');
 			sessionStorage.removeItem('token');
 			sessionStorage.removeItem('user');
+			sessionStorage.removeItem('role');
 		};
 
 		Auth.prototype.isAuthenticated = function isAuthenticated() {
