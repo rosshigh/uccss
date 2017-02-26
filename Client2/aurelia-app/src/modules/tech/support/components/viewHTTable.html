@@ -79,7 +79,7 @@
               </td>
               <td data-title="Owner">
                 <span show.bind="helpTicket.owner[0].personId === 'b1b1b1b1b1b1b1b1b1b1b1b1'" click.trigger="ownHelpTicket(helpTicket)" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg" aria-hidden="true"></i></span>
-                <span show.bind="helpTicket.owner[0].personId !== 'b1b1b1b1b1b1b1b1b1b1b1b1'"> ${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</span>
+                <span class="dropbtn" click.trigger="ownHelpTicket(helpTicket)" show.bind="helpTicket.owner[0].personId !== 'b1b1b1b1b1b1b1b1b1b1b1b1'"> ${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</span>
               </td>
               <td class="dropbtn" data-title="Status">
                 <div class="dropdown">

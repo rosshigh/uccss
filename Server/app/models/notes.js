@@ -6,6 +6,9 @@ var NoteSchema = new Schema({
     reference: { type: Schema.Types.ObjectId },
     helpTicketNo: { type: Number },
     dateCreated: { type: Date, default: Date.now },
+    dateRemind: { type: Date },
+    dateEndRemind: { type: Date },
+    reminder: { type: Boolean, default: false },
     note: { type: String },
     category: { type: String }
 });

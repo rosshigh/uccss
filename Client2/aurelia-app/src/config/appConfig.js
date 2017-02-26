@@ -7,7 +7,7 @@ export class AppConfig {
     SEND_EMAILS = true;
 
     HOST = location.origin;
-    // BASE_URL = "http://localhost:5000/api/";
+    // BASE_URL = "http://localhost:5000/api/"; 
     BASE_URL = this.HOST + "/api/";
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
