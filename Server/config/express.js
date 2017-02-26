@@ -5,7 +5,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var glob = require('glob');
-var cors = require('cors')
+var cors = require('cors');
+var url  = require('url');
 var onFinished = require('on-finished');
 var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
 var utils = require(path.join(__dirname, "utils.js"));
@@ -64,32 +65,27 @@ module.exports = function(app, config) {
 
   // error handler for all the applications
   app.use(function (err, req, res, next) {
-
-    var errorType = typeof err,
-        code = 500,
-        msg = { message: "Internal Server Error" };
-        logger.log(err,'error');
-
-    switch (err.name) {
-        case "UnauthorizedError":
+        
+    var url_parts = url.parse(req.url);
+    switch (err.status) {
+        case 401:
             code = err.status;
-            msg = undefined;
+            var msg = {event: 'error', code: 401, message: "Unauthorized Access-" + url_parts.pathname, error: 401};
             break;
-        case "DuplicateRecordError":
+        case 409:
             code = err.status;
-            msg = "Duplicate record found";
+            var msg = {event: 'error', code: 409, message: "Duplicate record found-" + url_parts.pathname, error: 409};
             break;
-        case "BadRequestError":
-        case "UnauthorizedAccessError":
-        case "NotFoundError":
-          logger.log(err.inner,'error');
-          logger.log(err.status,'error');
+        case 404:
             code = err.status;
-            msg = err.inner;
+            var msg = {event: 'error', code: 404, message: url_parts.pathname, error: 404};
             break;
         default:
+            code = 500;
+            var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500};
             break;
     }
+    logger.logError(msg);
 
     return res.status(code).json(msg);
 

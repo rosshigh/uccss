@@ -1,0 +1,43 @@
+<template>
+	<compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
+	<div id="no-more-tables">
+		<table class="table table-striped table-hover cf">
+			<thead class="cf">
+				<tr>
+					<td colspan='3'>
+						<span click.delegate="fileSelected(fileIndex)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+						<span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+					</td>
+				</tr>
+				<tr>
+					<th style="width:8em;">Event<span click.trigger="dataTable.sortArray('event')"><i class="fa fa-sort"></i></span></th>
+					<th style="width:8em;" if.bind="screenToShow==='log'">Code</th>
+					<th>Data <span click.trigger="dataTable.sortArray('user')"><i class="fa fa-sort"></i></span></th>
+					<th>Time <span click.trigger="dataTable.sortArray('date')"><i class="fa fa-sort"></i></span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>
+						<input input.delegate="dataTable.filterList($event)" id="event" type="text" placeholder="Filter Event" class="form-control" ref="eventFilter"/>
+					</th>
+					<th if.bind="screenToShow==='log'">
+						<input input.delegate="dataTable.filterList($event)" id="code" type="text" placeholder="Filter Event" class="form-control" ref="codeFilter" />
+					</th>
+					<th>
+						<input input.delegate="dataTable.filterList($event)" id="data" type="text" placeholder="Filter Email" class="form-control" ref="dataFilter" />
+					</th>
+					<th>
+						
+					</th>
+				</tr>
+				<tr repeat.for="item of dataTable.displayArray">
+					<td data-title="Event">${item.event}</td>
+					<td if.bind="screenToShow==='log'" data-title="Code">${item.code}</td>
+					<td data-title="Data"><span innerhtml.bind="item.data"></span></td>
+					<td data-title="Date">${item.date}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</template>

@@ -58,10 +58,9 @@ export class NavBar {
     }
 
     logout(){
-        this.auth.logout();
+        this.auth.logout(this.userObj.email);
         this.userObj = new Object();
-        sessionStorage.removeItem('user');
-        this.isAuthenticated = this.auth.isAuthenticated(); 
+         this.isAuthenticated = this.auth.isAuthenticated(); 
         this.router.navigate("home");
     }
 

@@ -371,6 +371,45 @@ export class EditPeople {
         this.emailSubject = "";
     }
 
+    sendAnEmail(id){
+        if(id){
+            let email = {emailBody: "", emailSubject: "", emailId: id};
+            return this.dialog.showEmail(
+                    "Enter Email",
+                    email,
+                    ['Submit', 'Cancel']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                        this.sendTheEmail(response.output);
+                    } else {
+                        console.log("Cancelled");
+                    }
+                });
+        }
+    }
+
+    async sendTheEmail(email){
+        if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
+        if(email){
+            var message = {
+                id: email.email.emailId,
+                message : email.email.emailBody,
+                email: this.people.selectedPerson.email,
+                subject: email.email.emailSubject,
+                audit: {
+                    property: 'Send Message',
+                    eventDate: new Date(),
+                    newValue: email.email.emailBody,
+                    personId: this.userObj._id
+                }
+            };     
+            let serverResponse = await this.people.sendCustomerMessage(message);
+            if (!serverResponse.error) {
+                this.utils.showNotification("The message was sent");
+            }
+        } 
+    }
+
     async sendCustomerEmail(){
         if(this.emailMessage){
             var message = {
@@ -388,6 +427,25 @@ export class EditPeople {
             let serverResponse = await this.people.sendCustomerMessage(message);
             if (!serverResponse.error) {
                 this.utils.showNotification("The message was sent");
+            }
+        } 
+    }
+
+    async toggleStatus(id, personStatus){
+        if(id && personStatus){
+            this.people.selectedPersonFromId(id);
+            this.people.selectedPerson.personStatus = personStatus === this.config.ACTIVE_PERSON ? this.config.INACTIVE_PERSON : this.config.ACTIVE_PERSON;
+            this.people.selectedPerson.audit.push({
+                    property: 'personStatus',
+                    eventDate: new Date(),
+                    newValue: this.people.selectedPerson.personStatus,
+                    personId: this.userObj._id
+                })
+            let serverResponse = await this.people.savePerson();
+            if (!serverResponse.error) {
+                this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+            } else {
+                this.utils.showNotification("There was a problem saving the person");
             }
         } 
     }

@@ -6,7 +6,8 @@ import {Utils} from '../utils/utils';
 @inject(EventAggregator, DataServices, Utils)
 export class Auth {
 
-	loginUrl = 'users/login'
+	loginUrl = 'users/login';
+	logoutUrl = 'users/logout';
 
 	constructor(eventAggregator, data, utils){
 		this.eventAggregator = eventAggregator;
@@ -14,8 +15,7 @@ export class Auth {
 		this.utils = utils;
 	}
 
-
-	 async login(email, password) {
+	async login(email, password) {
 		// let loginUrl = this.auth.getLoginUrl();
 		let content = {
 			'email': email,
@@ -32,7 +32,8 @@ export class Auth {
 		return response;
 	}
 
-	logout(){
+	logout(email){
+		this.data.saveObject({email: email}, this.logoutUrl,'post');
 		sessionStorage.removeItem('token');
 		sessionStorage.removeItem('user');
 	}
@@ -65,7 +66,5 @@ export class Auth {
 
 		return true;
 	}
-
-	
 	
 }

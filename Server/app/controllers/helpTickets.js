@@ -9,7 +9,7 @@ var express = require('express'),
     passport = require('passport'),
     HelpTicketLock = mongoose.model('HelpTicketLock'),
     HelpTicketTypes = mongoose.model('HelpTicketTypes'),
-    logger = require('../../config/logger');
+    writeLog = require('../../config/logger');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -17,7 +17,7 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/helpTickets', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket','verbose');
+    writeLog.log('Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec()
     .then(object => {
@@ -29,7 +29,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current',requireAuth,  function(req, res, next){
-    logger.log('Get helpTicket', 'verbose');
+    writeLog.log('Get helpTicket', 'verbose');
     Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
       .exec()
@@ -42,7 +42,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket');
+    writeLog.log('Get helpTicket');
     var query = buildQuery(req.query, Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]}))
       query.exec()
       .then(object => {
@@ -54,7 +54,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/current/count/:personId', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket', 'verbose');
+    writeLog.log('Get helpTicket', 'verbose');
     Model.find( { 'personId': req.params.personId, $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
       .sort(req.query.order)
       .exec()
@@ -67,7 +67,7 @@ module.exports = function (app, config) {
   });
  
   router.get('/api/helpTickets/count', requireAuth, function(req, res, next){
-    logger.log('Get helpTicket', 'verbose');
+    writeLog.log('Get helpTicket', 'verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec()
       .then(object => {
@@ -79,7 +79,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    logger.log('Get help ticket '+ req.params.id, 'verbose');
+    writeLog.log('Get help ticket '+ req.params.id, 'verbose');
     Model.findById(req.params.id)
     .exec()
       .then(object => {
@@ -96,7 +96,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTickets', requireAuth, function(req, res, next){
-    logger.log('Create HelpTicket', "verbose");
+    writeLog.log('Create HelpTicket', "verbose");
     var helpTicket =  new Model(req.body);
     helpTicket.save( function ( err, object ){
       if (err) {
@@ -129,7 +129,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/content/:id/:status', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket ' + req.body._id, 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {
         var content = new Content(req.body);
@@ -180,7 +180,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/owner/:id', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket owner', 'verbose');
+    writeLog.log('Update HelpTicket owner', 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {   
         if(req.body.personId != result.owner[0].personId){
@@ -206,7 +206,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/status/:id', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
     Model.findById(req.params.id)
     .exec()
     .then(result => {
@@ -225,7 +225,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/keywords/:id', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
     Model.findById(req.params.id)
     .exec()
     .then(result => {
@@ -244,7 +244,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket '+ req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
@@ -257,7 +257,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTickets/sendMail/:id', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket ' + req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket ' + req.body._id, 'verbose');
     if(req.body.audit){
       Model.findById(req.params.id, function(err, result){
         if (err) {
@@ -286,7 +286,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTickets/:id', requireAuth, function(req, res, next){
-    logger.log('Delete session ' + req.params.id, 'verbose');
+    writeLog.log('Delete session ' + req.params.id, 'verbose');
     Model.removeById(req.params.id)
     .exec()
     .then(result => {
@@ -318,7 +318,7 @@ module.exports = function (app, config) {
   var upload = multer({ storage: storage});
 
   router.post('/api/helpTickets/upload/:id/:container/:contentId',  upload.any(), function(req, res, next){
-     logger.log('Upload File ', 'verbose');    
+     writeLog.log('Upload File ', 'verbose');    
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);
@@ -354,7 +354,7 @@ module.exports = function (app, config) {
   });
   
   router.get('/api/helpTicketLocks', function(req, res, next){
-      logger.log('Get helpTicket Locks','verbose');
+      writeLog.log('Get helpTicket Locks','verbose');
       HelpTicketLock.find()
         .sort("-createdAt")
         .exec()
@@ -368,7 +368,7 @@ module.exports = function (app, config) {
   });
 
   router.get('/api/helpTicketLocks/:id',  function(req, res, next){
-    logger.log('Get helpTicket Locks' + req.params.id,'verbose');
+    writeLog.log('Get helpTicket Locks' + req.params.id,'verbose');
     HelpTicketLock.find({helpTicketId: req.params.id})
       .sort("-createdAt")
       .exec()
@@ -386,7 +386,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTicketLocks',  function(req, res, next){
-     logger.log('Create helpTicket Lock','verbose');
+     writeLog.log('Create helpTicket Lock','verbose');
       var helpTicketLock =  new HelpTicketLock(req.body);
       helpTicketLock.save()
 				.then(function (result) {
@@ -398,7 +398,7 @@ module.exports = function (app, config) {
   });
 
   router.delete('/api/helpTicketLocks/:id',  function(req, res, next){
-    logger.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
+    writeLog.log('Delete Help Ticket Lock ' + req.params.id, 'verbose');
     var query = HelpTicketLock.remove({ helpTicketId: req.params.id })
       .exec()
       .then(function (result) {
@@ -421,7 +421,7 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    logger.log('Get helpTicketypes','verbose');
+    writeLog.log('Get helpTicketypes Frick','verbose');
     var query = buildQuery(req.query, HelpTicketTypes.find())
       query.exec()
       .then(object => {
@@ -433,7 +433,7 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    logger.log('Create HelpTicketTypes', "verbose");
+    writeLog.log('Create HelpTicketTypes', "verbose");
     var helpTicketType =  new HelpTicketTypes(req.body);
     helpTicketType.save( function ( err, object ){
       if (err) {
@@ -445,7 +445,7 @@ module.exports = function (app, config) {
   });
 
   router.put('/api/helpTicketsTypes', requireAuth, function(req, res, next){
-    logger.log('Update HelpTicket Type '+ req.body._id, 'verbose');
+    writeLog.log('Update HelpTicket Type '+ req.body._id, 'verbose');
 
     HelpTicketTypes.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
     .exec()

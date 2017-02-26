@@ -14,15 +14,12 @@ var logDir = 'log';
 	var  logger = new (winston.Logger)({
 	transports: [
 		new (winston.transports.Console)({
-			timestamp: tsFormat,
 			colorize: true,
 			level: env === 'development' ? 'verbose' : 'info'
 		}),
 		new (require('winston-daily-rotate-file'))({
 			name: 'logFile',
 			filename: `${logDir}/-results.log`,
-			timestamp: tsFormat,
-			datePattern: 'yyyy-MM-dd',
 			prepend: true,
 			level: env === 'development' ? 'verbose' : 'info'
 		})
@@ -34,4 +31,10 @@ var logDir = 'log';
 		logger.log(level, message);
 	}
 
+	logError = function(message){
+		var msg = message.code + "-" + message.message;
+		logger.log('error',msg);
+	}
+
 	exports.log = log;
+	exports.logError = logError;

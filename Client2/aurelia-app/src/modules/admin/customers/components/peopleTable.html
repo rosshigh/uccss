@@ -53,14 +53,14 @@
                                 </select>
                                 </th>
                             </tr>
-                            <tr click.trigger="edit($index, $event)" repeat.for="person of dataTable.displayArray">
-                                <td data-title="Name">${person.firstName} ${person.lastName}</td>
-                                 <td data-title="Nickname">${person.nickName}</td>
-                                <td data-title="Insitution">${person.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
-                                <td data-tile="Phone">${person.phone | phoneNumber}</td>
-                                <td data-title="Email">${person.email}</td>
-                                <td data-title="Role">${person.roles}</td>
-                                <td data-title="Status">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>
+                            <tr repeat.for="person of dataTable.displayArray">
+                                <td click.trigger="edit($index, $event)" data-title="Name">${person.firstName} ${person.lastName}</td>
+                                <td click.trigger="edit($index, $event)" data-title="Nickname">${person.nickName}</td>
+                                <td click.trigger="edit($index, $event)" data-title="Insitution">${person.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
+                                <td click.trigger="edit($index, $event)" data-tile="Phone">${person.phone | phoneNumber}</td>
+                                <td class="dropbtn" data-title="Email" click.delegate="sendAnEmail(person._id)">${person.email}</td>
+                                <td click.trigger="edit($index, $event)" data-title="Role">${person.roles}</td>
+                                <td class="dropbtn" click.trigger="toggleStatus(person._id, person.personStatus)" data-title="Status">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>
                             </tr>
                         </tbody>
                     </table>

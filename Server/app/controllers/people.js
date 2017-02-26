@@ -6,6 +6,7 @@ var express = require('express'),
     PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
     logger = require('../../config/logger'),
+    logAuth = require('../../config/log-authenticate'),
     passportService = require('../../config/passport'),
     passport = require('passport'),
     Promise = require('bluebird'),
@@ -262,6 +263,12 @@ module.exports = function (app) {
 
   router.route('/api/users/login')
     .post(requireLogin, login);
+
+  router.route('/api/users/logout').post(function(req, res, next){
+    logAuth.log('logoff-' + req.body.email, 'info');
+    console.log(req.body.email);
+    res.status(201).json({message: "logout successful"});
+  })
 
   router.get('/api/notes', requireAuth,  function(req, res, next){
     logger.log('Get note','verbose');

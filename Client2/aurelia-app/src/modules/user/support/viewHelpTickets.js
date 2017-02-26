@@ -59,7 +59,7 @@ export class ViewHelpTickets {
   
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
-     this.isUCC = this.userObj.roles.indexOf('UCC');
+    this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   }
 
   async activate() {
@@ -244,6 +244,7 @@ export class ViewHelpTickets {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
           }
+          if(this.isChecked) this.filterOutClosed();
           this._cleanUp();
         }
     }

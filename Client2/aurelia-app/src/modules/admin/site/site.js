@@ -64,6 +64,14 @@ export class Site{
             nav: true,
             name: 'helptickets',
             title: 'Help Tickets'
+        },
+        {
+            route: 'admin',
+            moduleId: './admin',
+            settings: { auth: false, roles: [] },
+            nav: true,
+            name: 'admin',
+            title: 'Server Admin'
         }
         ]);
 

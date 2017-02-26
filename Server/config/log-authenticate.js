@@ -11,18 +11,18 @@ var logDir = 'log-auth';
 	}
 
 	var  logger = new (winston.Logger)({
-	transports: [
-		new (winston.transports.Console)({
-			colorize: true,
-			level: env === 'development' ? 'verbose' : 'info'
-		}),
-		new (require('winston-daily-rotate-file'))({
-			name: 'logFile',
-			filename: `${logDir}/-log-auth.log`,
-			prepend: true,
-			level: env === 'development' ? 'verbose' : 'info'
-		})
-	]
+		transports: [
+			new (winston.transports.Console)({
+				colorize: true,
+				level: env === 'development' ? 'verbose' : 'info'
+			}),
+			new (require('winston-daily-rotate-file'))({
+				name: 'logFile',
+				filename: `${logDir}/-log-auth.log`,
+				prepend: true,
+				level: env === 'development' ? 'verbose' : 'info'
+			})
+		]
 	});
 
 	log = function(message, level){

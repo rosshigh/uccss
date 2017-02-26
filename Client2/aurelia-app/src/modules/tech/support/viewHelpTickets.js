@@ -54,7 +54,7 @@ export class ViewHelpTickets {
 
   canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
-    this.isUCC = this.userObj.roles.indexOf('UCC');
+    this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   }
 
   /*****************************************************************************************
@@ -131,26 +131,29 @@ export class ViewHelpTickets {
      $(".hoverProfile").css("display", "none");
   }
 
-  sendAnEmail(){
-    let email = {emailBody: "", emailSubject: "", emailEmail: this.profileHelpTicket.personId};
-    return this.dialog.showEmail(
-          "Enter Email",
-          email,
-          ['Submit', 'Cancel']
-      ).then(response => {
-          if (!response.wasCancelled) {
-              this.sendTheEmail(response.output);
-          } else {
-              console.log("Cancelled");
-          }
-      });
+  sendAnEmail(id){
+    if(id){
+      let email = {emailBody: "", emailSubject: "", emailId: id};
+      return this.dialog.showEmail(
+            "Enter Email",
+            email,
+            ['Submit', 'Cancel']
+        ).then(response => {
+            if (!response.wasCancelled) {
+                this.sendTheEmail(response.output);
+            } else {
+                console.log("Cancelled");
+            }
+        });
+    }
   }
 
   async sendTheEmail(email){
     console.log( email.email.emailBody);
+    if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
     if(email){
         var message = {
-            id: this.profileHelpTicket.personId,
+            id: email.email.emailId,
             message : email.email.emailBody,
             email: this.people.selectedPerson.email,
             subject: email.email.emailSubject,
