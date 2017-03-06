@@ -25,9 +25,9 @@
     </div>
   </div>
 
-  <div class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
 
-  <compose show.bind="regularClient && sessionSelected" view='./Courses.html'></compose>
+
+  <compose show.bind="regularClient && sessionSelected && typeSelected" view='./Courses.html'></compose>
 
   <!-- Number of students -->
   <div class="row"  id="numStudents" show.bind="courseSelected">
@@ -35,7 +35,8 @@
       <div class="form-group">
         <label for="undergraduates" class="col-sm-3 control-label">Undergraduates</label>
         <div class="col-sm-8">
-          <input readonly.bind="existingRequest" id="undergraduates"  type="number" placeholder="Number of Undergraduates"
+          <!-- readonly.bind="existingRequest" -->
+          <input  id="undergraduates"  type="number" placeholder="Number of Undergraduates"
                   class="form-control" value.bind="requests.selectedRequest.undergradIds"/>
         </div>
       </div>
@@ -44,12 +45,16 @@
       <div class="form-group">
             <label for="graduates" class="col-sm-3 control-label">Graduates</label>
             <div class="col-sm-8">
-              <input readonly.bind="existingRequest" id="graduates" type="number" placeholder="Number of Graduates"
+               <!-- readonly.bind="existingRequest" -->
+              <input id="graduates" type="number" placeholder="Number of Graduates"
                     class="form-control" value.bind="requests.selectedRequest.graduateIds"/>
             </div>
       </div>
     </div>
   </div>
+  <div class="row col-lg-offset-3">
+        <span class="col-lg-8 " id="numberOfStudentsError"></span>
+    </div>
 
   <!-- Begin and End Date -->
   <div class="row" show.bind="sandBoxClient || courseSelected">
@@ -57,7 +62,16 @@
         <div class="form-group topMargin">
            <label class="col-sm-3 form-control-label ">Start Date</label>
            <div class="col-sm-8">
-            <date-picker disabled.bind="showLockMessage || existingRequest" value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+          <!--
+            <input ref="startDate" disabled.bind="showLockMessage || existingRequest" value.bind="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)"  class="aurelia-flatpickr form-control" type="text" placeholder="Select Date..">
+             -->
+             
+             <!-- || existingRequest -->
+             <!--
+            <date-picker ref="startDate" disabled.bind="showLockMessage " value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
+            -->
+            <flat-picker disabled.bind="showLockMessage" controlid="startDate"" config.bind="config" change.delegate="changeBeginDate($event)"  value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
+           <span id='startDateError'></span>
            </div>
         </div>
       </div>
@@ -65,10 +79,18 @@
         <div class="form-group topMargin">
           <label class="col-sm-3 form-control-label ">End Date</label>
           <div class="col-sm-8">
-            <date-picker disabled.bind="showLockMessage || existingRequest" value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
+            <!--
+            <input ref="endDate" disabled.bind="showLockMessage || existingRequest" value.bind="requests.selectedRequest.endDate" changedate.delegate="changeBeginDate($event)"  class="aurelia-flatpickr form-control" type="text" placeholder="Select Date..">
+             -->
+               <!-- || existingRequest 
+            <date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
+            -->
+            <flat-picker disabled.bind="showLockMessage" controlid="endDate"" config.bind="config" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
+           <span id='endDateError'></span>
           </div>
         </div>
       </div>
+       
     </div>
-
+<div show.bind="showInfoBox" class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
 </template>

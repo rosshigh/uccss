@@ -4,9 +4,9 @@
             <thead>
                 <tr>
                     <td colspan='6'>
-                        <span click.delegate="refreshCourses()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                        <span click.delegate="newCourse()"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                        <span style="margin-left:5px;" click.delegate="editACourse()"><i class="fa fa-pencil" aria-hidden="true"></i></span>
+                        <span click.delegate="refreshCourses()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                        <span click.delegate="newCourse()" class="smallMarginRight"  bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Course"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                        <span style="margin-left:5px;"  class="smallMarginRight"  bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save" click.delegate="editACourse()"><i class="fa fa-pencil" aria-hidden="true"></i></span>
                         <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
                     </td>
                 </tr>

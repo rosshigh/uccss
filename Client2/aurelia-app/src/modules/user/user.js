@@ -4,14 +4,16 @@ import {Utils} from '../../resources/utils/utils';
 import {AppConfig} from '../../config/appConfig';
 import {SiteInfo} from '../../resources/data/siteInfo';
 import {Sessions} from '../../resources/data/sessions';
+import {People} from '../../resources/data/people';
 import {HelpTickets} from '../../resources/data/helpTickets';
 import {ClientRequests} from '../../resources/data/clientRequests';
 import moment from 'moment';
+import * as toastr from "toastr";
 
-@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests)
+@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests, People)
 export class User {
 
-  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests){
+  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests, people){
     this.router = router;
     this.utils = utils;
     this.config = config;
@@ -19,6 +21,7 @@ export class User {
     this.sessions = sessions;
     this.helpTickets = helpTickets;
     this.requests = requests;
+    this.people = people;
   };
 
   attached(){
@@ -34,6 +37,8 @@ export class User {
             this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
         }
     }
+
+    this.reminders();
    
   }
 
@@ -168,5 +173,103 @@ export class User {
      $(".hoverProfile").css("display", "none");
   }
 
+    async reminders(){
+
+        let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+        if(!response.error && this.people){
+            toastr.options.closeButton = true;
+            toastr.options.closeMethod = 'fadeOut';
+            toastr.options.closeDuration = 300;
+            toastr.options.closeEasing = 'swing';
+            this.timeReminders = new Array();
+            var now = new Date();
+            var weekDay = now.getDay()
+            var monthDay = now.getDate();
+            this.reccurentReminders = new Array();
+            this.people.remindersArray.forEach((item, index) => {
+                switch(item.reminderType){
+                     case "D":
+                        if(!item.lastSeen || !moment(now).isSame(item.lastSeen,'day')) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "W":
+                        if(item.reminderDay == weekDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'day'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "M":
+                        if(item.reminderDay == monthDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "A":
+                        if(moment(now).isSame(item.dateRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "T":
+                        if(moment(now).isSame(item.dateRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            let diff = moment(now).diff(item.dateRemind, 'minutes');
+                            if(diff >= -15){
+                                if(item.priority == 1){
+                                    toastr.error(item.note, "Reminder");
+                                } else {
+                                    toastr.info(item.note, "Reminder");
+                                }
+                                item.lastSeen = now;
+                                this.people.saveReminder(item, index);
+                            } else {
+                                this.timeReminders.push({item: item, index: index});
+                            }
+                        }
+                }
+            })
+
+            if(this.timeReminders.length > 0){
+                 setInterval(() => {
+                    console.log('Checked reminders');
+                    var now = new Date();
+                    this.timeReminders.forEach(item => {
+                        let diff = moment().diff(item.item.dateRemind, 'minutes');
+                        if(item.priority == 1){
+                            toastr.error(item.item.note, "Reminder");
+                        } else {
+                            toastr.info(item.note, "Reminder");
+                        }
+                        item.lastSeen = now;
+                        this.people.saveReminder(item.item.item, item.index);
+                    });
+                    
+                }, 10000);
+            }
+
+           
+        }
+    }
     
 }

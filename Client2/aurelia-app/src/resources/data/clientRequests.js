@@ -185,6 +185,8 @@ export class ClientRequests {
         newObj.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
         newObj.undergradIds = 0;
         newObj.graduateIds = 0;
+        newObj.startDate = "";
+        newObj.endDate = "";
         newObj.addUndergraduates = 0;
         newObj.addGraduates = 0;
         newObj.comments = "";

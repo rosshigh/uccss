@@ -9,7 +9,8 @@ var express = require('express'),
   passport = require('passport'),
   Promise = require('bluebird'),
   ClientRequestLock = mongoose.model('ClientRequestLock'),
-  logger = require('../../config/logger');
+  logger = require('../../config/logger'),
+  ObjectId = require('mongodb').ObjectID;;
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -46,7 +47,9 @@ module.exports = function (app) {
   router.get('/api/clientRequests/:id/:sessions', requireAuth, function(req, res, next){
     logger.log('Get customers active clientRequests');
      var activeSessions = req.params.sessions.split(":");
-
+     for(let i = 0; i < activeSessions.length; i++){
+       activeSessions[i] = ObjectId(activeSessions[i]);
+     }
     Model.find()
       .where('personId').eq(req.params.id)
       .where('sessionId').in(activeSessions)
@@ -74,28 +77,22 @@ module.exports = function (app) {
   });
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Create clientRequest');
+    logger.log('Create clientRequest','verbose');  
     var clientRequest = new Model(req.body);
-    var details = new Array();
+     var tasks = new Array();
     req.body.requestDetails.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       obj.requestId = clientRequest._id;
-      details.push(obj);
+      tasks.push(ClientRequestDetail.create(obj));
     });
 
-    var tasks = new Array;
-
-    for (var i=0; i < details.length; i++) {
-      tasks.push(ClientRequestDetail.create(details[i]));
-    }
-
     Promise.all(tasks)
-      .then(function(results) {
+      .then(function(results) {     
         clientRequest.requestDetails = new Array();
         results.forEach(function (record) {
           clientRequest.requestDetails.push(record._id);
         });
-        clientRequest.save(function (err, result) {
+        clientRequest.save(function (err, result) {        
           if (err) {
             return next(err);
           } else {          
@@ -114,8 +111,8 @@ module.exports = function (app) {
                         context: result
                       }
                        requestCreated(mailObj)
-                        .then(result => {
-                            res.status(200).json(object);
+                        .then(result => {                        
+                            res.status(200).json(result);
                         })
                         .catch(error => {
                             return next(error);
@@ -123,74 +120,77 @@ module.exports = function (app) {
                     }
                   })
                 }
-              })
-              
-            }
+              }) 
+            } else {        
             res.status(200).json(result);
+            }
           }
         });
-      });
+      });    
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest [%s]', req.body._id);
-    var clientRequest = new Model(req.body);
-    var details = new Array();
-    var tasks = new Array();
-    req.body.requestDetailsToSave.forEach(function(detail, index){
-      var obj = new ClientRequestDetail(detail);
-      details.push(obj._id)
-      if(detail._id){            
-        // clientRequest.requestDetails.push(detail._id);
-        tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-      } else {             
-        var obj = new ClientRequestDetail(detail);
-        clientRequest.requestDetails.push(obj._id);
-        obj.requestId = clientRequest._id;
-        tasks.push(ClientRequestDetail.create(obj));
-      }
-    });
+    logger.log('Update clientRequest ' + req.body._id);      
+    let clientRequest = new Model(req.body);
+    clientRequest.requestDetails = new Array();  
+    let tasks = new Array();
+    if(req.body.requestDetailsToSave){
+       req.body.requestDetailsToSave.forEach((detail, index) => {
+         if(detail._id){
+           if(detail.delete){
+               tasks.push(ClientRequestDetail.remove({ _id: detail._id }));
+           } else {
+            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+            clientRequest.requestDetails.push(detail._id);   
+           }
+         } else {
+            let obj = new ClientRequestDetail(detail);
+            clientRequest.requestDetails.push(obj._id);               
+            obj.requestId = clientRequest._id;
+            tasks.push(ClientRequestDetail.create(obj));           
+         }
+       });
+    }      
 
     Promise.all(tasks)
-      .then(results => {
-        Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(err, result){
-          if(err) {
-            return next(err);
-          } else {
-            if(req.query.email == 1 && result._id){
-              var query = Model.findOne({_id: result._id}).populate('requestDetails').exec(function(err, result){
-                if(err){
-                  return next(err);
-                } else {
-                    Person.findById(result.personId, function(err, person){
-                    if(err){
-                      return next(err);
-                    } else {             
-                      var mailObj = {
-                        email: person.email,
-                        context: result
-                      }                    
-                     requestUpdated(mailObj)
-                        .then(result => {
-                            res.status(200).json(result);
+        .then(results => {      
+          Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
+                if(error){
+                  return next(error);
+                } else { 
+                  if(req.query.email == 1 && request._id){
+                    var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
+                      .then(requestResult => {  
+                        Person.findById(requestResult.personId, function(error, person){
+                          if(error){
+                            return next(error);
+                          } else {
+                              var mailObj = {
+                              email: person.email,
+                              context: request
+                            }                    
+                           requestUpdated(mailObj)
+                              .then(result => {                      
+                                  res.status(200).json(requestResult);                                
+                              })
+                              .catch(error => {
+                                  return next(error); 
+                              });
+                          }           
                         })
-                        .catch(error => {
-                            return next(error); 
-                        });  
-                    }
-                  })
+                      })
+                      .catch(error => { //Promise
+                        return next(error);
+                      }) 
+                  } else {
+                    res.status(200).json(request);
+                  }
                 }
-              })     
-            } else {
-              res.status(200).json(result);
-            }   
-          }
-        });
-      })
-      .catch(error =>  {
-        return next(error);
-      })
-
+          })
+        })
+        .catch(error => { //Promise        
+            return next(error);
+        }) 
   });
 
   router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){

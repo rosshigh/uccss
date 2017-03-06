@@ -1,7 +1,19 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+.assigned {
+    background-color: lightyellow;
+}
+
+.customer {
+    background-color: rosybrown;
+}
+
 span i {
     cursor: pointer;
+}
+
+.aurelia-flatpickr { 
+    background-color: white !important;
 }
 
 /* Dropdown Button */

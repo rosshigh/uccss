@@ -217,15 +217,16 @@ export class Utils{
   /********************************************************************************
   * Format the dates in an object to be compatible with data picker controls
   ********************************************************************************/
-  // formatDateForDatesPicker(obj){
-  //   for (var property in obj) {
-  //     if (property.toUpperCase().indexOf('DATE') > -1  ||  obj[property] instanceof Date){
-  //       if(obj[property] != null){
-  //         obj[property] = this.convertUTCDateToLocalDate( obj[property])
-  //         obj[property] = moment(obj[property]).format("YYYY-MM-DD");
-  //       }
-  //     }
-  //   }
+  formatDateForDatesPicker(obj){
+    for (var property in obj) {
+      if (property.toUpperCase().indexOf('DATE') > -1  ||  obj[property] instanceof Date){
+        if(obj[property] != null){
+          obj[property] = this.convertUTCDateToLocalDate( obj[property]);
+          obj[property] = moment(obj[property]).format("YYYY-MM-DD");
+        }
+      }
+    } 
+  }
 
 //?filter=helpTicketRelevant|eq|true&order=name
  //filter=field1|eq|value1	gt,lt,ge,le

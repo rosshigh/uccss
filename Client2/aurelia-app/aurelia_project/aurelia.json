@@ -229,12 +229,38 @@
             ]
           },
           {
+            "name": "flatpickr",
+            "path": "../node_modules/flatpickr/dist",
+            "main": "flatpickr",
+            "resources": [
+              "flatpickr.css",
+              "themes/dark.css",
+              "themes/material_blue.css"
+            ]
+          },
+          {
             "name": "aurelia-mask",
             "path": "../node_modules/aurelia-mask/dist",
             "main": "masked-input"
           },
-          "eonasdan-bootstrap-datetimepicker",
-          "bootstrap-datepicker"
+           {
+            "name": "eonasdan-bootstrap-datetimepicker",
+            "path": "../node_modules/eonasdan-bootstrap-datetimepicker/build",
+            "main": "js/bootstrap-datetimepicker.min",
+            "resources": [
+              "css/bootstrap-datetimepicker.css",
+              "css/bootstrap-datetimepicker-standalone.css"
+            ]
+          },
+          "bootstrap-datepicker",
+          {
+            "name": "toastr",
+            "path": "../node_modules/toastr",
+            "main": "toastr",
+            "resources": [
+              "build/toastr.css"
+            ]
+          }
         ]
       }
     ]

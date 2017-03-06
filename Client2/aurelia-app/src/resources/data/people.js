@@ -416,7 +416,29 @@ export class People {
                 return undefined;
             }
         }
-        return this.peopleArray;
+    }
+
+    async getRemindersArray(options, refresh){
+        if (!this.remindersArray || refresh) {
+            var url = this.data.NOTES_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.remindersArray = serverResponse;
+                    this.remindersArray = this.remindersArray.filter(item => {
+                        return item.isReminder;
+                    });
+                    return serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
     }
 
     selectNote(index) {
@@ -454,7 +476,7 @@ export class People {
         return obj;
     }
 
-    async saveNote(){
+    async saveNote(index){
         if(!this.selectedNote){
             return;
         }
@@ -463,7 +485,7 @@ export class People {
             let serverResponse = await this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
             if (!serverResponse.error) {
                 if(this.notesArray){
-                     this.notesArray.push(this.selectedNote);
+                    this.notesArray.push(this.selectedNote);
                     this.editNoteIndex = this.notesArray.length - 1;
                 }
             } else {
@@ -480,6 +502,22 @@ export class People {
             return serverResponse;
         }
     }
+
+    async saveReminder(item, index){
+        console.log(item)
+        if(item === undefined){
+            return;
+        }
+      
+        var serverResponse = await this.data.saveObject(item, this.data.NOTES_SERVICE, "put");
+        if (!serverResponse.error) {
+            this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
+        } else {
+            this.data.processError(response, "There was an error updating the course.");
+        }
+        return serverResponse;
+    }
+
 
     async deleteNote(){
         if(!this.selectedNote){

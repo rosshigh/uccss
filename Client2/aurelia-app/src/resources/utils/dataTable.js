@@ -359,6 +359,14 @@ export class DataTable{
     return "";
   }
 
+  /***************************************************************
+   * propertyName - property to sort on unless a surrogate is provided
+   * type - indicates an alternate sorting method
+   * surrogateArray - array that contains the property on which you want to sort
+   * surrogateProperty - property in surrogate array that matches propertyname
+   * sortProperty - property showing in table on which sort is actually performed
+   * sortDirectionParam - direction of sort
+   */
   sortArray(propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam){
     if(sortDirectionParam) this.sortDirecction = sortDirectionParam;
     if(propertyName === this.sortProperty){

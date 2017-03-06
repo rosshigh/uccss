@@ -19,6 +19,7 @@ export class ViewRequests {
   requestSelected = false;
   showLockMessage = false;
   showRequests = false;
+  statusClass = ["", "unassigned", "assigned","","customer"];
 
   navControl = "requestsNavButtons";
   spinnerHTML = "";
@@ -54,6 +55,8 @@ export class ViewRequests {
       this.systems.getSystemsArray(),
       this.config.getConfig() 
     ]);
+    this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: "Sandbox"});
+    await this.getRequests();
     // this._setUpValidation();
   }
 
@@ -62,30 +65,14 @@ export class ViewRequests {
   }
 
   async getRequests() {
-    if (this.selectedSession && this.selectedCourse) {
-      await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.selectedSession + ':courseId|eq|' + this.selectedCourse, true);
-      if (this.requests.requestsArray.length) {
-        //Select the first request by default
-        this.requests.selectRequest(0);
-        await this._lock();
-        //Update the display array
-        this.updateArray();
-        //Select the displayed session
-        this.sessions.selectSessionById(this.selectedSession);
-        //Set the date limits in the date controls
-        this.setDates();
-        //Save the request so we can check if it's dirty later'
-        this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
-        // this.dataTable.createPageButtons(1);
-        this.selectedDetailIndex = 0;
-        this.showRequests = true;
-      } else {
-        this.showRequests = false;
-      }
-     
-    } else {
-      this.displayArray = new Array();
-    }
+      let sessionString = "";
+      this.sessions.sessionsArray.forEach(item => {
+        sessionString += item._id + ":";
+      });
+      sessionString = sessionString.substring(0, sessionString.length-1);
+      sessionString = "/" + this.userObj._id + "/" + sessionString;
+      await this.requests.getPersonClientRequestsArray(sessionString, true);
+      this.dataTable.updateArray(this.requests.requestsArray);
   }
 
   async refresh() {
@@ -95,12 +82,9 @@ export class ViewRequests {
     this.spinnerHTML = "";
   }
 
-  updateArray() {
-      $("#infoBox").html("");
-      $("#infoBox").append(this.config.VIEW_REQUEST_MESSAGE);
-      $("#infoBox").fadeIn();
-      this.dataTable.updateArray(this.requests.requestsArray[0].requestDetails);
-  }
+  // updateArray() {
+  //     this.dataTable.updateArray(this.requests.requestsArray);
+  // }
 
   setDates(){
     this.minStartDate = this.sessions.selectedSession.startDate;
@@ -110,15 +94,17 @@ export class ViewRequests {
   }
 
   async edit(product, el, index) { 
+    this.requestSelected = true;
     this.selectedDetailIndex = index;
     this.requests.setSelectedRequestDetail(product);
-    this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-    this.selectedAssignmentIndex = 0;
+    this.requests.selectRequstById(product.requestId);
+    this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
+    this.sessions.selectSessionById(this.requests.selectedRequest.sessionId);
+    this.setDates();
+   
     if(this.requests.selectedRequestDetail.assignments.length){
+      this.selectedAssignmentIndex = 0;
       this.systems.selectedSystemFromId(this.requests.selectedRequestDetail.assignments[this.selectedAssignmentIndex].systemId);
-      this.showRequest = true;
-    } else {
-      this.showRequest = false;
     }
     
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -126,12 +112,16 @@ export class ViewRequests {
     this.selectedRow.children().addClass('info')
   }
 
+  back(){
+     this.requestSelected = false;
+  }
+
   async save() {
     if(!this.showLockMessage){
       if (this.validation.validate(1)) {
         if(this._buildRequest()){
           let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
-          if (!serverResponse.status) {
+          if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");
             this._cleanUp();
           }
@@ -146,14 +136,18 @@ export class ViewRequests {
   _buildRequest(){
     var changes = this.requests.isRequestDirty(this.originalRequest);
     if(changes.length){
-      this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].requestStatus = this.config.UPDATED_REQUEST_CODE;
-      var personId = this.userObj._id
+      this.requests.selectedRequest.requestDetails.forEach(item => {
+        item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+        item.modifiedDate = new Date();
+      })
+      // this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].requestStatus = this.config.UPDATED_REQUEST_CODE;
+      // var personId = this.userObj._id
       changes.forEach((currentValue) => {
         this.requests.selectedRequest.audit.push({
           property: currentValue.property,
           oldValue: currentValue.oldValue,
           newValue: currentValue.newValue,
-          personId: personId
+          personId: this.userObj._id
         })
         
       });
@@ -171,7 +165,7 @@ export class ViewRequests {
   }
 
   _cleanUp(){
-
+    this.requestSelected = false;
   }
 
   selectAssignment(assign, index){

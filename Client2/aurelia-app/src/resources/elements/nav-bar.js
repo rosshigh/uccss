@@ -29,20 +29,6 @@ export class NavBar {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
-    attached() {
-       setInterval(() => {
-           this.userObj = JSON.parse(sessionStorage.getItem('user'));
-           console.log('Checked token');
-           if(this.userObj.userRole < this.config.UCC_ROLE){
-                this.isAuthenticated = this.auth.isAuthenticated();
-                if(!this.isAuthenticated){
-                    this.logout();
-                }
-           }
-        }, 6000000);
-
-    }
-
     async login(){
         let response = await this.auth.login(this.email, this.password)
         if(!response.error){
@@ -60,7 +46,7 @@ export class NavBar {
     logout(){
         this.auth.logout(this.userObj.email);
         this.userObj = new Object();
-         this.isAuthenticated = this.auth.isAuthenticated(); 
+        this.isAuthenticated = this.auth.isAuthenticated(); 
         this.router.navigate("home");
     }
 

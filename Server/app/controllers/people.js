@@ -295,8 +295,9 @@ module.exports = function (app) {
   });
 
   router.put('/api/notes', requireAuth, function(req, res, next){
-    logger.log('Update note ' + req.body._id, 'verbose');    
-    Note.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
+    logger.log('Update note ' + req.body._id, 'verbose');  
+    console.log(req.body);
+    Note.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
       } else {

@@ -1,10 +1,11 @@
 <template>
 <require from="fuelux/css/fuelux.min.css"></require>
+<require from="flatpickr/flatpickr.css"></require>
 <div class="row">
  <span  show.bind="showLockMessage" class="leftMargin bottomMargin" >Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>
  
 </div>
-  <div class="fuelux col-lg-7 blackText">
+  <div class="fuelux col-lg-7 blackText" style="height:1000px;">
     <div class="wizard" data-initialize="wizard" id="myWizard">
       <div class="steps-container">
         <ul class="steps">
@@ -56,7 +57,20 @@
       </div>
     </div>
   </div>
-  <div class="topMargin col-lg-4 leftMargin" style="display: none;" id="existingRequestInfo"></div>
+  <div class="col-lg-4 leftMargin" id="SessionInfo">
+			<h2 class="underline">Current Sessions</h2>
+			<div class="list-group">
+				<a class="list-group-item" repeat.for="session of sessions.sessionsArray">
+					<h4 class="list-group-item-heading">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>
+					<p class="list-group-item-text">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+				</a>
+    </div>
+  </div>
+  <div show.bind="sandBoxClient" class="topMargin col-lg-4 leftMargin"><h4>Course: ${config.SANDBOX_NAME}</h4></div> 
+  <div show.bind="courseSelected" class="topMargin col-lg-4 leftMargin"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> 
+  <div show.bind="sandBoxClient || courseSelected" class="topMargin col-lg-4 leftMargin" style="display: none;" id="existingRequestInfo"></div>
 
   <div id="curriculumInfo" class="topMargin col-lg-4 leftMargin" >
     <div class="panel panel-default" >

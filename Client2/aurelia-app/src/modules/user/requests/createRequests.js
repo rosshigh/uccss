@@ -10,18 +10,22 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
+import Flatpickr from 'flatpickr';
+import { EventAggregator } from 'aurelia-event-aggregator';
 
 import fuelux from 'fuelux';
 import moment from 'moment';
 // import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator)
 export class ViewHelpTickets {
   sessionSelected = false;
   courseSelected = false;
+  sandBoxClient = false;
   editCourse = false;
   editCourseFlag = false;
   showLockMessage = false;
+  showInfoBox = true;
   spinnerHTML="";
   courseId = -1;
   requestType = -1;
@@ -33,8 +37,9 @@ export class ViewHelpTickets {
   minStartDate = "1/1/1900";
   maxStartDate = "1/1/9999";
   startDate = "";
+  config = {};
 
-  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo) {
+  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -48,6 +53,14 @@ export class ViewHelpTickets {
     this.requests = requests;
     this.siteInfo = siteInfo;
     this.dialog = dialog;
+    this.ea = ea;
+
+    this.subscription = this.ea.subscribe('date-change', response => {
+        console.log(response);
+        console.log("IN HERE")
+        // This should yield: Object {testValue: "What just happened?"}
+    });
+   
   };
 
   canActivate(){
@@ -58,11 +71,13 @@ export class ViewHelpTickets {
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
       this.products.getProductsArray('?order=name'),
-      this.people.getPeopleArray(),
       this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS',true),
-      this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' ),
+     
       this.config.getConfig()
     ]);
+    
+    this.people.getPeopleArray();
+     this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' );
     this.requests.selectRequest()
     this.filterList();
     this._setUpValidation();
@@ -74,20 +89,26 @@ export class ViewHelpTickets {
         this.ILockedIt = false;
         this.existingRequest = false;
         await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
-
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
+             this.setDates(false);
             await this._lock();
             this.ILockedIt = true;
             this.existingRequest = true;
-            this.updateMessages("EXISTING_REQUEST_MESSAGE");
+            // this.updateMessages("EXISTING_REQUEST_MESSAGE");
+            if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
+              let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
+              let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
+              $("#existingRequestInfo").html('').append(existingMsg).fadeIn();
+            }
         } else{
+            this.setDates(true);
             this.existingRequest = false;
             this.updateMessages(false);
             this.requests.selectRequest();
             this.requests.selectedRequest.sessionId = this.sessionId;
         }
-        this.setDates();
+        
     } else {
       this.existingRequest = false;
       let msg = this.sessionSelected ? "SESSION_SELECTED" : "CLIENT_REQUEST_START"
@@ -103,6 +124,7 @@ export class ViewHelpTickets {
 
   attached(){
     var wizard = $('.wizard').wizard();
+    this.toolTips();
     var that = this;
 
     wizard.on('actionclicked.fu.wizard', function(e, data) {
@@ -113,9 +135,12 @@ export class ViewHelpTickets {
             that.validation.makeValid( $("#productListTable"));
             that.save();
         }
-      }
+      } 
     })
-      this.updateMessages("CLIENT_REQUEST_START");
+    let config = {
+      altInput: true,
+	    altFormat: "F j, Y"
+    };
   }
 
   deactivate(){
@@ -131,6 +156,8 @@ export class ViewHelpTickets {
     if(!this.sessionId){
       //Drop down list changed to no session selected
       this.sessionSelected = false;
+      this.courseSelected = false;
+      this.sandBoxClient = false;
     } else {
         this._unLock();
         this.sessionSelected = true;
@@ -143,9 +170,23 @@ export class ViewHelpTickets {
     }
   }
 
-  setDates(){
-    this.requests.selectedRequest.startDate = this.sessions.selectedSession.startDate;
-    this.requests.selectedRequest.endDate = this.sessions.selectedSession.endDate;
+  async selectCourse(index, el){
+      this.editCourseIndex = index;
+      this.people.selectCourse(this.editCourseIndex);
+      this.courseSelected = true;
+      this.courseId = this.people.selectedCourse._id;
+      await this.getRequests();
+
+      if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
+      this.selectedCourseRow = $(el.target).closest('tr');
+      this.selectedCourseRow.children().addClass('info')
+  }
+
+  setDates(session){ 
+    if(session){
+      $("#input-startDate").val("")
+       $("#input-endDate").val("")
+    }  
     this.minStartDate = this.sessions.selectedSession.startDate;
     this.maxStartDate = this.sessions.selectedSession.endDate;
     this.minEndDate = this.sessions.selectedSession.startDate;
@@ -155,7 +196,6 @@ export class ViewHelpTickets {
     this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
     this.minRequiredDate = moment(this.minRequiredDate._d).format('YYYY-MM-DD');
     this.maxRequiredDate = this.sessions.selectedSession.endDate;
-
   }
 
   async changeCourse(el){
@@ -183,27 +223,32 @@ export class ViewHelpTickets {
   }
 
   changeBeginDate(evt){
-    this.minEndDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
-    this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+    if(evt.detail && evt.detail.value.date !== ""){
+      this.minEndDate = moment(evt.detail.value.date).format("MM/DD/YYYY");
+      this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+    }
+    
   }
-
-  // changeEndDate(){
-  //   this.maxStartDate = moment(evt.detail.event.date).format("MM/DD/YYYY");
-  //   // $("#beginDate").attr("max", $("#endDate").val());
-  //   this.requests.selectedRequest.startDate = moment.min(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
-  // }
 
   async changeRequestType(el){
     switch(el.target.value){
+      case "-1":
+        this.typeSelected = false;
+        this.courseSelected = false;
+        this.sandBoxClient = false;
+        break;
       case 'sandboxCourse':
-          this.courseSelected = false;
-          this.sandBoxClient = true;
-          this.regularClient = false;
-          this.courseId = this.config.SANDBOX_ID;
-          await this.getRequests();
-          this.validation.makeValid( $(el.target));
-          break;
+        this.typeSelected = true;
+        this.courseSelected = false;
+        this.sandBoxClient = true;
+        this.regularClient = false;
+        this.courseId = this.config.SANDBOX_ID;
+        await this.getRequests();
+        this.validation.makeValid( $(el.target));
+        break;
       case 'regularCourse':
+        this.typeSelected = true;
+        this.courseId = "-1";
         this.regularClient = true;
         this.sandBoxClient = false;
         this.validation.makeValid( $(el.target));
@@ -226,12 +271,17 @@ export class ViewHelpTickets {
       case "SANDBOX_MESSAGE":
       case "EXISTING_REQUEST_MESSAGE":
         //  this.productInfo = new Array();
-        if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
-          $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', moment(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
-        }
+        // if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
+        //   let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
+        //   let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
+        //   $("#existingRequestInfo").append(existingMsg).fadeIn();
+        // }
     }
-     $("#infoBox").html(this.siteInfo.selectMessageByKey(message).content).fadeIn();
-
+    let msg = this.siteInfo.selectMessageByKey(message);
+    if(msg){
+      $("#infoBox").html(msg.content).fadeIn();
+    }
+     
     // if(!clean) {
     //   this.productInfo = new Array();
     //   if(this.regularClient){
@@ -264,20 +314,32 @@ export class ViewHelpTickets {
 
   selectProduct(el){
     if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage){
-      $("#requestProductsLabel").html("Requested Products");
-      var newObj = this.requests.emptyRequestDetail();
-      newObj.productId = el.target.id;
-      newObj.sessionId = this.requests.selectedRequest.sessionId;
-      this.requests.selectedRequest.requestDetails.push(newObj);
-      this.products.selectedProductFromId(newObj.productId);
-      var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
-      if(productInfo) this.productInfo.push({
-        info: productInfo,
-        productId: newObj.productId,
-        header: this.products.selectedProduct.name
-      });
-    }
+      if(this.alreadyOnList(el.target.id)){
+        this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.')
+      } else {
+        $("#requestProductsLabel").html("Requested Products");
+            var newObj = this.requests.emptyRequestDetail();
+            newObj.productId = el.target.id;
+            newObj.sessionId = this.requests.selectedRequest.sessionId;
+            this.requests.selectedRequest.requestDetails.push(newObj);
+            this.products.selectedProductFromId(newObj.productId);
+            var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
+            if(productInfo) this.productInfo.push({
+              info: productInfo,
+              productId: newObj.productId,
+              header: this.products.selectedProduct.name
+            });
+          }
+      }
+    
     this.validation.makeValid( $("#productList"));
+  }
+
+  alreadyOnList(id){
+    for(let i = 0; i < this.requests.selectedRequest.requestDetails.length; i++ ){
+      if(this.requests.selectedRequest.requestDetails[i].productId === id) return true;
+    }
+    return false;
   }
 
   removeProduct(el){
@@ -300,7 +362,8 @@ export class ViewHelpTickets {
                 ['Yes','No']
                 ).then(response => {
                   if (!response.wasCancelled) {
-                      this.requests.selectedRequest.requestDetails.splice(i,1);
+                      this.requests.selectedRequest.requestDetails[i].delete = true;
+                      // this.requests.selectedRequest.requestDetails.splice(i,1);
                   }
                 });
             }
@@ -322,8 +385,6 @@ export class ViewHelpTickets {
 
   showCurriculum(product, $event){
     this.productInfoObject = this.products.getProductInfo(product._id);
-    // $(".hover").css("top", el.clientY - 100);
-    // $(".hover").css("left", el.clientX + 10);
     if(this.productInfoObject)  $("#curriculumInfo").css("display", "block");
   }
 
@@ -338,6 +399,14 @@ export class ViewHelpTickets {
         return !(context.sessionId == -1);
       }}
       
+      ]);
+      this.validation.addRule(1,"startDateError",[
+        {"rule":"required","message":"Select a date",
+        "value": "requests.selectedRequest.startDate"}
+      ]);
+       this.validation.addRule(1,"endDateError",[
+        {"rule":"required","message":"Select a date",
+        "value": "requests.selectedRequest.endDate"}
       ]);
 
      this.validation.addRule(1,"requestType",[{"rule":"custom","message":"Select a request type",
@@ -354,7 +423,7 @@ export class ViewHelpTickets {
         }
       }
     }]);
-    this.validation.addRule(1,"undergraduates",[{"rule":"custom","message":"Enter the number of students",
+    this.validation.addRule(1,"numberOfStudentsError",[{"rule":"custom","message":"Enter either the number of undergradate or graduate students",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
           return true;
@@ -395,13 +464,16 @@ export class ViewHelpTickets {
   _buildRequest(){
     if(this.existingRequest){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
+      // this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
+      //   item.requiredDate = new Date($("#requiredDate-" + index).val());
+      // })
     }
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;
     this.requests.selectedRequest.institutionId = this.userObj.institutionId;
     this.requests.selectedRequest.sessionId = this.sessionId;
     this.requests.selectedRequest.courseId = this.courseId;
     this.requests.selectedRequest.personId = this.userObj._id;
-    this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
+    this.requests.selectedRequest.requestStatus = this.config.UPDATED_REQUEST_CODE;
   }
 
   async save(){
@@ -409,7 +481,7 @@ export class ViewHelpTickets {
       this._buildRequest();
       let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
       if (!serverResponse.status) {
-          this.utils.showNotification("The product rerqeust was updated");
+          this.utils.showNotification("The product request was updated");
           this.systemSelected = false;
       }
     }
@@ -424,7 +496,9 @@ export class ViewHelpTickets {
     this.sandBoxClient = false;
     this.courseSelected = false;
     this.updateMessages('CLIENT_REQUEST_START');
+    this.courseId = "-1";
     this.sessionId = -1;
+    this.requestType = -1;
     $('.wizard').wizard('selectedItem', {
       step: 1
     })
@@ -438,18 +512,6 @@ export class ViewHelpTickets {
 
   async refreshCourses(){
       await this.people.getCoursesArray(true,'?filter=personId|eq|' + this.userObj._id + '&order=number' );
-  }
-
-  async selectCourse(index, el){
-      this.editCourseIndex = index;
-      this.people.selectCourse(this.editCourseIndex);
-      this.courseSelected = true;
-      this.courseId = this.people.selectedCourse._id;
-      await this.getRequests();
-
-      if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
-      this.selectedCourseRow = $(el.target).closest('tr');
-      this.selectedCourseRow.children().addClass('info')
   }
 
   editACourse(){
@@ -496,8 +558,10 @@ export class ViewHelpTickets {
           this.showLockMessage = false;
           this.lockObject = {}; 
       } else {
+        if(response[0].personId !== this.userObj._id){
           this.lockObject = response[0];
           this.showLockMessage = true;  
+        }
       }
     }
   }
@@ -509,6 +573,10 @@ export class ViewHelpTickets {
         this.requests.removeRequestLock(this.requests.selectedRequest._id);
       }    
     }
+  }
+
+  toolTips(){
+      $('[data-toggle="tooltip"]').tooltip();
   }
 
 }

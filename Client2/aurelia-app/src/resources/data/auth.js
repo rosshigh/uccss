@@ -37,6 +37,7 @@ export class Auth {
 		sessionStorage.removeItem('token');
 		sessionStorage.removeItem('user');
 		sessionStorage.removeItem('role');
+		sessionStorage.removeItem('alert');
 	}
 
 	isAuthenticated() {

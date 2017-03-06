@@ -42,7 +42,7 @@
                                 <th></th>
                                 <th></th>
                             </tr>
-                            <tr  repeat.for="item of dataTable.displayArray">
+                            <tr class="${item.isReminder} ? 'warning' : ''}" repeat.for="item of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Category">${item.category}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Date Created" style="width: 75px">
                                     <div>${item.dateCreated | dateFormat:config.DATE_FORMAT_TABLE}</div>

@@ -8,7 +8,11 @@ var NoteSchema = new Schema({
     dateCreated: { type: Date, default: Date.now },
     dateRemind: { type: Date },
     dateEndRemind: { type: Date },
-    reminder: { type: Boolean, default: false },
+    isReminder: { type: Boolean, default: false },
+    reminderType: { type: String },
+    reminderDay: { type: String },
+    priority: { type: String, default: 0 },
+    lastSeen: { type: Date },
     note: { type: String },
     category: { type: String }
 });

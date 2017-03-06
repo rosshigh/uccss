@@ -4,7 +4,7 @@ export function configure(config) {
     './elements/loading-indicator',
     './elements/table-navigation-bar',
     './elements/numeric-input',
-    './elements/tiny-mce',
+    './elements/flat-picker',
     './editor/editor',
     './elements/add-systems',
      './elements/rate-it',
