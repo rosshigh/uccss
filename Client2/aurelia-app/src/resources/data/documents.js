@@ -84,7 +84,8 @@ export class DocumentsServices {
     }
 
     uploadFile(files, version){
-       this.data.uploadFiles(files, this.data.DOCUMENTS_FILE_UPLOAD + "/" + this.selectedDocument.name + '/' + version);
+        let path = this.selectedCat.code + '$@' + this.selectedDocument.name
+       this.data.uploadFiles(files, this.data.DOCUMENTS_FILE_UPLOAD + "/" + path + '/' + version);
     }
 
     async deleteFile(index){

@@ -2,10 +2,11 @@
 	<div class="fluid-container">
 		<div class="row">
 			<div class="col-lg-2">
-				<select change.delegate="typeSelected()" class="form-control" value.bind="screenToShow">
+				<select  change.delegate="typeSelected()" class="form-control" value.bind="screenToShow">
 					<option value="">Select an option</option>
 					<option value="auth">Authorization Log</option>
 					<option value="log">Transaction Log</option>
+					<option value="files">Files</option>
 				</select>
 			</div>
 		</div>
@@ -21,17 +22,23 @@
 								</div>
 							</div>
 						</div>
-						<label>Log Files</label>
+						<label>Files</label>
                         <div class="well well2 overFlow" style="height:600px;">
-                            <ul class="list-group">
+                            <ul show.bind="screenToShow !== 'files'" class="list-group">
                                 <button click.trigger="fileSelected($index)" type="button" repeat.for="file of fileList" id="${type.code}" class="list-group-item">${file}</button>
+                            </ul>
+							 <ul show.bind="screenToShow === 'files'" class="list-group">
+                                <button click.trigger="uploadedFileSelected(file)" type="button" repeat.for="file of fileList" id="${$index}" class="list-group-item">${file.folder}</button>
                             </ul>
                         </div>
 					</div>
 				</div>
 			</div>
-			<div show.bind="fileContents.length" class="col-lg-9 topMargin">
+			<div show.bind="fileContents.length && screenToShow !== 'files'" class="col-lg-9 topMargin">
 				<compose view='./components/logFileTable.html'></compose>
+			</div>
+			<div show.bind="showFileList && screenToShow === 'files'" class="col-lg-9 topMargin">
+				<compose view='./components/uploadedFilesTable.html'></compose>
 			</div>
 		</div>
 	</div>

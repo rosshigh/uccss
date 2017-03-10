@@ -84,8 +84,8 @@ export class Utils{
                   });
                 }
             } else if ((property.indexOf('Date') > -1 || property.indexOf('date') > -1) ||  (obj1[property] instanceof Date)){
-                var date1 = obj1[property];
-                var date2 = obj2[property];
+                var date1 = new Date(obj1[property]);
+                var date2 = new Date(obj2[property]);
                 if(!moment(date1).isSame(date2, 'year')
                     || !moment(date1).isSame(date2, 'month')
                     || !moment(date1).isSame(date2, 'day') ) {

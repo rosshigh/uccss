@@ -3,19 +3,34 @@ import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {AdminData} from '../../../resources/data/admin';
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import moment from "moment";
 
-@inject(DataTable, AppConfig, Utils, AdminData)
+@inject(DataTable, AppConfig, Utils, AdminData, CommonDialogs, EventAggregator)
 export class Admin {
 	screenToShow = "";
 	spinnerHTML = "";
+	showFileList = false;
 
-	constructor(dataTable, config, utils, admin){
+
+	constructor(dataTable, config, utils, admin, dialog, EventAggregator){
 		this.dataTable = dataTable;
 		this.dataTable.initialize(this);
 		this.config = config;
 		this.utils = utils;
 		this.admin = admin;
+		this.dialog = dialog;
+		this.ea = EventAggregator;
+
+		// this.fileList = {
+		// 	name: "Files",
+		// 	value: "file_list",
+		// 	children: [
+		// 		{ name: "downloads", value: "downloads"},
+		// 		{ name: "helpTickets", value: "helpTickets"}
+		// 	]
+		// };
 	}
 
 	canActivate(){
@@ -24,6 +39,10 @@ export class Admin {
 
 	attached(){
         $('[data-toggle="tooltip"]').tooltip();
+
+		this.ea.subscribe('delete-file', obj => {
+			if(obj.file.file) this.deleteFile(obj);
+		});
     }
 
 	async typeSelected(){
@@ -36,6 +55,7 @@ export class Admin {
 					for(let i = 0; i < this.fileList.length; i++){
 						this.fileList[i] = this.fileList[i].substring(0,this.fileList[i].indexOf('.log'));
 					};
+					this.fileList.reverse();
 				}
 				break;
 			case 'log':
@@ -45,12 +65,20 @@ export class Admin {
 					for(let i = 0; i < this.fileList.length; i++){
 						this.fileList[i] = this.fileList[i].substring(0,this.fileList[i].indexOf('.log'));
 					};
+					this.fileList.reverse();
+				}
+				break;
+			case 'files':
+				let fileResponse = await this.admin.getFiles();
+				if(!fileResponse.error){
+					this.showFileList = true;
+					this.uploadedFileList = this.admin.filesList;
 				}
 				break;
 			default:
 				this.fileList = new Array();
 		}
-		this.fileList.reverse();
+		
 		
 	}
 
@@ -110,6 +138,60 @@ export class Admin {
 			default:
 				this.fileList = new Array();
 		}
+	}
+
+	uploadedFileSelected(file){
+		this.selectedCategoryFiles = file;
+		this.uploadedFilesArray = file.files;
+		this.dataTable.updateArray(this.uploadedFilesArray);
+	}
+
+	deleteFile(obj){	
+		var type = obj.file.value.split('-');
+		this.deletedFile = obj.file.value;
+		var msg = "Are you sure you want to delete the file?  It may affect links in other parts of the system.";
+		
+		return this.dialog.showMessage(
+			msg,
+			"Confirm", 
+			['Yes', 'No']
+			).then(response => {
+				if(!response.wasCancelled){
+					this.deleteAFile(obj.file.path);
+				} 
+			});
+	}
+
+	async deleteAFile(path){
+		let response = await this.admin.deleteFile(path);
+		if(!response.error){
+			// this.selectedCategoryFiles.files.splice(index,1);
+			// this.uploadedFilesArray = this.selectedCategoryFiles.files;
+			// this.dataTable.updateArray(this.uploadedFilesArray);
+			this.sliceDeletedFile();
+			this.utils.showNotification('The file was deleted');
+		}
+	}
+
+	sliceDeletedFile(){
+		console.log(this.uploadedFileList)
+		for(let i = 0; i < this.uploadedFileList.children.length; i++){
+			for(let j = 0; j < this.uploadedFileList.children[i].children.length; j++){
+				if(this.uploadedFileList.children[i].children[j].file){
+					if(this.uploadedFileList.children[i].children[j].value === this.deletedFile){
+						this.uploadedFileList.children[i].children.splice( j, 1 );
+					}
+				} else {
+					for(let k = 0; k < this.uploadedFileList.children[i].children[j].children.length; k++){
+						if(this.uploadedFileList.children[i].children[j].children[k].value === this.deletedFile){
+							this.uploadedFileList.children[i].children[j].children.splice( k, 1 );
+						}
+					}
+				}
+			}
+		}
+		console.log(this.uploadedFileList)
+		console.log(this.deletedFile)
 	}
 
 	async deleteFiles(){

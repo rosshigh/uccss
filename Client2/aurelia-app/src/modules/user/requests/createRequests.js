@@ -393,6 +393,15 @@ export class ViewHelpTickets {
   }
 
   _setUpValidation(){
+      this.validation.addRule(1,"course",[{"rule":"custom","message":"Select a course",
+      "valFunction":function(context){
+        if(context.requestType === "sandboxCourse"){
+          return true
+        } else {
+          return !(context.courseId == -1);
+        }
+      }
+    }]);
     this.validation.addRule(1,"session",[
       {"rule":"custom","message":"Select a session",
       "valFunction":function(context){
@@ -413,16 +422,6 @@ export class ViewHelpTickets {
       "valFunction":function(context){
         return !(context.requestType == -1);
       }}]);
-
-    this.validation.addRule(1,"course",[{"rule":"custom","message":"Select a course",
-      "valFunction":function(context){
-        if(context.requestType === "sandboxCourse"){
-          return true
-        } else {
-          return !(context.courseId == -1);
-        }
-      }
-    }]);
     this.validation.addRule(1,"numberOfStudentsError",[{"rule":"custom","message":"Enter either the number of undergradate or graduate students",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
@@ -464,9 +463,9 @@ export class ViewHelpTickets {
   _buildRequest(){
     if(this.existingRequest){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
-      // this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
-      //   item.requiredDate = new Date($("#requiredDate-" + index).val());
-      // })
+      this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
+        item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+      })
     }
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;
     this.requests.selectedRequest.institutionId = this.userObj.institutionId;

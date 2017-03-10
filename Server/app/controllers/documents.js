@@ -178,7 +178,8 @@ module.exports = function (app, config) {
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      var path = config.uploads + "/documents/" + req.params.container;
+      let paths = req.params.container.split('$@').join('/');
+      var path = config.uploads + "/documents/" + paths;
       mkdirp(path, function(err) {
         if(err){
           res.status(500).json(err);
@@ -188,7 +189,8 @@ module.exports = function (app, config) {
       });
     },
     filename: function (req, file, cb) {
-      cb(null, file.originalname + " - version " + req.params.version);
+      let fileName = file.originalname.split('.');
+      cb(null, fileName[0] + " (" + req.params.version + ")." + fileName[1]);
     }
   });
 

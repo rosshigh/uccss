@@ -15,7 +15,7 @@
                             </tr>
                             <tr>
                                 <th style="width:250px;">Category <span click.trigger="dataTable.sortArray('category')"><i class="fa fa-sort"></i></span></th>
-                                <th style="width:150px;">Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:150px;">Start <span click.trigger="dataTable.sortArray('dateStartRemind')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Note <span click.trigger="dataTable.sortArray('note')"><i class="fa fa-sort"></i></span></th>
                                 <th></th>
                                 <th>Help Ticket No</th>
@@ -31,12 +31,10 @@
 									</select>
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="dateCreated" type="date" placeholder="Filter Date" class="form-control"
-                                    />
+                                    <input input.delegate="dataTable.filterList($event)" id="dateStartRemind" type="date" placeholder="Filter Date" class="form-control"/>
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="note" type="text" placeholder="Filter note" class="form-control"
-                                    />
+                                    <input input.delegate="dataTable.filterList($event)" id="note" type="text" placeholder="Filter note" class="form-control"/>
                                 </th>
                                 <th></th>
                                 <th></th>
@@ -44,8 +42,8 @@
                             </tr>
                             <tr class="${item.isReminder} ? 'warning' : ''}" repeat.for="item of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Category">${item.category}</td>
-                                <td click.trigger="edit($index, $event)" data-title="Date Created" style="width: 75px">
-                                    <div>${item.dateCreated | dateFormat:config.DATE_FORMAT_TABLE}</div>
+                                <td click.trigger="edit($index, $event)" data-title="Date Start" style="width: 75px">
+                                    <div>${item.dateStartRemind | dateFormat:config.DATE_FORMAT_TABLE}</div>
                                 </td>
                                 <td click.trigger="edit($index, $event)" data-title="Type">${item.note}</td>
                                 <td style="width:5rem;">

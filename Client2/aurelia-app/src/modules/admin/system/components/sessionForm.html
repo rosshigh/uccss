@@ -1,5 +1,5 @@
 <template>
-  <div class="col-lg-12">
+  <div class="container">
     <div class="bottomMargin list-group-item leftMargin rightMargin">
       <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
       <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
@@ -24,19 +24,28 @@
       <div class="form-group row">
         <label class="col-sm-2 form-control-label ">Start Date</label>
         <div class="col-sm-10">
-          <date-picker value.two-way="sessions.selectedSession.startDate" controlid="startDate"></date-picker>
+           <flat-picker controlid="startDate" config.bind="config" value.bind="sessions.selectedSession.startDate"></flat-picker>
+         <!--
+          <date-picker value.two-way="sessions.selectedSession.startDate" controlid="startDate"></date-picker> 
+          -->
         </div>
       </div>
       <div class="form-group row">
         <label class="col-sm-2 form-control-label ">End Date</label>
         <div class="col-sm-10">
+          <flat-picker controlid="endDate" config.bind="config" value.bind="sessions.selectedSession.endDate"></flat-picker>
+          <!--
           <date-picker value.two-way="sessions.selectedSession.endDate" controlid="endDate"></date-picker>
+          -->
         </div>
       </div>
       <div class="form-group row">
         <label class="col-sm-2 form-control-label ">Requests Open</label>
         <div class="col-sm-10">
+           <flat-picker controlid="requestsOpenDate" config.bind="config" value.bind="sessions.selectedSession.requestsOpenDate"></flat-picker>
+           <!--
           <date-picker value.two-way="sessions.selectedSession.requestsOpenDate" controlid="requestsOpenDate"></date-picker>
+          -->
         </div>
       </div>
       <div class="form-group row">

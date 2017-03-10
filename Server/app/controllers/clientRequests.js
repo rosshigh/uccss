@@ -79,7 +79,7 @@ module.exports = function (app) {
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('Create clientRequest','verbose');  
     var clientRequest = new Model(req.body);
-     var tasks = new Array();
+    var tasks = new Array();
     req.body.requestDetails.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       obj.requestId = clientRequest._id;
@@ -130,7 +130,8 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest ' + req.body._id);      
+    logger.log('Update clientRequest ' + req.body._id);    
+console.log(req.body)      
     let clientRequest = new Model(req.body);
     clientRequest.requestDetails = new Array();  
     let tasks = new Array();

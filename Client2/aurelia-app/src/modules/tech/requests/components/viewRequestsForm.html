@@ -295,7 +295,7 @@
                   </div>
                 </div>
                 <div class="col-lg-5 pull-right">
-                  <div class="checkbox">
+                  <div class="checkbox" show.bind="products.selectedProduct.clientRelevant">
                       <label>
                           <input checked.bind="sandBoxOnly" id="sandBoxOnlyCheckBox" type="checkbox"  data-toggle="checkbox"> Sandbox only
                       </label>
@@ -322,7 +322,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient">
+              <tr click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant">
                 <td>${client.client}</td>
                 <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>
                 <td>${client.idsAvailable}</td>

@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div show.bind="showCategoryForm" class="row">
-                <div class="panel panel-default">
+                <div class="panel panel-default col-lg-8 col-lg-offset-2" style="background-color:ghostwhite;">
                     <div class="panel-body">
                         <div class="list-group-item bottomMargin col-sm-12 topMargin">
                             <span click.delegate="saveCategory()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
@@ -56,7 +56,8 @@
                                 <div class="form-group">
                                     <label for="editCategory" class="col-sm-2 control-label hideOnPhone">Description</label>
                                     <div class="col-sm-8">
-                                        <tiny-mce height.bind="150" value.two-way="categoryDescription"></tiny-mce>
+                                        <editor value.bind="curriculum.selectedCurriculumCategory.categoryDescription" height="250"></editor>
+                                     <!--   <tiny-mce height.bind="150" value.two-way="categoryDescription"></tiny-mce> -->
                                     </div>
                                 </div>
                             </div>

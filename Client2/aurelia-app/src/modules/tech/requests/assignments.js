@@ -70,8 +70,6 @@ export class Assignments {
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                // this.utils.formatDateForDatesPicker(this.requests.selectedRequest)
-                // this.dataTable.createPageButtons(1);
             } else {
                 this.displayArray = new Array();
             }
@@ -85,18 +83,6 @@ export class Assignments {
         await this.getRequests();
         this.spinnerHTML = "";
     }
-
-    // // updateArray() {
-    // //     if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-    // //         this.displayArray = this.requests.requestsDetailsArray;
-    // //         this.baseArray = this.displayArray;
-    // //         for (var i = 0; i < this.baseArray.length; i++) {
-    // //             this.baseArray[i].originalIndex = i;
-    // //         }
-    // //     } else {
-    // //         this.displayArray = new Array();
-    // //     }
-    // // }
 
     // /*****************************************************************************************************
     //  * User selected a requests table
@@ -114,7 +100,6 @@ export class Assignments {
         this.requestSelected = true;
 
         //Retrieve relevant data
-        // this.editIndex = this.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
          this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
         this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);

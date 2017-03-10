@@ -3,7 +3,8 @@ var express = require('express'),
   	passport = require('passport'),
   	path = require('path'),
 	rootPath = path.normalize(__dirname + '/..'),
-  	logger = require('../../config/logger');
+  	logger = require('../../config/logger'),
+	dir = require('node-dir');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
@@ -132,4 +133,34 @@ module.exports = function (app, config) {
 			}
 		}
 	});
+
+	router.route('/files/').get(function(req, res, next){
+		let filesFilder = config.uploads;
+		console.log(filesFilder)
+		dir.files(filesFilder, function(err, files) {
+			if (err)  return next(err);
+				if(files) res.status(200).json(files);
+			});
+	});
+
+	router.route('/files/:file').delete(function(req, res, next){
+		logger.log("Delete file " + req.params.file);
+		if(req.params.file){
+			req.params.file = req.params.file.split("$@").join('/');
+			fs.stat(req.params.file, function (err, stats) {
+				if(err) return next(err);			
+				if(stats){
+					if (stats.isFile()) {            
+						fs.unlink(req.params.file);
+					}
+					res.status(200).json({"message": "File deleted"});
+				} else {
+					res.status(404).json({"message": "File not found"});
+				}
+			})
+		} else {
+			res.status(404).json({"message": "File not found"});
+		}
+
+	})
 }

@@ -222,7 +222,7 @@ export class User {
                         }
                         break;
                     case "A":
-                        if(moment(now).isSame(item.dateRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
                             if(item.priority == 1){
                                 toastr.error(item.note, "Reminder");
                             } else {
@@ -233,8 +233,10 @@ export class User {
                         }
                         break;
                     case "T":
-                        if(moment(now).isSame(item.dateRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
-                            let diff = moment(now).diff(item.dateRemind, 'minutes');
+                    console.log(moment(now).isSame(item.dateStartRemind,'day') )
+                    console.log(!moment(now).isSame(item.lastSeen,'month'))
+                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            let diff = moment(now).diff(item.dateStartRemind, 'minutes');
                             if(diff >= -15){
                                 if(item.priority == 1){
                                     toastr.error(item.note, "Reminder");
@@ -255,7 +257,7 @@ export class User {
                     console.log('Checked reminders');
                     var now = new Date();
                     this.timeReminders.forEach(item => {
-                        let diff = moment().diff(item.item.dateRemind, 'minutes');
+                        let diff = moment().diff(item.item.dateStartRemind, 'minutes');
                         if(item.priority == 1){
                             toastr.error(item.item.note, "Reminder");
                         } else {

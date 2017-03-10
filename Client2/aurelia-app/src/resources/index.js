@@ -7,6 +7,7 @@ export function configure(config) {
     './elements/flat-picker',
     './editor/editor',
     './elements/add-systems',
+    './elements/tree-node',
      './elements/rate-it',
     './elements/date-picker',
      './elements/edit-client',

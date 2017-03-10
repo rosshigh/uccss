@@ -17,6 +17,7 @@ export class EditProducts {
     removedFiles = new Array();
     filesSelected = false;
     newDownload = false;
+    selectedFiles;
 
     constructor(datatable, downloads, utils, dialog, validation, config) {
         this.dataTable = datatable;
@@ -80,12 +81,13 @@ export class EditProducts {
     }
 
     cancel() {
+        this.filesToUpload = new Array();
         if (this.editIndex == -1) {
             this.new();
         } else {
             this.downloads.selectDownload(this.editIndex);
             this.originalDownload = this.utils.copyObject(this.downloads.selectedDownload);
-         this.downloads.selectedDownload.downCatcode = this.downloads.selectedDownload.downCatcode.toString();
+            this.downloads.selectedDownload.downCatcode = this.downloads.selectedDownload.downCatcode.toString();
         }
     }
 
@@ -94,7 +96,10 @@ export class EditProducts {
             let serverResponse = await this.downloads.saveDownload();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.downloads.appDownloadsArray);
-                if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
+                  if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.downloads.uploadFile(this.filesToUpload);
+                }
+                // if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
                  this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
             }
             this._cleanUp();
@@ -166,7 +171,7 @@ export class EditProducts {
         }}]);
     }
 
-     openEditCatForm(action){
+    openEditCatForm(action){
         this.editCourseFlag = action === 'edit'
         if(this.editCourseFlag){
             if($("#editType").val() != ""){
@@ -233,6 +238,22 @@ export class EditProducts {
         this.files = undefined;
         this.selectedFile = "";
         this.newDownload = false;
+        this.filesToUpload = new Array();
+    }
+
+    changeFiles() {
+        this.filesToUpload = new Array(); 
+        for(var i = 0; i < this.files.length; i++){
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if(item.name === this.files[i].name) addFile = false;
+            })
+            if(addFile) this.filesToUpload.push(this.files[i]);
+        }
+    }
+
+    removeFile(index){
+        this.filesToUpload.splice(index,1);
     }
 
     _cleanUpFilters(){

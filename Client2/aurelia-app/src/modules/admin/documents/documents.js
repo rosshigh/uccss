@@ -166,10 +166,12 @@ export class Documents {
                     version++;
                 }
             }
+            let fileNameArray =  this.files[0].name.split('.');
+            let fileName = fileNameArray[0] + " (" + version + ")." + fileNameArray[1]
             var newFile = {
                 personId: this.userObj._id,
                 originalFilename: this.files[0].name,
-                fileName: this.files[0].name + " - version " + version ,
+                fileName:  fileName ,
                 dateUploaded: new Date(),
                 active: true,
                 version: version
@@ -187,7 +189,9 @@ export class Documents {
                  this.dataTable.updateArray(this.documents.documentsArray);
                  this.utils.showNotification("The document was saved");
                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                 if (this.files && this.files.length > 0) await this.documents.uploadFile(this.files, this.documents.selectedDocument.files[0].version);
+                if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    await this.documents.uploadFile(this.filesToUpload, this.documents.selectedDocument.files[0].version);
+                }
                  this.spinnerHTML = "";
                  $("#spinner").toggle().toggle();
             }
@@ -196,9 +200,20 @@ export class Documents {
         }
     }
 
+    // changeFiles(){
+    //     this.selectedFile = this.files[0].name;
+    //     this.filesSelected = this.documents.selectedDocument ? true : false;
+    // }
+
     changeFiles(){
-        this.selectedFile = this.files[0].name;
-        this.filesSelected = this.documents.selectedDocument ? true : false;
+        this.filesToUpload =  new Array(); 
+        this.filesToUpload.push(this.files[0]);
+        this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
+        this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+    }
+
+    removeFile(index){
+        this.filesToUpload.splice(index,1);
     }
 
     newCategory(){
@@ -207,7 +222,7 @@ export class Documents {
     }
 
     editCategory(){
-        this.categoryForm = true;
+        if(this.documents.selectedCat) this.categoryForm = true;
     }
 
     saveCategory(){
@@ -219,9 +234,9 @@ export class Documents {
     }
 
     _cleanUp(){
-        document.getElementById("uploadFiles").value = "";
         this.selectedFiles = undefined;
         this.files = undefined;
+        this.filesToUpload = new Array();
     }
 
     backCategory(){

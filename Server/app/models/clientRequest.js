@@ -54,10 +54,8 @@ var ClientRequestDetailsSchema = new Schema({
   requestId: { type: Schema.Types.ObjectId, ref: 'ClientRequest'},
   idsAssigned: { type: Number },
   customerMessage: { type: String },
-  files: [{
-    name: {type: String},
-    url: {type: String},
-    comments: {type: String}
+   documents: [{
+    url: { type: String } 
   }],
   assignments: ['Assignment'],
   techComments: { type: String },
@@ -65,6 +63,7 @@ var ClientRequestDetailsSchema = new Schema({
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },
     oldValue: { type: Schema.Types.Mixed },
+    newValue: { type: Schema.Types.Mixed },
     personId: { type: Schema.Types.ObjectId }
   }]
 });
@@ -82,7 +81,7 @@ var ClientRequestSchema = new Schema({
   courseId: { type: Schema.Types.ObjectId },
   personId: { type:  Schema.Types.ObjectId },
   sessionId: { type: Schema.Types.ObjectId, required: true },
-  studentIdsAssigned: { type: Number },
+  studentIdsAssigned: { type: Number }, //?
   graduateIds: { type: Number, default: 0, min : 0 },
   undergradIds: { type: Number, default: 0, min: 0 },
   addUndergraduates: { type: Number, default: 0, min: 0 },

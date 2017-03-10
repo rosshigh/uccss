@@ -82,7 +82,8 @@
                     <div class="form-group">
                         <label for="editCreatedDate" class="col-sm-2 control-label hideOnPhone">Date Created</label>
                         <div class="col-sm-8">
-                            <date-picker value.two-way="siteinfo.selectedItem.createdDate"  controlid="editCreatedDate"></date-picker>
+                            <flat-picker controlid="editCreatedDate" config.bind="config"  value.bind="siteinfo.selectedItem.createdDate"></flat-picker>
+                          <!--  <date-picker value.two-way="siteinfo.selectedItem.createdDate"  controlid="editCreatedDate"></date-picker> -->
                         </div>
                     </div>
                 </div>
@@ -92,7 +93,8 @@
                     <div class="form-group">
                         <label for="editExpireddDate" class="col-sm-2 control-label hideOnPhone">Date Expires</label>
                         <div class="col-sm-8">
-                             <date-picker value.two-way="siteinfo.selectedItem.expiredDate"  controlid="editExpireddDate"></date-picker>
+                            <flat-picker controlid="editCreatedDate" config.bind="config"  value.bind="siteinfo.selectedItem.expiredDate"></flat-picker>
+                             <!-- <date-picker value.two-way="siteinfo.selectedItem.expiredDate"  controlid="editExpireddDate"></date-picker> -->
                         </div>
                     </div>
                 </div>

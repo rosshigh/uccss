@@ -17,6 +17,11 @@ export class Notes{
 	navControl = "notesNavButtons";
 	days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "uesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
     
+	configT = {
+		altFormat: 'F j, Y h:i K',
+		enableTime: true
+	};
+
     constructor(router, dataTable, config, people, utils, helpTickets){
 		this.router = router;
 		this.dataTable = dataTable;
@@ -29,16 +34,6 @@ export class Notes{
 
 	attached(){
         $('[data-toggle="tooltip"]').tooltip();
-		let configT = {
-			dateFormat: 'F j, Y h:i K',
-			enableTime: true
-		};
-		let config = {
-
-		}
-    	// this.dateRemindPicker = new Flatpickr(this.dateRemind, config);
-		// this.dateRemindTPicker = new Flatpickr(this.dateRemindT, configT);
-		// this.dateEndRemindPicker = new Flatpickr(this.dateEndRemind, config);
     }
 
 	canActivate(){
@@ -72,13 +67,6 @@ export class Notes{
 	edit(index, el){
 		this.editIndex = this.dataTable.getOriginalIndex(index);
 		this.people.selectNote(this.editIndex);
-		// let d1 = new Date(this.people.selectedNote.dateRemind)
-		// let d2 = new Date(this.people.selectedNote.dateRemind)
-		// let d3 = new Date(this.people.selectedNote.dateEndRemind)
-		// this.dateRemindPicker.setDate(d2);
-		// this.dateRemindTPicker.setDate(d2);
-		// this.dateEndRemindPicker.setDate(d3);
-		// this.people.selectedNote.dateRemind = new Date(d.getTime() ? d.valueOf() : d);
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -86,13 +74,7 @@ export class Notes{
         this.noteSelected = 'Yes';
 	}
 
-	// buildNote(){
-	// 	this.people.selectedNote.dateRemind = moment(this.people.selectedNote.dateRemind );
-	// 	this.people.selectedNote.dateRemind = new Date(this.people.selectedNote.dateRemind);
-	// }
-
 	async save(){
-		// this.buildNote();
 		let response = await this.people.saveNote();
 		if(!response.error){
 			this.utils.showNotification('The note was saved');
@@ -133,6 +115,10 @@ export class Notes{
             this.editCategoryFlag = true;
         }
     }
+
+	cancelEditCategory(){
+		this.showCategoryForm = false;
+	}
 
 	async saveCategory(){
 		this.people.selectedPersonFromId(this.userObj._id);
