@@ -8,6 +8,7 @@
 						<textarea readonly class="col-lg-12" id="message" innerhtml.bind="requests.selectedRequestDetail.customerMessage" class="form-control"
 							rows="10"></textarea>
 						<h5>Enter your response in the comments box below and click save</h5>
+						<editor value.bind="requests.selectedRequest.comments" height="250"></editor>	
 					</div>
 					<form class="form-horizontal topMargin">
 						<h4>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h4>
@@ -60,13 +61,14 @@
 								</div>
 							</div>
 						</div>
+						<!--
 						<div class="topMargin">
 							<label show.bind="requests.selectedRequest.comments">Comment</label>
 								<div innerhtml.bind="requests.selectedRequest.comments"></div>		
 						</div>
-						<!--
-						<editor value.bind="requests.selectedRequest.comments" height="250"></editor>	
-						-->	
+						-->
+						
+							
 					</div>
 				</div>
 			</div>

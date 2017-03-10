@@ -53,7 +53,6 @@ var ClientRequestDetailsSchema = new Schema({
   sessionId: { type: Schema.Types.ObjectId },
   requestId: { type: Schema.Types.ObjectId, ref: 'ClientRequest'},
   idsAssigned: { type: Number },
-  customerMessage: { type: String },
    documents: [{
     url: { type: String } 
   }],
@@ -94,6 +93,12 @@ var ClientRequestSchema = new Schema({
   modifiedDate: { type: Date },
   requestDetails: [ { type: Schema.Types.ObjectId, ref: 'ClientRequestDetail' } ],
   institutionId: { type: Schema.Types.ObjectId },
+  customerMessage: [{ 
+    message: { type: String },
+    personId:  { type: Schema.Types.ObjectId },
+    from: { type: String },
+    date: { type: Date, default Date.now }
+  }],
   audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },

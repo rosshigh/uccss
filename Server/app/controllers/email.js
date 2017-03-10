@@ -266,6 +266,7 @@ if(env === 'development'){
       mailObject.subject = 'Customer Action Required'; 
       sendGrid(mailObject)
           .then(result => {
+console.log(result)               
               if (result.statusCode === 202) {     
                 resolve(result);
               } else {

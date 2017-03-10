@@ -784,12 +784,13 @@ export class Assignments {
         if(msg){
             var productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
             this.message = {
-                id: this.requests.selectedRequestDetail._id,
+                id: this.requests.selectedRequest._id,
                 customerMessage : msg,
                 requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
                 toEmail: this.people.selectedPerson.email,
                 product:  productName,
                 session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+                from: "UCC",
                 audit: {
                     property: 'Send Message',
                     eventDate: new Date(),

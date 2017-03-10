@@ -119,13 +119,17 @@ export class ViewRequests {
   async save() {
     if(!this.showLockMessage){
       if (this.validation.validate(1)) {
-        if(this._buildRequest()){
+        // if(this._buildRequest()){
+          this.requests.selectedRequest.requestDetails.forEach(item => {
+            item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+            item.modifiedDate = new Date();
+          })
           let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
           if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");
             this._cleanUp();
           }
-        }
+        // }
       this._cleanUp();
       }
     } else {

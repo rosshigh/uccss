@@ -133,16 +133,18 @@ module.exports = function (app) {
     logger.log('Update clientRequest ' + req.body._id);    
 console.log(req.body)      
     let clientRequest = new Model(req.body);
-    clientRequest.requestDetails = new Array();  
+    // clientRequest.requestDetails = new Array();  
     let tasks = new Array();
+console.log('SDLKJF:LSKJDF:LSJ')    
     if(req.body.requestDetailsToSave){
        req.body.requestDetailsToSave.forEach((detail, index) => {
          if(detail._id){
            if(detail.delete){
                tasks.push(ClientRequestDetail.remove({ _id: detail._id }));
+               clientRequest.requestDetails.splice(clientRequest.requestDetails.indexOf(detail._id), 1);
            } else {
-            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-            clientRequest.requestDetails.push(detail._id);   
+              tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+              // clientRequest.requestDetails.push(detail._id);   
            }
          } else {
             let obj = new ClientRequestDetail(detail);
