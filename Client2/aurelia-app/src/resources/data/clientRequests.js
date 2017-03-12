@@ -306,6 +306,14 @@ export class ClientRequests {
         return serverResponse;
     }
 
+    updateDetailStatuses(selectedRequestNo, status){
+        this.requestsDetailsArray.forEach(item => {
+            if(item.requestId.clientRequestNo == selectedRequestNo){
+                if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+            }
+        })
+    }
+
     lockRequest(obj){
         if(obj.requestId) {
             var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");

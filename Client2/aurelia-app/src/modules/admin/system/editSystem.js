@@ -15,6 +15,7 @@ import $ from 'jquery';
 @inject(Router, Systems, Products, Validation, Utils, DataTable, AppConfig, CommonDialogs, Sessions)
 export class EditSystem {
     systemSelected = false;
+    editClients = false;
     navControl = "systemNavButtons";
     spinnerHTML = "";
 
@@ -46,14 +47,14 @@ export class EditSystem {
             this.config.getSessions()
         ]);
         this.dataTable.updateArray(this.systems.systemsArray);
-        this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.systems.getSystemsArray('?order=sid', true);
-         this.dataTable.updateArray(this.systems.systemsArray);
+        this.dataTable.updateArray(this.systems.systemsArray);
         this.spinnerHTML = "";
+        this. _cleanUpFilters();
     }
 
     new() {
@@ -79,6 +80,11 @@ export class EditSystem {
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.showTable = false;
+        setTimeout(function(){$('[data-toggle="tooltip"]').tooltip()},500);
+    }
+
+    editClientsButton(){
+        this.editClients = !this.editClients;
     }
 
     generateClients() {
@@ -131,7 +137,7 @@ export class EditSystem {
             });
     }
 
-    async deleteClients() {
+    deleteClients() {
         return this.dialog.showMessage(
             "Are you sure about this, this action cannot be undone?", 
             "Delete Clients", 
@@ -143,11 +149,9 @@ export class EditSystem {
             });
     }
     
-    async deleteAllClients(){
-        let serverResponse = await this.systems.deleteAllClients();
-        if (!serverResponse.error) {
-            this.utils.showNotification("The clients were successfully deleted");
-        }
+    deleteAllClients(){
+        this.systems.deleteAllClients();
+        this.utils.showNotification("You must save the system to complete the deletion");
     }
 
     editAClient(client, index, el) {
@@ -162,33 +166,45 @@ export class EditSystem {
         // this.saveClients = true;
     }
 
-    async deleteClient(){
-        return this.dialog.showMessage(
-            "Are you sure about this, this action cannot be undone?", 
-            "Delete Clients", 
-            ['Yes', 'No']
-            ).then(response => {
-                if (!response.wasCancelled) {
-                    this.deleteC();
-                }
-            });
-    }
-    
-    async deleteC(){
-        let serverResponse = await this.systems.deleteClient();
-        if (!serverResponse.error) {
-            this.utils.showNotification("Client " + this.selectedClient.client + " was deleted");
-            this.interfaceUpdate = false;
+    deleteClient(index){
+        if(!this. _okToDeleteClient(this.systems.selectedSystem.clients[index])){
+            this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
+        } else {
+            return this.dialog.showMessage(
+                "Are you sure about this, this action cannot be undone?", 
+                "Delete Clients", 
+                ['Yes', 'No']
+                ).then(response => {
+                    if (!response.wasCancelled) {
+                        this.systems.selectedSystem.clients.splice(index,1);
+                    }
+                });
         }
     }
 
-    async saveClient(){
-        let serverResponse = await this.systems.saveClient();
-        if (!serverResponse.error) {
-            this.utils.showNotification("Client " + this.selectedClient.client + " updated");
-            this.interfaceUpdate = false;
+    _okToDeleteClient(client){
+        if(client.assignments.length > 0) return false;
+        let status = client.clientStatus;
+        for(var i = 0; i<this.config.CLIENT_STATUSES.length; i++){
+            if(this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
+                return true;
+            }
         }
+        return false;
     }
+    
+    async deleteC(){
+        this.systems.deleteClient();
+        this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
+    }
+
+    // async saveClient(){
+    //     let serverResponse = await this.systems.saveClient();
+    //     if (!serverResponse.error) {
+    //         this.utils.showNotification("The client was updated");
+    //         this.interfaceUpdate = false;
+    //     }
+    // }
 
     cancel() {
         if (this.editIndex == -1) {
@@ -208,6 +224,29 @@ export class EditSystem {
                 this._cleanUp();
             } 
         }
+    }
+
+    toggleSandBox(index){
+        if(this.systems.selectedSystem.clients[index].assignments.length > 0){
+            this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
+        } else {
+            this.systems.selectedSystem.clients[index].clientStatus =   this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
+        }
+
+    }
+
+    refreshClient(index){
+        return this.dialog.showMessage(
+            "This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", 
+            "Refresh Clients", 
+            ['Yes', 'No']
+            ).then(response => {
+                if(!response.wasCancelled){
+                    this.systems.selectedSystem.clients[index].clientStatus =  this.config.UNASSIGNED_REQUEST_CODE;
+                    this.systems.selectedSystem.clients[index].assignments = new Array();
+                    this.systems.selectedSystem.clients[index].idsAvailable = this.systems.selectedSystem.idsAvailable;
+                }
+            });
     }
 
     delete(){
@@ -234,7 +273,7 @@ export class EditSystem {
     }
 
     _cleanUp(){
-        this._cleanUpFilters()
+        // this._cleanUpFilters()
         this.systemSelected = false;
         this.newSystem = false;
         this.validation.makeAllValid(1);

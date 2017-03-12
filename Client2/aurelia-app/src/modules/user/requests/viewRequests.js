@@ -82,10 +82,6 @@ export class ViewRequests {
     this.spinnerHTML = "";
   }
 
-  // updateArray() {
-  //     this.dataTable.updateArray(this.requests.requestsArray);
-  // }
-
   setDates(){
     this.minStartDate = this.sessions.selectedSession.startDate;
     this.maxStartDate = this.sessions.selectedSession.endDate;
@@ -96,10 +92,14 @@ export class ViewRequests {
   async edit(product, el, index) { 
     this.requestSelected = true;
     this.selectedDetailIndex = index;
+    this.showDetails = true;
     this.requests.setSelectedRequestDetail(product);
+    this.customerActionRequired = this.requests.selectedRequestDetail.requestStatus == this.config.CUSTOMER_ACTION_REQUEST_CODE;
+    this.customerMessage = this.requests.selectedRequestDetail.customerMessage;
     this.requests.selectRequstById(product.requestId);
-    this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
+    // this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
     this.sessions.selectSessionById(this.requests.selectedRequest.sessionId);
+    this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
     this.setDates();
    
     if(this.requests.selectedRequestDetail.assignments.length){
@@ -116,18 +116,30 @@ export class ViewRequests {
      this.requestSelected = false;
   }
 
+  customerActionResponse(request, el){
+    if(request.requestStatus == this.config.CUSTOMER_ACTION_REQUEST_CODE){
+      this.requests.setSelectedRequest(request);
+      this.showDetails = false;
+      this.requestSelected = true;
+      this.customerActionRequired = true;
+      this.selectedDetailIndex = -1;
+      this.customerMessage = request.customerMessage;
+
+      if (this.selectedRow) this.selectedRow.children().removeClass('info');
+      this.selectedRow = $(el.target).closest('tr');
+      this.selectedRow.children().addClass('info')
+    }
+  }
+   
+
   async save() {
     if(!this.showLockMessage){
-      if (this.validation.validate(1)) {
-        // if(this._buildRequest()){
-          this.requests.selectedRequest.requestDetails.forEach(item => {
-            item.requestStatus = this.config.UPDATED_REQUEST_CODE;
-            item.modifiedDate = new Date();
-          })
+      // if (this.validation.validate(1)) {
+        if(this._buildRequest()){
           let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
           if (!serverResponse.error) {
+            this.getRequests();
             this.utils.showNotification("The request was updated");
-            this._cleanUp();
           }
         // }
       this._cleanUp();
@@ -138,38 +150,41 @@ export class ViewRequests {
   }
 
   _buildRequest(){
-    var changes = this.requests.isRequestDirty(this.originalRequest);
-    if(changes.length){
-      this.requests.selectedRequest.requestDetails.forEach(item => {
-        item.requestStatus = this.config.UPDATED_REQUEST_CODE;
-        item.modifiedDate = new Date();
-      })
-      // this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].requestStatus = this.config.UPDATED_REQUEST_CODE;
-      // var personId = this.userObj._id
-      changes.forEach((currentValue) => {
-        this.requests.selectedRequest.audit.push({
-          property: currentValue.property,
-          oldValue: currentValue.oldValue,
-          newValue: currentValue.newValue,
-          personId: this.userObj._id
-        })
-        
-      });
+    //Update the table array
+    // this.requests.requestsArray.forEach(item => {
+    //   if(item._id == this.requests.selectedRequest._id) {
+    //     item.requestStatus = this.config.REPLIED_REQUEST_CODE;
+    //     item.requestDetails.forEach(item2 => {
+    //       item2.requesStatus = this.config.REPLIED_REQUEST_CODE;
+    //     })
+    //   }
+    // })
+
+    //Update the selected request to update
+    this.requests.selectedRequest.requestDetails.forEach(item => {
+      if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.REPLIED_REQUEST_CODE;
+      item.modifiedDate = new Date();
+    });
+    this.requests.selectedRequest.requestStatus = this.config.REPLIED_REQUEST_CODE;
+    this.requests.selectedRequest.comments = '<div class="well">' + this.customerResponse + '</div><p>' + this.requests.selectedRequest.comments
+    this.requests.selectedRequest.audit.push({
+      property: "Replied to Message",
+      newValue: this.customerResponse,
+      personId: this.userObj._id
+    })
       
-      this.requests.selectedRequest.requestDetailsToSave = new Array();
-      this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
-      this.requests.selectedRequest.requestDetails = new Array();
-      this.requests.selectedRequest.requestDetailsToSave.forEach((item) => {
-          this.requests.selectedRequest.requestDetails.push(item._id);
-      });
-        
-      return true;
-    }
-    return false;
+    this.requests.selectedRequest.requestDetailsToSave = new Array();
+    this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
+    this.requests.selectedRequest.requestDetails = new Array();
+    this.requests.selectedRequest.requestDetailsToSave.forEach((item) => {
+        this.requests.selectedRequest.requestDetails.push(item._id)
+    });
+    return true;
   }
 
   _cleanUp(){
     this.requestSelected = false;
+    this.customeResponse = "";
   }
 
   selectAssignment(assign, index){

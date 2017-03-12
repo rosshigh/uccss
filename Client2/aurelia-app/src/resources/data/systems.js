@@ -146,14 +146,19 @@ export class Systems{
     }
 
     async deleteAllClients(){
-        let serverResponse = await this.data.deleteObject(this.data.DELETE_ALL_CLIENTS.replace('SYSTEMID', this.selectedSystem._id));
-        if(!serverResponse.error){
-            this.systemsArray[this.editIndex].clients = [];
+        if(this.selectedSystem._id){
             this.selectedSystem.clients = new Array();
-        } else {
-                this.data.processError(serverResponse,"Error deleting the clients.<br>")
-            }
-        return serverResponse;
+        //     var serverResponse = await this.data.saveObject(this.selectedSystem, this.data.SYSTEMS_SERVICE, "put");
+        //     if(!serverResponse.error){
+        //         this.systemsArray[this.editIndex].clients = new Array();
+        //     } else {
+        //         this.data.processError(serverResponse,"Error deleting the clients.<br>")
+        //     }
+        //     return serverResponse;
+        // }
+        // return null;
+        }
+
     }
 
     generateClients(start, end, status){
@@ -166,7 +171,7 @@ export class Systems{
         if( start > 0 &&  end > 0 && end > start){
             for(var i = start; i <= end; i += this.config.CLIENT_INTERVAL){
                 if(this._findClient(i, 0, lastClientIndex) < 0){
-                    this.selectedSystem.clients.push({client: i, clientStatus: status, systemId: this.selectedSystem._id,  idsAvailable: this.selectedSystem.idsAvailable})
+                    this.selectedSystem.clients.push(this.emptyClient(i, status));
                 }
             }
             return true;
@@ -177,10 +182,11 @@ export class Systems{
 
     refreshClients(status){
          for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
-            this.selectedSystem.clients[i].clientStatus = status;
-            this.selectedSystem.clients[i].idsAvailable = this.selectedSystem.idsAvailable;
-            this.selectedSystem.clients[i].lastIdAllocated = 0;
-            this.selectedSystem.clients[i].assignments = new Array();
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status);
+            // this.selectedSystem.clients[i].clientStatus = status;
+            // this.selectedSystem.clients[i].idsAvailable = this.selectedSystem.idsAvailable;
+            // this.selectedSystem.clients[i].lastIdAllocated = 0;
+            // this.selectedSystem.clients[i].assignments = new Array();
         }
     }
 
@@ -205,15 +211,29 @@ export class Systems{
       for(var i = 0, x = this.systemsArray.length; i < x; i++){
         if(this.systemsArray[i]._id === systemId){
             this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
-          for(var j = 0; j < this.systemsArray[i].clients.length; j++){
-              if(this.systemsArray[i].clients[j]._id === clientId){
-                  this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
+            for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                if(this.systemsArray[i].clients[j]._id === clientId){
+                    this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
+                    this.clientIndex = j;
                     break;
-              }
-          }  
-          
+                }
+            }  
         }
       }
+    }
+
+    emptyClient(clientNo, status){
+        let obj = new Object();
+        obj.client = clientNo;
+        obj.clientStatus = status;
+        obj.systemId = this.selectedSystem._id;
+        obj.idsAvailable = this.selectedSystem.idsAvailable;
+        obj.assignments = new Array(); 
+        obj.createdDate = new Date();
+        obj.lastIdAssigned = 0;
+        obj.lastFacIdAssigned = 0;
+        obj.firstFacIdAssigned = 0;
+        return obj;
     }
     
     /*****************************************************************************************************
@@ -232,33 +252,28 @@ export class Systems{
         };
     }
 
-    async saveClients(array){
-      if(array){
-        var obj = {clients: array};
-          var serverResponse = await this.data.saveObject(obj, this.data.CLIENTS_SERVICE + '/multiple', "put");
-        }
-    }
+    // async saveClients(array){
+    //   if(array){
+    //     var obj = {clients: array};
+    //       var serverResponse = await this.data.saveObject(obj, this.data.CLIENTS_SERVICE + '/multiple', "put");
+    //     }
+    // }
 
-    async saveClient(){
-        var serverResponse = await this.data.saveObject(this.selectedClient, this.data.CLIENTS_SERVICE, "put");
-        if(!serverResponse.error){
-            this.updateClient(serverResponse);
-            this.selectedSystem.clients[this.clientIndex] = serverResponse;
-        }
-        return serverResponse;
-    }
+    // async saveClient(){
+    //     var serverResponse = await this.data.saveObject(this.selectedClient, this.data.CLIENTS_SERVICE, "put");
+    //     if(!serverResponse.error){
+    //         this.updateClient(serverResponse);
+    //         this.selectedSystem.clients[this.clientIndex] = serverResponse;
+    //     }
+    //     return serverResponse;
+    // }
 
-    async deleteClient(){
-            if(this.selectedClient._id){
-                if(this._okToDeleteClient(this.selectedClient.clientStatus)){
-                    var response = await this.data.deleteObject(this.data.CLIENTS_SERVICE +'/' +  this.selectedClient._id);
-                    if(!response.error) {
-                        this.selectedSystem.clients.splice(this.clientIndex,1);
-                    }
-                    return response;
-                }
+    deleteClient(){
+        if(this.selectedClient._id){
+            if(this._okToDeleteClient(this.selectedClient.clientStatus)){
+                this.selectedSystem.clients.splice(this.clientIndex,1);
             }
-            return {status: "500"};
+        }
     }
 
     _okToDeleteClient(status){

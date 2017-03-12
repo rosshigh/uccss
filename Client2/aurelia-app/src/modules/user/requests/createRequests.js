@@ -70,7 +70,7 @@ export class ViewHelpTickets {
   async activate() {
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
-      this.products.getProductsArray('?order=name'),
+      this.products.getProductsArray('?filter=active|eq|true&order=name'),
       this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS',true),
      
       this.config.getConfig()
@@ -101,6 +101,7 @@ export class ViewHelpTickets {
               let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
               $("#existingRequestInfo").html('').append(existingMsg).fadeIn();
             }
+            this.updateMessages("");
         } else{
             this.setDates(true);
             this.existingRequest = false;
@@ -276,6 +277,9 @@ export class ViewHelpTickets {
         //   let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
         //   $("#existingRequestInfo").append(existingMsg).fadeIn();
         // }
+        break;
+      default:
+        message = "";
     }
     let msg = this.siteInfo.selectMessageByKey(message);
     if(msg){

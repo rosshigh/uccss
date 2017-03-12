@@ -44,7 +44,7 @@
                                     <ul>
                                         <li repeat.for="detail of product.requestDetails" class="list-group-item">
                                             <h5>${detail.productId | productName:products.productsArray}</h5>
-                                             ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}
+                                             Status: ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}
                                              <span class="leftMargin">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</span>
                                         </li>
                                     </ul>

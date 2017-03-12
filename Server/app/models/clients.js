@@ -16,7 +16,9 @@ var ClientsSchema = new Schema({
     studentIDRange: {type: String},
     facultyIDRange: {type: String},
     firstID: { type: Number },
-    lastID: { type: Number }
+    lastID: { type: Number },
+    firstFacID: { type: Number },
+    lastFacID: { type: Number}
   }]
 });
 

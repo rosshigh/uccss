@@ -14,21 +14,27 @@ module.exports = function (app) {
 
   router.get('/api/systems', requireAuth, function(req, res, next){
     logger.log('Get systems',"verbose");
-    var query = buildQuery(req.query, Model.find())
-    query.populate({
-      path: 'clients'
-    //  ,
-    //  populate: {
-    //    path: 'assignments.assignment',
-    //    model : 'ClientRequestDetail' }
+    var query = buildQuery(req.query, Model.find()).exec()
+    .then(result => {
+      res.status(200).json(result)
     })
-    .exec(function(err, object){
-        if (err) {
-          return next(err);
-        } else {
-          res.status(200).json(object);
-        }
-      });
+    .catch(error => {
+      return next(error);
+    })
+    // query.populate({
+    //   path: 'clients'
+    // //  ,
+    // //  populate: {
+    // //    path: 'assignments.assignment',
+    // //    model : 'ClientRequestDetail' }
+    // })
+    // .exec(function(err, object){
+    //     if (err) {
+    //       return next(err);
+    //     } else {
+    //       res.status(200).json(object);
+    //     }
+    //   });
   });
 
   router.get('/api/systems/clients', requireAuth, function(req, res, next){
@@ -120,29 +126,29 @@ module.exports = function (app) {
     logger.log('Update Systems ' + req.body._id, "verbose");
     if(req.body){
       var system = new Model();
-      system._id = req.body._id;
-      system.sid = req.body.sid;
-      system.active = req.body.active;
-      system.description = req.body.description;
-      system.server = req.body.server;
-      system.its = req.body.its;
-      system.terms = req.body.terms;
-      system.productId = req.body.productId;
-      system.idsAvailable = req.body.idsAvailable;
-      system.instance = req.body.instance;
-      system.sessions = req.body.sessions;    
+      // system._id = req.body._id;
+      // system.sid = req.body.sid;
+      // system.active = req.body.active;
+      // system.description = req.body.description;
+      // system.server = req.body.server;
+      // system.its = req.body.its;
+      // system.terms = req.body.terms;
+      // system.productId = req.body.productId;
+      // system.idsAvailable = req.body.idsAvailable;
+      // system.instance = req.body.instance;
+      // system.sessions = req.body.sessions;    
 
-      req.body.clients.forEach(item => {
-        var client = new Client(item);
-        system.clients.push(client._id);
-        Client.findOneAndUpdate({_id: client._id}, client, {upsert: true, new: true}, function(err, client){
-          if(err) {
-            return next(err);
-          }
-        })
-      })
+      // req.body.clients.forEach(item => {
+      //   var client = new Client(item);
+      //   system.clients.push(client._id);
+      //   Client.findOneAndUpdate({_id: client._id}, client, {upsert: true, new: true}, function(err, client){
+      //     if(err) {
+      //       return next(err);
+      //     }
+      //   })
+      // })
 
-      Model.findOneAndUpdate({_id: req.body._id}, system, {safe:true, multi:false}, function(err, result){
+      Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
         if (err) {
           return next(err);
         } else {

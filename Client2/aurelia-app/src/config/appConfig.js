@@ -299,6 +299,7 @@ export class AppConfig {
     SANDBOX_NAME = "Sandbox"
     FIRST_DEFAULT_ID = 1;
     FACULTY_ID_BUFFER = 2;
+    DEFAULT_FACULTY_IDS = 2;
 
     ASSIGNED_REQUEST_CODE = 2;
     UNASSIGNED_REQUEST_CODE = 1;
@@ -306,13 +307,16 @@ export class AppConfig {
     CUSTOMER_ACTION_REQUEST_CODE = 4;
     CANCELLED_REQUEST_CODE = 5;
     PROVISIONAL_REQUEST_CODE = 6;
+    REPLIED_REQUEST_CODE = 7;
 
-    REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned' }, 
-                      { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned' }, 
-                      { code: this.UPDATED_REQUEST_CODE, description: 'Updated' }, 
-                      { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action' },
-                      { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled' },
-                      { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional' }];
+    REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, 
+                      { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: ""  }, 
+                      { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "info"  }, 
+                      { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning"  },
+                      { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: ""  },
+                      { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
+                      { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" }];
+
     
     constructor(http){
         this.http = http;

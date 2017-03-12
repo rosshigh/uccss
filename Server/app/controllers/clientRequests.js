@@ -130,12 +130,10 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest ' + req.body._id);    
-console.log(req.body)      
+    logger.log('Update clientRequest ' + req.body._id);       
     let clientRequest = new Model(req.body);
     // clientRequest.requestDetails = new Array();  
-    let tasks = new Array();
-console.log('SDLKJF:LSKJDF:LSJ')    
+    let tasks = new Array();   
     if(req.body.requestDetailsToSave){
        req.body.requestDetailsToSave.forEach((detail, index) => {
          if(detail._id){
@@ -197,34 +195,78 @@ console.log('SDLKJF:LSKJDF:LSJ')
   });
 
   router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){
-    if(req.body.customerMessage){
-      ClientRequestDetail.findById(req.body.id, function(err, request){
-        request.customerMessage = req.body.customerMessage;
-        request.requestStatus = req.body.requestStatus;
-        if(req.body.audit) request.audit.push(req.body.audit);
-        request.save(function(err, request){
-          if(err) {
-            return next(err);
-          } else {
-            var obj = {
-              email: req.body.toEmail,
-              context: {
-                requestNo: request.requestNo,
-                product: req.body.product,
-                session: req.body.session,
-                customerMessage: req.body.customerMessage
-              }
-            };
-            customerAction(obj)
-             .then(result => {
-                res.status(200).json(object);
+    if(req.body.customerMessage){    
+      if(req.body.model === 'header'){
+        Model.findById(req.body.id, function(err, request){      
+          request.customerMessage = req.body.customerMessage;
+          request.requestStatus = req.body.requestStatus;
+          request.requestDetails.forEach(item => {   
+            ClientRequestDetail.findById(item).exec()
+              .then(detail => {                
+                if(detail.requestStatus != "2") {
+                  detail.requestStatus = "4";                          
+                  detail.save();
+                }
               })
-              .catch(error => {
-                  return next(error);
-              });
-          }
+          })
+          if(req.body.audit) request.audit.push(req.body.audit);
+          request.save(function(err, request){
+            if(err) {
+              return next(err);
+            } else {
+              var obj = {
+                email: req.body.toEmail,
+                subject: req.body.subject,
+                context: {
+                  requestNo: req.body.clientRequestNo,
+                  course: req.body.course,
+                  session: req.body.session,
+                  customerMessage: req.body.customerMessage
+                }
+              };
+              customerAction(obj)
+              .then(result => {
+                  res.status(200).json(result);
+                })
+                .catch(error => {           
+                    return next(error);
+                });
+            }
+          })
         })
-      })
+      } else {
+          ClientRequestDetail.findById(req.body.id, function(err, request){                 
+            request.customerMessage = req.body.customerMessage;     
+            request.requestStatus = req.body.requestStatus;          
+            if(req.body.audit) request.audit.push(req.body.audit);
+            request.save(function(err, request){
+              if(err) {
+                return next(err);
+              } else {
+                var obj = {
+                  email: req.body.toEmail,
+                  subject: req.body.subject,
+                  context: {
+                    requestNo: req.body.clientRequestNo,
+                    product: req.body.product,
+                    course: req.body.course,
+                    session: req.body.session,
+                    customerMessage: req.body.customerMessage
+                  }
+                };
+                customerAction(obj)
+                .then(result => {
+                    res.status(200).json(result);
+                  })
+                  .catch(error => {           
+                      return next(error);
+                  });
+              }
+            })
+          })
+      }
+    } else {
+      res.status(404).json({message: "No Message"});
     }
   });
 

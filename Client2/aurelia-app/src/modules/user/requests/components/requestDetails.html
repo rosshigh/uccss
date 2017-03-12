@@ -3,75 +3,42 @@
 		<div class="col-lg-12">
 			<div class="panel panel-default topMargin">
 				<div class="panel-body leftJustify">
-					<div class="form-group bottomMargin" show.bind="requests.selectedRequestDetail.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE">
+					<div class="form-group bottomMargin" show.bind="customerActionRequired">
 						<label for="message" class="control-label">The UCC staff has asked you to provide additional information</label>
-						<textarea readonly class="col-lg-12" id="message" innerhtml.bind="requests.selectedRequestDetail.customerMessage" class="form-control"
+						<textarea readonly class="col-lg-12" id="message" innerhtml.bind="customerMessage" class="form-control"
 							rows="10"></textarea>
 						<h5>Enter your response in the comments box below and click save</h5>
-						<editor value.bind="requests.selectedRequest.comments" height="250"></editor>	
+						<editor value.bind="customerResponse" height="250"></editor>	
 					</div>
-					<form class="form-horizontal topMargin">
+					<div show.bind="showDetails" class="form-horizontal topMargin">
 						<h4>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h4>
 						<h5>Course: ${requests.selectedRequest.courseId | courseName:people.coursesArray}</h5>
 						<div class="topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">
 							<div class="row">
 								<div class="col-lg-5 leftMargin">
-									<!--<div class="form-group">-->
-										<h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>
-										<!--
-										<div class="col-sm-8">
-											<input disabled.bind="showLockMessage" value.bind="requests.selectedRequest.undergradIds" id="editAddUnder" class="form-control input-sm"  type="number"/>
-										</div>
-										-->
-									<!--	</div> -->
+									<h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>
 								</div>
 								<div class="col-lg-5">
-									<!--	<div class="form-group"> -->
-										<h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>
-										<!--
-										<div class="col-sm-8">
-											<input disabled.bind="showLockMessage"  disabled.bind="showLockMessage" value.bind="requests.selectedRequest.graduateIds" type="number" id="editAddGrad" class="form-control input-sm"  />
-										</div>
-										-->
-									<!--	</div> -->
+									<h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>
 								</div>
 							</div> 
 						</div>
 						<div class="row">
 							<div class="col-lg-5 leftMargin">
-								<!--	<div class="form-group topMargin"> -->
-									<div>
-									<h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
-									<!--
-									<date-picker id="editStartDate" disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)"
-										startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
-									-->
-									<!--	</div> -->
-								</div>
+								<h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
 							</div>
 							<div class="col-lg-5">
-								<!--	<div class="form-group topMargin"> -->
-									<div >
-										<h5>End Date: <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
-										<!--
-									<date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate" startdate.bind="minEndDate"
-										enddate.bind="maxEndDate" controlid="endDate"></date-picker>
-										-->
-									<!--	</div> -->
-								</div>
+								<h5>End Date: <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
 							</div>
 						</div>
-						<!--
-						<div class="topMargin">
-							<label show.bind="requests.selectedRequest.comments">Comment</label>
-								<div innerhtml.bind="requests.selectedRequest.comments"></div>		
-						</div>
-						-->
-						
-							
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	<div show.bind="products.selectedProduct.productInfo" class="panel panel-primary topMargin">
+		<div class="panel-heading">Product Information</div>
+		<div class="panel-body" innerhtml.bind="products.selectedProduct.productInfo"></div>
+	</div>
+
 </template>

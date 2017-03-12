@@ -68,6 +68,7 @@
 				</a>
     </div>
   </div>
+  <div show.bind="sessionSelected" class="topMargin col-lg-4 leftMargin"><h4>Session: ${sessions.selectedSession.session} - ${sessions.selectedSession.year}</h4></div> 
   <div show.bind="sandBoxClient" class="topMargin col-lg-4 leftMargin"><h4>Course: ${config.SANDBOX_NAME}</h4></div> 
   <div show.bind="courseSelected" class="topMargin col-lg-4 leftMargin"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> 
   <div show.bind="sandBoxClient || courseSelected" class="topMargin col-lg-4 leftMargin" style="display: none;" id="existingRequestInfo"></div>

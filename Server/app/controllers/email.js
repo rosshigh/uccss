@@ -263,13 +263,13 @@ if(env === 'development'){
     return new Promise(function(resolve, reject) {
       mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
-      mailObject.subject = 'Customer Action Required'; 
+      mailObject.subject = mailObject.subject; 
       sendGrid(mailObject)
           .then(result => {
-console.log(result)               
+            
               if (result.statusCode === 202) {     
                 resolve(result);
-              } else {
+              } else {                  
                 reject(Error(result));
               }
           })

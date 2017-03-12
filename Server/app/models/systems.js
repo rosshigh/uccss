@@ -11,14 +11,14 @@ var SystemSchema = new Schema({
   sessions: [{ type: String }],
   productId: [{ type: Schema.Types.ObjectId }],
   idsAvailable: { type: Number },
-  clients: [ { type: Schema.Types.ObjectId, ref: 'Client' } ],
+  clients: ['Client'],
+  // clients: [ { type: Schema.Types.ObjectId, ref: 'Client' } ],
   active: { type: Boolean, default: true},
   dateModified: { type: Date }
 });
 
 SystemSchema.pre('save', function(next){
   var system = this;
-  console.log(system.productId)
   if(!system.productId){
     system.productId = null;
     next();

@@ -228,13 +228,20 @@ export class DataTable{
                     condition += "['" + properties[j] + "']";
                   }
                 }
-                keep = eval(condition) === filters[i].value;
+                if(filters[i].value.indexOf('NOT') === -1){
+                  keep = eval(condition) === filters[i].value;
+                } else {
+                  let thisValue = filters[i].value.substring(3);
+                  keep = eval(condition) !== thisValue;
+                }
                 break
               case "boolean":
                 keep = eval(filters[i].value) === eval(item[filters[i].property]);
                 break;
+              case "not":
+                break;
               default:
-                // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId" compare="obj" ref="ownerFilter">
+                // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId"  ref="ownerFilter">
                 keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
             }
             break;
@@ -270,11 +277,30 @@ export class DataTable{
               case 'lookup':
                 // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
                 var arrayToLookup = filters[i].property.split('-');
-                let value = this.lookup(item[arrayToLookup[0]], arrayToLookup[1], lookupArray);
+                var properties = arrayToLookup[0].split('.');
+                var condition = "item"
+                for(var j = 0; j<properties.length; j++){
+                  if(properties[j].indexOf('[') > -1 ) {
+                    condition += properties[j];
+                  } else {
+                    condition += "['" + properties[j] + "']";
+                  }
+                }
+                let value = this.lookup(eval(condition), arrayToLookup[1], lookupArray);
                 if(value){
                    keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                 }
                 break;
+              // case 'lookup-deep':
+              //   // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+              //   //Used when the property to lookup is in an object of the item
+              //   var arrayToLookup = filters[i].property.split('-');
+              //   var depth = arrayToLookup[0].split('.');
+              //   let deepValue = this.lookup(item[depth[0]][depth[1]], arrayToLookup[1], lookupArray);
+              //   if(deepValue){
+              //     keep = deepValue.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+              //   }
+              //   break;
               case 'lookup-array-item':
                 //<input input.delegate="dataTable.filterList($event, people.peopleArray)" id="owner-fullName-0-personId" type="text" compare="lookup-array-item" class="form-control" ref="ownerFilter"/>
                 var array = filters[i].property.split('-');
@@ -294,6 +320,8 @@ export class DataTable{
                 }
                 break;
               case 'not':
+                let propValue = isNaN(item[filters[i].property]) ? item[filters[i].property] : item[filters[i].property].toString();
+                let filterValue = isNaN(filters[i].value) ? filters[i].value : filters[i].value.toString();
                 if(filters[i].property.indexOf('.') > -1){
                     var properties = filters[i].property.split('.')
                     var condition = "item"
@@ -301,8 +329,10 @@ export class DataTable{
                       condition += "['" + properties[j] + "']"
                     }
                     keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
+                    //  keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
                   } else {
-                    keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
+                     keep = propValue.toUpperCase().indexOf(filterValue.toUpperCase()) === -1;
+                    // keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
                   }
                  break;
               case 'not-number':

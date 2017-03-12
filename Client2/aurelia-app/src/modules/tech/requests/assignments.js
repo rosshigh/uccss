@@ -21,6 +21,7 @@ export class Assignments {
     roundTo10 = false;
     showAudit = false;
     lastIDidsRemaining = -1;
+    isChecked = false;
 
     navControl = "requestsNavButtons";
     spinnerHTML = "";
@@ -58,6 +59,7 @@ export class Assignments {
             this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
+        this.people.getCoursesArray();
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
         this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
@@ -69,7 +71,8 @@ export class Assignments {
             this.sessions.selectSessionById(this.selectedSession);
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
-                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                this.filterInAssigned();
+                // this.dataTable.updateArray(this.requests.requestsDetailsArray);
             } else {
                 this.displayArray = new Array();
             }
@@ -84,6 +87,17 @@ export class Assignments {
         this.spinnerHTML = "";
     }
 
+
+    clearFilters(){
+        $(this.courseFilter).val("");
+        $(this.requestStatus).val("");
+        $(this.productFilter).val("");
+        $(this.nameFilter).val("");
+        $(this.nickNameFilter).val("");
+        this.filterInAssigned();
+        // this.dataTable.updateArray(this.requests.requestsDetailsArray);
+    }
+
     // /*****************************************************************************************************
     //  * User selected a requests table
     //  * index - index of the item selected
@@ -94,16 +108,19 @@ export class Assignments {
         //Initiate temp arrays to hold selected clients and assignment details
         this.proposedClient = new Array();
         this.assignmentDetails = new Array();
+        this.profileRequest = undefined;
         
         //Initiate interface flags
         this.enableButton = false;
         this.requestSelected = true;
 
         //Retrieve relevant data
-         this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
         this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
         this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+
+        this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
         this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
         
@@ -112,6 +129,8 @@ export class Assignments {
         }
         
         this.clientRequired();
+
+        this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -198,13 +217,28 @@ export class Assignments {
             }
             
             //Make sure the client hasn't already been selected
-            if(this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client._id) > -1) return;
+            let alreadySelected = false;
+            this.assignmentDetails.forEach(item => {
+                if(item.systemId === client.systemId && item.client === client.client) alreadySelected = true;
+            })
+            // if(this.utils.arrayContainsValue(this.assignmentDetails, 'clientId', client.client) > -1) return;
+            if(alreadySelected) return;
 
             //Save the client so we can update it
             this.proposedClient.push(client);
 
+            if(client.assignments.length > 0){
+                 let maxId = 0;
+                client.assignments.forEach(item => {
+                    if(item.lastID > maxId) maxId = item.lastID;
+                });
+                this.firstID = maxId + parseInt(this.idBuffer);
+            }
+
             //Save the first id 
             this.lastFirstID = this.firstID;
+            this.firstNumericFacID = client.lastFacIdAssigned == 0 ? parseInt(client.lastFacIdAssigned) : parseInt(client.lastFacIdAssigned) + parseInt(this.config.FACULTY_ID_BUFFER);
+            this.lastNumericFacID =  this.firstNumericFacID + this.config.DEFAULT_FACULTY_IDS;
             
             this.calcLastID();
             
@@ -213,10 +247,12 @@ export class Assignments {
                 staffId : this.userObj._id, 
                 // assignedDate : new Date(),
                 client : client.client,
-                clientId : client._id,
+                // client : client._id,
                 systemId : client.systemId,
                 firstID: this.firstID,
                 lastID : this.lastID,
+                firstFacID: this.firstNumericFacID,
+                lastFacID: this.lastNumericFacID,
                 idsAssigned : parseInt(this.lastID) - parseInt(this.firstID)
             });
             this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
@@ -493,7 +529,7 @@ export class Assignments {
             this.selectedAssignedClient = "";
             if (this.selectedRow) this.selectedRow.children().removeClass('info');
         } else {
-            this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].clientId;
+            this.selectedAssignedClient = this.assignmentDetails[this.assignmentDetailIndex].client;
 
             //UPdate the firstID and lastID fileds with the assignment firstID and lastID
             this.firstID = this.assignmentDetails[this.assignmentDetailIndex].firstID;
@@ -586,13 +622,13 @@ export class Assignments {
         if (this.validation.validate(1, this)) {
             if(this._buildRequest()){
                 this.requests.setSelectedRequest(this.requestToSave);
-                let serverResponse = await this.requests.saveRequest();
+                let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE;
+                let serverResponse = await this.requests.saveRequest(email);
                 if (!serverResponse.status) {
-                    this.utils.showNotification("The request was updated", "", "", "", "", 5);
-                    await this.systems.saveClients(this.proposedClient);
+                    this.utils.showNotification("The request was updated");
+                    await this.systems.saveSystem();
                     this._cleanUp();
                 }
-
             }
         }
     }
@@ -607,7 +643,7 @@ export class Assignments {
                 for(var j = 0; j < this.proposedClient.length; j++){
                     var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
                     var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                    if(this.assignmentDetails[i].clientId == this.proposedClient[j]._id){
+                    if(this.assignmentDetails[i].client == this.proposedClient[j].client){
                         //If this isn't a new assignment
                         if(this.assignmentDetails[i].assignedDate){
                             //If there are more than one assignment, make the client shared
@@ -620,6 +656,8 @@ export class Assignments {
                                     this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
                                     this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                     this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                    // this.proposedClient[j].assignments[k].firstFacID = this.assignmentDetails[i].firstFacID;
+                                    // this.proposedClient[j].assignments[k].lastFacID = this.assignmentDetails[i].lastFacID;
                                     this.systems.updateClient(this.proposedClient[j]);
                                 }
                             }
@@ -770,46 +808,133 @@ export class Assignments {
         localStorage.setItem('roundTo10', this.roundTo10);
     }
 
-    customerAction(){
-        this.message = {
-            customerMessage: ""
-        }
-
-        this.customerMessage = true;
-        $("#customerMessage").focus();
+    customerActionDialog(){
+         if(this.profileRequest){
+             this.model = 'header';
+             this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
+             this.requestId = this.profileRequest.requestId._id;
+             this.course = this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
+             this.productName = undefined;
+             this.hideProfile();
+         } else {
+            this.model = 'detail';
+            this.requestId =  this.requests.selectedRequestDetail._id;
+            this.productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+            this.selectedRequestNo = this.requests.selectedRequestDetail.requestId.clientRequestNo;
+            this.course = this.utils.lookupValue(this.requests.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
+         }  
+            
+        let subject = "Question about product request " +  this.selectedRequestNo;
+        let email = {emailBody: "", emailSubject: subject, emailId: this.requestId};
+        return this.dialog.showEmail(
+                "Enter Email",
+                email,
+                ['Submit', 'Cancel']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.sendTheEmail(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
     }
 
-    async sendCustomerAction(){
-        var msg = $("#customerMessage").val();
-        if(msg){
-            var productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+    async sendTheEmail(email){
+        if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
+        if(email){
+            this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+            this.filterInAssigned();
             this.message = {
-                id: this.requests.selectedRequest._id,
-                customerMessage : msg,
-                requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                id: this.requestId,
+                customerMessage : email.email.emailBody,
                 toEmail: this.people.selectedPerson.email,
-                product:  productName,
+                subject: email.email.emailSubject,
+                clientRequestNo: this.selectedRequestNo,
+                product: this.productName,
                 session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
-                from: "UCC",
+                course: this.course,
+                requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                model: this.model,
                 audit: {
                     property: 'Send Message',
                     eventDate: new Date(),
-                    oldValue: this.customerMessageText,
+                    newValue: email.email.emailBody,
                     personId: this.userObj._id
                 }
             };     
             let serverResponse = await this.requests.sendCustomerMessage(this.message);
             if (!serverResponse.error) {
-                // this.email.sendMail('CLIENT_REQUEST_CUSTOMER_ACTION', {id: });
                 this.utils.showNotification("The message was sent");
-                this._cleanUp();
             }
         } 
     }
 
-    cancelCustomerAction(){
-        this.customerMessage = false;
+    showProfile(request, el){
+        this.profileRequest = request;
+        this.people.selectedPersonFromId(request.requestId.personId);
+        $(".hoverProfile").css("top", el.clientY - 175);
+        $(".hoverProfile").css("left", el.clientX - 300);
+        $(".hoverProfile").css("display", "block");
     }
+
+    hideProfile(){
+        $(".hoverProfile").css("display", "none");
+    }
+
+    showComment(request, el) {
+        if(request.requestStatus == this.config.REPLIED_REQUEST_CODE){
+            this.commentShown = request.requestId.comments;
+            $(".hover").css("top", el.clientY - 200);
+            $(".hover").css("left", el.clientX - 10);
+            $(".hover").css("display", "block");
+        }
+    }
+
+    hideComment() {
+            $(".hover").css("display", "none");
+    }
+
+    // customerAction(){
+    //     this.message = {
+    //         customerMessage: ""
+    //     }
+
+    //     this.customerMessage = true;
+    //     $("#customerMessage").focus();
+    // }
+
+    // async sendCustomerAction(){
+    //     var msg = $("#customerMessage").val();
+    //     if(msg){
+    //         var productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+    //         this.message = {
+    //             id: this.requests.selectedRequestDetail.requestId._id,
+    //             customerMessage : msg,
+    //             requestNo: this.requests.selectedRequestDetail.requestNo,
+    //             requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+    //             toEmail: this.people.selectedPerson.email,
+    //             product:  productName,
+    //             session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+    //             from: "UCC",
+    //             audit: {
+    //                 property: 'Send Message',
+    //                 eventDate: new Date(),
+    //                 oldValue: this.customerMessageText,
+    //                 personId: this.userObj._id
+    //             }
+    //         };     
+    //         let serverResponse = await this.requests.sendCustomerMessage(this.message);
+    //         if (!serverResponse.error) {
+    //             // this.email.sendMail('CLIENT_REQUEST_CUSTOMER_ACTION', {id: });
+    //             this.utils.showNotification("The message was sent");
+    //             this._cleanUp();
+    //         }
+    //     } 
+    // }
+
+    // cancelCustomerAction(){
+    //     this.customerMessage = false;
+    // }
     
     openSettings(){
         this.showSettings = ! this.showSettings;
@@ -850,4 +975,17 @@ export class Assignments {
     openAudit(){
         this.showAudit = !this.showAudit;
     }
+
+    filterInAssigned() {
+        if (!this.isChecked) {
+            this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
+            var filterValues = new Array();
+            filterValues.push({ property: "requestStatus", value: this.config.ASSIGNED_REQUEST_CODE.toString(), type: 'text', compare: 'not' });
+            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+        } else {
+             this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
+            // this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
+        }
+    }
+
 }

@@ -23,7 +23,7 @@ module.exports = Mongoose.model('Course', CourseSchema);
 
 var AssignmentSchema = new Schema({
   systemId: { type: Schema.Types.ObjectId },
-  clientId: { type: Schema.Types.ObjectId },
+  client: { type: Number },
   studentUserIds: { type: String },
   studentPassword: { type: String },
   facultyUserIds: { type: String },
@@ -58,6 +58,7 @@ var ClientRequestDetailsSchema = new Schema({
   }],
   assignments: ['Assignment'],
   techComments: { type: String },
+  customerMessage: { type: String },
   audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },
@@ -93,12 +94,7 @@ var ClientRequestSchema = new Schema({
   modifiedDate: { type: Date },
   requestDetails: [ { type: Schema.Types.ObjectId, ref: 'ClientRequestDetail' } ],
   institutionId: { type: Schema.Types.ObjectId },
-  customerMessage: [{ 
-    message: { type: String },
-    personId:  { type: Schema.Types.ObjectId },
-    from: { type: String },
-    date: { type: Date, default Date.now }
-  }],
+  customerMessage: { type: String },
   audit: [{
     property: { type: String, default: 'Created' },
     eventDate: { type: Date, default: Date.now },

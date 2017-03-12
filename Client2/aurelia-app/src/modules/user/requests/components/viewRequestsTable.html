@@ -29,26 +29,28 @@
                   Session <span click.trigger="dataTable.sortArray('sessionId','id',sessions.sessionsArray,'_id','startDate')"><i class="fa fa-sort"></i></span><br>
                 </th>
                 <th>
-                  Details
+                  Product Requests (Click to see the details)
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr repeat.for="request of dataTable.displayArray">
-                <td data-title="Course">
-                  <h5>${request.courseId | courseName:people.coursesArray}
-                    <h5>
-                      <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>
+              <tr  repeat.for="request of dataTable.displayArray">
+                <td click.delegate="customerActionResponse(request, $event)" data-title="Course">
+                  <h5>${request.courseId | courseName:people.coursesArray}</h5>
+                  <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>
+                  <h7>Request No: ${request.clientRequestNo}</h7>
+                  <h6 show.bind="request.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h6>
                 </td>
                 <td data-title="Session">
                   <h5>${request.sessionId | sessionName:sessions.sessionsArray}</h5>
                 </td>
                 <td>
                   <ul>
-                    <li class="${statusClass[detail.requestStatus]} list-group-item" click.delegate="edit(detail, $event, $index)" repeat.for="detail of request.requestDetails" >
+                    <li class="${detail.requestStatus | requestStatusClass:statusClass:request:config.CUSTOMER_ACTION_REQUEST_CODE} list-group-item" click.delegate="edit(detail, $event, $index)" repeat.for="detail of request.requestDetails" >
                       <h5>${detail.productId | productName:products.productsArray}</h5>
-                      ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}
-                      <span class="leftMargin">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</span>
+                      Status: ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}
+                      <h7 class="leftMargin">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h7>
+                      <h7 class="pull-right" show.bind="detail.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE && request.requestStatus != config.CUSTOMER_ACTION_REQUEST_CODE" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h7>
                     </li>
                   </ul>
                 </td>

@@ -1,5 +1,8 @@
-This is a message from your UCC concerning client request: {{requestNo}}  for product
-{{product}} in session {{session}}.
+This is a message from your UCC concerning product request: {{requestNo}}  
+ {{#if product}}
+    for product {{product}}
+  {{/if}}
+ in session {{session}} for course {{course}}.
 
 <h2>MESSAGE</h2>
 {{customerMessage}}

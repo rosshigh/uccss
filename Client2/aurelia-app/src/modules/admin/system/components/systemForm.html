@@ -106,76 +106,80 @@
                 </div>
             </div>
              <div class=" col-lg-6 topMargin">
+<!--
                 <div if.bind="interfaceUpdate" class="col-sm-12 col-lg-12">
                     <edit-client client-obj.bind="systems.selectedClient" show-session-select.bind=true sid.bind="systems.selectedSystem.sid"
                     show-form.two-way="interfaceUpdate" session-array.bind="sessions.sessionsArray" action1.call="deleteClient()"
                     action2.call="saveClient()">
                     </edit-client>
                 </div>
-
-                <div show.bind="!interfaceUpdate">
-                    <div class="row">
-                        <div class="bottomMargin list-group-item col-sm-9">
-                            <span click.delegate="generateClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Clients"><i class="fa fa-plus fa-lg fa-border" aria-hidden="true"></i></span>
-                            <span click.delegate="refreshClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh Clients"><i class="fa fa-refresh fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-                            <span click.delegate="deleteClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Clients"><i class="fa fa-trash-o fa-lg fa-border text-danger" aria-hidden="true"></i></span>
-                        </div>  
+-->
+                <div class="row">
+                    <div class="bottomMargin list-group-item col-sm-9">
+                            <span click.delegate="editClientsButton()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit Client List"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span>
                     </div>
-                    
-                    <div class="row topMargin bottomMargin">
-                        <div class="form-group col-sm-2 ">
-                            <input value.bind="editFirstClient" style="width:75px;margin-right:10px;" id="editFirstClient" placeholder="Start" class="form-control input-sm"
-                            type="number" />
-                        </div>
-                        <div class="form-group col-sm-2 ">
-                            <input value.bind="editLastClient" style="width:75px;margin-right:10px;" id="editLastClient" placeholder="End" class="form-control input-sm"
-                            type="number" />
-                        </div>
-                        <div class="form-group col-sm-2 ">
-                            <input value.bind="systems.selectedSystem.idsAvailable" style="width:75px;margin-right:10px;" id="editClientIdsAvailable"
-                            placeholder="IDS Available" class="form-control input-sm" type="number" />
-                        </div>
-                        <div class="fom-group col-sm-3 ">
-                            <select value.bind="editClientStatus" class="form-control" data-title="Single Select" data-style="btn-default btn-block"
-                            data-menu-style="dropdown-blue">
-                                <option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">${status.description}
-                                    <option>
-                            </select>
-                        </div>
-                         <h6 class="col-lg-12">Client interval: ${config.CLIENT_INTERVAL}</h6>
-                    </div>
-
-                        <div show.bind="systems.selectedSystem.clients.length > 0" class=" col-sm-9">
-                                                <div class="fom-group col-sm-3 ">
-                       
-                    </div>
-                            <div class="panel panel-default" >
-                                <div class="panel-body">
-                                    <table class="table" style="display: block;height: 400px;overflow-y: scroll;width: 500px;">
-                                        <thead>
-                                            <tr>
-                                                <th style="width:150px;">Client</th>
-                                                <th style="width:200px;">Status</th>
-                                                <th style="width:200px;">IDS Available</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr click.trigger="editAClient(client, $index, $event)" repeat.for="client of systems.selectedSystem.clients | sortArray:'client':'ASC'">
-                                                <td>${client.client}</td>
-                                                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>
-                                                <td>${client.idsAvailable}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                </div>
+                <div class="row">
+                    <div show.bind="editClients" class="panel panel-default editPanel topMargin col-sm-9" >
+                        <div class="panel-body">
+                            <div class="topMargin leftmargin">
+                                <div class="row">
+                                    <div class="bottomMargin list-group-item leftMargin rightMargin">
+                                        <span click.delegate="generateClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Clients"><i class="fa fa-plus fa-lg fa-border" aria-hidden="true"></i></span>
+                                        <span click.delegate="refreshClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh Clients"><i class="fa fa-refresh fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+                                        <span click.delegate="deleteClients()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Clients"><i class="fa fa-trash-o fa-lg fa-border text-danger" aria-hidden="true"></i></span>
+                                    </div>  
+                                </div>
+                        
+                                <div class="row topMargin bottomMargin">
+                                    <div class="form-group col-sm-2 ">
+                                        <input value.bind="editFirstClient" style="width:75px;margin-right:10px;" id="editFirstClient" placeholder="Start" class="form-control input-sm"
+                                        type="number" />
+                                    </div>
+                                    <div class="form-group col-sm-2 ">
+                                        <input value.bind="editLastClient" style="width:75px;margin-right:10px;" id="editLastClient" placeholder="End" class="form-control input-sm"
+                                        type="number" />
+                                    </div>
+                                    <div class="form-group col-sm-2 ">
+                                        <input value.bind="systems.selectedSystem.idsAvailable" style="width:75px;margin-right:10px;" id="editClientIdsAvailable"
+                                        placeholder="IDS Available" class="form-control input-sm" type="number" />
+                                    </div>
+                                    <div class="fom-group col-sm-3 ">
+                                        <select value.bind="editClientStatus" class="form-control" data-title="Single Select" data-style="btn-default btn-block"
+                                        data-menu-style="dropdown-blue">
+                                            <option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">${status.description}
+                                                <option>
+                                        </select>
+                                    </div>
+                                    <h6 class="col-lg-12">Client interval: ${config.CLIENT_INTERVAL}</h6>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-             </div>
-        </div>
-
-
+               
+                <div show.bind="systems.selectedSystem.clients.length > 0" class="col-sm-9">
+                    <div class="panel panel-default topMargin" >
+                        <div class="panel-body">
+                            <ul>
+                                <li class="list-group-item" repeat.for="client of systems.selectedSystem.clients | sortArray:'client':'ASC'">
+                                    <div class="row">
+                                        <span class="col-sm-8">
+                                            <h5>Client ${client.client} </h5>
+                                            <h6>IDs: ${client.idsAvailable}</h6>
+                                            <h6>Status: ${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</h6>
+                                        </span>
+                                        <span class="col-sm-4">
+                                            <span click.delegate="refreshClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh Client"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                                            <span click.delegate="toggleSandBox($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Toggle Sandbox"><i class="fa fa-users" aria-hidden="true"></i></span>
+                                            <span click.delegate="deleteClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete Client"><i class="fa fa-trash" aria-hidden="true"></i></span>
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 </template>

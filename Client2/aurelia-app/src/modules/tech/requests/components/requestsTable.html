@@ -1,8 +1,31 @@
 <template>
+   <div class="hover" innerhtml.bind="commentShown"></div>
+    <div class="hoverProfile" >
+      <span  click.delegate="hideProfile()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o" aria-hidden="true"></i></span>
+      <span  click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
+      <hr/>
+      <div class="col-md-4">
+        <div style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
+      </div>
+      <div class="col-md-8">
+        <h5>Nickname: ${people.selectedPerson.nickName}</h5>
+        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>
+        <h5>Mobile: ${people.selectedPersonmobile | formatPhone}</h5>
+      </div>
+  </div>
   <div class="col-lg-10 col-lg-offset-1">
     <div class='row'>
       <table id="requestsTable" class="table table-striped table-hover">
         <thead>
+          <tr>
+            <td colspan='6'>
+                <div class="checkbox">
+                    <label>
+                        <input checked.bind="isChecked" change.trigger="filterInAssigned()" type="checkbox"> Show assigned requests
+                    </label>
+                </div>
+            </td>
+          </tr>
           <tr>
             <td colspan='9'>
               <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
@@ -10,7 +33,8 @@
           </tr>
           <tr>
             <td colspan='9'>
-              <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+              <span click.delegate="refresh()"class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+              <span click.delegate="clearFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
               <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
             </td>
           </tr>
@@ -30,50 +54,52 @@
           <tr>
             <th></th>
             <th>
-              <input change.delegate="dataTable.filterList($event)" id="requiredDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              <input change.delegate="dataTable.filterList($event)" id="requiredDate" type="date" compare="after" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
             </th>
             <th>
-              <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" compare="after" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
             </th>
             <th>
-              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestId.courseId" compare="obj">
-                   <option value=""></option>
-                   <option  value="${config.SANDBOX_ID}">Sandbox</option>
-                   <option  value="">Regular</option>
-                 </select>
+              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestId.courseId" compare="obj" ref="courseFilter">
+                <option value=""></option>
+                <option  value="${config.SANDBOX_ID}">Sandbox</option>
+                <option  value="NOT${config.SANDBOX_ID}">Regular</option>
+              </select>
             </th>
             <th>
-              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestStatus">
+              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestStatus" ref="requestStatus">
                    <option value=""></option>
                    <option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
                  </select>
             </th>
             <th></th>
             <th>
+              <input input.delegate="dataTable.filterList($event, products.productsArray)" id="productId-name" type="text" compare="lookup" class="form-control" ref="productFilter"/>
+              <!--
               <select change.delegate="dataTable.filterList($event)" class="form-control " id="productId" type="id" compare="id">
                    <option value=""></option>
                    <option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
               </select>
+              -->
             </th>
             <th>
-              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup"
-                class="form-control" />
+              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
             </th>
             <th>
-              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-nickName" type="text" compare="lookup"
-                class="form-control" />
+              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-nickName" type="text" compare="lookup" class="form-control" ref="nickNameFilter"/>
             </th>
           </tr>
-          <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of dataTable.displayArray">
-            <td data-title="requestNo">${request.requestNo}</td>
-            <td data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
-            <td data-title="status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
-            <td data-title="ids-requested">${request.requestId | idsRequested}
-              <td data-title="product">${request.productId | productName:products.productsArray}</td>
-              <td data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
-              <td data-title="Nickname">${request.requestId.personId | personProperty:people.peopleArray:"nickName"}</td>
+          <tr repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
+            <td  mouseover.delegate="showComment(request, $event)" mouseout.delegate="hideComment()"  click.trigger="selectRequest($index, $event, request)" data-title="status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="product">${request.productId | productName:products.productsArray}</td>
+            <td  class="dropbtn" click.delegate="showProfile(request, $event)"  data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
+            <td  click.trigger="selectRequest($index, $event, request)" data-title="Nickname">${request.requestId.personId | personProperty:people.peopleArray:"nickName"}</td>
+
           </tr>
         </tbody>
       </table>

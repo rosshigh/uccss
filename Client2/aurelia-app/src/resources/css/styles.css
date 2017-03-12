@@ -8,6 +8,10 @@
     background-color: LightSkyBlue;
 }
 
+.editPanel {
+    background-color: ghostwhite;
+}
+
 span i {
     cursor: pointer;
 }
