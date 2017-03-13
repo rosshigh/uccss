@@ -27,6 +27,7 @@ export class ViewHelpTickets {
   showLockMessage = false;
   showInfoBox = true;
   spinnerHTML="";
+  sessionId = -1;
   courseId = -1;
   requestType = -1;
 
@@ -77,10 +78,16 @@ export class ViewHelpTickets {
     ]);
     
     this.people.getPeopleArray();
-     this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' );
+    this.people.getCoursesArray(true, '?filter=personId|eq|' + this.userObj._id +'&order=number' );
     this.requests.selectRequest()
     this.filterList();
     this._setUpValidation();
+    this.getMessages();
+  }
+
+  getMessages(){
+    this.CLIENT_REQUEST_START = this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START');
+    this.SESSION_SELECTED = this.siteInfo.selectMessageByKey('SESSION_SELECTED');
   }
 
   async getRequests(){
@@ -95,25 +102,23 @@ export class ViewHelpTickets {
             await this._lock();
             this.ILockedIt = true;
             this.existingRequest = true;
-            // this.updateMessages("EXISTING_REQUEST_MESSAGE");
             if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
-              let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
+              let dateFoo = moment(new Date(this.requests.selectedRequest.requestDetails[0].dateCreated)).format(this.config.DATE_FORMAT_TABLE);
               let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
               $("#existingRequestInfo").html('').append(existingMsg).fadeIn();
+            } else {
+              $("#existingRequestInfo").empty().hide();
             }
-            this.updateMessages("");
         } else{
+           $("#existingRequestInfo").empty().hide();
             this.setDates(true);
             this.existingRequest = false;
-            this.updateMessages(false);
             this.requests.selectRequest();
             this.requests.selectedRequest.sessionId = this.sessionId;
         }
         
     } else {
       this.existingRequest = false;
-      let msg = this.sessionSelected ? "SESSION_SELECTED" : "CLIENT_REQUEST_START"
-      this.updateMessages(msg);
     }
   }
 
@@ -146,7 +151,6 @@ export class ViewHelpTickets {
 
   deactivate(){
     this._unLock();
-    this.updateMessages("CLIENT_REQUEST_START");
   }
 
   /*******************************************************************
@@ -166,7 +170,6 @@ export class ViewHelpTickets {
         this.sessions.selectSession(el.target.selectedIndex - 1);
         this.setDates();
         this.validation.makeValid( $(el.target));
-        this.updateMessages("SESSION_SELECTED");
         await this.getRequests();
     }
   }
@@ -232,6 +235,7 @@ export class ViewHelpTickets {
   }
 
   async changeRequestType(el){
+     $("#existingRequestInfo").empty().hide();
     switch(el.target.value){
       case "-1":
         this.typeSelected = false;
@@ -261,30 +265,30 @@ export class ViewHelpTickets {
   * Update the screen messages
   * message - The key of he message to display
   *****************************************************************************************/
-  updateMessages(message){
-    $("#existingRequestInfo").empty().hide();
-    $("#infoBox").empty().hide();
-    switch(message){
-      case "CLIENT_REQUEST_START":
-      case "SESSION_SELECTED":
-      case "REGULAR_CLIENT_MESSAGE":
-        this.productInfo = new Array();
-      case "SANDBOX_MESSAGE":
-      case "EXISTING_REQUEST_MESSAGE":
-        //  this.productInfo = new Array();
-        // if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
-        //   let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
-        //   let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
-        //   $("#existingRequestInfo").append(existingMsg).fadeIn();
-        // }
-        break;
-      default:
-        message = "";
-    }
-    let msg = this.siteInfo.selectMessageByKey(message);
-    if(msg){
-      $("#infoBox").html(msg.content).fadeIn();
-    }
+  // updateMessages(message){
+  //   $("#existingRequestInfo").empty().hide();
+  //   $("#infoBox").empty().hide();
+  //   switch(message){
+  //     case "CLIENT_REQUEST_START":
+  //     case "SESSION_SELECTED":
+  //     case "REGULAR_CLIENT_MESSAGE":
+  //       this.productInfo = new Array();
+  //     case "SANDBOX_MESSAGE":
+  //     case "EXISTING_REQUEST_MESSAGE":
+  //       //  this.productInfo = new Array();
+  //       // if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
+  //       //   let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
+  //       //   let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
+  //       //   $("#existingRequestInfo").append(existingMsg).fadeIn();
+  //       // }
+  //       break;
+  //     default:
+  //       message = "";
+  //   }
+  //   let msg = this.siteInfo.selectMessageByKey(message);
+  //   if(msg){
+  //     $("#infoBox").html(msg.content).fadeIn();
+  //   }
      
     // if(!clean) {
     //   this.productInfo = new Array();
@@ -306,7 +310,7 @@ export class ViewHelpTickets {
       
     // }
     
-  }
+  // }
 
   _cleanRequest(){
     this.request.undergraduates = 0;
@@ -498,7 +502,6 @@ export class ViewHelpTickets {
     this.sessionSelected = false;
     this.sandBoxClient = false;
     this.courseSelected = false;
-    this.updateMessages('CLIENT_REQUEST_START');
     this.courseId = "-1";
     this.sessionId = -1;
     this.requestType = -1;

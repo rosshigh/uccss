@@ -77,9 +77,9 @@
       </tbody>
     </table>
   </div>
-  <div show.bind="!showAudit" class="row leftMargin rightMargin">
+  <div show.bind="!showAudit" class="row">
     <div show.bind="showSettings">
-      <div class="panel panel-default col-lg-12 leftMargin editPanel">
+      <div class="panel panel-default leftMargin rightMargin editPanel">
         <div class="panel-body">
           <div class="bottomMargin list-group-item leftMargin rightMargin">
             <span click.delegate="saveSettings()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
@@ -94,7 +94,12 @@
             <div class="form-group col-lg-3">
               <label>Number of Sandbox IDs</label>
               <input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
-              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>
+              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>
+            </div>
+             <div class="form-group col-lg-3">
+              <label>Sandbox ID  Bufffer</label>
+              <input  value.bind="sandBoxIDs"  id="sandBoxIDs"  class="form-control" type="number" />
+              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>
             </div>
 
           </div>

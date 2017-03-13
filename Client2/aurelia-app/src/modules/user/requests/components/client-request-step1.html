@@ -11,8 +11,7 @@
       </div>
     </div>
   </div>
-
-
+  
   <div class="row">
     <div show.bind="sessionSelected" class="col-sm-12">
       <div class="form-group">
@@ -24,8 +23,6 @@
       </div>
     </div>
   </div>
-
-
 
   <compose show.bind="regularClient && sessionSelected && typeSelected" view='./Courses.html'></compose>
 
@@ -62,15 +59,8 @@
         <div class="form-group topMargin">
            <label class="col-sm-3 form-control-label ">Start Date</label>
            <div class="col-sm-8">
-          <!--
-            <input ref="startDate" disabled.bind="showLockMessage || existingRequest" value.bind="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)"  class="aurelia-flatpickr form-control" type="text" placeholder="Select Date..">
-             -->
-             
-             <!-- || existingRequest -->
-             <!--
-            <date-picker ref="startDate" disabled.bind="showLockMessage " value.two-way="requests.selectedRequest.startDate" changedate.delegate="changeBeginDate($event)" startdate.bind="minStartDate" enddate.bind="maxStartDate" controlid="startDate"></date-picker>
-            -->
-            <flat-picker disabled.bind="showLockMessage" controlid="startDate"" config.bind="config" change.delegate="changeBeginDate($event)"  value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
+            <flat-picker disabled.bind="showLockMessage" controlid="startDate" config.bind="config" change.delegate="changeBeginDate($event)"  
+                value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
            <span id='startDateError'></span>
            </div>
         </div>
@@ -79,18 +69,16 @@
         <div class="form-group topMargin">
           <label class="col-sm-3 form-control-label ">End Date</label>
           <div class="col-sm-8">
-            <!--
-            <input ref="endDate" disabled.bind="showLockMessage || existingRequest" value.bind="requests.selectedRequest.endDate" changedate.delegate="changeBeginDate($event)"  class="aurelia-flatpickr form-control" type="text" placeholder="Select Date..">
-             -->
-               <!-- || existingRequest 
-            <date-picker disabled.bind="showLockMessage" value.two-way="requests.selectedRequest.endDate"  startdate.bind="minEndDate" enddate.bind="maxEndDate" controlid="endDate"></date-picker>
-            -->
-            <flat-picker disabled.bind="showLockMessage" controlid="endDate"" config.bind="config" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
+            <flat-picker disabled.bind="showLockMessage" controlid="endDate" config.bind="config" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
            <span id='endDateError'></span>
           </div>
         </div>
       </div>
        
     </div>
-<div show.bind="showInfoBox" class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
+
+  <div show.bind="sessionId == -1 && requestType == -1" innerhtml.bind="CLIENT_REQUEST_START.content"></div>
+  <div show.bind="sessionId != -1 && requestType == -1" innerhtml.bind="SESSION_SELECTED.content"></div>
+  
+  <div show.bind="showInfoBox" class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
 </template>

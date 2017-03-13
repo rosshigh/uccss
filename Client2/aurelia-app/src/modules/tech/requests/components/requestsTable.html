@@ -10,7 +10,8 @@
       <div class="col-md-8">
         <h5>Nickname: ${people.selectedPerson.nickName}</h5>
         <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>
-        <h5>Mobile: ${people.selectedPersonmobile | formatPhone}</h5>
+        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>
+        <h5>Email: ${people.selectedPerson.email}</h5>
       </div>
   </div>
   <div class="col-lg-10 col-lg-offset-1">
@@ -47,7 +48,6 @@
             <th class="col-sm-1">IDS Requestd</th>
             <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Nickname <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')"><i class="fa fa-sort"></i></span></th>
           </tr>
         </thead>
         <tbody>
@@ -85,9 +85,6 @@
             <th>
               <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
             </th>
-            <th>
-              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-nickName" type="text" compare="lookup" class="form-control" ref="nickNameFilter"/>
-            </th>
           </tr>
           <tr repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
             <td  click.trigger="selectRequest($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
@@ -98,8 +95,6 @@
             <td  click.trigger="selectRequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
             <td  click.trigger="selectRequest($index, $event, request)" data-title="product">${request.productId | productName:products.productsArray}</td>
             <td  class="dropbtn" click.delegate="showProfile(request, $event)"  data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
-            <td  click.trigger="selectRequest($index, $event, request)" data-title="Nickname">${request.requestId.personId | personProperty:people.peopleArray:"nickName"}</td>
-
           </tr>
         </tbody>
       </table>
