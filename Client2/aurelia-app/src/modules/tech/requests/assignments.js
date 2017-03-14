@@ -127,11 +127,6 @@ export class Assignments {
         if(!this.products.selectedProduct.systems[0] ){
              this.utils.showNotification("You need to assign a system to this product before you can assign this request");
         }
-
-        this.studentIDTemplateAvailable = this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1 && this.studentIDTemplates.length > 0; 
-        this.facultyIDTemplateAvailable = this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
-            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID
-            && this.facultyIDTemplates.length > 0;
         
         this.clientRequired();
 
@@ -153,6 +148,11 @@ export class Assignments {
         
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
         this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
+        this.studentIDTemplateAvailable = this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1 && this.studentIDTemplates.length > 0; 
+        this.facultyIDTemplateAvailable = this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
+            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID
+            && this.facultyIDTemplates.length > 0;
+            
         if(this.products.selectedProduct.systems[0]) {
             this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
             $('#systemSelect option:eq(1)').attr('selected', 'true');
