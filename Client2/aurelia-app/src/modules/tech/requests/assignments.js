@@ -148,10 +148,11 @@ export class Assignments {
         
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
         this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
-        this.studentIDTemplateAvailable = this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1 && this.studentIDTemplates.length > 0; 
-        this.facultyIDTemplateAvailable = this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
-            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID
-            && this.facultyIDTemplates.length > 0;
+        
+        this.studentIDTemplateAvailable = this.studentIDTemplates.length > 0 && this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1; 
+        this.facultyIDTemplateAvailable = this.facultyIDTemplates.length > 0
+            && this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
+            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID;
 
         if(this.products.selectedProduct.systems[0]) {
             this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
