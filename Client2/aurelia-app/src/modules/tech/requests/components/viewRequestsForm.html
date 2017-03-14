@@ -52,7 +52,6 @@
               </div>
           </span>
         </div>
-      </div>
     </div>
   </div>
   <div show.bind="showAudit">
@@ -106,36 +105,38 @@
         </div>
       </div>
     </div>
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th class="col-sm-1">System</th>
-          <th class="col-sm-1">Client</th>
-          <th class="col-sm-1">Assigned IDs</th>
-          <th>Student IDs</th>
-          <th>Student Password</th>
-          <th>Faculty IDs</th>
-          <th>Faculty Password</th>
-          <th>Assigned Date</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
-          <td>${client.systemId | lookupSid:systems.systemsArray}</td>
-          <td>${client.client}</td>
-          <td>${client.idsAssigned}</td>
-          <td>${client.studentUserIds}</td>
-          <td>${client.studentPassword}</td>
-          <td>${client.facultyUserIds}</td>
-          <td>${client.facultyPassword}</td>
-          <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-          <td>${client.notValid | overlap}
-          <td><span click.delegate="deleteProposedClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="row leftMargin rightMargin">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th class="col-sm-1">System</th>
+            <th class="col-sm-1">Client</th>
+            <th class="col-sm-1">Assigned IDs</th>
+            <th>Student IDs</th>
+            <th>Student Password</th>
+            <th>Faculty IDs</th>
+            <th>Faculty Password</th>
+            <th>Assigned Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
+            <td>${client.systemId | lookupSid:systems.systemsArray}</td>
+            <td>${client.client}</td>
+            <td>${client.idsAssigned}</td>
+            <td>${client.studentUserIds}</td>
+            <td>${client.studentPassword}</td>
+            <td>${client.facultyUserIds}</td>
+            <td>${client.facultyPassword}</td>
+            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+            <td>${client.notValid | overlap}
+            <td><span click.delegate="deleteProposedClient($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <span id="errorRange"></span>
   <div show.bind="!showAudit" class="row leftMargin">
@@ -219,12 +220,12 @@
             <label>Student IDs</label>
             <input value.bind="assignmentDetails[assignmentDetailIndex].studentUserIds" id="proposedIDRange"  placeholder="Proposed IDs" class="form-control" type="text" />
           </div>
-          <div class="form-group col-lg-2">
+          <div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
             <label>First ID</label>
             <input disabled.bind="manualMode" value.bind="firstID" change.trigger ="firstIDChanged()" style="width:75px;margin-right:10px;" id="firstID"  class="form-control input-sm"
             type="number" />
           </div>
-          <div class="form-group col-lg-2">
+          <div show.bind="studentIDTemplateAvailable" class="form-group col-lg-2">
             <label>Last ID</label>
             <input  disabled.bind="manualMode" value.bind="lastID" change.trigger ="lastIDChanged()" style="width:75px;margin-right:10px;" id="lastID"  class="form-control input-sm"
             type="number" />
@@ -242,12 +243,12 @@
             <label>Faculty IDs</label>
               <input value.bind="assignmentDetails[assignmentDetailIndex].facultyUserIds" id="proposedFacultyIDRange"  placeholder="Proposed Faculty IDs" class="form-control" type="text" />
           </div>
-          <div class="form-group col-lg-2">
+          <div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
             <label>First ID</label>
             <input disabled.bind="manualMode" value.bind="firstNumericFacID" change.trigger ="firstFacIDChanged()" style="width:75px;margin-right:10px;" id="firstFacID"  class="form-control input-sm"
             type="number" />
           </div>
-          <div class="form-group col-lg-2">
+          <div show.bind="facultyIDTemplateAvailable" class="form-group col-lg-2">
             <label>Last ID</label>
             <input  disabled.bind="manualMode" value.bind="lastNumericFacID" change.trigger ="lastFacIDChanged()" style="width:75px;margin-right:10px;" id="lastFacID"  class="form-control input-sm"
             type="number" />

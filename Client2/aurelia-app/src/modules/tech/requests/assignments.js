@@ -127,6 +127,11 @@ export class Assignments {
         if(!this.products.selectedProduct.systems[0] ){
              this.utils.showNotification("You need to assign a system to this product before you can assign this request");
         }
+
+        this.studentIDTemplateAvailable = this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1 && this.studentIDTemplates.length > 0; 
+        this.facultyIDTemplateAvailable = this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
+            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID
+            && this.facultyIDTemplates.length > 0;
         
         this.clientRequired();
 
@@ -314,7 +319,7 @@ export class Assignments {
         }
         //If there is no template, set the range to empty string
         if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
-            this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = "";
+            this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.products.selectedProduct.defaultStudentIdPrefix;
         } else {
             //Determine if user has selected a template and if not, select the first one
             var selectedStudentIDTemplates = new Array();
@@ -372,7 +377,7 @@ export class Assignments {
         if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
             || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
             || this.facultyIDTemplates.length == 0) {
-            this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
+            this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
         } else {
             var selectedFacultyIDTemplates = new Array();
             if (this.selectedStudentIDTemplate.length == 0){
@@ -430,6 +435,8 @@ export class Assignments {
                 prefix = "9" + "000".substr(0, len - 1);
                 random = Math.floor(Math.random() * parseInt(prefix));
                 this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword.substr(0, this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD)) + random;
+            } else {
+                this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword;
             }
             //Sandbox assignments don't have faculty ids so set the password to empty string
             if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
@@ -441,6 +448,8 @@ export class Assignments {
                     prefix = "9" + "000".substr(0, len - 1);
                     random = Math.floor(Math.random() * parseInt(prefix));
                     this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword.substr(0, this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD)) + random;
+                } else {
+                     this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = this.products.selectedProduct.defaultFacultyPassword;
                 }
             }
     }
