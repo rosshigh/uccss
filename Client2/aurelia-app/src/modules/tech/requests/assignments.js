@@ -125,7 +125,7 @@ export class Assignments {
         this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
         
         if(!this.products.selectedProduct.systems[0] ){
-             this.utils.showNotification("You need to assign a system to this product before you can assign this request", "", "", "", "", 4);
+             this.utils.showNotification("You need to assign a system to this product before you can assign this request");
         }
         
         this.clientRequired();
@@ -769,8 +769,8 @@ export class Assignments {
 
     
     findAssignedClients(){
-        this.assignmentDetails.forEach((item) => {
-            this.systems.selectClientFromID(item.systemId, item.clientId);
+        this.assignmentDetails.forEach(item => {
+            this.systems.selectClientFromID(item.systemId, item.client);
             this.proposedClient.push(this.systems.selectedClient);
         })
     }
