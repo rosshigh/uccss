@@ -22550,7 +22550,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
         Assignments.prototype.calcFacIDRangeFromTemplate = function calcFacIDRangeFromTemplate() {
             if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID || this.facultyIDTemplates.length == 0) {
-                this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
+
+                if (this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID) this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
             } else {
                 var selectedFacultyIDTemplates = new Array();
                 if (this.selectedStudentIDTemplate.length == 0) {

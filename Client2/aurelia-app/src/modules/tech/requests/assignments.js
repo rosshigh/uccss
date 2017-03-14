@@ -152,7 +152,7 @@ export class Assignments {
         this.facultyIDTemplateAvailable = this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
             && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID
             && this.facultyIDTemplates.length > 0;
-            
+
         if(this.products.selectedProduct.systems[0]) {
             this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
             $('#systemSelect option:eq(1)').attr('selected', 'true');
@@ -377,7 +377,8 @@ export class Assignments {
         if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
             || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
             || this.facultyIDTemplates.length == 0) {
-            this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
+
+            if(this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID) this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
         } else {
             var selectedFacultyIDTemplates = new Array();
             if (this.selectedStudentIDTemplate.length == 0){
