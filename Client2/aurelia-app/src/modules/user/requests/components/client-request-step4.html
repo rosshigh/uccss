@@ -5,12 +5,12 @@
   </div>
   <div class="form-group col-md-12">
     <div class="row">
-      <h4 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="col-md-5 topMargin">Course: <b>${requests.selectedRequest.courseId | courseName:people.coursesArray}</b></h4>
-      <h4 show.bind="requests.selectedRequest.courseId == config.SANDBOX_ID" class="col-md-5 topMargin">Course: <b>Sandbox</b></h4>
+      <h4 show.bind="requestType != 'sandboxCourse'" class="col-md-5 topMargin">Course: <b>${courseId | courseName:people.coursesArray}</b></h4>
+      <h4 show.bind="requestType == 'sandboxCourse'" class="col-md-5 topMargin">Course: <b>Sandbox</b></h4>
     </div>
     <div class="row">
-      <h4 class="col-md-5 topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">Undergraduates: <b>${requests.selectedRequest.undergradIds}</b></h4>
-      <h4 class="col-md-5 topMargin" show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>
+      <h4 class="col-md-5 topMargin" show.bind="requestType != 'sandboxCourse'">Undergraduates: <b>${requests.selectedRequest.undergradIds}</b></h4>
+      <h4 class="col-md-5 topMargin" show.bind="requestType != 'sandboxCourse'">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>
     </div>
     <div class="row">
       <h4 class="col-md-5 topMargin">Course Begins: <b>${requests.selectedRequest.startDate | dateFormat:'YYYY-MM-DD'}</b></h4>
