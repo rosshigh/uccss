@@ -156,7 +156,7 @@ export class Assignments {
 
         if(this.products.selectedProduct.systems[0]) {
             this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-            $('#systemSelect option:eq(1)').attr('selected', 'true');
+            setTimeout(function(){$('#systemSelect option:eq(1)').attr('selected', 'true')}, 250);;
         }
         this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
         this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;

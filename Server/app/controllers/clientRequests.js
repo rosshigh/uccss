@@ -131,8 +131,8 @@ module.exports = function (app) {
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('Update clientRequest ' + req.body._id);       
-    let clientRequest = new Model(req.body);
-    // clientRequest.requestDetails = new Array();  
+    let clientRequest = new Model(req.body); 
+    // clientRequest.requestDetails = new Array();   
     let tasks = new Array();   
     if(req.body.requestDetailsToSave){
        req.body.requestDetailsToSave.forEach((detail, index) => {
@@ -142,7 +142,7 @@ module.exports = function (app) {
                clientRequest.requestDetails.splice(clientRequest.requestDetails.indexOf(detail._id), 1);
            } else {
               tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-              // clientRequest.requestDetails.push(detail._id);   
+              clientRequest.requestDetails.push(detail._id);   
            }
          } else {
             let obj = new ClientRequestDetail(detail);
