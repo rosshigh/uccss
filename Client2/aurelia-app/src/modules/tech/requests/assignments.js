@@ -210,17 +210,38 @@ export class Assignments {
     //  * client - the selected client object
     //  ****************************************************************************************************/
     selectClient(index, client, el) {
+        let message, okToProcess = true;
         //Don't allow a client to be selected if there are no ids to be assigned
         if (this.idsRemaining > 0) {
             //Make sure the selected client is compatible with the selected request
             if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
-                return;
+                message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
             }
             if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
-                return;
+                message = "The request is for a regular course and the client is a sandbox client";
+                // this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
+                // return;
             }
+
+            if(message){
+                return this.dialog.showMessage(
+                        message,
+                        "Confirm Assignment",
+                        ['Yes', 'No']
+                    ).then(response => {                      
+                        if (response.wasCancelled) {
+                            okToProcess = false;
+                        } else {
+                            this.processClient(index, client, el);
+                        }
+                    });
+            } else {
+                this.processClient(index, client, el);
+            }
+        }
+    }
+
+        processClient(index, client, el){
             
             //Make sure the client hasn't already been selected
             let alreadySelected = false;
@@ -284,7 +305,7 @@ export class Assignments {
             if (this.selectedRow) this.selectedRow.children().removeClass('info');
             this.selectedRow = $(el.target).closest('tr');
             this.selectedRow.children().addClass('info')
-        }
+        // }
     }
 
     // /*****************************************************************************************************

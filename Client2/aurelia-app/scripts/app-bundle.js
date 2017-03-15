@@ -22520,75 +22520,92 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         Assignments.prototype.selectClient = function selectClient(index, client, el) {
             var _this = this;
 
+            var message = void 0,
+                okToProcess = true;
+
             if (this.idsRemaining > 0) {
                 if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a sandbox and the client isn't a sandbox client", "", "", "", "", 5);
-                    return;
+                    message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
                 }
                 if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                    this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
-                    return;
+                    message = "The request is for a regular course and the client is a sandbox client";
                 }
 
-                var alreadySelected = false;
-                this.assignmentDetails.forEach(function (item) {
-                    if (item.systemId === client.systemId && item.client === client.client) alreadySelected = true;
-                });
-
-                if (alreadySelected) return;
-
-                this.proposedClient.push(client);
-
-                if (client.assignments.length > 0) {
-                    (function () {
-                        var maxId = 0;
-                        client.assignments.forEach(function (item) {
-                            if (item.lastID > maxId) maxId = item.lastID;
-                        });
-                        _this.firstID = maxId + parseInt(_this.idBuffer);
-                    })();
+                if (message) {
+                    return this.dialog.showMessage(message, "Confirm Assignment", ['Yes', 'No']).then(function (response) {
+                        if (response.wasCancelled) {
+                            okToProcess = false;
+                        } else {
+                            _this.processClient(index, client, el);
+                        }
+                    });
+                } else {
+                    this.processClient(index, client, el);
                 }
-
-                this.lastFirstID = this.firstID;
-                this.firstNumericFacID = client.lastFacIdAssigned == 0 ? parseInt(client.lastFacIdAssigned) : parseInt(client.lastFacIdAssigned) + parseInt(this.config.FACULTY_ID_BUFFER);
-                this.lastNumericFacID = this.firstNumericFacID + this.config.DEFAULT_FACULTY_IDS;
-
-                this.calcLastID();
-
-                this.assignmentDetails.push({
-                    staffId: this.userObj._id,
-
-                    client: client.client,
-
-                    systemId: client.systemId,
-                    firstID: this.firstID,
-                    lastID: this.lastID,
-                    firstFacID: this.firstNumericFacID,
-                    lastFacID: this.lastNumericFacID,
-                    idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
-                });
-                this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
-                this.assignmentDetailIndex = this.assignmentDetails.length - 1;
-
-                this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-                this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-                this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
-                this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
-
-                if (this.studentIDTemplates.length) {
-                    this.calcAssignment();
-                    this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
-                }
-
-                this.clientSelected = true;
-                this.enableButton = true;
-
-                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                this.selectedRow.children().addClass('info');
             }
+        };
+
+        Assignments.prototype.processClient = function processClient(index, client, el) {
+            var _this2 = this;
+
+            var alreadySelected = false;
+            this.assignmentDetails.forEach(function (item) {
+                if (item.systemId === client.systemId && item.client === client.client) alreadySelected = true;
+            });
+
+            if (alreadySelected) return;
+
+            this.proposedClient.push(client);
+
+            if (client.assignments.length > 0) {
+                (function () {
+                    var maxId = 0;
+                    client.assignments.forEach(function (item) {
+                        if (item.lastID > maxId) maxId = item.lastID;
+                    });
+                    _this2.firstID = maxId + parseInt(_this2.idBuffer);
+                })();
+            }
+
+            this.lastFirstID = this.firstID;
+            this.firstNumericFacID = client.lastFacIdAssigned == 0 ? parseInt(client.lastFacIdAssigned) : parseInt(client.lastFacIdAssigned) + parseInt(this.config.FACULTY_ID_BUFFER);
+            this.lastNumericFacID = this.firstNumericFacID + this.config.DEFAULT_FACULTY_IDS;
+
+            this.calcLastID();
+
+            this.assignmentDetails.push({
+                staffId: this.userObj._id,
+
+                client: client.client,
+
+                systemId: client.systemId,
+                firstID: this.firstID,
+                lastID: this.lastID,
+                firstFacID: this.firstNumericFacID,
+                lastFacID: this.lastNumericFacID,
+                idsAssigned: parseInt(this.lastID) - parseInt(this.firstID)
+            });
+            this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
+            this.assignmentDetailIndex = this.assignmentDetails.length - 1;
+
+            this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
+            this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
+            this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned = this.firstNumericFacID;
+            this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
+            this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned = this.lastNumericFacID;
+            this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
+
+            if (this.studentIDTemplates.length) {
+                this.calcAssignment();
+                this.idsRemaining = parseInt(this.idsRemaining) - this.assignmentDetails[this.assignmentDetailIndex].idsAssigned;
+            }
+
+            this.clientSelected = true;
+            this.enableButton = true;
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
         };
 
         Assignments.prototype.calcLastID = function calcLastID() {
@@ -22793,7 +22810,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
         Assignments.prototype.deleteProposedClient = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index) {
-                var _this2 = this;
+                var _this3 = this;
 
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
@@ -22806,7 +22823,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
                                 return _context4.abrupt('return', this.dialog.showMessage("This will delete the assignment.  Are you sure you want to do that?", "Delete Assignment", ['Yes', 'No']).then(function (response) {
                                     if (!response.wasCancelled) {
-                                        _this2.deleteSaved(index);
+                                        _this3.deleteSaved(index);
                                     }
                                 }));
 
@@ -23084,11 +23101,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         };
 
         Assignments.prototype.findAssignedClients = function findAssignedClients() {
-            var _this3 = this;
+            var _this4 = this;
 
             this.assignmentDetails.forEach(function (item) {
-                _this3.systems.selectClientFromID(item.systemId, item.client);
-                _this3.proposedClient.push(_this3.systems.selectedClient);
+                _this4.systems.selectClientFromID(item.systemId, item.client);
+                _this4.proposedClient.push(_this4.systems.selectedClient);
             });
         };
 
@@ -23148,7 +23165,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         };
 
         Assignments.prototype.customerActionDialog = function customerActionDialog() {
-            var _this4 = this;
+            var _this5 = this;
 
             if (this.profileRequest) {
                 this.model = 'header';
@@ -23169,7 +23186,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             var email = { emailBody: "", emailSubject: subject, emailId: this.requestId };
             return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).then(function (response) {
                 if (!response.wasCancelled) {
-                    _this4.sendTheEmail(response.output);
+                    _this5.sendTheEmail(response.output);
                 } else {
                     console.log("Cancelled");
                 }
@@ -25844,7 +25861,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       this.validation.addRule(4, "productListTable", [{ "rule": "custom", "message": "Enter all required dates",
         "valFunction": function valFunction(context) {
           for (var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++) {
-            if (context.requests.selectedRequest.requestDetails[i].requiredDate === "") {
+            if (!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === "") {
               return false;
             }
           }
@@ -35671,7 +35688,7 @@ define('text!modules/user/requests/components/client-request-step2.html', ['modu
 define('text!modules/user/requests/components/client-request-step3.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('CLIENT_REQUESTS_COMMENTS').content}</div>\n    </div>\n    <div class=\"form-group col-md-12\">\n      <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/requests/components/client-request-step4.html', ['module'], function(module) { module.exports = "<template>\n\n  <div class=\"col-md-12\" >\n    <div  class=\"well well-sm col-md-10 col-sm-offset-1\" innerhtml.bind=\"siteInfo.selectMessageByKey('CLIENT_REQUESTS_SUMMARY').content\"></div>\n  </div>\n  <div class=\"form-group col-md-12\">\n    <div class=\"row\">\n      <h4 show.bind=\"requestType != 'sandboxCourse'\" class=\"col-md-5 topMargin\">Course: <b>${courseId | courseName:people.coursesArray}</b></h4>\n      <h4 show.bind=\"requestType == 'sandboxCourse'\" class=\"col-md-5 topMargin\">Course: <b>Sandbox</b></h4>\n    </div>\n    <div class=\"row\">\n      <h4 class=\"col-md-5 topMargin\" show.bind=\"requestType != 'sandboxCourse'\">Undergraduates: <b>${requests.selectedRequest.undergradIds}</b></h4>\n      <h4 class=\"col-md-5 topMargin\" show.bind=\"requestType != 'sandboxCourse'\">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>\n    </div>\n    <div class=\"row\">\n      <h4 class=\"col-md-5 topMargin\">Course Begins: <b>${requests.selectedRequest.startDate | dateFormat:'YYYY-MM-DD'}</b></h4>\n      <h4 class=\"col-md-5 topMargin\">Course Ends: <b>${requests.selectedRequest.endDate | dateFormat:'YYYY-MM-DD'}</b></h4>\n    </div>\n    <div class=\"col-md-12\"></div>\n    <div class=\"row\" id=\"productListTable\">\n      <table class=\"table table-striped table-bordered col-md-10 topMargin\">\n        <thead>\n        <tr>\n          <th>Requested Product</th>\n          <th>Date Required</th>\n        </tr>\n        <tbody id=\"requiredProductsTable\">\n        <tr repeat.for=\"request of requests.selectedRequest.requestDetails\">\n          <td>${request.productId | productName:products.productsArray}</td>\n          <td>\n            <div class=\"form-group  col-md-8\">\n              <!--  || request._id -->\n               <flat-picker controlid=\"requiredDate-${$index}\" config.bind=\"config\" value.bind=\"request.requiredDate\" startdate.bind=\"minRequiredDate\" enddate.bind=\"maxRequiredDate\"></flat-picker>\n           <!--   <date-picker disabled.bind=\"showLockMessage\" value.two-way=\"request.requiredDate\"  startdate.bind=\"minRequiredDate\" enddate.bind=\"maxRequiredDate\" controlid=\"requiredDate-${$index}\"></date-picker> -->\n            </div>\n          </td>\n        </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <div class=\"form-group\" show.bind=\"comments !== ''\">\n          <label >Comments:</label>\n          <div class=\"topMargin\" rows=\"12\" innerhtml.bind=\"requests.selectedRequest.comments\"></div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span style=\"margin-left:5px;\"  class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\" click.delegate=\"editACourse()\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"nummber\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"editCourse\">\n            <div class=\"panel panel-default col-md-10 col-md-offset-1\" style=\"background-color:ghostwhite;\">\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin topMargin\">\n                    <span click.trigger=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Course\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.trigger=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                </div>\n                <div class=\"panel-body\">\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <span id=\"course\"></span>\n</template>\n"; });
-define('text!modules/user/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-12\">\n\t\t\t<div class=\"panel panel-default topMargin\">\n\t\t\t\t<div class=\"panel-body leftJustify\">\n\t\t\t\t\t<div class=\"form-group bottomMargin\" show.bind=\"customerActionRequired\">\n\t\t\t\t\t\t<h5 for=\"message\">The UCC staff has asked you to provide additional information</h5>\n\t\t\t\t\t\t<div class=\"well col-lg-12\" id=\"message\" innerhtml.bind=\"customerMessage\" class=\"form-control\"></div>\n\t\t\t\t\t\t<h5>Enter your response in the comments box below and click save</h5>\n\t\t\t\t\t\t<editor value.bind=\"customerResponse\" height=\"250\"></editor>\t\n\t\t\t\t\t</div>\n\t\t\t\t\t<div show.bind=\"showDetails\" class=\"form-horizontal topMargin\">\n\t\t\t\t\t\t<h4>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h4>\n\t\t\t\t\t\t<h5>Course: ${requests.selectedRequest.courseId | courseName:people.coursesArray}</h5>\n\t\t\t\t\t\t<div class=\"topMargin\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t\t<h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5\">\n\t\t\t\t\t\t\t\t\t<h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div> \n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t<h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-5\">\n\t\t\t\t\t\t\t\t<h5>End Date: <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div show.bind=\"products.selectedProduct.productInfo\">\n\t\t<h4>Product Information</h4>\n\t\t<div innerhtml.bind=\"products.selectedProduct.productInfo\"></div>\n\t</div>\n\n</template>"; });
+define('text!modules/user/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-12\">\n\t\t\t<div class=\"panel panel-default topMargin\">\n\t\t\t\t<div class=\"panel-body leftJustify\">\n\t\t\t\t\t<div class=\"form-group bottomMargin\" show.bind=\"customerActionRequired\">\n\t\t\t\t\t\t<h5 for=\"message\">The UCC staff has asked you to provide additional information</h5>\n\t\t\t\t\t\t<div class=\"well col-lg-12\" id=\"message\" innerhtml.bind=\"customerMessage\" class=\"form-control\"></div>\n\t\t\t\t\t\t<h5>Enter your response in the comments box below and click save</h5>\n\t\t\t\t\t\t<editor value.bind=\"customerResponse\" height=\"250\"></editor>\t\n\t\t\t\t\t</div>\n\t\t\t\t\t<div show.bind=\"showDetails\" class=\"form-horizontal topMargin\">\n\t\t\t\t\t\t<h4>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h4>\n\t\t\t\t\t\t<h5>Course: ${requests.selectedRequest.courseId | courseName:people.coursesArray}</h5>\n\t\t\t\t\t\t<div class=\"topMargin\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t\t<h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-lg-5\">\n\t\t\t\t\t\t\t\t\t<h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div> \n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-5 leftMargin\">\n\t\t\t\t\t\t\t\t<h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-5\">\n\t\t\t\t\t\t\t\t<h5>End Date: <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"topMargin\" innerhtml.bind=\"requests.selectedRequest.comments\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div show.bind=\"products.selectedProduct.productInfo\">\n\t\t<h4>Product Information</h4>\n\t\t<div innerhtml.bind=\"products.selectedProduct.productInfo\"></div>\n\t</div>\n\n</template>"; });
 define('text!modules/user/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n\n    <div class=\"container\">\n        <div class='row'>\n            <div class='bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='6'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr>\n                                <th>\n                                    Course <span click.trigger=\"dataTable.sortArray('courseId')\"><i class=\"fa fa-sort\"></i></span>\n                                </th>\n                                <th>\n                                    Session <span click.trigger=\"dataTable.sortArray('sessionId')\"><i class=\"fa fa-sort\"></i></span><br>\n                                </th>\n                                <th>\n                                    Details\n                                </th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr click.delegate=\"edit(product, $event, $index)\" repeat.for=\"product of dataTable.displayArray\">\n                                <td data-title=\"Course\">\n                                    <h5>${product.courseId | courseName:people.coursesArray}<h5>\n                                    <h6>Undergraduates: ${product.undergradIds} Graduates: ${product.graduateIds}</h6>\n                                </td>\n                                <td data-title=\"Session\"><h5>${product.sessionId | sessionName:sessions.sessionsArray}</h5></td>\n                                <td>\n                                    <ul>\n                                        <li repeat.for=\"detail of product.requestDetails\" class=\"list-group-item\">\n                                            <h5>${detail.productId | productName:products.productsArray}</h5>\n                                             Status: ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}\n                                             <span class=\"leftMargin\">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</span>\n                                        </li>\n                                    </ul>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n    </div>\n\n    <!--\n     <div class='row'>\n            <span class=\"leftMargin\" show.bind=\"showLockMessage\">Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n            <div class='col-lg-12'>\n                <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n                    <thead>\n                        \n                        <tr>\n                            <td colspan=\"6\">\n                                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                            </td>\n                        </tr>\n                        <tr>\n                          <th>Product</th>\n                          <th>Status</th>\n                          <th>Date Created</th>\n                          <th>Date Required</th>\n                        </tr>\n                  </thead>\n                  <tbody>\n                    <tr  click.delegate=\"edit(product, $event, $index)\" repeat.for=\"product of dataTable.displayArray\">\n                      <td data-title=\"Product\">${product.productId | productName:products.productsArray}</td>\n                      <td data-title=\"Status\">${product.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n                      <td data-title=\"createdDate\">${product.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                      <td data-title=\"createdDate\">${product.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    </tr>\n                </tbody>\n            </table>\n          </div>\n        </div>\n        -->\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"fluid-container\">\n\t\t<!-- Buttons -->\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span show.bind=\"customerActionRequired\" click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n\t\t\t<span show.bind=\"customerActionRequired\" click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\tdata-title=\"Cancel\" title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\n\t\t</div>\n\t\t<div class=\"col-lg-6\">\n\t\t\t<compose view=\"./requestDetails.html\"></compose>\n\t\t</div>\n\t\t<div class=\"col-lg-6\">\n\t\t\t<compose view=\"./assignmentDetails.html\"></compose>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/user/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n\n  <div class=\"container\">\n    <div class='row'>\n      <div class='bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='6'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th></th>\n              </tr>\n              <tr>\n                <th>\n                  Course <span click.trigger=\"dataTable.sortArray('courseId','id', people.coursesArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Session <span click.trigger=\"dataTable.sortArray('sessionId','id',sessions.sessionsArray,'_id','startDate')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Product Requests (Click to see the details)\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr  repeat.for=\"request of dataTable.displayArray\">\n                <td click.delegate=\"customerActionResponse(request, $event)\" data-title=\"Course\">\n                  <h5>${request.courseId | courseName:people.coursesArray}</h5>\n                  <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>\n                  <h7>Request No: ${request.clientRequestNo}</h7>\n                  <h6 show.bind=\"request.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE\" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h6>\n                </td>\n                <td data-title=\"Session\">\n                  <h5>${request.sessionId | sessionName:sessions.sessionsArray}</h5>\n                </td>\n                <td>\n                  <ul>\n                    <li class=\"${detail.requestStatus | requestStatusClass:statusClass:request:config.CUSTOMER_ACTION_REQUEST_CODE} list-group-item\" click.delegate=\"edit(detail, $event, $index)\" repeat.for=\"detail of request.requestDetails\" >\n                      <h5>${detail.productId | productName:products.productsArray}</h5>\n                      Status: ${detail.requestStatus | lookupDescription:config.REQUEST_STATUS}\n                      <h7 class=\"leftMargin\">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h7>\n                      <h7 class=\"pull-right\" show.bind=\"detail.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE && request.requestStatus != config.CUSTOMER_ACTION_REQUEST_CODE\" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h7>\n                    </li>\n                  </ul>\n                </td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });

@@ -401,7 +401,7 @@ export class ViewHelpTickets {
   }
 
   _setUpValidation(){
-      this.validation.addRule(1,"course",[{"rule":"custom","message":"Select a course",
+    this.validation.addRule(1,"course",[{"rule":"custom","message":"Select a course",
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
           return true
@@ -455,7 +455,7 @@ export class ViewHelpTickets {
     this.validation.addRule(4,"productListTable",[{"rule":"custom","message":"Enter all required dates",
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-          if(context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
+          if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
             return false;
           }
         }
