@@ -109,7 +109,7 @@ module.exports = function (app) {
       req.body.forEach(item => {  
         if(item.operation === 'add'){
            tasks.push(Model.update({_id: item.systemId}, { $push: { productId: item.productId } }));
-        } else {
+        } else {        
            tasks.push(Model.update({_id: item.systemId}, { $pull: { productId: item.productId } }));
         }
       });

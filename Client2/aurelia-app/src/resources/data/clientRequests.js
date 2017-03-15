@@ -329,6 +329,14 @@ var url = this.data.CLIENT_REQUESTS_SERVICES + '/assign';
         })
     }
 
+    updateDetailStatus(id, status){
+         this.requestsDetailsArray.forEach(item => {
+            if(item.requestId._id == id){
+                if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+            }
+        })
+    }
+
     lockRequest(obj){
         if(obj.requestId) {
             var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");

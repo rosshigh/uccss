@@ -4684,6 +4684,16 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             });
         };
 
+        ClientRequests.prototype.updateDetailStatus = function updateDetailStatus(id, status) {
+            var _this2 = this;
+
+            this.requestsDetailsArray.forEach(function (item) {
+                if (item.requestId._id == id) {
+                    if (item.requestStatus != _this2.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+                }
+            });
+        };
+
         ClientRequests.prototype.lockRequest = function lockRequest(obj) {
             if (obj.requestId) {
                 var response = this.data.saveObject(obj, this.data.CLIENT_REQUEST_LOCK_SERVICES, "post");
@@ -23207,7 +23217,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                     break;
                                 }
 
-                                this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+                                if (this.model === 'header') {
+                                    this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+                                } else {
+                                    this.requests.updateDetailStatus(this.requestId, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+                                }
+
                                 this.filterInAssigned();
                                 this.message = {
                                     id: this.requestId,

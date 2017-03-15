@@ -875,7 +875,12 @@ export class Assignments {
     async sendTheEmail(email){
         if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
         if(email){
-            this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+            if(this.model === 'header'){
+                this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+            } else {
+                this.requests.updateDetailStatus( this.requestId,  this.config.CUSTOMER_ACTION_REQUEST_CODE);
+            }
+            
             this.filterInAssigned();
             this.message = {
                 id: this.requestId,
