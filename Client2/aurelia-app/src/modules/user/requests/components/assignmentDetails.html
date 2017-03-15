@@ -1,8 +1,8 @@
 <template>
     <div show.bind="requests.selectedRequestDetail.assignments.length > 0">
       <div show.bind="requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE" class="panel panel-primary topMargin">
-        <div class="panel-body">        
-          <div >
+        <div class="panel-body">  
+
           <table class="table table-striped table-hover">
             <thead>
               <tr>
@@ -21,6 +21,7 @@
               </tr>
             </tbody>
           </table>
+         
           <h4 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="topMargin"><strong>Faculty IDs</strong></h4>
           <div class="form-group">
             <h5 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="panel-title">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>
@@ -28,6 +29,7 @@
           <div class="form-group">
             <h5 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="panel-title">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>
           </div>
+       
           <h4 class="topMargin"><strong>System Details</strong></h4>
           <div class="form-group">
             <h5 class="panel-title">SID: ${systems.selectedSystem.sid}</h3>

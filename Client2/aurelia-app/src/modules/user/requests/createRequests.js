@@ -472,7 +472,7 @@ export class ViewHelpTickets {
     if(this.existingRequest){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
-        item.requestStatus = this.config.UPDATED_REQUEST_CODE;
+        if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
       })
     }
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;

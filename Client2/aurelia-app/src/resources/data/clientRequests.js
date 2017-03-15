@@ -238,8 +238,8 @@ export class ClientRequests {
         if(!this.selectedRequest){
             return;
         }
-
-        var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
+var url =  this.data.CLIENT_REQUESTS_SERVICES;
+        // var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
 
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
@@ -258,6 +258,21 @@ export class ClientRequests {
             }
             return serverResponse;
         }
+    }
+
+    async assignRequest(email){
+        if(!this.selectedRequest){
+            return;
+        }
+var url = this.data.CLIENT_REQUESTS_SERVICES + '/assign';
+        // var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.data.CLIENT_REQUESTS_SERVICES + '/assign';
+         var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
+        if(!serverResponse.error){
+                if(this.requestsArray && this.editRequestIndex){
+                this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
+                }
+        }
+        return serverResponse;
     }
 
     isRequestDirty(obj){

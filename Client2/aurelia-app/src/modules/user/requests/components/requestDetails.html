@@ -35,9 +35,9 @@
 			</div>
 		</div>
 	</div>
-	<div show.bind="products.selectedProduct.productInfo" class="panel panel-primary topMargin">
-		<div class="panel-heading">Product Information</div>
-		<div class="panel-body" innerhtml.bind="products.selectedProduct.productInfo"></div>
+	<div show.bind="products.selectedProduct.productInfo">
+		<h4>Product Information</h4>
+		<div innerhtml.bind="products.selectedProduct.productInfo"></div>
 	</div>
 
 </template>

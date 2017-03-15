@@ -304,6 +304,21 @@ export class EditSystem {
         }
     }
 
+    selectClient(client, index){
+        this.selectedClient = this.utils.copyObject(client);
+        this.clientSelected = true;
+        this.selectedClientIndex = index;
+    }
+
+    backClient(){
+        this.clientSelected = false;
+    }
+
+    saveClient(){
+        this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
+        this.clientSelected = false;
+    }
+
     _setupValidation(){
         this.validation.addRule(1,"editSid",[{"rule":"required","message":"SID is required", "value": "systems.selectedSystem.sid"},
         {"rule":"custom", "message":"A system with that SID already exists",

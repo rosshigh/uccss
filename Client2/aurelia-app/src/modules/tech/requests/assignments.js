@@ -163,7 +163,7 @@ export class Assignments {
         
         //Check if the request is a sandbox request
         if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
-            this.idBuffer = 0;
+            this.idBuffer =localStorage.getItem('idSandboxBuffer')  ? localStorage.getItem('idSandboxBuffer') : this.config.SANDBOX_ID_BUFFER;
             this.numberOfIds = localStorage.getItem('sandBoxIDs')  ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
             this.sandBoxOnly = true;
         } else {
@@ -634,7 +634,7 @@ export class Assignments {
             if(this._buildRequest()){
                 this.requests.setSelectedRequest(this.requestToSave);
                 let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE;
-                let serverResponse = await this.requests.saveRequest(email);
+                let serverResponse = await this.requests.assignRequest(email);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");
                     await this.systems.saveSystem();
@@ -729,6 +729,7 @@ export class Assignments {
         this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
         this.requestToSave.audit.push({
            property: 'Assigned',
+           newValue: this.requests.selectedRequestDetail.requestNo,
            eventDate: new  Date(),
            personId: this.userObj._id
         })
@@ -950,12 +951,14 @@ export class Assignments {
     openSettings(){
         this.showSettings = ! this.showSettings;
         if( this.showSettings){
+            this.idSandboxBuffer = localStorage.getItem('idSandboxBuffer') ? localStorage.getItem('idBuffer') : this.config.SANDBOX_ID_BUFFER;
             this.idBuffer = localStorage.getItem('idBuffer')  ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
             this.sandBoxIDs = localStorage.getItem('sandBoxIDs')  ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
         }  
     }
     
     saveSettings(){
+        localStorage.setItem('idSandboxBuffer', this.idSandboxBuffer);
         localStorage.setItem('idBuffer', this.idBuffer);
         localStorage.setItem('sandBoxIDs', this.sandBoxIDs);
         this.showSettings = false;
