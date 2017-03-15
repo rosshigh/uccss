@@ -122,7 +122,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
+          <tr class="dropbtn" click.trigger="selectProposedClient($index, $event)" repeat.for="client of assignmentDetails" class="${client.notValid}">
             <td>${client.systemId | lookupSid:systems.systemsArray}</td>
             <td>${client.client}</td>
             <td>${client.idsAssigned}</td>
@@ -328,7 +328,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant">
+              <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant">
                 <td>${client.client}</td>
                 <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>
                 <td>${client.idsAvailable}</td>
