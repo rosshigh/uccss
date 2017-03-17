@@ -67,6 +67,8 @@ export class Notes{
 	edit(index, el){
 		this.editIndex = this.dataTable.getOriginalIndex(index);
 		this.people.selectNote(this.editIndex);
+
+		if( !this.userObj.noteCategories ) this.userObj.noteCategories = new Array();
         //Reset the selected row
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -126,6 +128,7 @@ export class Notes{
 			this.userObj.noteCategories[this.editCategoryIndex] =  this.categoryDescription;
 			this.people.selectedPerson.noteCategories[this.editCategoryIndex] =  this.categoryDescription;
 		} else {
+			if(!this.people.selectedPerson.noteCategories) this.people.selectedPerson.noteCategories = this.userObj.noteCategories;
 			this.userObj.noteCategories.push(this.categoryDescription);
 			this.people.selectedPerson.noteCategories.push(this.categoryDescription);
 		}
@@ -136,7 +139,12 @@ export class Notes{
 	}
 
 	async deleteCat(){
-
+		this.people.selectedPersonFromId(this.userObj._id);
+		this.userObj.noteCategories.splice(this.userObj.noteCategories.indexOf(this.people.selectedNote.category),1);
+		this.people.selectedPerson.noteCategories.splice(this.people.selectedPerson.noteCategories.indexOf(this.people.selectedNote.category),1);
+		await this.people.savePerson();
+		sessionStorage.setItem('user',JSON.stringify(this.userObj));
+		this.showCategoryForm = false; 
 	}
 
 	backHelpTicket(){
@@ -159,26 +167,26 @@ export class Notes{
 		this.people.selectedNote.dateEndRemind = new Date();
 	}
    
-   typeSelected(){
-	   this.showDates = true;
-	   switch($(this.reminderType).val()){
-		   	case "W":
-				this.days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "Tuesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
-				break;
-			case "M":
-				this.days = new Array();
-				for(let i = 1; i < 31; i++){
-					this.days.push({number: i, day: i});
-				}
-				break;
-			case "D":
-				break;
-			case "T":
-				this.people.selectedNote.reminderType = "T";
-				this.people.selectedNote.dateRemind = new Date();	
-				// this.people.selectedNote.dateEndRemind = new Date();	
-			// default:
-			// 	 this.showDates = true;
-	   }
-   }
+	typeSelected(){
+		this.showDates = true;
+		switch($(this.reminderType).val()){
+				case "W":
+					this.days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "Tuesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
+					break;
+				case "M":
+					this.days = new Array();
+					for(let i = 1; i < 31; i++){
+						this.days.push({number: i, day: i});
+					}
+					break;
+				case "D":
+					break;
+				case "T":
+					this.people.selectedNote.reminderType = "T";
+					this.people.selectedNote.dateRemind = new Date();	
+					// this.people.selectedNote.dateEndRemind = new Date();	
+				// default:
+				// 	 this.showDates = true;
+		}
+	}
 }
