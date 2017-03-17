@@ -31,12 +31,11 @@ module.exports = function (app, config) {
 		let filePath = authFolder + req.params.fileName;
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
-				
-				data = data.split('\n');
+				data = data.split('\n');				
 				let dataArray = new Array();
 				data.forEach(item => {
 					var obj = new Object();
-					let array = item.replace('{','').replace('}','').split(',');
+					let array = item.replace('{','').replace('}','').split(',');				
 					array.forEach(item2 => {
 						let propArray = item2.split('"').join('').replace('\r','').split(":");
 						if(propArray[0] === 'timestamp'){
@@ -47,13 +46,7 @@ module.exports = function (app, config) {
 					})
 					dataArray.push(obj);
 				});
-	
-				console.log('received data: ' + dataArray[0]);
-				// data = JSON.parse(data)
 				res.status(200).json(dataArray)
-				// res.writeHead(200, {'Content-Type': 'text/html'});
-				// res.write(data);
-				// res.end();
 			} else{
 				return next(err);
 			}
@@ -66,7 +59,7 @@ module.exports = function (app, config) {
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
-					let fileName = authFolder + file + '.log';
+					let fileName = authFolder + file + '.log';					
 					fs.unlink(fileName);
 				});
 				res.status(200).json({message: "Files deleted"});
@@ -123,8 +116,8 @@ module.exports = function (app, config) {
 		if(req.body.files){
 			try {
 				req.body.files.forEach(file => {
-					let fileName = logFolder + file + '.log';
-					fs.unlink(fileName);
+					let fileName = logFolder + file + '.log';				
+					fs.unlink(fileName);					
 				});
 				res.status(200).json({message: "Files deleted"});
 			}

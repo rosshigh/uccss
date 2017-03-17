@@ -176,9 +176,9 @@ export class Notes{
 			case "T":
 				this.people.selectedNote.reminderType = "T";
 				this.people.selectedNote.dateRemind = new Date();	
-				this.people.selectedNote.dateEndRemind = new Date();	
-			default:
-				 this.showDates = true;
+				// this.people.selectedNote.dateEndRemind = new Date();	
+			// default:
+			// 	 this.showDates = true;
 	   }
    }
 }

@@ -751,6 +751,7 @@ export class Assignments {
         this.requestToSave.audit.push({
            property: 'Assigned',
            newValue: this.requests.selectedRequestDetail.requestNo,
+           oldValue: this.requests.selectedRequestDetail.productId,
            eventDate: new  Date(),
            personId: this.userObj._id
         })

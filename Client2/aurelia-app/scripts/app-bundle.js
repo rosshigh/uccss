@@ -2712,7 +2712,7 @@ define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-ro
 		return ResetPassword;
 	}()) || _class);
 });
-define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment', 'toastr'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment, _toastr) {
+define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -2721,25 +2721,6 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
     exports.User = undefined;
 
     var _moment2 = _interopRequireDefault(_moment);
-
-    var toastr = _interopRequireWildcard(_toastr);
-
-    function _interopRequireWildcard(obj) {
-        if (obj && obj.__esModule) {
-            return obj;
-        } else {
-            var newObj = {};
-
-            if (obj != null) {
-                for (var key in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-                }
-            }
-
-            newObj.default = obj;
-            return newObj;
-        }
-    }
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -2811,8 +2792,6 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                     this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
                 }
             }
-
-            this.reminders();
         };
 
         User.prototype.updateTwitter = function updateTwitter(d, s, id) {
@@ -3001,143 +2980,6 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
         User.prototype.moreInfoExists = function moreInfoExists(item) {
             return item.url && item.url.length > 0;
         };
-
-        User.prototype.openAlert = function openAlert(alert) {
-            this.alert = alert;
-            $(".hoverProfile").css("top", 100);
-            $(".hoverProfile").css("left", 100);
-            $(".hoverProfile").css("display", "block");
-            sessionStorage.setItem('alert', true);
-        };
-
-        User.prototype.hideAlert = function hideAlert() {
-            $(".hoverProfile").css("display", "none");
-        };
-
-        User.prototype.reminders = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var _this2 = this;
-
-                var response, now, weekDay, monthDay;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                _context3.next = 2;
-                                return this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
-
-                            case 2:
-                                response = _context3.sent;
-
-                                if (!response.error && this.people) {
-                                    toastr.options.closeButton = true;
-                                    toastr.options.closeMethod = 'fadeOut';
-                                    toastr.options.closeDuration = 300;
-                                    toastr.options.closeEasing = 'swing';
-                                    this.timeReminders = new Array();
-                                    now = new Date();
-                                    weekDay = now.getDay();
-                                    monthDay = now.getDate();
-
-                                    this.reccurentReminders = new Array();
-                                    this.people.remindersArray.forEach(function (item, index) {
-                                        switch (item.reminderType) {
-                                            case "D":
-                                                if (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day')) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this2.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "W":
-                                                if (item.reminderDay == weekDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this2.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "M":
-                                                if (item.reminderDay == monthDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this2.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "A":
-                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this2.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "T":
-                                                console.log((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day'));
-                                                console.log(!(0, _moment2.default)(now).isSame(item.lastSeen, 'month'));
-                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    var diff = (0, _moment2.default)(now).diff(item.dateStartRemind, 'minutes');
-                                                    if (diff >= -15) {
-                                                        if (item.priority == 1) {
-                                                            toastr.error(item.note, "Reminder");
-                                                        } else {
-                                                            toastr.info(item.note, "Reminder");
-                                                        }
-                                                        item.lastSeen = now;
-                                                        _this2.people.saveReminder(item, index);
-                                                    } else {
-                                                        _this2.timeReminders.push({ item: item, index: index });
-                                                    }
-                                                }
-                                        }
-                                    });
-
-                                    if (this.timeReminders.length > 0) {
-                                        setInterval(function () {
-                                            console.log('Checked reminders');
-                                            var now = new Date();
-                                            _this2.timeReminders.forEach(function (item) {
-                                                var diff = (0, _moment2.default)().diff(item.item.dateStartRemind, 'minutes');
-                                                if (item.priority == 1) {
-                                                    toastr.error(item.item.note, "Reminder");
-                                                } else {
-                                                    toastr.info(item.note, "Reminder");
-                                                }
-                                                item.lastSeen = now;
-                                                _this2.people.saveReminder(item.item.item, item.index);
-                                            });
-                                        }, 10000);
-                                    }
-                                }
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function reminders() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return reminders;
-        }();
 
         return User;
     }()) || _class);
@@ -3614,22 +3456,21 @@ define('resources/data/admin',['exports', 'aurelia-framework', './dataServices']
 			return getLogFile;
 		}();
 
-		AdminData.prototype.getFiles = function () {
-			var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-				var response;
+		AdminData.prototype.deleteLogFiles = function () {
+			var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(filesToDelete) {
+				var obj, response;
 				return regeneratorRuntime.wrap(function _callee6$(_context6) {
 					while (1) {
 						switch (_context6.prev = _context6.next) {
 							case 0:
-								_context6.next = 2;
-								return this.data.get(this.FILES_SERVICE);
+								obj = {
+									files: filesToDelete
+								};
+								_context6.next = 3;
+								return this.data.saveObject(obj, this.LOG_SERVICE, "put");
 
-							case 2:
+							case 3:
 								response = _context6.sent;
-
-								if (!response.error) {
-									this.parseFileList(response);
-								}
 								return _context6.abrupt('return', response);
 
 							case 5:
@@ -3640,8 +3481,41 @@ define('resources/data/admin',['exports', 'aurelia-framework', './dataServices']
 				}, _callee6, this);
 			}));
 
-			function getFiles() {
+			function deleteLogFiles(_x4) {
 				return _ref6.apply(this, arguments);
+			}
+
+			return deleteLogFiles;
+		}();
+
+		AdminData.prototype.getFiles = function () {
+			var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee7$(_context7) {
+					while (1) {
+						switch (_context7.prev = _context7.next) {
+							case 0:
+								_context7.next = 2;
+								return this.data.get(this.FILES_SERVICE);
+
+							case 2:
+								response = _context7.sent;
+
+								if (!response.error) {
+									this.parseFileList(response);
+								}
+								return _context7.abrupt('return', response);
+
+							case 5:
+							case 'end':
+								return _context7.stop();
+						}
+					}
+				}, _callee7, this);
+			}));
+
+			function getFiles() {
+				return _ref7.apply(this, arguments);
 			}
 
 			return getFiles;
@@ -3746,35 +3620,35 @@ define('resources/data/admin',['exports', 'aurelia-framework', './dataServices']
 		};
 
 		AdminData.prototype.deleteFile = function () {
-			var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(file) {
+			var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(file) {
 				var response;
-				return regeneratorRuntime.wrap(function _callee7$(_context7) {
+				return regeneratorRuntime.wrap(function _callee8$(_context8) {
 					while (1) {
-						switch (_context7.prev = _context7.next) {
+						switch (_context8.prev = _context8.next) {
 							case 0:
 								if (!file) {
-									_context7.next = 6;
+									_context8.next = 6;
 									break;
 								}
 
 								file = file.split('\\').join('$@');
-								_context7.next = 4;
+								_context8.next = 4;
 								return this.data.deleteObject(this.FILES_SERVICE + "/" + file);
 
 							case 4:
-								response = _context7.sent;
-								return _context7.abrupt('return', response);
+								response = _context8.sent;
+								return _context8.abrupt('return', response);
 
 							case 6:
 							case 'end':
-								return _context7.stop();
+								return _context8.stop();
 						}
 					}
-				}, _callee7, this);
+				}, _callee8, this);
 			}));
 
-			function deleteFile(_x4) {
-				return _ref7.apply(this, arguments);
+			function deleteFile(_x5) {
+				return _ref8.apply(this, arguments);
 			}
 
 			return deleteFile;
@@ -4172,9 +4046,9 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                     break;
                                 }
 
-                                this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_CLIENT_REQUEST, 'requestStatus', response);
-                                this.updatedRequests = this.utils.countItems(this.config.UPDATED_CLIENT_REQUEST, 'requestStatus', response);
-                                this.customerActionRequests = this.utils.countItems(this.config.CUSTOMER_ACTION_CLIENT_REQUEST, 'requestStatus', response);
+                                this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_REQUEST_CODE, 'requestStatus', response);
+                                this.updatedRequests = this.utils.countItems(this.config.UPDATED_REQUEST_CODE, 'requestStatus', response);
+                                this.customerActionRequests = this.utils.countItems(this.config.CUSTOMER_ACTION_REQUEST_CODE, 'requestStatus', response);
                                 return _context4.abrupt('return', response.count);
 
                             case 12:
@@ -4513,7 +4387,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 return _context10.abrupt('return');
 
                             case 2:
-                                url = this.data.CLIENT_REQUESTS_SERVICES;
+                                url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
 
                                 if (this.selectedRequest._id) {
                                     _context10.next = 11;
@@ -4577,7 +4451,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 return _context11.abrupt('return');
 
                             case 2:
-                                url = this.data.CLIENT_REQUESTS_SERVICES + '/assign';
+                                url = email ? this.data.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.data.CLIENT_REQUESTS_SERVICES + '/assign';
                                 _context11.next = 5;
                                 return this.data.saveObject(this.selectedRequest, url, "put");
 
@@ -12586,13 +12460,40 @@ define('resources/elements/multiselect',['exports', 'aurelia-framework', 'bootst
     }
   })), _class2)) || _class);
 });
-define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig', '../dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig, _commonDialogs) {
+define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig', '../dialogs/common-dialogs', 'moment', 'toastr'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig, _commonDialogs, _moment, _toastr) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
     exports.NavBar = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var toastr = _interopRequireWildcard(_toastr);
+
+    function _interopRequireWildcard(obj) {
+        if (obj && obj.__esModule) {
+            return obj;
+        } else {
+            var newObj = {};
+
+            if (obj != null) {
+                for (var key in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+                }
+            }
+
+            newObj.default = obj;
+            return newObj;
+        }
+    }
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
 
     function _asyncToGenerator(fn) {
         return function () {
@@ -12667,11 +12568,9 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                                 if (!response.error) {
                                     sessionStorage.setItem('uccweather', JSON.stringify({ temp: response.temp, icon: response.icon }));
                                     this.loginError = "";
-                                    console.log(response);
                                     this.loginSuccess();
                                     this.isAuthenticated = this.auth.isAuthenticated();
                                 } else {
-                                    console.log(response);
                                     this.loginError = "Invalid credentials.";
                                 }
 
@@ -12709,7 +12608,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                                 this.userObj = JSON.parse(sessionStorage.getItem('user'));
 
                                 if (!this.userObj) {
-                                    _context2.next = 19;
+                                    _context2.next = 20;
                                     break;
                                 }
 
@@ -12726,7 +12625,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
 
                                 this.utils.showNotification("You must belong to an active institution to access the web site");
                                 this.logout();
-                                _context2.next = 17;
+                                _context2.next = 18;
                                 break;
 
                             case 10:
@@ -12742,17 +12641,18 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                             case 14:
                                 if (!this.userObj.userRole) this.logout();
                                 sessionStorage.setItem('role', this.userObj.userRole);
+                                this.reminders();
                                 this.router.navigate("user");
 
-                            case 17:
-                                _context2.next = 21;
+                            case 18:
+                                _context2.next = 22;
                                 break;
 
-                            case 19:
+                            case 20:
                                 this.utils.showNotification("There was a problem validating your account");
                                 this.router.navigate("home");
 
-                            case 21:
+                            case 22:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -12860,6 +12760,143 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             }
 
             return saveNote;
+        }();
+
+        NavBar.prototype.openAlert = function openAlert(alert) {
+            this.alert = alert;
+            $(".hoverProfile").css("top", 100);
+            $(".hoverProfile").css("left", 100);
+            $(".hoverProfile").css("display", "block");
+            sessionStorage.setItem('alert', true);
+        };
+
+        NavBar.prototype.hideAlert = function hideAlert() {
+            $(".hoverProfile").css("display", "none");
+        };
+
+        NavBar.prototype.reminders = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this3 = this;
+
+                var response, now, weekDay, monthDay;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                _context5.next = 2;
+                                return this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+
+                            case 2:
+                                response = _context5.sent;
+
+                                if (!response.error && this.people) {
+                                    toastr.options.closeButton = true;
+                                    toastr.options.closeMethod = 'fadeOut';
+                                    toastr.options.closeDuration = 300;
+                                    toastr.options.closeEasing = 'swing';
+                                    this.timeReminders = new Array();
+                                    now = new Date();
+                                    weekDay = now.getDay();
+                                    monthDay = now.getDate();
+
+                                    this.reccurentReminders = new Array();
+                                    this.people.remindersArray.forEach(function (item, index) {
+                                        switch (item.reminderType) {
+                                            case "D":
+                                                if (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day')) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "W":
+                                                if (item.reminderDay == weekDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "M":
+                                                if (item.reminderDay == monthDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "A":
+                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "T":
+                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    var diff = (0, _moment2.default)(now).diff(item.dateStartRemind, 'minutes');
+                                                    if (diff >= -15) {
+                                                        if (item.priority == 1) {
+                                                            toastr.error(item.note, "Reminder");
+                                                        } else {
+                                                            toastr.info(item.note, "Reminder");
+                                                        }
+                                                        item.lastSeen = now;
+                                                        _this3.people.saveReminder(item, index);
+                                                    } else {
+                                                        _this3.timeReminders.push({ item: item, index: index });
+                                                    }
+                                                }
+                                        }
+                                    });
+
+                                    if (this.timeReminders.length > 0) {
+                                        setInterval(function () {
+                                            console.log('Checked reminders');
+                                            var now = new Date();
+                                            _this3.timeReminders.forEach(function (item) {
+                                                var diff = (0, _moment2.default)().diff(item.item.dateStartRemind, 'minutes');
+                                                if (diff >= -15) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item.item, item.index);
+                                                }
+                                            });
+                                        }, 10000);
+                                    }
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function reminders() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return reminders;
         }();
 
         return NavBar;
@@ -18267,9 +18304,6 @@ define('modules/admin/notes/notes',['exports', 'aurelia-framework', 'aurelia-rou
 				case "T":
 					this.people.selectedNote.reminderType = "T";
 					this.people.selectedNote.dateRemind = new Date();
-					this.people.selectedNote.dateEndRemind = new Date();
-				default:
-					this.showDates = true;
 			}
 		};
 
@@ -18360,25 +18394,52 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 			});
 		};
 
-		Admin.prototype.typeSelected = function () {
+		Admin.prototype.refresh = function () {
 			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var response, i, logResponse, _i, fileResponse;
-
 				return regeneratorRuntime.wrap(function _callee$(_context) {
 					while (1) {
 						switch (_context.prev = _context.next) {
 							case 0:
+								_context.next = 2;
+								return this.typeSelected();
+
+							case 2:
+								this.fileSelected(this.fileIndex);
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function refresh() {
+				return _ref.apply(this, arguments);
+			}
+
+			return refresh;
+		}();
+
+		Admin.prototype.typeSelected = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var response, i, logResponse, _i, fileResponse;
+
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
 								this.clearFilters();
-								_context.t0 = this.screenToShow;
-								_context.next = _context.t0 === 'auth' ? 4 : _context.t0 === 'log' ? 9 : _context.t0 === 'files' ? 14 : 19;
+								_context2.t0 = this.screenToShow;
+								_context2.next = _context2.t0 === 'auth' ? 4 : _context2.t0 === 'log' ? 9 : _context2.t0 === 'files' ? 14 : 20;
 								break;
 
 							case 4:
-								_context.next = 6;
+								_context2.next = 6;
 								return this.admin.getAuthLogs();
 
 							case 6:
-								response = _context.sent;
+								response = _context2.sent;
 
 								if (!response.error) {
 									this.fileList = this.utils.copyArray(response);
@@ -18387,14 +18448,14 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 									};
 									this.fileList.reverse();
 								}
-								return _context.abrupt('break', 20);
+								return _context2.abrupt('break', 21);
 
 							case 9:
-								_context.next = 11;
+								_context2.next = 11;
 								return this.admin.getLogs();
 
 							case 11:
-								logResponse = _context.sent;
+								logResponse = _context2.sent;
 
 								if (!logResponse.error) {
 									this.fileList = this.utils.copyArray(logResponse);
@@ -18403,59 +18464,60 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 									};
 									this.fileList.reverse();
 								}
-								return _context.abrupt('break', 20);
+								return _context2.abrupt('break', 21);
 
 							case 14:
-								_context.next = 16;
+								_context2.next = 16;
 								return this.admin.getFiles();
 
 							case 16:
-								fileResponse = _context.sent;
+								fileResponse = _context2.sent;
 
 								if (!fileResponse.error) {
 									this.showFileList = true;
 									this.uploadedFileList = this.admin.filesList;
 								}
-								return _context.abrupt('break', 20);
-
-							case 19:
 								this.fileList = new Array();
+								return _context2.abrupt('break', 21);
 
 							case 20:
+								this.fileList = new Array();
+
+							case 21:
 							case 'end':
-								return _context.stop();
+								return _context2.stop();
 						}
 					}
-				}, _callee, this);
+				}, _callee2, this);
 			}));
 
 			function typeSelected() {
-				return _ref.apply(this, arguments);
+				return _ref2.apply(this, arguments);
 			}
 
 			return typeSelected;
 		}();
 
 		Admin.prototype.fileSelected = function () {
-			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index) {
 				var response, i, array, dateTime, logResponse, _i2, j, code, _dateTime, _array, data;
 
-				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
 					while (1) {
-						switch (_context2.prev = _context2.next) {
+						switch (_context3.prev = _context3.next) {
 							case 0:
 								this.clearFilters();
 								this.fileIndex = index;
-								_context2.t0 = this.screenToShow;
-								_context2.next = _context2.t0 === 'auth' ? 5 : _context2.t0 === 'log' ? 10 : 15;
+								_context3.t0 = this.screenToShow;
+								_context3.next = _context3.t0 === 'auth' ? 5 : _context3.t0 === 'log' ? 10 : 15;
 								break;
 
 							case 5:
-								_context2.next = 7;
+								_context3.next = 7;
 								return this.admin.getAuthLogFile(this.fileList[index] + '.log');
 
 							case 7:
-								response = _context2.sent;
+								response = _context3.sent;
 
 								if (!response.error) {
 									this.fileContents = new Array();
@@ -18473,21 +18535,21 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 									};
 									this.dataTable.updateArray(this.fileContents);
 								}
-								return _context2.abrupt('break', 16);
+								return _context3.abrupt('break', 16);
 
 							case 10:
-								_context2.next = 12;
+								_context3.next = 12;
 								return this.admin.getLogFile(this.fileList[index] + '.log');
 
 							case 12:
-								logResponse = _context2.sent;
+								logResponse = _context3.sent;
 
 								if (!logResponse.error) {
 									this.fileContents = new Array();
 									for (_i2 = 0; _i2 < this.admin.logContents.length; _i2++) {
 										if (this.admin.logContents[_i2].message) {
 											_dateTime = new Date(this.admin.logContents[_i2].timestamp);
-											_array = this.admin.logContents[_i2].message.split('-');
+											_array = this.admin.logContents[_i2].message.split('@@');
 											data = "";
 
 											if (this.admin.logContents[_i2].level !== 'error') {
@@ -18503,28 +18565,28 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 											this.fileContents.push({
 												event: this.admin.logContents[_i2].level,
 												code: code,
-												data: data,
+												data: data.replace(/%/g, ":"),
 												date: (0, _moment2.default)(_dateTime).format("YYYY-MM-DD HH:mm:ss")
 											});
 										}
 									};
 									this.dataTable.updateArray(this.fileContents);
 								}
-								return _context2.abrupt('break', 16);
+								return _context3.abrupt('break', 16);
 
 							case 15:
 								this.fileList = new Array();
 
 							case 16:
 							case 'end':
-								return _context2.stop();
+								return _context3.stop();
 						}
 					}
-				}, _callee2, this);
+				}, _callee3, this);
 			}));
 
 			function fileSelected(_x) {
-				return _ref2.apply(this, arguments);
+				return _ref3.apply(this, arguments);
 			}
 
 			return fileSelected;
@@ -18551,17 +18613,17 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 		};
 
 		Admin.prototype.deleteAFile = function () {
-			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(path) {
+			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(path) {
 				var response;
-				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+				return regeneratorRuntime.wrap(function _callee4$(_context4) {
 					while (1) {
-						switch (_context3.prev = _context3.next) {
+						switch (_context4.prev = _context4.next) {
 							case 0:
-								_context3.next = 2;
+								_context4.next = 2;
 								return this.admin.deleteFile(path);
 
 							case 2:
-								response = _context3.sent;
+								response = _context4.sent;
 
 								if (!response.error) {
 									this.sliceDeletedFile();
@@ -18570,14 +18632,14 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 
 							case 4:
 							case 'end':
-								return _context3.stop();
+								return _context4.stop();
 						}
 					}
-				}, _callee3, this);
+				}, _callee4, this);
 			}));
 
 			function deleteAFile(_x2) {
-				return _ref3.apply(this, arguments);
+				return _ref4.apply(this, arguments);
 			}
 
 			return deleteAFile;
@@ -18604,35 +18666,49 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 			console.log(this.deletedFile);
 		};
 
-		Admin.prototype.deleteFiles = function () {
-			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-				var deleteFileArray, i, response;
-				return regeneratorRuntime.wrap(function _callee4$(_context4) {
+		Admin.prototype.deleteFiles = function deleteFiles() {
+			var _this3 = this;
+
+			if (!this.filesToDelete || this.filesToDelete <= 0) return;
+			var msg = "Are you sure you want to delete " + this.filesToDelete + " log files?  This action cannot be undone.";
+
+			return this.dialog.showMessage(msg, "Confirm", ['Yes', 'No']).then(function (response) {
+				if (!response.wasCancelled) {
+					_this3.deleteTheFiles();
+				}
+			});
+		};
+
+		Admin.prototype.deleteTheFiles = function () {
+			var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+				var deleteFileArray, i, response, _i3, _response;
+
+				return regeneratorRuntime.wrap(function _callee5$(_context5) {
 					while (1) {
-						switch (_context4.prev = _context4.next) {
+						switch (_context5.prev = _context5.next) {
 							case 0:
-								_context4.t0 = this.screenToShow;
-								_context4.next = _context4.t0 === 'auth' ? 3 : 12;
+								_context5.t0 = this.screenToShow;
+								_context5.next = _context5.t0 === 'auth' ? 3 : _context5.t0 === 'log' ? 12 : 21;
 								break;
 
 							case 3:
-								this.filesToDelete = parseInt(this.filesToDelete);
+								this.filesToDelete = parseInt(this.filesToDelete) <= this.fileList.length - 1 ? parseInt(this.filesToDelete) : this.fileList.length - 1;
 
 								if (!(this.filesToDelete > 0)) {
-									_context4.next = 11;
+									_context5.next = 11;
 									break;
 								}
 
 								deleteFileArray = new Array();
 
-								for (i = 0; i <= this.filesToDelete, i < this.fileList.length; i++) {
-									deleteFileArray.push(this.fileList[i]);
+								for (i = 1; i <= this.filesToDelete; i++) {
+									deleteFileArray.push(this.fileList[this.fileList.length - i]);
 								}
-								_context4.next = 9;
+								_context5.next = 9;
 								return this.admin.deleteAuthFiles(deleteFileArray);
 
 							case 9:
-								response = _context4.sent;
+								response = _context5.sent;
 
 								if (!response.error) {
 
@@ -18642,21 +18718,50 @@ define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../res
 								}
 
 							case 11:
-								return _context4.abrupt('break', 12);
+								return _context5.abrupt('break', 21);
 
 							case 12:
+								this.filesToDelete = parseInt(this.filesToDelete) <= this.fileList.length - 1 ? parseInt(this.filesToDelete) : this.fileList.length - 1;
+
+								if (!(this.filesToDelete > 0)) {
+									_context5.next = 20;
+									break;
+								}
+
+								deleteFileArray = new Array();
+
+								for (_i3 = 1; _i3 <= this.filesToDelete; _i3++) {
+									deleteFileArray.push(this.fileList[this.fileList.length - _i3]);
+								}
+								_context5.next = 18;
+								return this.admin.deleteLogFiles(deleteFileArray);
+
+							case 18:
+								_response = _context5.sent;
+
+								if (!_response.error) {
+
+									this.utils.showNotification(this.filesToDelete + ' files were deleted');
+								} else {
+									this.utils.showNotification('There was problem deleting the files');
+								}
+
+							case 20:
+								return _context5.abrupt('break', 21);
+
+							case 21:
 							case 'end':
-								return _context4.stop();
+								return _context5.stop();
 						}
 					}
-				}, _callee4, this);
+				}, _callee5, this);
 			}));
 
-			function deleteFiles() {
-				return _ref4.apply(this, arguments);
+			function deleteTheFiles() {
+				return _ref5.apply(this, arguments);
 			}
 
-			return deleteFiles;
+			return deleteTheFiles;
 		}();
 
 		Admin.prototype.clearFilters = function clearFilters() {
@@ -23065,6 +23170,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.requestToSave.audit.push({
                 property: 'Assigned',
                 newValue: this.requests.selectedRequestDetail.requestNo,
+                oldValue: this.requests.selectedRequestDetail.productId,
                 eventDate: new Date(),
                 personId: this.userObj._id
             });
@@ -35641,8 +35747,8 @@ define('text!modules/admin/customers/components/peopleForm.html', ['module'], fu
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='6'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='6'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"nickName\" type=\"text\" placeholder=\"Filter Nickname\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\" data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
 define('text!modules/admin/notes/components/helpTicket.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"fluid-container\">\n\t <div class=\"row\">\n        <span class=\"leftMargin largeFont\">Help Ticket ${helpTickets.selectedHelpTicket.helpTicketNo}</span>\n    </div>\n\n    <!-- Buttons -->\n    <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\n      <span click.delegate=\"backHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div>\n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n      <!-- Enter Response -->\n      <div class=\"row\">\n        <div class=\"list-group-item leftMargin rightMargin\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\n                    | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people.peopleArray:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n        </div>\n      </div>\n    </div>\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n</div>\n</template>"; });
-define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\n<div class=\"panel-body\">\n    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n</div>\n</div>\n\n<div class=\"row\">\n    <div class=\"col-sm-12 col-lg-12\">\n        <div class=\"form-group\">\n            <div class=\"checkbox col-lg-offset-2\">\n                <label>\n                                <input checked.bind=\"people.selectedNote.isReminder\"  type=\"checkbox\"> This note is a reminder\n                            </label>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"people.selectedNote.isReminder\">\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderType\" class=\"col-lg-2 control-label\">Reminder Type</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderType\" change.delegate=\"typeSelected()\" id=\"reminderType\"\n                        ref=\"reminderType\">\n                                        <option value=\"\">Type of Reminder</option>\n                                        <option value=\"T\">Time</option>\n                                        <option value=\"D\">Daily</option>\n                                        <option value=\"W\">Weekly</option>\n                                        <option value=\"M\">Monthly</option>\n                                        <option value=\"A\">Annual</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"priority\" class=\"col-lg-2 control-label\">Priority</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.priority\" id=\"priority\" ref=\"priority\">\n                                        <option value=\"0\">Information</option>\n                                        <option value=\"1\">Critical</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div show.bind=\"people.selectedNote.reminderType === 'W' || people.selectedNote.reminderType === 'M'\" class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderDay\" class=\"col-lg-2 control-label\">Day</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderDay\" id=\"reminderDay\">\n                                        <option value=\"\">Choose the day</option>\n                                        <option repeat.for=\"day of days\" value=\"${day.number}\">${day.day}</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"showDates\">\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType === 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Date and time</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateRemindT\" config.bind=\"configT\" value.bind=\"people.selectedNote.dateStartRemind\"></flat-picker>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType !== 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Start Date</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateStartRemind\" config.bind=\"config\" value.bind=\"test\"></flat-picker>\n                </div>\n            </div>\n        </div>\n\n\n        <div class=\"row\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"input-dateEndRemind\" class=\"col-lg-2 control-label \">End Date</label>\n                    <div class=\"col-lg-8\">\n                        <flat-picker id.bind=\"dateEndRemind\" config.bind=\"config\" value.bind=\"people.selectedNote.dateEndRemind\"></flat-picker>\n                        <!--     <date-picker value.two-way=\"people.selectedNote.dateEndRemind\" controlid=\"dateEndRemind\"></date-picker>-->\n\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"col-lg-8  col-lg-offset-2 topMargin\">\n    <editor value.bind=\"people.selectedNote.note\" height=\"250\"></editor>\n\n</div>\n\n</form>\n\n</div>\n</template>"; });
-define('text!modules/admin/notes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='4'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Start <span click.trigger=\"dataTable.sortArray('dateStartRemind')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Note <span click.trigger=\"dataTable.sortArray('note')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th></th>\n                                <th>Help Ticket No</th>\n                                <th></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                   <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"\"></option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n\t\t\t\t\t\t\t\t\t</select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"dateStartRemind\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"/>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"note\" type=\"text\" placeholder=\"Filter note\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr class=\"${item.isReminder} ? 'warning' : ''}\" repeat.for=\"item of dataTable.displayArray\">\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Category\">${item.category}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Date Start\" style=\"width: 75px\">\n                                    <div>${item.dateStartRemind | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\">${item.note}</td>\n                                <td style=\"width:5rem;\">\n                                    <span show.bind=\"item.reference\" click.trigger=\"navigateToHelpTicket(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View\"><i class=\"fa fa-eye fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                                <td style=\"width:5rem;\" click.trigger=\"edit($index, $event)\">${item.helpTicketNo}</td>\n                                <td style=\"width:5rem;\">\n                                    <span  click.trigger=\"delete(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\n<div class=\"panel-body\">\n    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n</div>\n</div>\n\n<div class=\"row\">\n    <div class=\"col-sm-12 col-lg-12\">\n        <div class=\"form-group\">\n            <div class=\"checkbox col-lg-offset-2\">\n                <label>\n                                <input checked.bind=\"people.selectedNote.isReminder\"  type=\"checkbox\"> This note is a reminder\n                            </label>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"people.selectedNote.isReminder\">\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderType\" class=\"col-lg-2 control-label\">Reminder Type</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderType\" change.delegate=\"typeSelected()\" id=\"reminderType\"\n                        ref=\"reminderType\">\n                                        <option value=\"\">Type of Reminder</option>\n                                        <option value=\"T\">Time</option>\n                                        <option value=\"D\">Daily</option>\n                                        <option value=\"W\">Weekly</option>\n                                        <option value=\"M\">Monthly</option>\n                                        <option value=\"A\">Annual</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"priority\" class=\"col-lg-2 control-label\">Priority</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.priority\" id=\"priority\" ref=\"priority\">\n                                        <option value=\"0\">Information</option>\n                                        <option value=\"1\">Critical</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div show.bind=\"people.selectedNote.reminderType === 'W' || people.selectedNote.reminderType === 'M'\" class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderDay\" class=\"col-lg-2 control-label\">Day</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderDay\" id=\"reminderDay\">\n                                        <option value=\"\">Choose the day</option>\n                                        <option repeat.for=\"day of days\" value=\"${day.number}\">${day.day}</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"showDates\">\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType === 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Date and time</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateRemindT\" config.bind=\"configT\" value.bind=\"people.selectedNote.dateStartRemind\"></flat-picker>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType !== 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Start Date</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateStartRemind\" config.bind=\"config\" value.bind=\"test\"></flat-picker>\n                </div>\n            </div>\n        </div>\n\n\n        <div class=\"row\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"input-dateEndRemind\" class=\"col-lg-2 control-label \">End Date</label>\n                    <div class=\"col-lg-8\">\n                        <flat-picker id.bind=\"dateEndRemind\" config.bind=\"config\" value.bind=\"people.selectedNote.dateEndRemind\"></flat-picker>\n                       \n\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class=\"col-lg-8  col-lg-offset-2 topMargin\">\n    <editor value.bind=\"people.selectedNote.note\" height=\"250\"></editor>\n\n</div>\n\n</form>\n\n</div>\n</template>"; });
+define('text!modules/admin/notes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:8em;\">Reminder Type <span click.trigger=\"dataTable.sortArray('reminderType')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Start <span click.trigger=\"dataTable.sortArray('dateStartRemind')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Note <span click.trigger=\"dataTable.sortArray('note')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th></th>\n                                <th>Help Ticket No</th>\n                                <th></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                   <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"\"></option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n\t\t\t\t\t\t\t\t\t</select>\n                                </th>\n                                 <th>\n                                     <select class=\"form-control\" id=\"reminderType\"  change.delegate=\"dataTable.filterList($event)\" id=\"reminderType\"\n                                        compare=\"id\" type=\"select-one\" ref=\"reminderType\">\n                                            <option value=\"\"></option>\n                                            <option value=\"T\">Time</option>\n                                            <option value=\"D\">Daily</option>\n                                            <option value=\"W\">Weekly</option>\n                                            <option value=\"M\">Monthly</option>\n                                            <option value=\"A\">Annual</option>\n                                    </select>\n                                 </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"dateStartRemind\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"/>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"note\" type=\"text\" placeholder=\"Filter note\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr class=\"${item.isReminder} ? 'warning' : ''}\" repeat.for=\"item of dataTable.displayArray\">\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Category\">${item.category}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\">${item.reminderType}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Date Start\" style=\"width: 75px\">\n                                    <div>${item.dateStartRemind | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\">${item.note}</td>\n                                <td style=\"width:5rem;\">\n                                    <span show.bind=\"item.reference\" click.trigger=\"navigateToHelpTicket(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View\"><i class=\"fa fa-eye fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                                <td style=\"width:5rem;\" click.trigger=\"edit($index, $event)\">${item.helpTicketNo}</td>\n                                <td style=\"width:5rem;\">\n                                    <span  click.trigger=\"delete(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/inventory/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
@@ -35662,7 +35768,7 @@ define('text!modules/admin/site/components/downloadForm.html', ['module'], funct
 define('text!modules/admin/site/components/downloadTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Download\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:75px;\">Name <span click.trigger=\"dataTable.sortArray('name')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">File <span click.trigger=\"dataTable.sortArray('file.originalFilename','object')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Type <span click.trigger=\"dataTable.sortArray('downCatcode','id',downloads.appCatsArray,'downCatcode','description')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Status <span click.trigger=\"dataTable.sortArray('active')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:150px;\">Help Ticket Relevant <span click.trigger=\"dataTable.sortArray('helpTicketRelevant')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"name\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"file.originalFilename\" type=\"text\" placeholder=\"Filter File\" class=\"form-control\"/>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"downCatcode\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"category of downloads.appCatsArray\" value=\"${category.downCatcode}\">${category.description}</option>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\"  class=\"form-control\" id=\"active\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">Active</option>\r\n                                    <option value=\"false\">Inactive</options>\r\n                                </select>\r\n                                </th>\r\n                                <th>\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketRelevant\" compare=\"boolean\">\r\n                                    <option value=\"\"></option>\r\n                                    <option value=\"true\">True</option>\r\n                                    <option value=\"false\">False</options>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                                <td data-title=\"Name\">${item.name}</td>\r\n                                <td data-title=\"Original Filename\" style=\"width: 75px\">\r\n                                    <div>${item.file.originalFilename}</div>\r\n                                </td>\r\n                                <td data-title=\"Type\" style=\"width: 75px\">\r\n                                    <div>${item.downCatcode | lookupDescription:downloads.appCatsArray:'downCatcode'}</div>\r\n                                </td>\r\n                                <td data-title=\"Status\">${item.active | translateStatus}</td>\r\n                                <td data-title=\"Help Ticket Relevant\">${item.helpTicketRelevant}</a>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/site/components/htTypeForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-12\">\n\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"bottomMargin panel panel-default leftMargin rightMargin\">\n\t\t\t<div class=\"panel-body\">\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t<div class=\"col-lg-4\">\n\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\n\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<div class=\"col-lg-1 topMargin\">\n\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.showSubtypes\" id=\"subtypesCheckBox\" type=\"checkbox\"> Show subtypes\n\t\t\t\t\t\t</label>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t</div>\n</template>"; });
 define('text!modules/admin/site/components/htTypeTable.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t</div>\n\t<div class=\"fluid-container\">\n\t\t<div class=\"row leftMargin rightMargin\">\n\t\t\t<div class=\"form-group topMargin col-lg-5\">\n\t\t\t\t<select value.bind=\"selectedCategory\" change.delegate=\"selectCategory()\" id=\"category\" class=\"form-control\">\n\t\t\t\t<option value=\"-1\">Select a Category</option>\n\t\t\t\t<option repeat.for=\"type of helpTickets.helpTicketTypesArray\"\n\t\t\t\t\t\tvalue.bind=\"$index\">${type.description}</option>\n\t\t\t\t</select>\n\t\t\t\t <a class=\"btn btn-link\" click.trigger=\"newCategory()\" aria-hidden=\"true\">(Add a Category)</a>\n\t\t\t<!--\t<span click.delegate=\"newCategory()\" class=\"topMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span> -->\n\t\t\t</div>\n\t\t\t<div show.bind=\"selectedCategory > -1\" class=\"form-group topMargin col-lg-5\">\n\t\t\t\t<select value.bind=\"selectedSubtype\" change.delegate=\"typeSelected()\" id=\"course\"\n\t\t\t\t\t\tclass=\"form-control\">\n\t\t\t\t<option value=\"-1\">Select a Subtype</option>\n\t\t\t\t<option repeat.for=\"subtype of helpTickets.selectedHelpTicketType.subtypes\"\n\t\t\t\t\t\tvalue.bind=\"$index\">${subtype.description}</option>\n\t\t\t\t</select>\n\t\t\t\t <a class=\"btn btn-link\" click.trigger=\"newCategory()\" aria-hidden=\"true\">(Add a Subtype)</a>\n\t\t\t<!--\t<span click.delegate=\"newSubtype()\" class=\"topMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Subtype\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span> -->\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div show.bind=\"selectedCategory > -1\">\n\t\t\t<h4>Category</h4>\n\t\t\t<div class=\"bottomMargin panel panel-default leftMargin rightMargin\">\n\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-lg-4\">\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\n\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"col-lg-8\">\n\t\t\t\t\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.showSubtypes\" id=\"subtypesCheckBox\" type=\"checkbox\"> Show subtypes\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"selectedSubtype > -1\">\n\t\t\t\t<h4>Subtype</h4>\n\t\t\t\t<div class=\"bottomMargin panel panel-default leftMargin rightMargin\">\n\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].active\" id=\"activeSubtypesCheckBox\" type=\"checkbox\"> Active\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-4\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"editKey\" class=\"col-sm-2 control-label hideOnPhone\">Key</label>\n\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].type\" id=\"editKey\" class=\"form-control \" placeholder=\"Key\"\n\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].public\" id=\"publicSubtypesCheckBox\" type=\"checkbox\"> Public\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].appsRequired\" id=\"appsSubtypesCheckBox\" type=\"checkbox\"> Applications Required\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t\t\t\t\t<div class=\"checkbox \">\n\t\t\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t<input checked.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].clientRequried\" id=\"clientSubtypesCheckBox\" type=\"checkbox\"> Client Required\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-lg-4\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].description\" id=\"editSubtypeDescription\" class=\"form-control \" placeholder=\"Description\"\n\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<hr/>\n\t\t\t\t\t\t<div class=\"row\">\t\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"editInputForm\" class=\"col-sm-4 control-label hideOnPhone\">Input Form</label>\n\t\t\t\t\t\t\t\t\t<textarea value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].inputForm\" id=\"editInputForm\" class=\"form-control \" placeholder=\"Input Form\" rows=\"20\" ></textarea>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"bottomMargin panel panel-default col-lg-5\">\n\t\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t\t<label class=\"col-sm-12 control-label hideOnPhone\">Preview</label>\n\t\t\t\t\t\t\t\t\t<div innerhtml.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].inputForm\"></div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\t\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"editOutputForm\" class=\"col-sm-4 control-label hideOnPhone\">Output Form</label>\n\t\t\t\t\t\t\t\t\t<textarea value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].outputForm\" id=\"editOutputForm\" class=\"form-control \" placeholder=\"Input Form\" rows=\"20\" ></textarea>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"bottomMargin panel panel-default col-lg-5\">\n\t\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t\t<label class=\"col-sm-12 control-label hideOnPhone\">Preview</label>\n\t\t\t\t\t\t\t\t\t<div innerhtml.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].outputForm\"></div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"form-group topMargin col-lg-5\">\n\t\t\t\t\t\t\t\t<select value.bind=\"selectedValidationRules\" change.delegate=\"selectCategory()\" id=\"validation\" class=\"form-control\">\n\t\t\t\t\t\t\t\t<option value=\"-1\">Select a Rule</option>\n\t\t\t\t\t\t\t\t<option repeat.for=\"type of helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation\"\n\t\t\t\t\t\t\t\t\t\tvalue.bind=\"$index\">${type.rule} - ${type.value}</option>\n\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div show.bind=\"selectedValidationRules > -1\" class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-10\">\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t\t<label for=\"editRule\" class=\"col-sm-2 control-label hideOnPhone\">Rule</label>\n\t\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].rule\" id=\"editRule\" class=\"form-control\" placeholder=\"Rule\"\n\t\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t\t<label for=\"editRule\" class=\"col-sm-2 control-label hideOnPhone\">Value</label>\n\t\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].value\" id=\"editRule\" class=\"form-control\" placeholder=\"Value\"\n\t\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t\t<label for=\"editRule\" class=\"col-sm-2 control-label hideOnPhone\">Message</label>\n\t\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].message\" id=\"editRule\" class=\"form-control\" placeholder=\"Message\"\n\t\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t\t<label for=\"editRule\" class=\"col-sm-2 control-label hideOnPhone\">Control</label>\n\t\t\t\t\t\t\t\t\t\t<input value.bind=\"helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].control\" id=\"editRule\" class=\"form-control\" placeholder=\"Control\"\n\t\t\t\t\t\t\t\t\t\t\ttype=\"text\" />\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<compose view=\"./document.html\"></compose>\n\t\t</div>\n      </div>\n\t\n    </div>\n</template>"; });
-define('text!modules/admin/site/components/logFileTable.html', ['module'], function(module) { module.exports = "<template>\n\t<compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n\t<div id=\"no-more-tables\">\n\t\t<table class=\"table table-striped table-hover cf\">\n\t\t\t<thead class=\"cf\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td colspan='3'>\n\t\t\t\t\t\t<span click.delegate=\"fileSelected(fileIndex)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t\t<span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<th style=\"width:8em;\">Event<span click.trigger=\"dataTable.sortArray('event')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t\t<th style=\"width:8em;\" if.bind=\"screenToShow==='log'\">Code</th>\n\t\t\t\t\t<th>Data <span click.trigger=\"dataTable.sortArray('user')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t\t<th>Time <span click.trigger=\"dataTable.sortArray('date')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"event\" type=\"text\" placeholder=\"Filter Event\" class=\"form-control\" ref=\"eventFilter\"/>\n\t\t\t\t\t</th>\n\t\t\t\t\t<th if.bind=\"screenToShow==='log'\">\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"code\" type=\"text\" placeholder=\"Filter Event\" class=\"form-control\" ref=\"codeFilter\" />\n\t\t\t\t\t</th>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"data\" type=\"text\" placeholder=\"Filter Email\" class=\"form-control\" ref=\"dataFilter\" />\n\t\t\t\t\t</th>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t\n\t\t\t\t\t</th>\n\t\t\t\t</tr>\n\t\t\t\t<tr repeat.for=\"item of dataTable.displayArray\">\n\t\t\t\t\t<td data-title=\"Event\">${item.event}</td>\n\t\t\t\t\t<td if.bind=\"screenToShow==='log'\" data-title=\"Code\">${item.code}</td>\n\t\t\t\t\t<td data-title=\"Data\"><span innerhtml.bind=\"item.data\"></span></td>\n\t\t\t\t\t<td data-title=\"Date\">${item.date}</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>"; });
+define('text!modules/admin/site/components/logFileTable.html', ['module'], function(module) { module.exports = "<template>\n\t<compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n\t<div id=\"no-more-tables\">\n\t\t<table class=\"table table-striped table-hover cf\">\n\t\t\t<thead class=\"cf\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td colspan='3'>\n\t\t\t\t\t\t<span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t\t<span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<th style=\"width:8em;\">Event<span click.trigger=\"dataTable.sortArray('event')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t\t<th style=\"width:8em;\" if.bind=\"screenToShow==='log'\">Code</th>\n\t\t\t\t\t<th>Data <span click.trigger=\"dataTable.sortArray('user')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t\t<th>Time <span click.trigger=\"dataTable.sortArray('date')\"><i class=\"fa fa-sort\"></i></span></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"event\" type=\"text\" placeholder=\"Filter Event\" class=\"form-control\" ref=\"eventFilter\"/>\n\t\t\t\t\t</th>\n\t\t\t\t\t<th if.bind=\"screenToShow==='log'\">\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"code\" type=\"text\" placeholder=\"Filter Event\" class=\"form-control\" ref=\"codeFilter\" />\n\t\t\t\t\t</th>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t<input input.delegate=\"dataTable.filterList($event)\" id=\"data\" type=\"text\" placeholder=\"Filter Email\" class=\"form-control\" ref=\"dataFilter\" />\n\t\t\t\t\t</th>\n\t\t\t\t\t<th>\n\t\t\t\t\t\t\n\t\t\t\t\t</th>\n\t\t\t\t</tr>\n\t\t\t\t<tr repeat.for=\"item of dataTable.displayArray\">\n\t\t\t\t\t<td data-title=\"Event\">${item.event}</td>\n\t\t\t\t\t<td if.bind=\"screenToShow==='log'\" data-title=\"Code\">${item.code}</td>\n\t\t\t\t\t<td data-title=\"Data\"><span innerhtml.bind=\"item.data\"></span></td>\n\t\t\t\t\t<td data-title=\"Date\">${item.date}</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n</template>"; });
 define('text!modules/admin/site/components/messageForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <!--\n            <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n            -->\n        </div>         \n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedMessage.category\" class=\"form-control\" id=\"category\">\n                                <option value=\"\">-- Select an Option --</option>\n                                <option value=\"${type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editKey\" class=\"col-sm-2 control-label hideOnPhone\">Key</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.key\" id=\"editKey\" class=\"form-control \" placeholder=\"Key\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedMessage.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <editor value.bind=\"siteinfo.selectedMessage.content\" height=\"250\"></editor>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Preview</label>\n                        <div class=\"col-sm-8\">\n                            <div show.bind=\"siteinfo.selectedMessage.content\" class=\"bottomMargin topMargin\" innerhtml.bind=\"siteinfo.selectedMessage.content\"></div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            -->\n        </form>\n    </div>\n</template>\n"; });
 define('text!modules/admin/site/components/messageTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='3'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\">Key <span click.trigger=\"dataTable.sortArray('key')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Category <span click.trigger=\"dataTable.sortArray('category')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:150px;\">Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n                                    <option value=\"\"></option>\n                                    <option value=\"${type.type}\" repeat.for=\"type of config.MESSAGE_TYPES\">${type.description}</option>\n                                </select>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"key\" type=\"text\" placeholder=\"Key\" class=\"form-control\" />\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"description\" type=\"text\" placeholder=\"Description\" class=\"form-control\"\n                                    />\n                                </th>\n                            </tr>\n                            <tr click.trigger=\"edit($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"Key\">${item.key}</td>\n                                <td data-title=\"Category\" style=\"width: 75px\">\n                                    <div>${item.category}</div>\n                                </td>\n                                <td data-title=\"Description\" style=\"width: 75px\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/newsForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"siteinfo.selectedItem._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n\n            <!-- Row 1 -->\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-sm-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.itemType\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type.type}\" repeat.for=\"type of config.SITE_INFO_TYPES\">${type.description}</optionp>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\" show.bind=\"siteinfo.selectedItem.itemType == 'SYST'\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editPriority\" class=\"col-sm-2 control-label hideOnPhone\">Priority</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"siteinfo.selectedItem.priority\" class=\"form-control \" id=\"priority\">\n                                <option value=\"\"></option>\n                                <option value=\"INFO\">Information</option>\n                                <option value=\"WARN\">Warning</options>\n                                <option value=\"DANG\">Danger</options>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editContent\" class=\"col-sm-2 control-label hideOnPhone\">Content</label>\n                        <div class=\"col-sm-8\">\n                            <editor value.bind=\"siteinfo.selectedItem.content\" height=\"250\"></editor>                           \n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCategory\" class=\"col-sm-2 control-label hideOnPhone\">Category</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.category\" id=\"editCategory\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editUrl\" class=\"col-sm-2 control-label hideOnPhone\"><a href=\"${siteinfo.selectedItem.url}\" target=\"_blank\">URL</a></label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.url\" id=\"editUrl\" class=\"form-control \" placeholder=\"URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editCreatedDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Created</label>\n                        <div class=\"col-sm-8\">\n                            <flat-picker controlid=\"editCreatedDate\" config.bind=\"config\"  value.bind=\"siteinfo.selectedItem.createdDate\"></flat-picker>\n                          <!--  <date-picker value.two-way=\"siteinfo.selectedItem.createdDate\"  controlid=\"editCreatedDate\"></date-picker> -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editExpireddDate\" class=\"col-sm-2 control-label hideOnPhone\">Date Expires</label>\n                        <div class=\"col-sm-8\">\n                            <flat-picker controlid=\"editCreatedDate\" config.bind=\"config\"  value.bind=\"siteinfo.selectedItem.expiredDate\"></flat-picker>\n                             <!-- <date-picker value.two-way=\"siteinfo.selectedItem.expiredDate\"  controlid=\"editExpireddDate\"></date-picker> -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editImageUrl\" class=\"col-sm-2 control-label hideOnPhone\">Image URL</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.image\" id=\"editImageUrl\" class=\"form-control \" placeholder=\"Image URL\" type=\"text\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n             <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editSortOrder\" class=\"col-sm-2 control-label hideOnPhone\">Sort Order</label>\n                        <div class=\"col-sm-8\">\n                            <input value.bind=\"siteinfo.selectedItem.sortOrder\" id=\"editSortOrder\" class=\"form-control \" placeholder=\"Sort Order\" type=\"number\" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-lg-9 col-lg-offset-2\">\n                    <div class=\"col-lg-2\">\n                        <label class=\"btn btn-primary\">\n                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\n                        </label>\n                    </div>\n                    <div class=\"col-lg-6\">\n                        <ul>\n                            <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                        </ul>\n                    </div>\n                </div>\n            </div>          \n        </form>\n    </div>\n</template>\n"; });
@@ -35685,7 +35791,7 @@ define('text!modules/admin/system/components/systemTable.html', ['module'], func
 define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div  class=\"panel panel-default topMargin\">\n            <div class=\"panel-body leftJustify\">\n              <div class=\"bottomMargin\">\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"save()\">Save</button>\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"cancel()\">Cancel</button>\n              </div>\n              <div class=\"form-group\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>\n                  </div>\n                </div>\n                 \n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddUnder\" class=\"control-label\">Add Undergraduates</label>\n                            <input value.bind=\"requests.selectedRequest.addUndergraduates\" id=\"editAddUnder\" class=\"form-control input-sm\" placeholder=\"Addiiontal undergraduates\" type=\"number\" />\n                        </div>\n                    </div>\n                              \n                    <div class=\"col-lg-4 col-lg-offset-2\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddGrad\" class=\"control-label\">Add Graduate</label>\n                             <input value.bind=\"requests.selectedRequest.addGraduates\" type=\"number\" id=\"editAddGrad\" class=\"form-control input-sm\" placeholder=\"Addiiontal Graduates\"/>\n                        </div>\n                    </div>\n                  </div>\n                \n                \n                 <label show.bind=\"request.addUndergraduates > 0\">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>\n                 <label show.bind=\"request.addGraduates > 0\">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>\n              </div>\n              <div class=\"leftJustify\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"beginDate\" class=\"leftJustify\">Date the course begins</label>\n                          <input change.trigger=\"changeBeginDate()\" type=\"date\" value.bind=\"requests.selectedRequest.startDate\"\n                                class=\"form-control\" id=\"beginDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"endDate\" class=\"leftJustify\">Date the course ends</label>\n                          <input change.trigger=\"changeEndDate()\" type=\"date\" value.bind=\"requests.selectedRequest.endDate\"\n                                class=\"form-control\" id=\"endDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                \n              </div>\n               <textarea  placeholder=\"Additional Comments\" class=\"topMargin col-lg-12\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n              \n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n</template>\n    "; });
 define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n   <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${people.selectedPerson.nickName}</h5>\n        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>\n        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>\n        <h5>Email: ${people.selectedPerson.email}</h5>\n      </div>\n  </div>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n    <div class='row'>\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='6'>\n                <div class=\"checkbox\">\n                    <label>\n                        <input checked.bind=\"isChecked\" change.trigger=\"filterInAssigned()\" type=\"checkbox\"> Show assigned requests\n                    </label>\n                </div>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <span click.delegate=\"refresh()\"class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n            </td>\n          </tr>\n          <tr>\n            <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('requiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Type</th>\n            <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-sm-1\">IDS Requestd</th>\n            <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th></th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestId.courseId\" compare=\"obj\" ref=\"courseFilter\">\n                <option value=\"\"></option>\n                <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\n                <option  value=\"NOT${config.SANDBOX_ID}\">Regular</option>\n              </select>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\" ref=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n            </th>\n            <th></th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, products.productsArray)\" id=\"productId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"productFilter\"/>\n              <!--\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n              </select>\n              -->\n            </th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"requestId.personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n            </th>\n          </tr>\n          <tr repeat.for=\"request of dataTable.displayArray\" class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requestNo\">${request.requestNo}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n            <td  mouseover.delegate=\"showComment(request, $event)\" mouseout.delegate=\"hideComment()\"  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"ids-requested\">${request.requestId | idsRequested}\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"product\">${request.productId | productName:products.productsArray}</td>\n            <td  class=\"dropbtn\" click.delegate=\"showProfile(request, $event)\"  data-title=\"Name\">${request.requestId.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  </div>\n</template>"; });
-define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"col-lg-12\">\n        <h4>Request No: ${requests.selectedRequestDetail.requestNo}</h4>\n      </div>\n\n      <div class=\"col-lg-12\">\n        <div class=\"col-lg-2\">\n          <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n        </div>\n        <div class=\"col-lg-3\">\n            <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n        </div>\n\n        <div class=\"col-lg-2\">\n            <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n        </div>\n      </div>\n\n        <!-- Faculty Detail Form -->\n        <div class=\"col-lg-12\">\n          <span show.bind=\"facultyDetails\">\n              <div class=\"col-lg-2\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Phone: ${people.selectedPerson.phone | phoneNumber}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Mobile: ${people.selectedPerson.mobile | phoneNumber}</h5>\n              </div>\n          </span>\n        </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <!--\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        -->\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12\">\n                    <div class=\"panel-body\">\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control input-lg\"/>\n                        </div>\n                    </div>\n                    <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-2x\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-2x\" aria-hidden=\"true\"></i></span>\n                    </div>\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <textarea innerhtml.bind=\"requests.selectedRequestDetail.techComments\" class=\"form-control\" rows=\"10\"></textarea>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly && products.selectedProduct.clientRelevant\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\" show.bind=\"products.selectedProduct.clientRelevant\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
+define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"col-lg-12\">\n        <h4>Request No: ${requests.selectedRequestDetail.requestNo}</h4>\n      </div>\n\n      <div class=\"col-lg-12\">\n        <div class=\"col-lg-2\">\n          <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n        </div>\n        <div class=\"col-lg-3\">\n            <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n        </div>\n\n        <div class=\"col-lg-2\">\n            <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n        </div>\n      </div>\n\n        <!-- Faculty Detail Form -->\n        <div class=\"col-lg-12\">\n          <span show.bind=\"facultyDetails\">\n              <div class=\"col-lg-2\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Phone: ${people.selectedPerson.phone | phoneNumber}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Mobile: ${people.selectedPerson.mobile | phoneNumber}</h5>\n              </div>\n          </span>\n        </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <!--\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        -->\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12 editPanel\">\n                    <div class=\"panel-body\">\n                      <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Template\"><i class=\"fa fa-floppy-o fa-lg\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg\" aria-hidden=\"true\"></i></span>\n                      </div>\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control\"/>\n                        </div>\n                    </div>\n\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <textarea innerhtml.bind=\"requests.selectedRequestDetail.techComments\" class=\"form-control\" rows=\"10\"></textarea>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly && products.selectedProduct.clientRelevant\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\" show.bind=\"products.selectedProduct.clientRelevant\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
 define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n          <!--\n          <div class=\"col-lg-6\">\n             Request Details\n            <compose view=\"./requestDetails.html\"></compose>\n          </div>\n          -->\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/tech/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div> \n    \n     <div class=\"col-lg-12 topMargin\">\n          <div id=\"container\" ></div>\n            \n        <!-- Additional Information Panel -->\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n        </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });

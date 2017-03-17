@@ -45,6 +45,11 @@ export class Admin {
 		});
     }
 
+	async refresh(){
+		await this.typeSelected();
+		this.fileSelected(this.fileIndex);
+	}
+
 	async typeSelected(){
 		this.clearFilters();
 		switch(this.screenToShow){
@@ -57,7 +62,7 @@ export class Admin {
 					};
 					this.fileList.reverse();
 				}
-				break;
+				break; 
 			case 'log':
 				let logResponse = await this.admin.getLogs();
 				if(!logResponse.error){
@@ -74,6 +79,7 @@ export class Admin {
 					this.showFileList = true;
 					this.uploadedFileList = this.admin.filesList;
 				}
+				this.fileList = new Array();
 				break;
 			default:
 				this.fileList = new Array();
@@ -109,10 +115,10 @@ export class Admin {
 				if(!logResponse.error){
 					this.fileContents = new Array();
 					for(let i = 0; i < this.admin.logContents.length; i++){
-						var j, code;
+						var j, code;					
 						if(this.admin.logContents[i].message){
 							let dateTime = new Date(this.admin.logContents[i].timestamp);
-							let array = this.admin.logContents[i].message.split('-');
+							let array = this.admin.logContents[i].message.split('@@');
 							let data = "";
 							if(this.admin.logContents[i].level !== 'error'){
 								j = 0;
@@ -127,7 +133,7 @@ export class Admin {
 							this.fileContents.push({
 								event: this.admin.logContents[i].level,
 								code: code,
-								data: data,
+								data: data.replace(/%/g,":"),
 								date: moment(dateTime).format("YYYY-MM-DD HH:mm:ss")
 							})
 						}
@@ -194,16 +200,47 @@ export class Admin {
 		console.log(this.deletedFile)
 	}
 
-	async deleteFiles(){
+	deleteFiles(){	
+		if(!this.filesToDelete || this.filesToDelete <= 0) return;
+		var msg = "Are you sure you want to delete " + this.filesToDelete + " log files?  This action cannot be undone.";
+		
+		return this.dialog.showMessage(
+			msg,
+			"Confirm", 
+			['Yes', 'No']
+			).then(response => {
+				if(!response.wasCancelled){
+					this.deleteTheFiles();
+				} 
+			});
+	}
+
+	async deleteTheFiles(){
 		switch(this.screenToShow){
 			case 'auth':
-				this.filesToDelete = parseInt(this.filesToDelete)
+				this.filesToDelete = parseInt(this.filesToDelete) <= this.fileList.length - 1  ? parseInt(this.filesToDelete) : this.fileList.length - 1;
 				if(this.filesToDelete > 0){
-					let deleteFileArray = new Array();
-					for(let i = 0; i <= this.filesToDelete, i < this.fileList.length; i++ ){
-						deleteFileArray.push(this.fileList[i]);
+					var deleteFileArray = new Array();
+					for(let i = 1; i <= this.filesToDelete; i++ ){
+						deleteFileArray.push(this.fileList[ this.fileList.length - i]);
 					}
 					let response = await this.admin.deleteAuthFiles(deleteFileArray);
+					if(!response.error){
+
+						this.utils.showNotification(this.filesToDelete + ' files were deleted');
+					} else {
+						this.utils.showNotification('There was problem deleting the files');
+					}
+				}
+				break;
+			case 'log':
+				this.filesToDelete = parseInt(this.filesToDelete) <= this.fileList.length - 1  ? parseInt(this.filesToDelete) : this.fileList.length - 1;
+				if(this.filesToDelete > 0){
+					var deleteFileArray = new Array();
+					for(let i = 1; i <= this.filesToDelete; i++ ){
+						deleteFileArray.push(this.fileList[this.fileList.length - i]);
+					}
+					let response = await this.admin.deleteLogFiles(deleteFileArray);
 					if(!response.error){
 
 						this.utils.showNotification(this.filesToDelete + ' files were deleted');

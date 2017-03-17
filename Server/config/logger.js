@@ -32,7 +32,7 @@ var logDir = 'log';
 	}
 
 	logError = function(message){
-		var msg = message.code + "-" + message.message;
+		var msg = message.code + "@@" + message.message.split(":").join('%').replace(',','') + "@@" + message.err.split(":").join('%').replace(',','') + "@@" + message.ip.split(":").join('%');
 		logger.log('error',msg);
 	}
 

@@ -6,6 +6,8 @@ import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 import {AppConfig} from "../../config/appConfig";
 import { CommonDialogs } from '../dialogs/common-dialogs';
+import moment from 'moment';
+import * as toastr from "toastr";
 
 
 // @inject(Router, AuthService, People, AppState, Utils, AppConfig, BindingEngine)
@@ -34,11 +36,9 @@ export class NavBar {
         if(!response.error){
             sessionStorage.setItem('uccweather', JSON.stringify({temp: response.temp, icon: response.icon}));
             this.loginError = "";
-            console.log(response);
             this.loginSuccess();
             this.isAuthenticated = this.auth.isAuthenticated(); 
         } else {
-            console.log(response);
             this.loginError = "Invalid credentials.";
         }
     }
@@ -71,6 +71,7 @@ export class NavBar {
                 } else {
                     if (!this.userObj.userRole)  this.logout();
                     sessionStorage.setItem('role',this.userObj.userRole)
+                    this.reminders();
                     this.router.navigate("user");
                 }
             }
@@ -120,8 +121,119 @@ export class NavBar {
             if(!response.error){
                 this.utils.showNotification('The note was saved');
             }
-        // console.log(note.note.noteBody);
-        // console.log(note.selectedCategory);
+    }
+
+    openAlert(alert){
+        this.alert = alert;
+        $(".hoverProfile").css("top", 100);
+        $(".hoverProfile").css("left", 100);
+        $(".hoverProfile").css("display", "block");
+        sessionStorage.setItem('alert',true);
+    }
+    
+    hideAlert(){
+        $(".hoverProfile").css("display", "none");
+    }
+
+    async reminders(){
+
+        let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+        if(!response.error && this.people){
+            toastr.options.closeButton = true;
+            toastr.options.closeMethod = 'fadeOut';
+            toastr.options.closeDuration = 300;
+            toastr.options.closeEasing = 'swing';
+            this.timeReminders = new Array();
+            var now = new Date();
+            var weekDay = now.getDay()
+            var monthDay = now.getDate();
+            this.reccurentReminders = new Array();
+            this.people.remindersArray.forEach((item, index) => {
+                switch(item.reminderType){
+                     case "D":
+                        if(!item.lastSeen || !moment(now).isSame(item.lastSeen,'day')) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "W":
+                        if(item.reminderDay == weekDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'day'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "M":
+                        if(item.reminderDay == monthDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "A":
+                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+                            if(item.priority == 1){
+                                toastr.error(item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item, index);
+                        }
+                        break;
+                    case "T":
+                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {                            
+                            let diff = moment(now).diff(item.dateStartRemind, 'minutes');                         
+                            if(diff >= -15){
+                                if(item.priority == 1){
+                                    toastr.error(item.note, "Reminder");
+                                } else {
+                                    toastr.info(item.note, "Reminder");
+                                }
+                                item.lastSeen = now;
+                                this.people.saveReminder(item, index);
+                            } else {
+                                this.timeReminders.push({item: item, index: index});
+                            }
+                        }
+                }
+            })
+
+            if(this.timeReminders.length > 0){
+                 setInterval(() => {
+                    console.log('Checked reminders');
+                    var now = new Date();
+                    this.timeReminders.forEach(item => {                        
+                        let diff = moment().diff(item.item.dateStartRemind, 'minutes');
+                        if(diff >= -15){
+                            if(item.priority == 1){
+                                toastr.error(item.item.note, "Reminder");
+                            } else {
+                                toastr.info(item.note, "Reminder");
+                            }
+                            item.lastSeen = now;
+                            this.people.saveReminder(item.item, item.index);
+                        }
+                    });
+                    
+                }, 10000);
+            }
+
+           
+        }
     }
 
 }

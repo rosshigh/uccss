@@ -72,9 +72,9 @@ export class ClientRequests {
         url += options ? options : "";
         var response = await this.data.get(url);
         if (!response.error) {
-            this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_CLIENT_REQUEST, 'requestStatus', response);
-            this.updatedRequests =  this.utils.countItems(this.config.UPDATED_CLIENT_REQUEST, 'requestStatus', response);
-            this.customerActionRequests =  this.utils.countItems(this.config.CUSTOMER_ACTION_CLIENT_REQUEST, 'requestStatus', response);
+            this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_REQUEST_CODE, 'requestStatus', response);
+            this.updatedRequests =  this.utils.countItems(this.config.UPDATED_REQUEST_CODE, 'requestStatus', response);
+            this.customerActionRequests =  this.utils.countItems(this.config.CUSTOMER_ACTION_REQUEST_CODE, 'requestStatus', response);
             return response.count;
         } else {
             return null;
@@ -238,8 +238,8 @@ export class ClientRequests {
         if(!this.selectedRequest){
             return;
         }
-var url =  this.data.CLIENT_REQUESTS_SERVICES;
-        // var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
+        // var url =  this.data.CLIENT_REQUESTS_SERVICES;
+        var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
 
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
@@ -264,8 +264,8 @@ var url =  this.data.CLIENT_REQUESTS_SERVICES;
         if(!this.selectedRequest){
             return;
         }
-var url = this.data.CLIENT_REQUESTS_SERVICES + '/assign';
-        // var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.data.CLIENT_REQUESTS_SERVICES + '/assign';
+        // var url = this.data.CLIENT_REQUESTS_SERVICES + '/assign';
+        var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.data.CLIENT_REQUESTS_SERVICES + '/assign';
          var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
         if(!serverResponse.error){
                 if(this.requestsArray && this.editRequestIndex){

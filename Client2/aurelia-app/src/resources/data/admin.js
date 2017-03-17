@@ -55,6 +55,14 @@ export class AdminData{
 		}
 	}
 
+	async deleteLogFiles(filesToDelete){
+		let obj = {
+			files: filesToDelete
+		};
+		let response = await this.data.saveObject(obj, this.LOG_SERVICE, "put");	
+		return response;
+	}
+
 	async getFiles(){
 		let response = await this.data.get(this.FILES_SERVICE);
 		if(!response.error){

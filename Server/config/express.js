@@ -65,24 +65,25 @@ module.exports = function(app, config) {
 
   // error handler for all the applications
   app.use(function (err, req, res, next) {
-        
+console.log(err.stack)        
+// console.log('laskjdflajsflj;')
     var url_parts = url.parse(req.url);
     switch (err.status) {
         case 401:
             code = err.status;
-            var msg = {event: 'error', code: 401, message: "Unauthorized Access-" + url_parts.pathname, error: 401};
+            var msg = {event: 'error', code: 401, message: "Unauthorized Access-" + url_parts.pathname, error: 401, ip: req.connection.remoteAddress};
             break;
         case 409:
             code = err.status;
-            var msg = {event: 'error', code: 409, message: "Duplicate record found-" + url_parts.pathname, error: 409};
+            var msg = {event: 'error', code: 409, message: "Duplicate record found-" + url_parts.pathname, error: 409, ip: req.connection.remoteAddress};
             break;
         case 404:
             code = err.status;
-            var msg = {event: 'error', code: 404, message: url_parts.pathname, error: 404};
+            var msg = {event: 'error', code: 404, message: url_parts.pathname, error: 404, ip: req.connection.remoteAddress};
             break;
         default:
             code = 500;
-            var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500};
+            var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500, ip: req.connection.remoteAddress, err: err.stack};
             break;
     }
     logger.logError(msg);

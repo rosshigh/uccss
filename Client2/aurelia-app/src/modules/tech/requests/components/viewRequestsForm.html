@@ -180,16 +180,17 @@
         </div>
         <!-- Add Student ID Template -->
             <div class="row" show.bind="showAddStudentTemplate">
-                <div class="panel panel-default col-md-12">
+                <div class="panel panel-default col-md-12 editPanel">
                     <div class="panel-body">
+                      <div class="bottomMargin">
+                        <span click.delegate="saveStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Template"><i class="fa fa-floppy-o fa-lg" aria-hidden="true"></i></span>
+                        <span click.delegate="cancelEditStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg" aria-hidden="true"></i></span>
+                      </div>
                         <div class="form-group">
-                            <input id="number" value.bind="products.selectedProduct.defaultStudentIdPrefix" type="text" placeholder="Template" class="form-control input-lg"/>
+                            <input id="number" value.bind="products.selectedProduct.defaultStudentIdPrefix" type="text" placeholder="Template" class="form-control"/>
                         </div>
                     </div>
-                    <div class="bottomMargin">
-                        <span click.delegate="saveStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i></span>
-                        <span click.delegate="cancelEditStudentTemplate()" class="smallLeftMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-2x" aria-hidden="true"></i></span>
-                    </div>
+
                 </div>
             </div>
           <div class="row">

@@ -7,7 +7,7 @@
                     <table id="newsTable" class="table table-striped table-hover cf">
                         <thead class="cf">
                             <tr>
-                                <td colspan='4'>
+                                <td colspan='5'>
                                     <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
                                     <span click.delegate="new()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
                                     <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
@@ -15,6 +15,7 @@
                             </tr>
                             <tr>
                                 <th style="width:250px;">Category <span click.trigger="dataTable.sortArray('category')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:8em;">Reminder Type <span click.trigger="dataTable.sortArray('reminderType')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Start <span click.trigger="dataTable.sortArray('dateStartRemind')"><i class="fa fa-sort"></i></span></th>
                                 <th style="width:150px;">Note <span click.trigger="dataTable.sortArray('note')"><i class="fa fa-sort"></i></span></th>
                                 <th></th>
@@ -30,6 +31,17 @@
 										<option value="${type}" repeat.for="type of userObj.noteCategories">${type}</optionp>
 									</select>
                                 </th>
+                                 <th>
+                                     <select class="form-control" id="reminderType"  change.delegate="dataTable.filterList($event)" id="reminderType"
+                                        compare="id" type="select-one" ref="reminderType">
+                                            <option value=""></option>
+                                            <option value="T">Time</option>
+                                            <option value="D">Daily</option>
+                                            <option value="W">Weekly</option>
+                                            <option value="M">Monthly</option>
+                                            <option value="A">Annual</option>
+                                    </select>
+                                 </th>
                                 <th>
                                     <input input.delegate="dataTable.filterList($event)" id="dateStartRemind" type="date" placeholder="Filter Date" class="form-control"/>
                                 </th>
@@ -42,6 +54,7 @@
                             </tr>
                             <tr class="${item.isReminder} ? 'warning' : ''}" repeat.for="item of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Category">${item.category}</td>
+                                <td click.trigger="edit($index, $event)" data-title="Type">${item.reminderType}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Date Start" style="width: 75px">
                                     <div>${item.dateStartRemind | dateFormat:config.DATE_FORMAT_TABLE}</div>
                                 </td>
