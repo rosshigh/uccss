@@ -9,12 +9,12 @@ import {AppConfig} from '../../../config/appConfig';
 import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
-
+import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, DataTable, Utils, Sessions, Systems, Products, ClientRequests)
+@inject(Router, AppConfig, Validation, People, DataTable, Utils, Sessions, Systems, Products, ClientRequests, CommonDialogs)
 export class ViewRequests {
   requestSelected = false;
   showLockMessage = false;
@@ -25,7 +25,7 @@ export class ViewRequests {
   spinnerHTML = "";
   lockObject = new Object();
 
-  constructor(router, config, validation, people, datatable, utils, sessions, systems, products, requests) {
+  constructor(router, config, validation, people, datatable, utils, sessions, systems, products, requests, dialogs) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -38,7 +38,8 @@ export class ViewRequests {
     this.products = products;
     this.requests = requests;
     this.systems = systems;
-  };;
+    this.dialogs = dialogs;
+  };
 
   canActivate(){
     this.userObj = JSON.parse(sessionStorage.getItem('user'))
@@ -180,6 +181,40 @@ export class ViewRequests {
         this.requests.selectedRequest.requestDetails.push(item._id)
     });
     return true;
+  }
+
+  delete(){
+     return this.dialogs.showMessage(
+        "Are you sure you want to delete that request?",
+        "Delete Request",
+        ['Yes','No']
+        ).then(response => {
+          if (!response.wasCancelled) {
+             this.deleteRequest();
+          }
+        });
+  }
+
+  async deleteRequest(){
+      this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].delete = true;
+      this.requests.selectedRequest.audit.push({
+        property: "Deleted Product",
+        newValue: this.requests.selectedRequest.requestDetails[this.selectedDetailIndex].productId,
+        personId: this.userObj._id
+      })
+      
+    this.requests.selectedRequest.requestDetailsToSave = new Array();
+    this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
+    this.requests.selectedRequest.requestDetails = new Array();
+    this.requests.selectedRequest.requestDetailsToSave.forEach((item) => {
+        this.requests.selectedRequest.requestDetails.push(item._id)
+    });
+    let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
+    if (!serverResponse.error) {
+      this.getRequests();
+      this.utils.showNotification("The request was deleted");
+    }
+    this._cleanUp();
   }
 
   _cleanUp(){

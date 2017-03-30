@@ -61,6 +61,14 @@ export class ViewHelpTickets {
         console.log("IN HERE")
         // This should yield: Object {testValue: "What just happened?"}
     });
+
+    this.useSandbox = this.config.SANDBOX_USED == 1;
+    if(this.config.SANDBOX_USED == 1){
+      this.typeSelected = true;
+      this.regularClient = true;
+      this.requestType = "regularCourse";
+    }
+   
    
   };
 
@@ -158,7 +166,7 @@ export class ViewHelpTickets {
    * el - event object
    ******************************************************************/
   async changeSession(el){
-    if(!this.sessionId){
+    if(this.sessionId == -1){
       //Drop down list changed to no session selected
       this.sessionSelected = false;
       this.courseSelected = false;

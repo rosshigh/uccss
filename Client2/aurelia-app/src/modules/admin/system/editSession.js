@@ -35,7 +35,7 @@ export class EditSessions {
     }
 
     async activate() {
-        await this.sessions.getSessionsArray('?order=startDate:DSC');
+        await this.sessions.getSessionsArray('?order=startDate:DSC', true);
         await this.config.getConfig();
         await this.config.getSessions();
         this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);

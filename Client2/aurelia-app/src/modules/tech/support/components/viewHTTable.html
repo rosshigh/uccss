@@ -63,11 +63,11 @@
               <th>No <span click.trigger="dataTable.sortArray('helpTicketNo')"><i class="fa fa-sort"></i></span></th>
               <th style="width:20em">Type <span click.trigger="dataTable.sortArray('helpTicketType')"><i class="fa fa-sort"></i></span><br></th>
               <th style="width:15em">Owner <span click.trigger="dataTable.sortArray('owner[0].personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th></th>
-              <th style="width:10em;">Status <span click.trigger="dataTable.sortArray('status')"><i class="fa fa-sort"></i></span><br></th>
+              <th style="width:10em;">Status <span click.trigger="dataTable.sortArray('helpTicketStatus')"><i class="fa fa-sort"></i></span><br></th>
               <th style="width:8em">Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
               <th style="width:8em">Date Updated <span click.trigger="dataTable.sortArray('modifiedDate')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:15em">Faculty <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:20em">Institution</th>
+              <th style="width:15em">Faculty <span click.trigger="dataTable.sortArray('personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th>
+              <th style="width:20em">Institution <span click.trigger="dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
               <th>Email</th>
             </tr>
           </thead>

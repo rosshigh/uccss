@@ -390,7 +390,7 @@ export class DataTable{
   }
 
   /***************************************************************
-   * propertyName - property to sort on unless a surrogate is provided
+   * propertyName - property to sort on unless a surrogate is provided 
    * type - indicates an alternate sorting method
    * surrogateArray - array that contains the property on which you want to sort
    * surrogateProperty - property in surrogate array that matches propertyname
@@ -419,14 +419,20 @@ export class DataTable{
         var sortArray = this.utils.copyArray(this.baseArray);
         sortArray.forEach((item) => {
           var obj = this.findObj(surrogateArray, surrogateProperty, eval('item.' + propertyName));
-          if(obj) item[sortProperty] = obj[sortProperty];
+
+          item[sortProperty] = obj ? obj[sortProperty] : null;
         })
         
         this.sortProperty=propertyName;
 
         this.baseArray = sortArray
           .sort((a, b) => {
-            var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+            var result;
+            if(a[sortProperty] === null) {
+              result = -1;
+            } else {
+              result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+            }
             return result * this.sortDirection;
           });
     } else if (type == 'object'){

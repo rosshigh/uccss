@@ -35,7 +35,14 @@
                             <tr  repeat.for="item of dataTable.displayArray">
                                 <td data-title="Parameter">${item.parameter}</td>
                                 <td data-title="Description">${item.description}</td>
-                                <td data-title="Value"><input readonly.bind="item.readOnly" value.bind="item.value" id="editValue" class="form-control" type="text" /></td>
+                                <td data-title="Value">
+                                    <input show.bind="item.type == 'value'" readonly.bind="item.readOnly" value.bind="item.value" id="editValue" class="form-control" type="text" />
+                                    <div show.bind="item.type == 'boolean'">
+                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 0" ><i class="fa fa-toggle-on fa-2x" aria-hidden="true"></i></span>
+                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 1" ><i class="fa fa-toggle-off fa-2x" aria-hidden="true"></i></span>
+                                    </div>
+                                </td>
+
                                 <td data-title="Modified Date"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>
                             </tr>
                         </tbody>

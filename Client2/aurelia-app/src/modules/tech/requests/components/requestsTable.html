@@ -43,7 +43,7 @@
             <th class="col-xs-1">No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Due <span click.trigger="dataTable.sortArray('requiredDate')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Type</th>
+            <th  show.bind="config.SANDBOX_USED == 0" class="col-lg-1">Type</th>
             <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')"><i class="fa fa-sort"></i></span></th>
             <th class="col-sm-1">IDS Requestd</th>
             <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
@@ -59,7 +59,7 @@
             <th>
               <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" compare="after" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
             </th>
-            <th>
+            <th  show.bind="config.SANDBOX_USED == 0" >
               <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestId.courseId" compare="obj" ref="courseFilter">
                 <option value=""></option>
                 <option  value="${config.SANDBOX_ID}">Sandbox</option>
@@ -90,11 +90,11 @@
             <td  click.trigger="selectRequest($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
             <td  click.trigger="selectRequest($index, $event, request)" data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
             <td  click.trigger="selectRequest($index, $event, request)" data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
-            <td  click.trigger="selectRequest($index, $event, request)" data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
+            <td  show.bind="config.SANDBOX_USED == 0" click.trigger="selectRequest($index, $event, request)" data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
             <td  mouseover.delegate="showComment(request, $event)" mouseout.delegate="hideComment()"  click.trigger="selectRequest($index, $event, request)" data-title="status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
             <td  click.trigger="selectRequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
             <td  click.trigger="selectRequest($index, $event, request)" data-title="product">${request.productId | productName:products.productsArray}</td>
-            <td  class="dropbtn" click.delegate="showProfile(request, $event)"  data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
+            <td  class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
           </tr>
         </tbody>
       </table>

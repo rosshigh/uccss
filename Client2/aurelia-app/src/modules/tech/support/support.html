@@ -1,6 +1,6 @@
 <template>
-    <nav class="navbar navbar-inverse subMenu">
-        <div class="container-fluid">
+    <div class="subMenu-container">
+        <nav class="navbar navbar-inverse subMenu">
             <div class="navbar-header">
                 <a class="navbar-brand">Tech Help Tickets</a>
             </div>
@@ -9,10 +9,12 @@
                     <li class="${row.isActive ? 'active' : ''}" repeat.for="row of router.navigation"><a href.bind="row.href">${row.title}</a></li>
                 </ul>
             </div>
+        
             <div class="pull-right">
                 <h5 class="rightMargin" style="color:white;">${userObj.fullName}</h5>
             </div>
-    </nav>
+        </nav>
+    </div>
     <div class="col-lg-12">
         <router-view></router-view>
     </div>

@@ -28,13 +28,12 @@ export class EditConfig {
         await this.siteConfig.getConfigArray(true)
 
         this.dataTable.updateArray(this.siteConfig.configArray);
-        this.dataTable.createPageButtons(1);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.siteConfig.getConfigArray(true);
-       this.siteConfig.configArray
+        this.dataTable.updateArray(this.siteConfig.configArray);
         this.spinnerHTML = "";
     }
 
@@ -45,6 +44,11 @@ export class EditConfig {
 			this.utils.showNotification('The confiugration was saved.')
 		}
 	}
+
+    switchValue(index){
+        this.siteConfig.configArray[index].value =  this.siteConfig.configArray[index].value == 0 ?  1 : 0;
+        this.dataTable.updateArray(this.siteConfig.configArray);
+    }
 
 	cancel(){
 		this.siteConfig.configArray

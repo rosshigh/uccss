@@ -374,6 +374,7 @@ export class AppConfig {
         this.CLIENT_INTERVAL = parseInt(this.getParameter('CLIENT_INTERVAL'));
         this.DATE_FORMAT_TABLE = this.getParameter('DATE_FORMAT_TABLE');
         this.UCC_HOME = this.getParameter('UCC_HOME');
+        this.SANDBOX_USED = this.getParameter('SANDBOX_USED');
         console.log(JSON.stringify(this.SESSION_PARAMS));
     }
 
