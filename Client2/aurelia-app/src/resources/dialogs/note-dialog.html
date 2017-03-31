@@ -10,7 +10,7 @@
     </ai-dialog-body>
 
     <ai-dialog-footer>
-      <button repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+      <button class="btn btn-primary smallMarginRight" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
     </ai-dialog-footer>
   </ai-dialog>
 </template>

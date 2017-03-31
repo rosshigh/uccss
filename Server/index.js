@@ -1,11 +1,11 @@
 var express = require('express'),
-  config = require('./config/config'),
-  http = require('http'),
-  debug = require('debug')('uccss'),
-  fs = require('fs'),
-  path = require('path'),
-  AsyncPolling = require('async-polling'),
-  logger = require('./config/logger');
+    config = require('./config/config'),
+    http = require('http'),
+    https = require('https'),
+    fs = require('fs'),
+    path = require('path'),
+    AsyncPolling = require('async-polling'),
+    logger = require('./config/logger');
 
   AsyncPolling(function (end) {
     // Do whatever you want.
@@ -42,18 +42,15 @@ var app = express();
 
 require('./config/express')(app, config);
 
-logger.log("Creating HTTP server on port: " + config.port);
-require('http').createServer(app).listen(config.port, function () {
-    logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
-});
-
-// logger.log("Creating HTTPS server on port: %s", config.port);
-// require('https').createServer({
-//     key: fs.readFileSync(path.join(__dirname, "keys", "server.key")),
-//     cert: fs.readFileSync(path.join(__dirname, "keys", "server.crt")),
-//     ca: fs.readFileSync(path.join(__dirname, "keys", "ca.crt")),
-//     requestCert: true,
-//     rejectUnauthorized: false
-// }, app).listen(config.https_port, function () {
-//     logger.log("HTTPS Server listening on port: %s, in %s mode", config.https_port, app.get('env'));
+// logger.log("Creating HTTP server on port: " + config.port);
+// require('http').createServer(app).listen(config.port, function () {
+//     logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
 // });
+
+logger.log("Creating HTTPS server on port: " + config.https_port);
+require('https').createServer({
+    key: fs.readFileSync("config/server.key"),
+    cert: fs.readFileSync("config/server.crt") 
+}, app).listen(config.https_port, function () {
+    logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
+});
