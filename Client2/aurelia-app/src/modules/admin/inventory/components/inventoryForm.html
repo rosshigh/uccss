@@ -36,7 +36,6 @@
 							<div class="col-sm-10">
 								<label>Date Created</label>
 								<flat-picker controlid="dateCreated" config.bind="config" value.bind="inventory.selectedInventory.dateCreated"></flat-picker>
-							<!--	<date-picker value.two-way="inventory.selectedInventory.dateCreated"  controlid="createdDate"></date-picker> -->
 							</div>
 						</div>
 					</div>
@@ -51,7 +50,7 @@
 							</thead>
 							<tbody>
 								<tr repeat.for="document of inventory.selectedInventory.documents">
-									<td data-title="name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryName}/${document.fileName}">${document.fileName}</a></td>
+									<td data-title="name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}">${document.fileName}</a></td>
 									<td data-title="default" click.trigger="toggleDefault($index)" innerhtml.bind='document.default | checkBox'></td>
 									<td  click.trigger="removeDocument($index)"><i class="fa fa-trash"></i></td>
 								</tr>

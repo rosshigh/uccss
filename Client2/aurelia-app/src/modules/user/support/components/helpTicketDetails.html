@@ -8,7 +8,7 @@
     <div class="topMargin bottomMargin leftMargin list-group-item" show.bind="resources && resources.length > 0">
         <h5>Here are some resources that may be of help.</h5>
         <ul>
-            <li style="list-style-type: none" repeat.for="file of resources"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryName}/${file.fileName}">${file.fileName}</a></li>
+            <li style="list-style-type: none" repeat.for="file of resources"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${file.categoryCode}/${file.categoryName}/${file.fileName}">${file.fileName}</a></li>
         </ul>
     </div>
     <div class='col-lg-12'>
