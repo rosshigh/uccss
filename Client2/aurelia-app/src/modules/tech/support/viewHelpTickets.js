@@ -12,10 +12,11 @@ import { People } from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import { CommonDialogs } from '../../../resources/dialogs/common-dialogs';
 import {ClientRequests} from '../../../resources/data/clientRequests';
+import {DocumentsServices} from '../../../resources/data/documents';
 
 import $ from 'jquery';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, TemplatingEngine, ClientRequests)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, HelpTickets, Sessions, Systems, Downloads, Products, TemplatingEngine, ClientRequests, DocumentsServices)
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
@@ -33,7 +34,7 @@ export class ViewHelpTickets {
   commentShown = "";
   responseMessage = "";
 
-  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products, templatingEngine, requests) {
+  constructor(router, config, validation, people, dialog, datatable, utils, helpTickets, sessions, systems, apps, products, templatingEngine, requests, documents) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -50,6 +51,7 @@ export class ViewHelpTickets {
     this.dialog = dialog;
     this.templatingEngine = templatingEngine;
     this.requests = requests;
+    this.documents = documents;
   };
 
   canActivate() {
@@ -70,6 +72,7 @@ export class ViewHelpTickets {
       this.people.getPeopleArray('', true),
       this.people.getInstitutionsArray('?order=name'),
       this.systems.getSystemsArray(),
+      this.documents.getDocumentsCategoriesArray(),
       this.config.getConfig()
     ]);
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -559,6 +562,32 @@ export class ViewHelpTickets {
 
   removeFile(index){
       this.filesToUpload.splice(index,1);
-    }
+  }
+
+  insertDocument(){
+    var document = {documentURL: "", documentCats: this.documents.docCatsArray, documents: new Array(), selectedCategory: 0};
+        return this.dialog.showDocument(
+              "Select Document",
+              document,
+              ['Submit', 'Cancel']
+          ).then(response => {
+              if (!response.wasCancelled) {
+                this.helpTickets.selectedHelpTicketContent.documents = this.helpTickets.selectedHelpTicketContent.documents ? this.helpTickets.selectedHelpTicketContent.documents : new Array();
+                response.output.documents.documents.forEach(item => {
+                  this.helpTickets.selectedHelpTicketContent.documents.push({
+                    categoryCode: item.categoryCode,
+                    categoryName: item.categoryName,
+                    fileName: item.fileName,
+                  });
+                })
+              } else {
+                  console.log("Cancelled");
+              }
+          });
+  }
+
+  removeDocument(index){
+     this.helpTickets.selectedHelpTicketContent.documents.splice(index,1);
+  }
 
 }

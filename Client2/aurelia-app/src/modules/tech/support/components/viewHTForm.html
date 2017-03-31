@@ -46,8 +46,8 @@
                       </div>
                     </div>
                 </div>
-
-                <div class="row leftMargin rightMargin">
+               
+                <div class="leftMargin rightMargin">
                       <editor value.bind="responseMessage" height="250"></editor>
                       <p>&nbsp;</p>
                       <div class="row">
@@ -56,13 +56,43 @@
                                 Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
                             </label>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <ul>
                                 <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
                             </ul>
                         </div>
                     </div>
+                    <div class='row topMargin'>
+                      <div class="col-lg-2">
+                        <button click.delegate="insertDocument()" class="btn btn-primary">Insert Document</button>
+                      </div>
+                      <div class="col-lg-4">
+                        <ul>
+                            <li repeat.for = "file of helpTickets.selectedHelpTicketContent.documents" class="list-group-item">${file.fileName}<span click.delegate="removeDocument($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                        </ul>
+                      </div>
+                    </div>
                 </div>
+                
+                    <!--
+                      <table show.bind="helpTickets.selectedHelpTicketContent.documents.length > 0" id="coursesTable" class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>Document </th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr repeat.for="document of helpTickets.selectedHelpTicketContent.documents">
+                            <td data-title="name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}">${document.fileName}</a></td>
+                            <td click.trigger="removeDocument($index)"><i class="fa fa-trash"></i></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
+                  </div>
+                </div>
+                -->
             </div>
           </div>
           </div>

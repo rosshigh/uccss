@@ -159,7 +159,7 @@ export class EditInventory {
         this.showDocumentForm = true;
     }
 
-     toggleDefault(index){
+    toggleDefault(index){
         this.inventory.selectedInventory.documents[index].default = ! this.inventory.selectedInventory.documents[index].default;
     }
 
@@ -174,6 +174,17 @@ export class EditInventory {
         await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
         this.showDocuments = true;
       }
+    }
+
+    filterList(){
+        if(this.filter){
+            var thisFilter = this.filter
+            this.filteredDocumentArray = this.documents.docCatsArray.filter((item) => {
+            return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+            });
+        } else {
+            this.filteredDocumentArray = this.documents.docCatsArray;
+        }
     }
 
     async changeTab(el, index){

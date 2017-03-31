@@ -1,0 +1,53 @@
+<template>
+	<ai-dialog style="width:800px;">
+		<ai-dialog-header>${model.title}</ai-dialog-header>
+
+		<ai-dialog-body>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-lg-4">
+							<div show.bind="!categoryForm">
+								<label>Available Categories</label>
+								<div class="well well2 overFlow" style="height:400px;">
+									<input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter Categories" />
+									<ul class="list-group">
+										<button click.trigger="typeChanged($index)" type="button" repeat.for="type of filteredDocumentArray" id="${type.code}" class="list-group-item">${type.description}</button>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-lg-8" style='padding:15px;'>
+							<table show.bind="model.documents.documents.length > 0" id="coursesTable" class="table table-striped table-hover">
+								<thead>
+									<tr>
+										<th>Document </th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr repeat.for="document of model.documents.documents">
+										<td data-title="name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}">${document.fileName}</a></td>
+										<td click.trigger="removeDocument($index)"><i class="fa fa-trash"></i></td>
+									</tr>
+								</tbody>
+							</table>
+							<div show.bind="showDocuments">
+								<div show.bind="showDocumentForm">
+									<compose view="./documentForm.html"></compose>
+								</div>
+								<compose show.bind="!showDocumentForm" view="./documentsTable.html"></compose>
+							</div>
+						</div>
+					</div>
+				</div>
+		</ai-dialog-body>
+
+		<ai-dialog-footer>
+			<div class="pull-right topMargin bottomMargin rightMargin">
+				<button class="btn btn-primary" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+			</div>
+		</ai-dialog-footer>
+	</ai-dialog>
+</template>

@@ -4,6 +4,7 @@ import {ConfirmDialog} from './confirm-dialog';
 import {MessageDialog} from './message-dialog';
 import {NoteDialog} from './note-dialog';
 import {EmailDialog} from './email-dialog';
+import {DocumentDialog} from './document-dialog';
 
 @inject(DialogService)
 export class CommonDialogs {
@@ -23,6 +24,10 @@ export class CommonDialogs {
 
   showEmail( title = 'Enter Email', email, options){
     return this.dialogService.open({ viewModel: EmailDialog, model: { title, email, options } })
+  }
+
+  showDocument(title = "Select Document", documents, options){
+     return this.dialogService.open({ viewModel: DocumentDialog, model: { title, documents, options } })
   }
 
 }

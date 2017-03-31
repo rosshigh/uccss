@@ -23,7 +23,13 @@ var HelpTicketContentSchema = new Schema({
   confidential: { type: Boolean, default: false },
   personId: { type: Schema.Types.ObjectId, ref: 'person' },
   content: { type: Schema.Types.Mixed },
-  displayForm: { type: String }
+  displayForm: { type: String },
+	documents: [{
+		categoryCode: { type: Number },
+		categoryName: { type: String },
+		fileName: { type: String },
+		default: { type: Boolean, default: true } 
+	}]
 });
 
 module.exports = Mongoose.model('HelpTicketContent', HelpTicketContentSchema);
