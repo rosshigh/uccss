@@ -354,7 +354,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             }];
             this.SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';
             this.ID_WILDCARD = "#";
-            this.SANDBOX_NAME = "Sandbox";
+            this.SANDBOX_NAME = "Trial Client";
             this.FIRST_DEFAULT_ID = 1;
             this.FACULTY_ID_BUFFER = 2;
             this.DEFAULT_FACULTY_IDS = 2;

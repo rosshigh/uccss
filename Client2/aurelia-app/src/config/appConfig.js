@@ -296,7 +296,7 @@ export class AppConfig {
 
     SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
     ID_WILDCARD = "#";                          //Wildcard in id templates
-    SANDBOX_NAME = "Sandbox"
+    SANDBOX_NAME = "Trial Client"
     FIRST_DEFAULT_ID = 1;
     FACULTY_ID_BUFFER = 2;
     DEFAULT_FACULTY_IDS = 2;
