@@ -189,8 +189,8 @@ export class HelpTickets {
         return response;
     }
 
-     async saveHelpTicket(){
-          if(!this.selectedHelpTicket){
+    async saveHelpTicket(){
+        if(!this.selectedHelpTicket){
             return;
         }
         var url = this.data.HELP_TICKET_SERVICES;
@@ -403,6 +403,34 @@ export class HelpTickets {
     emptyHelpTicketType(){
         let obj = new Object();
         return obj;
+    }
+
+    async saveHelpTicketType(){
+        if(!this.selectedHelpTicketType){
+            return;
+        }
+        var url = this.data.HELP_TICKET_TYPES;
+
+        if(!this.selectedHelpTicketType._id){
+            var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
+            if (!response.error) {
+                this.selectedHelpTicketType = this.utils.copyObject(response);
+                if(this.helpTicketTypesArray) this.helpTicketTypesArray.push(this.selectedHelpTicketType);
+            } else {
+                     this.data.processError(response, "There was an error creating the help ticket type.");
+                }
+            return response;
+        } else {
+            var response = await this.data.saveObject(this.selectedHelpTicketType, url, "put");
+            if (!response.error) {
+                this.selectedHelpTicketType = this.utils.copyObject(response);
+                this.helpTicketTypesArray[this.editTypeIndex] = this.utils.copyObject(this.selectedHelpTicketType, this.helpTicketTypesArray[this.editTypeIndex]);
+
+            } else {
+                 this.data.processError(response, "There was an error updating the help ticket type.");
+                }
+            return response;
+        }
     }
 
 }

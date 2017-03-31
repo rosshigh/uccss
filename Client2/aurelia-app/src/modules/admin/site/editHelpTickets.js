@@ -32,7 +32,7 @@ export class EditHelpTickets {
 		 	this.documents.getDocumentsCategoriesArray()
 		]);
 		this.dataTable.updateArray(this.helpTickets.helpTicketTypesArray);
-		 this.filteredDocumentArray = this.documents.docCatsArray;
+		this.filteredDocumentArray = this.documents.docCatsArray;
 	}
 	
 	async refresh() {
@@ -60,7 +60,13 @@ export class EditHelpTickets {
 		this.htTypeSelected = false;
 	}
 
-	save(){
+	async save(){
+		let resposne = await this.helpTickets.saveHelpTicketType();
+		if(!response.error){
+			this.dataTable.updateArray(this.helpTickets.helpTicketTypesArray);
+			this.filteredDocumentArray = this.documents.docCatsArray;
+			this.utils.showNotification('The help ticket type was updated');
+		}
 		this.htTypeSelected = false;
 	}
 
@@ -78,7 +84,7 @@ export class EditHelpTickets {
 
 	}
 
-	 addDocument(index){
+	addDocument(index){
         if(!this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents) this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents = new Array();
         for(var i = 0; i < this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents.length; i++){
             if(this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents[i].fileName == this.documents.selectedDocument.files[index].fileName){
@@ -104,7 +110,7 @@ export class EditHelpTickets {
         this.showDocumentForm = true;
     }
 
-     toggleDefault(index){
+	toggleDefault(index){
         this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents[index].default = ! this.helpTickets.selectedHelpTicketType.subtypes[this.selectedSubtype].documents[index].default;
     }
 
