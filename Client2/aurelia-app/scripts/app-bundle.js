@@ -28021,6 +28021,7 @@ define('modules/user/support/downloads',['exports', 'aurelia-framework', '../../
 
         Download.prototype.typeChanged = function typeChanged(el) {
             if (el.target.id != "") {
+                this.typeSelected = el.target.id;
                 this.filterValues = new Array();
                 this.filterValues.push({ property: "downCatcode", value: el.target.id, type: 'select-one', compare: "id" });
                 if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
