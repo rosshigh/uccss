@@ -71,6 +71,7 @@ export class EditInventory {
         this.inventory.selectInventory(this.editIndex);
         this.systemSelected = true;
         $("#editSystemName").focus();
+        this.isDuplicate = false;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -91,6 +92,7 @@ export class EditInventory {
 
     duplicate(){
       delete this.inventory.selectedInventory._id;
+      this.isDuplicate = true;
       this.utils.showNotification('The inventory item was duplicated. You must save it to create the database record.');
     }
 

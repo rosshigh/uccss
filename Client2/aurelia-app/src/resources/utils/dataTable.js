@@ -203,7 +203,7 @@ export class DataTable{
     var keep;
     var index = 0;
     return this.sourceArray.filter((item) => {
-      //Assume the item should be eliminated
+      //Assume the item should be 
       keep = false;
       //For each filter in filterValues
       for(var i = 0, x =  filters.length; i < x; i++){
@@ -242,7 +242,12 @@ export class DataTable{
                 break;
               default:
                 // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId"  ref="ownerFilter">
-                keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
+                // if( isNaN(filters[i].value)){
+                //   keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
+                // } else {
+                  keep = filters[i].value == item[filters[i].property];
+                // }
+                
             }
             break;
           case 'text':
