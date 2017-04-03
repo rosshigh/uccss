@@ -27969,9 +27969,10 @@ define('modules/user/support/downloads',['exports', 'aurelia-framework', '../../
 
                                 this.updateArray();
 
-                                this.dataTable.createPageButtons(1);
+                                this.typeSelected = this.downloads.appCatsArray[0].downCatcode;
+                                this.filterList();
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -28022,10 +28023,14 @@ define('modules/user/support/downloads',['exports', 'aurelia-framework', '../../
         Download.prototype.typeChanged = function typeChanged(el) {
             if (el.target.id != "") {
                 this.typeSelected = el.target.id;
-                this.filterValues = new Array();
-                this.filterValues.push({ property: "downCatcode", value: el.target.id, type: 'select-one', compare: "id" });
-                if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
+                this.filterList();
             }
+        };
+
+        Download.prototype.filterList = function filterList() {
+            this.filterValues = new Array();
+            this.filterValues.push({ property: "downCatcode", value: this.typeSelected, type: 'select-one', compare: "id" });
+            if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
         };
 
         return Download;

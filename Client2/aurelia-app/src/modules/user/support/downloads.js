@@ -24,7 +24,8 @@ export class Download {
 
         this.updateArray();
 
-        this.dataTable.createPageButtons(1);
+        this.typeSelected = this.downloads.appCatsArray[0].downCatcode;
+        this.filterList();
     }
 
     async refresh() {
@@ -41,11 +42,18 @@ export class Download {
     typeChanged(el) {
         if (el.target.id != "") {
             this.typeSelected = el.target.id;
-            this.filterValues = new Array();
-            this.filterValues.push({ property: "downCatcode", value: el.target.id, type: 'select-one', compare: "id" });
-            if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
+            this.filterList();
+            // this.filterValues = new Array();
+            // this.filterValues.push({ property: "downCatcode", value: el.target.id, type: 'select-one', compare: "id" });
+            // if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
             // if (this.baseArray) this.displayArray = this.dataTable.filter(this.filterValues);
 
         }
+    }
+
+    filterList(){
+        this.filterValues = new Array();
+        this.filterValues.push({ property: "downCatcode", value:  this.typeSelected, type: 'select-one', compare: "id" });
+        if (this.dataTable.active) this.dataTable.externalFilter(this.filterValues);
     }
 }
