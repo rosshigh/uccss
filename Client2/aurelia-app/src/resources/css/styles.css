@@ -273,6 +273,10 @@ chart-data {
   display: none;
 }
 
+.selected{
+    background-color: ghostwhite;
+}
+
 .topMargin {
     margin-top: 25px;
 }

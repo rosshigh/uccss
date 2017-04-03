@@ -28,7 +28,8 @@
 
   <!-- Number of students -->
   <div class="row"  id="numStudents" show.bind="courseSelected">
-    <div class="col-lg-5">
+    <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="REGULAR_NUMBER_OF_STUDENTS.content"></div>
+    <div class="topMargin col-lg-5">
       <div class="form-group">
         <label for="undergraduates" class="col-sm-3 control-label">Undergraduates</label>
         <div class="col-sm-8">
@@ -38,7 +39,7 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="topMargin col-lg-5">
       <div class="form-group">
             <label for="graduates" class="col-sm-3 control-label">Graduates</label>
             <div class="col-sm-8">
@@ -55,6 +56,7 @@
 
   <!-- Begin and End Date -->
   <div class="row" show.bind="sandBoxClient || courseSelected">
+    <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="START_END_DATES.content"></div>
       <div class="col-lg-5">
         <div class="form-group topMargin">
            <label class="col-sm-3 form-control-label ">Start Date</label>

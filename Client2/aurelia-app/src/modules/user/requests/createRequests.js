@@ -96,6 +96,8 @@ export class ViewHelpTickets {
   getMessages(){
     this.CLIENT_REQUEST_START = this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START');
     this.SESSION_SELECTED = this.siteInfo.selectMessageByKey('SESSION_SELECTED');
+    this.REGULAR_NUMBER_OF_STUDENTS = this.siteInfo.selectMessageByKey('REGULAR_NUMBER_OF_STUDENTS');
+    this.START_END_DATES = this.siteInfo.selectMessageByKey('START_END_DATES');
   }
 
   async getRequests(){

@@ -15,6 +15,16 @@ import $ from 'jquery';
 
 @inject(Router, AppConfig, People, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
 export class ClientRequestAnalytics {
+    categories = [
+        {
+            code: 0,
+            description: 'Requests by Institution'
+        },
+        {
+            code: 1,
+            description: 'Requests by Product'
+        }
+    ]
 
 
     constructor(router, config, people, datatable, utils, sessions, products, systems, requests) {
@@ -40,17 +50,31 @@ export class ClientRequestAnalytics {
 
     async activate() {
         let responses = await Promise.all([
-            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate'),
+            this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
             this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?order=name'),
-            this.products.getProductsArray('?filter=active|eq|true&order=Category'),
+            this.products.getProductsArray('?order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
         this.dataTable.updateArray(this.requests.requestsDetailsArray);
+        this.selectedCategory = this.categories[0];
     }
 
-    async getRequests() {
+    typeChanged(category, el){
+        this.selectedCategory = category;
+        $('.categoryButtons').removeClass('rowSelected');
+        $(el.target).addClass('rowSelected');
+        switch(category.code){
+            case 0:
+                $(el.target).css('background-color','blue');
+                break;
+            case 1:
+                break;
+        }
+    }
+
+    async getInstitutionRequests() {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
@@ -58,13 +82,28 @@ export class ClientRequestAnalytics {
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.requests.groupRequestsByInstitution();
                 this.dataTable.updateArray(this.requests.analyticsResultArray);
-                this.dataTable.createPageButtons(1);
             } else {
                 this.displayArray = new Array();
             }
         } else {
             this.displayArray = new Array();
         }
-        
+    }
+
+    async getProductsRequests(){
+        if (this.selectedSession) {
+            this.numCols = this.config.REQUEST_STATUS.length + 1
+            this.sessions.selectSessionById(this.selectedSession);
+            await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
+            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                this.requests.groupRequestsByProduct();
+                this.dataTable.updateArray(this.requests.analyticsResultArray);
+            } else {
+                this.displayArray = new Array();
+            }
+        } else {
+            this.displayArray = new Array();
+        }
+
     }
 }

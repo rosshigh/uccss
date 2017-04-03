@@ -38,8 +38,8 @@
                                 <td data-title="Value">
                                     <input show.bind="item.type == 'value'" readonly.bind="item.readOnly" value.bind="item.value" id="editValue" class="form-control" type="text" />
                                     <div show.bind="item.type == 'boolean'">
-                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 0" ><i class="fa fa-toggle-on fa-2x" aria-hidden="true"></i></span>
-                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 1" ><i class="fa fa-toggle-off fa-2x" aria-hidden="true"></i></span>
+                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 0" ><i class="fa fa-toggle-on fa-2x" aria-hidden="true"></i> On</span>
+                                        <span  click.delegate="switchValue($index)" show.bind="item.value == 1" ><i class="fa fa-toggle-off fa-2x" aria-hidden="true"></i> Off</span>
                                     </div>
                                 </td>
 

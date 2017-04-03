@@ -24,7 +24,7 @@
 
           <div class="panel panel-default leftMargin rightMargin" style="background-color:ghostwhite;">
             <div class="panel-body">
-              <div class="col-md-12 topMargin">
+              <div class="list-group-item col-md-12 topMargin">
                 <span  click.delegate="saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Response"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true" ></i></span>
                 <span  click.delegate="saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Customer Action"><i class="fa fa-users fa-lg fa-border" aria-hidden="true"></i></span>
                 <span  click.delegate="saveResponse(config.CLOSED_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Close"><i class="fa fa-window-close-o fa-lg fa-border" aria-hidden="true"></i></span>
@@ -50,28 +50,32 @@
                 <div class="leftMargin rightMargin">
                       <editor value.bind="responseMessage" height="250"></editor>
                       <p>&nbsp;</p>
+
                       <div class="row">
-                        <div class="col-lg-2">
-                            <label class="btn btn-primary">
-                                Browse for files&hellip; <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
-                            </label>
+                        <div class="col-lg-6">
+                          <div class="col-lg-3">
+                              <label class="btn btn-primary">
+                                  Browse for files <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
+                              </label>
+                          </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
+                          <button click.delegate="insertDocument()" class="btn btn-primary">Insert Document</button>
+                        </div>
+                        <div class="col-lg-6 topMargin">
+                          <div class="col-lg-10">
+                              <ul>
+                                  <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                              </ul>
+                          </div>
+                        </div>
+                        <div class='col-lg-6 topMargin'>
+                          <div class="col-lg-10">
                             <ul>
-                                <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                                <li repeat.for = "file of helpTickets.selectedHelpTicketContent.documents" class="list-group-item">${file.fileName}<span click.delegate="removeDocument($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
                             </ul>
-                        </div>
-                    </div>
-                    <div class='row topMargin'>
-                      <div class="col-lg-2">
-                        <button click.delegate="insertDocument()" class="btn btn-primary">Insert Document</button>
+                          </div>
                       </div>
-                      <div class="col-lg-4">
-                        <ul>
-                            <li repeat.for = "file of helpTickets.selectedHelpTicketContent.documents" class="list-group-item">${file.fileName}<span click.delegate="removeDocument($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
-                        </ul>
-                      </div>
-                    </div>
                 </div>
                 
                     <!--

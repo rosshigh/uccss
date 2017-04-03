@@ -54,7 +54,7 @@ export class EditInventory {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.systems.getInventoryArray('?order=systemName', true);
+        await this.inventory.getInventoryArray('?order=systemName', true);
 		this.dataTable.updateArray(this.inventory.inventoryArray);
         this.spinnerHTML = "";
     }
@@ -87,6 +87,11 @@ export class EditInventory {
 
     _cleanUp(){
          this.systemSelected = false;
+    }
+
+    duplicate(){
+      delete this.inventory.selectedInventory._id;
+      this.utils.showNotification('The inventory item was duplicated. You must save it to create the database record.');
     }
 
     cancel(){

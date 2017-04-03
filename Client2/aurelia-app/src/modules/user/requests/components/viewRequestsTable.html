@@ -36,7 +36,7 @@
             <tbody>
               <tr  repeat.for="request of dataTable.displayArray">
                 <td click.delegate="customerActionResponse(request, $event)" data-title="Course">
-                  <h5>${request.courseId | courseName:people.coursesArray}</h5>
+                  <h5>${request.courseId | courseName:people.coursesArray:config.SANDBOX_ID:config.SANDBOX_NAME}</h5>
                   <h6>Undergraduates: ${request.undergradIds} Graduates: ${request.graduateIds}</h6>
                   <h7>Request No: ${request.clientRequestNo}</h7>
                   <h6 show.bind="request.requestStatus == config.CUSTOMER_ACTION_REQUEST_CODE" ><b>CUSTOMER ACTION REQUIRED (click here to respond)</b></h6>

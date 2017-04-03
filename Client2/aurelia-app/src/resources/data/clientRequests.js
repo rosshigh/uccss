@@ -67,7 +67,7 @@ export class ClientRequests {
         return this.requestsArray;
     }
 
-	 async getCurrentCount(options){
+    async getCurrentCount(options){
         var url = this.data.CLIENT_REQUESTS_SERVICES +'/current/count';
         url += options ? options : "";
         var response = await this.data.get(url);
@@ -314,6 +314,35 @@ export class ClientRequests {
             that.analyticsResultArray[that.analyticsResultArray.length-1][item.requestStatus] += 1;
         })
         
+    }
+
+    groupRequestsByProduct(){
+         if(!this.requestsDetailsArray) {
+            return;
+        }
+        var sortedArray = this.requestsDetailsArray 
+            .sort((a, b) => {
+                var result = (a.productId < b.productId) ? -1 : (a.productId > b.productId) ? 1 : 0;
+                return result;
+            });
+
+        this.analyticsResultArray = new Array();
+        var prodID = "";
+        var numStatuses = this.config.REQUEST_STATUS.length;
+        var templateObj = new Object();
+        for(var i = 0; i < numStatuses; i++){
+            templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+        }
+
+        sortedArray.forEach(item => {
+            if(item.productId != prodID){
+                prodID = item.productId;
+                var obj = this.utils.copyObject(templateObj);
+                obj.productId = item.productId;
+                this.analyticsResultArray.push(obj);
+            }
+            this.analyticsResultArray[this.analyticsResultArray.length-1][item.requestStatus] += 1;
+        })
     }
 
     async sendCustomerMessage(message){
