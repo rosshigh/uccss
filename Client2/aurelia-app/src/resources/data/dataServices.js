@@ -2,15 +2,17 @@ import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
 import {Utils} from '../utils/utils';
 import {AppConfig} from '../../config/appConfig';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
-@inject(HttpClient, Utils, AppConfig)
+@inject(HttpClient, Utils, AppConfig, EventAggregator)
 export class DataServices {
     isRequesting = false;
 
-    constructor(http, utils, config) {
+    constructor(http, utils, config, eventAggregator) {
         this.http = http;
         this.utils = utils;
         this.config = config;
+        this.eventAggregator = eventAggregator;
 
 		this.http.configure(x => {
 			x.withBaseUrl(this.config.BASE_URL);
@@ -174,6 +176,7 @@ export class DataServices {
 			.withContent(formData)
 			.skipContentProcessing()
             .withProgressCallback(progress => {
+                this.eventAggregator.publish('upload-progress', {progress: progress.loaded, total: progress.total});
                 this.progress = progress.loaded / progress.total;
             })
 			.send().then(response => {

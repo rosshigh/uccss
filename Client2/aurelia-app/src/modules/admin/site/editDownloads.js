@@ -5,9 +5,10 @@ import {Utils} from '../../../resources/utils/utils';
 import {Downloads} from '../../../resources/data/downloads';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import $ from 'jquery';
 
-@inject(DataTable, Downloads, Utils, CommonDialogs, Validation, AppConfig)
+@inject(DataTable, Downloads, Utils, CommonDialogs, Validation, AppConfig, EventAggregator)
 export class EditProducts {
     downloadItemSelected = false;
     editCat = false;
@@ -19,7 +20,7 @@ export class EditProducts {
     newDownload = false;
     selectedFiles;
 
-    constructor(datatable, downloads, utils, dialog, validation, config) {
+    constructor(datatable, downloads, utils, dialog, validation, config, eventAggregator) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
         this.utils = utils;
@@ -29,10 +30,19 @@ export class EditProducts {
         this.validation = validation;
         this.validation.initialize(this);
         this._setupValidation();
+        this.eventAggregator = eventAggregator;
     }
 
     attached(){
         $('[data-toggle="tooltip"]').tooltip();
+        this.mySubscription = this.eventAggregator.subscribe('upload-progress', obj => {
+            var elem = document.getElementById("progressBar");
+            elem.style.width = obj.progress/obj.total * 100 + '%'; 
+        });
+    }
+
+    detached() {
+        this.mySubscription.dispose();
     }
 
     async activate() {
@@ -97,6 +107,7 @@ export class EditProducts {
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.downloads.appDownloadsArray);
                   if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.uploading = true;
                     await this.downloads.uploadFile(this.filesToUpload);
                     this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
                     this._cleanUp();
@@ -236,6 +247,7 @@ export class EditProducts {
 
     _cleanUp(){
         this. _cleanUpFilters();
+        this.uploading = false;
         this.downloadSelected = false;
         this.selectedFiles = undefined;
         this.files = undefined;
