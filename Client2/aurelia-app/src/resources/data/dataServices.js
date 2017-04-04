@@ -172,9 +172,9 @@ export class DataServices {
 			.withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
 			.withContent(formData)
 			.skipContentProcessing()
-            // .withProgressCallback(progress => {
-            //     this.progress = progress.loaded / progress.total;
-            // })
+            .withProgressCallback(progress => {
+                this.progress = progress.loaded / progress.total;
+            })
 			.send().then(response => {
 				this.isRequesting = false;
 				if (!response.isSuccess) {

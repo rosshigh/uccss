@@ -234,7 +234,7 @@ module.exports = function (app, config) {
   });
 
   function extendTimeout (req, res, next) {
-    res.setTimeout(480000, function () { /* Handle timeout */ logger.log('Timeout') });
+    res.setTimeout(480000, function () { /* Handle timeout */ logger.log('Timeout', 'error') });
     next();
   }
 };

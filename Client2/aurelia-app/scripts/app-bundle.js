@@ -5624,7 +5624,9 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
                 formData.append("file" + index, item);
             });
 
-            return this.http.createRequest(url).asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(formData).skipContentProcessing().send().then(function (response) {
+            return this.http.createRequest(url).asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(formData).skipContentProcessing().withProgressCallback(function (progress) {
+                _this8.progress = progress.loaded / progress.total;
+            }).send().then(function (response) {
                 _this8.isRequesting = false;
                 if (!response.isSuccess) {
                     return response;
