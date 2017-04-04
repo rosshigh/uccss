@@ -205,9 +205,10 @@ module.exports = function (app, config) {
         cb(null, file.originalname);
     }
   });
+
   var upload = multer({ storage: storage });
 
-  router.post('/api/downloads/upload/:id/:container', upload.any(), function(req, res, next){
+  router.post('/api/downloads/upload/:id/:container', extendTimeout, upload.any(), function(req, res, next){
       Model.findById(req.params.id, function(err, download){
         if(err){
           return next(err);
@@ -231,4 +232,9 @@ module.exports = function (app, config) {
       });
 
   });
+
+  function extendTimeout (req, res, next) {
+    res.setTimeout(480000, function () { /* Handle timeout */ logger.log('Timeout') });
+    next();
+  }
 };
