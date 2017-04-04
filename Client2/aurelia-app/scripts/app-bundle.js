@@ -5617,7 +5617,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
         DataServices.prototype.uploadFiles = function uploadFiles(files, url) {
             var _this8 = this;
 
-            this.isRequesting = true;
+            this.progress = 0;
             var formData = new FormData();
 
             files.forEach(function (item, index) {
@@ -19992,7 +19992,7 @@ define('modules/admin/site/editDownloads',['exports', 'aurelia-framework', '../.
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 if (!this.validation.validate(1, this)) {
-                                    _context5.next = 6;
+                                    _context5.next = 15;
                                     break;
                                 }
 
@@ -20002,17 +20002,32 @@ define('modules/admin/site/editDownloads',['exports', 'aurelia-framework', '../.
                             case 3:
                                 serverResponse = _context5.sent;
 
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.downloads.appDownloadsArray);
-                                    if (this.filesToUpload && this.filesToUpload.length > 0) {
-                                        this.downloads.uploadFile(this.filesToUpload);
-                                    }
-
-                                    this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
+                                if (serverResponse.error) {
+                                    _context5.next = 15;
+                                    break;
                                 }
+
+                                this.dataTable.updateArray(this.downloads.appDownloadsArray);
+
+                                if (!(this.filesToUpload && this.filesToUpload.length > 0)) {
+                                    _context5.next = 13;
+                                    break;
+                                }
+
+                                _context5.next = 9;
+                                return this.downloads.uploadFile(this.filesToUpload);
+
+                            case 9:
+                                this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
+                                this._cleanUp();
+                                _context5.next = 15;
+                                break;
+
+                            case 13:
+                                this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
                                 this._cleanUp();
 
-                            case 6:
+                            case 15:
                             case 'end':
                                 return _context5.stop();
                         }

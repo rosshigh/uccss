@@ -97,12 +97,15 @@ export class EditProducts {
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.downloads.appDownloadsArray);
                   if (this.filesToUpload && this.filesToUpload.length > 0) {
-                    this.downloads.uploadFile(this.filesToUpload);
+                    await this.downloads.uploadFile(this.filesToUpload);
+                    this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
+                    this._cleanUp();
+                } else {
+                    this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
+                    this._cleanUp();
                 }
-                // if (this.files && this.files.length > 0) await this.downloads.uploadFile(this.files);
-                 this.utils.showNotification("Download " + this.downloads.selectedDownload.name + " was updated");
             }
-            this._cleanUp();
+           
         }
     }
 

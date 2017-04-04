@@ -160,7 +160,8 @@ export class DataServices {
     }
 
     uploadFiles(files, url){
-        this.isRequesting = true;
+        // this.isRequesting = true;
+        this.progress = 0;
 		let formData = new FormData();
 
 		files.forEach((item, index) => {
