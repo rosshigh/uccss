@@ -161,20 +161,21 @@ export class DataServices {
 
     uploadFiles(files, url){
         this.isRequesting = true;
+        this.progress = 0;
 		let formData = new FormData();
 
 		files.forEach((item, index) => {
             formData.append("file" + index, item);
         })
-        // for (var i = 0; i < files.length; i++) {
-		// 	formData.append("file" + i, files[0]);
-		// }
 
 		return this.http.createRequest(url)
 			.asPost()
 			.withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token'))
 			.withContent(formData)
 			.skipContentProcessing()
+            .withProgressCallback(progress => {
+                this.progress = progress.loaded / progress.total;
+            })
 			.send().then(response => {
 				this.isRequesting = false;
 				if (!response.isSuccess) {

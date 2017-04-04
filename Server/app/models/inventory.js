@@ -42,6 +42,7 @@ var InventorySchema = new Schema({
 	maintenanceStartDate: { type: Date },
 	maintenanceEndDate: { type: Date },
 	systemSunsetDate: { type: Date },
+	maintenanceAlert: { type: Number },
 	maintenanceHistory: [{
 		serviceDate: { type: Date, default: Date.now },
 		servcieDetails: { type: String }

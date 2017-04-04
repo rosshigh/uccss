@@ -27,7 +27,7 @@
 		<div class="col-lg-3">
 			<div class="form-group">
 				<div class="col-sm-10">
-					<label>Email</label>
+					<label>Contact Name</label>
 					<input value.bind="inventory.selectedInventory.maintenanceContact"  class="form-control" placeholder="Contact" type="text" />
 				</div>
 			</div>
@@ -91,6 +91,14 @@
 					<label>End Date</label>
 					<flat-picker controlid="maintenanceEndDate" config.bind="config" value.bind="inventory.selectedInventory.maintenanceEndDate"></flat-picker>
 					<!-- <date-picker value.two-way="inventory.selectedInventory.maintenanceEndDate"  controlid="maintenanceEndDate"></date-picker> -->
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<label>Days of warning before expiration</label>
+					<input value.bind="inventory.selectedInventory.maintenanceAlert"  class="form-control" placeholder="Days" type="number" />
 				</div>
 			</div>
 		</div>

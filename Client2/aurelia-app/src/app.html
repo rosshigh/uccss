@@ -6,7 +6,7 @@
   <nav-bar></nav-bar>
 
  <div class="page-host">
-    <loading-indicator loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
+    <loading-indicator progress.bind="data.progress" loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
     <router-view></router-view>
   </div>
    

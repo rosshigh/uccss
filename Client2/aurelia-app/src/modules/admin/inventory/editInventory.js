@@ -20,7 +20,7 @@ export class EditInventory {
     address = "";
     description = "";
 
-    tabs = [ {id: 'Maintenance', title: 'Maintenance'}, {id: 'Purchase', title: 'Purchase'}, {id: 'Technical', title: "Technical"}, {id: 'Documents', title: "Documents"}];
+    tabs = [ {id: 'Maintenance', title: 'Maintenance'}, {id: 'History', title: 'History'},{id: 'Purchase', title: 'Purchase'}, {id: 'Technical', title: "Technical"}, {id: 'Documents', title: "Documents"}];
     tabPath = './';
 
     constructor(router, inventory, validation, utils, datatable, config, dialog, documents) {
