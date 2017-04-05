@@ -7,9 +7,10 @@ import {DocumentsServices} from '../../../resources/data/documents';
 import {People} from '../../../resources/data/people';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import $ from 'jquery';
 
-@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, CommonDialogs, Validation)
+@inject(Router, DataTable, DocumentsServices, People, Utils, AppConfig, CommonDialogs, Validation, EventAggregator)
 export class Documents {
     navControl = "documentssNavButtons";
     spinnerHTML = "";
@@ -20,7 +21,7 @@ export class Documents {
     showDocuments = false;
     displayTitle = "";
 
-    constructor(router, datatable, documents, people, utils, config, dialog, validation) {
+    constructor(router, datatable, documents, people, utils, config, dialog, validation, eventAggregator) {
         this.router = router;
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -29,6 +30,7 @@ export class Documents {
         this.config = config;
         this.people = people;
         this.dialog = dialog;
+        this.eventAggregator = eventAggregator;
         this.validation = validation;
         this.validation.initialize(this);
     }
@@ -44,15 +46,16 @@ export class Documents {
             this.config.getConfig()
         ]);
         this.filteredDocumentArray = this.documents.docCatsArray;
-
-         this.dataTable.updateArray(this.documents.docCatsArray);
-
-        this.dataTable.createPageButtons(1);
+        this.dataTable.updateArray(this.documents.docCatsArray);
     }
 
     attached(){
         $('[data-toggle="tooltip"]').tooltip();
-         this._setupValidation();
+        this._setupValidation();
+        this.mySubscription = this.eventAggregator.subscribe('upload-progress', obj => {
+            var elem = document.getElementById("progressBar");
+            elem.style.width = obj.progress/obj.total * 100 + '%'; 
+        });
     }
 
     async refresh() {
@@ -186,30 +189,31 @@ export class Documents {
           if(this.validation.validate(1)){ 
             let serverResponse = await this.documents.saveDocument();
             if (!serverResponse.error) {
-                 this.dataTable.updateArray(this.documents.documentsArray);
-                 this.utils.showNotification("The document was saved");
-                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                this.dataTable.updateArray(this.documents.documentsArray);
                 if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.uploading = true;
+                    this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                     await this.documents.uploadFile(this.filesToUpload, this.documents.selectedDocument.files[0].version);
+                    this.spinnerHTML = "";
+                    $("#spinner").toggle().toggle();
+                    this. _cleanUp();
+                    this.selectedFile = "";
+                    this.utils.showNotification("The document was saved");
+                } else {
+                    this. _cleanUp();
+                    this.utils.showNotification("The document was saved");
                 }
-                 this.spinnerHTML = "";
-                 $("#spinner").toggle().toggle();
+                
             }
-            this. _cleanUp();
-            this.selectedFile = "";
+            
         }
     }
-
-    // changeFiles(){
-    //     this.selectedFile = this.files[0].name;
-    //     this.filesSelected = this.documents.selectedDocument ? true : false;
-    // }
 
     changeFiles(){
         this.filesToUpload =  new Array(); 
         this.filesToUpload.push(this.files[0]);
-        this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
-        this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
+        // this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
+        // this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
     }
 
     removeFile(index){
@@ -236,6 +240,7 @@ export class Documents {
     _cleanUp(){
         this.selectedFiles = undefined;
         this.files = undefined;
+        this.uploading = false;    
         this.filesToUpload = new Array();
     }
 

@@ -105,7 +105,7 @@ export class EditProducts {
         if(this.validation.validate(1, this)){
             let serverResponse = await this.downloads.saveDownload();
             if (!serverResponse.error) {
-                this.dataTable.updateArray(this.downloads.appDownloadsArray);
+                // this.dataTable.updateArray(this.downloads.appDownloadsArray);
                   if (this.filesToUpload && this.filesToUpload.length > 0) {
                     this.uploading = true;
                     await this.downloads.uploadFile(this.filesToUpload);
@@ -246,11 +246,11 @@ export class EditProducts {
     }
 
     _cleanUp(){
-        this. _cleanUpFilters();
+        // this. _cleanUpFilters();
         this.uploading = false;
         this.downloadSelected = false;
         this.selectedFiles = undefined;
-        this.files = undefined;
+        this.files = null;
         this.selectedFile = "";
         this.newDownload = false;
         this.filesToUpload = new Array();
@@ -277,6 +277,7 @@ export class EditProducts {
         $("#type").val("");
         $("#active").val("");
         $("#helpTicketRelevant").val("");
+        this.dataTable.updateArray(this.downloads.appDownloadsArray);
     }
 
 }
