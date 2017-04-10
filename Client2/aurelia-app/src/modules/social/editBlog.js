@@ -19,7 +19,7 @@ export class EditBlogs{
 
 	async activate(){
 		let responses = await Promise.all([
-            this.people.getPeopleArray('', true),
+            this.people.getPeopleArray(),
 			this.social.getBlogArray('?order=-dateCreated',true)
 		]);
 	}

@@ -23,9 +23,14 @@ var express = require('express'),
         res.on('data', function(d) {
             str = JSON.parse(d);
             console.info('GET result:\n');
-            process.env.TEMP = str.main.temp;
-            process.env.ICON = str.weather[0].icon;
-            console.info('\n\nCall completed');
+            try {
+                process.env.TEMP = str.main.temp;
+                process.env.ICON = str.weather[0].icon;
+                console.info('\n\nCall completed');
+            }
+            catch(error){
+                console.log(error)
+            }
         });
     
     });
@@ -42,15 +47,15 @@ var app = express();
 
 require('./config/express')(app, config);
 
-// logger.log("Creating HTTP server on port: " + config.port);
-// require('http').createServer(app).listen(config.port, function () {
-//     logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
-// });
-
-logger.log("Creating HTTPS server on port: " + config.https_port);
-require('https').createServer({
-    key: fs.readFileSync("config/server.key"),
-    cert: fs.readFileSync("config/server.crt") 
-}, app).listen(config.https_port, function () {
-    logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
+logger.log("Creating HTTP server on port: " + config.port);
+require('http').createServer(app).listen(config.port, function () {
+    logger.log("HTTP Server listening on port: " + config.port + " in " + app.get('env') + " mode");
 });
+
+// logger.log("Creating HTTPS server on port: " + config.https_port);
+// require('https').createServer({
+//     key: fs.readFileSync("config/server.key"),
+//     cert: fs.readFileSync("config/server.crt") 
+// }, app).listen(config.https_port, function () {
+//     logger.log("HTTPS Server listening on port: " + config.https_port + ", in " + app.get('env') + " mode");
+// });

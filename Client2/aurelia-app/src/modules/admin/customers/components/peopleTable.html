@@ -47,7 +47,7 @@
                                         compare="array">
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="personStatus">
+                                    <select value.bind="activeFilterValue" change.delegate="filterActive()" class="form-control " id="personStatus">
                                     <option value=""></option>
                                     <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>
                                 </select>

@@ -20,6 +20,7 @@ module.exports = function (app) {
   app.use('/', router);
 
   router.get('/api/people', requireAuth,  function(req, res, next){
+
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
     query.exec( function(err, object){

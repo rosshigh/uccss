@@ -10,14 +10,14 @@ var url  = require('url');
 var onFinished = require('on-finished');
 var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
 var utils = require(path.join(__dirname, "utils.js"));
+var helmet = require('helmet');
 
 
 module.exports = function(app, config) {
 
   logger.log("Starting application");
-
+  app.use(helmet())
   app.use(express.static(config.root + '/public'));
-
   app.use(cors());
 
   logger.log("Loading Mongoose functionality");
@@ -41,7 +41,7 @@ module.exports = function(app, config) {
 
   logger.log("Loading models");
   var models = glob.sync(config.root + '/app/models/*.js');
-    models.forEach(function (model) {
+    models.forEach(function (model) { 
       require(model);
     });
 

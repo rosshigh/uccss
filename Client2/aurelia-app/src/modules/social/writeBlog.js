@@ -27,7 +27,7 @@ export class WriteBlogs{
 
 	async activate(){
 		let responses = await Promise.all([
-            this.people.getPeopleArray('', true),
+            this.people.getPeopleArray(),
 			this.social.getBlogArray('?order=-dateCreated',true),
 			this.social.getBlogArray("?filter=personId|eq|" + this.userObj._id + "&order=-dateCreated",true)
 		]);

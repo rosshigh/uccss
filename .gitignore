@@ -5,3 +5,4 @@ twitterBot/public
 UCCSS/
 Server/log/
 Server/log-auth
+data/node_modules

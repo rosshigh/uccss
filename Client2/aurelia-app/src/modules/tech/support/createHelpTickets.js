@@ -66,7 +66,7 @@ export class CreateHelpTickets{
             this.helpTickets.getHelpTicketTypes('?order=category'),
             this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true),
             this.people.getInstitutionsArray('?order=name',true),
-            this.people.getPeopleArray('?order=lastName',true),
+            this.people.getPeopleArray('?order=lastName'),
             this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant[eq]true&order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig(),

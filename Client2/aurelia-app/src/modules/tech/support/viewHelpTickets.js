@@ -69,7 +69,7 @@ export class ViewHelpTickets {
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
       this.sessions.getSessionsArray('?order=startDate'),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray('', true),
+      this.people.getPeopleArray(),
       this.people.getInstitutionsArray('?order=name'),
       this.systems.getSystemsArray(),
       this.documents.getDocumentsCategoriesArray(),

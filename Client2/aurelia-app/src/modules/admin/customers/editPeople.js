@@ -39,12 +39,18 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray('?order=lastName', true),
+            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
             this.people.getInstitutionsArray('?order=name', true),
             this.is4ua.loadIs4ua(),
             this.config.getConfig()
         ]);
-         this.filteredArray = this.config.ROLES;
+        this.activeFilterValue = "01";
+        this.filteredArray = this.config.ROLES;
+        this.dataTable.updateArray(this.people.peopleArray);
+    }
+
+    async filterActive(){
+        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
         this.dataTable.updateArray(this.people.peopleArray);
     }
 
@@ -55,7 +61,7 @@ export class EditPeople {
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getPeopleArray('?order=lastName', true);
+        await this.people.getPeopleArray('?order=lastName&filter=active|eq|true', true),
         this.dataTable.updateArray(this.people.peopleArray);
         this.spinnerHTML = "";
     }

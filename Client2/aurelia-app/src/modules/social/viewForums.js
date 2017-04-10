@@ -27,7 +27,7 @@ export class ViewForums{
 
 	async activate(){
 		let responses = await Promise.all([
-            this.people.getPeopleArray('', true),
+            this.people.getPeopleArray(),
 			this.social.getForumArray('?order=-dateCreated',true)
 		]);
 	}

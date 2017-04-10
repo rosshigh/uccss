@@ -48,7 +48,7 @@ export class ArchiveHelpTickets {
       this.sessions.getSessionsArray('?order=startDate', true),
       this.products.getProductsArray('?order=name'),
       this.people.getInstitutionsArray('?order=name'),
-      this.people.getPeopleArray('?order=lastName', true),
+      this.people.getPeopleArray('?order=lastName'),
       this.config.getConfig()
     ]);
     this.filterList();
