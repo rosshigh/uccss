@@ -151,7 +151,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.SEND_EMAILS = true;
             this.HOST = location.origin;
-            this.BASE_URL = "http://localhost:5000/api/";
+            this.BASE_URL = this.HOST + "/api/";
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
