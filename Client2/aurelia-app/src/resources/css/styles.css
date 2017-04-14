@@ -107,7 +107,7 @@ h1 { font-size: 1.5em; margin: 10px; }
 
 .parallax1 {
     /* The image used */
-    background-image: url("/img/campus-panorama.jpg");
+    background-image: url("/img/parallax1.jpg");
 
     /* Set a specific height */
     min-height: 300px; 
@@ -121,7 +121,7 @@ h1 { font-size: 1.5em; margin: 10px; }
 
 .parallax2 {
     /* The image used */
-    background-image: url("/img/DataCenter.jpg");
+    background-image: url("/img/parallax2.jpg");
 
     /* Set a specific height */
     min-height: 200px; 

@@ -17,8 +17,6 @@ export class AppConfig {
     // IMG_DOWNLOAD_URL = this.HOST + '/img/'
      IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
 
-     DEFAULT_HOME_IMAGE = 'defaultImage.JPG'
-
     //User roles
     ROLES = [{ role: 'USER', label: 'User', UCConly: false },
         { role: 'PROV', label: "Provisional", UCConly: false },
@@ -383,6 +381,8 @@ export class AppConfig {
         this.DATE_FORMAT_TABLE = this.getParameter('DATE_FORMAT_TABLE');
         this.UCC_HOME = this.getParameter('UCC_HOME');
         this.SANDBOX_USED = this.getParameter('SANDBOX_USED');
+        this.HOME_WELCOME = this.getParameter('HOME_WELCOME');
+        this.DEFAULT_HOME_IMAGE = this.getParameter('DEFAULT_HOME_IMAGE');
         console.log(JSON.stringify(this.SESSION_PARAMS));
     }
 
