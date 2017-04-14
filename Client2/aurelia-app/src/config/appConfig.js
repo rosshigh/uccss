@@ -14,6 +14,10 @@ export class AppConfig {
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
     DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents';  
     SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/'
+    // IMG_DOWNLOAD_URL = this.HOST + '/img/'
+     IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
+
+     DEFAULT_HOME_IMAGE = 'defaultImage.JPG'
 
     //User roles
     ROLES = [{ role: 'USER', label: 'User', UCConly: false },
@@ -102,6 +106,10 @@ export class AppConfig {
         {
             'type': "ALRT",
             'description': 'Alerts'
+        },
+        {
+            'type': "CARO",
+            'description': 'Carousel'
         }
     ];
 

@@ -144,7 +144,7 @@ export class SiteInfo {
         return null;
     }
     
-     selectMessage(index){
+    selectMessage(index){
         if (index === -1) {
             this.selectedMessage = this.emptyMessage();
         } else {
@@ -208,5 +208,12 @@ export class SiteInfo {
         let response = this.data.getNoAuth(this.data.OPEN_WEATHER_MAP_SERVICE  + '?q=' + city + '&APPID=' + this.data.API_KEY);
         return response;
     } 
+
+    showCarousel(){
+        for(let i = 0; i < this.siteArray.length; i++){
+            if(this.siteArray[i].itemType === 'CARO') return true
+        }
+        return false;
+    }
 
 }

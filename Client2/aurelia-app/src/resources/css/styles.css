@@ -313,6 +313,15 @@ chart-data {
     margin-top: 10rem;
 }
 
+.carouselSize {
+    width:700px;
+    height:500px;
+}
+
+.carouselImage {
+    height:500px;
+}
+
 textarea {
   overflow-y:scroll;
 }

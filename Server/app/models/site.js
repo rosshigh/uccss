@@ -18,7 +18,7 @@ var SiteSchema = new Schema({
   expiredDate: { type: Date },
   url: { type: String },
   image: { type: String},
-  itemType: { type: String,  enum: ['NEWS', 'OLNK', 'INFO', 'ILNK', 'SYST','DLNK','ALRT'] },
+  itemType: { type: String },
   priority: { type: String, enum: ['INFO', 'WARN', 'DANG'] },
   sortOrder: { type: Number },
   category: { type: String },

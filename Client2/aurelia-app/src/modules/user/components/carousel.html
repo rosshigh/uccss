@@ -1,51 +1,16 @@
 <template>
-  <div id="carousel-example-generic" class="carousel slide bigTopMargin" data-ride="carousel" style="width:700px;height:500px">
+  <div show.bind="showCarousel" id="carousel-example-generic" class="carousel slide bigTopMargin carouselSize" data-ride="carousel">
     <!-- Indicators -->
     <ol class="carousel-indicators">
-      <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-      <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-      <li data-target="#carousel-example-generic" data-slide-to="2"></li>
-      <li data-target="#carousel-example-generic" data-slide-to="3"></li>
-      <li data-target="#carousel-example-generic" data-slide-to="4"></li>
-      <li data-target="#carousel-example-generic" data-slide-to="5"></li>
+      <li data-target="#carousel-example-generic" data-slide-to="${$index}" class="$firts ? 'active' : '''" repeat.for="item of siteinfo.siteArray | infoFilter:'CARO'"></li>
     </ol>
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
-      <div class="item active">
-        <img src="/img/DataCenter.jpg" style="height:500px" alt="UCC Data Center">
+      <div repeat.for="item of siteinfo.siteArray | infoFilter:'CARO'" class="${$first ? 'item active' : 'item'}">
+        <img src="${item.url}" style="height:500px" alt="${item.title}">
         <div class="carousel-caption">
-          <h3>UCC Data Center</h3>
-        </div>
-      </div>
-      <div class="item">
-        <img src="/img/campus-panorama.jpg" style="height:500px" alt="UWM Campus">
-        <div class="carousel-caption">
-          <h3>UWM Campus</h3>
-        </div>
-      </div>
-      <div class="item">
-        <img src="/img/chico.jpg" style="height:500px" alt="Chco Campus">
-        <div class="carousel-caption">
-          <h3>Cal St. Chico Campus</h3>
-        </div>
-      </div>
-      <div class="item">
-        <img src="/img/sandy.jpg" style="height:500px" alt="Sandy">
-        <div class="carousel-caption">
-          <h3>Sandy prepping Spring Systems</h3>
-        </div>
-      </div>
-      <div class="item">
-        <img src="/img/barca1.jpg" style="height:500px" alt="Sandy">
-        <div class="carousel-caption">
-          <h3>Sergey and Ksenia - some of our EMEA colleagues</h3>
-        </div>
-      </div>
-      <div class="item">
-        <img src="/img/sapios.jpg" style="height:500px" alt="Sandy">
-        <div class="carousel-caption">
-          <h3>Looking forward to the SAP IOS SDK</h3>
+          <h3>${item.title}</h3>
         </div>
       </div>
     </div>
@@ -60,4 +25,6 @@
       <span class="sr-only">Next</span>
     </a>
   </div>
-</template>
+  <div class="carouselSize" show.bind="!showCarousel">
+    <img src="${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}" style="height:500px;width:700px;">
+  </div>
