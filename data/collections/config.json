@@ -121,3 +121,10 @@
     "type" : "value", 
     "readOnly" : false
 }
+{ 
+    "_id" : ObjectId("58f0f44f1fda141924169ca6"), 
+    "parameter" : "WEATHER_API_KEY", 
+    "value" : "0f85bb931f8faad7e35b6f685aa4e931", 
+    "type" : "value", 
+    "readOnly" : false
+}

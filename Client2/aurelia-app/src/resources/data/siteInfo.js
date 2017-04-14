@@ -205,7 +205,7 @@ export class SiteInfo {
     }
 
 	async getWeather(city){
-        let response = this.data.getNoAuth(this.data.OPEN_WEATHER_MAP_SERVICE  + '?q=' + city + '&APPID=' + this.data.API_KEY);
+        let response = this.data.getNoAuth(this.data.OPEN_WEATHER_MAP_SERVICE  + '?q=' + city + '&APPID=' + this.config.WEATHER_API_KEY);
         return response;
     } 
 

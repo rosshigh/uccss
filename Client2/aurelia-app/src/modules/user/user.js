@@ -111,7 +111,8 @@ export class User {
             this.requests.getCurrentCount(),  
             this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true),
             this.sessions.getSessionsArray('?order=startDate'),
-            this.siteinfo.getInfoArray(true, options)
+            this.siteinfo.getInfoArray(true, options),
+             this.config.getConfig()
             ]);
             this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
             this.showHelpTickets = this.helpTickets.newHelpTickets;
@@ -123,7 +124,8 @@ export class User {
             this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.userObj._id),
             this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id),
             this.sessions.getSessionsArray('?order=startDate'),
-            this.siteinfo.getInfoArray(true, options)  
+            this.siteinfo.getInfoArray(true, options),
+             this.config.getConfig()
         ]);
         this.showRequests = this.requests.customerActionRequests;
         this.showHelpTickets = this.helpTickets.customerActionHelpTickets;

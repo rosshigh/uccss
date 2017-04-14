@@ -383,6 +383,7 @@ export class AppConfig {
         this.SANDBOX_USED = this.getParameter('SANDBOX_USED');
         this.HOME_WELCOME = this.getParameter('HOME_WELCOME');
         this.DEFAULT_HOME_IMAGE = this.getParameter('DEFAULT_HOME_IMAGE');
+        this.WEATHER_API_KEY = this.getParameter('WEATHER_API_KEY');
         console.log(JSON.stringify(this.SESSION_PARAMS));
     }
 
