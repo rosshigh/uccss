@@ -1,0 +1,119 @@
+{ 
+    "_id" : ObjectId("571f70a13e026db8397c476d"), 
+    "title" : "All SAP servers are up and running.", 
+    "content" : "", 
+    "url" : "", 
+    "expiredDate" : ISODate("2017-12-31T00:00:00.000+0000"), 
+    "image" : "", 
+    "itemType" : "SYST", 
+    "createdDate" : ISODate("2016-04-26T00:00:00.000+0000"), 
+    "__v" : NumberInt(0), 
+    "priority" : "DANG"
+}
+{ 
+    "_id" : ObjectId("571f974084f8fd1c16329f56"), 
+    "title" : " ", 
+    "content" : "<p>Spring - Jan 4th 2016 to June 30th<br/>\nSummer - May 1st to September 30th<br/>\nFall   - August 1st to December 24th <br/>\nWinter - November 1st to March 31st</p>\n\n<p>Client requests open 1 month before the term begins.</p>", 
+    "url" : "", 
+    "expiredDate" : ISODate("2017-04-26T00:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "Info", 
+    "itemType" : "INFO", 
+    "createdDate" : ISODate("2016-04-26T00:00:00.000+0000"), 
+    "__v" : NumberInt(0), 
+    "file" : {
+        "dateUploaded" : ISODate("2016-12-09T17:10:29.550+0000")
+    }
+}
+{ 
+    "_id" : ObjectId("571f9ef284f8fd1c16329f57"), 
+    "title" : "SAP University Alliances", 
+    "content" : "The official web page of the SAP University Alliances.  You'll find information on all the things that the SAP UA is up to.", 
+    "url" : "http://go.sap.com/training-certification/university-alliances.learning-center.html", 
+    "expiredDate" : ISODate("2017-04-26T00:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "Info", 
+    "itemType" : "OLNK", 
+    "createdDate" : ISODate("2016-04-26T00:00:00.000+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("571f9f2d84f8fd1c16329f58"), 
+    "title" : "SAP University Alliance Learning Hub", 
+    "content" : "The SAP Learning Hub, academic edition functions as the backbone for all teaching learning materials that are provided to the SAP University Alliances community for teaching SAP related skills and consists of two main areas.", 
+    "url" : "https://performancemanager.successfactors.eu/sf/home?bplte_company=learninghub", 
+    "expiredDate" : ISODate("9999-07-30T00:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "Info", 
+    "itemType" : "OLNK", 
+    "createdDate" : ISODate("2016-04-26T00:00:00.000+0000"), 
+    "__v" : NumberInt(0), 
+    "file" : {
+        "dateUploaded" : ISODate("2016-08-05T18:19:42.035+0000")
+    }
+}
+{ 
+    "_id" : ObjectId("573dbce5f38035e0115dc3a6"), 
+    "title" : "University Alliances Learning Hub", 
+    "content" : "Get on-demand access to a variety of learning content.", 
+    "url" : "https://performancemanager.successfactors.eu/sf/home?bplte_company=learninghub", 
+    "expiredDate" : ISODate("2017-05-17T00:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "INFO", 
+    "itemType" : "ILNK", 
+    "sortOrder" : NumberInt(0), 
+    "category" : "University Alliances", 
+    "createdDate" : ISODate("2016-05-19T13:14:12.781+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("58a9f5c2ecff9f5821d314a1"), 
+    "title" : "20th SAP Academic Conference Americas", 
+    "content" : "<span style=\"font-size:11.0pt;font-family:&quot;BentonSans Book&quot;;\nmso-fareast-font-family:Calibri;mso-fareast-theme-font:minor-latin;mso-bidi-font-family:\nCalibri;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:\nAR-SA\">The <b>20<sup>th</sup> SAP Academic Conference Americas is June 12 – 13,\n2017.</b>&nbsp; The event takes place at the SAP Next-Gen Lab New York in\npartnership with the Hasso Plattner Institute, at 10 Hudson Yards, New York\nCity. &nbsp;</span>", 
+    "url" : "", 
+    "expiredDate" : ISODate("2017-06-16T05:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "INFO", 
+    "itemType" : "NEWS", 
+    "sortOrder" : NumberInt(0), 
+    "file" : {
+        "dateUploaded" : ISODate("2017-02-19T19:45:06.416+0000")
+    }, 
+    "createdDate" : ISODate("2017-02-19T19:43:37.881+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("5841bb97d927755050ca6943"), 
+    "title" : "SAP University Alliances North America  Faculty Winter Workshops 2017", 
+    "content" : "<p>Professors from SAP University Alliances member institutions from across the Americas are invited to attend the SAP University Alliances&nbsp;Winter Workshop.</p><p>Workshops are held at Sam Houston State University in January. Each workshop session features several topics. &nbsp;Topics run in parallel, each participant may only register for one topic each week. &nbsp;Registration begins October 15, 2016. &nbsp;Please register early to secure a seat in the workshop of your choice. If you are unable to attend, please contact us at <a href=\"mailto:uap.na@sap.com\" data-mce-href=\"mailto:uap.na@sap.com\">uap.na@sap.com</a> to cancel your reservation. To ensure a positive workshop experience, seats are limited in each topic and registration will close when capacity is reached</p>", 
+    "url" : "http://events.sap.com/sap-university-alliances-winter-workshops-2017/en/home", 
+    "expiredDate" : ISODate("2017-01-09T06:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "INFO", 
+    "itemType" : "NEWS", 
+    "sortOrder" : NumberInt(5), 
+    "file" : {
+        "dateUploaded" : ISODate("2016-12-02T18:21:11.123+0000")
+    }, 
+    "createdDate" : ISODate("2016-12-02T18:20:53.766+0000"), 
+    "__v" : NumberInt(0)
+}
+{ 
+    "_id" : ObjectId("573f2b60b36855bc3db7d895"), 
+    "title" : "EMEA UCC Portal", 
+    "content" : "The SAP UA EMEA Portal provides all important pieces of information and services for the users of the SAP UCC Magdeburg, SAP UCC Munich, as well as ACC in Sierre, St. Petersburg, and Vienna. ", 
+    "url" : "https://portal.ucc.uni-magdeburg.de/irj/portal/anonymous?guest_user=guest_en", 
+    "expiredDate" : ISODate("2017-05-31T05:00:00.000+0000"), 
+    "image" : "", 
+    "priority" : "INFO", 
+    "itemType" : "ILNK", 
+    "sortOrder" : NumberInt(0), 
+    "category" : "UCC", 
+    "createdDate" : ISODate("2016-05-20T15:20:24.766+0000"), 
+    "__v" : NumberInt(0), 
+    "file" : {
+        "dateUploaded" : ISODate("2017-02-20T17:39:07.680+0000"), 
+        "fileName" : "account_created.handlebars", 
+        "originalFilename" : "account_created.handlebars"
+    }
+}

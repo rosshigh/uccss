@@ -1,0 +1,640 @@
+{ 
+    "_id" : ObjectId("564f404cfb1b351a128ae5f5"), 
+    "deptCat" : [
+        {
+            "description" : "Business", 
+            "code" : "01"
+        }, 
+        {
+            "code" : "02", 
+            "description" : "Economics"
+        }, 
+        {
+            "code" : "03", 
+            "description" : "Computer Science"
+        }, 
+        {
+            "code" : "04", 
+            "description" : "MIS/BIS/CIS"
+        }, 
+        {
+            "code" : "05", 
+            "description" : "Mathematics"
+        }, 
+        {
+            "code" : "06", 
+            "description" : "Engineering"
+        }, 
+        {
+            "code" : "99", 
+            "description" : "Unknown/Other"
+        }
+    ], 
+    "highestDegree" : [
+        {
+            "description" : "Associate", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc1")
+        }, 
+        {
+            "description" : "Bachelor", 
+            "code" : "02", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc0")
+        }, 
+        {
+            "description" : "Diploma", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbbf")
+        }, 
+        {
+            "description" : "Masters", 
+            "code" : "04", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbbe")
+        }, 
+        {
+            "description" : "PhD", 
+            "code" : "05", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbbd")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbbc")
+        }
+    ], 
+    "institutionStatus" : [
+        {
+            "description" : "Active", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc6")
+        }, 
+        {
+            "code" : "02", 
+            "description" : "Inactive", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc5")
+        }, 
+        {
+            "description" : "Prospective", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc4")
+        }, 
+        {
+            "description" : "Suspended", 
+            "code" : "98", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc3")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc2")
+        }
+    ], 
+    "institutionTypes" : [
+        {
+            "description" : "University", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbcc")
+        }, 
+        {
+            "description" : "College", 
+            "code" : "02", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbcb")
+        }, 
+        {
+            "description" : "Community College", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbca")
+        }, 
+        {
+            "description" : "Vocational School", 
+            "code" : "04", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc9")
+        }, 
+        {
+            "description" : "High School", 
+            "code" : "05", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc8")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbc7")
+        }
+    ], 
+    "memberTypes" : [
+        {
+            "description" : "Hosted", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd1")
+        }, 
+        {
+            "description" : "Self Hosted", 
+            "code" : "02", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd0")
+        }, 
+        {
+            "description" : "Dual Hosted", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbcf")
+        }, 
+        {
+            "description" : "Associate", 
+            "code" : "04", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbce")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbcd")
+        }
+    ], 
+    "personRoles" : [
+        {
+            "description" : "Legal", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbea")
+        }, 
+        {
+            "code" : "02", 
+            "description" : "Invoice", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe9")
+        }, 
+        {
+            "description" : "Technical", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe8")
+        }, 
+        {
+            "description" : "Faculty Coordiantor", 
+            "code" : "04", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe7")
+        }, 
+        {
+            "description" : "Faculty", 
+            "code" : "05", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe6")
+        }
+    ], 
+    "personSpecialization" : [
+        {
+            "description" : "Acounting", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe5")
+        }, 
+        {
+            "description" : "Accounting Information Systems", 
+            "code" : "02", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe4")
+        }, 
+        {
+            "description" : "Business Administration", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe3")
+        }, 
+        {
+            "description" : "Business Information Systems", 
+            "code" : "04", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe2")
+        }, 
+        {
+            "code" : "05", 
+            "description" : "Business Process Management", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe1")
+        }, 
+        {
+            "description" : "Computer Science/Information Technology", 
+            "code" : "06", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbe0")
+        }, 
+        {
+            "description" : "Economics", 
+            "code" : "07", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbdf")
+        }, 
+        {
+            "code" : "08", 
+            "description" : "Engineering", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbde")
+        }, 
+        {
+            "description" : "Entrepreneurial Studies", 
+            "code" : "09", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbdd")
+        }, 
+        {
+            "description" : "Finance", 
+            "code" : "10", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbdc")
+        }, 
+        {
+            "description" : "Human Capital Management", 
+            "code" : "11", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbdb")
+        }, 
+        {
+            "description" : "International Business", 
+            "code" : "12", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbda")
+        }, 
+        {
+            "description" : "Marketing", 
+            "code" : "13", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd9")
+        }, 
+        {
+            "description" : "Operations/Supply Chain Management", 
+            "code" : "14", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd8")
+        }, 
+        {
+            "code" : "15", 
+            "description" : "Strategic Management", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd7")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd6")
+        }
+    ], 
+    "personStatus" : [
+        {
+            "description" : "Active", 
+            "code" : "01", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd5")
+        }, 
+        {
+            "description" : "Inactive", 
+            "code" : "02", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd4")
+        }, 
+        {
+            "description" : "Prospective", 
+            "code" : "03", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd3")
+        }, 
+        {
+            "description" : "Unknown/Other", 
+            "code" : "99", 
+            "_id" : ObjectId("57a6254fc486bb9c2f57dbd2")
+        }
+    ], 
+    "sap-products" : [
+        {
+            "code" : NumberInt(1), 
+            "description" : "SAP ERP 5.00", 
+            "id" : "56aa6f2e3f8738a29d611789"
+        }, 
+        {
+            "code" : NumberInt(2), 
+            "description" : "SAP ERP 6.00", 
+            "id" : "56aa6f2e3f8738a29d61178a"
+        }, 
+        {
+            "code" : NumberInt(3), 
+            "description" : "SAP ERP", 
+            "id" : "56aa6f2e3f8738a29d61178b"
+        }, 
+        {
+            "code" : NumberInt(4), 
+            "description" : "SAP Customer Relationship Management 5.0", 
+            "id" : "56aa6f2e3f8738a29d61178c"
+        }, 
+        {
+            "code" : NumberInt(5), 
+            "description" : "SAP CRM", 
+            "id" : "56aa6f2e3f8738a29d61178d"
+        }, 
+        {
+            "code" : NumberInt(6), 
+            "description" : "SAP SCM", 
+            "id" : "56aa6f2e3f8738a29d61178e"
+        }, 
+        {
+            "code" : NumberInt(7), 
+            "description" : "SAP SRM", 
+            "id" : "56aa6f2e3f8738a29d61178f"
+        }, 
+        {
+            "code" : NumberInt(8), 
+            "description" : "SAP PLM", 
+            "id" : "56aa6f2e3f8738a29d611790"
+        }, 
+        {
+            "code" : NumberInt(9), 
+            "description" : "SAP BW", 
+            "id" : "56aa6f2e3f8738a29d611791"
+        }, 
+        {
+            "code" : NumberInt(10), 
+            "description" : "SAP BO", 
+            "id" : "56aa6f2e3f8738a29d611792"
+        }, 
+        {
+            "description" : "SAP NetWeaver Business Process Management", 
+            "id" : "56aa6f2e3f8738a29d611793", 
+            "code" : NumberInt(11)
+        }, 
+        {
+            "code" : NumberInt(12), 
+            "description" : "SAP PO", 
+            "id" : "56aa6f2e3f8738a29d611794"
+        }, 
+        {
+            "id" : "56aa6f2e3f8738a29d611795", 
+            "code" : NumberInt(13), 
+            "description" : "SAP MDM"
+        }, 
+        {
+            "code" : NumberInt(14), 
+            "description" : "SAP Portal", 
+            "id" : "56aa6f2e3f8738a29d611796"
+        }, 
+        {
+            "description" : "SAP NetWeaver Composition Environment", 
+            "id" : "56aa6f2e3f8738a29d611797", 
+            "code" : NumberInt(15)
+        }, 
+        {
+            "code" : NumberInt(16), 
+            "description" : "SAP NetWeaver Developer Studio", 
+            "id" : "56aa6f2e3f8738a29d611798"
+        }, 
+        {
+            "id" : "56aa6f2e3f8738a29d611799", 
+            "code" : NumberInt(17), 
+            "description" : "SAP NetWeaver Visual Composer"
+        }, 
+        {
+            "code" : NumberInt(18), 
+            "description" : "SAP Solution Manager 4.0", 
+            "id" : "56aa6f2e3f8738a29d61179a"
+        }, 
+        {
+            "code" : NumberInt(19), 
+            "description" : "SAP Solution Manager", 
+            "id" : "56aa6f2e3f8738a29d61179b"
+        }, 
+        {
+            "description" : "SAP Business ByDesign", 
+            "id" : "56aa6f2e3f8738a29d61179c", 
+            "code" : NumberInt(20)
+        }, 
+        {
+            "code" : NumberInt(21), 
+            "description" : "SAP Business One", 
+            "id" : "56aa6f2e3f8738a29d61179d"
+        }, 
+        {
+            "id" : "56aa6f2e3f8738a29d61179e", 
+            "code" : NumberInt(22), 
+            "description" : "SAP for Retail"
+        }, 
+        {
+            "code" : NumberInt(23), 
+            "description" : "SAP for Healthcare", 
+            "id" : "56aa6f2e3f8738a29d61179f"
+        }, 
+        {
+            "description" : "SAP for Banking", 
+            "id" : "56aa6f2e3f8738a29d6117a0", 
+            "code" : NumberInt(24)
+        }, 
+        {
+            "code" : NumberInt(25), 
+            "description" : "SAP for Media", 
+            "id" : "56aa6f2e3f8738a29d6117a1"
+        }, 
+        {
+            "code" : NumberInt(26), 
+            "description" : "SAP HANA", 
+            "id" : "56aa6f2e3f8738a29d6117a2"
+        }, 
+        {
+            "code" : NumberInt(27), 
+            "description" : "SAP Sybase Unwired Platform", 
+            "id" : "56aa6f2e3f8738a29d6117a3"
+        }, 
+        {
+            "id" : "56aa6f2e3f8738a29d6117a4", 
+            "code" : NumberInt(99), 
+            "description" : "Unknown/Other"
+        }
+    ], 
+    "ua-curriculum" : [
+        {
+            "code" : NumberInt(1), 
+            "description" : "Intro to ERP", 
+            "id" : "56aa6e813f8738a29d611761"
+        }, 
+        {
+            "description" : "Configuration", 
+            "id" : "56aa6e813f8738a29d611762", 
+            "code" : NumberInt(2)
+        }, 
+        {
+            "id" : "56aa6e813f8738a29d611763", 
+            "code" : NumberInt(4), 
+            "description" : "AIS"
+        }, 
+        {
+            "code" : NumberInt(3), 
+            "description" : "Intro to SCM", 
+            "id" : "56aa6e813f8738a29d611764"
+        }, 
+        {
+            "code" : NumberInt(5), 
+            "description" : "HEC ERPsim", 
+            "id" : "56aa6e813f8738a29d611765"
+        }, 
+        {
+            "code" : NumberInt(6), 
+            "description" : "ABAP", 
+            "id" : "56aa6e813f8738a29d611766"
+        }, 
+        {
+            "description" : "BW", 
+            "id" : "56aa6e813f8738a29d611767", 
+            "code" : NumberInt(7)
+        }, 
+        {
+            "id" : "56aa6e813f8738a29d611768", 
+            "code" : NumberInt(8), 
+            "description" : "Business Objects"
+        }, 
+        {
+            "code" : NumberInt(9), 
+            "description" : "NetWeaver", 
+            "id" : "56aa6e813f8738a29d611769"
+        }, 
+        {
+            "code" : NumberInt(10), 
+            "description" : "TERP10", 
+            "id" : "56aa6e813f8738a29d61176a"
+        }, 
+        {
+            "code" : NumberInt(11), 
+            "description" : "IDES", 
+            "id" : "56aa6e813f8738a29d61176b"
+        }, 
+        {
+            "code" : NumberInt(12), 
+            "description" : "HANA - Introduction", 
+            "id" : "56aa6e813f8738a29d61176c"
+        }, 
+        {
+            "code" : NumberInt(13), 
+            "description" : "HANA - Native Development", 
+            "id" : "56aa6e813f8738a29d61176d"
+        }, 
+        {
+            "code" : NumberInt(14), 
+            "description" : "HANA - Data Mining", 
+            "id" : "56aa6e813f8738a29d61176e"
+        }, 
+        {
+            "code" : NumberInt(15), 
+            "description" : "MANZ series", 
+            "id" : "56aa6e813f8738a29d61176f"
+        }, 
+        {
+            "code" : NumberInt(16), 
+            "description" : "HANA - Geospatial", 
+            "id" : "56aa6e813f8738a29d611770"
+        }, 
+        {
+            "code" : NumberInt(17), 
+            "description" : "HANA - Text Analysis", 
+            "id" : "56aa6e813f8738a29d611771"
+        }, 
+        {
+            "code" : NumberInt(18), 
+            "description" : "SCM Advanced", 
+            "id" : "56aa6e813f8738a29d611772"
+        }, 
+        {
+            "code" : NumberInt(19), 
+            "description" : "Intro to CRM", 
+            "id" : "56aa6e813f8738a29d611773"
+        }, 
+        {
+            "code" : NumberInt(21), 
+            "description" : "Sybase #1", 
+            "id" : "56aa6e813f8738a29d611774"
+        }, 
+        {
+            "code" : NumberInt(22), 
+            "description" : "Sybase #2", 
+            "id" : "56aa6e813f8738a29d611775"
+        }, 
+        {
+            "code" : NumberInt(23), 
+            "description" : "Sybase #3", 
+            "id" : "56aa6e813f8738a29d611776"
+        }, 
+        {
+            "code" : NumberInt(31), 
+            "description" : "Intro to ByDesign", 
+            "id" : "56aa6e813f8738a29d611777"
+        }, 
+        {
+            "code" : NumberInt(32), 
+            "description" : "ByDesign - BIT", 
+            "id" : "56aa6e813f8738a29d611778"
+        }, 
+        {
+            "code" : NumberInt(33), 
+            "description" : "ByDesign - Other", 
+            "id" : "56aa6e813f8738a29d611779"
+        }, 
+        {
+            "code" : NumberInt(99), 
+            "description" : "Unknown/Other", 
+            "id" : "56aa6e813f8738a29d61177a"
+        }
+    ], 
+    "ua-datasets" : [
+        {
+            "code" : NumberInt(2), 
+            "description" : "GBI1.0", 
+            "id" : "56aa6ed73f8738a29d61177b"
+        }, 
+        {
+            "code" : NumberInt(1), 
+            "description" : "IDES", 
+            "id" : "56aa6ed73f8738a29d61177c"
+        }, 
+        {
+            "code" : NumberInt(3), 
+            "description" : "GBI", 
+            "id" : "56aa6ed73f8738a29d61177d"
+        }, 
+        {
+            "description" : "Fitter Snacker", 
+            "id" : "56aa6ed73f8738a29d61177e", 
+            "code" : NumberInt(4)
+        }, 
+        {
+            "id" : "56aa6ed73f8738a29d61177f", 
+            "code" : NumberInt(5), 
+            "description" : "Fly-a-kite"
+        }, 
+        {
+            "code" : NumberInt(6), 
+            "description" : "Quazi Computers", 
+            "id" : "56aa6ed73f8738a29d611780"
+        }, 
+        {
+            "code" : NumberInt(7), 
+            "description" : "BPI", 
+            "id" : "56aa6ed73f8738a29d611781"
+        }, 
+        {
+            "code" : NumberInt(8), 
+            "description" : "Chico AIS", 
+            "id" : "56aa6ed73f8738a29d611782"
+        }, 
+        {
+            "code" : NumberInt(9), 
+            "description" : "HEC ERPsim", 
+            "id" : "56aa6ed73f8738a29d611783"
+        }, 
+        {
+            "description" : "Business Intelligence (BW)", 
+            "id" : "56aa6ed73f8738a29d611784", 
+            "code" : NumberInt(10)
+        }, 
+        {
+            "id" : "56aa6ed73f8738a29d611785", 
+            "code" : NumberInt(11), 
+            "description" : "TERP10"
+        }, 
+        {
+            "code" : NumberInt(12), 
+            "description" : "Almika", 
+            "id" : "56aa6ed73f8738a29d611786"
+        }, 
+        {
+            "code" : NumberInt(99), 
+            "description" : "Unknown/Other", 
+            "id" : "56aa6ed73f8738a29d611787"
+        }, 
+        {
+            "code" : NumberInt(13), 
+            "description" : "GBI Austria (only relevant for EMEA)", 
+            "id" : "56aa6ed73f8738a29d611788"
+        }
+    ], 
+    "depCat" : [
+
+    ], 
+    "uaCurriculum" : [
+
+    ], 
+    "uaDatasets" : [
+
+    ], 
+    "sapProducts" : [
+
+    ]
+}
