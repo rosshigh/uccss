@@ -34,3 +34,34 @@
     "fullName": "Gino Edinger",
     "id": "57e9a6fce85f3c58100f66e2"
   }
+   {
+    "_id": "57ea8a22e85f3c58100f66e4",
+    "lastName": "Strait",
+    "firstName": "Jon",
+    "middleName": "M",
+    "phone": "",
+    "mobile": "",
+    "email": "jstrait@csuchico.edu",
+    "gender": "",
+    "password": "$2a$10$t.Y4.KjL9Uk2zNVOAEEMAOiTIEJwNf/Vrn96SruFh3yj2fkMzU4a.",
+    "institutionId": "57b5fe7324d1753c09014e88",
+    "personStatus": "01",
+    "__v": 1,
+    "audit": [],
+    "courses": [],
+    "dateModified": "2016-09-27T15:02:58.199Z",
+    "dateRegistered": "2016-09-27T15:02:58.199Z",
+    "scope": "user",
+    "personSpecialization": "99",
+    "departmentCategory": "99",
+    "active": false,
+    "roles": [
+      "USER",
+      "UCCT",
+      "UCCA",
+      "UCSA"
+    ],
+    "noteCategories": [],
+    "fullName": "Jon Strait",
+    "id": "57ea8a22e85f3c58100f66e4"
+  }
