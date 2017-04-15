@@ -16,9 +16,9 @@ export class is4ua {
         this.deptArray = responses[0].deptCat;
         this.specialArray = responses[0].personSpecialization;
         
-        this.sapProductsArray = responses[0]["sap-products"];
-        this.uaCurriculumArray = responses[0]["ua-curriculum"];
-        this.uaDataSetsArray = responses[0]["ua-datasets"];
+        this.sapProductsArray = responses[0].sapProducts;
+        this.uaCurriculumArray = responses[0].uaCurriculum;
+        this.uaDataSetsArray = responses[0].uaDatasets;
         
         this.institutonStatusArray = responses[0].institutionStatus;
         this.institutionTypes = responses[0].institutionTypes;
