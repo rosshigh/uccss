@@ -1,0 +1,15 @@
+"_id"#parameter#value#type#readOnly#description#dateModified
+57f7b6902003b53442a43dec#DEFAULT_FACULTY_IDS#2#value#false#Default number of faculty IDs#2016-10-07T14:52:00.880Z
+57f7b6a42003b53442a43ded#REQUEST_LIMIT#4#value#false#Maximum products in a request#2016-10-07T14:52:20.193Z
+57f7b7110772f2dc18780347#REGULAR_ID_BUFFER#5#value#false#IDS between assignments in shared clients#2016-10-07T14:54:09.447Z
+57f7b7290772f2dc18780348#REGULAR_ID_ALLOWANCE#5#value#false#Additional IDs assigned#2016-10-07T14:54:33.694Z
+57f7b7440772f2dc18780349#SANDBOX_ID_BUFFER#2#value#false#IDS between assigned sandbox ranges#2016-10-07T14:55:00.581Z
+57f7b76e0772f2dc1878034a#SHARED_ID_BUFFER#5#value#false#IDS between assigned shared ranges#2016-10-07T14:55:42.724Z
+57f7b78a0772f2dc1878034b#SANDBOX_ID_COUNT#2#value#false#Default ids assigned to sandbox#2016-10-07T14:56:10.408Z
+57f7d146e190d6c02d213954#REQUEST_LEEWAY#5#value#false#Minimum days before request can be completed.#2016-10-07T16:45:58.754Z
+5800f26773b426b81c9512ea#CLIENT_INTERVAL#5#value#false#Interval between generated system clients.#2016-10-14T14:57:43.885Z
+5813baa3ca25dcf451b571a1#DATE_FORMAT_TABLE#MMM Do YYYY#value#false#Date format#2016-10-28T20:52:51.087Z
+58d9683065e850216c1298e3#SANDBOX_USED#0#boolean#false#Whether sandbox courses are used#2017-03-27T19:37:44.355Z
+58f0daf91fda141924169ca2#HOME_WELCOME#Welcome to the UWM UCC#value#false##
+58f0dccc1fda141924169ca4#DEFAULT_HOME_IMAGE#defaultImage.JPG#value#false##
+58f0f44f1fda141924169ca6#WEATHER_API_KEY#0f85bb931f8faad7e35b6f685aa4e931#value#false##

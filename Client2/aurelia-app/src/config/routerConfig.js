@@ -14,7 +14,7 @@ export default class {
             config.title = 'UCCSS';
             config.map([
                 { route: ['','home'],       moduleId: './modules/home/home',                    name: 'Home', settings: { auth: false, roles: [] }},
-                // { route: 'contact',         moduleId: './modules/home/contact',                 name: 'Contact' },
+                { route: 'contact',         moduleId: './modules/home/contact',                name: 'Contact', settings: { auth: false, roles: [] } },
                 { route: 'register',        moduleId: './modules/home/register',                name: 'Register',        settings: { auth: false, roles: [] }  },
                 { route: 'user',            moduleId: './modules/user/user',                    name: 'User',           settings: { auth: true, roles: [] } },
                 { route: 'profile',         moduleId: './modules/user/profile',                 name: 'Profile',         settings: { auth: true, roles: [] }  },
