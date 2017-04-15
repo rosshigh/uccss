@@ -4,7 +4,7 @@ var	mongoose = require('mongoose'),
 	Model = mongoose.model('SemesterConfig');
 
 
-	var db = 'mongodb://127.0.0.1/uccss-test';
+	var db = 'mongodb://127.0.0.1/uccss-dev';
 
 	console.log('Parse file ' + process.argv[2]);
 	mongoose.Promise = require('bluebird');
