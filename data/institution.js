@@ -6,7 +6,7 @@ var path = require('path'),
 	Model = mongoose.model('Institution');
 
 
-	var db = 'mongodb://127.0.0.1/uccss-dev';
+	var db = 'mongodb://127.0.0.1/uccss-test';
 
 	console.log('Parse file ' + process.argv[2]);
 	mongoose.Promise = require('bluebird');
@@ -21,20 +21,20 @@ var path = require('path'),
 	let filePath = process.argv[2];
 	fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 		if (!err){
-			data = data.split('\n');				
+			data = data.split('\n');						
 			let dataArray = new Array();
 			data.forEach((item, index) => {
 				if(index > 0){
-
 					var obj = new Object();
 					let array = item.split(process.argv[3]);	
+					if(index === 2) console.log(array)
 					obj.name = array[2];
 					obj.abrCode = array[1];
-					obj.memberType = pad(array[19]);
+					obj.memberType = pad(array[20]);
 					obj.institutionType = pad(array[4]);
-					obj.institutionStatus = pad(array[21]);// == -1 ? '01' : '02';
-					obj.active = array[16] == -1;
-					obj.highestDegree = pad(array[20]);
+					obj.institutionStatus = pad(array[22]);// == -1 ? '01' : '02';
+					obj.active = array[17] == -1;
+					obj.highestDegree = pad(array[21]);
 					obj.universityDept =array[7];
 					obj.key = array[0];
 
@@ -55,13 +55,14 @@ var path = require('path'),
 						}
 					}
 					obj.address1 = array[9] + " " + array[8];
-					obj.POBox = array[11];
-					obj.city = array[10];
-					obj.region = array[13];
-					obj.country = array[15];
-					obj.postalCode = array[14];
-					obj.timeZone = array[18];
-					obj.url = array[23];
+					obj.address2 = array[10]
+					obj.POBox = array[12];
+					obj.city = array[11];
+					obj.region = array[14];
+					obj.country = array[16];
+					obj.postalCode = array[15];
+					obj.timeZone = array[19];
+					obj.url = array[24];
 					obj.faculty = new Array();
 
 					if(obj.name){
@@ -77,10 +78,16 @@ var path = require('path'),
 				}
 				
 			});
+		} else {
+			console.log(err)
 		}
 	});
 
 	function pad(value){
-		return value.length === 2 ? value : '0' + value;
+		if(value) {
+			return value.length === 2 ? value : '0' + value;
+		} else {
+			return "";
+		}
 	}
 		

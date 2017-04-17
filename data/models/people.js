@@ -12,8 +12,8 @@ module.exports = Mongoose.model('PasswordReset', PasswordResetSchema);
 
 var PersonSchema = new Schema({
   //demographics
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  firstName: { type: String },
+  lastName: { type: String },
   middleName: { type: String },
   nickName: { type: String },
   gender: { type: String },
@@ -21,7 +21,7 @@ var PersonSchema = new Schema({
   salutation: { type: String },
 
   //Communication
-  email: { type: String, unique: true, required: true },
+  email: { type: String },
   password: { type: String },
   phone: { type: String },
   mobile: { type: String },
@@ -31,13 +31,13 @@ var PersonSchema = new Schema({
   address1: { type: String },
   address2: { type: String },
   city:  { type: String },
-  region: { type: String, max: 2 },
+  region: { type: String },
   postalCode: { type: String },
   country: { type: String },
   timeZone: { type: String },
   language: { type: String },
   POBox: { type: String },
-  institutionId: { type: Schema.Types.ObjectId, required: true },
+  institutionId: { type: Schema.Types.ObjectId },
   noteCategories: [{ type: String }],
 
   //Site Status
@@ -47,8 +47,8 @@ var PersonSchema = new Schema({
 
   //Classification
   departmentName: { type: String },
-  departmentCategory: { type: String, max: 2, default: '99' },
-  personSpecialization: { type: String, max: 2, default: '99' },
+  departmentCategory: { type: String,  default: '99' },
+  personSpecialization: { type: String,  default: '99' },
   academicTitle: { type: String },
 
   scope:  { type: String, enum: ['admin','user'], default: 'user'},
@@ -57,8 +57,8 @@ var PersonSchema = new Schema({
   dateModified: { type: Date, default: Date.now },
   dateInactive: { type: Date },
   courses: [{
-    courseNumber: { type: String, required: true },
-    courseName: { type: String, required: true },
+    courseNumber: { type: String },
+    courseName: { type: String },
     courseDescription: { type: String }
   }],
   audit: [{
@@ -80,25 +80,25 @@ PersonSchema.pre('update', function() {
   this.update({},{ $set: { dateModified: new Date() } });
 });
 
-PersonSchema.pre('save', function(next){
-  var person = this;
-  if (this.isModified('password') || this.isNew) {
-        Bcrypt.genSalt(10, function (err, salt) {
-            if (err) {
-                return next(err);
-            }
-            Bcrypt.hash(person.password, salt, function (err, hash) {
-                if (err) {
-                    return next(err);
-                }
-                person.password = hash;
-                next();
-            });
-        });
-    } else {
-        return next();
-    }
-});
+// PersonSchema.pre('save', function(next){
+//   var person = this;
+// //   if (this.isModified('password') || this.isNew) {
+//         Bcrypt.genSalt(10, function (err, salt) {
+//             if (err) {
+//                 return next(err);
+//             }
+//             Bcrypt.hash(person.password, salt, function (err, hash) {
+//                 if (err) {
+//                     return next(err);
+//                 }
+//                 person.password = hash;
+//                 next();
+//             });
+//         });
+//     // } else {
+//     //     return next();
+//     // }
+// });
 
 PersonSchema.methods.comparePassword = function (passw, cb) {
     Bcrypt.compare(passw, this.password, function (err, isMatch) {
