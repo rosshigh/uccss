@@ -27,7 +27,7 @@ var mongoose = require('mongoose'),
 					obj.clientKey = array[0];
 					obj.active = array[5] == 1;
 					obj.uaCurriculum = pad(array[9])
-					obj.spaProduct = pad(array[7])
+					obj.sapProduct = pad(array[7])
 					obj.uaDataset = pad(array[8])
 					obj.hostWhere = array[11] == 1 ? 'UCC' : '';
 
