@@ -22,6 +22,15 @@ export class Notes{
 		enableTime: true
 	};
 
+	toolbar = [
+		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['color', ['color']],
+		['font', ['strikethrough', 'superscript', 'subscript']],
+		['layout', ['ul', 'ol', 'paragraph']],
+		['insert', [ 'link', 'table', 'hello']],
+		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+	];
+
     constructor(router, dataTable, config, people, utils, helpTickets){
 		this.router = router;
 		this.dataTable = dataTable;

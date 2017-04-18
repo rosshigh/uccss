@@ -25,6 +25,15 @@ export class EditProducts {
     tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
     tabPath = './';
 
+    toolbar = [
+		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['color', ['color']],
+		['font', ['strikethrough', 'superscript', 'subscript']],
+		['layout', ['ul', 'ol', 'paragraph']],
+		['insert', [ 'link', 'table', 'hello']],
+		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+	];
+
     constructor(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);

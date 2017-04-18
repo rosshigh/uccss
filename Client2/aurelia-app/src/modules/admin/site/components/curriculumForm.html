@@ -56,7 +56,7 @@
                                 <div class="form-group">
                                     <label for="editCategory" class="col-sm-2 control-label hideOnPhone">Description</label>
                                     <div class="col-sm-8">
-                                        <editor value.bind="curriculum.selectedCurriculumCategory.categoryDescription" height="250"></editor>
+                                        <editor value.bind="curriculum.selectedCurriculumCategory.categoryDescription" toolbar.bind="toolbar" height="250"></editor>
                                      <!--   <tiny-mce height.bind="150" value.two-way="categoryDescription"></tiny-mce> -->
                                     </div>
                                 </div>
@@ -81,7 +81,7 @@
                     <div class="form-group">
                         <label for="editContent" class="col-sm-2 control-label hideOnPhone">Description</label>
                         <div class="col-sm-8">
-                            <editor value.bind="curriculum.selectedCurriculum.description" height="250"></editor>
+                            <editor value.bind="curriculum.selectedCurriculum.description" toolbar.bind="toolbar" height="250"></editor>
                         </div>
                     </div>
                 </div>

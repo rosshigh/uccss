@@ -15,6 +15,15 @@ export class EditMessages {
     spinnerHTML = "";
     isInformationItem = false;
 
+    toolbar = [
+		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['color', ['color']],
+		['font', ['strikethrough', 'superscript', 'subscript']],
+		['layout', ['ul', 'ol', 'paragraph']],
+		['insert', [ 'link', 'table', 'hello']],
+		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+	];
+
     constructor(datatable, siteinfo, utils, dialog, validation, config) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);

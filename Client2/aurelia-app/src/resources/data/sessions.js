@@ -83,14 +83,16 @@ export class Sessions {
         if (!sessions[0]) {
             var today = new Date();
             var month = today.getMonth();
+            var year = today.getFullYear();
             nextSession = 1;
+          
             for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
-                if (month >= this.config.SESSION_PARAMS[i].startMonth && month <= this.config.SESSION_PARAMS[i].endMonth) {
+                if (month >= parseInt(this.config.SESSION_PARAMS[i].startMonth) && month <= parseInt(this.config.SESSION_PARAMS[i].endMonth)) {
                     nextSession = i + 1;
                     break;
                 }
             }
-
+            var thisYear = nextSession != 4 ? year : year--;
         } else {
             for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
                 if (sessions[0].session === this.config.SESSION_PARAMS[i].session) {
@@ -98,6 +100,8 @@ export class Sessions {
                     break;
                 }
             }
+             var thisYear = parseInt(sessions[0].year);
+            
         }
 
         //If the next session is the fifth session then set it to the first session
@@ -105,7 +109,7 @@ export class Sessions {
         //Set the session name
         newSessionObj.session = this.config.SESSION_PARAMS[nextSession].session;
         //And the year
-        let thisYear = parseInt(sessions[0].year);
+        // let thisYear = parseInt(sessions[0].year);
         if(nextSession === 0) thisYear++;
         newSessionObj.year = thisYear;
         if (nextSession === 3) {

@@ -23,6 +23,16 @@ export class EditPeople {
     tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"}];
     tabPath = './';
 //, { id: 'is4ua' }
+
+    toolbar = [
+		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['color', ['color']],
+		['font', ['strikethrough', 'superscript', 'subscript']],
+		['layout', ['ul', 'ol', 'paragraph']],
+		['insert', [ 'link', 'table', 'hello']],
+		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+	];
+    
     constructor(datatable, config, people, utils, is4ua, dialog, validation) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);

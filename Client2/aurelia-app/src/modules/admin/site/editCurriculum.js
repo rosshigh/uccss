@@ -16,6 +16,15 @@ export class EditCurriculum {
     spinnerHTML = "";
 	newItem = false;
 
+    toolbar = [
+		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['color', ['color']],
+		['font', ['strikethrough', 'superscript', 'subscript']],
+		['layout', ['ul', 'ol', 'paragraph']],
+		['insert', [ 'link', 'table', 'hello']],
+		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
+	];
+
     constructor(datatable, curriculum, products, config, utils, dialog, validation) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
