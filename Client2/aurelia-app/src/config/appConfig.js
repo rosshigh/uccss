@@ -9,7 +9,7 @@ export class AppConfig {
     HOST = location.origin;
 
     // BASE_URL = "http://localhost:5000/api/"; 
-    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
+    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
 
     BASE_URL = this.HOST + "/api/";
     IMG_DOWNLOAD_URL = this.HOST + '/img/' 

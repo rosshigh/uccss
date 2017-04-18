@@ -52,7 +52,7 @@
                             <tr click.trigger="edit($index, $event)" repeat.for="system of dataTable.displayArray">
                                 <td data-title="Client Key">${system.clientKey}</td>
                                 <td data-title="Name">${system.name}</td>
-                                <td data-title="SAP Product">${system.sapProduct | lookupDescription:sapProductsArray}</td>
+                                <td data-title="SAP Product">${system.sapProduct | lookupDescription:is4ua.sapProductsArray}</td>
                                 <td class="centerText" data-title="Status">${system.active | translateStatus}</td>
                                 <td data-title="Systems">${system.systems | systemList}</td>
                             </tr>
