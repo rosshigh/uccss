@@ -2,8 +2,10 @@ var mongoose = require('mongoose'),
 	Person = require('./models/people'),
 	Institution = require('./models/institutions'),
 	InstitutionModel = mongoose.model('Institution'),
+	Iconv  = require('iconv-lite'),
 	fs = require('fs'),
 	Model = mongoose.model('Person');
+
 
 var db = 'mongodb://127.0.0.1/uccss-test';
 
@@ -20,27 +22,20 @@ var db = 'mongodb://127.0.0.1/uccss-test';
 		console.log("Mongoose connected to the database");
 	});
 
-	// let filePath = process.argv[2];
 	let filePath = './data/chico/People-semi.csv';
-	fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
+	var buffer = fs.readFile(filePath, function(err, data){
 		if (!err){
-			data = data.split('\n');				
-			let dataArray = new Array();
+			result = Iconv.decode(data, "win1252");
+			data = result.split('\n');						
 			data.forEach((item,index) => {
-				// console.log(item)
-				// if(index >= process.argv[2] && index < process.argv[3]){
-				if(index > 0){
+				if(index > 0){	
 					var obj = new Object();
-					// let array = item.split(process.argv[3]);	
-					let array = item.split(';');			
-					// console.log(array)
-					// obj.key = array[0];
+					let array = item.split(';');									
 					obj.firstName = array[4];
 					obj.middleName = array[5];
 					obj.lastName = array[3];
 					obj.title = array[7];
 					obj.departmentName = array[37];
-					// obj.salutation = array[];
 					obj.email = array[14];
 					obj.password = array[26];
 					obj.phone = array[12];
@@ -52,23 +47,18 @@ var db = 'mongodb://127.0.0.1/uccss-test';
 					obj.region = array[18];
 					obj.postalCode = array[19];
 					obj.country = array[20];
-					// obj.timeZone = array[29];
-					// obj.langage = array[30];
 					obj.POBox = array[35];
 					obj.institutionId = array[1];
 					obj.roles = new Array();
-					obj.roles.push('USER');
-					if(array[28] && array[28].indexOf('BSTAFF')) obj.roles.push('UCCA');
-					if(array[28] && array[28].indexOf('TSTAFF')) obj.roles.push('UCCT');
-					if(array[28] && array[28].indexOf('ASTAFF')) obj.roles.push('UCCA');
-					if(array[28] && array[28].indexOf('COORD')) obj.roles.push('PRIM');
+					obj.roles.push('USER');					
+					if(array[28] && array[28].indexOf('BSTAFF') > -1) obj.roles.push('UCCA');
+					if(array[28] && array[28].indexOf('TSTAFF') > -1) obj.roles.push('UCCT');
+					if(array[28] && array[28].indexOf('ASTAFF') > -1) obj.roles.push('UCCA');
+					if(array[28] && array[28].indexOf('COORD') > -1) obj.roles.push('PRIM');
 					if(array[22] == 1) obj.roles.push('BUSI');
 					if(array[23] == 1) obj.roles.push('TECH');
-					// if(array[21] == -1) obj.roles.push('BUSI');
-					// if(array[27] && array[27].indexOf('COORD') > -1) obj.roles.push('LEGL');
 					obj.active = array[32] == 1; 
 					obj.personStatus = pad(array[33]);
-					// departmentCategory = array[];
 					obj.personSpecialization = pad(array[11]);
 					obj.academicTitle = pad(array[8]);
 					obj.departmentCategory =pad( array[10]);
@@ -86,10 +76,9 @@ var db = 'mongodb://127.0.0.1/uccss-test';
 						.then(result => {						
 								if(!result[0])	{
 									// console.log('NO INSTITUION ' + array[1])
-								} else {
+								} else {									
 									obj.institutionId = result[0]._id;
-									var newPerson = new Model(obj);	
-									
+									var newPerson = new Model(obj);									
 									// console.log("SAVING")
 									if (index == 100) console.log(newPerson)								
 									newPerson.save(function(err, object){

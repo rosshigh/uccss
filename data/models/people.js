@@ -80,25 +80,25 @@ PersonSchema.pre('update', function() {
   this.update({},{ $set: { dateModified: new Date() } });
 });
 
-// PersonSchema.pre('save', function(next){
-//   var person = this;
-// //   if (this.isModified('password') || this.isNew) {
-//         Bcrypt.genSalt(10, function (err, salt) {
-//             if (err) {
-//                 return next(err);
-//             }
-//             Bcrypt.hash(person.password, salt, function (err, hash) {
-//                 if (err) {
-//                     return next(err);
-//                 }
-//                 person.password = hash;
-//                 next();
-//             });
-//         });
-//     // } else {
-//     //     return next();
-//     // }
-// });
+PersonSchema.pre('save', function(next){
+  var person = this;
+//   if (this.isModified('password') || this.isNew) {
+        Bcrypt.genSalt(10, function (err, salt) {
+            if (err) {
+                return next(err);
+            }
+            Bcrypt.hash(person.password, salt, function (err, hash) {
+                if (err) {
+                    return next(err);
+                }
+                person.password = hash;
+                next();
+            });
+        });
+    // } else {
+    //     return next();
+    // }
+});
 
 PersonSchema.methods.comparePassword = function (passw, cb) {
     Bcrypt.compare(passw, this.password, function (err, isMatch) {
