@@ -113,12 +113,12 @@ module.exports = function (app) {
                         context: result
                       }
                        requestCreated(mailObj)
-                        .then(result => {                        
+                        // .then(result => {                        
                             res.status(200).json(result);
-                        })
-                        .catch(error => {
-                            return next(error);
-                        });    
+                        // })
+                        // .catch(error => {
+                        //     return next(error);
+                        // });    
                     }
                   })
                 }
@@ -159,12 +159,12 @@ module.exports = function (app) {
                               context: request
                             }                    
                            requestUpdated(mailObj)
-                              .then(result => {                      
+                              // .then(result => {                      
                                   res.status(200).json(requestResult);                                
-                              })
-                              .catch(error => {
-                                  return next(error); 
-                              });
+                              // })
+                              // .catch(error => {
+                              //     return next(error); 
+                              // });
                           }           
                         })
                       })
@@ -256,12 +256,12 @@ console.log('delete')
                 }
               };
               customerAction(obj)
-              .then(result => {
+              // .then(result => {
                   res.status(200).json(result);
-                })
-                .catch(error => {           
-                    return next(error);
-                });
+                // })
+                // .catch(error => {           
+                //     return next(error);
+                // });
             }
           })
         })
@@ -286,12 +286,12 @@ console.log('delete')
                   }
                 };
                 customerAction(obj)
-                .then(result => {
+                // .then(result => {
                     res.status(200).json(result);
-                  })
-                  .catch(error => {           
-                      return next(error);
-                  });
+                  // })
+                  // .catch(error => {           
+                  //     return next(error);
+                  // });
               }
             })
           })
@@ -489,12 +489,12 @@ console.log('delete')
                       context: request
                     }                    
                     requestUpdated(mailObj)
-                      .then(result => {                      
+                      // .then(result => {                      
                           res.status(200).json(requestResult);                                
-                      })
-                      .catch(error => {
-                          return next(error); 
-                      });
+                      // })
+                      // .catch(error => {
+                      //     return next(error); 
+                      // });
                   }           
                 })
               })
@@ -525,12 +525,12 @@ console.log('delete')
                       context: request
                     }                    
                     requestUpdated(mailObj)
-                      .then(result => {                      
+                      // .then(result => {                      
                           res.status(200).json(requestResult);                                
-                      })
-                      .catch(error => {
-                          return next(error); 
-                      });
+                      // })
+                      // .catch(error => {
+                      //     return next(error); 
+                      // });
                   }           
                 })
               })

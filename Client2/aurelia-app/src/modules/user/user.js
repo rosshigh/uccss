@@ -148,19 +148,24 @@ export class User {
                 let weather = await this.siteinfo.getWeather(this.userObj.city);
                 this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
                 this.temp = this.temp + "\u00b0 C";
-                this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
+                // this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
+                 this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" +  weather.weather[0].icon + ".png";
                 var weatherObj = {temp: this.temp, url: this.weatherIcon};
-                sessionStorage.setItem('weather',JSON.stringify(weatherObj));
+                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
              }
         } else {
             let weather = JSON.parse(sessionStorage.getItem('weather'));
             this.temp = weather.temp;
             this.weatherIcon = weather.url; 
         }
-        let uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
-        this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + "\u00b0 C";
-        this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
-
+            if(sessionStorage.getItem('uccweather')){
+                let uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
+                this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + "\u00b0 C";
+                // this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
+                this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL  + 'icons/' + uccweather.icon + ".png";
+                console.log(this.uccweatherIcon)
+            }
+           
   }
 
   moreInfoExists(item){

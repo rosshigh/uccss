@@ -81,6 +81,7 @@ export class CreateHelpTickets{
     }
 
     async categoryChanged(){
+        this.showAdditionalInfo = false;
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
             if(this.requestsRequired) await this.getActiveRequests();
@@ -89,31 +90,19 @@ export class CreateHelpTickets{
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
-                // this.showRequests = true; 
                 this.showAdditionalInfo = true;
-                //  this.showHelpTicketDescription = true;
                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
-                // this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm;
                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
             } else {
                 this.helpTicketTypeMessage = this.clientRequestsArray.length ? this.getMessage('SELECT_TYPE') : undefined;
-                // this.showHelpTicketDescription = true;
                 this.inputForm = null;
                 this.showAdditionalInfo = false;
-                // this.helpTicketTypeMessage = undefined;
-                // this.showHelpTicketDescription = false;
-                // this.showRequests = false;
             }
-            // let message = this.getMessage("CURRENT_PRODUCT_REQUESTS");
-            // this.helpTicketTypeMessage = message.replace("NUMBER",  this.clientRequestsArray.length);
-
         } else {
             this.inputForm = null;
             this.showTypes = false;
             this.showAdditionalInfo = false;
             this.helpTicketTypeMessage = undefined;
-            // this.showHelpTicketDescription = false;
-            // this.showRequests = false;
         }
          $("#helpTicketPurpose").addClass('focus');
     }

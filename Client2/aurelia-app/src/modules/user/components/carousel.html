@@ -8,7 +8,7 @@
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
       <div repeat.for="item of siteinfo.siteArray | infoFilter:'CARO'" class="${$first ? 'item active' : 'item'}">
-        <img src="${item.url}" style="height:500px" alt="${item.title}">
+        <img src="${item.url}" class="img-responsive"  alt="${item.title}">
         <div class="carousel-caption">
           <h3>${item.title}</h3>
         </div>
@@ -25,6 +25,6 @@
       <span class="sr-only">Next</span>
     </a>
   </div>
-  <div class="carouselSize" show.bind="!showCarousel">
-    <img src="${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}" style="height:500px;width:700px;">
+  <div  class="carouselSize" show.bind="!showCarousel">
+    <img src="${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}" class="img-responsive">
   </div>

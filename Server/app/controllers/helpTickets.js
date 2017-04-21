@@ -102,8 +102,9 @@ module.exports = function (app, config) {
       if (err) {
         return next(err);
       } else {          
+
         if(req.query.email == 1){        
-          Person.findById(object.personId, function(err, person){           
+          Person.findById(object.personId, function(err, person){                     
             if(err){
               return next(err);
             } else {                    
@@ -112,13 +113,8 @@ module.exports = function (app, config) {
                 email: person.email,
                 context: object
               }             
-              helpTicketCreated(mailObj)
-                .then(result => {
-                    res.status(200).json(object);
-                })
-                .catch(error => {
-                    return next(error);
-                });            
+              helpTicketCreated(mailObj); 
+              res.status(200).json(object);           
             }
           })
         } else {
@@ -149,20 +145,20 @@ module.exports = function (app, config) {
                     }       
                     if(req.params.status == 6){
                       helpTicketClosed(mailObj)
-                        .then(result => {
+                        // .then(result => {
                             res.status(200).json(content);
-                        })
-                        .catch(error => {
-                            return next(error);
-                        });  
+                        // })
+                        // .catch(error => {
+                        //     return next(error);
+                        // });  
                     } else {
                       helpTicketUpdated(mailObj)
-                        .then(result => {
+                        // .then(result => {
                             res.status(200).json(content);
-                        })
-                        .catch(error => {
-                            return next(error);
-                        });  
+                        // })
+                        // .catch(error => {
+                        //     return next(error);
+                        // });  
                     }     
                 })
                 .catch(error => {

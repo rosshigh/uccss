@@ -70,6 +70,15 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
+                                <label for="editMobile" class="col-sm-3 control-label hideOnPhone">Mobile</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="editMobile" masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-lg-4">
+                            <div class="form-group">
                                 <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone *</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" id="editPhone" masked="value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *"
@@ -79,10 +88,9 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="editMobile" class="col-sm-3 control-label hideOnPhone">Mobile</label>
+                                <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Extension</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="editMobile" masked="value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *"
-                                    />
+                                    <input class="form-control" id="editPhoneExt" value.bind="people.selectedPerson.ext"/>
                                 </div>
                             </div>
                         </div>

@@ -171,10 +171,12 @@ export class People {
         }
     }
 
-    isPersonDirty(){
+    isPersonDirty(originalObj){
         if(this.selectedPerson){
-            if(this.selectedPerson._id){
-                var obj = this.peopleArray[this.editIndex];
+            if(originalObj){
+                var obj = originalObj;
+            } else if(this.selectedPerson._id){
+                var obj = this.selectedPersonFromId(this.selectedPerson._id)
             } else {
                 var obj = this.emptyPerson();
             }

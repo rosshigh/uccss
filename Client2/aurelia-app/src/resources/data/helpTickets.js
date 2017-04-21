@@ -189,12 +189,12 @@ export class HelpTickets {
         return response;
     }
 
-    async saveHelpTicket(){
+    async saveHelpTicket(email){
         if(!this.selectedHelpTicket){
             return;
         }
         var url = this.data.HELP_TICKET_SERVICES;
-
+        if(email) url += '?email=1';
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
@@ -220,6 +220,7 @@ export class HelpTickets {
     async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
             var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+            if(email) url += '?email=1';
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);

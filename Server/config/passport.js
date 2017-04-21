@@ -22,7 +22,7 @@ var localLogin = new localStrategy(localOptions, function(email, password, next)
     } else {    
       if(!user){
         next(new NotFoundError("404",{ message: "Email not found."}));
-      } else {
+      } else {       
         user.comparePassword(password, function (err, isMatch) {
           if (err) {
             return next(err);

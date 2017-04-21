@@ -9,6 +9,7 @@
             <hr/>
             <div innerhtml.bind="alert.content"></div>
         </div>
+
         <div class="row">
             <div class="col-lg-3  bigMarginTop leftMargin">
                 <div class="bigMarginTop leftMargin">
@@ -20,17 +21,15 @@
                     <compose view="./components/homePageLinks.html"></compose> 
                 </div>
             </div>
+
             <div class="col-lg-4">
-                <div class="col-lg-12">
-                    <div style="height:500px;">
-                        <compose view="./components/carousel.html"></compose>
-                    </div>
+                <div style="height:500px;">
+                    <compose view="./components/carousel.html"></compose>
                 </div>
             </div>
 
             <div class="col-lg-3 col-lg-offset-1">
-            <a class="twitter-timeline"  href="https://twitter.com/hashtag/SAPNextGen" data-widget-id="826153620517376000">#SAPNextGen Tweets</a>
-            
+                <a class="twitter-timeline"  href="https://twitter.com/hashtag/SAPNextGen" data-widget-id="826153620517376000">#SAPNextGen Tweets</a>
             
                 <div>
                     <h2 show.bind="siteinfo.siteArray | infoFilter:'NEWS':true" class="underline topMargin">UCC and UA News</h2>
@@ -38,6 +37,7 @@
                         <compose view="./components/newsItem.html"></compose>
                     </div>
                 </div>
+
                 <h2 class="underline topMargin">Useful Information</h2>
                 <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
                     <compose view="./components/newsItem.html"></compose>

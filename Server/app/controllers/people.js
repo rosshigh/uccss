@@ -3,6 +3,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
     Note = mongoose.model('Note'),
+     http = require('http'),
     PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
     logger = require('../../config/logger'),
@@ -122,12 +123,12 @@ module.exports = function (app) {
                 context: object
               }     
               welcome(mailObj)
-                .then(result => {
+                // .then(result => {
                     res.status(200).json(object);
-                })
-                .catch(error => {
-                    return next(error);
-                });     
+                // })
+                // .catch(error => {
+                //     return next(error);
+                // });     
           }
         });
       }
@@ -135,11 +136,11 @@ module.exports = function (app) {
   });
 
   router.put('/api/people', requireAuth, function(req, res, next){
-    logger.log('Update Person ' + req.body._id, 'verbose');    
+    logger.log('Update Person ' + req.body._id, 'verbose');       
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);
-      } else {
+      } else {    
         res.status(200).json(person);
       }
     })
@@ -150,12 +151,12 @@ module.exports = function (app) {
     Model.findById(req.params.id, function(err, result){
       if (err) {
          return next(err);
-      } else {
+      } else {       
         result.password = req.body.password;
         result.save(function(err, person){
           if (err) {
              return next(err);
-          } else {
+          } else {           
             res.status(200).json(result);
           }
         });
@@ -189,14 +190,14 @@ module.exports = function (app) {
         };
   
         genericEmail(obj)
-          .then(result => {
+          // .then(result => {
               person.audit.push(req.body.audit);
               person.save();
               res.status(200).json({message: "Email Sent"});
-          })
-          .catch(error => {
-              return next(error);
-          });
+          // })
+          // .catch(error => {
+          //     return next(error);
+          // });
         
     })
     .catch(error => {
@@ -221,12 +222,12 @@ module.exports = function (app) {
                 context: context
               }     
               passwordReset(mailObj)
-                .then(emailResult => {
+                // .then(emailResult => {
                     res.status(200).json(result);
-                })
-                .catch(error => {
-                    return next(error);
-                });  
+                // })
+                // .catch(error => {
+                //     return next(error);
+                // });  
           })
           .catch(error => {
             return next(error);
@@ -261,6 +262,54 @@ module.exports = function (app) {
        return next(error);
     })
   });
+
+  router.get('/api/getWeather/:city', function(req, res, next){
+    logger.log("Getting weather for " + req.params.city, 'verbose')
+
+    return http.get({
+        host: 'api.openweathermap.org',
+        path: '/data/2.5/weather?q=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931'
+    }, function(response) {
+        // Continuously update stream with data
+        var str = '';
+        response.on('data', function(d) {
+            str = JSON.parse(d);
+            console.log(str);
+        });
+        response.on('end', function() {
+            // Data reception is done, do whatever with it!
+            console.log("ENDING")
+            res.status(200).json(str);
+        });
+
+    // var optionsget = {
+    //     host : 'api.openweathermap.org', 
+    //     path : '/data/2.5/weather?q=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931', 
+    //     method : 'GET'
+    // };
+
+    // logger.log(optionsget.path);
+    
+    // var reqGet = http.request(optionsget, function(response) {
+    //     console.log("statusCode: ", response.statusCode);
+    //     var str = '';
+    
+    //     res.on('data', function(d) {
+    //         str = JSON.parse(d);
+    //         console.log(str)
+    //         res.status(200).json(str);
+    //     });
+    
+    });
+
+    reqGet.end();
+    
+    reqGet.on('error', function(e) {
+        console.error(e);
+        return next(err);
+    });
+
+  })
 
   router.route('/api/users/login')
     .post(requireLogin, login);

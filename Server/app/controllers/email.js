@@ -74,7 +74,7 @@ if(env === 'development'){
   var HelpTicketClosedTemplateCompiled = hbs.compile(HelpTicketClosedTemplate);
 
   sendGrid = function(mailObject){
-    mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>');
+    mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>'); 
     if(mailObject.email){
         var helper = require('sendgrid').mail;
         var from_email = new helper.Email(config.emailAddress);
@@ -87,17 +87,17 @@ if(env === 'development'){
           body: mail.toJSON(),
         });
 
-        return new Promise(function(resolve, reject) {
+        // return new Promise(function(resolve, reject) {
             sg.API(request)
               .then(response => {
                   logger.log(response, "verbose");
-                  resolve(response);
+                  // resolve(response);
               })
               .catch(error => {
                   logger.log(error, "verbose");
-                  reject(Error(result));
+                  // reject(Error(result));
               });
-        });
+        // });
     }
   }
 
@@ -174,124 +174,124 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
     logger.log("Help Ticket Created email", "verbose");
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
       mailObject.email = mailObject.email;
-      mailObject.subject = 'Help Ticket Created'; 
+      mailObject.subject = 'Help Ticket Created';      
       sendGrid(mailObject)
-      .then(result => {
-              if (result.statusCode === 202) {     
-                resolve(result);
-              } else {
-                reject(Error(result));
-              }
-          })
-    });
+      // .then(result => {
+      //         if (result.statusCode === 202) {     
+      //           resolve(result);
+      //         } else {
+      //           reject(Error(result));
+      //         }
+      //     })
+    // });
   }
 
   helpTicketUpdated = function(mailObject){
     logger.log("Help Ticket Update email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
       mailObject.body = HelpTicketUpdatedTemplateCompiled(mailObject.context);
       mailObject.email = mailObject.email;
       mailObject.subject = 'Help Ticket Updated'; 
       sendGrid(mailObject)
-      .then(result => {
-                if (result.statusCode === 202) {     
-                  resolve(result);
-                } else {
-                  reject(Error(result));
-                }
-            })
-    });
+      // .then(result => {
+                // if (result.statusCode === 202) {     
+                  // resolve(result);
+                // } else {
+                  // reject(Error(result));
+            //     }
+            // })
+    // });
   }
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
     mailObject.body = HelpTicketClosedTemplateCompiled(mailObject.context);
     mailObject.to_email = mailObject.email;
     mailObject.subject = 'Help Ticket Closed'; 
     sendGrid(mailObject)
-     .then(result => {
-          if (result.statusCode === 202) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });
+    //  .then(result => {
+    //       if (result.statusCode === 202) {     
+    //           resolve(result);
+    //         } else {
+    //           reject(Error(result));
+    //         }
+    //     })
+    // });
   }
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
       mailObject.body = "Request " + mailObject.context.clientRequestNo + " created."; 
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
       sendGrid(mailObject)
-        .then(result => {
-            if (result.statusCode === 202) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });
+    //     .then(result => {
+    //         if (result.statusCode === 202) {     
+    //           resolve(result);
+    //         } else {
+    //           reject(Error(result));
+    //         }
+    //     })
+    // });
   }
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Updated'; 
        sendGrid(mailObject)
-          .then(result => {
-              if (result.statusCode === 202) {     
-                resolve(result);
-              } else {
-                reject(Error(result));
-              }
-          })
+          // .then(result => {
+          //     if (result.statusCode === 202) {     
+          //       resolve(result);
+          //     } else {
+          //       reject(Error(result));
+          //     }
+          // })
 
-      });
+      // });
   }
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject; 
       sendGrid(mailObject)
-          .then(result => {
+      //     .then(result => {
             
-              if (result.statusCode === 202) {     
-                resolve(result);
-              } else {                  
-                reject(Error(result));
-              }
-          })
+      //         if (result.statusCode === 202) {     
+      //           resolve(result);
+      //         } else {                  
+      //           reject(Error(result));
+      //         }
+      //     })
 
-      });
+      // });
   }
 
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");    
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       mailObject.body = GenericTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject; 
       sendGrid(mailObject)
-        .then(result => {
-            if (result.statusCode === 202) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });
+        // .then(result => {
+        //     if (result.statusCode === 202) {     
+        //       resolve(result);
+        //     } else {
+        //       reject(Error(result));
+        //     }
+        // })
+    // });
   }
 
   annualUpdateContactInfo = function(mailObject){
@@ -300,19 +300,19 @@ if(env === 'development'){
 
   passwordReset = function(mailObject){
     logger.log("Password reset request", "verbose");    
-    return new Promise(function(resolve, reject) {    
+    // return new Promise(function(resolve, reject) {    
       mailObject.body = PasswordResetTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject;    
       sendGrid(mailObject)
-        .then(result => {
-            if (result.statusCode === 202) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });
+    //     .then(result => {
+    //         if (result.statusCode === 202) {     
+    //           resolve(result);
+    //         } else {
+    //           reject(Error(result));
+    //         }
+    //     })
+    // });
   }
 
 } else {
@@ -333,17 +333,17 @@ if(env === 'development'){
   transporter.use('compile', options);
 
   nodeMailerSendMail = function(mailObject){
-     return new Promise(function(resolve, reject) {        
+    //  return new Promise(function(resolve, reject) {        
         transporter.sendMail(mailObject)
         .then(result => {       
             logger.log(result, 'verbose ');
-            resolve(result);
+            // resolve(result);
         })
         .catch(error => {         
             logger.log(error, 'error');
-             reject(Error(error));
+            //  reject(Error(error));
         })
-     });
+    //  });
   };
 
   welcome = function(mailObject){
@@ -411,7 +411,7 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-      return new Promise(function(resolve, reject) {
+      // return new Promise(function(resolve, reject) {
         var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -421,19 +421,19 @@ if(env === 'development'){
         };
 
         nodeMailerSendMail(mail)
-        .then(result => {      
-              if (result.rejected.length === 0) {     
-                resolve(result);
-              } else {
-                reject(Error(result));
-              }
-          })
-    });
+        // .then(result => {      
+        //       if (result.rejected.length === 0) {     
+        //         resolve(result);
+        //       } else {
+        //         reject(Error(result));
+        //       }
+          // })
+    // });
   }
 
   helpTicketUpdated = function(mailObject){
       logger.log("Help Ticket Update email", "verbose");
-       return new Promise(function(resolve, reject) {
+      //  return new Promise(function(resolve, reject) {
           var mail = {
               from: config.emailAddress,
               to: mailObject.email,
@@ -443,19 +443,19 @@ if(env === 'development'){
             };
 
           nodeMailerSendMail(mail)
-          .then(result => {      
-                if (result.rejected.length === 0) {     
-                  resolve(result);
-                } else {
-                  reject(Error(result));
-                }
-            })
-       });
+      //     .then(result => {      
+      //           if (result.rejected.length === 0) {     
+      //             resolve(result);
+      //           } else {
+      //             reject(Error(result));
+      //           }
+      //       })
+      //  });
   }
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
      var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -465,19 +465,19 @@ if(env === 'development'){
       };
 
       nodeMailerSendMail(mail)
-      .then(result => {      
-                if (result.rejected.length === 0) {     
-                  resolve(result);
-                } else {
-                  reject(Error(result));
-                }
-            })
-    });   
+    //   .then(result => {      
+    //             if (result.rejected.length === 0) {     
+    //               resolve(result);
+    //             } else {
+    //               reject(Error(result));
+    //             }
+    //         })
+    // });   
   }
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
       var mail = {
             from: config.emailAddress,
             to: mailObject.email,
@@ -487,19 +487,19 @@ if(env === 'development'){
         };
 
         nodeMailerSendMail(mail)
-          .then(result => {      
-                if (result.rejected.length === 0) {     
-                  resolve(result);
-                } else {
-                  reject(Error(result));
-                }
-            })
-    });   
+    //       .then(result => {      
+    //             if (result.rejected.length === 0) {     
+    //               resolve(result);
+    //             } else {
+    //               reject(Error(result));
+    //             }
+    //         })
+    // });   
   }
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -509,19 +509,19 @@ if(env === 'development'){
       };
 
       nodeMailerSendMail(mail)
-            .then(result => {      
-                  if (result.rejected.length === 0) {     
-                    resolve(result);
-                  } else {
-                    reject(Error(result));
-                  }
-              })
-    });   
+    //         .then(result => {      
+    //               if (result.rejected.length === 0) {     
+    //                 resolve(result);
+    //               } else {
+    //                 reject(Error(result));
+    //               }
+    //           })
+    // });   
   }
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-     return new Promise(function(resolve, reject) {
+    //  return new Promise(function(resolve, reject) {
         var mail = {
             from: config.emailAddress,
             to: mailObject.email,
@@ -531,19 +531,19 @@ if(env === 'development'){
         };
 
         nodeMailerSendMail(mail)
-        .then(result => {      
-              if (result.rejected.length === 0) {     
-                resolve(result);
-              } else {
-                reject(Error(result));
-              }
-          })
-    });   
+    //     .then(result => {      
+    //           if (result.rejected.length === 0) {     
+    //             resolve(result);
+    //           } else {
+    //             reject(Error(result));
+    //           }
+    //       })
+    // });   
   }
 
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");  
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -552,14 +552,14 @@ if(env === 'development'){
           context: mailObject.context
       };
       nodeMailerSendMail(mail)
-      .then(result => {      
-            if (result.rejected.length === 0) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });      
+    //   .then(result => {      
+    //         if (result.rejected.length === 0) {     
+    //           resolve(result);
+    //         } else {
+    //           reject(Error(result));
+    //         }
+    //     })
+    // });      
   }
 
   annualUpdateContactInfo = function(mailObject){
@@ -568,7 +568,7 @@ if(env === 'development'){
 
   passwordReset = function(mailObject){
     logger.log("Password reset request", "verbose"); 
-    return new Promise(function(resolve, reject) {
+    // return new Promise(function(resolve, reject) {
       var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -577,14 +577,14 @@ if(env === 'development'){
           context: mailObject.context
       };
       nodeMailerSendMail(mail)
-      .then(result => {      
-            if (result.rejected.length === 0) {     
-              resolve(result);
-            } else {
-              reject(Error(result));
-            }
-        })
-    });      
+      // .then(result => {      
+      //       if (result.rejected.length === 0) {     
+      //         resolve(result);
+      //       } else {
+      //         reject(Error(result));
+      //       }
+        // })
+    // });      
   }
 
 }

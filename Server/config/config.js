@@ -11,7 +11,7 @@ var config = {
     port: 5000,
     https_port: 5001,
     db: 'mongodb://127.0.0.1/uccss-dev',
-    corsDomain: 'http://192.168.116.1:9000',
+    corsDomain: 'http://localhost:5000',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     uploads: './public/uploadedFiles',
     smtp: 'smtps://rhightower@gmail.com:Kinja1@3@smtp.gmail.com',

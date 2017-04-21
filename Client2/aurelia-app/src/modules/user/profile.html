@@ -11,6 +11,7 @@
       <div class="panel-body">
           <div class="bottomMargin list-group-item leftMargin rightMargin">
             <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+             <span click.delegate="changePassword()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Change Password"><i class="fa fa-key fa-lg fa-border" aria-hidden="true"></i></span>
             <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
         </div>  
         <div class="topMargin col-sm-12 col-lg-1">
@@ -57,6 +58,14 @@
                             <label for="editPhone" class="col-sm-3 control-label hideOnPhone">Phone</label>
                             <div class="col-sm-8">
                             <input value.bind="people.selectedPerson.phone| phoneNumber" id="editPhone" class="form-control input-md" placeholder="Phone" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                     <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="editext" class="col-sm-3 control-label hideOnPhone">Extension</label>
+                            <div class="col-sm-8">
+                            <input value.bind="people.selectedPerson.ext" id="editext" class="form-control input-md" placeholder="Extension" type="text" />
                             </div>
                         </div>
                     </div>
@@ -178,7 +187,10 @@
                 </div>
             </div>
 
-          </div> <!-- Row -->
+        
+
+          
+
         </form>
       </div>
   </div>

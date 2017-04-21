@@ -171,6 +171,11 @@ ai-dialog-header {
     border-bottom-width: 1px;
 }
 
+.weatherIcon {
+    height: 50px;
+    width: 50px;
+}
+
 .subMenu{
     position: relative;
     top: -5px;

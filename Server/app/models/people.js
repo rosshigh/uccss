@@ -24,6 +24,7 @@ var PersonSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String },
   phone: { type: String },
+  ext: { type: String },
   mobile: { type: String },
   fax: { type: String },
 
@@ -86,12 +87,12 @@ PersonSchema.pre('save', function(next){
         Bcrypt.genSalt(10, function (err, salt) {
             if (err) {
                 return next(err);
-            }
+            }         
             Bcrypt.hash(person.password, salt, function (err, hash) {
                 if (err) {
                     return next(err);
-                }
-                person.password = hash;
+                }               
+                person.password = hash;             
                 next();
             });
         });
