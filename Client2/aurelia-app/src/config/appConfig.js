@@ -4,8 +4,6 @@ import {HttpClient} from 'aurelia-http-client';
 @inject(HttpClient)
 export class AppConfig {
 
-    SEND_EMAILS = true;
-
     HOST = location.origin;
 
     // BASE_URL = "http://localhost:5000/api/"; 
@@ -31,7 +29,10 @@ export class AppConfig {
         { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true },
         { role: 'UCSA', label: 'UCCSS Admin', UCConly: true },
         { role: 'BLOG', label: 'Blog Author', UCConly: false },
-        { role: "TMAN", label: "Director", UCConly: true}];
+        { role: "TMAN", label: "Director", UCConly: true},
+        { role: "EDIR", label: "Executive Director", UCConly: true},
+        { role: "TDIR", label: "Technical Director", UCConly: true},
+        { role: "TMGR", label: "Technical Manager", UCConly: true}];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
@@ -400,6 +401,7 @@ export class AppConfig {
         this.SHOW_STAFF_CONTACT = this.getParameter('SHOW_STAFF_CONTACT');
         this.UCC_HEADER_IMAGE = this.getParameter('UCC_HEADER_IMAGE');
         this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
+        this.SEND_EMAILS = this.getParameter('SEND_EMAILS');
     }
 
     getParameter(parameter){

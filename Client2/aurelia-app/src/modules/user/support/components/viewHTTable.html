@@ -70,7 +70,7 @@
               <tr repeat.for="helpTicket of dataTable.displayArray">
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Reference">${helpTicket.helpTicketNo}</td>
                 <td click.delegate="selectHelpTicket($event, $index)" data-title="Type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>
-                <td style="width:12rem;">${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td> 
+                <td style="width:12rem;">${helpTicket.owner[0].personId | person:people:'fullName'}</td> 
                 <td style="width:2rem;" data-title="Update">
                   <span click.trigger="closeHelpTicket(helpTicket)" show.bind="helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close Help Ticket"><i class="fa fa-window-close-o fa-lg" aria-hidden="true"></i></span>
                   <!--

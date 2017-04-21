@@ -28,8 +28,14 @@ export class Contact {
 		this.staff = new Array();
 		this.admin = new Array();
 		this.people.uccPeople.forEach(item => {
-			if(item.roles.indexOf('TMAN') > -1) {
-				this.directors.push(item);
+			if(item.roles.indexOf('TMAN') > -1){
+				this.directors.push({item: item, role: 'TMAN'});
+			} else if(item.roles.indexOf('EDIR') > -1) {
+				this.directors.push({item: item, role: 'EDIR'});
+			} else if(item.roles.indexOf('TDIR') > -1) {
+				this.directors.push({item: item, role: 'TDIR'});
+			} else if(item.roles.indexOf('TMGR') > -1) {
+				this.directors.push({item: item, role: 'TMGR'});
 			} else if(item.roles.indexOf('UCCT') > -1) {
 				this.staff.push(item);
 			} else if(item.roles.indexOf('UCCA') > -1 ) {
@@ -39,7 +45,11 @@ export class Contact {
 		
 		this.staff = this.staff.sort((a, b) => {
 			return a.lastName > b.lastName;
-		})
+		});
+
+		this.directors = this.directors.sort((a, b) => {
+			return a.role > b.role;
+		});
 
 		// this.contactInfo = "";
 		// for(let i = 0; this.siteinfo.siteArray.length; i++){

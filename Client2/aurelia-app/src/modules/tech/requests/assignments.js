@@ -59,6 +59,7 @@ export class Assignments {
             this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
+        this.sendEmail = this.config.SEND_EMAILS;
         this.people.getCoursesArray();
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
@@ -241,7 +242,7 @@ export class Assignments {
         }
     }
 
-        processClient(index, client, el){
+    processClient(index, client, el){
             
             //Make sure the client hasn't already been selected
             let alreadySelected = false;
@@ -654,7 +655,7 @@ export class Assignments {
         if (this.validation.validate(1, this)) {
             if(this._buildRequest()){
                 this.requests.setSelectedRequest(this.requestToSave);
-                let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE;
+                let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
                 let serverResponse = await this.requests.assignRequest(email);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");

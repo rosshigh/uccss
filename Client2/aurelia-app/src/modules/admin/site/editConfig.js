@@ -66,14 +66,14 @@ export class EditConfig {
          this.siteConfig.configArray[this.selectedIndex]= this.utils.copyObject(this.originalParameter );
     }
 
-    switchValue(item){
-         let index;
+    switchValue(parameter, value){
+        let index;
         for(let i = 0; i < this.siteConfig.configArray.length; i++){
             if(this.siteConfig.configArray[i].parameter === parameter.parameter){
                 index = i;
             }
         }
-        this.siteConfig.configArray[index].value =  this.siteConfig.configArray[index].value == 0 ?  1 : 0;
+        this.siteConfig.configArray[index].value = this.siteConfig.configArray[index].value == 'false' || this.siteConfig.configArray[index].value == false;
         this.dataTable.updateArray(this.siteConfig.configArray);
     }
 

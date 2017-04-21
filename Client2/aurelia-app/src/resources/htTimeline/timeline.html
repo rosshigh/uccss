@@ -3,13 +3,13 @@
       <div class="smart-timeline">
         <ul class="smart-timeline-list">
           <li>
-            <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="helpTickets.selectedHelpTicket.personId | gravatarUrlId:people.peopleArray:100:1"></div>
+            <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="helpTickets.selectedHelpTicket.personId | gravatarUrlId:people:100:1"></div>
               <div class="smart-timeline-time">
                 <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
               </div>
               <div class="smart-timeline-content borderTop leftJustify">
                 <div class="form-group">
-                  <p>${helpTickets.selectedHelpTicket.personId | person:people.peopleArray:'fullName'}</p>
+                  <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>
                   <div class="row">
                     <div class="col-lg-4">
                       <span id="container"></span>

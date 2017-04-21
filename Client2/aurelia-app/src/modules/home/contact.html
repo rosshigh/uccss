@@ -24,19 +24,20 @@
 		</div>
 		<div class="col-lg-6">
 			<div class="col-lg-12" show.bind="directors.length > 0">
-				<h3>Director</h3>
+				<h3>Management</h3>
 				<ul>
 					<li class="list-group-item  topMargin" repeat.for="person of directors">
-						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
+						<div class="media-left" innerhtml='${person.item.email | gravatarUrl:people.peopleArray:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
-								<h4>${person.fullName}</h4>
+								<h4>${person.item.fullName}</h4>
+								<h5>${person.role | uccTitle:config.ROLES}</h5>
 							</div>
 							<div class="col-lg-12">
-								<span>${person.phone | phoneNumber}</span>
+								<span>${person.item.phone | phoneNumber}</span>
 							</div>
 							<div class="col-lg-12">
-								<span><a href="mailto:${person.email}">${person.email}</a></span>
+								<span><a href="mailto:${person.item.email}">${person.item.email}</a></span>
 							</div>
 						</div>
 					</li>
@@ -64,7 +65,7 @@
 				</ul>
 			</div>
 			<div class="col-lg-12 bigTopMargin bottomMargin" show.bind="admin.length > 0">
-				<h3>Administrative Staff</h3>
+				<h3>Administrative Support</h3>
 				<ul>
 					<li class="list-group-item topMargin" repeat.for="person of admin">
 						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>

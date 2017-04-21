@@ -63,20 +63,29 @@ export class ViewHelpTickets {
   }
 
   async activate() {
+    let uccRoles = "";
+		this.config.ROLES.forEach(item => {
+			if(item.UCConly) uccRoles += item.role + ":";
+		});
+
     let responses = await Promise.all([
-      this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
+      this.people.getUCCStaff(uccRoles),
+      this.helpTickets.getHelpTicketTypes('?order=category'),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
-      this.people.getPeopleArray('?order=lastName'),
       this.systems.getSystemsArray(),
+      // this.people.getPeopleArray('?order=lastName'),
       this.config.getConfig()
     ]);
+
+    this.people = this.people.uccPeople;
+
     this.updateArray();
 
     this.filterOutClosed();
 
-    this.sendEmail = false;;
+    this.sendEmail = this.config.SEND_EMAILS;;
 
     this.helpTicketTypeLookupArray = new Array();
     this.helpTickets.helpTicketTypesArray.forEach(item => {

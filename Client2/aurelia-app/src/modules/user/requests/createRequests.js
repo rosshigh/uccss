@@ -62,8 +62,8 @@ export class ViewHelpTickets {
         // This should yield: Object {testValue: "What just happened?"}
     });
 
-    this.useSandbox = this.config.SANDBOX_USED == 1;
-    if(this.config.SANDBOX_USED == 1){
+    this.useSandbox = this.config.SANDBOX_USED == 'true';
+    if(!this.useSandbox){
       this.typeSelected = true;
       this.regularClient = true;
       this.requestType = "regularCourse";

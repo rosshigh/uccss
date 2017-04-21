@@ -13,7 +13,7 @@
   </div>
   
   <div class="row">
-    <div show.bind="sessionSelected && !useSandbox" class="col-sm-12">
+    <div show.bind="sessionSelected && useSandbox" class="col-sm-12">
       <div class="form-group">
         <select value.bind="requestType" change.delegate="changeRequestType($event)" id="requestType" class="form-control">
           <option value="-1">Choose the Type of The Request</option>
@@ -80,7 +80,7 @@
     </div>
 
   <div show.bind="sessionId == -1 && requestType == -1" innerhtml.bind="CLIENT_REQUEST_START.content"></div>
-  <div show.bind="sessionId != -1 && requestType == -1 && !useSandbox" innerhtml.bind="SESSION_SELECTED.content"></div>
+  <div show.bind="sessionId != -1 && requestType == -1 && useSandbox" innerhtml.bind="SESSION_SELECTED.content"></div>
   
   <div show.bind="showInfoBox" class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
 </template>

@@ -20,7 +20,6 @@ import $ from 'jquery';
 export class ViewHelpTickets {
   helpTicketSelected = false;
   enterResponse = false;
-  sendEmail = false;
   showLockMessage = false;
   sendMailDisable = false;
   notesHistory = false;
@@ -67,14 +66,17 @@ export class ViewHelpTickets {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
-      this.sessions.getSessionsArray('?order=startDate'),
-      this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.people.getPeopleArray(),
       this.people.getInstitutionsArray('?order=name'),
-      this.systems.getSystemsArray(),
-      this.documents.getDocumentsCategoriesArray(),
       this.config.getConfig()
     ]);
+
+    this.sessions.getSessionsArray('?order=startDate');
+    this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name');
+    this.systems.getSystemsArray();
+    this.documents.getDocumentsCategoriesArray();
+
+    this.people = this.people.peopleArray;
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();
