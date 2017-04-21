@@ -8,11 +8,11 @@ export class AppConfig {
 
     HOST = location.origin;
 
-    // BASE_URL = "http://localhost:5000/api/"; 
-    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
+    BASE_URL = "http://localhost:5000/api/"; 
+    IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
 
-    BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    // BASE_URL = this.HOST + "/api/";
+    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -30,7 +30,8 @@ export class AppConfig {
         { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true },
         { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true },
         { role: 'UCSA', label: 'UCCSS Admin', UCConly: true },
-        { role: 'BLOG', label: 'Blog Author', UCConly: false }];
+        { role: 'BLOG', label: 'Blog Author', UCConly: false },
+        { role: "TMAN", label: "Director", UCConly: true}];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
@@ -391,7 +392,13 @@ export class AppConfig {
         this.HOME_WELCOME = this.getParameter('HOME_WELCOME');
         this.DEFAULT_HOME_IMAGE = this.getParameter('DEFAULT_HOME_IMAGE');
         this.WEATHER_API_KEY = this.getParameter('WEATHER_API_KEY');
-        console.log(JSON.stringify(this.SESSION_PARAMS));
+        this.UCC_PHONE = this.getParameter('UCC_PHONE');
+        this.UCC_EMAIL = this.getParameter('UCC_EMAIL');
+        this.UCC_ADMIN_PHONE = this.getParameter('UCC_ADMIN_PHONE');
+        this.UCC_ADMIN_EMAIL = this.getParameter('UCC_ADMIN_EMAIL');
+        this.UCC_ADDRESS = this.getParameter('UCC_ADDRESS');
+        this.SHOW_STAFF_CONTACT = this.getParameter('SHOW_STAFF_CONTACT');
+        this.UCC_HEADER_IMAGE = this.getParameter('UCC_HEADER_IMAGE');
     }
 
     getParameter(parameter){

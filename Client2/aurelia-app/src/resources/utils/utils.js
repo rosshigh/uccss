@@ -254,28 +254,29 @@ export class Utils{
   // }
 
   /*****************************************************************************
-     * Determine users role for authorizations
-     ****************************************************************************/
-    setRole(roles){
-        // var roles = this.user.roles;
-        var userRole;
-        if(!roles) userRole = 0;
-        if(roles.indexOf('UCSA') > -1) {
-            userRole = 10;
-        } else if(roles.indexOf('UCCT') > -1){
-            userRole = 8;
-        } else if(roles.indexOf('UCCA') > -1){
-            userRole = 6;
-        } else if(roles.indexOf('PRIM') > -1){
-            userRole = 4;
-        } else if(roles.indexOf('USER') > -1){
-            userRole = 2;
-        }  else {
-            userRole = 1;
-        }
-        return userRole;
-    }
-
+   * Determine users role for authorizations
+   ****************************************************************************/
+  setRole(roles){
+      // var roles = this.user.roles;
+      var userRole;
+      if(!roles) userRole = 0;
+      if(roles.indexOf('TMAN') > -1) {
+          userRole = 11;
+      } else if(roles.indexOf('UCSA') > -1) {
+          userRole = 10;
+      } else if(roles.indexOf('UCCT') > -1){
+          userRole = 8;
+      } else if(roles.indexOf('UCCA') > -1){
+          userRole = 6;
+      } else if(roles.indexOf('PRIM') > -1){
+          userRole = 4;
+      } else if(roles.indexOf('USER') > -1){
+          userRole = 2;
+      }  else {
+          userRole = 1;
+      }
+      return userRole;
+  }
 
   toCamelCase(str) {
     return str.toLowerCase()

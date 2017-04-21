@@ -311,6 +311,19 @@ module.exports = function (app) {
 
   })
 
+  router.get('/api/uccStaff/:uccRoles', function(req, res, next){
+    logger.log('Getting UCC Staff', 'verbose');
+    let roles = req.params.uccRoles.split(':');
+    Model.find({roles: {$in: roles}}).exec()
+    .then(people => {
+      res.status(200).json(people);
+    })
+    .catch(error => {
+      return next(error);
+    })
+
+  })
+
   router.route('/api/users/login')
     .post(requireLogin, login);
 

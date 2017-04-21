@@ -81,6 +81,7 @@ export class EditPeople {
         this.people.selectPerson(this.editIndex);
         this.oldEmail = this.people.selectedPerson.email;
         this.institutionId = this.people.selectedPerson.institutionId;
+        this.orginalObject = this.people.selectedPerson;
         this.filterRoles();
         this.newPerson = false;
         $("#editFirstName").focus();
@@ -119,7 +120,7 @@ export class EditPeople {
     }
 
     buildAudit(){
-        var changes = this.people.isPersonDirty();
+        var changes = this.people.isPersonDirty(this.orginalObject);
         changes.forEach(item => {
             this.people.selectedPerson.audit.push({
                  property: item.property,
@@ -176,7 +177,7 @@ export class EditPeople {
     }
 
     back() {
-        if (this.people.isPersonDirty().length) {
+        if (this.people.isPersonDirty(this.orginalObject).length) {
             return this.dialog.showMessage(
                 "The account has been changed. Do you want to save your changes?",
                 "Save Changes",

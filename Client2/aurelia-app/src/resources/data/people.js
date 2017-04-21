@@ -10,6 +10,8 @@ export class People {
     cleanObject = true;
     peopleArray = undefined;
 
+    UCC_STAFF_SERVICE = 'uccStaff';
+
     constructor(data, utils) {
         this.data = data;
         this.utils = utils;
@@ -50,6 +52,23 @@ export class People {
             console.log(error);
         }
         return this.selectedPerson;
+    }
+
+    async getUCCStaff(uccRoles){
+        var url = this.UCC_STAFF_SERVICE + '/' + uccRoles;
+        try {
+            let serverResponse = await this.data.get(url);
+            if (!serverResponse.error) {
+                this.uccPeople = serverResponse;
+            } else {
+                this.data.processError(serverResponse);
+                return undefined;
+            }
+        } catch (error) {
+            console.log(error);
+            return undefined;
+        }
+        return this.uccPeople;
     }
 
 	selectPerson(index) {

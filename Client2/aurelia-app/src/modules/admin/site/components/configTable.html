@@ -41,6 +41,10 @@
                                         <span  click.delegate="switchValue($index)" show.bind="item.value == 0" ><i class="fa fa-toggle-on fa-2x" aria-hidden="true"></i> On</span>
                                         <span  click.delegate="switchValue($index)" show.bind="item.value == 1" ><i class="fa fa-toggle-off fa-2x" aria-hidden="true"></i> Off</span>
                                     </div>
+                                    <div show.bind="item.type == 'html'">
+                                        <textarea value.bind = "item.value" rows="5" class="form-control"></textarea>
+                                        <div innerhtml.bind="item.value"></div>
+                                    </div> 
                                 </td>
 
                                 <td data-title="Modified Date"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>
