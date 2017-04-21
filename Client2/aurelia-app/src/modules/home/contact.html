@@ -27,7 +27,7 @@
 				<h3>Management</h3>
 				<ul>
 					<li class="list-group-item  topMargin" repeat.for="person of directors">
-						<div class="media-left" innerhtml='${person.item.email | gravatarUrl:people.peopleArray:100:1}'></div>
+						<div class="media-left" innerhtml='${person.item.email | gravatarUrl:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
 								<h4>${person.item.fullName}</h4>
@@ -47,7 +47,7 @@
 				<h3>Technical Staff</h3>
 				<ul>
 					<li class="list-group-item  topMargin" repeat.for="person of staff">
-						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
+						<div class="media-left" innerhtml='${person.email | gravatarUrl:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
 								<h4>${person.fullName}</h4>
@@ -68,7 +68,7 @@
 				<h3>Administrative Support</h3>
 				<ul>
 					<li class="list-group-item topMargin" repeat.for="person of admin">
-						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
+						<div class="media-left" innerhtml='${person.email | gravatarUrl:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
 								<h4>${person.fullName}</h4>
