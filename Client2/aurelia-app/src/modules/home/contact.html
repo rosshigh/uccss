@@ -16,7 +16,7 @@
 					<div class="col-lg-4">
 						<div innerhtml.bind="config.UCC_ADDRESS"></div>
 					</div>
-					<div show.bind="config.IMG_DOWNLOAD_URL.length && config.IMG_DOWNLOAD_URL.length > 0" class="col-lg-8">
+					<div show.bind="config.IMG_DOWNLOAD_URL.length && config.IMG_DOWNLOAD_URL.length > 0" class="col-lg-8 center">
 						<img src="${config.IMG_DOWNLOAD_URL}${config.UCC_HEADER_IMAGE}" class="img-responsive pull-right">
 					</div>
 				
@@ -24,7 +24,6 @@
 		</div>
 		<div class="col-lg-6">
 			<div class="col-lg-12" show.bind="directors.length > 0">
-				<h3>Management</h3>
 				<ul>
 					<li class="list-group-item  topMargin" repeat.for="person of directors">
 						<div class="media-left" innerhtml='${person.item.email | gravatarUrl:100:1}'></div>
