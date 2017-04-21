@@ -8,11 +8,11 @@ export class AppConfig {
 
     HOST = location.origin;
 
-    BASE_URL = "http://localhost:5000/api/"; 
-    IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
+    // BASE_URL = "http://localhost:5000/api/"; 
+    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
 
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
@@ -399,6 +399,7 @@ export class AppConfig {
         this.UCC_ADDRESS = this.getParameter('UCC_ADDRESS');
         this.SHOW_STAFF_CONTACT = this.getParameter('SHOW_STAFF_CONTACT');
         this.UCC_HEADER_IMAGE = this.getParameter('UCC_HEADER_IMAGE');
+        this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
     }
 
     getParameter(parameter){

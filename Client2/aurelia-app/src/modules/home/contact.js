@@ -36,6 +36,10 @@ export class Contact {
 				this.admin.push(item)
 			}
 		})
+		
+		this.staff = this.staff.sort((a, b) => {
+			return a.lastName > b.lastName;
+		})
 
 		// this.contactInfo = "";
 		// for(let i = 0; this.siteinfo.siteArray.length; i++){

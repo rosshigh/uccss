@@ -37,15 +37,42 @@ export class EditConfig {
         this.spinnerHTML = "";
     }
 
+    edit(parameter){
+        let index;
+        for(let i = 0; i < this.siteConfig.configArray.length; i++){
+            if(this.siteConfig.configArray[i].parameter === parameter.parameter){
+                index = i;
+            }
+        }
+        this.selectedIndex = index;
+        this.originalParameter = this.utils.copyObject(this.siteConfig.configArray[index]);
+        this.parameterSelected = true;
+    }
+
 	async save(){
 		let response = await this.siteConfig.saveAll(this.dataTable.displayArray);
 		if(!response.error){
             this.refresh();
+            this.parameterSelected = false;
 			this.utils.showNotification('The confiugration was saved.')
 		}
 	}
 
-    switchValue(index){
+    back(){
+        this.parameterSelected = false;
+    }
+
+    cancel(){
+         this.siteConfig.configArray[this.selectedIndex]= this.utils.copyObject(this.originalParameter );
+    }
+
+    switchValue(item){
+         let index;
+        for(let i = 0; i < this.siteConfig.configArray.length; i++){
+            if(this.siteConfig.configArray[i].parameter === parameter.parameter){
+                index = i;
+            }
+        }
         this.siteConfig.configArray[index].value =  this.siteConfig.configArray[index].value == 0 ?  1 : 0;
         this.dataTable.updateArray(this.siteConfig.configArray);
     }

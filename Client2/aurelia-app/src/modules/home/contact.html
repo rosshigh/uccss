@@ -13,20 +13,20 @@
 		<div class="panel panel-primary topMargin">
 			<div class="panel-body">
 			
-					<div class="col-lg-3">
+					<div class="col-lg-4">
 						<div innerhtml.bind="config.UCC_ADDRESS"></div>
 					</div>
-					<div show.bind="config.IMG_DOWNLOAD_URL.length && config.IMG_DOWNLOAD_URL.length > 0" class="col-lg-9">
+					<div show.bind="config.IMG_DOWNLOAD_URL.length && config.IMG_DOWNLOAD_URL.length > 0" class="col-lg-8">
 						<img src="${config.IMG_DOWNLOAD_URL}${config.UCC_HEADER_IMAGE}" class="img-responsive pull-right">
 					</div>
 				
 			</div>
 		</div>
-		<div class="col-lg-offset-2">
+		<div class="col-lg-6">
 			<div class="col-lg-12" show.bind="directors.length > 0">
 				<h3>Director</h3>
 				<ul>
-					<li class="list-group-item col-lg-8 topMargin" repeat.for="person of directors">
+					<li class="list-group-item  topMargin" repeat.for="person of directors">
 						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
@@ -45,7 +45,7 @@
 			<div class="col-lg-12 bigTopMargin" show.bind="staff.length > 0">
 				<h3>Technical Staff</h3>
 				<ul>
-					<li class="list-group-item col-lg-8 topMargin" repeat.for="person of staff">
+					<li class="list-group-item  topMargin" repeat.for="person of staff">
 						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
@@ -66,7 +66,7 @@
 			<div class="col-lg-12 bigTopMargin bottomMargin" show.bind="admin.length > 0">
 				<h3>Administrative Staff</h3>
 				<ul>
-					<li class="list-group-item col-lg-8 topMargin" repeat.for="person of admin">
+					<li class="list-group-item topMargin" repeat.for="person of admin">
 						<div class="media-left" innerhtml='${person.email | gravatarUrl:people.peopleArray:100:1}'></div>
 						<div class="media-body">
 							<div class="col-lg-12">
@@ -84,6 +84,8 @@
 					</li>
 				</ul>
 			</div>
+		</div>
+		<div class="col-lg-6 bigTopMargin" innerhtml.bind="config.CONTACT_CONTENT">
 		</div>
 
 	</div>
