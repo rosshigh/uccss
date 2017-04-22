@@ -34,46 +34,45 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true),
+            this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true),
             this.is4ua.loadIs4ua()
         ]);
 
-        this.dataTable.updateArray(this.people.peopleArray);
+        this.dataTable.updateArray(this.people.instutionPeopleArray);
 
         this.dataTable.createPageButtons(1);
     }
 
     async refresh(){
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
-        this.people.getInstitutionPeople(this.userObj.institutionId);
-        this.dataTable.updateArray(this.people.peopleArray);
+        await this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+        this.dataTable.updateArray(this.people.instutionPeopleArray);
         this.spinnerHTML = "";
     }
 
-    edit(index, el){
-        this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.people.selectPerson(this.editIndex);
-        this.roles = "";
-        for (var i = 0; i < this.config.ROLES.length; i++) {
-            if(this.people.selectedPerson.roles.indexOf(this.config.ROLES[i].role) > -1){
-                this.roles += this.config.ROLES[i].label + "<br/>";
-            }
-        }
+    // edit(index, el){
+    //     this.editIndex = this.dataTable.getOriginalIndex(index);
+    //     this.people.selectPerson(this.editIndex,'i');
+    //     this.roles = "";
+    //     for (var i = 0; i < this.config.ROLES.length; i++) {
+    //         if(this.people.selectedPerson.roles.indexOf(this.config.ROLES[i].role) > -1){
+    //             this.roles += this.config.ROLES[i].label + "<br/>";
+    //         }
+    //     }
 
-        $("#editFirstName").focus();
+    //     $("#editFirstName").focus();
 
-        if (this.selectedRow) this.selectedRow.children().removeClass('info');
-        this.selectedRow = $(el.target).closest('tr');
-        this.selectedRow.children().addClass('info')
-        this.personSelected = true;
-    }
+    //     if (this.selectedRow) this.selectedRow.children().removeClass('info');
+    //     this.selectedRow = $(el.target).closest('tr');
+    //     this.selectedRow.children().addClass('info')
+    //     this.personSelected = true;
+    // }
 
     buildAudit(){
-        var changes = this.people.isPersonDirty();
+        var changes = this.people.isPersonDirty(this.originalPerson);
         changes.forEach(item => {
             this.people.selectedPerson.audit.push({
-                 property: item.property,
+                property: item.property,
                 eventDate: new Date(),
                 oldValue: item.oldValue,
                 newValue: item.newValue,
@@ -86,14 +85,16 @@ export class EditPeople {
         this.buildAudit();
         let serverResponse = await this.people.savePerson();
         if (!serverResponse.error) {
-            this.dataTable.updateArray(this.people.peopleArray);
+            this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
+            this.dataTable.updateArray(this.people.instutionPeopleArray);
             this.utils.showNotification(serverResponse.firstName +  " " + serverResponse.lastName + " was updated");
         }
         this.personSelected = false;
     }
 
     updateStatus(person){
-        this.people.selectedPersonFromId(person._id);
+        this.people.selectedPersonFromId(person._id, 'i');
+        this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
         if(this.people.selectedPerson.personStatus === '01'){
             this.people.selectedPerson.personStatus = '02';
         } else {

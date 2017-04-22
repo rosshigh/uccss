@@ -945,13 +945,13 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
+                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
 
                             case 2:
                                 responses = _context.sent;
 
 
-                                this.dataTable.updateArray(this.people.peopleArray);
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
 
                                 this.dataTable.createPageButtons(1);
 
@@ -978,14 +978,13 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
                             case 0:
                                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                                 _context2.next = 3;
-                                return this.people.getPeopleArray('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
 
                             case 3:
-                                this.people.getInstitutionPeople(this.userObj.institutionId);
-                                this.dataTable.updateArray(this.people.peopleArray);
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
                                 this.spinnerHTML = "";
 
-                            case 6:
+                            case 5:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -1000,28 +999,10 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
             return refresh;
         }();
 
-        EditPeople.prototype.edit = function edit(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.people.selectPerson(this.editIndex);
-            this.roles = "";
-            for (var i = 0; i < this.config.ROLES.length; i++) {
-                if (this.people.selectedPerson.roles.indexOf(this.config.ROLES[i].role) > -1) {
-                    this.roles += this.config.ROLES[i].label + "<br/>";
-                }
-            }
-
-            (0, _jquery2.default)("#editFirstName").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.personSelected = true;
-        };
-
         EditPeople.prototype.buildAudit = function buildAudit() {
             var _this = this;
 
-            var changes = this.people.isPersonDirty();
+            var changes = this.people.isPersonDirty(this.originalPerson);
             changes.forEach(function (item) {
                 _this.people.selectedPerson.audit.push({
                     property: item.property,
@@ -1048,7 +1029,8 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
                                 serverResponse = _context3.sent;
 
                                 if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.people.peopleArray);
+                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
+                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
                                 }
                                 this.personSelected = false;
@@ -1069,7 +1051,8 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
         }();
 
         EditPeople.prototype.updateStatus = function updateStatus(person) {
-            this.people.selectedPersonFromId(person._id);
+            this.people.selectedPersonFromId(person._id, 'i');
+            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
             if (this.people.selectedPerson.personStatus === '01') {
                 this.people.selectedPerson.personStatus = '02';
             } else {
@@ -1248,7 +1231,7 @@ define('modules/facco/viewRequests',['exports', 'aurelia-framework', 'aurelia-ro
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
@@ -3154,7 +3137,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
 
                                 if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
-                                    _context2.next = 14;
+                                    _context2.next = 15;
                                     break;
                                 }
 
@@ -3170,30 +3153,31 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
                                 this.showHelpTickets = this.helpTickets.newHelpTickets;
                                 this.showCarousel = this.siteinfo.showCarousel();
-                                _context2.next = 22;
+                                this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
+                                _context2.next = 23;
                                 break;
 
-                            case 14:
+                            case 15:
                                 countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
 
                                 this.countHeader = "Your Institution's Recent Request History";
-                                _context2.next = 18;
+                                _context2.next = 19;
                                 return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
 
-                            case 18:
+                            case 19:
                                 _responses = _context2.sent;
 
                                 this.showRequests = this.requests.customerActionRequests;
                                 this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
                                 this.showCarousel = this.siteinfo.showCarousel();
 
-                            case 22:
+                            case 23:
                                 this.requestsCount = new Array();
                                 this.countLabels = new Array();
-                                _context2.next = 26;
+                                _context2.next = 27;
                                 return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
 
-                            case 26:
+                            case 27:
                                 requestCountArray = _context2.sent;
 
                                 if (requestCountArray) {
@@ -3206,19 +3190,19 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 this.temp = undefined;
 
                                 if (sessionStorage.getItem('weather')) {
-                                    _context2.next = 41;
+                                    _context2.next = 42;
                                     break;
                                 }
 
                                 if (!this.userObj.city) {
-                                    _context2.next = 39;
+                                    _context2.next = 40;
                                     break;
                                 }
 
-                                _context2.next = 33;
+                                _context2.next = 34;
                                 return this.siteinfo.getWeather(this.userObj.city);
 
-                            case 33:
+                            case 34:
                                 weather = _context2.sent;
 
                                 this.temp = parseFloat(weather.main.temp) - 273.15;
@@ -3232,17 +3216,17 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 sessionStorage.setItem('weather', JSON.stringify(weatherObj));
 
-                            case 39:
-                                _context2.next = 44;
+                            case 40:
+                                _context2.next = 45;
                                 break;
 
-                            case 41:
+                            case 42:
                                 _weather = JSON.parse(sessionStorage.getItem('weather'));
 
                                 this.temp = _weather.temp;
                                 this.weatherIcon = _weather.url;
 
-                            case 44:
+                            case 45:
                                 if (sessionStorage.getItem('uccweather')) {
                                     uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
 
@@ -3256,7 +3240,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                     console.log(this.uccweatherIcon);
                                 }
 
-                            case 45:
+                            case 46:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -8430,31 +8414,104 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             return getUCCStaff;
         }();
 
-        People.prototype.selectPerson = function selectPerson(index) {
+        People.prototype.getInstitutionPeople = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!(!this.peopleArray || refresh)) {
+                                    _context4.next = 19;
+                                    break;
+                                }
+
+                                url = this.data.PEOPLE_SERVICE;
+
+                                url += options ? options : "";
+                                _context4.prev = 3;
+                                _context4.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context4.sent;
+
+                                if (serverResponse.error) {
+                                    _context4.next = 11;
+                                    break;
+                                }
+
+                                this.instutionPeopleArray = serverResponse;
+                                _context4.next = 13;
+                                break;
+
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context4.abrupt('return', undefined);
+
+                            case 13:
+                                _context4.next = 19;
+                                break;
+
+                            case 15:
+                                _context4.prev = 15;
+                                _context4.t0 = _context4['catch'](3);
+
+                                console.log(_context4.t0);
+                                return _context4.abrupt('return', undefined);
+
+                            case 19:
+                                return _context4.abrupt('return', this.peopleArray);
+
+                            case 20:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this, [[3, 15]]);
+            }));
+
+            function getInstitutionPeople(_x5, _x6) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return getInstitutionPeople;
+        }();
+
+        People.prototype.selectPerson = function selectPerson(index, array) {
             if (index === undefined) {
                 this.selectedPerson = this.emptyPerson();
             } else {
-                try {
+                if (array && array === 'i') {
+                    this.selectedPerson = this.utils.copyObject(this.instutionPeopleArray[index]);
+                    this.editIndex = index;
+                } else {
                     this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
                     this.editIndex = index;
-                } catch (error) {
-                    console.log(error);
-                    this.selectedPerson = this.emptyPerson();
                 }
             }
         };
 
-        People.prototype.selectedPersonFromId = function selectedPersonFromId(id) {
+        People.prototype.selectedPersonFromId = function selectedPersonFromId(id, array) {
             var _this = this;
 
-            this.peopleArray.forEach(function (item, index) {
-                if (item._id === id) {
-                    _this.editIndex = index;
-                    _this.selectedPerson = _this.utils.copyObject(item);
-                    return;
-                }
-            });
-            return null;
+            if (array && array === 'i') {
+                this.instutionPeopleArray.forEach(function (item, index) {
+                    if (item._id === id) {
+                        _this.editIndex = index;
+                        _this.selectedPerson = _this.utils.copyObject(item);
+                    }
+                });
+                return;
+            } else {
+                this.peopleArray.forEach(function (item, index) {
+                    if (item._id === id) {
+                        _this.editIndex = index;
+                        _this.selectedPerson = _this.utils.copyObject(item);
+                    }
+                });
+                return;
+            }
         };
 
         People.prototype.emptyPerson = function emptyPerson() {
@@ -8484,62 +8541,19 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.checkEmail = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (!this.selectedPerson.email) {
-                                    _context4.next = 9;
-                                    break;
-                                }
-
-                                _context4.next = 3;
-                                return this.data.get(this.data.CHECK_EMAIL + '?email=' + this.selectedPerson.email);
-
-                            case 3:
-                                serverResponse = _context4.sent;
-
-                                if (!(serverResponse.code === 409)) {
-                                    _context4.next = 8;
-                                    break;
-                                }
-
-                                return _context4.abrupt('return', true);
-
-                            case 8:
-                                return _context4.abrupt('return', false);
-
-                            case 9:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function checkEmail() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return checkEmail;
-        }();
-
-        People.prototype.checkName = function () {
             var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                if (!(this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId)) {
+                                if (!this.selectedPerson.email) {
                                     _context5.next = 9;
                                     break;
                                 }
 
                                 _context5.next = 3;
-                                return this.data.get(this.data.CHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+                                return this.data.get(this.data.CHECK_EMAIL + '?email=' + this.selectedPerson.email);
 
                             case 3:
                                 serverResponse = _context5.sent;
@@ -8562,23 +8576,66 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee5, this);
             }));
 
-            function checkName() {
+            function checkEmail() {
                 return _ref5.apply(this, arguments);
+            }
+
+            return checkEmail;
+        }();
+
+        People.prototype.checkName = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!(this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId)) {
+                                    _context6.next = 9;
+                                    break;
+                                }
+
+                                _context6.next = 3;
+                                return this.data.get(this.data.CHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+
+                            case 3:
+                                serverResponse = _context6.sent;
+
+                                if (!(serverResponse.code === 409)) {
+                                    _context6.next = 8;
+                                    break;
+                                }
+
+                                return _context6.abrupt('return', true);
+
+                            case 8:
+                                return _context6.abrupt('return', false);
+
+                            case 9:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function checkName() {
+                return _ref6.apply(this, arguments);
             }
 
             return checkName;
         }();
 
         People.prototype.savePerson = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(register) {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(register) {
                 var url, _response, _response2;
 
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 if (this.selectedPerson._id) {
-                                    _context6.next = 9;
+                                    _context7.next = 9;
                                     break;
                                 }
 
@@ -8587,11 +8644,11 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     url = this.data.PEOPLE_SERVICE;
                                 }
-                                _context6.next = 4;
+                                _context7.next = 4;
                                 return this.data.saveObject(this.selectedPerson, url, "post");
 
                             case 4:
-                                _response = _context6.sent;
+                                _response = _context7.sent;
 
                                 if (!_response.error) {
                                     if (this.peopleArray) {
@@ -8600,65 +8657,23 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(_response, "There was an error creating the account.");
                                 }
-                                return _context6.abrupt('return', _response);
+                                return _context7.abrupt('return', _response);
 
                             case 9:
-                                _context6.next = 11;
+                                _context7.next = 11;
                                 return this.data.saveObject(this.selectedPerson, this.data.PEOPLE_SERVICE, "put");
 
                             case 11:
-                                _response2 = _context6.sent;
+                                _response2 = _context7.sent;
 
                                 if (!_response2.error) {
                                     if (this.peopleArray) {
                                         this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
                                     }
                                 }
-                                return _context6.abrupt('return', _response2);
+                                return _context7.abrupt('return', _response2);
 
                             case 14:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function savePerson(_x5) {
-                return _ref6.apply(this, arguments);
-            }
-
-            return savePerson;
-        }();
-
-        People.prototype.deletePerson = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                if (!this.selectedPerson._id) {
-                                    _context7.next = 6;
-                                    break;
-                                }
-
-                                _context7.next = 3;
-                                return this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
-
-                            case 3:
-                                serverResponse = _context7.sent;
-
-                                if (!serverResponse.error) {
-                                    this.peopleArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                }
-                                return _context7.abrupt('return', serverResponse);
-
-                            case 6:
-                                return _context7.abrupt('return', null);
-
-                            case 7:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -8666,8 +8681,50 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee7, this);
             }));
 
-            function deletePerson() {
+            function savePerson(_x7) {
                 return _ref7.apply(this, arguments);
+            }
+
+            return savePerson;
+        }();
+
+        People.prototype.deletePerson = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                if (!this.selectedPerson._id) {
+                                    _context8.next = 6;
+                                    break;
+                                }
+
+                                _context8.next = 3;
+                                return this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
+
+                            case 3:
+                                serverResponse = _context8.sent;
+
+                                if (!serverResponse.error) {
+                                    this.peopleArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                }
+                                return _context8.abrupt('return', serverResponse);
+
+                            case 6:
+                                return _context8.abrupt('return', null);
+
+                            case 7:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function deletePerson() {
+                return _ref8.apply(this, arguments);
             }
 
             return deletePerson;
@@ -8693,78 +8750,28 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.sendCustomerMessage = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(message) {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(message) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (!message.email) {
-                                    _context8.next = 7;
-                                    break;
-                                }
-
-                                _context8.next = 3;
-                                return this.data.saveObject(message, this.data.SEND_MAIL, "put");
-
-                            case 3:
-                                serverResponse = _context8.sent;
-                                return _context8.abrupt('return', serverResponse);
-
-                            case 7:
-                                return _context8.abrupt('return', { error: "no email" });
-
-                            case 8:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function sendCustomerMessage(_x6) {
-                return _ref8.apply(this, arguments);
-            }
-
-            return sendCustomerMessage;
-        }();
-
-        People.prototype.getInstitutionsArray = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(options, refresh) {
-                var url, _response3;
-
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
                             case 0:
-                                if (!(!this.institutionsArray || refresh)) {
-                                    _context9.next = 14;
+                                if (!message.email) {
+                                    _context9.next = 7;
                                     break;
                                 }
 
-                                url = this.data.INSTITUTION_SERVICES;
+                                _context9.next = 3;
+                                return this.data.saveObject(message, this.data.SEND_MAIL, "put");
 
-                                url += options ? options : "";
-                                _context9.next = 5;
-                                return this.data.get(url);
+                            case 3:
+                                serverResponse = _context9.sent;
+                                return _context9.abrupt('return', serverResponse);
 
-                            case 5:
-                                _response3 = _context9.sent;
+                            case 7:
+                                return _context9.abrupt('return', { error: "no email" });
 
-                                if (_response3.error) {
-                                    _context9.next = 11;
-                                    break;
-                                }
-
-                                this.institutionsArray = _response3;
-                                return _context9.abrupt('return', this.institutionArray);
-
-                            case 11:
-                                this.institutionsArray = undefined;
-                                this.data.processError(_response3);
-                                return _context9.abrupt('return', this.institutionArray);
-
-                            case 14:
+                            case 8:
                             case 'end':
                                 return _context9.stop();
                         }
@@ -8772,38 +8779,49 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee9, this);
             }));
 
-            function getInstitutionsArray(_x7, _x8) {
+            function sendCustomerMessage(_x8) {
                 return _ref9.apply(this, arguments);
             }
 
-            return getInstitutionsArray;
+            return sendCustomerMessage;
         }();
 
-        People.prototype.getInstitution = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(id) {
-                var url, response;
+        People.prototype.getInstitutionsArray = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(options, refresh) {
+                var url, _response3;
+
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                         switch (_context10.prev = _context10.next) {
                             case 0:
-                                url = this.data.INSTITUTION_SERVICES + '/' + id;
-                                _context10.next = 3;
-                                return this.data.get(url);
-
-                            case 3:
-                                response = _context10.sent;
-
-                                if (response.status) {
-                                    _context10.next = 8;
+                                if (!(!this.institutionsArray || refresh)) {
+                                    _context10.next = 14;
                                     break;
                                 }
 
-                                return _context10.abrupt('return', response);
+                                url = this.data.INSTITUTION_SERVICES;
 
-                            case 8:
-                                return _context10.abrupt('return', { institutionStatus: '99' });
+                                url += options ? options : "";
+                                _context10.next = 5;
+                                return this.data.get(url);
 
-                            case 9:
+                            case 5:
+                                _response3 = _context10.sent;
+
+                                if (_response3.error) {
+                                    _context10.next = 11;
+                                    break;
+                                }
+
+                                this.institutionsArray = _response3;
+                                return _context10.abrupt('return', this.institutionArray);
+
+                            case 11:
+                                this.institutionsArray = undefined;
+                                this.data.processError(_response3);
+                                return _context10.abrupt('return', this.institutionArray);
+
+                            case 14:
                             case 'end':
                                 return _context10.stop();
                         }
@@ -8811,8 +8829,47 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee10, this);
             }));
 
-            function getInstitution(_x9) {
+            function getInstitutionsArray(_x9, _x10) {
                 return _ref10.apply(this, arguments);
+            }
+
+            return getInstitutionsArray;
+        }();
+
+        People.prototype.getInstitution = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(id) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                        switch (_context11.prev = _context11.next) {
+                            case 0:
+                                url = this.data.INSTITUTION_SERVICES + '/' + id;
+                                _context11.next = 3;
+                                return this.data.get(url);
+
+                            case 3:
+                                response = _context11.sent;
+
+                                if (response.status) {
+                                    _context11.next = 8;
+                                    break;
+                                }
+
+                                return _context11.abrupt('return', response);
+
+                            case 8:
+                                return _context11.abrupt('return', { institutionStatus: '99' });
+
+                            case 9:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
+            }));
+
+            function getInstitution(_x11) {
+                return _ref11.apply(this, arguments);
             }
 
             return getInstitution;
@@ -8858,7 +8915,7 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             return newInstitution;
         };
 
-        People.prototype.getInstitutionPeople = function getInstitutionPeople(id) {
+        People.prototype.getInstitutionPeopleFilter = function getInstitutionPeopleFilter(id) {
             this.peopleInstArray = new Array();
             if (id == -1) {
                 return;
@@ -8870,80 +8927,46 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveInstitution = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
                 var _response4, _response5;
 
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 if (this.selectedInstitution._id) {
-                                    _context11.next = 8;
+                                    _context12.next = 8;
                                     break;
                                 }
 
-                                _context11.next = 3;
+                                _context12.next = 3;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "post");
 
                             case 3:
-                                _response4 = _context11.sent;
+                                _response4 = _context12.sent;
 
                                 if (!_response4.error) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray.push(_response4);
                                     }
                                 }
-                                return _context11.abrupt('return', _response4);
+                                return _context12.abrupt('return', _response4);
 
                             case 8:
-                                _context11.next = 10;
+                                _context12.next = 10;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "put");
 
                             case 10:
-                                _response5 = _context11.sent;
+                                _response5 = _context12.sent;
 
                                 if (!_response5.status) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
                                     }
                                 }
-                                return _context11.abrupt('return', _response5);
+                                return _context12.abrupt('return', _response5);
 
                             case 13:
-                            case 'end':
-                                return _context11.stop();
-                        }
-                    }
-                }, _callee11, this);
-            }));
-
-            function saveInstitution() {
-                return _ref11.apply(this, arguments);
-            }
-
-            return saveInstitution;
-        }();
-
-        People.prototype.deleteInstitution = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
-                    while (1) {
-                        switch (_context12.prev = _context12.next) {
-                            case 0:
-                                _context12.next = 2;
-                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
-
-                            case 2:
-                                serverResponse = _context12.sent;
-
-                                if (!serverResponse.error) {
-                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
-                                    this.editInstitutionIndex = -1;
-                                }
-                                return _context12.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context12.stop();
                         }
@@ -8951,8 +8974,42 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee12, this);
             }));
 
-            function deleteInstitution() {
+            function saveInstitution() {
                 return _ref12.apply(this, arguments);
+            }
+
+            return saveInstitution;
+        }();
+
+        People.prototype.deleteInstitution = function () {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                    while (1) {
+                        switch (_context13.prev = _context13.next) {
+                            case 0:
+                                _context13.next = 2;
+                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
+
+                            case 2:
+                                serverResponse = _context13.sent;
+
+                                if (!serverResponse.error) {
+                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
+                                    this.editInstitutionIndex = -1;
+                                }
+                                return _context13.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context13.stop();
+                        }
+                    }
+                }, _callee13, this);
+            }));
+
+            function deleteInstitution() {
+                return _ref13.apply(this, arguments);
             }
 
             return deleteInstitution;
@@ -8970,63 +9027,63 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.getCoursesArray = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(refresh, options, fields) {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(refresh, options, fields) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context14.prev = _context14.next) {
                             case 0:
                                 if (!(!this.coursesArray || refresh)) {
-                                    _context13.next = 19;
+                                    _context14.next = 19;
                                     break;
                                 }
 
                                 url = this.data.COURSES_SERVICE;
 
                                 url += options ? options : "";
-                                _context13.prev = 3;
-                                _context13.next = 6;
+                                _context14.prev = 3;
+                                _context14.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context13.sent;
+                                serverResponse = _context14.sent;
 
                                 if (serverResponse.error) {
-                                    _context13.next = 11;
+                                    _context14.next = 11;
                                     break;
                                 }
 
                                 this.coursesArray = serverResponse;
-                                _context13.next = 12;
+                                _context14.next = 12;
                                 break;
 
                             case 11:
-                                return _context13.abrupt('return', undefined);
+                                return _context14.abrupt('return', undefined);
 
                             case 12:
-                                _context13.next = 18;
+                                _context14.next = 18;
                                 break;
 
                             case 14:
-                                _context13.prev = 14;
-                                _context13.t0 = _context13['catch'](3);
+                                _context14.prev = 14;
+                                _context14.t0 = _context14['catch'](3);
 
-                                console.log(_context13.t0);
-                                return _context13.abrupt('return', undefined);
+                                console.log(_context14.t0);
+                                return _context14.abrupt('return', undefined);
 
                             case 18:
-                                return _context13.abrupt('return', this.coursesArray);
+                                return _context14.abrupt('return', this.coursesArray);
 
                             case 19:
                             case 'end':
-                                return _context13.stop();
+                                return _context14.stop();
                         }
                     }
-                }, _callee13, this, [[3, 14]]);
+                }, _callee14, this, [[3, 14]]);
             }));
 
-            function getCoursesArray(_x10, _x11, _x12) {
-                return _ref13.apply(this, arguments);
+            function getCoursesArray(_x12, _x13, _x14) {
+                return _ref14.apply(this, arguments);
             }
 
             return getCoursesArray;
@@ -9056,31 +9113,31 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveCourse = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
                 var _serverResponse, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (this.selectedCourse) {
-                                    _context14.next = 2;
+                                    _context15.next = 2;
                                     break;
                                 }
 
-                                return _context14.abrupt('return');
+                                return _context15.abrupt('return');
 
                             case 2:
                                 if (this.selectedCourse._id) {
-                                    _context14.next = 10;
+                                    _context15.next = 10;
                                     break;
                                 }
 
-                                _context14.next = 5;
+                                _context15.next = 5;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
 
                             case 5:
-                                _serverResponse = _context14.sent;
+                                _serverResponse = _context15.sent;
 
                                 if (!_serverResponse.error) {
                                     this.selectedCourse = this.utils.copyObject(_serverResponse);
@@ -9089,14 +9146,14 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error creating the product.");
                                 }
-                                return _context14.abrupt('return', _serverResponse);
+                                return _context15.abrupt('return', _serverResponse);
 
                             case 10:
-                                _context14.next = 12;
+                                _context15.next = 12;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedCourse = this.utils.copyObject(serverResponse);
@@ -9104,18 +9161,18 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error updating the course.");
                                 }
-                                return _context14.abrupt('return', serverResponse);
+                                return _context15.abrupt('return', serverResponse);
 
                             case 15:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee15, this);
             }));
 
             function saveCourse() {
-                return _ref14.apply(this, arguments);
+                return _ref15.apply(this, arguments);
             }
 
             return saveCourse;
@@ -9128,53 +9185,20 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.requestPasswordReset = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(obj) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
-                    while (1) {
-                        switch (_context15.prev = _context15.next) {
-                            case 0:
-                                _context15.next = 2;
-                                return this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
-
-                            case 2:
-                                serverResponse = _context15.sent;
-                                return _context15.abrupt('return', serverResponse);
-
-                            case 4:
-                            case 'end':
-                                return _context15.stop();
-                        }
-                    }
-                }, _callee15, this);
-            }));
-
-            function requestPasswordReset(_x13) {
-                return _ref15.apply(this, arguments);
-            }
-
-            return requestPasswordReset;
-        }();
-
-        People.prototype.getPasswordReset = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(validationCode) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(obj) {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
                         switch (_context16.prev = _context16.next) {
                             case 0:
                                 _context16.next = 2;
-                                return this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+                                return this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
 
                             case 2:
                                 serverResponse = _context16.sent;
-
-                                if (!serverResponse.code) {
-                                    this.selectedPerson = serverResponse;
-                                }
                                 return _context16.abrupt('return', serverResponse);
 
-                            case 5:
+                            case 4:
                             case 'end':
                                 return _context16.stop();
                         }
@@ -9182,83 +9206,55 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee16, this);
             }));
 
-            function getPasswordReset(_x14) {
+            function requestPasswordReset(_x15) {
                 return _ref16.apply(this, arguments);
+            }
+
+            return requestPasswordReset;
+        }();
+
+        People.prototype.getPasswordReset = function () {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(validationCode) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                    while (1) {
+                        switch (_context17.prev = _context17.next) {
+                            case 0:
+                                _context17.next = 2;
+                                return this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+
+                            case 2:
+                                serverResponse = _context17.sent;
+
+                                if (!serverResponse.code) {
+                                    this.selectedPerson = serverResponse;
+                                }
+                                return _context17.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context17.stop();
+                        }
+                    }
+                }, _callee17, this);
+            }));
+
+            function getPasswordReset(_x16) {
+                return _ref17.apply(this, arguments);
             }
 
             return getPasswordReset;
         }();
 
         People.prototype.getNotesArray = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(options, refresh) {
-                var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee17$(_context17) {
-                    while (1) {
-                        switch (_context17.prev = _context17.next) {
-                            case 0:
-                                if (!(!this.notesArray || refresh)) {
-                                    _context17.next = 19;
-                                    break;
-                                }
-
-                                url = this.data.NOTES_SERVICE;
-
-                                url += options ? options : "";
-                                _context17.prev = 3;
-                                _context17.next = 6;
-                                return this.data.get(url);
-
-                            case 6:
-                                serverResponse = _context17.sent;
-
-                                if (serverResponse.error) {
-                                    _context17.next = 11;
-                                    break;
-                                }
-
-                                this.notesArray = serverResponse;
-                                _context17.next = 13;
-                                break;
-
-                            case 11:
-                                this.data.processError(serverResponse);
-                                return _context17.abrupt('return', undefined);
-
-                            case 13:
-                                _context17.next = 19;
-                                break;
-
-                            case 15:
-                                _context17.prev = 15;
-                                _context17.t0 = _context17['catch'](3);
-
-                                console.log(_context17.t0);
-                                return _context17.abrupt('return', undefined);
-
-                            case 19:
-                            case 'end':
-                                return _context17.stop();
-                        }
-                    }
-                }, _callee17, this, [[3, 15]]);
-            }));
-
-            function getNotesArray(_x15, _x16) {
-                return _ref17.apply(this, arguments);
-            }
-
-            return getNotesArray;
-        }();
-
-        People.prototype.getRemindersArray = function () {
             var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(options, refresh) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
                         switch (_context18.prev = _context18.next) {
                             case 0:
-                                if (!(!this.remindersArray || refresh)) {
-                                    _context18.next = 21;
+                                if (!(!this.notesArray || refresh)) {
+                                    _context18.next = 19;
                                     break;
                                 }
 
@@ -9273,7 +9269,68 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 serverResponse = _context18.sent;
 
                                 if (serverResponse.error) {
-                                    _context18.next = 13;
+                                    _context18.next = 11;
+                                    break;
+                                }
+
+                                this.notesArray = serverResponse;
+                                _context18.next = 13;
+                                break;
+
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context18.abrupt('return', undefined);
+
+                            case 13:
+                                _context18.next = 19;
+                                break;
+
+                            case 15:
+                                _context18.prev = 15;
+                                _context18.t0 = _context18['catch'](3);
+
+                                console.log(_context18.t0);
+                                return _context18.abrupt('return', undefined);
+
+                            case 19:
+                            case 'end':
+                                return _context18.stop();
+                        }
+                    }
+                }, _callee18, this, [[3, 15]]);
+            }));
+
+            function getNotesArray(_x17, _x18) {
+                return _ref18.apply(this, arguments);
+            }
+
+            return getNotesArray;
+        }();
+
+        People.prototype.getRemindersArray = function () {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
+                    while (1) {
+                        switch (_context19.prev = _context19.next) {
+                            case 0:
+                                if (!(!this.remindersArray || refresh)) {
+                                    _context19.next = 21;
+                                    break;
+                                }
+
+                                url = this.data.NOTES_SERVICE;
+
+                                url += options ? options : "";
+                                _context19.prev = 3;
+                                _context19.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context19.sent;
+
+                                if (serverResponse.error) {
+                                    _context19.next = 13;
                                     break;
                                 }
 
@@ -9281,33 +9338,33 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 this.remindersArray = this.remindersArray.filter(function (item) {
                                     return item.isReminder;
                                 });
-                                return _context18.abrupt('return', serverResponse);
+                                return _context19.abrupt('return', serverResponse);
 
                             case 13:
                                 this.data.processError(serverResponse);
-                                return _context18.abrupt('return', undefined);
+                                return _context19.abrupt('return', undefined);
 
                             case 15:
-                                _context18.next = 21;
+                                _context19.next = 21;
                                 break;
 
                             case 17:
-                                _context18.prev = 17;
-                                _context18.t0 = _context18['catch'](3);
+                                _context19.prev = 17;
+                                _context19.t0 = _context19['catch'](3);
 
-                                console.log(_context18.t0);
-                                return _context18.abrupt('return', undefined);
+                                console.log(_context19.t0);
+                                return _context19.abrupt('return', undefined);
 
                             case 21:
                             case 'end':
-                                return _context18.stop();
+                                return _context19.stop();
                         }
                     }
-                }, _callee18, this, [[3, 17]]);
+                }, _callee19, this, [[3, 17]]);
             }));
 
-            function getRemindersArray(_x17, _x18) {
-                return _ref18.apply(this, arguments);
+            function getRemindersArray(_x19, _x20) {
+                return _ref19.apply(this, arguments);
             }
 
             return getRemindersArray;
@@ -9348,31 +9405,31 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveNote = function () {
-            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(index) {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(index) {
                 var _serverResponse2, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee19$(_context19) {
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
                     while (1) {
-                        switch (_context19.prev = _context19.next) {
+                        switch (_context20.prev = _context20.next) {
                             case 0:
                                 if (this.selectedNote) {
-                                    _context19.next = 2;
+                                    _context20.next = 2;
                                     break;
                                 }
 
-                                return _context19.abrupt('return');
+                                return _context20.abrupt('return');
 
                             case 2:
                                 if (this.selectedNote._id) {
-                                    _context19.next = 10;
+                                    _context20.next = 10;
                                     break;
                                 }
 
-                                _context19.next = 5;
+                                _context20.next = 5;
                                 return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
 
                             case 5:
-                                _serverResponse2 = _context19.sent;
+                                _serverResponse2 = _context20.sent;
 
                                 if (!_serverResponse2.error) {
                                     if (this.notesArray) {
@@ -9382,68 +9439,23 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error creating the note.");
                                 }
-                                return _context19.abrupt('return', _serverResponse2);
+                                return _context20.abrupt('return', _serverResponse2);
 
                             case 10:
-                                _context19.next = 12;
+                                _context20.next = 12;
                                 return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context19.sent;
+                                serverResponse = _context20.sent;
 
                                 if (!serverResponse.error) {
                                     this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the course.");
                                 }
-                                return _context19.abrupt('return', serverResponse);
-
-                            case 15:
-                            case 'end':
-                                return _context19.stop();
-                        }
-                    }
-                }, _callee19, this);
-            }));
-
-            function saveNote(_x19) {
-                return _ref19.apply(this, arguments);
-            }
-
-            return saveNote;
-        }();
-
-        People.prototype.saveReminder = function () {
-            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(item, index) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee20$(_context20) {
-                    while (1) {
-                        switch (_context20.prev = _context20.next) {
-                            case 0:
-                                console.log(item);
-
-                                if (!(item === undefined)) {
-                                    _context20.next = 3;
-                                    break;
-                                }
-
-                                return _context20.abrupt('return');
-
-                            case 3:
-                                _context20.next = 5;
-                                return this.data.saveObject(item, this.data.NOTES_SERVICE, "put");
-
-                            case 5:
-                                serverResponse = _context20.sent;
-
-                                if (!serverResponse.error) {
-                                    this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
-                                } else {
-                                    this.data.processError(response, "There was an error updating the course.");
-                                }
                                 return _context20.abrupt('return', serverResponse);
 
-                            case 8:
+                            case 15:
                             case 'end':
                                 return _context20.stop();
                         }
@@ -9451,41 +9463,44 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee20, this);
             }));
 
-            function saveReminder(_x20, _x21) {
+            function saveNote(_x21) {
                 return _ref20.apply(this, arguments);
             }
 
-            return saveReminder;
+            return saveNote;
         }();
 
-        People.prototype.deleteNote = function () {
-            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21() {
+        People.prototype.saveReminder = function () {
+            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(item, index) {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee21$(_context21) {
                     while (1) {
                         switch (_context21.prev = _context21.next) {
                             case 0:
-                                if (this.selectedNote) {
-                                    _context21.next = 2;
+                                console.log(item);
+
+                                if (!(item === undefined)) {
+                                    _context21.next = 3;
                                     break;
                                 }
 
                                 return _context21.abrupt('return');
 
-                            case 2:
-                                _context21.next = 4;
-                                return this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+                            case 3:
+                                _context21.next = 5;
+                                return this.data.saveObject(item, this.data.NOTES_SERVICE, "put");
 
-                            case 4:
+                            case 5:
                                 serverResponse = _context21.sent;
 
                                 if (!serverResponse.error) {
-                                    this.notesArray.splice(this.editNoteIndex, 1);
-                                    this.editNoteIndex = -1;
+                                    this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the course.");
                                 }
                                 return _context21.abrupt('return', serverResponse);
 
-                            case 7:
+                            case 8:
                             case 'end':
                                 return _context21.stop();
                         }
@@ -9493,8 +9508,50 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee21, this);
             }));
 
-            function deleteNote() {
+            function saveReminder(_x22, _x23) {
                 return _ref21.apply(this, arguments);
+            }
+
+            return saveReminder;
+        }();
+
+        People.prototype.deleteNote = function () {
+            var _ref22 = _asyncToGenerator(regeneratorRuntime.mark(function _callee22() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee22$(_context22) {
+                    while (1) {
+                        switch (_context22.prev = _context22.next) {
+                            case 0:
+                                if (this.selectedNote) {
+                                    _context22.next = 2;
+                                    break;
+                                }
+
+                                return _context22.abrupt('return');
+
+                            case 2:
+                                _context22.next = 4;
+                                return this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+
+                            case 4:
+                                serverResponse = _context22.sent;
+
+                                if (!serverResponse.error) {
+                                    this.notesArray.splice(this.editNoteIndex, 1);
+                                    this.editNoteIndex = -1;
+                                }
+                                return _context22.abrupt('return', serverResponse);
+
+                            case 7:
+                            case 'end':
+                                return _context22.stop();
+                        }
+                    }
+                }, _callee22, this);
+            }));
+
+            function deleteNote() {
+                return _ref22.apply(this, arguments);
             }
 
             return deleteNote;
@@ -17142,7 +17199,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
+                                return Promise.all([this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
@@ -36760,7 +36817,7 @@ define('text!modules/analytics/components/requestsTable.html', ['module'], funct
 define('text!modules/facco/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-12\">\n\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\n\t\t<div class=\"topMargin\">\n\t\t\t<form class=\"form-horizontal topMargin\">\n\t\t\t\t<!-- Row 1 -->\n\t\t\t\t<div class=\"row\">\n\t\t\t\t\t<div class=\"col-lg-1\">\n\t\t\t\t\t\t<div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-10 col-lg-offset-1\">\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<h3 innerhtml.bind=\"people.selectedPerson.fullName\"></h3>\n\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"form-group pull-left\">\n\t\t\t\t\t\t\t\t\t<label class=\"control-label col-sm-3 hideOnPhone\">Status</label>\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-8\">\n\t\t\t\t\t\t\t\t\t\t<select value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control input-md\" placeholder=\"Status\">\n                                                <option value=\"\">Select an option</option>\n                                                <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\n                                            </select>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Contact</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Phone: <span innerhtml.bind=\"people.selectedPerson.phone\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Mobile: <span innerhtml.bind=\"people.selectedPerson.mobile\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Email: <span innerhtml.bind=\"people.selectedPerson.email\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Address</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.address1\"></span>\n\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t<h4 if.bind=\"people.selectedPerson.address2\"><span innerhtml.bind=\"people.selectedPerson.address2\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.city\"></span> <span innerhtml.bind=\"people.selectedPerson.region\">, <span innerhtml.bind=\"people.selectedPerson.postalCode\"></span></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4><span innerhtml.bind=\"people.selectedPerson.country\"></span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"row topMargin\">\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Area</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Specialization: <span innerhtml.bind=\"people.selectedPerson.personSpecialization\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4>Department: <span innerhtml.bind=\"people.selectedPerson.departmentCategory\"></span></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h3>Roles</h3>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t\t\t<h4 innerhtml.bind=\"roles\"></h4>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t</div>\n\t\t<!-- Row -->\n\t\t</form>\n\t</div>\n\t</div>\n</template>"; });
 define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n        <div class='row'>\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n                <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='7'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th style=\"width:15rem;\">Phone</th>\n                                <th style=\"width:15rem;\">Mobile</th>\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                                <th>Role</th>\n                                <th>Status</th>\n                                <th>Change Status</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"lastName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\n                                        compare=\"array\">\n                                </th>\n                                <th>\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"personStatus\">\n                                    <option value=\"\"></option>\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\n                                </select>\n                                </th>\n                                <th></th>\n                            </tr>\n                            <tr  repeat.for=\"person of dataTable.displayArray\">\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.fullName}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Phone\">${person.phone | phoneNumber}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Phone\">${person.mobile | phoneNumber}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Email\">${person.email}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                                <td data-title=\"Update\" style=\"width: 100px\" click.trigger=\"updateStatus(person)\" innerhtml.bind=\"person.personStatus | personStatusButton\">\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n    <div class='row'>\n      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n      <div id=\"no-more-tables\">\n        <table class=\"table table-striped table-hover cf\">\n          <thead class=\"cf\">\n            <tr>\n              <td colspan='7'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Type</th>\n              <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-sm-1\">IDS Requestd</th>\n              <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <th></th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"courseId\">\n                   <option value=\"\"></option>\n                   <option  value=\"config.SANDBOX_ID\">Sandbox</option>\n                   <option  value=\"\">Regular</option>\n                 </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n              </th>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n                 </select>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event)\" id=\"requestId.personId\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n              </th>\n            </tr>\n            <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\n              <td data-title=\"Request No\">${request.requestNo}</td>\n              <td data-title=\"Required Date\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Date Created\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Course\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n              <td data-title=\"Status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n              <td data-title=\"IDs Requested\">${request.requestId | idsRequested}\n              <td data-title=\"Product\">${request.productId | productName:products.productsArray}</td>\n              <td data-title=\"Person\">${request.requestId.personId | person:people.peopleArray:\"fullName\"}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-10 col-lg-offset-1\">\n    <div class='row'>\n      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n      <div id=\"no-more-tables\">\n        <table class=\"table table-striped table-hover cf\">\n          <thead class=\"cf\">\n            <tr>\n              <td colspan='7'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Type</th>\n              <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-sm-1\">IDS Requestd</th>\n              <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <th></th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"courseId\">\n                   <option value=\"\"></option>\n                   <option  value=\"config.SANDBOX_ID\">Sandbox</option>\n                   <option  value=\"\">Regular</option>\n                 </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n              </th>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"productId\" type=\"id\" compare=\"id\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n                 </select>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event)\" id=\"requestId.personId\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\">\n              </th>\n            </tr>\n            <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\n              <td data-title=\"Request No\">${request.requestNo}</td>\n              <td data-title=\"Required Date\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Date Created\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n              <td data-title=\"Course\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\n              <td data-title=\"Status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n              <td data-title=\"IDs Requested\">${request.requestId | idsRequested}\n              <td data-title=\"Product\">${request.productId | productName:products.productsArray}</td>\n              <td data-title=\"Person\">${request.requestId.personId | person:people.instutionPeopleArray:\"fullName\"}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
 define('text!modules/facco/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerAction()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n  </div>    \n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"col-lg-5\" show.bind=\"showRequest\">\n        <div class=\"panel panel-primary topMargin\">\n        <div class=\"panel-heading\">\n            <h3 class=\"panel-title\">${requests.selectedRequestDetail.productId | productName:products.productsArray}</h3>\n        </div>\n        <div class=\"panel-body\">        \n            <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\">\n            <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                <th>System</th>\n                <th>Client</th>\n                <th>Student IDs</th>\n                <th>Student Password</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"assign of requests.selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\n                <td>${assign.systemId | lookupSid:systems.systemsArray}</td>\n                <td>${assign.client}</td>\n                <td>${assign.studentUserIds}</td>\n                <td>${assign.studentPassword}</td>\n                </tr>\n            </tbody>\n            </table>\n            <h4 class=\"topMargin\"><strong>Faculty IDs</strong></h4>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\n            </div>\n            <h4 class=\"topMargin\"><strong>System Details</strong></h4>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\n            </div>\n            <div class=\"form-group\">\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\n            </div>\n            <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\n        </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/facco/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"dataTable.displayArray.length > 0\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\n  <div  style=\"margin-top:20px;\">\n    <div class=\"col-md-12\">\n      <h2>${heading}</h2>\n    <div class=\"col-md-12 \">\n      <img class=\"col-md-12\" src=\"img/DataCenter.jpg\" class=\"homePageImage\" />\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ucc_logo.jpg\" style=\"height:100px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/sap_ua2.PNG\" style=\"height:75px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\n    </div>\n  </div>\n</template>"; });

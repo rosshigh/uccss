@@ -63,7 +63,7 @@
               <td data-title="Status">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>
               <td data-title="IDs Requested">${request.requestId | idsRequested}
               <td data-title="Product">${request.productId | productName:products.productsArray}</td>
-              <td data-title="Person">${request.requestId.personId | person:people.peopleArray:"fullName"}</td>
+              <td data-title="Person">${request.requestId.personId | person:people.instutionPeopleArray:"fullName"}</td>
             </tr>
           </tbody>
         </table>

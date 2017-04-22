@@ -71,30 +71,59 @@ export class People {
         return this.uccPeople;
     }
 
-	selectPerson(index) {
+    async getInstitutionPeople(options, refresh){
+        if (!this.peopleArray || refresh) {
+            var url = this.data.PEOPLE_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.instutionPeopleArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+        return this.peopleArray;
+    }
+
+	selectPerson(index, array) {
         if (index === undefined) {
             this.selectedPerson = this.emptyPerson();
         } else {
-            try {
+            if(array && array === 'i'){
+                this.selectedPerson = this.utils.copyObject(this.instutionPeopleArray[index]);
+                this.editIndex = index;
+            } else {
                 this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
                 this.editIndex = index;
-            } catch (error) {
-                console.log(error);
-                this.selectedPerson = this.emptyPerson();
             }
-
         }
     }
 
-    selectedPersonFromId(id){
-        this.peopleArray.forEach((item, index) => {
-          if(item._id === id){
-            this.editIndex = index;
-            this.selectedPerson = this.utils.copyObject(item);
+    selectedPersonFromId(id, array){
+        if(array && array === 'i'){
+            this.instutionPeopleArray.forEach((item, index) => {
+                if(item._id === id){
+                    this.editIndex = index;
+                    this.selectedPerson = this.utils.copyObject(item);
+                }
+                
+            });
             return;
-          }
-        });
-        return null;
+        } else {
+             this.peopleArray.forEach((item, index) => {
+                if(item._id === id){
+                    this.editIndex = index;
+                    this.selectedPerson = this.utils.copyObject(item);
+                }
+            });
+            return;
+        }
     }
 
     emptyPerson() {
@@ -279,7 +308,7 @@ export class People {
         return newInstitution;
     }
 
-     getInstitutionPeople(id){
+    getInstitutionPeopleFilter(id){
         this.peopleInstArray = new Array();
         if(id == -1){
            return;

@@ -49,7 +49,7 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true),
+            this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01'),
             this.people.getInstitutionsArray('?order=name', true),
             this.is4ua.loadIs4ua(),
             this.config.getConfig()
