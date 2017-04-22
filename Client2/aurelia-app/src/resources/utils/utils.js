@@ -2,11 +2,13 @@ import {inject} from 'aurelia-framework';
 import $ from 'jquery';
 import {Notification} from 'aurelia-notification';
 import moment from 'moment';
+import {AppConfig} from '../../config/appConfig';
 
-@inject(Notification)
+@inject(Notification, AppConfig)
 export class Utils{
 
-    constructor(notification){
+    constructor(notification, config){
+        this.config = config;
         this.notification = notification;
         this.notification.waitForMove = true 
     }
@@ -67,7 +69,7 @@ export class Utils{
      * obj2 - second object
      * skip - an array of properties to skip
      *************************************************************************/
-    objectsEqual(obj1, obj2, skip){
+  objectsEqual(obj1, obj2, skip){
       var changes = new Array();
       var skipArray = skip || new Array();
       for (var property in obj1) {
@@ -257,25 +259,16 @@ export class Utils{
    * Determine users role for authorizations
    ****************************************************************************/
   setRole(roles){
-      // var roles = this.user.roles;
-      var userRole;
-      if(!roles) userRole = 0;
-      if(roles.indexOf('TMAN') > -1) {
-          userRole = 11;
-      } else if(roles.indexOf('UCSA') > -1) {
-          userRole = 10;
-      } else if(roles.indexOf('UCCT') > -1){
-          userRole = 8;
-      } else if(roles.indexOf('UCCA') > -1){
-          userRole = 6;
-      } else if(roles.indexOf('PRIM') > -1){
-          userRole = 4;
-      } else if(roles.indexOf('USER') > -1){
-          userRole = 2;
-      }  else {
-          userRole = 1;
-      }
-      return userRole;
+    let userRole = 1;
+
+    for(let i = 0; i < roles.length; i++){
+      this.config.ROLES.forEach(item => {
+        if(roles[i] == item.role){
+          userRole = item.authLevel > userRole ? item.authLevel : userRole;
+        }
+      })
+    }
+    return userRole;
   }
 
   toCamelCase(str) {

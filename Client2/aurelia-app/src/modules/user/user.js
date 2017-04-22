@@ -146,13 +146,16 @@ export class User {
         if(!sessionStorage.getItem('weather')){
              if(this.userObj.city){
                 let weather = await this.siteinfo.getWeather(this.userObj.city);
-                this.temp = (parseFloat(weather.main.temp) - 273.15).toFixed(1);
-                this.temp = this.temp + "\u00b0 C";
-                // this.weatherIcon = "http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png";
-                 this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" +  weather.weather[0].icon + ".png";
+                this.temp =  (parseFloat(weather.main.temp) - 273.15);
+                if(this.config.TEMP_SCALE == 'C'){
+                    this.temp = this.temp.toFixed(1) + "\u00b0 C";
+                } else {
+                    this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + "\u00b0 F";
+                }
+                this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" +  weather.weather[0].icon + ".png";
                 var weatherObj = {temp: this.temp, url: this.weatherIcon};
                 sessionStorage.setItem('weather', JSON.stringify(weatherObj));
-             }
+            }
         } else {
             let weather = JSON.parse(sessionStorage.getItem('weather'));
             this.temp = weather.temp;
@@ -160,8 +163,12 @@ export class User {
         }
             if(sessionStorage.getItem('uccweather')){
                 let uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
-                this.ucctemp = (parseFloat(uccweather.temp) - 273.15).toFixed(1) + "\u00b0 C";
-                // this.uccweatherIcon = "http://openweathermap.org/img/w/" + uccweather.icon + ".png";
+                this.ucctemp = (parseFloat(uccweather.temp) - 273.15);
+                if(this.config.TEMP_SCALE == 'C'){
+                    this.ucctemp = this.ucctemp.toFixed(1) + "\u00b0 C";
+                } else {
+                    this.ucctemp = (parseFloat(this.ucctemp) * 1.8 + 32).toFixed(1) + "\u00b0 F";
+                }
                 this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL  + 'icons/' + uccweather.icon + ".png";
                 console.log(this.uccweatherIcon)
             }

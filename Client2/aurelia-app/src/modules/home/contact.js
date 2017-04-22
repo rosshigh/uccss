@@ -36,7 +36,7 @@ export class Contact {
 				this.directors.push({item: item, role: 'TDIR'});
 			} else if(item.roles.indexOf('TMGR') > -1) {
 				this.directors.push({item: item, role: 'TMGR'});
-			} else if(item.roles.indexOf('UCCT') > -1) {
+			} else if(item.roles.indexOf('UCCT') > -1 && item.roles.indexOf('STUT') == -1) {
 				this.staff.push(item);
 			} else if(item.roles.indexOf('UCCA') > -1 ) {
 				this.admin.push(item)

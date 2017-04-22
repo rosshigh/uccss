@@ -19,20 +19,21 @@ export class AppConfig {
     SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/'
 
     //User roles
-    ROLES = [{ role: 'USER', label: 'User', UCConly: false },
-        { role: 'PROV', label: "Provisional", UCConly: false },
-        { role: 'LEGL', label: 'Legal', UCConly: false },
-        { role: 'BUSI', label: 'Billing', UCConly: false },
-        { role: 'PRIM', label: 'Primary', UCConly: false },
-        { role: 'TECH', label: 'Technical', UCConly: false },
-        { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true },
-        { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true },
-        { role: 'UCSA', label: 'UCCSS Admin', UCConly: true },
-        { role: 'BLOG', label: 'Blog Author', UCConly: false },
-        { role: "TMAN", label: "Director", UCConly: true},
-        { role: "EDIR", label: "Executive Director", UCConly: true},
-        { role: "TDIR", label: "Technical Director", UCConly: true},
-        { role: "TMGR", label: "Technical Manager", UCConly: true}];
+    ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },
+        { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },
+        { role: 'LEGL', label: 'Legal', UCConly: false, authLevel: 2 },
+        { role: 'BUSI', label: 'Billing', UCConly: false, authLevel: 2 },
+        { role: 'PRIM', label: 'Primary', UCConly: false, authLevel: 4 },
+        { role: 'TECH', label: 'Technical', UCConly: false, authLevel: 2 },
+        { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true, authLevel: 8 },
+        { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true, authLevel: 6 },
+        { role: 'UCSA', label: 'UCCSS Admin', UCConly: true, authLevel:  11},
+        { role: 'BLOG', label: 'Blog Author', UCConly: false, authLevel:  2},
+        { role: "TMAN", label: "Director", UCConly: true, authLevel: 11},
+        { role: "EDIR", label: "Executive Director", UCConly: true, authLevel: 11},
+        { role: "TDIR", label: "Technical Director", UCConly: true, authLevel: 11},
+        { role: "TMGR", label: "Technical Manager", UCConly: true, authLevel: 11},
+        { role: "STUT", label: "Student Worker", UCConly: true, authLevel: 8}];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
@@ -402,6 +403,7 @@ export class AppConfig {
         this.UCC_HEADER_IMAGE = this.getParameter('UCC_HEADER_IMAGE');
         this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
         this.SEND_EMAILS = this.getParameter('SEND_EMAILS');
+        this.TEMP_SCALE = this.getParameter('TEMP_SCALE');
     }
 
     getParameter(parameter){
