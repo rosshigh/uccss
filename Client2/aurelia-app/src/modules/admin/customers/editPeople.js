@@ -72,7 +72,7 @@ export class EditPeople {
     async refresh() {
         this._cleanUpFilters();
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getPeopleArray('?order=lastName&filter=active|eq|true', true),
+        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true),
         this.dataTable.updateArray(this.people.peopleArray);
         this.spinnerHTML = "";
     }

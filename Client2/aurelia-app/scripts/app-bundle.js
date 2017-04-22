@@ -17264,7 +17264,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                                 this._cleanUpFilters();
                                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                                 _context3.next = 4;
-                                return this.people.getPeopleArray('?order=lastName&filter=active|eq|true', true);
+                                return this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
 
                             case 4:
                                 this.dataTable.updateArray(this.people.peopleArray);
