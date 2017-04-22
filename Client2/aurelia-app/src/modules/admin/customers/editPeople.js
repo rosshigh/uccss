@@ -70,6 +70,7 @@ export class EditPeople {
     }
 
     async refresh() {
+        this._cleanUpFilters();
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
         await this.people.getPeopleArray('?order=lastName&filter=active|eq|true', true),
         this.dataTable.updateArray(this.people.peopleArray);
@@ -378,7 +379,7 @@ export class EditPeople {
 
     _cleanUpFilters() {
         $("#fullName").val("");
-        $("#institutionId").val("");
+        $("#institutionId-name").val("");
         $("#roles").val("");
         $("#personStatus").val("");
     }

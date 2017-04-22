@@ -5,12 +5,12 @@
                 <div id="no-more-tables">
                     <table class="table table-striped table-hover cf">
                         <thead class="cf">
-                            <tr colspan='6'>
+                            <tr colspan='7'>
                                  <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
                                  </tr>
                             <tr>                            
                             <tr>
-                                <td colspan='6'>
+                                <td colspan='7'>
                                     <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
                                     <span click.delegate="new()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
                                     <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
@@ -35,9 +35,12 @@
                                     <input input.delegate="dataTable.filterList($event)" id="nickName" type="text" placeholder="Filter Nickname" class="form-control"> 
                                 </th>
                                 <th>
+                                     <input input.delegate="dataTable.filterList($event, people.institutionsArray)" id="institutionId-name" type="text" compare="lookup" class="form-control" ref="institutionFilter"/>
+                                     <!--
                                     <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionId" compare="id">
                                     <option value=""></option>
                                     <option repeat.for="institution of people.institutionsArray" value="${institution._id}">${institution.name}</option>
+                                    -->
                                 </select>
                                 </th>
                                 <th></th>
