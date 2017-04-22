@@ -12,7 +12,7 @@ var express = require('express'),
     logger.log("Polling...");
     var optionsget = {
         host : 'api.openweathermap.org', 
-        path : '/data/2.5/weather?q=' + process.env.UCC_HOME + '&APPID=0f85bb931f8faad7e35b6f685aa4e931', 
+        path : '/data/2.5/weather?q=' + config.UCC_HOME + '&APPID=0f85bb931f8faad7e35b6f685aa4e931', 
         method : 'GET'
     };
     logger.log(optionsget.path);

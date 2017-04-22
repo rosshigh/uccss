@@ -19,7 +19,7 @@ var express = require('express'),
     var requireAuth = passport.authenticate('jwt', { session: false }),
         requireLogin = passport.authenticate('local', { session: false });
 
-module.exports = function (app) {
+module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/people', requireAuth,  function(req, res, next){
@@ -317,8 +317,13 @@ module.exports = function (app) {
     logger.log('Getting UCC Staff', 'verbose');
     let roles = req.params.uccRoles.split(':');
     Model.find({roles: {$in: roles}}).exec()
-    .then(people => {
-      res.status(200).json(people);
+    .then(people => {    
+      if(people){
+        var uccPeople = people.filter(item => {
+          if(item.institutionId == config.UCC_ID) return true;
+        })
+      }
+      res.status(200).json(uccPeople);
     })
     .catch(error => {
       return next(error);
