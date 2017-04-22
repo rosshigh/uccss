@@ -151,9 +151,15 @@ export class EditPeople {
         this._cleanUpFilters();
     }
 
+    _clearFilters(){
+        this._cleanUpFilters();
+        this.dataTable.updateArray(this.people.institutionsArray);
+    }
+
     _cleanUpFilters(){
         $("#name").val("");
         $("#memberType").val("");
+        $("#institutionType").val("");
         $("#highestDegree").val("");
         $("#institutionStatus").val("");
     }

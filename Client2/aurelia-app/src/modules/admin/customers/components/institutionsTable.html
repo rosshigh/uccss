@@ -11,7 +11,8 @@
                             <tr>
                                 <td colspan='6'>
                                     <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
-                                    <span click.delegate="new()" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                    <span click.delegate="new()"  class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                    <span click.delegate="_clearFilters()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter" aria-hidden="true"></i></span>
                                     <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
                                 </td>
                             </tr>
@@ -31,28 +32,28 @@
                                 </th>
                                 <th>
                                     <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionType" compare="status">
-                                    <option value=""></option>
-                                    <option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}">${institution.description}</option>
-                                </select>
+                                        <option value=""></option>
+                                        <option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}">${institution.description}</option>
+                                    </select>
                                 </th>
                                 <th>
                                     <select change.delegate="dataTable.filterList($event)" class="form-control " id="memberType" compare="status">
-                                    <option value=""></option>
-                                    <option repeat.for="institution of is4ua.memberTypes" value="${institution.code}">${institution.description}</option>
-                                </select>
+                                        <option value=""></option>
+                                        <option repeat.for="institution of is4ua.memberTypes" value="${institution.code}">${institution.description}</option>
+                                    </select>
                                 </th>
                                 <th></th>
                                 <th>
                                     <select change.delegate="dataTable.filterList($event)" class="form-control " id="highestDegree" compare="status">
-                                    <option value=""></option>
-                                    <option repeat.for="institution of is4ua.highestDegrees" value="${institution.code}">${institution.description}</option>
-                                </select>
+                                        <option value=""></option>
+                                        <option repeat.for="institution of is4ua.highestDegrees" value="${institution.code}">${institution.description}</option>
+                                    </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionStatus">
-                                    <option value=""></option>
-                                    <option repeat.for='status of is4ua.institutonStatusArray' value='${status.code}'>${status.description}</option>
-                                </select>
+                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionStatus" compare="status">
+                                        <option value=""></option>
+                                        <option repeat.for='status of is4ua.institutonStatusArray' value='${status.code}'>${status.description}</option>
+                                    </select>
                                 </th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="inst of dataTable.displayArray">

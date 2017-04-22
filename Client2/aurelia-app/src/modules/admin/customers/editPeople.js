@@ -187,13 +187,14 @@ export class EditPeople {
                 if (!response.wasCancelled) {
                     this.save();
                 } else {
-                    this._cleanUp();
+                     this.personSelected = false;
+                    // this._cleanUp();
                 }
             });
         } else {
-            this._cleanUp();
+             this.personSelected = false;
+            // this._cleanUp();
         }
-
     }
 
     async checkEmail() {
@@ -375,6 +376,11 @@ export class EditPeople {
                     return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email));
                 }
             }]);
+    }
+
+    _clearFilters(){
+        this._cleanUpFilters();
+        this.dataTable.updateArray(this.people.peopleArray);
     }
 
     _cleanUpFilters() {

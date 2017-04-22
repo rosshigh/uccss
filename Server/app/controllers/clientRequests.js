@@ -186,13 +186,11 @@ module.exports = function (app) {
     logger.log('Update clientRequest ' + req.body._id);       
     let clientRequest = new Model(req.body); 
     clientRequest.requestDetails = new Array();    
-    let tasks = new Array();   
-console.log(clientRequest.requestDetails)    
+    let tasks = new Array();     
     if(req.body.requestDetailsToSave){
        req.body.requestDetailsToSave.forEach((detail, index) => {
          if(detail._id){
-           if(detail.delete){
-console.log(detail._id)             
+           if(detail.delete){        
                tasks.push(ClientRequestDetail.remove({ _id: detail._id }));
                clientRequest.requestDetails.splice(clientRequest.requestDetails.indexOf(detail._id), 1);
            } else {
@@ -206,15 +204,12 @@ console.log(detail._id)
             tasks.push(ClientRequestDetail.create(obj));           
          }
        });
-    }      
-console.log(clientRequest.requestDetails)      
+    }        
     Promise.all(tasks)
         .then(results => {            
-          if(clientRequest.requestDetails.length > 0){
-console.log('update')            
+          if(clientRequest.requestDetails.length > 0){           
             updateRequest(clientRequest, req, res, next);
-          } else {
-console.log('delete')            
+          } else {          
             deleteRequest(clientRequest, req, res, next);
           }
         })
@@ -222,8 +217,6 @@ console.log('delete')
             return next(error);
         }) 
   });
-
-  
 
   router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){
     if(req.body.customerMessage){    
