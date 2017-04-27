@@ -16,6 +16,9 @@ var express = require('express'),
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
+  var ASSIGNED_REQUEST_CODE = '2';
+  var CUSTOMER_ACTION_REQUEST_CODE = "4";
+
 module.exports = function (app) {
   app.use('/', router);
 
@@ -29,7 +32,7 @@ module.exports = function (app) {
         if(object){
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests found"});
+          res.status(404).json({message: "No requests were found"});
         }
       })
       .catch(err => {
@@ -48,7 +51,7 @@ module.exports = function (app) {
           if(object){
             res.status(200).json(object);
           } else {
-            res.status(404).json({message: "No request found"});
+            res.status(404).json({message: "No requests were found"});
           }
         }
       });
@@ -70,7 +73,7 @@ module.exports = function (app) {
         if(object){
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests found"});
+          res.status(404).json({message: "No requests were found"});
         }
       })
       .catch(err => {
@@ -88,7 +91,7 @@ module.exports = function (app) {
         if(object){
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests found"});
+          res.status(404).json({message: "No requests were found"});
         }
       }
     });
@@ -108,10 +111,6 @@ module.exports = function (app) {
 
     Promise.all(tasks)
       .then(function(results) {     
-        // clientRequest.requestDetails = new Array();
-        // results.forEach(function (record) {
-        //   clientRequest.requestDetails.push(record._id);
-        // });
         clientRequest.save(function (err, result) {        
           if (err) {
             return next(err);
@@ -122,20 +121,24 @@ module.exports = function (app) {
                 if(err){
                   return next(err);
                 } else {
+                  if(result){
                     Person.findById(result.personId, function(err, person){
-                    if(err){
-                      return next(err);
-                    } else {   
-                      if(person){
-                        var mailObj = {
-                          email: person.email,
-                          context: result
-                        }
-                        requestCreated(mailObj)  
-                      }                       
-                      res.status(200).json(result);
-                    }
-                  })
+                      if(err){
+                        return next(err);
+                      } else {   
+                        if(person){
+                          var mailObj = {
+                            email: person.email,
+                            context: result
+                          }
+                          requestCreated(mailObj)  
+                        }                       
+                        res.status(200).json(result);
+                      }
+                    })
+                  } else {
+                    res.status(200).json({message: "request created"});
+                  }
                 }
               }) 
             } else {        
@@ -169,11 +172,13 @@ module.exports = function (app) {
                           if(error){
                             return next(error);
                           } else {
+                            if(person){
                               var mailObj = {
-                              email: person.email,
-                              context: request
-                            }                    
-                            requestUpdated(mailObj)                    
+                                email: person.email,
+                                context: request
+                              }                    
+                              requestUpdated(mailObj) 
+                            }
                             res.status(200).json(requestResult);                                
                           }           
                         })
@@ -231,42 +236,19 @@ module.exports = function (app) {
   router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){
     if(req.body.customerMessage){    
       if(req.body.model === 'header'){
-        Model.findById(req.body.id, function(err, request){      
-          request.customerMessage = req.body.customerMessage;
-          request.requestStatus = req.body.requestStatus;
-          request.requestDetails.forEach(item => {   
-            ClientRequestDetail.findById(item).exec()
-              .then(detail => {                
-                if(detail.requestStatus != "2") {
-                  detail.requestStatus = "4";                          
-                  detail.save();
-                }
-              })
-          })
-          if(req.body.audit) request.audit.push(req.body.audit);
-          request.save(function(err, request){
-            if(err) {
-              return next(err);
-            } else {
-              var obj = {
-                email: req.body.toEmail,
-                subject: req.body.subject,
-                context: {
-                  requestNo: req.body.clientRequestNo,
-                  course: req.body.course,
-                  session: req.body.session,
-                  customerMessage: req.body.customerMessage
-                }
-              };
-              customerAction(obj)
-              res.status(200).json(request);
-            }
-          })
-        })
-      } else {
-          ClientRequestDetail.findById(req.body.id, function(err, request){                 
-            request.customerMessage = req.body.customerMessage;     
-            request.requestStatus = req.body.requestStatus;          
+        Model.findById(req.body.id, function(err, request){   
+          if(request){  
+            request.customerMessage = req.body.customerMessage;
+            request.requestStatus = req.body.requestStatus;
+            request.requestDetails.forEach(item => {   
+              ClientRequestDetail.findById(item).exec()
+                .then(detail => {                
+                  if(detail.requestStatus != ASSIGNED_REQUEST_CODE) {
+                    detail.requestStatus = CUSTOMER_ACTION_REQUEST_CODE;                          
+                    detail.save();
+                  }
+                })
+            })
             if(req.body.audit) request.audit.push(req.body.audit);
             request.save(function(err, request){
               if(err) {
@@ -277,7 +259,6 @@ module.exports = function (app) {
                   subject: req.body.subject,
                   context: {
                     requestNo: req.body.clientRequestNo,
-                    product: req.body.product,
                     course: req.body.course,
                     session: req.body.session,
                     customerMessage: req.body.customerMessage
@@ -287,7 +268,43 @@ module.exports = function (app) {
                 res.status(200).json(request);
               }
             })
-          })
+          } else {
+              var error = new Error('No request found');
+              error.status = 404;
+              return next(error);
+          }   
+        })
+      } else {
+          ClientRequestDetail.findById(req.body.id, function(err, request){  
+            if(request){
+                request.customerMessage = req.body.customerMessage;     
+                request.requestStatus = req.body.requestStatus;          
+                if(req.body.audit) request.audit.push(req.body.audit);
+                request.save(function(err, request){
+                  if(err) {
+                    return next(err);
+                  } else {
+                    var obj = {
+                      email: req.body.toEmail,
+                      subject: req.body.subject,
+                      context: {
+                        requestNo: req.body.clientRequestNo,
+                        product: req.body.product,
+                        course: req.body.course,
+                        session: req.body.session,
+                        customerMessage: req.body.customerMessage
+                      }
+                    };
+                    customerAction(obj)
+                    res.status(200).json(request);
+                  }
+                })
+              } else {
+                  var error = new Error('No request found');
+                  error.status = 404;
+                  return next(error);
+              }    
+            })     
       }
     } else {
       res.status(404).json({message: "No Message"});
@@ -311,7 +328,11 @@ module.exports = function (app) {
     query.populate('requestId')
     query.exec()
       .then(object => {
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests were found"});
+        }
       })
       .catch(err => {
         return next(err);
@@ -324,7 +345,11 @@ module.exports = function (app) {
       .populate('requestId')
       .exec()
       .then(object => {
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No request was found"});
+        }
       })
       .catch(err => {
         return next(err);
@@ -336,11 +361,15 @@ module.exports = function (app) {
     ClientRequestDetail.find()
     .populate('requestId')
     .exec()
-    .then(results => {    
-       var resultArray = results.filter(item => {        
-         return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId == req.params.institutionId;
-       })    
-       res.status(200).json(resultArray);
+    .then(results => {   
+       if(results){
+          var resultArray = results.filter(item => {        
+            return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId == req.params.institutionId;
+          }) 
+          res.status(200).json(resultArray);
+        } else {
+          res.status(404).json({message: "No requests were found"});
+        } 
       })
       .catch(err => {
         return next(err);
@@ -384,7 +413,11 @@ module.exports = function (app) {
         if (err) {
           return next(err);
         } else {
-          res.status(200).json(object);
+          if(object){
+            res.status(200).json(object);
+          } else {
+            res.status(404).json({message: "No courses were found"});
+          }
         }
       });
   });
@@ -397,7 +430,11 @@ module.exports = function (app) {
         if (err) {
           return next(err);
         } else {
+        if(object){
           res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No courses was found"});
+        }
         }
       });
   });
