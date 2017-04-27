@@ -346,8 +346,14 @@ module.exports = function (app, config) {
     query.exec( function(err, object){
         if (err) {
           res.status(500).json(err);
-        } else {
-          res.status(200).json(object);
+        } else {       
+          if(!object || object.length === 0){          
+            var error = new Error('No notes found');
+            error.status = 404;
+            return next(error);
+          } else {
+             res.status(200).json(object);
+          }
         }
       });
   });
@@ -359,14 +365,13 @@ module.exports = function (app, config) {
         if (err) {
            return next(err);
         } else {
-          res.status(200).json(object);
+          res.status(201).json(object);
         }
       });
   });
 
   router.put('/api/notes', requireAuth, function(req, res, next){
     logger.log('Update note ' + req.body._id, 'verbose');  
-    console.log(req.body);
     Note.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, person){
       if (err) {
         return next(err);

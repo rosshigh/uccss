@@ -316,9 +316,9 @@ if(env === 'development'){
   }
 
 } else {
-   var nodemailer = require('nodemailer'),
-      handlebars = require('express-handlebars'),
-      exphbs = require('nodemailer-express-handlebars');
+   var  nodemailer = require('nodemailer'),
+        handlebars = require('express-handlebars'),
+        exphbs = require('nodemailer-express-handlebars');
 
   var smtpConfig = {
     host: config.smtp
@@ -332,18 +332,14 @@ if(env === 'development'){
   });
   transporter.use('compile', options);
 
-  nodeMailerSendMail = function(mailObject){
-    //  return new Promise(function(resolve, reject) {        
+  nodeMailerSendMail = function(mailObject){     
         transporter.sendMail(mailObject)
         .then(result => {       
             logger.log(result, 'verbose ');
-            // resolve(result);
         })
         .catch(error => {         
             logger.log(error, 'error');
-            //  reject(Error(error));
         })
-    //  });
   };
 
   welcome = function(mailObject){

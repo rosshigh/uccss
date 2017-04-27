@@ -31,8 +31,8 @@ var logDir = 'log';
 		logger.log(level, message);
 	}
 
-	logError = function(message){
-		var msg = message.code + "@@" + message.message.split(":").join('%').replace(',','') + "@@" + message.err.split(":").join('%').replace(',','') + "@@" + message.ip.split(":").join('%');
+	logError = function(message){		
+		var msg = message.code + "@@" + message.message.split(":").join('%').replace(',','') + "@@" + message.err.split(":").join('%').replace(',','') + "@@" + message.ip.split(":").join('%');		
 		logger.log('error',msg);
 	}
 

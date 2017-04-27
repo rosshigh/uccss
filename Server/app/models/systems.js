@@ -12,9 +12,14 @@ var SystemSchema = new Schema({
   productId: [{ type: Schema.Types.ObjectId }],
   idsAvailable: { type: Number },
   clients: ['Client'],
-  // clients: [ { type: Schema.Types.ObjectId, ref: 'Client' } ],
   active: { type: Boolean, default: true},
-  dateModified: { type: Date }
+  os: { type: String },
+  osVersion: { type: String },
+  dbType: { type: String },
+  dbVersion: { type: String },
+  ipAddress: { type: String },
+  notes: { type: String },
+  dateModified: { type: Date } 
 });
 
 SystemSchema.pre('save', function(next){

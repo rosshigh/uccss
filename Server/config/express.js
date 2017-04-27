@@ -11,13 +11,17 @@ var onFinished = require('on-finished');
 var NotFoundError = require(path.join(__dirname, "errors", "NotFoundError.js"));
 var utils = require(path.join(__dirname, "utils.js"));
 var helmet = require('helmet');
+var compression = require('compression');
+var favicon = require('serve-favicon');
 
 
 module.exports = function(app, config) {
 
   logger.log("Starting application");
+  app.use(compression({threshold: 1}));
   app.use(helmet())
   app.use(express.static(config.root + '/public'));
+  app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
   app.use(cors());
 
   logger.log("Loading Mongoose functionality");
@@ -60,30 +64,31 @@ module.exports = function(app, config) {
 
   // all other requests redirect to 404
   app.all("*", function (req, res, next) {
-      next(new NotFoundError("404",{ message: "Route not found."}));
+       var error = new Error('Route not found.');
+        error.status = 404;
+        return next(error);
   });
 
   // error handler for all the applications
   app.use(function (err, req, res, next) {
 console.log(err.stack)        
-// console.log('laskjdflajsflj;')
     var url_parts = url.parse(req.url);
     switch (err.status) {
         case 401:
             code = err.status;
-            var msg = {event: 'error', code: 401, message: "Unauthorized Access-" + url_parts.pathname, error: 401, ip: req.connection.remoteAddress};
+            var msg = {event: 'error', code: 401, message: "Unauthorized Access-" + url_parts.pathname, error: 401, ip: req.connection.remoteAddress, err: err.stack.toString()};
             break;
         case 409:
             code = err.status;
-            var msg = {event: 'error', code: 409, message: "Duplicate record found-" + url_parts.pathname, error: 409, ip: req.connection.remoteAddress};
+            var msg = {event: 'error', code: 409, message: "Duplicate record found-" + url_parts.pathname, error: 409, ip: req.connection.remoteAddress, err: err.stack.toString()};
             break;
-        case 404:
+        case 404:      
             code = err.status;
-            var msg = {event: 'error', code: 404, message: url_parts.pathname, error: 404, ip: req.connection.remoteAddress};
+            var msg = {event: 'error', code: 404, message: url_parts.pathname, error: 404, ip: req.connection.remoteAddress, err: err.stack.toString()};
             break;
         default:
             code = 500;
-            var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500, ip: req.connection.remoteAddress, err: err.stack};
+            var msg = {event: 'error', code: 500, message: url_parts.pathname, error: 500, ip: req.connection.remoteAddress, err: err.stack.toString()};
             break;
     }
     logger.logError(msg);

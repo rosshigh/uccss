@@ -167,6 +167,7 @@ ai-dialog-header {
 .banner {
     height: 50px;
     width: 100%;
+    background-color: white;
     border-bottom-style: solid;
     border-bottom-width: 1px;
 }

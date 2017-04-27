@@ -26,7 +26,11 @@ module.exports = function (app) {
       .populate('requestDetails')
       .exec()
       .then(object => {
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests found"});
+        }
       })
       .catch(err => {
           return next(err);
@@ -41,7 +45,11 @@ module.exports = function (app) {
         if (err) {
           return next(err);
         } else {
-          res.status(200).json(object);
+          if(object){
+            res.status(200).json(object);
+          } else {
+            res.status(404).json({message: "No request found"});
+          }
         }
       });
   });
@@ -59,7 +67,11 @@ module.exports = function (app) {
       .populate('requestDetails')
       .exec()
       .then(object => {      
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests found"});
+        }
       })
       .catch(err => {
           return next(err);
@@ -73,7 +85,11 @@ module.exports = function (app) {
       if (err) {
         return next(err);
       } else {
-        res.status(200).json(object);
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests found"});
+        }
       }
     });
   });
@@ -82,18 +98,20 @@ module.exports = function (app) {
     logger.log('Create clientRequest','verbose');  
     var clientRequest = new Model(req.body);
     var tasks = new Array();
+    clientRequest.requestDetails = new Array();
     req.body.requestDetails.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       obj.requestId = clientRequest._id;
+      clientRequest.requestDetails.push(obj._id);
       tasks.push(ClientRequestDetail.create(obj));
     });
 
     Promise.all(tasks)
       .then(function(results) {     
-        clientRequest.requestDetails = new Array();
-        results.forEach(function (record) {
-          clientRequest.requestDetails.push(record._id);
-        });
+        // clientRequest.requestDetails = new Array();
+        // results.forEach(function (record) {
+        //   clientRequest.requestDetails.push(record._id);
+        // });
         clientRequest.save(function (err, result) {        
           if (err) {
             return next(err);
@@ -107,18 +125,15 @@ module.exports = function (app) {
                     Person.findById(result.personId, function(err, person){
                     if(err){
                       return next(err);
-                    } else {             
-                      var mailObj = {
-                        email: person.email,
-                        context: result
-                      }
-                       requestCreated(mailObj)
-                        // .then(result => {                        
-                            res.status(200).json(result);
-                        // })
-                        // .catch(error => {
-                        //     return next(error);
-                        // });    
+                    } else {   
+                      if(person){
+                        var mailObj = {
+                          email: person.email,
+                          context: result
+                        }
+                        requestCreated(mailObj)  
+                      }                       
+                      res.status(200).json(result);
                     }
                   })
                 }
@@ -158,13 +173,8 @@ module.exports = function (app) {
                               email: person.email,
                               context: request
                             }                    
-                           requestUpdated(mailObj)
-                              // .then(result => {                      
-                                  res.status(200).json(requestResult);                                
-                              // })
-                              // .catch(error => {
-                              //     return next(error); 
-                              // });
+                            requestUpdated(mailObj)                    
+                            res.status(200).json(requestResult);                                
                           }           
                         })
                       })
@@ -249,12 +259,7 @@ module.exports = function (app) {
                 }
               };
               customerAction(obj)
-              // .then(result => {
-                  res.status(200).json(result);
-                // })
-                // .catch(error => {           
-                //     return next(error);
-                // });
+              res.status(200).json(request);
             }
           })
         })
@@ -279,12 +284,7 @@ module.exports = function (app) {
                   }
                 };
                 customerAction(obj)
-                // .then(result => {
-                    res.status(200).json(result);
-                  // })
-                  // .catch(error => {           
-                  //     return next(error);
-                  // });
+                res.status(200).json(request);
               }
             })
           })
@@ -345,6 +345,35 @@ module.exports = function (app) {
       .catch(err => {
         return next(err);
       })
+  });
+
+  router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
+    logger.log('Delete clientRequestsDetails ', req.params.id);
+
+    Model.findById(req.params.requestid, function(err, request) {
+      if(err){
+        return next(err);
+      } else {
+        if(request){
+          if(request.requestDetails && request.requestDetails.length > 0){      
+            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id),1); 
+            if(request.requestDetails.length === 0) {
+              Model.remove(req.params.requestid);
+            } else {
+              request.save();
+            }
+          }
+        }
+      }
+    })
+
+    ClientRequestDetail.findByIdAndRemove(req.params.id, function(err, result){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(204).json({message: "Request deleted"});
+      }
+    })
   });
 
   //Courses Routes
@@ -517,13 +546,8 @@ module.exports = function (app) {
                       email: person.email,
                       context: request
                     }                    
-                    requestUpdated(mailObj)
-                      // .then(result => {                      
-                          res.status(200).json(requestResult);                                
-                      // })
-                      // .catch(error => {
-                      //     return next(error); 
-                      // });
+                    requestUpdated(mailObj)                    
+                      res.status(200).json(requestResult);                                
                   }           
                 })
               })

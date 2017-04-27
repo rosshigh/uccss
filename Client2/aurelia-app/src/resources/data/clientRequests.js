@@ -275,6 +275,21 @@ export class ClientRequests {
         return serverResponse;
     }
 
+    async deleteRequest(){
+        if(!this.selectedRequestDetail._id){
+            return;
+        }
+
+       let serverResponse = await this.data.deleteObject(this.data.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+        if (!serverResponse.error) {
+            this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+            return serverResponse;
+        } else {
+            return undefined;
+        }
+
+    }
+
     isRequestDirty(obj){
       if(this.selectedRequest){
           if(!obj){
@@ -352,7 +367,7 @@ export class ClientRequests {
 
     updateDetailStatuses(selectedRequestNo, status){
         this.requestsDetailsArray.forEach(item => {
-            if(item.requestId.clientRequestNo == selectedRequestNo){
+            if(item.requestId && item.requestId.clientRequestNo == selectedRequestNo){
                 if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
             }
         })

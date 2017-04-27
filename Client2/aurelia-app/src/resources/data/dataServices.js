@@ -199,7 +199,7 @@ export class DataServices {
         var msg = (message ? message : "") + " ";
         switch (obj.code) {
             case 404:
-                msg = msg += "The service wasn't found.  Contact your UCC.";
+                msg = undefined;
                 break;
             case 422:
                 msg = msg += "The request was bad.  Contact your UCC.";
@@ -213,7 +213,7 @@ export class DataServices {
             default:
                 msg = msg += "An unspecified error occured.  Contact your UCC."
         }
-        this.utils.showNotification(msg);
+        if(msg && msg.length > 0) this.utils.showNotification(msg);
     }
 
     // //File URLs

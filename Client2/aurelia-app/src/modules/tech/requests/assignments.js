@@ -648,6 +648,30 @@ export class Assignments {
         this.selectedAssignedClient = "";
     }
 
+    /**
+     * Delete the request
+     */
+    delete(){
+        return this.dialog.showMessage(
+            "Are you sure you want to delete the request?",
+            "Delete Request",
+            ['Yes', 'No']
+        ).then(response => {
+            if (!response.wasCancelled) {
+                this.deleteRequest();
+            }
+        });
+    }
+
+     async deleteRequest() {
+        let serverResponse = await this.requests.deleteRequest();
+        if (!serverResponse.error) {
+            this.filterInAssigned()
+            this.utils.showNotification("The request was deleted");
+        }
+       this.requestSelected = false;
+    }
+
     /*****************************************************************************************************
      * Save the request 
      ****************************************************************************************************/
@@ -933,48 +957,6 @@ export class Assignments {
     hideComment() {
             $(".hover").css("display", "none");
     }
-
-    // customerAction(){
-    //     this.message = {
-    //         customerMessage: ""
-    //     }
-
-    //     this.customerMessage = true;
-    //     $("#customerMessage").focus();
-    // }
-
-    // async sendCustomerAction(){
-    //     var msg = $("#customerMessage").val();
-    //     if(msg){
-    //         var productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
-    //         this.message = {
-    //             id: this.requests.selectedRequestDetail.requestId._id,
-    //             customerMessage : msg,
-    //             requestNo: this.requests.selectedRequestDetail.requestNo,
-    //             requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
-    //             toEmail: this.people.selectedPerson.email,
-    //             product:  productName,
-    //             session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
-    //             from: "UCC",
-    //             audit: {
-    //                 property: 'Send Message',
-    //                 eventDate: new Date(),
-    //                 oldValue: this.customerMessageText,
-    //                 personId: this.userObj._id
-    //             }
-    //         };     
-    //         let serverResponse = await this.requests.sendCustomerMessage(this.message);
-    //         if (!serverResponse.error) {
-    //             // this.email.sendMail('CLIENT_REQUEST_CUSTOMER_ACTION', {id: });
-    //             this.utils.showNotification("The message was sent");
-    //             this._cleanUp();
-    //         }
-    //     } 
-    // }
-
-    // cancelCustomerAction(){
-    //     this.customerMessage = false;
-    // }
     
     openSettings(){
         this.showSettings = ! this.showSettings;
