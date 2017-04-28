@@ -95,16 +95,9 @@ export class EditProducts {
         this.products.selectProduct(this.editIndex);
          this.newProduct = false;
 
-        // this.editSystemsString = "";
-        // if(this.products.selectedProduct.systems){
-        //     for (var i = 0, x = this.products.selectedProduct.systems.length; i < x; i++) {
-        //         this.editSystemsString += this.products.selectedProduct.systems[i].sid + " "
-        //     }
-        // } else {
-        //     this.products.selectedProduct.systems
-        // }
-
         if(!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
+        if(!this.products.selectedProduct.clientInfo) this.products.selectedProduct.clientInfo = "";
+        if(!this.products.selectedProduct.productInfo) this.products.selectedProduct.productInfo = "";
 
         this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
 
