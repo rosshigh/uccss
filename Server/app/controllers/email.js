@@ -6,8 +6,8 @@ var config = require('../../config/config'),
     logger = require('../../config/logger'),
     hbs = require('handlebars'),
     path = require('path'),
-    fs = require('fs');
-
+    fs = require('fs'),
+    emailConfig = require('../../config/email-config');
 
 module.exports = function (app) {
   
@@ -62,6 +62,7 @@ if(env === 'development'){
   var HelpTicketClosedTemplate = fs.readFileSync(viewPath + "/help-ticket-closed.handlebars", "utf-8");
   var RequestUpdatedTemplate = fs.readFileSync(viewPath + "/client-request-updated.handlebars", "utf-8");
   var PasswordResetTemplate = fs.readFileSync(viewPath + "/password-reset.handlebars", "utf-8");
+  var RequestCreatedTemplate = fs.readFileSync(viewPath + "/client-request-created.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
@@ -72,6 +73,7 @@ if(env === 'development'){
   var RequestUpdatedTemplateCompiled = hbs.compile(RequestUpdatedTemplate);
   var PasswordResetTemplateCompiled = hbs.compile(PasswordResetTemplate);
   var HelpTicketClosedTemplateCompiled = hbs.compile(HelpTicketClosedTemplate);
+   var RequestCreatedTemplateCompiled = hbs.compile(RequestCreatedTemplate);
 
   sendGrid = function(mailObject){
     mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>'); 
@@ -87,17 +89,13 @@ if(env === 'development'){
           body: mail.toJSON(),
         });
 
-        // return new Promise(function(resolve, reject) {
-            sg.API(request)
-              .then(response => {
-                  logger.log(response, "verbose");
-                  // resolve(response);
-              })
-              .catch(error => {
-                  logger.log(error, "verbose");
-                  // reject(Error(result));
-              });
-        // });
+        sg.API(request)
+          .then(response => {
+              logger.log(response, "verbose");
+          })
+          .catch(error => {
+              logger.log(error, "verbose");
+          });
     }
   }
 
@@ -225,19 +223,15 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-    //  return new Promise(function(resolve, reject) {
-      mailObject.body = "Request " + mailObject.context.clientRequestNo + " created."; 
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.body = RequestCreatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
+
       sendGrid(mailObject)
-    //     .then(result => {
-    //         if (result.statusCode === 202) {     
-    //           resolve(result);
-    //         } else {
-    //           reject(Error(result));
-    //         }
-    //     })
-    // });
   }
 
   requestUpdated = function(mailObject){
@@ -473,7 +467,10 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-    //  return new Promise(function(resolve, reject) {
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
             from: config.emailAddress,
             to: mailObject.email,
@@ -482,15 +479,7 @@ if(env === 'development'){
             context: mailObject.context
         };
 
-        nodeMailerSendMail(mail)
-    //       .then(result => {      
-    //             if (result.rejected.length === 0) {     
-    //               resolve(result);
-    //             } else {
-    //               reject(Error(result));
-    //             }
-    //         })
-    // });   
+        nodeMailerSendMail(mail) 
   }
 
   requestUpdated = function(mailObject){

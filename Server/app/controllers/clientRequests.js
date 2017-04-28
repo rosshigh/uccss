@@ -8,6 +8,7 @@ var express = require('express'),
   Assignment = mongoose.model('Assignment'),
   Course = mongoose.model('Course'),
   Person = mongoose.model('Person'),
+  Product = mongoose.model('Product'),
   passport = require('passport'),
   Promise = require('bluebird'),
   ClientRequestLock = mongoose.model('ClientRequestLock'),
@@ -101,12 +102,19 @@ module.exports = function (app) {
     logger.log('Create clientRequest','verbose');  
     var clientRequest = new Model(req.body);
     var tasks = new Array();
+    var products = new Array();    
+
     clientRequest.requestDetails = new Array();
     req.body.requestDetails.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       obj.requestId = clientRequest._id;
       clientRequest.requestDetails.push(obj._id);
       tasks.push(ClientRequestDetail.create(obj));
+      var date = new Date(detail.requiredDate);
+      var day = date.getDate();
+      var month = date.getMonth();
+      var year = date.getFullYear();
+      products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: detail.productName})    
     });
 
     Promise.all(tasks)
@@ -116,37 +124,32 @@ module.exports = function (app) {
             return next(err);
           } else {          
             if(req.query.email == 1){            
-              var id = result._id;
-              var query = Model.findOne({_id: id}).populate('requestDetails').exec(function(err, result){
+              Person.findById(clientRequest.personId, function(err, person){
                 if(err){
                   return next(err);
-                } else {
-                  if(result){
-                    Person.findById(result.personId, function(err, person){
-                      if(err){
-                        return next(err);
-                      } else {   
-                        if(person){
-                          var mailObj = {
-                            email: person.email,
-                            context: result
-                          }
-                          requestCreated(mailObj)  
-                        }                       
-                        res.status(200).json(result);
-                      }
-                    })
-                  } else {
-                    res.status(200).json({message: "request created"});
-                  }
+                } else {   
+                  if(person){                                          
+                    var context = {
+                      products: products,
+                      numStudents: parseInt(clientRequest.undergradIds) + parseInt(clientRequest.graduateIds),
+                      requestNo: clientRequest.clientRequestNo,
+                      comments: clientRequest.comments
+                    }                   
+                    var mailObj = {
+                      email: person.email,
+                      context: context
+                    }                   
+                    requestCreated(mailObj) 
+                  }                       
+                  res.status(200).json({message: "request created"});
                 }
-              }) 
-            } else {        
-            res.status(200).json(result);
+              })
+            } else {
+              res.status(200).json({message: "request created"});
             }
           }
-        });
-      });    
+        }) 
+      })
   });
 
   router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
@@ -531,7 +534,9 @@ module.exports = function (app) {
   });
 };
 
- function updateRequest(clientRequest, req, res, next){
+  function updateRequest(clientRequest, req, res, next){
+
+
       Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
         if(error){
           return next(error);
@@ -596,4 +601,4 @@ module.exports = function (app) {
           }
         }
     })
-   }
+  }

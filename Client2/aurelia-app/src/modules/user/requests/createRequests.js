@@ -62,14 +62,6 @@ export class ViewHelpTickets {
         // This should yield: Object {testValue: "What just happened?"}
     });
 
-    this.useSandbox = this.config.SANDBOX_USED == 'true';
-    if(!this.useSandbox){
-      this.typeSelected = true;
-      this.regularClient = true;
-      this.requestType = "regularCourse";
-    }
-   
-   
   };
 
   canActivate(){
@@ -91,6 +83,13 @@ export class ViewHelpTickets {
     this.filterList();
     this._setUpValidation();
     this.getMessages();
+
+     this.useSandbox = this.config.SANDBOX_USED == 'true';
+    if(!this.useSandbox){
+      this.typeSelected = true;
+      this.regularClient = true;
+      this.requestType = "regularCourse";
+    }
   }
 
   getMessages(){
@@ -271,57 +270,6 @@ export class ViewHelpTickets {
     }
   }
 
-  /*****************************************************************************************
-  * Update the screen messages
-  * message - The key of he message to display
-  *****************************************************************************************/
-  // updateMessages(message){
-  //   $("#existingRequestInfo").empty().hide();
-  //   $("#infoBox").empty().hide();
-  //   switch(message){
-  //     case "CLIENT_REQUEST_START":
-  //     case "SESSION_SELECTED":
-  //     case "REGULAR_CLIENT_MESSAGE":
-  //       this.productInfo = new Array();
-  //     case "SANDBOX_MESSAGE":
-  //     case "EXISTING_REQUEST_MESSAGE":
-  //       //  this.productInfo = new Array();
-  //       // if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
-  //       //   let dateFoo = moment(this.requests.selectedRequest.requestDetails[0].dateCreated).format(this.config.DATE_FORMAT_TABLE);
-  //       //   let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
-  //       //   $("#existingRequestInfo").append(existingMsg).fadeIn();
-  //       // }
-  //       break;
-  //     default:
-  //       message = "";
-  //   }
-  //   let msg = this.siteInfo.selectMessageByKey(message);
-  //   if(msg){
-  //     $("#infoBox").html(msg.content).fadeIn();
-  //   }
-     
-    // if(!clean) {
-    //   this.productInfo = new Array();
-    //   if(this.regularClient){
-    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('REGULAR_CLIENT_MESSAGE').content).fadeIn();
-    //   } else if(this.sandBoxClient){
-    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('SANDBOX_MESSAGE').content).fadeIn();
-    //   }
-    //   if(this.existingRequest){
-    //     $("#existingRequestInfo").append(this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', moment(this.requests.requestsArray[0].dateCreated).format(this.config.DATE_FORMAT_TABLE))).fadeIn();
-    //   }
-    // } else {
-    //   if(!this.sessionSelected) {
-    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('CLIENT_REQUEST_START').content).fadeIn();
-    //   }
-    //   if(this.sessionSelected){
-    //     $("#infoBox").html(this.siteInfo.selectMessageByKey('SESSION_SELECTED').content).fadeIn();
-    //   }
-      
-    // }
-    
-  // }
-
   _cleanRequest(){
     this.request.undergraduates = 0;
     this.request.graduates = 0;
@@ -341,6 +289,7 @@ export class ViewHelpTickets {
             newObj.sessionId = this.requests.selectedRequest.sessionId;
             this.requests.selectedRequest.requestDetails.push(newObj);
             this.products.selectedProductFromId(newObj.productId);
+            this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
             var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
             if(productInfo) this.productInfo.push({
               info: productInfo,
@@ -485,6 +434,12 @@ export class ViewHelpTickets {
         if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
       })
     }
+
+    // this.requests.selectedRequest.productNames = new Array();
+    // this.requests.selectedRequest.requestDetailsToSave.forEach(item => {
+    //   this.requests.selectedRequest.productNames.push(this.getProductName(item.productId));
+    // })
+
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;
     this.requests.selectedRequest.institutionId = this.userObj.institutionId;
     this.requests.selectedRequest.sessionId = this.sessionId;
@@ -492,6 +447,10 @@ export class ViewHelpTickets {
     this.requests.selectedRequest.personId = this.userObj._id;
     this.requests.selectedRequest.requestStatus = this.config.UPDATED_REQUEST_CODE;
   }
+
+  // getProductName(id){
+  //   for(let i = 0; i < this)
+  // }
 
   async save(){
     if(this.validation.validate(1)){
@@ -510,6 +469,7 @@ export class ViewHelpTickets {
     this.requests.selectRequest();
     this.productInfo = new Array();
     this.sessionSelected = false;
+    this.typeSelected = false;
     this.sandBoxClient = false;
     this.courseSelected = false;
     this.courseId = "-1";
