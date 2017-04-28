@@ -1787,7 +1787,7 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
           return !context.duplicateAccount;
         } }, { "rule": "custom", "message": "Enter a valid email address",
         "valFunction": function valFunction(context) {
-          return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email)
+          return (/^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(context.people.selectedPerson.email)
           );
         }
       }]);
@@ -17814,7 +17814,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                 }
             }, { "rule": "custom", "message": "Enter a valid email address",
                 "valFunction": function valFunction(context) {
-                    return (/^\w+([\.-]?\ w+)*@\w+([\.-]?\ w+)*(\.\w{2,3})+$/.test(context.people.selectedPerson.email)
+                    return (/^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(context.people.selectedPerson.email)
                     );
                 }
             }]);
