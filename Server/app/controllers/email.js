@@ -294,19 +294,14 @@ if(env === 'development'){
 
   passwordReset = function(mailObject){
     logger.log("Password reset request", "verbose");    
-    // return new Promise(function(resolve, reject) {    
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;  
       mailObject.body = PasswordResetTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject;    
       sendGrid(mailObject)
-    //     .then(result => {
-    //         if (result.statusCode === 202) {     
-    //           resolve(result);
-    //         } else {
-    //           reject(Error(result));
-    //         }
-    //     })
-    // });
   }
 
 } else {
@@ -553,7 +548,11 @@ if(env === 'development'){
 
   passwordReset = function(mailObject){
     logger.log("Password reset request", "verbose"); 
-    // return new Promise(function(resolve, reject) {
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+    
       var mail = {
           from: config.emailAddress,
           to: mailObject.email,
@@ -561,15 +560,7 @@ if(env === 'development'){
           template: 'password-reset',
           context: mailObject.context
       };
-      nodeMailerSendMail(mail)
-      // .then(result => {      
-      //       if (result.rejected.length === 0) {     
-      //         resolve(result);
-      //       } else {
-      //         reject(Error(result));
-      //       }
-        // })
-    // });      
+      nodeMailerSendMail(mail)   
   }
 
 }

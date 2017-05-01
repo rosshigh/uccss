@@ -1,0 +1,19 @@
+[32minfo[39m: Polling...
+[32minfo[39m: /data/2.5/weather?q=Milwaukee&APPID=0f85bb931f8faad7e35b6f685aa4e931
+[32minfo[39m: Starting application
+[32minfo[39m: Loading Mongoose functionality
+[32minfo[39m: Attaching plugins
+[32minfo[39m: Loading models
+[32minfo[39m: Loading controllers
+[32minfo[39m: Creating HTTP server on port: 5000
+[32minfo[39m: HTTP Server listening on port: 5000 in development mode
+[32minfo[39m: Mongoose connected to the database
+statusCode:  200
+GET result:
+
+
+
+Call completed
+[36mverbose[39m: ::1 finished request
+[36mverbose[39m: Get people
+[36mverbose[39m: ::1 finished request

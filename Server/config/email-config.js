@@ -2,6 +2,7 @@
 var HOST = "http://129.89.93.81/img/"
 
 var emailConfig = {
+	UCCSS_NAME: "University of Wisconsin-Milwaukee UCCSS",
 	UCC_LOGO: HOST + 'uwm_logo.jpg',
 	UCC_PHONE: '414-229-3333', 
 	UCC_EMAIL: 'ucc@uwm.edu',
