@@ -107,9 +107,7 @@ module.exports = function (app, config) {
           Person.findById(object.personId, function(err, person){                     
             if(err){
               return next(err);
-            } else {    
-console.log("LKDFJLSDJF:LSJ")              
-console.log(person.fullName)              
+            } else {                 
               var cc = req.query.cc ? req.query.cc : "";                 
               var mailObj = {
                 name: person.fullName,
