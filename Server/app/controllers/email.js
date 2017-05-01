@@ -414,10 +414,9 @@ console.log(mail.personalizations)
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
-console.log(toEmail)      
       var mail = {
-        from: toEmail,
-        to: mailObject.email,
+        from: config.emailAddress,
+        to: toEmail,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
         context: mailObject.context
