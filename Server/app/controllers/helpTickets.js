@@ -107,10 +107,12 @@ module.exports = function (app, config) {
           Person.findById(object.personId, function(err, person){                     
             if(err){
               return next(err);
-            } else {                    
+            } else {    
+              var cc = req.query.cc ? req.query.cc : "";                 
               var mailObj = {
                 name: person.fullName,
                 email: person.email,
+                cc: cc,
                 context: object
               }             
               helpTicketCreated(mailObj); 

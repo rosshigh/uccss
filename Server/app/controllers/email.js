@@ -82,7 +82,23 @@ if(env === 'development'){
         var from_email = new helper.Email(config.emailAddress);
         var to_email = new helper.Email(mailObject.email);
         var content = new helper.Content('text/html', mailObject.body);
+
         var mail = new helper.Mail(from_email, mailObject.subject, to_email, content);
+
+        if(mailObject.cc && mailObject.cc.length > 0){
+          var ccArray = mailObject.cc.split(';');
+          if(ccArray && ccArray.length > 0){
+            var personalization = new helper.Personalization()
+            ccArray.forEach(item => {
+console.log(item)              
+              personalization.addCc(new helper.Email(item));
+            })
+          }
+          mail.addPersonalization(personalization);
+console.log(mail.personalizations)          
+        }
+
+        
         var request = sg.emptyRequest({
           method: 'POST',
           path: '/v3/mail/send',
@@ -227,6 +243,7 @@ if(env === 'development'){
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.cc = cc;
       mailObject.body = RequestCreatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
@@ -396,24 +413,17 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-      // return new Promise(function(resolve, reject) {
-        var mail = {
-          from: config.emailAddress,
-          to: mailObject.email,
-          subject: 'Help Ticket Created',
-          template: 'help-ticket-created',
-          context: mailObject.context
-        };
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+console.log(toEmail)      
+      var mail = {
+        from: toEmail,
+        to: mailObject.email,
+        subject: 'Help Ticket Created',
+        template: 'help-ticket-created',
+        context: mailObject.context
+      };
 
-        nodeMailerSendMail(mail)
-        // .then(result => {      
-        //       if (result.rejected.length === 0) {     
-        //         resolve(result);
-        //       } else {
-        //         reject(Error(result));
-        //       }
-          // })
-    // });
+      nodeMailerSendMail(mail)  
   }
 
   helpTicketUpdated = function(mailObject){
@@ -471,6 +481,7 @@ if(env === 'development'){
             to: mailObject.email,
             subject: 'Product Request Created',
             template: 'client-request-created',
+            cc: mailObject.cc,
             context: mailObject.context
         };
 

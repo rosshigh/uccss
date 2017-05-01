@@ -404,6 +404,7 @@ export class AppConfig {
         this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
         this.SEND_EMAILS = this.getParameter('SEND_EMAILS');
         this.TEMP_SCALE = this.getParameter('TEMP_SCALE');
+        this.HELP_TICKET_EMAIL_LIST = this.getParameter('HELP_TICKET_EMAIL_LIST');
     }
 
     getParameter(parameter){

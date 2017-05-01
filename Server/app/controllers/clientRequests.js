@@ -134,9 +134,11 @@ module.exports = function (app) {
                       numStudents: parseInt(clientRequest.undergradIds) + parseInt(clientRequest.graduateIds),
                       requestNo: clientRequest.clientRequestNo,
                       comments: clientRequest.comments
-                    }                   
+                    }                  
+                    var cc = req.query.cc ? req.query.cc : ""; 
                     var mailObj = {
                       email: person.email,
+                      cc: cc,
                       context: context
                     }                   
                     requestCreated(mailObj) 

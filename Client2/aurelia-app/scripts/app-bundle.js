@@ -485,6 +485,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
             this.SEND_EMAILS = this.getParameter('SEND_EMAILS');
             this.TEMP_SCALE = this.getParameter('TEMP_SCALE');
+            this.HELP_TICKET_EMAIL_LIST = this.getParameter('HELP_TICKET_EMAIL_LIST');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
@@ -7392,16 +7393,19 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 url = this.data.HELP_TICKET_SERVICES;
 
                                 if (email) url += '?email=1';
+                                if (this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+                                    url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
+                                }
 
                                 if (this.selectedHelpTicket._id) {
-                                    _context7.next = 12;
+                                    _context7.next = 13;
                                     break;
                                 }
 
-                                _context7.next = 7;
+                                _context7.next = 8;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
-                            case 7:
+                            case 8:
                                 response = _context7.sent;
 
                                 if (!response.error) {
@@ -7412,11 +7416,11 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context7.abrupt('return', response);
 
-                            case 12:
-                                _context7.next = 14;
+                            case 13:
+                                _context7.next = 15;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "put");
 
-                            case 14:
+                            case 15:
                                 response = _context7.sent;
 
                                 if (!response.error) {
@@ -7427,7 +7431,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context7.abrupt('return', response);
 
-                            case 17:
+                            case 18:
                             case 'end':
                                 return _context7.stop();
                         }

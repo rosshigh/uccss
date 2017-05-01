@@ -195,6 +195,9 @@ export class HelpTickets {
         }
         var url = this.data.HELP_TICKET_SERVICES;
         if(email) url += '?email=1';
+         if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+            url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
+        }
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
