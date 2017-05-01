@@ -108,6 +108,8 @@ module.exports = function (app, config) {
             if(err){
               return next(err);
             } else {    
+console.log("LKDFJLSDJF:LSJ")              
+console.log(person.fullName)              
               var cc = req.query.cc ? req.query.cc : "";                 
               var mailObj = {
                 name: person.fullName,
