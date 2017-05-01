@@ -413,7 +413,6 @@ console.log(mail.personalizations)
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-      mailObject.context.name = mailObject.name;
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       var mail = {
         from: config.emailAddress,

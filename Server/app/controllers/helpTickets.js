@@ -108,12 +108,12 @@ module.exports = function (app, config) {
             if(err){
               return next(err);
             } else {                 
-              var cc = req.query.cc ? req.query.cc : "";                 
+              var cc = req.query.cc ? req.query.cc : "";   
+              var context = {helpticket: object, name: person.fullName}              
               var mailObj = {
-                name: person.fullName,
                 email: person.email,
                 cc: cc,
-                context: object
+                context: context
               }             
               helpTicketCreated(mailObj); 
               res.status(200).json(object);           
