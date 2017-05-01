@@ -247,7 +247,25 @@ module.exports = function (app, config) {
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
     .then(result => {
-        res.status(200).json(result);
+        if(req.query.email == 1){        
+          Person.findById(result.personId, function(err, person){                     
+            if(err){
+              return next(err);
+            } else {                 
+              var cc = req.query.cc ? req.query.cc : "";   
+              var context = {helpticket: object, name: person.fullName}              
+              var mailObj = {
+                email: person.email,
+                cc: cc,
+                context: context
+              }             
+              helpTicketUpdated(mailObj); 
+              res.status(200).json(result);           
+            }
+          })
+        } else {
+          res.status(200).json(result);
+        }
       })
       .catch(error => {
         return next(error);

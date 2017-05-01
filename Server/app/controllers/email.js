@@ -431,24 +431,20 @@ console.log(mail.personalizations)
 
   helpTicketUpdated = function(mailObject){
       logger.log("Help Ticket Update email", "verbose");
-      //  return new Promise(function(resolve, reject) {
-          var mail = {
-              from: config.emailAddress,
-              to: mailObject.email,
-              subject: 'Help Ticket Updated',
-              template: 'help-ticket-updated',
-              context: mailObject.context
-            };
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+      var mail = {
+          from: config.emailAddress,
+          to: toEmail,
+          subject: 'Help Ticket Updated',
+          template: 'help-ticket-updated',
+          context: mailObject.context
+      };
 
-          nodeMailerSendMail(mail)
-      //     .then(result => {      
-      //           if (result.rejected.length === 0) {     
-      //             resolve(result);
-      //           } else {
-      //             reject(Error(result));
-      //           }
-      //       })
-      //  });
+      nodeMailerSendMail(mail);
   }
 
   helpTicketClosed = function(mailObject){
