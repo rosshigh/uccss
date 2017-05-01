@@ -253,7 +253,7 @@ module.exports = function (app, config) {
               return next(err);
             } else {                 
               var cc = req.query.cc ? req.query.cc : "";   
-              var context = {helpticket: object, name: person.fullName}              
+              var context = {helpticket: result, name: person.fullName}              
               var mailObj = {
                 email: person.email,
                 cc: cc,
