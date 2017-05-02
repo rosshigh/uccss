@@ -53,11 +53,12 @@ if(env === 'development'){
   var sg = require('sendgrid')(config.sg_key);
 
   var viewPath = path.resolve(__dirname, '../views');
-  var HelpTicketCreateTemplate = fs.readFileSync(viewPath + "/help-ticket-created.handlebars", 'utf-8');
   var WelcomeTemplate = fs.readFileSync(viewPath + "/welcome.handlebars", 'utf-8');
   var FacoCoWelcomeTemplate = fs.readFileSync(viewPath + "/facco-welcome.handlebars", 'utf-8');
   var CustomerActionTemplate = fs.readFileSync(viewPath + "/client-request-customer-action.handlebars", "utf-8");
   var GenericTemplate = fs.readFileSync(viewPath + "/generic.handlebars", "utf-8");
+  var HelpTicketCreateTemplate = fs.readFileSync(viewPath + "/help-ticket-created.handlebars", 'utf-8');
+  var HelpTicketCreateStaffTemplate = fs.readFileSync(viewPath + "/help-ticket-staff-created.handlebars", 'utf-8');
   var HelpTicketUpdatedTemplate = fs.readFileSync(viewPath + "/help-ticket-updated.handlebars", "utf-8");
   var HelpTicketClosedTemplate = fs.readFileSync(viewPath + "/help-ticket-closed.handlebars", "utf-8");
   var RequestUpdatedTemplate = fs.readFileSync(viewPath + "/client-request-updated.handlebars", "utf-8");
@@ -65,6 +66,7 @@ if(env === 'development'){
   var RequestCreatedTemplate = fs.readFileSync(viewPath + "/client-request-created.handlebars", "utf-8");
 
   var HelpTicketCreateTemplateCompiled = hbs.compile(HelpTicketCreateTemplate);
+  var HelpTicketCreateStaffTemplateCompiled = hbs.compile(HelpTicketCreateStaffTemplate);
   var WelcomeTemplateCompiled = hbs.compile(WelcomeTemplate);
   var FacoCoWelcomeTemplateCompiled = hbs.compile(FacoCoWelcomeTemplate);
   var CustomerActionTemplateCompiled = hbs.compile(CustomerActionTemplate);
@@ -73,7 +75,7 @@ if(env === 'development'){
   var RequestUpdatedTemplateCompiled = hbs.compile(RequestUpdatedTemplate);
   var PasswordResetTemplateCompiled = hbs.compile(PasswordResetTemplate);
   var HelpTicketClosedTemplateCompiled = hbs.compile(HelpTicketClosedTemplate);
-   var RequestCreatedTemplateCompiled = hbs.compile(RequestCreatedTemplate);
+  var RequestCreatedTemplateCompiled = hbs.compile(RequestCreatedTemplate); 
 
   sendGrid = function(mailObject){
     mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>'); 
@@ -84,20 +86,6 @@ if(env === 'development'){
         var content = new helper.Content('text/html', mailObject.body);
 
         var mail = new helper.Mail(from_email, mailObject.subject, to_email, content);
-
-        if(mailObject.cc && mailObject.cc.length > 0){
-          var ccArray = mailObject.cc.split(';');
-          if(ccArray && ccArray.length > 0){
-            var personalization = new helper.Personalization()
-            ccArray.forEach(item => {
-console.log(item)              
-              personalization.addCc(new helper.Email(item));
-            })
-          }
-          mail.addPersonalization(personalization);
-console.log(mail.personalizations)          
-        }
-
         
         var request = sg.emptyRequest({
           method: 'POST',
@@ -188,19 +176,22 @@ console.log(mail.personalizations)
 
   helpTicketCreated = function(mailObject){
     logger.log("Help Ticket Created email", "verbose");
-    // return new Promise(function(resolve, reject) {
-      mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
-      mailObject.email = mailObject.email;
-      mailObject.subject = 'Help Ticket Created';      
+    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
+
+    mailObject.body = HelpTicketCreateTemplateCompiled(mailObject.context);
+    mailObject.email = mailObject.email;
+    mailObject.subject = 'Help Ticket Created';      
+    sendGrid(mailObject)
+
+    if(mailObject.cc) {       
+      mailObject.body = HelpTicketCreateStaffTemplateCompiled(mailObject.context);
+      mailObject.email = mailObject.cc;      
       sendGrid(mailObject)
-      // .then(result => {
-      //         if (result.statusCode === 202) {     
-      //           resolve(result);
-      //         } else {
-      //           reject(Error(result));
-      //         }
-      //     })
-    // });
+    }
   }
 
   helpTicketUpdated = function(mailObject){
@@ -413,20 +404,26 @@ console.log(mail.personalizations)
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+     
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
         from: config.emailAddress,
-        to: toEmail,
+        to: mailObject.email,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
         context: mailObject.context
       };
 
       nodeMailerSendMail(mail)  
+      
+      if(mail.cc) {       
+        mail.template = 'help-ticket-staff-created',
+        mail.to = mail.cc;      
+        nodeMailerSendMail(mail)  
+      }
   }
 
   helpTicketUpdated = function(mailObject){

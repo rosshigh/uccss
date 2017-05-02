@@ -300,7 +300,17 @@ export class CreateHelpTickets{
     async save(){
         if(this.validation.validate(1)){ //this.helpTickets.selectedHelpTicket.helpTicketType
             await this.buldHelpTicket();
-            let serverResponse = await this.helpTickets.saveHelpTicket(this.sendEmail);
+            var email = new Object();
+            if(this.sendEmail){
+                email.reason = this.config.HELP_TICKET_EMAIL_CREATE;
+                email.fullName = this.userObj.fullName;
+                email.email = this.userObj.email;
+                email.helpTicketNo = 0;
+                email.helpTicketContext = this.buildHelpTicketContext();
+                email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+            } 
+
+            let serverResponse = await this.helpTickets.saveHelpTicket(email);
             if (!serverResponse.status) {
                 this.utils.showNotification("The help ticket was created");
                 if (this.filesToUpload && this.filesToUpload.length > 0) {
@@ -311,11 +321,20 @@ export class CreateHelpTickets{
         }
     }
 
+    buildHelpTicketContext(){
+        var obj = new Object()
+        
+        obj.type = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].description;
+        obj.subtype = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].description;
+
+        return obj;
+    }
+
     _cleanUp(){
         this.showTypes = false;
         this.helpTicketTypeMessage = undefined;
         // this.showHelpTicketDescription = false;
-        this.clientRequests = new Array();
+        // this.clientRequests = new Array();
         // this.showRequests = false;
         this.showAdditionalInfo = false;
         this.helpTickets.selectHelpTicket();

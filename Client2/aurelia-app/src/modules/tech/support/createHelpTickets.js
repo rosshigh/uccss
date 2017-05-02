@@ -296,13 +296,15 @@ export class CreateHelpTickets{
     // * Save the help ticket
     // *****************************************************************************************/
     async save(){
-        if(this.validation.validate(1)){ //this.helpTickets.selectedHelpTicket.helpTicketType
+        if(this.validation.validate(1)){ 
             await this.buldHelpTicket();
-            let serverResponse = await this.helpTickets.saveHelpTicket(this.sendEmail);
-            if (!serverResponse.status) {
+            var email = this.sendEmail ? 1 : 0;
+            let serverResponse = await this.helpTickets.saveHelpTicket(email);
+            if (!serverResponse.status) { 
                 this.utils.showNotification("The help ticket was created");
                 if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files,serverResponse.content[0]._id);
             }
+            
             this._cleanUp();
         }
     }

@@ -95,39 +95,19 @@ module.exports = function (app, config) {
       })
   });
 
-  router.post('/api/helpTickets', requireAuth, function(req, res, next){
-    writeLog.log('Create HelpTicket', "verbose");
+  router.post('/api/helpTickets/', requireAuth, function(req, res, next){
+    writeLog.log('Create HelpTicket', "verbose");   
     var helpTicket =  new Model(req.body);
     helpTicket.save( function ( err, object ){
       if (err) {
         return next(err);
       } else {          
-
-        if(req.query.email == 1){        
-          Person.findById(object.personId, function(err, person){                     
-            if(err){
-              return next(err);
-            } else {                 
-              var cc = req.query.cc ? req.query.cc : "";
-              var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}  
-              // var context = {helpticket: object, name: person.fullName}              
-              var mailObj = {
-                email: person.email,
-                cc: cc,
-                context: context
-              }             
-              helpTicketCreated(mailObj); 
-              res.status(200).json(object);           
-            }
-          })
-        } else {
-          res.status(200).json(object);
-        }
+        res.status(200).json(object);
       }
     });
   });
 
-  router.put('/api/helpTickets/content/:id/:status', requireAuth, function(req, res, next){
+  router.put('/api/helpTickets/content/:id/:email', requireAuth, function(req, res, next){
     writeLog.log('Update HelpTicket ' + req.body._id, 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {
@@ -139,9 +119,17 @@ module.exports = function (app, config) {
           if(err){
             return next(err);
           } else {         
-            if(req.body.emailSent && !req.body.confidential){        
+            if(req.body.emailSent && !req.body.confidential){       
+               if(req.query.email && req.query.email > 0){     
+                  sendEmail(req,  object.personId, object);
+                  res.status(200).json(object); 
+                } else {
+                  res.status(200).json(object);
+                } 
               Person.findById(result.personId).exec()
                 .then(person => {
+
+
                   var cc = req.query.cc ? req.query.cc : "";   
                   var context = {helpTicketNo: result.helpTicketNo, name: person.fullName}              
                   var mailObj = {
@@ -235,31 +223,16 @@ module.exports = function (app, config) {
       })
   });
 
-  router.put('/api/helpTickets', requireAuth, function(req, res, next){
+  router.put('/api/helpTickets/:email', requireAuth, function(req, res, next){
     writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
     .then(result => {
-        if(req.query.email == 1){        
-          Person.findById(result.personId, function(err, person){                     
-            if(err){
-              return next(err);
-            } else {                             
-              var cc = req.query.cc ? req.query.cc : "";   
-              var context = {helpticket: result, name: person.fullName}              
-              var mailObj = {
-                email: person.email,
-                cc: cc,
-                context: context
-              }             
-              helpTicketUpdated(mailObj); 
-              res.status(200).json(result);           
-            }
-          })
-        } else {
-          res.status(200).json(result);
+        if(req.params.email > 1){                                          
+          helpTicketUpdated(req, result.personId, result);    
         }
+        res.status(200).json(result); 
       })
       .catch(error => {
         return next(error);
@@ -306,6 +279,26 @@ module.exports = function (app, config) {
         return next(error);
       })
   });
+
+  router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){
+    writeLog.log("Send email to " + req.body.email, 'verbose');
+
+    if(req.body){
+       switch(req.body.reason){
+         case 1: //help ticket created
+           var cc = req.query.cc ? req.query.cc : "";
+          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, helpTicketContext: req.body.helpTicketContext}            
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context
+          }                                 
+          helpTicketCreated(mailObj);
+          break;
+       }
+    }
+    res.status(201).json({message: "Email sent"});
+  })
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -468,3 +461,35 @@ module.exports = function (app, config) {
   });
 
 };
+
+sendEmail= function(req, personId, object){
+console.log(req.params.email)  
+  Person.findById(personId, function(err, person){                     
+    if(err){
+      return next(err);
+    } else {       
+        switch(req.params.email) {
+          case "1": //Email created
+            var cc = req.query.cc ? req.query.cc : "";
+            var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}            
+            var mailObj = {
+              email: person.email,
+              cc: cc,
+              context: context
+            }                        
+            helpTicketCreated(mailObj);
+            break;
+          case "6": //Email closed by tech staff
+            // var cc = req.query.cc ? req.query.cc : "";   
+            var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}              
+            var mailObj = {
+              email: person.email,
+              // cc: cc,
+              context: context
+            }         
+            helpTicketClosed(mailObj)
+            break;
+        }
+    }
+  })
+}

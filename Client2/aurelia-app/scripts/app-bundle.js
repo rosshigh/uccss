@@ -341,6 +341,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.CUSTOMER_ACTION_HELPTICKET_STATUS = 4;
             this.REPLIED_HELPTICKET_STATUS = 5;
             this.CLOSED_HELPTICKET_STATUS = 6;
+            this.HELP_TICKET_EMAIL_CREATE = 1;
             this.HELP_TICKET_STATUSES = [{
                 "code": this.NEW_HELPTICKET_STATUS,
                 "description": "New"
@@ -7010,6 +7011,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
             this.HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
             this.HELP_TICKET_TYPES = "helpTicketsTypes";
+            this.HELP_TICKET_EMAIL = "helpTickets/sendMail";
 
             this.data = data;
             this.utils = utils;
@@ -7392,23 +7394,20 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                             case 2:
                                 url = this.data.HELP_TICKET_SERVICES;
 
-                                if (email) url += '?email=1';
-                                if (this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
-                                    url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
-                                }
-
                                 if (this.selectedHelpTicket._id) {
-                                    _context7.next = 13;
+                                    _context7.next = 11;
                                     break;
                                 }
 
-                                _context7.next = 8;
+                                _context7.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "post");
 
-                            case 8:
+                            case 6:
                                 response = _context7.sent;
 
                                 if (!response.error) {
+                                    email.helpTicketNo = response.helpTicketNo;
+                                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     this.selectedHelpTicket = this.utils.copyObject(response);
                                     if (this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
                                 } else {
@@ -7416,11 +7415,11 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context7.abrupt('return', response);
 
-                            case 13:
-                                _context7.next = 15;
+                            case 11:
+                                _context7.next = 13;
                                 return this.data.saveObject(this.selectedHelpTicket, url, "put");
 
-                            case 15:
+                            case 13:
                                 response = _context7.sent;
 
                                 if (!response.error) {
@@ -7431,7 +7430,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context7.abrupt('return', response);
 
-                            case 18:
+                            case 16:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -7458,9 +7457,9 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                     break;
                                 }
 
-                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", email);
 
-                                if (email) url += '?email=1';
+                                url = email ? url + "/" + email : url + "/" + 0;
                                 if (this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
                                     url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
                                 }
@@ -25370,13 +25369,13 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
 
         CreateHelpTickets.prototype.save = function () {
             var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var serverResponse;
+                var email, serverResponse;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context6.next = 8;
+                                    _context6.next = 9;
                                     break;
                                 }
 
@@ -25384,19 +25383,21 @@ define('modules/tech/support/createHelpTickets',['exports', 'aurelia-framework',
                                 return this.buldHelpTicket();
 
                             case 3:
-                                _context6.next = 5;
-                                return this.helpTickets.saveHelpTicket(this.sendEmail);
+                                email = this.sendEmail ? 1 : 0;
+                                _context6.next = 6;
+                                return this.helpTickets.saveHelpTicket(email);
 
-                            case 5:
+                            case 6:
                                 serverResponse = _context6.sent;
 
                                 if (!serverResponse.status) {
                                     this.utils.showNotification("The help ticket was created");
                                     if (this.files && this.files.length > 0) this.helpTickets.uploadFile(this.files, serverResponse.content[0]._id);
                                 }
+
                                 this._cleanUp();
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -28344,13 +28345,13 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
         CreateHelpTickets.prototype.save = function () {
             var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var serverResponse;
+                var email, serverResponse;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context7.next = 8;
+                                    _context7.next = 10;
                                     break;
                                 }
 
@@ -28358,10 +28359,21 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 return this.buldHelpTicket();
 
                             case 3:
-                                _context7.next = 5;
-                                return this.helpTickets.saveHelpTicket(this.sendEmail);
+                                email = new Object();
 
-                            case 5:
+                                if (this.sendEmail) {
+                                    email.reason = this.config.HELP_TICKET_EMAIL_CREATE;
+                                    email.fullName = this.userObj.fullName;
+                                    email.email = this.userObj.email;
+                                    email.helpTicketNo = 0;
+                                    email.helpTicketContext = this.buildHelpTicketContext();
+                                    email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                                }
+
+                                _context7.next = 7;
+                                return this.helpTickets.saveHelpTicket(email);
+
+                            case 7:
                                 serverResponse = _context7.sent;
 
                                 if (!serverResponse.status) {
@@ -28372,7 +28384,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 }
                                 this._cleanUp();
 
-                            case 8:
+                            case 10:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -28387,11 +28399,18 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
             return save;
         }();
 
+        CreateHelpTickets.prototype.buildHelpTicketContext = function buildHelpTicketContext() {
+            var obj = new Object();
+
+            obj.type = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].description;
+            obj.subtype = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].description;
+
+            return obj;
+        };
+
         CreateHelpTickets.prototype._cleanUp = function _cleanUp() {
             this.showTypes = false;
             this.helpTicketTypeMessage = undefined;
-
-            this.clientRequests = new Array();
 
             this.showAdditionalInfo = false;
             this.helpTickets.selectHelpTicket();
@@ -36965,7 +36984,7 @@ define('text!modules/user/components/userHelpTickets.html', ['module'], function
 define('text!modules/user/requests/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Product Requests</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n    \n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/user/requests/createRequests.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"fuelux/css/fuelux.min.css\"></require>\n<require from=\"flatpickr/flatpickr.css\"></require>\n<div class=\"row\">\n <span  show.bind=\"showLockMessage\" class=\"leftMargin bottomMargin\" >Request is currently locked by ${lockObject.personId | person:people.peopleArray:'fullName'}</span>\n \n</div>\n  <div class=\"fuelux col-lg-7 blackText\" style=\"height:1000px;\">\n    <div class=\"wizard\" data-initialize=\"wizard\" id=\"myWizard\">\n      <div class=\"steps-container\">\n        <ul class=\"steps\">\n          <li data-step=\"1\"  data-target=\"#step1\" class=\"active\">\n            <span class=\"badge badge-info\">1</span>Step 1<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"2\" data-target=\"#step2\">\n            <span class=\"badge\">2</span>Step 2<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"3\" data-target=\"#step3\">\n            <span class=\"badge\">3</span>Step 3<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"4\" data-target=\"#step4\">\n            <span class=\"badge\">4</span>Step 4<span class=\"chevron\"></span>\n          </li>\n        </ul>\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn btn-default btn-prev btn-md\">\n           <span><i class=\"fa fa-chevron-left\" aria-hidden=\"true\"></i></span>Prev</button>\n        <button type=\"button\" class=\"btn btn-primary btn-next btn-md\" data-last=\"Complete\">Next\n          <span><i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i></span>\n        </button>\n      </div>\n      <div class=\"step-content\">\n\n        <div class=\"step-pane active\" id=\"step1\" data-step=\"1\">\n          <h3><strong>Step 1 </strong> - Course Information</h3>\n          <compose view=\"./components/client-request-step1.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step2\"  data-step=\"2\">\n          <h3><strong>Step 2 </strong> - Products</h3>\n\n          <compose view=\"./components/client-request-step2.html\"></compose>\n\n        </div>\n\n        <div class=\"step-pane\" id=\"step3\"  data-step=\"3\">\n          <h3><strong>Step 3 </strong> - Additional Comments</h3>\n          <compose view=\"./components/client-request-step3.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step4\"  data-step=\"4\">\n          <h3><strong>Step 4 </strong> - Requested Dates!</h3>\n          <compose view=\"./components/client-request-step4.html\"></compose>\n        </div>\n\n      </div>\n    </div>\n  </div>\n  <div class=\"col-lg-4 leftMargin\" id=\"SessionInfo\">\n\t\t\t<h2 class=\"underline\">Current Sessions</h2>\n\t\t\t<div class=\"list-group\">\n\t\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray\">\n\t\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\n\t\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t</a>\n    </div>\n  </div>\n  <div show.bind=\"sessionSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Session: ${sessions.selectedSession.session} - ${sessions.selectedSession.year}</h4></div> \n  <div show.bind=\"sandBoxClient\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${config.SANDBOX_NAME}</h4></div> \n  <div show.bind=\"courseSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> \n  <div class=\"topMargin col-lg-4 leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n\n  <div id=\"curriculumInfo\" class=\"topMargin col-lg-4 leftMargin\" >\n    <div class=\"panel panel-default\" >\n      <div class=\"panel-heading\">${productInfoObject.header}</div>\n      <div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\n    </div>\n  </div>\n</div>\n  \n</template>\n"; });
 define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n        </div>\n      </div> \n</template>"; });
-define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n           <!-- \n            <compose view='./components/Courses.html' show.bind=\"helpTickets.helpTicketTypesArray[helpTicketType].subtypes[selectedHelpTicketType].clientRequired\"></compose>\n         -->\n            <compose view='./components/Requests.html' show.bind=\"requestsRequired\"></compose>\n           \n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
+define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n\n            <compose show.bind=\"helpTicketType != 'NULL'\" view='./components/Requests.html' show.bind=\"requestsRequired\"></compose>\n           \n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo && helpTicketType != 'NULL'\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/user/support/currInfo.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-3\">\n\t\t<h4>Curriculum Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"category of curriculum.curriculumCatArray\"\n\t\t\t\t\tid=\"${category.name}\" class=\"list-group-item\">${category.name}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n\t<div class=\"col-lg-9\">\n\t\t<div show.bind=\"typeSelected != '' && !curriculumSelected\" style='padding:15px;'>\n\t\t\t<div class='row'>\n\t\t\t\t<div class='col-lg-12 bottomMargin'>\n\t\t\t\t\t<table id=\"newsTable\" class=\"table table-striped table-hover\">\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td colspan='4'>\n\t\t\t\t\t\t\t\t\t<compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th>Title </th>\n\t\t\t\t\t\t\t\t<th>Rating</th>\n\t\t\t\t\t\t\t\t<th>Rate It</th>\n\t\t\t\t\t\t\t\t<th>Products</th>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr repeat.for=\"curriculum of curriculumArray\">\n\t\t\t\t\t\t\t\t<td click.delegate=\"selectCurriculum(curriculum)\" data-title=\"Title\" class=\"col-lg-6\">${curriculum.title}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\">${curriculum.rating | formatDigits:2}</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\" class=\"col-lg-2\">\n\t\t\t\t\t\t\t\t\t<rate-it id=\"${curriculum._id}\" change.delegate=\"rateCurriculum($event)\" rating.two-way=\"curriculum.rating\" raters.bind=\"curriculum.raters\"></rate-it>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td data-title=\"Products\" class=\"col-lg-4\">\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<li repeat.for=\"product of curriculum.products\" class=\"list-group-item\">${product | productName:products.productsArray}</li>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t</table>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div show.bind=\"curriculumSelected\">\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"add()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Add Comment\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"panel panel-default leftMargin rightMargin\">\n\t\t\t\t <div class=\"panel-heading\">\n\t\t\t\t\t<h3 class=\"panel-title\">${curriculum.selectedCurriculum.title}</h3>\n\t\t\t\t</div>\n\t\t\t\t\t<div show.bind=\"curriculum.selectedCurriculum.description.length > 0\" class=\"panel-body\" innerhtml.bind=\"curriculum.selectedCurriculum.description\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"addComment\">\n\t\t\t\t<h3>Comments are not anonymous</h3>\n\t\t\t\t <editor value.bind=\"comment\" height=\"250\"></editor>\n\t\t\t</div>\n\t\t\t<div class=\"well well-sm topMargin leftMargin rightMargin\" show.bind=\"curriculum.selectedCurriculum.customerComments.length > 0\">\n\t\t\t\t<!-- Timeline Content -->\n\t\t\t\t<div class=\"smart-timeline\">\n\t\t\t\t\t<ul class=\"smart-timeline-list\">\n\t\t\t\t\t\t<li  repeat.for=\"comment of curriculum.selectedCurriculum.customerComments\">\n\t\t\t\t\t\t\t<compose view=\"./components/comment.html\"></compose>\n\t\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n</template>"; });
 define('text!modules/user/support/downloads.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n          <div class=\"col-lg-3\">\n\t\t<h4>Download Categories</h4>\n\t\t<div>\n\t\t\t<ul class=\"list-group\">\n\t\t\t\t<button click.trigger=\"typeChanged($event, $index)\" type=\"button\" repeat.for=\"type of downloads.appCatsArray\" id=\"${type.downCatcode}\"\n\t\t\t\t\tclass=\"list-group-item\">${type.description}</button>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n       \n\n        <div show.bind=\"typeSelected != ''\" class=\"col-lg-9\" style='padding:15px;'>\n            <div class='row'>\n                <div class='col-lg-12 bottomMargin'>\n                    <table id=\"newsTable\" class=\"table table-striped table-hover\">\n                        <thead>\n                            <tr>\n                                <td colspan='3'>\n                                    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th >Name </th>\n                                <th>File</th>\n                                <th >Decription</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr repeat.for=\"item of dataTable.displayArray\">\n                                <td data-title=\"name\" class=\"col-md-2\">${item.name}</td>\n                                <td data-title=\"originalFilename\" class=\"col-md-2\">\n                                    <a href=\"${config.DOWNLOAD_FILE_DOWNLOAD_URL}/${typeSelected}/${item.file.originalFilename}\" target=\"_blank\">${item.file.originalFilename}</a>\n                                </td>\n                                <td data-title=\"description\" class=\"col-md-8\">\n                                    <div>${item.description}</div>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n   </div>\n</template>"; });
 define('text!modules/user/support/support.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Support</a>\n            </div>\n            <div class=\"collapse navbar-collapse col-lg-8\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });

@@ -283,6 +283,8 @@ export class AppConfig {
     REPLIED_HELPTICKET_STATUS = 5;
     CLOSED_HELPTICKET_STATUS = 6;
 
+    HELP_TICKET_EMAIL_CREATE = 1;
+
     HELP_TICKET_STATUSES = [
         {
             "code": this.NEW_HELPTICKET_STATUS,

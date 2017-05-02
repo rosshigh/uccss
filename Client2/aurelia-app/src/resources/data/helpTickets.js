@@ -13,6 +13,7 @@ export class HelpTickets {
     HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
     HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
     HELP_TICKET_TYPES = "helpTicketsTypes";
+    HELP_TICKET_EMAIL = "helpTickets/sendMail";
 
     constructor(data, utils, config) {
         this.data = data;
@@ -194,13 +195,15 @@ export class HelpTickets {
             return;
         }
         var url = this.data.HELP_TICKET_SERVICES;
-        if(email) url += '?email=1';
-        if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
-            url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
-        }
+        // url = email ? url + "/" + email  : url + "/" + 0;
+        // if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+        //     url += "?cc=" + this.config.HELP_TICKET_EMAIL_LIST;
+        // }
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
+                email.helpTicketNo = response.helpTicketNo;
+                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 if(this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
             } else {
@@ -222,8 +225,8 @@ export class HelpTickets {
 
     async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
-            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
-            if(email) url += '?email=1';
+            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", email);
+             url = email ? url + "/" + email  : url + "/" + 0;
             if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
                 url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
             }
