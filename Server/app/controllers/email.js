@@ -450,24 +450,21 @@ console.log(mail.personalizations)
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
-    //  return new Promise(function(resolve, reject) {
+    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.HOST = emailConfig.HOST;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
      var mail = {
           from: config.emailAddress,
-          to: mailObject.email,
+          to: toEmail,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
           context: mailObject.context
       };
 
-      nodeMailerSendMail(mail)
-    //   .then(result => {      
-    //             if (result.rejected.length === 0) {     
-    //               resolve(result);
-    //             } else {
-    //               reject(Error(result));
-    //             }
-    //         })
-    // });   
+      nodeMailerSendMail(mail); 
   }
 
   requestCreated = function(mailObject){
