@@ -251,7 +251,8 @@ module.exports = function (app, config) {
           Person.findById(result.personId, function(err, person){                     
             if(err){
               return next(err);
-            } else {                 
+            } else {    
+console.log(result)                           
               var cc = req.query.cc ? req.query.cc : "";   
               var context = {helpticket: result, name: person.fullName}              
               var mailObj = {
