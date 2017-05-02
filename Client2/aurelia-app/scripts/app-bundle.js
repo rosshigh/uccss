@@ -7454,17 +7454,20 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 if (!this.selectedHelpTicket._id) {
-                                    _context8.next = 8;
+                                    _context8.next = 9;
                                     break;
                                 }
 
                                 url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
 
                                 if (email) url += '?email=1';
-                                _context8.next = 5;
+                                if (this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+                                    url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
+                                }
+                                _context8.next = 6;
                                 return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
 
-                            case 5:
+                            case 6:
                                 response = _context8.sent;
 
                                 if (!response.error) {
@@ -7475,7 +7478,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context8.abrupt('return', response);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context8.stop();
                         }

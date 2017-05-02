@@ -195,7 +195,7 @@ export class HelpTickets {
         }
         var url = this.data.HELP_TICKET_SERVICES;
         if(email) url += '?email=1';
-         if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+        if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
             url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
         }
         if(!this.selectedHelpTicket._id){
@@ -224,6 +224,9 @@ export class HelpTickets {
         if(this.selectedHelpTicket._id) {
             var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
             if(email) url += '?email=1';
+            if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
+                url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
+            }
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
                     this.selectedHelpTicket.content.push(response);

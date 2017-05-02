@@ -108,8 +108,9 @@ module.exports = function (app, config) {
             if(err){
               return next(err);
             } else {                 
-              var cc = req.query.cc ? req.query.cc : "";   
-              var context = {helpticket: object, name: person.fullName}              
+              var cc = req.query.cc ? req.query.cc : "";
+              var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}  
+              // var context = {helpticket: object, name: person.fullName}              
               var mailObj = {
                 email: person.email,
                 cc: cc,
@@ -141,26 +142,19 @@ module.exports = function (app, config) {
             if(req.body.emailSent && !req.body.confidential){        
               Person.findById(result.personId).exec()
                 .then(person => {
+                  var cc = req.query.cc ? req.query.cc : "";   
+                  var context = {helpTicketNo: result.helpTicketNo, name: person.fullName}              
                   var mailObj = {
-                      email: person.email,
-                      context: {name: person.fullName, helpTicketNo: result.helpTicketNo}
-                    }       
+                    email: person.email,
+                    cc: cc,
+                    context: context
+                  }         
                     if(req.params.status == 6){
                       helpTicketClosed(mailObj)
-                        // .then(result => {
-                            res.status(200).json(content);
-                        // })
-                        // .catch(error => {
-                        //     return next(error);
-                        // });  
+                      res.status(200).json(content);
                     } else {
                       helpTicketUpdated(mailObj)
-                        // .then(result => {
-                            res.status(200).json(content);
-                        // })
-                        // .catch(error => {
-                        //     return next(error);
-                        // });  
+                      res.status(200).json(content);
                     }     
                 })
                 .catch(error => {
@@ -251,8 +245,7 @@ module.exports = function (app, config) {
           Person.findById(result.personId, function(err, person){                     
             if(err){
               return next(err);
-            } else {    
-console.log(result)                           
+            } else {                             
               var cc = req.query.cc ? req.query.cc : "";   
               var context = {helpticket: result, name: person.fullName}              
               var mailObj = {
