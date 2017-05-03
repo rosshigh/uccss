@@ -75,7 +75,6 @@ export class ViewHelpTickets {
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
       this.systems.getSystemsArray(),
-      // this.people.getPeopleArray('?order=lastName'),
       this.config.getConfig()
     ]);
 
@@ -218,9 +217,20 @@ export class ViewHelpTickets {
   async saveResponse() {
     // if(this.validation.validate(1)){
     this._createResponse();
-    let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
+     var email = new Object();
+    if(this.sendEmail){
+      //  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+        email.reason = 2;
+        email.fullName = this.userObj.fullName;
+        email.email = this.userObj.email;
+        email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+        email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+        email.message = this.userObj.fullName + " has responded to the help ticket."
+    }
+    let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
-      this.updateArray()
+      this.updateArray();
+      this.filterOutClosed();
       this.utils.showNotification("The help ticket was updated");
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
@@ -247,10 +257,20 @@ export class ViewHelpTickets {
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
         if (response.helpTicketId === 0) {
+          var email = new Object();
+          if(this.sendEmail){
+              email.reason = this.config.CLOSED_HELPTICKET_STATUS;
+              email.fullName = this.userObj.fullName;
+              email.email = this.userObj.email;
+              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+              email.message = "The help ticket was closed by " + this.userObj.fullName;
+          }
           this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.CLOSED_HELPTICKET_STATUS;
-          let serverResponse = await this.helpTickets.updateStatus();
+          let serverResponse = await this.helpTickets.updateStatus(email);
           if (!serverResponse.error) {
-            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.updateArray();
+            this.filterOutClosed();
             this.utils.showNotification("The help ticket was updated");
           }
           if(this.isChecked) this.filterOutClosed();
@@ -264,10 +284,20 @@ export class ViewHelpTickets {
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
         if (response.helpTicketId === 0) {
+           var email = new Object();
+          if(this.sendEmail){
+              email.reason = 2;
+              email.fullName = this.userObj.fullName;
+              email.email = this.userObj.email;
+              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+              email.message = "The help ticket was reopened by " + this.userObj.fullName;
+          }
           this.helpTickets.selectedHelpTicket.helpTicketStatus = this.config.REVIEW_HELPTICKET_STATUS;
-          let serverResponse = await this.helpTickets.updateStatus();
+          let serverResponse = await this.helpTickets.updateStatus(email);
           if (!serverResponse.error) {
-            this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+            this.updateArray();
+            this.filterOutClosed();
             this.utils.showNotification("The help ticket was updated");
           }
           this._cleanUp();

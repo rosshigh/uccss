@@ -273,7 +273,7 @@ module.exports = function (app, config) {
           helpTicketUpdated(mailObj);
           break;
         case 6: //help ticket closed
-          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName}            
+          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message}            
           var mailObj = {
             email: req.body.email,
             cc: req.body.cc,

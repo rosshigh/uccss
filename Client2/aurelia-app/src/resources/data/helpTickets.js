@@ -166,13 +166,14 @@ export class HelpTickets {
         return response;
     }
     
-    async updateStatus(){
+    async updateStatus(email){
          if(!this.selectedHelpTicket){
             return;
         }
 
          var response = await this.data.saveObject(this.selectedHelpTicket, this.data.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
+            if(email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
             this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");
