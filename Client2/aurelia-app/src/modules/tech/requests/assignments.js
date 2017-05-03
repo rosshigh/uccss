@@ -179,7 +179,7 @@ export class Assignments {
         //Check to see if an assignment has already been made
         if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
             //No assignment has been made
-            this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.clientInfo ? this.products.selectedProduct.clientInfo : "";
+            this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
             this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
             this.idsRemaining = this.idsRequired;
             this.existingRequest = false;

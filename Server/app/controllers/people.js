@@ -133,8 +133,13 @@ module.exports = function (app, config) {
           if(people[i].roles.indexOf('PRIM') > -1) {           
             var facCoord = people[i];
           }
-        }      
-        var context = {facultyCoordinator: facCoord.fullName, name: req.body.fullName, institutions: req.body.institution};
+        }    
+        if(facCoord){
+          var facCoordName = facCoord.fullName;
+        }  else {
+          var facCoordName = "";
+        }
+        var context = {facultyCoordinator: facCoordName, name: req.body.fullName, institutions: req.body.institution};
         var mailObj = {
           email: req.body.email, 
           context: context
