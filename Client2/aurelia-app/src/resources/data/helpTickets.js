@@ -147,13 +147,17 @@ export class HelpTickets {
 
     }
 
-     async updateOwner(obj){
+    async updateOwner(email){
          if(!this.selectedHelpTicket){
             return;
         }
 
-        var response = await this.data.saveObject(obj, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+        var response = await this.data.saveObject(email, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
         if (!response.error) {
+            if(email.email){
+                email.helpTicketNo = response.helpTicketNo;
+                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+            }
             this.selectedHelpTicket = this.utils.copyObject(response);
             this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
         } else {
@@ -195,15 +199,13 @@ export class HelpTickets {
             return;
         }
         var url = this.data.HELP_TICKET_SERVICES;
-        // url = email ? url + "/" + email  : url + "/" + 0;
-        // if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
-        //     url += "?cc=" + this.config.HELP_TICKET_EMAIL_LIST;
-        // }
         if(!this.selectedHelpTicket._id){
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
             if (!response.error) {
-                email.helpTicketNo = response.helpTicketNo;
-                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                if(email.email){
+                    email.helpTicketNo = response.helpTicketNo;
+                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                }
                 this.selectedHelpTicket = this.utils.copyObject(response);
                 if(this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
             } else {
@@ -213,9 +215,11 @@ export class HelpTickets {
         } else {
             var response = await this.data.saveObject(this.selectedHelpTicket, url, "put");
             if (!response.error) {
-                this.selectedHelpTicket = this.utils.copyObject(response);
+                if(email.email){
+                    this.selectedHelpTicket = this.utils.copyObject(response);
+                }
                 this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
-
+                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
             } else {
                  this.data.processError(response, "There was an error updating the help ticket.");
                 }
@@ -225,13 +229,10 @@ export class HelpTickets {
 
     async saveHelpTicketResponse(email){
         if(this.selectedHelpTicket._id) {
-            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", email);
-             url = email ? url + "/" + email  : url + "/" + 0;
-            if(this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
-                url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
-            }
+            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
             var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
                 if (!response.error) {
+                    if(!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                     this.selectedHelpTicket.content.push(response);
                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                 } else {

@@ -85,11 +85,20 @@ export class EditPeople {
         this.buildAudit();
         let serverResponse = await this.people.savePerson();
         if (!serverResponse.error) {
+            if(this.people.selectedPerson.personStatus === '01') this.sendActivateEmail()
             this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
             this.dataTable.updateArray(this.people.instutionPeopleArray);
             this.utils.showNotification(serverResponse.firstName +  " " + serverResponse.lastName + " was updated");
         }
         this.personSelected = false;
+    }
+
+    sendActivateEmail(){
+        var email = {
+            email: this.people.selectedPerson.email,
+            name: this.people.selectedPerson.firstName
+        }
+        this.people.activateAccountEmail(email)
     }
 
     updateStatus(person){

@@ -141,7 +141,7 @@ export class AppConfig {
     HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
     HELP_TICKET_OTHER_TYPE = 99;
 
-    HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Who cares", status: ""},{priority: "Medium", message: "Whenever", status: "warning"},{priority: "Critical", message:"Need NOW!  Walked into class without testing",status: "danger"}];
+    HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Not time sensitive", status: ""},{priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning"},{priority: "Critical", message:"Critical, time sensitive issue",status: "danger"}];
 
     REFRESH_KEYWORDS = ["ERPSIM"];
 
@@ -284,6 +284,7 @@ export class AppConfig {
     CLOSED_HELPTICKET_STATUS = 6;
 
     HELP_TICKET_EMAIL_CREATE = 1;
+    HELP_TICKET_EMAIL_STATUS_CHANGE = 9;
 
     HELP_TICKET_STATUSES = [
         {
@@ -411,7 +412,13 @@ export class AppConfig {
 
     getParameter(parameter){
         for(var i = 0; i < this.configArray.length; i++){
-            if(this.configArray[i].parameter === parameter) return this.configArray[i].value;
+            if(this.configArray[i].parameter === parameter){
+                if(this.configArray[i].type === 'boolean') {
+                    return this.configArray[i].value == "true";
+                } else {
+                    return this.configArray[i].value;
+                }
+            } 
         }
         return null;
     }

@@ -76,7 +76,7 @@ export class ViewHelpTickets {
     this.systems.getSystemsArray();
     this.documents.getDocumentsCategoriesArray();
 
-    this.people = this.people.peopleArray;
+    this.peopleArray = this.people.peopleArray;
     this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
     this.sendEmail = this.config.SEND_EMAILS;
     this._setUpValidation();
@@ -98,7 +98,6 @@ export class ViewHelpTickets {
     })
 
     this.removeHTStatus = [this.config.NEW_HELPTICKET_STATUS, this.config.REPLIED_HELPTICKET_STATUS];
-      
   }
 
   attached() {
@@ -223,7 +222,6 @@ export class ViewHelpTickets {
 
   }
 
-
   getIndex(subtypes, type){
     for(let i = 0; i < subtypes.length; i++){
       if(subtypes[i].type === type){
@@ -330,11 +328,31 @@ export class ViewHelpTickets {
          })
        })
      }
-
+    
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
         if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
-          let serverResponse = await this.helpTickets.saveHelpTicket(false);
+          var email = new Object();
+          var lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length -1 ];
+          if(this.sendEmail){
+              this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+              email.reason = 2;
+              email.fullName = this.people.selectedPerson.fullName;
+              email.email = this.people.selectedPerson.email;
+              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+              if(lastChange.property == 'helpTicketStatus') {
+                email.reason = lastChange.newValue;
+                email.message =  "The status was changed to " + this.getStatusDescription(lastChange.newValue);
+              } else if (lastChange.property == 'priority'){
+                email.reason = 2;
+                email.message =  "The priority was changed to " + this.config.HELP_TICKET_PRIORITIES[lastChange.newValue].priority;
+              } else {
+                var email = new Object();
+              }
+           
+          }
+          let serverResponse = await this.helpTickets.saveHelpTicket(email);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -344,11 +362,21 @@ export class ViewHelpTickets {
     }
   }
 
+  getStatusDescription(status){
+    for(let i = 0; i < this.config.HELP_TICKET_STATUSES.length; i++){
+      if(status == this.config.HELP_TICKET_STATUSES[i].code){
+        return this.config.HELP_TICKET_STATUSES[i].description;
+      }
+    }
+    return "";
+  }
+
   /*****************************************************************************************
   * Open the response form and create an empty help ticket content object
   *****************************************************************************************/
   respond() {
     if (!this.showLockMessage && !this.enterResponse) {
+      this.sendMailDisable = false;
       this.responseMessage = "";
       this.helpTickets.selectHelpTicketContent();
       this.enterResponse = true;
@@ -377,10 +405,19 @@ export class ViewHelpTickets {
   * Save the response
   *****************************************************************************************/
   async saveResponse(status) {
-    // if(this.validation.validate(1)){
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
     this._createResponse();
-    let serverResponse = await this.helpTickets.saveHelpTicketResponse(this.sendEmail);
+    var email = new Object();
+    if(this.sendEmail){
+       this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+        email.reason = status;
+        email.fullName = this.people.selectedPerson.fullName;
+        email.email = this.people.selectedPerson.email;
+        email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+        email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+        email.message = status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS ? this.userObj.fullName + " has asked for more information." : this.userObj.fullName + " has responded to the help ticket."
+    }
+    let serverResponse = await this.helpTickets.saveHelpTicketResponse(email);
     if (!serverResponse.error) {
       if(status = this.config.CLOSED_HELPTICKET_STATUS) await this.refresh();
       this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -388,7 +425,6 @@ export class ViewHelpTickets {
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
-    // }
   }
 
   async ownHelpTicket(helpTicket) {
@@ -397,11 +433,21 @@ export class ViewHelpTickets {
     }
     if(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id){
       if(!this.showLockMessage){
-          var obj = {
-            personId: this.userObj._id,
-            status: this.config.REVIEW_HELPTICKET_STATUS
+          var email = new Object();
+          email.personId = this.userObj._id;
+          email.status = this.config.REVIEW_HELPTICKET_STATUS;
+          if(this.sendEmail){    
+            this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+              email.reason = 2;
+              email.fullName = this.people.selectedPerson.fullName;
+              email.personId = this.userObj._id;
+              email.status = this.config.REVIEW_HELPTICKET_STATUS;
+              email.email = this.people.selectedPerson.email;
+              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+              email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
           }
-          let serverResponse = await this.helpTickets.updateOwner(obj);
+          let serverResponse = await this.helpTickets.updateOwner(email);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -413,7 +459,7 @@ export class ViewHelpTickets {
     }
   }
 
-  async changeStatus(helpTicket, status){
+  async changeStatus(helpTicket, status, description){
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
@@ -426,8 +472,18 @@ export class ViewHelpTickets {
             date: new Date
           }
           this.helpTickets.selectedHelpTicket.audit.push(obj);
+          var email = new Object();
+          if(this.sendEmail){
+            this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+              email.reason = status;
+              email.fullName = this.people.selectedPerson.fullName;
+              email.email = this.people.selectedPerson.email;
+              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+              email.message = "The status was changed to " + description;
+          }
           this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-          let serverResponse = await this.helpTickets.saveHelpTicket();
+          let serverResponse = await this.helpTickets.saveHelpTicket(email);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -548,6 +604,7 @@ export class ViewHelpTickets {
   }
 
   checkSendMail() {
+    console.log(this.sendMail)
     this.sendMail = !this.sendMail;
   }
 

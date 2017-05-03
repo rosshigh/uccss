@@ -213,6 +213,27 @@ export class People {
         return null;
     }
 
+//     getFacCoord(institutionId){
+// console.log('ID ' + institutionId)        
+//         if(this.peopleArray){
+//             for(let i = 0; i < this.peopleArray.length; i++){
+//                 if(this.peopleArray[i].institutionId == institutionId){
+// console.log(this.peopleArray[i])                    
+//                     if(this.peopleArray[i].roles.indexOf('PRIM')) return this.peopleArray[i];
+//                 }
+//             }
+//         }
+//         return undefined;
+//     }
+
+    sendNewRegisterEmail(email){       
+        this.data.saveObject(email, this.data.PERSON_REGISTER + "/facDev", 'post');
+    }
+
+    activateAccountEmail(email){
+        this.data.saveObject(email, this.data.PEOPLE_SERVICE + "/facDev/activate", 'post');
+    }
+
     updatePassword(obj){
         if (this.selectedPerson._id) {
             return this.data.saveObject(obj, this.data.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");

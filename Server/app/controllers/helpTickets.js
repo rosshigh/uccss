@@ -107,8 +107,8 @@ module.exports = function (app, config) {
     });
   });
 
-  router.put('/api/helpTickets/content/:id/:email', requireAuth, function(req, res, next){
-    writeLog.log('Update HelpTicket ' + req.body._id, 'verbose');
+  router.put('/api/helpTickets/content/:id/:status', requireAuth, function(req, res, next){
+    writeLog.log('Update HelpTicket ' + req.params._id, 'verbose');
     Model.findById(req.params.id).exec()
     .then(result => {
         var content = new Content(req.body);
@@ -119,38 +119,7 @@ module.exports = function (app, config) {
           if(err){
             return next(err);
           } else {         
-            if(req.body.emailSent && !req.body.confidential){       
-               if(req.query.email && req.query.email > 0){     
-                  sendEmail(req,  object.personId, object);
-                  res.status(200).json(object); 
-                } else {
-                  res.status(200).json(object);
-                } 
-              Person.findById(result.personId).exec()
-                .then(person => {
-
-
-                  var cc = req.query.cc ? req.query.cc : "";   
-                  var context = {helpTicketNo: result.helpTicketNo, name: person.fullName}              
-                  var mailObj = {
-                    email: person.email,
-                    cc: cc,
-                    context: context
-                  }         
-                    if(req.params.status == 6){
-                      helpTicketClosed(mailObj)
-                      res.status(200).json(content);
-                    } else {
-                      helpTicketUpdated(mailObj)
-                      res.status(200).json(content);
-                    }     
-                })
-                .catch(error => {
-                  return next(error);
-                })
-            } else {
               res.status(200).json(content);
-            }
           }
     })
     })
@@ -223,15 +192,12 @@ module.exports = function (app, config) {
       })
   });
 
-  router.put('/api/helpTickets/:email', requireAuth, function(req, res, next){
+  router.put('/api/helpTickets', requireAuth, function(req, res, next){
     writeLog.log('Update HelpTicket '+ req.body._id, 'verbose');
 
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
     .then(result => {
-        if(req.params.email > 1){                                          
-          helpTicketUpdated(req, result.personId, result);    
-        }
         res.status(200).json(result); 
       })
       .catch(error => {
@@ -286,7 +252,6 @@ module.exports = function (app, config) {
     if(req.body){
        switch(req.body.reason){
          case 1: //help ticket created
-           var cc = req.query.cc ? req.query.cc : "";
           var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, helpTicketContext: req.body.helpTicketContext}            
           var mailObj = {
             email: req.body.email,
@@ -294,6 +259,27 @@ module.exports = function (app, config) {
             context: context
           }                                 
           helpTicketCreated(mailObj);
+          break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message};            
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context
+          }                                 
+          helpTicketUpdated(mailObj);
+          break;
+        case 6: //help ticket closed
+          var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName}            
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context
+          }                                 
+          helpTicketClosed(mailObj);
           break;
        }
     }
@@ -461,35 +447,3 @@ module.exports = function (app, config) {
   });
 
 };
-
-sendEmail= function(req, personId, object){
-console.log(req.params.email)  
-  Person.findById(personId, function(err, person){                     
-    if(err){
-      return next(err);
-    } else {       
-        switch(req.params.email) {
-          case "1": //Email created
-            var cc = req.query.cc ? req.query.cc : "";
-            var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}            
-            var mailObj = {
-              email: person.email,
-              cc: cc,
-              context: context
-            }                        
-            helpTicketCreated(mailObj);
-            break;
-          case "6": //Email closed by tech staff
-            // var cc = req.query.cc ? req.query.cc : "";   
-            var context = {helpTicketNo: object.helpTicketNo, name: person.fullName}              
-            var mailObj = {
-              email: person.email,
-              // cc: cc,
-              context: context
-            }         
-            helpTicketClosed(mailObj)
-            break;
-        }
-    }
-  })
-}

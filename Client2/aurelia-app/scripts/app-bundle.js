@@ -224,7 +224,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.HELP_TICKET_OTHER_UCCSS_TYPE = 12;
             this.HELP_TICKET_OTHER_CURRICULUM_TYPE = 13;
             this.HELP_TICKET_OTHER_TYPE = 99;
-            this.HELP_TICKET_PRIORITIES = [{ priority: "Low", message: "Who cares", status: "" }, { priority: "Medium", message: "Whenever", status: "warning" }, { priority: "Critical", message: "Need NOW!  Walked into class without testing", status: "danger" }];
+            this.HELP_TICKET_PRIORITIES = [{ priority: "Low", message: "Not time sensitive", status: "" }, { priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning" }, { priority: "Critical", message: "Critical, time sensitive issue", status: "danger" }];
             this.REFRESH_KEYWORDS = ["ERPSIM"];
             this.HELP_TICKET_TYPES = [{
                 "code": 0,
@@ -342,6 +342,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.REPLIED_HELPTICKET_STATUS = 5;
             this.CLOSED_HELPTICKET_STATUS = 6;
             this.HELP_TICKET_EMAIL_CREATE = 1;
+            this.HELP_TICKET_EMAIL_STATUS_CHANGE = 9;
             this.HELP_TICKET_STATUSES = [{
                 "code": this.NEW_HELPTICKET_STATUS,
                 "description": "New"
@@ -491,7 +492,13 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
             for (var i = 0; i < this.configArray.length; i++) {
-                if (this.configArray[i].parameter === parameter) return this.configArray[i].value;
+                if (this.configArray[i].parameter === parameter) {
+                    if (this.configArray[i].type === 'boolean') {
+                        return this.configArray[i].value == "true";
+                    } else {
+                        return this.configArray[i].value;
+                    }
+                }
             }
             return null;
         };
@@ -1031,6 +1038,7 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
                                 serverResponse = _context3.sent;
 
                                 if (!serverResponse.error) {
+                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
                                     this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
                                     this.dataTable.updateArray(this.people.instutionPeopleArray);
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
@@ -1051,6 +1059,14 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
 
             return save;
         }();
+
+        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
+            var email = {
+                email: this.people.selectedPerson.email,
+                name: this.people.selectedPerson.firstName
+            };
+            this.people.activateAccountEmail(email);
+        };
 
         EditPeople.prototype.updateStatus = function updateStatus(person) {
             this.people.selectedPersonFromId(person._id, 'i');
@@ -1845,7 +1861,7 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
                 }
 
                 return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).then(function (response) {
-                  _this.router.navigate("home");
+                  _this.sendFacDevEmail();
                 }));
 
               case 9:
@@ -1865,6 +1881,19 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
 
       return save;
     }();
+
+    Register.prototype.sendFacDevEmail = function sendFacDevEmail() {
+      var email = new Object();
+      this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
+      email.email = this.people.selectedPerson.email;
+      email.institutionId = this.people.selectedPerson.institutionId;
+      email.institution = this.people.selectedInstitution.name;
+      email.fullName = this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+
+      this.people.sendNewRegisterEmail(email);
+      this.router.navigate("home");
+    };
 
     Register.prototype.back = function back() {
       window.history.back();
@@ -7248,7 +7277,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.updateOwner = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(obj) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(email) {
                 var response;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
@@ -7263,12 +7292,16 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
 
                             case 2:
                                 _context4.next = 4;
-                                return this.data.saveObject(obj, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+                                return this.data.saveObject(email, this.data.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
 
                             case 4:
                                 response = _context4.sent;
 
                                 if (!response.error) {
+                                    if (email.email) {
+                                        email.helpTicketNo = response.helpTicketNo;
+                                        this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                                    }
                                     this.selectedHelpTicket = this.utils.copyObject(response);
                                     this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
                                 } else {
@@ -7406,8 +7439,10 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 response = _context7.sent;
 
                                 if (!response.error) {
-                                    email.helpTicketNo = response.helpTicketNo;
-                                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                                    if (email.email) {
+                                        email.helpTicketNo = response.helpTicketNo;
+                                        this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                                    }
                                     this.selectedHelpTicket = this.utils.copyObject(response);
                                     if (this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
                                 } else {
@@ -7423,8 +7458,11 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 response = _context7.sent;
 
                                 if (!response.error) {
-                                    this.selectedHelpTicket = this.utils.copyObject(response);
+                                    if (email.email) {
+                                        this.selectedHelpTicket = this.utils.copyObject(response);
+                                    }
                                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                 } else {
                                     this.data.processError(response, "There was an error updating the help ticket.");
                                 }
@@ -7453,23 +7491,19 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 if (!this.selectedHelpTicket._id) {
-                                    _context8.next = 9;
+                                    _context8.next = 7;
                                     break;
                                 }
 
-                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", email);
-
-                                url = email ? url + "/" + email : url + "/" + 0;
-                                if (this.config.HELP_TICKET_EMAIL_LIST && this.config.HELP_TICKET_EMAIL_LIST.length > 0) {
-                                    url += "&cc=" + this.config.HELP_TICKET_EMAIL_LIST;
-                                }
-                                _context8.next = 6;
+                                url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+                                _context8.next = 4;
                                 return this.data.saveObject(this.selectedHelpTicketContent, url, "put");
 
-                            case 6:
+                            case 4:
                                 response = _context8.sent;
 
                                 if (!response.error) {
+                                    if (!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
                                     this.selectedHelpTicket.content.push(response);
                                     this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
                                 } else {
@@ -7477,7 +7511,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                                 }
                                 return _context8.abrupt('return', response);
 
-                            case 9:
+                            case 7:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -8782,6 +8816,14 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
 
             return deletePerson;
         }();
+
+        People.prototype.sendNewRegisterEmail = function sendNewRegisterEmail(email) {
+            this.data.saveObject(email, this.data.PERSON_REGISTER + "/facDev", 'post');
+        };
+
+        People.prototype.activateAccountEmail = function activateAccountEmail(email) {
+            this.data.saveObject(email, this.data.PEOPLE_SERVICE + "/facDev/activate", 'post');
+        };
 
         People.prototype.updatePassword = function updatePassword(obj) {
             if (this.selectedPerson._id) {
@@ -25631,7 +25673,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 this.systems.getSystemsArray();
                 this.documents.getDocumentsCategoriesArray();
 
-                this.people = this.people.peopleArray;
+                this.peopleArray = this.people.peopleArray;
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                 this.sendEmail = this.config.SEND_EMAILS;
                 this._setUpValidation();
@@ -26047,7 +26089,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
         var _this3 = this;
 
-        var changes, response, serverResponse;
+        var changes, response, email, lastChange, serverResponse;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
@@ -26073,19 +26115,39 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 response = _context7.sent;
 
                 if (response.error) {
-                  _context7.next = 12;
+                  _context7.next = 15;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0 || response[0].personId === this.userObj._id)) {
-                  _context7.next = 12;
+                  _context7.next = 15;
                   break;
                 }
 
-                _context7.next = 9;
-                return this.helpTickets.saveHelpTicket(false);
+                email = new Object();
+                lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length - 1];
 
-              case 9:
+                if (this.sendEmail) {
+                  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+                  email.reason = 2;
+                  email.fullName = this.people.selectedPerson.fullName;
+                  email.email = this.people.selectedPerson.email;
+                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                  if (lastChange.property == 'helpTicketStatus') {
+                    email.reason = lastChange.newValue;
+                    email.message = "The status was changed to " + this.getStatusDescription(lastChange.newValue);
+                  } else if (lastChange.property == 'priority') {
+                    email.reason = 2;
+                    email.message = "The priority was changed to " + this.config.HELP_TICKET_PRIORITIES[lastChange.newValue].priority;
+                  } else {
+                    email = new Object();
+                  }
+                }
+                _context7.next = 12;
+                return this.helpTickets.saveHelpTicket(email);
+
+              case 12:
                 serverResponse = _context7.sent;
 
                 if (!serverResponse.error) {
@@ -26094,7 +26156,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 12:
+              case 15:
               case 'end':
                 return _context7.stop();
             }
@@ -26109,8 +26171,18 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
       return save;
     }();
 
+    ViewHelpTickets.prototype.getStatusDescription = function getStatusDescription(status) {
+      for (var i = 0; i < this.config.HELP_TICKET_STATUSES.length; i++) {
+        if (status == this.config.HELP_TICKET_STATUSES[i].code) {
+          return this.config.HELP_TICKET_STATUSES[i].description;
+        }
+      }
+      return "";
+    };
+
     ViewHelpTickets.prototype.respond = function respond() {
       if (!this.showLockMessage && !this.enterResponse) {
+        this.sendMailDisable = false;
         this.responseMessage = "";
         this.helpTickets.selectHelpTicketContent();
         this.enterResponse = true;
@@ -26134,41 +26206,52 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.saveResponse = function () {
       var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(status) {
-        var serverResponse;
+        var email, serverResponse;
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
                 this._createResponse();
-                _context8.next = 4;
-                return this.helpTickets.saveHelpTicketResponse(this.sendEmail);
+                email = new Object();
 
-              case 4:
+                if (this.sendEmail) {
+                  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+                  email.reason = status;
+                  email.fullName = this.people.selectedPerson.fullName;
+                  email.email = this.people.selectedPerson.email;
+                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                  email.message = status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS ? this.userObj.fullName + " has asked for more information." : this.userObj.fullName + " has responded to the help ticket.";
+                }
+                _context8.next = 6;
+                return this.helpTickets.saveHelpTicketResponse(email);
+
+              case 6:
                 serverResponse = _context8.sent;
 
                 if (serverResponse.error) {
-                  _context8.next = 12;
+                  _context8.next = 14;
                   break;
                 }
 
                 if (!(status = this.config.CLOSED_HELPTICKET_STATUS)) {
-                  _context8.next = 9;
+                  _context8.next = 11;
                   break;
                 }
 
-                _context8.next = 9;
+                _context8.next = 11;
                 return this.refresh();
 
-              case 9:
+              case 11:
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                 this.utils.showNotification("The help ticket was updated");
                 if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
 
-              case 12:
+              case 14:
                 this._cleanUp();
 
-              case 13:
+              case 15:
               case 'end':
                 return _context8.stop();
             }
@@ -26185,7 +26268,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.ownHelpTicket = function () {
       var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(helpTicket) {
-        var obj, serverResponse;
+        var email, serverResponse;
         return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
@@ -26195,23 +26278,34 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
 
                 if (!(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id)) {
-                  _context9.next = 9;
+                  _context9.next = 12;
                   break;
                 }
 
                 if (this.showLockMessage) {
-                  _context9.next = 9;
+                  _context9.next = 12;
                   break;
                 }
 
-                obj = {
-                  personId: this.userObj._id,
-                  status: this.config.REVIEW_HELPTICKET_STATUS
-                };
-                _context9.next = 6;
-                return this.helpTickets.updateOwner(obj);
+                email = new Object();
 
-              case 6:
+                email.personId = this.userObj._id;
+                email.status = this.config.REVIEW_HELPTICKET_STATUS;
+                if (this.sendEmail) {
+                  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+                  email.reason = 2;
+                  email.fullName = this.people.selectedPerson.fullName;
+                  email.personId = this.userObj._id;
+                  email.status = this.config.REVIEW_HELPTICKET_STATUS;
+                  email.email = this.people.selectedPerson.email;
+                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                  email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
+                }
+                _context9.next = 9;
+                return this.helpTickets.updateOwner(email);
+
+              case 9:
                 serverResponse = _context9.sent;
 
                 if (!serverResponse.error) {
@@ -26222,7 +26316,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   this._cleanUp();
                 }
 
-              case 9:
+              case 12:
               case 'end':
                 return _context9.stop();
             }
@@ -26238,8 +26332,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     }();
 
     ViewHelpTickets.prototype.changeStatus = function () {
-      var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(helpTicket, status) {
-        var response, obj, serverResponse;
+      var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(helpTicket, status, description) {
+        var response, obj, email, serverResponse;
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
@@ -26252,12 +26346,12 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 response = _context10.sent;
 
                 if (response.error) {
-                  _context10.next = 14;
+                  _context10.next = 16;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0)) {
-                  _context10.next = 14;
+                  _context10.next = 16;
                   break;
                 }
 
@@ -26270,11 +26364,22 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 };
 
                 this.helpTickets.selectedHelpTicket.audit.push(obj);
-                this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-                _context10.next = 11;
-                return this.helpTickets.saveHelpTicket();
+                email = new Object();
 
-              case 11:
+                if (this.sendEmail) {
+                  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+                  email.reason = status;
+                  email.fullName = this.people.selectedPerson.fullName;
+                  email.email = this.people.selectedPerson.email;
+                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                  email.message = "The status was changed to " + description;
+                }
+                this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
+                _context10.next = 13;
+                return this.helpTickets.saveHelpTicket(email);
+
+              case 13:
                 serverResponse = _context10.sent;
 
                 if (!serverResponse.error) {
@@ -26283,7 +26388,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 14:
+              case 16:
               case 'end':
                 return _context10.stop();
             }
@@ -26291,7 +26396,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee10, this);
       }));
 
-      function changeStatus(_x7, _x8) {
+      function changeStatus(_x7, _x8, _x9) {
         return _ref10.apply(this, arguments);
       }
 
@@ -26359,7 +26464,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
         }, _callee11, this);
       }));
 
-      function saveNote(_x9) {
+      function saveNote(_x10) {
         return _ref11.apply(this, arguments);
       }
 
@@ -26427,6 +26532,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     };
 
     ViewHelpTickets.prototype.checkSendMail = function checkSendMail() {
+      console.log(this.sendMail);
       this.sendMail = !this.sendMail;
     };
 
@@ -28040,7 +28146,8 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 if (!this.showTypes) {
                                     this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                                     this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                                    this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+                                    this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+                                    this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
                                     this.showAdditionalInfo = true;
                                     this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm);
                                     this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
@@ -28118,7 +28225,6 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.selectedHelpTicketType = this.getIndex();
                                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm);
                                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-
                                 this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
                                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
 
@@ -28401,7 +28507,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
 
         CreateHelpTickets.prototype.buildHelpTicketContext = function buildHelpTicketContext() {
             var obj = new Object();
-
+            this.selectedHelpTicketType = this.selectedHelpTicketType ? this.selectedHelpTicketType : 0;
             obj.type = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].description;
             obj.subtype = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].description;
 
@@ -37066,9 +37172,9 @@ define('text!modules/tech/support/components/Requests.html', ['module'], functio
 define('text!modules/tech/support/components/searchHTForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"bottomMargin list-group-item  leftMargin rightMargin\">\n\t\t\t\t<span click.delegate=\"search()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Search\"><i class=\"fa fa-search fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span  click.delegate=\"clearCriteria()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \n\t\t\t\t\ttitle=\"\" data-original-title=\"Clear Criteria\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-3 col-lg-offset-1\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<label>Help Ticket Number</label>\n\t\t\t\t\t\t<input input.delegate=\"helpTicketNoEntered()\" class=\"form-control\" value.bind=\"helpTicketNo\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"elementsToOperateOn\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-lg-3 col-lg-offset-1\">\n\t\t\t\t\t<div class=\"panel panel-primary topMargin\">\n\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t<h5>Date Created</h5>\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12  topMargin\">\n\t\t\t\t\t\t\t\t\t<label>Date From</label>\n\t\t\t\t\t\t\t\t\t<date-picker value.two-way=\"dateFrom\" controlid=\"dateFrom\"></date-picker>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-12  topMargin\">\n\t\t\t\t\t\t\t\t\t<label>Date To</label>\n\t\t\t\t\t\t\t\t\t<date-picker value.two-way=\"dateTo\" controlid=\"dateTo\"></date-picker>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-3  col-lg-offset-1\">\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-lg-8\">\n\t\t\t\t\t\t\t\t<label>KeyWords</label>\n\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"keyWords\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<div class=\"col-lg-8\">\n\t\t\t\t\t\t\t\t<label>Content</label>\n\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"content\" type=\"text\" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t<div class=\"col-lg-12 topMargin\">\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"col-lg-6\">\n\t\t\t\t\t\t\t\t\t<multiselect label=\"Status\" options.bind=\"config.HELP_TICKET_STATUSES\" value.bind=\"selectedStatus\"></multiselect>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t\n\t\t\t</div>\n\t\t\t<div class=\"col-lg-9 col-lg-offset-1\">\n\t\t\t\t<div class=\"panel-group\" id=\"accordion\">\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseOne\">Search by Product</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseOne\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Products</label>\n\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\" />\n\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${product.name}</button>\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t\t\t<label id=\"requestProductsLabel\">Requested Products</label>\n\t\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of selectedProducts\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tid=\"${product}\" class=\"list-group-item\">${product | productName:products.productsArray}</button>\n\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseTwo\">Search by Customer</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseTwo\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t<label id=\"productList\">Available People</label>\n\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"peopleFilter\" input.trigger=\"filterPeopleList()\" placeholder=\"Filter people\" />\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectPerson($event)\" type=\"button\" repeat.for=\"person of filteredPersonArray\" id=\"${person._id}\"\n\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${person.fullName}</button>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t<label >Requested Person</label>\n\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removePerson($event)\" type=\"button\" repeat.for=\"person of selectedPeople\"\n\t\t\t\t\t\t\t\t\t\t\tid=\"${person}\" class=\"list-group-item\">${person | person:people.peopleArray:\"fullName\"}</button>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"panel panel-primary\">\n\t\t\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t\t\t<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapseThree\">Search by Institution</a>\n\t\t\t\t\t\t\t</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div id=\"collapseThree\" class=\"panel-collapse collapse\">\n\t\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t\t\t\t\t\t<label id=\"productList\">Available Institutions</label>\n\t\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"institutionsFilter\" input.trigger=\"filterInstitutionsList()\" placeholder=\"Filter institutions\" />\n\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"selectInstitution($event)\" type=\"button\" repeat.for=\"institution of filteredInstitutionArray\" id=\"${institution._id}\"\n\t\t\t\t\t\t\t\t\t\t\t\tclass=\"list-group-item\">${institution.name}</button>\n\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t\t\t\t\t\t<label >Requested Institution</label>\n\t\t\t\t\t\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"removeInstitution($event)\" type=\"button\" repeat.for=\"institution of selectedInstitutions\"\n\t\t\t\t\t\t\t\t\t\t\t\tid=\"${institution}\" class=\"list-group-item\">${institution | lookupValue:people.institutionsArray:\"_id\":\"name\"}</button>\n\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\t\t\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-lg-9 col-lg-offset-1\">\n\t\t\t\t\t<div class=\"panel panel-primary topMargin leftMargin rightMargin\">\n\t\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t\t<div class=\"col-lg-3\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t\t\t\t<label>Type</label>\n\t\t\t\t\t\t\t\t\t\t<select change.delegate=\"typeChanged()\" value.bind=\"selectedType\" id=\"helpTicketPurpose\" class=\"form-control\">\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"-1\">Nothing selected</option>\n\t\t\t\t\t\t\t\t\t\t\t<option repeat.for=\"types of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" value.bind=\"types.type\">${types.description}</option>\n\t\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<!--\n\t\t\t\t\t\t\t<div class=\"col-lg-8 topMargin\" show.bind=\"showAdditionalInfo\">\n\t\t\t\t\t\t\t\t<compose repeat.for=\"helpTicket of helpTickets.helpTicketTypesArray\" show.bind=\"helpTicket.show\" view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t-->\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\t\t\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/tech/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/support/components/viewHelpTicketTableFilters.html', ['module'], function(module) { module.exports = "<template \"containerless\">\n\t<th></th>\n              <th class=\"col-md-1\">\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\"\n                  class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\"\n                  class=\"form-control\" />\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\"\n                  class=\"form-control\" />\n              </th>\n              <th class=\"col-lg-1\">\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\n                    <option value=\"\"></option>\n                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                </select>\n              </th>\n</template>"; });
-define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\" id=\"toolbar\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"ownHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span show.bind=\"showLockMessage\" click.delegate=\"_unlock()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Unlock\"><i class=\"fa fa-unlock-alt fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${lockMessage}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\n\n          <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\n            <div class=\"panel-body\">\n              <div class=\"list-group-item col-md-12 topMargin\">\n                <span  click.delegate=\"saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n                <span  click.delegate=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n              </div>\n              <div class=\"row\">\n                  <div class=\"col-lg-1 topMargin\">\n                      <div class=\"checkbox \">\n                        <label>\n                          <input change.delegate=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\n                        </label>\n                      </div>\n                    </div>\n                    <div class=\"col-lg-2 topMargin\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input disabled.bind=\"sendMailDisable\" change.bind=\"checkSendMail()\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                        </label>\n                      </div>\n                    </div>\n                </div>\n               \n                <div class=\"leftMargin rightMargin\">\n                      <editor value.bind=\"responseMessage\" height=\"250\"></editor>\n                      <p>&nbsp;</p>\n\n                      <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                          <div class=\"col-lg-3\">\n                              <label class=\"btn btn-primary\">\n                                  Browse for files <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                              </label>\n                          </div>\n                        </div>\n                        <div class=\"col-lg-6\">\n                          <button click.delegate=\"insertDocument()\" class=\"btn btn-primary\">Insert Document</button>\n                        </div>\n                        <div class=\"col-lg-6 topMargin\">\n                          <div class=\"col-lg-10\">\n                              <ul>\n                                  <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                              </ul>\n                          </div>\n                        </div>\n                        <div class='col-lg-6 topMargin'>\n                          <div class=\"col-lg-10\">\n                            <ul>\n                                <li repeat.for = \"file of helpTickets.selectedHelpTicketContent.documents\" class=\"list-group-item\">${file.fileName}<span click.delegate=\"removeDocument($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                            </ul>\n                          </div>\n                      </div>\n                </div>\n                \n                    <!--\n                      <table show.bind=\"helpTickets.selectedHelpTicketContent.documents.length > 0\" id=\"coursesTable\" class=\"table table-striped table-hover\">\n                        <thead>\n                          <tr>\n                            <th>Document </th>\n                            <th></th>\n                          </tr>\n                        </thead>\n                        <tbody>\n                          <tr repeat.for=\"document of helpTickets.selectedHelpTicketContent.documents\">\n                            <td data-title=\"name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\">${document.fileName}</a></td>\n                            <td click.trigger=\"removeDocument($index)\"><i class=\"fa fa-trash\"></i></td>\n                          </tr>\n                        </tbody>\n                      </table>\n                      \n                  </div>\n                </div>\n                -->\n            </div>\n          </div>\n          </div>\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId| person:people.peopleArray:\"fullName\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\" col-md-offset-1\">Type:</label>\n                      <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control col-md-offset-1\" id=\"helpTicketType\">\n                          <option repeat.for=\"type of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"type.type\">${type.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Status</label>\n                      <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Priority</label>\n                      <select id=\"priority\" value.bind=\"helpTickets.selectedHelpTicket.priority\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"priority of config.HELP_TICKET_PRIORITIES\" model.bind=\"$index\">${priority.priority}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Keywords</label>\n                      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control col-md-offset-1\">\n                    </div>\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n  \n    </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\" id=\"toolbar\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"ownHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span show.bind=\"showLockMessage\" click.delegate=\"_unlock()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Unlock\"><i class=\"fa fa-unlock-alt fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${lockMessage}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\n\n          <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\n            <div class=\"panel-body\">\n              <div class=\"list-group-item col-md-12 topMargin\">\n                <span  click.delegate=\"saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n                <span  click.delegate=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n              </div>\n              <div class=\"row\">\n                  <div class=\"col-lg-1 topMargin\">\n                      <div class=\"checkbox \">\n                        <label>\n                          <input change.delegate=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\n                        </label>\n                      </div>\n                    </div>\n                    <div class=\"col-lg-2 topMargin\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                        </label>\n                      </div>\n                    </div>\n                </div>\n               \n                <div class=\"leftMargin rightMargin\">\n                      <editor value.bind=\"responseMessage\" height=\"250\"></editor>\n                      <p>&nbsp;</p>\n\n                      <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                          <div class=\"col-lg-3\">\n                              <label class=\"btn btn-primary\">\n                                  Browse for files <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                              </label>\n                          </div>\n                        </div>\n                        <div class=\"col-lg-6\">\n                          <button click.delegate=\"insertDocument()\" class=\"btn btn-primary\">Insert Document</button>\n                        </div>\n                        <div class=\"col-lg-6 topMargin\">\n                          <div class=\"col-lg-10\">\n                              <ul>\n                                  <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                              </ul>\n                          </div>\n                        </div>\n                        <div class='col-lg-6 topMargin'>\n                          <div class=\"col-lg-10\">\n                            <ul>\n                                <li repeat.for = \"file of helpTickets.selectedHelpTicketContent.documents\" class=\"list-group-item\">${file.fileName}<span click.delegate=\"removeDocument($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                            </ul>\n                          </div>\n                      </div>\n                </div>\n            </div>\n          </div>\n          </div>\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId| person:people.peopleArray:\"fullName\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\" col-md-offset-1\">Type:</label>\n                      <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control col-md-offset-1\" id=\"helpTicketType\">\n                          <option repeat.for=\"type of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"type.type\">${type.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Status</label>\n                      <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Priority</label>\n                      <select id=\"priority\" value.bind=\"helpTickets.selectedHelpTicket.priority\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"priority of config.HELP_TICKET_PRIORITIES\" model.bind=\"$index\">${priority.priority}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Keywords</label>\n                      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control col-md-offset-1\">\n                    </div>\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n  \n    </div>\n</template>"; });
 define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"!searchResults\">\n    <div class=\"row\">\n        <div class=\"bottomMargin list-group-item\">\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div> \n    </div>\n\t<div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan='13'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n              </td>\n            </tr>\n            <tr>\n              <td colspan='13'>\n                <span click.delegate=\"refresh()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\" ref=\"ownerFilter\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nickNameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n            </tr>\n            <tr>\n              <th>\n                Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th class=\"col-lg-1\">\n                Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th>Institution</th>\n              <th>Email</th>\n              <th>Phone</th>\n              <th>Mobile</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket(helpTicket, $event)\">\n              <td style=\"width:6rem;\" data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td style=\"width:15rem;\" mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" \n                data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}\n                <td style=\"width:15rem;\" data-title=\"Owner\" >${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td>\n                <td style=\"width:5rem;\" data-title=\"Update\" click.trigger=\"ownHelpTicket(helpTicket)\"><span bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span></td>\n                <td data-title=\"Status\" >${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Modified Date\" >${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Customer\" >${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n                <td data-title=\"Nickname\" >${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Email\" >${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Phone\" >${helpTicket.personId | person:people.peopleArray:\"phone\" | formatPhone}</td>\n                 <td style=\"width:10rem;\" data-title=\"Phone\">${helpTicket.personId | person:people.peopleArray:\"mobile\" | formatPhone}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n\t</div>\n  </div>\n  <div class=\"row\" show.bind=\"searchResults\">\n    <compose view=\"./viewHTForm.html\"></compose>\n  </div>\n\t\n</template>"; });
-define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n        <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n        <span  click.delegate=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n        <hr/>\n        <div class=\"col-md-4\">\n          <div style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId | person:people:'email' | gravatarUrl:100:6\"></div>\n        </div>\n        <div class=\"col-md-8\">\n          <h5>Nickname: ${profileHelpTicket.personId | person:people:\"nickName\"}</h5>\n          <h5>Phone: ${profileHelpTicket.personId | person:people:\"phone\" | formatPhone}</h5>\n          <h5>Mobile: ${profileHelpTicket.personId | person:people:\"mobile\" | formatPhone}</h5>\n        </div>\n    </div>\n\n    <div class='row'>\n      <div class='bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\n            </tr>\n            <tr>\n              <td colspan='colSpan'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span click.delegate=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, helpTicketTypeLookupArray)\" id=\"helpTicketType-description\" type=\"text\" compare=\"lookup-array\" class=\"form-control\" ref=\"typeFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people)\" id=\"owner-fullName-0-personId\" type=\"text\" compare=\"lookup-array-item\" class=\"form-control\" ref=\"ownerFilter\"/>\n              </th>\n           \n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n              <th></th>\n            </tr>\n            <tr>\n              <th>No <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:15em\">Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId', 'id', people, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th></th>\n              <th style=\"width:10em;\">Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:8em\">Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:8em\">Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:15em\">Faculty <span click.trigger=\"dataTable.sortArray('personId', 'id', people, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Institution <span click.trigger=\"dataTable.sortArray('institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th>Email</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\n              <td  data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.delegate=\"selectHelpTicket($event, $index)\"\n                data-title=\"type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\n              </td>\n              <td data-title=\"Owner\">\n                <span show.bind=\"helpTicket.owner[0].personId === 'b1b1b1b1b1b1b1b1b1b1b1b1'\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\n                <span class=\"dropbtn\" click.trigger=\"ownHelpTicket(helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== 'b1b1b1b1b1b1b1b1b1b1b1b1'\"> ${helpTicket.owner[0].personId | person:people:'fullName'}</span>\n              </td>\n              <td class=\"dropbtn\" data-title=\"Status\">\n                <div class=\"dropdown\">\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\n                    </div>\n                  </span>\n                </div>\n              </td>\n              <td  data-title=\"Created Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td  data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td class=\"dropbtn\" style=\"width:10rem;\" data-title=\"Customer\" click.delegate=\"showProfile(helpTicket, $event)\"  >${helpTicket.personId | person:people:\"fullName\"}</td>\n              <td  data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n              <td class=\"dropbtn\"  click.delegate=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId | person:people:\"email\"}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n        <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n        <span  click.delegate=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n        <hr/>\n        <div class=\"col-md-4\">\n          <div style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId | person:peopleArray:'email' | gravatarUrl:100:6\"></div>\n        </div>\n        <div class=\"col-md-8\">\n          <h5>Nickname: ${profileHelpTicket.personId | person:peopleArray:\"nickName\"}</h5>\n          <h5>Phone: ${profileHelpTicket.personId | person:peopleArray:\"phone\" | formatPhone}</h5>\n          <h5>Mobile: ${profileHelpTicket.personId | person:peopleArray:\"mobile\" | formatPhone}</h5>\n        </div>\n    </div>\n\n    <div class='row'>\n      <div class='bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n                <td colspan='colSpan'>\n                  <div class=\"checkbox\">\n                    <label>\n                      <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </td>\n            </tr>\n            <tr>\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\n            </tr>\n            <tr>\n              <td colspan='colSpan'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span click.delegate=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, helpTicketTypeLookupArray)\" id=\"helpTicketType-description\" type=\"text\" compare=\"lookup-array\" class=\"form-control\" ref=\"typeFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray)\" id=\"owner-fullName-0-personId\" type=\"text\" compare=\"lookup-array-item\" class=\"form-control\" ref=\"ownerFilter\"/>\n              </th>\n           \n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n              <th></th>\n            </tr>\n            <tr>\n              <th>No <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:15em\">Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId', 'id', peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th></th>\n              <th style=\"width:10em;\">Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:8em\">Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:8em\">Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:15em\">Faculty <span click.trigger=\"dataTable.sortArray('personId', 'id', peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Institution <span click.trigger=\"dataTable.sortArray('institutionId', 'id', peopleArray.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th>Email</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\n              <td  data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.delegate=\"selectHelpTicket($event, $index)\"\n                data-title=\"type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\n              </td>\n              <td data-title=\"Owner\">\n                <span show.bind=\"helpTicket.owner[0].personId === 'b1b1b1b1b1b1b1b1b1b1b1b1'\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\n                <span class=\"dropbtn\" click.trigger=\"ownHelpTicket(helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== 'b1b1b1b1b1b1b1b1b1b1b1b1'\"> ${helpTicket.owner[0].personId | person:peopleArray:'fullName'}</span>\n              </td>\n              <td class=\"dropbtn\" data-title=\"Status\">\n                <div class=\"dropdown\">\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code, status.description)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\n                    </div>\n                  </span>\n                </div>\n              </td>\n              <td  data-title=\"Created Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td  data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td class=\"dropbtn\" style=\"width:10rem;\" data-title=\"Customer\" click.delegate=\"showProfile(helpTicket, $event)\"  >${helpTicket.personId | person:peopleArray:\"fullName\"}</td>\n              <td  data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:peopleArray.institutionsArray:\"_id\":\"name\"}</td>\n              <td class=\"dropbtn\"  click.delegate=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId | person:peopleArray:\"email\"}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
 define('text!modules/user/requests/components/assignmentDetails.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"requests.selectedRequestDetail.assignments.length > 0\">\n      <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\" class=\"panel panel-primary topMargin\">\n        <div class=\"panel-body\">  \n\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th>System</th>\n                <th>Client</th>\n                <th>Student IDs</th>\n                <th>Student Password</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr repeat.for=\"assign of requests.selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\n                <td>${assign.systemId | lookupSid:systems.systemsArray}</td>\n                <td>${assign.client}</td>\n                <td>${assign.studentUserIds}</td>\n                <td>${assign.studentPassword}</td>\n              </tr>\n            </tbody>\n          </table>\n         \n          <h4 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"topMargin\"><strong>Faculty IDs</strong></h4>\n          <div class=\"form-group\">\n            <h5 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\n          </div>\n       \n          <h4 class=\"topMargin\"><strong>System Details</strong></h4>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\n          </div>\n          <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step1.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Term Select -->\n  <div class=\"row\">\n    <div class=\"col-sm-12\">\n      <div class=\"form-group leftJustify\">\n        <select value.bind=\"sessionId\" class=\"form-control\" change.delegate=\"changeSession($event)\" id=\"session\">\n          <option value=\"-1\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n    </div>\n  </div>\n  \n  <div class=\"row\">\n    <div show.bind=\"sessionSelected && useSandbox\" class=\"col-sm-12\">\n      <div class=\"form-group\">\n        <select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\n          <option value=\"-1\">Choose the Type of The Request</option>\n           <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\n           <option value=\"regularCourse\">Regular Course</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n  <compose show.bind=\"regularClient && sessionSelected && typeSelected\" view='./Courses.html'></compose>\n\n  <!-- Number of students -->\n  <div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected\">\n    <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"REGULAR_NUMBER_OF_STUDENTS.content\"></div>\n    <div class=\"topMargin col-lg-5\">\n      <div class=\"form-group\">\n        <label for=\"undergraduates\" class=\"col-sm-3 control-label\">Undergraduates</label>\n        <div class=\"col-sm-8\">\n          <!-- readonly.bind=\"existingRequest\" -->\n          <input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\n                  class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\"/>\n        </div>\n      </div>\n    </div>\n    <div class=\"topMargin col-lg-5\">\n      <div class=\"form-group\">\n            <label for=\"graduates\" class=\"col-sm-3 control-label\">Graduates</label>\n            <div class=\"col-sm-8\">\n               <!-- readonly.bind=\"existingRequest\" -->\n              <input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\n                    class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\"/>\n            </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"row col-lg-offset-3\" show.bind=\"courseSelected\">\n      <span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\n  </div>\n\n  <!-- Begin and End Date -->\n  <div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\n    <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"START_END_DATES.content\"></div>\n      <div class=\"col-lg-5\">\n        <div class=\"form-group topMargin\">\n           <label class=\"col-sm-3 form-control-label \">Start Date</label>\n           <div class=\"col-sm-8\">\n            <flat-picker disabled.bind=\"showLockMessage\" controlid=\"startDate\" config.bind=\"config\" change.delegate=\"changeBeginDate($event)\"  \n                value.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\n           <span id='startDateError'></span>\n           </div>\n        </div>\n      </div>\n      <div class=\"col-lg-5\">\n        <div class=\"form-group topMargin\">\n          <label class=\"col-sm-3 form-control-label \">End Date</label>\n          <div class=\"col-sm-8\">\n            <flat-picker disabled.bind=\"showLockMessage\" controlid=\"endDate\" config.bind=\"config\" value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n           <span id='endDateError'></span>\n          </div>\n        </div>\n      </div>\n       \n    </div>\n\n  <div show.bind=\"sessionId == -1 && requestType == -1\" innerhtml.bind=\"CLIENT_REQUEST_START.content\"></div>\n  <div show.bind=\"sessionId != -1 && requestType == -1 && useSandbox\" innerhtml.bind=\"SESSION_SELECTED.content\"></div>\n  \n  <div show.bind=\"showInfoBox\" class=\"topMargin leftMargin\" style=\"display: none;\" id=\"infoBox\"></div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step2.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\"  >\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\" innerhtml.bind =\"siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content.replace('REQUEST_LIMIT', config.REQUEST_LIMIT)\"></div>\n    </div>\n    \n    <div class=\"col-md-12\" >\n      <div class=\"col-md-5 topMargin\">\n        <label id=\"productList\">Available Products</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <a click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    mouseover.delegate=\"showCurriculum(product, $event)\" mouseout.delegate=\"hideCurriculum()\"\n                    class=\"list-group-item\">${product.name}</a>\n          </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 col-md-offset-1 topMargin\">\n        <label id=\"requestProductsLabel\">Requested Products</label>\n        <div class=\"well well2 overflow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <a  show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                    class=\"list-group-item\">${product.productId | productName:products.productsArray}</a>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });

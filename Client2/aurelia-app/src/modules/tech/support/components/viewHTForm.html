@@ -41,7 +41,7 @@
                     <div class="col-lg-2 topMargin">
                       <div class="checkbox">
                         <label>
-                          <input disabled.bind="sendMailDisable" change.bind="checkSendMail()" checked.bind="sendEmail" type="checkbox"> Send Email
+                          <input disabled.bind="sendMailDisable" checked.bind="sendEmail" type="checkbox"> Send Email
                         </label>
                       </div>
                     </div>
@@ -77,26 +77,6 @@
                           </div>
                       </div>
                 </div>
-                
-                    <!--
-                      <table show.bind="helpTickets.selectedHelpTicketContent.documents.length > 0" id="coursesTable" class="table table-striped table-hover">
-                        <thead>
-                          <tr>
-                            <th>Document </th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr repeat.for="document of helpTickets.selectedHelpTicketContent.documents">
-                            <td data-title="name"><a target="_blank" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}">${document.fileName}</a></td>
-                            <td click.trigger="removeDocument($index)"><i class="fa fa-trash"></i></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      
-                  </div>
-                </div>
-                -->
             </div>
           </div>
           </div>

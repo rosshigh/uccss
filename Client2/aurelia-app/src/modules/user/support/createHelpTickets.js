@@ -33,7 +33,7 @@ export class CreateHelpTickets{
 
     showAdditionalInfo=false;
 
-     constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site, templatingEngine) {
+    constructor(router, sessions, apps, helpTickets, validation, utils, datatable, config, people, clientRequests, products, systems, site, templatingEngine) {
         this.router = router;
         this.sessions = sessions;
         this.apps = apps;
@@ -89,7 +89,8 @@ export class CreateHelpTickets{
             if(!this.showTypes){
                 this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type);
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
-                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+                this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
+                this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
                 this.showAdditionalInfo = true;
                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
@@ -140,15 +141,13 @@ export class CreateHelpTickets{
         //Make sure the user selected a help ticket type
         if(this.helpTicketType !== "NULL"){
             this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
-            this.selectedHelpTicketType = this.getIndex()
+            this.selectedHelpTicketType = this.getIndex();
             this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm)
             this.helpTicketTypeMessage = this.getMessage(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].type);
-            // this.showHelpTicketDescription = true;
             this.inputForm = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].inputForm;
             this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].validation);
           
             await this.products.getProductsArray('?fields=_id name');
-            // if( this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].clientRequired) await this.getActiveRequests();
             this.showAdditionalInfo = false;
 
             if(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].requestKeywords){
@@ -323,7 +322,7 @@ export class CreateHelpTickets{
 
     buildHelpTicketContext(){
         var obj = new Object()
-        
+        this.selectedHelpTicketType =  this.selectedHelpTicketType ?  this.selectedHelpTicketType : 0;
         obj.type = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].description;
         obj.subtype = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[this.selectedHelpTicketType].description;
 

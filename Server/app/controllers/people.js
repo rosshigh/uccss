@@ -112,29 +112,60 @@ module.exports = function (app, config) {
       } if (person.length){
         return next(new DuplicateRecordError("409"));
       } else {
-        var person =  new Model(req.body);          
-        person.save( function ( err, object ){
+        var person =  new Model(req.body);  
+        person.save(function ( err, object ){
           if (err) {
-             return next(err);
+            return next(err);
           } else {
-            var mailObj = {
-                personId: object._id,
-                email: object.email,
-                subject: 'Account Created',
-                type: 'welcome',
-                context: object
-              }     
-              welcome(mailObj)
-                // .then(result => {
-                    res.status(200).json(object);
-                // })
-                // .catch(error => {
-                //     return next(error);
-                // });     
+            res.status(200).json(object);
           }
         });
       }
     })
+  });
+
+  router.post('/api/people/register/facDev',  function(req, res, next){
+    Model.find({institutionId: req.body.institutionId}, function(err, people){
+      if(err){
+        return next(err);
+      } else {       
+        for(var i = 0; i < people.length; i++){
+          if(people[i].roles.indexOf('PRIM') > -1) {           
+            var facCoord = people[i];
+          }
+        }      
+        var context = {facultyCoordinator: facCoord.fullName, name: req.body.fullName, institutions: req.body.institution};
+        var mailObj = {
+          email: req.body.email, 
+          context: context
+        }    
+
+        welcome(mailObj)
+
+        var context = {name: req.body.fullName, institution: req.body.institution};            
+        var mailObj = {
+          email: facCoord.email,
+          institution: req.body.institution,
+          cc: req.body.cc,
+          context: context
+        }                          
+                      
+        newCustomer(mailObj);
+
+      }
+      res.status(201).json({message: "Email sent"});
+    });
+  });
+
+   router.post('/api/people/facDev/activate',  function(req, res, next){
+             
+      var mailObj = {
+        email: req.body.email,
+        context: {name: req.body.name}
+      }                          
+                    
+      newCustomerActivate(mailObj);
+      res.status(201).json({message: "Email sent"});
   });
 
   router.put('/api/people', requireAuth, function(req, res, next){

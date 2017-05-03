@@ -125,13 +125,26 @@ export class Register {
                   "Account Created", 
                   ['OK']
                   ).then(response => {
-                      this.router.navigate("home");
+                    this.sendFacDevEmail();
                   });              
             } else {
                 this.utils.showNotification("An error occurred creating the account");
             }
     }
   };
+
+  sendFacDevEmail(){
+    var email = new Object();
+    this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
+    email.email = this.people.selectedPerson.email;
+    email.institutionId = this.people.selectedPerson.institutionId;
+    email.institution = this.people.selectedInstitution.name;
+    email.fullName = this.people.selectedPerson.firstName + " " +  this.people.selectedPerson.lastName;
+    email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+
+    this.people.sendNewRegisterEmail(email);
+    this.router.navigate("home");
+  }
 
   back(){
     window.history.back()
