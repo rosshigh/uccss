@@ -309,7 +309,8 @@ if(env === 'development'){
         exphbs = require('nodemailer-express-handlebars');
 
   var smtpConfig = {
-    host: config.smtp
+    host: config.smtp,
+    pool: true
   }   
 
   var transporter = nodemailer.createTransport(smtpConfig);

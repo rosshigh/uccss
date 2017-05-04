@@ -455,6 +455,25 @@ export class EditPeople {
         } 
     }
 
+    bulkEmail(){
+        let email = {emailBody: "", emailSubject: ""};
+        return this.dialog.showEmail(
+                "Enter Email",
+                email,
+                ['Submit', 'Cancel']
+            ).then(response => {
+                if (!response.wasCancelled) {
+                    this.sendBulkEmail(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+    }
+
+    sendBulkEmail(email){
+        console.log(email);
+    }
+
     async toggleStatus(id, personStatus){
         if(id && personStatus){
             this.people.selectedPersonFromId(id);
