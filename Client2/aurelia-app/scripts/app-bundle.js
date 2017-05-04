@@ -15313,7 +15313,7 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
           return !context.duplicateAccount;
         } }, { "rule": "custom", "message": "Enter a valid email address",
         "valFunction": function valFunction(context) {
-          return (/^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(context.people.selectedPerson.email)
+          return (/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email)
           );
         }
       }]);
@@ -17862,7 +17862,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                 }
             }, { "rule": "custom", "message": "Enter a valid email address",
                 "valFunction": function valFunction(context) {
-                    return (/^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(context.people.selectedPerson.email)
+                    return (/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email)
                     );
                 }
             }]);

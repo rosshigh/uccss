@@ -352,7 +352,7 @@ export class EditPeople {
             },
             {"rule":"custom","message":"Enter a valid email address",
                 "valFunction":function(context){
-                    return ( /^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(context.people.selectedPerson.email));
+                    return ( /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email));
                 }
             }]);
         this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "institutionId" }]);
