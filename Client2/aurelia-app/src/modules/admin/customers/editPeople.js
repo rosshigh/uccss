@@ -463,7 +463,7 @@ export class EditPeople {
                 ['Submit', 'Cancel']
             ).then(response => {
                 if (!response.wasCancelled) {
-                    this.sendBulkEmail(response.output);
+                    this.sendBulkEmail(response.output.email);
                 } else {
                     console.log("Cancelled");
                 }

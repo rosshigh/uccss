@@ -6,7 +6,6 @@ export class InfoFilterValueConverter {
       })
     }
     return length ? array.length > 0 : array;
-    // return array;
   }
 
 }

@@ -13062,7 +13062,6 @@ define('resources/value-converters/gravatar-url-id',['exports'], function (expor
             break;
           }
         }
-
         var size = size || 80;
         return '<img src="https://secure.gravatar.com/avatar/' + CryptoJS.MD5(email.toLowerCase()) + '.jpg?s=' + size + '"/>';
       } else {
@@ -18028,7 +18027,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             var email = { emailBody: "", emailSubject: "" };
             return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).then(function (response) {
                 if (!response.wasCancelled) {
-                    _this7.sendBulkEmail(response.output);
+                    _this7.sendBulkEmail(response.output.email);
                 } else {
                     console.log("Cancelled");
                 }
@@ -26779,7 +26778,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
                 this._setUpValidation();
                 this.getMessages();
 
-                this.useSandbox = this.config.SANDBOX_USED == 'true';
+                this.useSandbox = this.config.SANDBOX_USED;
                 if (!this.useSandbox) {
                   this.typeSelected = true;
                   this.regularClient = true;

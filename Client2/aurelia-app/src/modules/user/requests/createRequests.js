@@ -84,7 +84,7 @@ export class ViewHelpTickets {
     this._setUpValidation();
     this.getMessages();
 
-     this.useSandbox = this.config.SANDBOX_USED == 'true';
+     this.useSandbox = this.config.SANDBOX_USED;
     if(!this.useSandbox){
       this.typeSelected = true;
       this.regularClient = true;

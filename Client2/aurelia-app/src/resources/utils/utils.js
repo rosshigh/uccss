@@ -34,34 +34,6 @@ export class Utils{
         return countArray.length;
     }
 
-    /*****************************************************************************
-     * Display a notification
-     ****************************************************************************/
-    // showNotification(msg, icon, from, align, time, typeIndex ){
-
-    //     var vertical = from || "top";
-    //     var horizontal = align || "right";
-    //     var interval = time || 2000;
-    //     var ind = typeIndex || 1;
-
-    //     var type = ['','info','success','warning','danger', 'pastel-info', 'pastel-warning', 'pastel-danger'];
-    //     $.notify({
-    //         icon: "fa fa-exclamation-triangle",
-    //         message: msg
-    //         },{
-
-    //             delay: interval,
-    //             placement: {
-    //                 from: vertical,
-    //                 align: horizontal
-    //             },
-    //             type: type[ind],
-    //             template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
-    //                 '<span data-notify="title">{1}</span>' +
-    //                 '<span data-notify="message">{2}</span>' +
-    //             '</div>'
-    //         });
-    // }
 
     /*************************************************************************
      * Compare to objects to determine if they are equal
@@ -230,30 +202,6 @@ export class Utils{
     } 
   }
 
-//?filter=helpTicketRelevant|eq|true&order=name
- //filter=field1|eq|value1	gt,lt,ge,le
-  //filter=[or]field1|value1:value2
-  //filter=[and]field1|eq|value1:field2|eq|value2
-  //filter=[in]field|list|value1:value2:value3
-  // parseURLOptions(options){
-  //   if(options){
-  //     var optionsObject = new Object();
-  //     var optionsArray = new Array();
-  //     var parseArray = options.split('&');
-  //     parseArray.forEach(item => {
-  //       if(item.indexOf('order')) {
-  //         var tempSort = item.split('=');
-  //         optionsObject.sortOrder = {
-  //           fields : tempSort.split(':') 
-  //         }
-  //       } else if(item.indexOf('filter')){
-  //         var tempFilter = item.split("=");
-
-  //       }
-
-  //     })
-  //   }
-  // }
 
   /*****************************************************************************
    * Determine users role for authorizations
@@ -300,20 +248,7 @@ export class Utils{
       return null;
     }
 
-  // tokenIsExpired() {
-  //   let jwt = localStorage.getItem('id_token')
-  //   if(jwt) {
-  //     let jwtExp = jwt_decode(jwt).exp;
-  //     let expiryDate = new Date(0);
-  //     expiryDate.setUTCSeconds(jwtExp);
-      
-  //     if(new Date() < expiryDate) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
+  
 
 
     
