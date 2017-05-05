@@ -287,7 +287,6 @@ export class HelpTickets {
     }
 
     advancedSearch(searchObj){
-        console.log(searchObj.type)
 
          var resultArray = this.utils.copyArray(this.helpTicketsArray);
 
@@ -306,9 +305,6 @@ export class HelpTickets {
                 } else {
                     resultArray = resultArray.filter(item => {
                         var dt = moment(item.createdDate).format('YYYY-MM-DD');
-                        console.log(item.createdDate)
-                        console.log(moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom))
-                        console.log(moment(item.createdDate).isBefore(searchObj.dateRange.dateTo))
                     return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom) && moment(item.createdDate).isBefore(searchObj.dateRange.dateTo);
                     });
                 }

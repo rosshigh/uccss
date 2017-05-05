@@ -224,13 +224,13 @@ export class DataServices {
     INSTITUTION_SERVICES = "institutions";
 
     // //People Services
-    PEOPLE_SERVICE = "people";
-    PERSON_REGISTER = "people/register"
-    CHECK_EMAIL = 'people/checkEmail';
-    CHECK_NAME = 'people/checkName';
-    SEND_MAIL = 'people/sendMail';
-    PASSWORD_RESET = 'passwordReset';
-    NOTES_SERVICE = "notes";
+    // PEOPLE_SERVICE = "people";
+    // PERSON_REGISTER = "people/register"
+    // CHECK_EMAIL = 'people/checkEmail';
+    // CHECK_NAME = 'people/checkName';
+    // SEND_MAIL = 'people/sendMail';
+    // PASSWORD_RESET = 'passwordReset';
+    // NOTES_SERVICE = "notes";
     
     CURRICULUM_SERVICE = 'curriculum';
     CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';

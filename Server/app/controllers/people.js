@@ -23,9 +23,21 @@ module.exports = function (app, config) {
   app.use('/', router);
 
   router.get('/api/people', requireAuth,  function(req, res, next){
-
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          res.status(200).json(object);
+        }
+      });
+  });
+
+  router.get('/api/people/bulkEmail', function(req, res, next){
+    logger.log('Get people builkEmail', 'verbose');
+    var query = buildQuery(req.query, Model.find());
+    query.populate('institutionId',{institutionType: 1, memberType: 1, name: 1, region: 1, city: 1, country: 1})
     query.exec( function(err, object){
         if (err) {
           res.status(500).json(err);
@@ -241,6 +253,12 @@ module.exports = function (app, config) {
     .catch(error => {
        return next(error);
     })
+  });
+
+  router.post('/api/people/sendBulkEmail', requireAuth, function(req, res, next){
+    logger.log('Sending bulk email', 'verbose');
+
+    sendBulkEmail(req.body);
   });
 
   router.post('/api/passwordReset',  function(req, res, next){

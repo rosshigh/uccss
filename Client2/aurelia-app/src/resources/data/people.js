@@ -11,6 +11,13 @@ export class People {
     peopleArray = undefined;
 
     UCC_STAFF_SERVICE = 'uccStaff';
+    PEOPLE_SERVICE = "people";
+    PERSON_REGISTER = "people/register"
+    CHECK_EMAIL = 'people/checkEmail';
+    CHECK_NAME = 'people/checkName';
+    SEND_MAIL = 'people/sendMail';
+    PASSWORD_RESET = 'passwordReset';
+    NOTES_SERVICE = "notes";
 
     constructor(data, utils) {
         this.data = data;
@@ -19,7 +26,7 @@ export class People {
 
     async getPeopleArray(options, refresh) { 
         if (!this.peopleArray || refresh) {
-            var url = this.data.PEOPLE_SERVICE;
+            var url = this.PEOPLE_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -37,8 +44,29 @@ export class People {
         return this.peopleArray;
     }
 
+    async getPeopleBulkEmailArray(options, refresh) { 
+        if (!this.peopleBulkEmailArray || refresh) {
+            var url = this.PEOPLE_SERVICE + '/bulkEmail';
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.peopleBulkEmailArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+        return this.peopleBulkEmailArray;
+    }
+
+
     async getPerson(id) {
-        var url = this.data.PEOPLE_SERVICE + "/" + id;
+        var url = this.PEOPLE_SERVICE + "/" + id;
         try {
             let serverResponse = await this.data.get(url);
             if (!serverResponse.error) {
@@ -73,7 +101,7 @@ export class People {
 
     async getInstitutionPeople(options, refresh){
         if (!this.peopleArray || refresh) {
-            var url = this.data.PEOPLE_SERVICE;
+            var url = this.PEOPLE_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -154,7 +182,7 @@ export class People {
 
 	 async checkEmail() {
         if (this.selectedPerson.email) {
-            let serverResponse = await this.data.get(this.data.CHECK_EMAIL + '?email=' +  this.selectedPerson.email);
+            let serverResponse = await this.data.get(this.CHECK_EMAIL + '?email=' +  this.selectedPerson.email);
             if (serverResponse.code === 409) {
                 return true;
             } else {
@@ -165,7 +193,7 @@ export class People {
 
     async checkName(){
          if (this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId) {
-            let serverResponse = await this.data.get(this.data.CHECK_NAME + '?filter=[and]firstName|eq|' +  this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|'+ this.selectedPerson.institutionId);
+            let serverResponse = await this.data.get(thisCHECK_NAME + '?filter=[and]firstName|eq|' +  this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|'+ this.selectedPerson.institutionId);
             if (serverResponse.code === 409) {
                 return true;
             } else {
@@ -177,9 +205,9 @@ export class People {
     async savePerson(register) {
         if (!this.selectedPerson._id) {
             if(register) {
-                var url = this.data.PERSON_REGISTER;
+                var url = this.PERSON_REGISTER;
             } else {
-                var url = this.data.PEOPLE_SERVICE;
+                var url = this.PEOPLE_SERVICE;
             }
             let response = await this.data.saveObject(this.selectedPerson, url, "post")
                 if (!response.error) {
@@ -191,7 +219,7 @@ export class People {
                 }
                 return response;
         } else {
-            let response = await this.data.saveObject(this.selectedPerson, this.data.PEOPLE_SERVICE, "put")
+            let response = await this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put")
                 if (!response.error) {
                     if(this.peopleArray){
                         this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
@@ -203,7 +231,7 @@ export class People {
 
     async deletePerson(){
         if(this.selectedPerson._id){
-            let serverResponse = await this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
+            let serverResponse = await this.data.deleteObject(this.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
             if (!serverResponse.error) {
                 this.peopleArray.splice(this.editIndex, 1);
                 this.editIndex = - 1;
@@ -213,30 +241,17 @@ export class People {
         return null;
     }
 
-//     getFacCoord(institutionId){
-// console.log('ID ' + institutionId)        
-//         if(this.peopleArray){
-//             for(let i = 0; i < this.peopleArray.length; i++){
-//                 if(this.peopleArray[i].institutionId == institutionId){
-// console.log(this.peopleArray[i])                    
-//                     if(this.peopleArray[i].roles.indexOf('PRIM')) return this.peopleArray[i];
-//                 }
-//             }
-//         }
-//         return undefined;
-//     }
-
     sendNewRegisterEmail(email){       
-        this.data.saveObject(email, this.data.PERSON_REGISTER + "/facDev", 'post');
+        this.data.saveObject(email, this.PERSON_REGISTER + "/facDev", 'post');
     }
 
     activateAccountEmail(email){
-        this.data.saveObject(email, this.data.PEOPLE_SERVICE + "/facDev/activate", 'post');
+        this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
     }
 
     updatePassword(obj){
         if (this.selectedPerson._id) {
-            return this.data.saveObject(obj, this.data.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
+            return this.data.saveObject(obj, this.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
         }
     }
 
@@ -255,7 +270,16 @@ export class People {
 
     async sendCustomerMessage(message){
         if(message.email){
-            var serverResponse = await this.data.saveObject(message, this.data.SEND_MAIL, "put");
+            var serverResponse = await this.data.saveObject(message, this.SEND_MAIL, "put");
+            return serverResponse;
+        } else {
+            return {error: "no email"};
+        }
+    }
+
+    sendBuikEmail(email){
+        if(email.email){
+            var serverResponse = this.data.saveObject(email, this.PEOPLE_SERVICE + '/sendBulkEmail', "post");
             return serverResponse;
         } else {
             return {error: "no email"};
@@ -458,12 +482,12 @@ export class People {
     }
 
     async requestPasswordReset(obj){
-        let serverResponse = await this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
+        let serverResponse = await this.data.saveObject(obj, this.PASSWORD_RESET, "post");
         return serverResponse;
     }
 
     async getPasswordReset(validationCode){
-        let serverResponse = await this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+        let serverResponse = await this.data.get(this.PASSWORD_RESET + '/' + validationCode);
         if(!serverResponse.code){
             this.selectedPerson = serverResponse;
         }
@@ -472,7 +496,7 @@ export class People {
 
     async getNotesArray(options, refresh){
         if (!this.notesArray || refresh) {
-            var url = this.data.NOTES_SERVICE;
+            var url = this.NOTES_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -491,7 +515,7 @@ export class People {
 
     async getRemindersArray(options, refresh){
         if (!this.remindersArray || refresh) {
-            var url = this.data.NOTES_SERVICE;
+            var url = this.NOTES_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -553,7 +577,7 @@ export class People {
         }
 
         if(!this.selectedNote._id){
-            let serverResponse = await this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
+            let serverResponse = await this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "post");
             if (!serverResponse.error) {
                 if(this.notesArray){
                     this.notesArray.push(this.selectedNote);
@@ -564,7 +588,7 @@ export class People {
                 }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "put");
             if (!serverResponse.error) {
                 this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
             } else {
@@ -580,7 +604,7 @@ export class People {
             return;
         }
       
-        var serverResponse = await this.data.saveObject(item, this.data.NOTES_SERVICE, "put");
+        var serverResponse = await this.data.saveObject(item, this.NOTES_SERVICE, "put");
         if (!serverResponse.error) {
             this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
         } else {
@@ -589,19 +613,108 @@ export class People {
         return serverResponse;
     }
 
-
     async deleteNote(){
         if(!this.selectedNote){
             return;
         }
 
-        let serverResponse = await this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+        let serverResponse = await this.data.deleteObject(this.NOTES_SERVICE + '/' + this.selectedNote._id);
         if (!serverResponse.error) {
             this.notesArray.splice(this.editNoteIndex, 1);
             this.editNoteIndex = - 1;
         }
         return serverResponse;
 
+    }
+
+     advancedSearch(searchObj){
+
+         var resultArray = this.utils.copyArray(this.helpTicketsArray);
+
+         if(searchObj.helpTicketNo.length > 0){
+             resultArray = resultArray.filter(item => {
+                 return item.helpTicketNo == searchObj.helpTicketNo;
+             });
+         } else {
+             //Dates
+            if(searchObj.dateRange && searchObj.dateRange.dateFrom !== "" && searchObj.dateRange.dateFrom !== "Invalid date"){
+                if(!searchObj.dateRange.dateTo || searchObj.dateRange.dateTo == "Invalid date"){
+                    resultArray = resultArray.filter(item => {
+                        var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                    return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom);
+                    });
+                } else {
+                    resultArray = resultArray.filter(item => {
+                        var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                    return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom) && moment(item.createdDate).isBefore(searchObj.dateRange.dateTo);
+                    });
+                }
+            }
+            //Status
+            if(searchObj.status && searchObj.status.length > 0){
+                for(var i = 0; i < searchObj.status.length; i++){
+                    searchObj.status[i] = parseInt(searchObj.status[i]);
+                }
+                resultArray = resultArray.filter(item => {
+                    return searchObj.status.indexOf(item.helpTicketStatus) > -1;
+                });
+            }
+            //Keywords
+            if(searchObj.keyWords && searchObj.keyWords.length > 0){
+                var searchKeyword = searchObj.keyWords.toUpperCase();
+                resultArray = resultArray.filter(item => {
+                    if(item.keyWords){
+                        var htKeyword = item.keyWords.toUpperCase();
+                        return htKeyword.indexOf(searchKeyword) > -1;
+                    } else {
+                        return false;
+                    }
+                    
+                });
+            }
+            //Content
+            if(searchObj.content && searchObj.content.length > 0){
+                var searchContent = searchObj.content.toUpperCase();
+                resultArray = resultArray.filter(item => {
+                    for(var i = 0; i < item.content.length; i++){
+                        if(item.content[i].content.comments.toUpperCase().indexOf(searchContent) > -1){
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }         
+            //Type
+            if(searchObj.type && searchObj.type != -1){
+                resultArray = resultArray.filter(item => {
+                    return searchObj.type == item.helpTicketType;
+                });
+            }   
+
+            //Products
+            if(searchObj.productIds && searchObj.productIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.productIds.indexOf(item.productId) > -1;
+                });
+            }
+
+            //People
+             if(searchObj.peopleIds && searchObj.peopleIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.peopleIds.indexOf(item.personId) > -1;
+                });
+            }
+
+             //Instituions
+             if(searchObj.institutionIds && searchObj.institutionIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.institutionIds.indexOf(item.institutionId) > -1;
+                });
+            }
+         }
+
+         
+         return resultArray;
     }
 
 }

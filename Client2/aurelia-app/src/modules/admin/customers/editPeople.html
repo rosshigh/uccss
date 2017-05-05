@@ -2,11 +2,14 @@
     <div class="panel panel-info">
       <div class="panel-body">
         <div class="row">
-            <div show.bind="!personSelected" class="col-lg-12">
+            <div show.bind="!personSelected && !bulkEmailSelected" class="col-lg-12">
                 <compose view="./components/peopleTable.html"></compose>
             </div> 
-            <div show.bind="personSelected" class="col-lg-12">
+            <div show.bind="personSelected && !bulkEmailSelected" class="col-lg-12">
                 <compose view="./components/peopleForm.html"></compose>
+            </div>
+             <div show.bind="!personSelected && bulkEmailSelected" class="col-lg-12">
+                <compose view="./components/bulkEmail.html"></compose>
             </div>
         </div> 
       </div> 

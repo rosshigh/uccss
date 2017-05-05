@@ -576,6 +576,2723 @@ define('resources/index',['exports'], function (exports) {
     config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/numeric-input', './elements/flat-picker', './editor/editor', './elements/add-systems', './elements/tree-node', './elements/rate-it', './elements/date-picker', './elements/edit-client', './elements/multiselect', './value-converters/format-digits', './value-converters/overlap', './value-converters/request-number', './value-converters/append-products', './value-converters/ucc-staff', './value-converters/ucc-title', './value-converters/erpsim', './value-converters/onoff-switch', './value-converters/session-status-button', './value-converters/person-status-button', './value-converters/to-uppercase', './value-converters/help-ticket-statuses', './value-converters/request-status-class', './value-converters/help-ticket-subtypes', './value-converters/format-phone', './value-converters/session-name', './value-converters/get-array-value', './value-converters/info-filter', './value-converters/date-format', './value-converters/help-ticket-type', './value-converters/session-type', './value-converters/lookup-value', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/phone-number', './value-converters/lookup-description', './value-converters/translate-status', './value-converters/product-name', './value-converters/sort-array', './value-converters/system-list', './value-converters/check-box', './value-converters/session', './value-converters/person', './value-converters/file-type', './value-converters/sort-date-time', './value-converters/lookup-sid', './value-converters/course-name', './value-converters/stat-value', './value-converters/person-property', './value-converters/sandbox', './value-converters/ids-requested', './value-converters/filter-clients', './charts/chart-data', './charts/doughnut-chart', './charts/bar-chart']);
   }
 });
+define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Analytics = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Analytics = exports.Analytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function Analytics(router) {
+            _classCallCheck(this, Analytics);
+
+            this.router = router;
+        }
+
+        Analytics.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        Analytics.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'clientRequestsAnalytics'],
+                moduleId: './clientRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'clientRequests',
+                title: 'Client Requests'
+            }, {
+                route: 'helpTicketAnalytics',
+                moduleId: './helpTickets',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'helpTickets',
+                title: 'Help Tickets'
+            }]);
+
+            this.router = router;
+        };
+
+        return Analytics;
+    }()) || _class);
+});
+define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ClientRequestAnalytics = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ClientRequestAnalytics = exports.ClientRequestAnalytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function ClientRequestAnalytics(router, config, people, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, ClientRequestAnalytics);
+
+            this.categories = [{
+                code: 0,
+                description: 'Requests by Institution'
+            }, {
+                code: 1,
+                description: 'Requests by Product'
+            }];
+
+            this.router = router;
+            this.config = config;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+        }
+
+        ClientRequestAnalytics.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        ClientRequestAnalytics.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        ClientRequestAnalytics.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                                this.selectedCategory = this.categories[0];
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        ClientRequestAnalytics.prototype.typeChanged = function typeChanged(category, el) {
+            this.selectedCategory = category;
+            (0, _jquery2.default)('.categoryButtons').removeClass('rowSelected');
+            (0, _jquery2.default)(el.target).addClass('rowSelected');
+            switch (category.code) {
+                case 0:
+                    (0, _jquery2.default)(el.target).css('background-color', 'blue');
+                    break;
+                case 1:
+                    break;
+            }
+        };
+
+        ClientRequestAnalytics.prototype.getInstitutionRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 8;
+                                    break;
+                                }
+
+                                this.numCols = this.config.REQUEST_STATUS.length + 1;
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 5;
+                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 5:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.requests.groupRequestsByInstitution();
+                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context2.next = 9;
+                                break;
+
+                            case 8:
+                                this.displayArray = new Array();
+
+                            case 9:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getInstitutionRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getInstitutionRequests;
+        }();
+
+        ClientRequestAnalytics.prototype.getProductsRequests = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context3.next = 8;
+                                    break;
+                                }
+
+                                this.numCols = this.config.REQUEST_STATUS.length + 1;
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context3.next = 5;
+                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
+
+                            case 5:
+                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+                                    this.requests.groupRequestsByProduct();
+                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
+                                } else {
+                                    this.displayArray = new Array();
+                                }
+                                _context3.next = 9;
+                                break;
+
+                            case 8:
+                                this.displayArray = new Array();
+
+                            case 9:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function getProductsRequests() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return getProductsRequests;
+        }();
+
+        return ClientRequestAnalytics;
+    }()) || _class);
+});
+define('modules/analytics/helpTickets',["exports"], function (exports) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var HelpTicketAnalytics = exports.HelpTicketAnalytics = function HelpTicketAnalytics() {
+        _classCallCheck(this, HelpTicketAnalytics);
+    };
+});
+define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditPeople = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
+            _classCallCheck(this, EditPeople);
+
+            this.personSelected = false;
+            this.navControl = "peopleNavButtons";
+            this.spinnerHTML = "";
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.utils = utils;
+            this.people = people;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+        }
+
+        EditPeople.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditPeople.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        EditPeople.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditPeople.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditPeople.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty(this.originalPerson);
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: _this.userObj._id
+                });
+            });
+        };
+
+        EditPeople.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.buildAudit();
+                                _context3.next = 3;
+                                return this.people.savePerson();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
+                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
+                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+                                }
+                                this.personSelected = false;
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
+            var email = {
+                email: this.people.selectedPerson.email,
+                name: this.people.selectedPerson.firstName
+            };
+            this.people.activateAccountEmail(email);
+        };
+
+        EditPeople.prototype.updateStatus = function updateStatus(person) {
+            this.people.selectedPersonFromId(person._id, 'i');
+            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
+            if (this.people.selectedPerson.personStatus === '01') {
+                this.people.selectedPerson.personStatus = '02';
+            } else {
+                this.people.selectedPerson.personStatus = '01';
+            }
+            this.save();
+        };
+
+        EditPeople.prototype.cancel = function cancel() {
+            this.people.selectPerson(this.editIndex);
+        };
+
+        EditPeople.prototype.back = function back() {
+            var _this2 = this;
+
+            if (this.people.isPersonDirty().length) {
+                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this2.save();
+                    } else {
+                        _this2.personSelected = false;
+                    }
+                });
+            } else {
+                this.personSelected = false;
+            }
+        };
+
+        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
+            (0, _jquery2.default)("#lastName").val("");
+            (0, _jquery2.default)("#roles").val("");
+            (0, _jquery2.default)("#personStatus").val("");
+        };
+
+        return EditPeople;
+    }()) || _class);
+});
+define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.FacCo = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function FacCo(router) {
+            _classCallCheck(this, FacCo);
+
+            this.router = router;
+        }
+
+        FacCo.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        FacCo.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editPeople'],
+                moduleId: './editPeople',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editPeople',
+                title: 'People'
+            }, {
+                route: 'viewRequests',
+                moduleId: './viewRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'viewRequests',
+                title: 'Clients Requests'
+            }]);
+
+            this.router = router;
+        };
+
+        return FacCo;
+    }()) || _class);
+});
+define('modules/facco/viewRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ViewRequests = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ViewRequests = exports.ViewRequests = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function ViewRequests(router, config, people, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, ViewRequests);
+
+            this.navControl = "requestsNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.config = config;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+        }
+
+        ViewRequests.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        ViewRequests.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        ViewRequests.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                            case 3:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        ViewRequests.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
+
+                            case 4:
+                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.dataTable.updateArray([]);
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        ViewRequests.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        return ViewRequests;
+    }()) || _class);
+});
+define('modules/home/contact',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _siteInfo, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Contact = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var Contact = exports.Contact = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function Contact(siteinfo, people, config) {
+			_classCallCheck(this, Contact);
+
+			this.siteinfo = siteinfo;
+			this.people = people;
+			this.config = config;
+		}
+
+		Contact.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var _this = this;
+
+				var uccRoles;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								uccRoles = "";
+
+								this.config.ROLES.forEach(function (item) {
+									if (item.UCConly) uccRoles += item.role + ":";
+								});
+
+								_context.next = 4;
+								return this.config.getConfig();
+
+							case 4:
+								_context.next = 6;
+								return this.people.getUCCStaff(uccRoles);
+
+							case 6:
+
+								this.showPersonalContactInfo = this.config.SHOW_STAFF_CONTACT == 0;
+
+								this.directors = new Array();
+								this.staff = new Array();
+								this.admin = new Array();
+								this.people.uccPeople.forEach(function (item) {
+									if (item.roles.indexOf('TMAN') > -1) {
+										_this.directors.push({ item: item, role: 'TMAN' });
+									} else if (item.roles.indexOf('EDIR') > -1) {
+										_this.directors.push({ item: item, role: 'EDIR' });
+									} else if (item.roles.indexOf('TDIR') > -1) {
+										_this.directors.push({ item: item, role: 'TDIR' });
+									} else if (item.roles.indexOf('TMGR') > -1) {
+										_this.directors.push({ item: item, role: 'TMGR' });
+									} else if (item.roles.indexOf('UCCT') > -1 && item.roles.indexOf('STUT') == -1) {
+										_this.staff.push(item);
+									} else if (item.roles.indexOf('UCCA') > -1) {
+										_this.admin.push(item);
+									}
+								});
+
+								this.staff = this.staff.sort(function (a, b) {
+									return a.lastName > b.lastName;
+								});
+
+								this.directors = this.directors.sort(function (a, b) {
+									return a.role > b.role;
+								});
+
+							case 13:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		return Contact;
+	}()) || _class);
+});
+define('modules/home/home',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _siteInfo, _sessions, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Home = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _sessions.Sessions, _appConfig.AppConfig), _dec(_class = function () {
+        function Home(siteinfo, sessions, config) {
+            _classCallCheck(this, Home);
+
+            this.email = '';
+            this.password = '';
+            this.loginError = '';
+
+            this.sessions = sessions;
+            this.siteinfo = siteinfo;
+            this.config = config;
+            this.config.getConfig(true);
+        }
+
+        Home.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var currentDate, options;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+                                _context.next = 4;
+                                return this.sessions.getSessionsArray('?order=startDate', true);
+
+                            case 4:
+                                _context.next = 6;
+                                return this.siteinfo.getInfoArray(true, options);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        return Home;
+    }()) || _class);
+});
+define('modules/home/logout',['exports', 'aurelia-framework', '../../resources/data/auth'], function (exports, _aureliaFramework, _auth) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Logout = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Logout = exports.Logout = (_dec = (0, _aureliaFramework.inject)(_auth.Auth), _dec(_class = function () {
+    function Logout(auth) {
+      _classCallCheck(this, Logout);
+
+      this.auth = auth;
+    }
+
+    Logout.prototype.activate = function activate() {
+      this.auth.logout();
+      this.router.navigate("home");
+    };
+
+    return Logout;
+  }()) || _class);
+});
+define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', '../../resources/utils/validation', '../../config/appConfig', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _people, _is4ua, _commonDialogs, _validation, _appConfig, _jquery) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Register = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  var _jquery2 = _interopRequireDefault(_jquery);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Register = exports.Register = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _people.People, _is4ua.is4ua, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
+    function Register(router, people, is4ua, utils, config, dialog, validation) {
+      _classCallCheck(this, Register);
+
+      this.router = router;
+      this.people = people;
+      this.is4ua = is4ua;
+      this.utils = utils;
+      this.validation = validation;
+      this.config = config;
+      this.dialog = dialog;
+      this.validation.initialize(this);
+
+      this.thresholdLength = 6;
+      this.threshold = 3;
+    }
+
+    Register.prototype.attached = function attached() {
+      this._setUpValidation();
+      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+    };
+
+    Register.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
+
+              case 2:
+                _context.next = 4;
+                return this.is4ua.loadIs4ua();
+
+              case 4:
+                this.people.selectPerson();
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    Register.prototype.checkEmail = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.people.checkEmail();
+
+              case 2:
+                if (!_context2.sent) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                this.duplicateAccount = true;
+                this.validation.validate(2);
+                _context2.next = 9;
+                break;
+
+              case 7:
+                this.duplicateAccount = false;
+                this.validation.makeValid((0, _jquery2.default)("#register_email"));
+
+              case 9:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function checkEmail() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return checkEmail;
+    }();
+
+    Register.prototype.checkName = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.people.checkName();
+
+              case 2:
+                if (!_context3.sent) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                this.duplicateName = true;
+                this.validation.validate(3);
+                _context3.next = 9;
+                break;
+
+              case 7:
+                this.duplicateName = false;
+                this.validation.makeValid((0, _jquery2.default)("#register_institution"));
+
+              case 9:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function checkName() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return checkName;
+    }();
+
+    Register.prototype.passwordComplexity = function passwordComplexity() {
+
+      var newValue = this.people.selectedPerson.password;
+
+      this.longPassword = newValue.length >= this.thresholdLength;
+
+      var strength = 0;
+      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+      strength += /[a-z]+/.test(newValue) ? 1 : 0;
+      strength += /[0-9]+/.test(newValue) ? 1 : 0;
+      strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+      this.complexPassword = strength >= this.threshold && this.longPassword;
+      this.validation.validate(4);
+    };
+
+    Register.prototype._setUpValidation = function _setUpValidation() {
+      this.validation.addRule(1, "register_firstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+      this.validation.addRule(1, "register_lastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+      this.validation.addRule(1, "register_email", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }, { "rule": "custom", "message": "Enter a valid email address",
+        "valFunction": function valFunction(context) {
+          return (/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email)
+          );
+        }
+      }]);
+      this.validation.addRule(1, "register_phone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }, { "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.phone", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_mobile", [{ "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.mobile", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_institution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }, { "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
+      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+        "valFunction": function valFunction(context) {
+          return context.people.selectedPerson.password === context.password_repeat;
+        } }], true);
+      this.validation.addRule(2, "register_email", [{ "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }]);
+      this.validation.addRule(3, "register_institution", [{ "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+        "valFunction": function valFunction(context) {
+          return context.complexPassword;
+        } }]);
+    };
+
+    Register.prototype.save = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var _this = this;
+
+        var response;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.validation.validate(1)) {
+                  _context4.next = 10;
+                  break;
+                }
+
+                this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
+                _context4.next = 4;
+                return this.people.savePerson('register');
+
+              case 4:
+                response = _context4.sent;
+
+                if (response.error) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).then(function (response) {
+                  _this.sendFacDevEmail();
+                }));
+
+              case 9:
+                this.utils.showNotification("An error occurred creating the account");
+
+              case 10:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function save() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return save;
+    }();
+
+    Register.prototype.sendFacDevEmail = function sendFacDevEmail() {
+      var email = new Object();
+      this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
+      email.email = this.people.selectedPerson.email;
+      email.institutionId = this.people.selectedPerson.institutionId;
+      email.institution = this.people.selectedInstitution.name;
+      email.fullName = this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+
+      this.people.sendNewRegisterEmail(email);
+      this.router.navigate("home");
+    };
+
+    Register.prototype.back = function back() {
+      window.history.back();
+    };
+
+    return Register;
+  }()) || _class);
+});
+define('modules/social/editBlog',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.EditBlogs = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var EditBlogs = exports.EditBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function EditBlogs(social, people, config) {
+			_classCallCheck(this, EditBlogs);
+
+			this.blogSelected = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+		}
+
+		EditBlogs.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		EditBlogs.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		EditBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.social.selectBlog(index);
+			this.blogSelected = true;
+		};
+
+		EditBlogs.prototype.toggleActivation = function toggleActivation() {
+			this.social.selectedBlog.active = !this.social.selectedBlog.active;
+			this.social.saveBlog();
+		};
+
+		EditBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
+		return EditBlogs;
+	}()) || _class);
+});
+define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Social = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Social = exports.Social = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig), _dec(_class = function () {
+        function Social(router, config) {
+            _classCallCheck(this, Social);
+
+            this.router = router;
+            this.config = config;
+        }
+
+        Social.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+            this.blogAuthor = this.userObj.roles.indexOf('BLOG') > -1;
+            this.uccStaff = this.userObj.roles.indexOf('BLOG') > -1;
+        };
+
+        Social.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        Social.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'blogs'],
+                moduleId: './viewBlogs',
+                settings: { auth: false, roles: [] },
+                nav: true,
+                name: 'blogs',
+                title: 'Blogs'
+            }, {
+                route: 'forums',
+                moduleId: './viewForums',
+                settings: { auth: false, roles: [] },
+                nav: true,
+                name: 'forums',
+                title: 'Forums'
+            }, {
+                route: 'writeBlog',
+                moduleId: './writeBlog',
+                settings: { auth: false, roles: [] },
+                nav: false,
+                name: 'writeBlog',
+                title: 'writeBlog'
+            }, {
+                route: 'editBlog',
+                moduleId: './editBlog',
+                settings: { auth: false, roles: [] },
+                nav: false,
+                name: 'editBlog',
+                title: 'editBlog'
+            }]);
+
+            this.router = router;
+        };
+
+        return Social;
+    }()) || _class);
+});
+define('modules/social/viewBlogs',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ViewBlogs = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ViewBlogs = exports.ViewBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function ViewBlogs(social, people, config) {
+			_classCallCheck(this, ViewBlogs);
+
+			this.blogSelected = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+		}
+
+		ViewBlogs.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		ViewBlogs.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ViewBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.selectedIndex = index;
+			this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
+			this.social.selectBlog(index);
+			this.social.saveBlog();
+			this.blogSelected = true;
+		};
+
+		ViewBlogs.prototype.like = function like(index) {
+			if (index === 999) index = this.selectedIndex;
+			this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
+			this.social.selectBlog(index);
+			this.social.saveBlog();
+		};
+
+		ViewBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
+		return ViewBlogs;
+	}()) || _class);
+});
+define('modules/social/viewForums',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig', '../../resources/utils/utils'], function (exports, _aureliaFramework, _social, _people, _appConfig, _utils) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ViewForums = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ViewForums = exports.ViewForums = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig, _utils.Utils), _dec(_class = function () {
+		function ViewForums(social, people, config, utils) {
+			_classCallCheck(this, ViewForums);
+
+			this.forumSelected = false;
+			this.openNewForumForm = false;
+			this.openNewTopicForm = false;
+
+			this.social = social;
+			this.people = people;
+			this.config = config;
+			this.utils = utils;
+		}
+
+		ViewForums.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		ViewForums.prototype.canActivate = function canActivate() {
+			this.userObj = JSON.parse(sessionStorage.getItem('user'));
+		};
+
+		ViewForums.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray(), this.social.getForumArray('?order=-dateCreated', true)]);
+
+							case 2:
+								responses = _context.sent;
+
+							case 3:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ViewForums.prototype.selectForum = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								this.selectedIndex = index;
+								this.social.selectForum(index);
+								_context2.next = 4;
+								return this.social.getForumMessages('?filter=discusssionId|eq|' + this.social.selectedForum._id + '&order=-dateCreated', true);
+
+							case 4:
+								this.forumSelected = true;
+
+							case 5:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function selectForum(_x) {
+				return _ref2.apply(this, arguments);
+			}
+
+			return selectForum;
+		}();
+
+		ViewForums.prototype.newForum = function newForum() {
+			this.social.selectForum();
+			this.openNewForumForm = true;
+		};
+
+		ViewForums.prototype.saveForum = function () {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+					while (1) {
+						switch (_context3.prev = _context3.next) {
+							case 0:
+								this.social.selectedForum.title = this.title;
+								this.social.selectedForum.text = this.text;
+								this.social.selectedForum.personId = this.userObj._id;
+								_context3.next = 5;
+								return this.social.saveForum();
+
+							case 5:
+								response = _context3.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The forum was saved');
+									this._cleanUp();
+								}
+
+							case 7:
+							case 'end':
+								return _context3.stop();
+						}
+					}
+				}, _callee3, this);
+			}));
+
+			function saveForum() {
+				return _ref3.apply(this, arguments);
+			}
+
+			return saveForum;
+		}();
+
+		ViewForums.prototype._cleanUp = function _cleanUp() {
+			this.openNewForumForm = false;
+			this.openNewTopicForm = false;
+		};
+
+		ViewForums.prototype.cancel = function cancel() {
+			this.text = "";
+			this.title = "";
+		};
+
+		ViewForums.prototype.newForumTopic = function newForumTopic() {
+			this.social.selectForumTopic();
+			this.openNewTopicForm = true;
+		};
+
+		ViewForums.prototype.saveForumTopic = function () {
+			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+				var response;
+				return regeneratorRuntime.wrap(function _callee4$(_context4) {
+					while (1) {
+						switch (_context4.prev = _context4.next) {
+							case 0:
+								this.social.selectedForumTopic.title = this.FormTopicTitle;
+								this.social.selectedForumTopic.text = this.ForumTopicText;
+								this.social.selectedForumTopic.personId = this.userObj._id;
+								this.social.selectedForumTopic.parentId = this.social.selectedForum._id;
+								_context4.next = 6;
+								return this.social.saveForumTopic();
+
+							case 6:
+								response = _context4.sent;
+
+								if (!response.error) {
+									this.utils.showNotification('The forum was saved');
+									this._cleanUp();
+								}
+
+							case 8:
+							case 'end':
+								return _context4.stop();
+						}
+					}
+				}, _callee4, this);
+			}));
+
+			function saveForumTopic() {
+				return _ref4.apply(this, arguments);
+			}
+
+			return saveForumTopic;
+		}();
+
+		ViewForums.prototype.back = function back() {
+			this.forumSelected = false;
+			this.openNewTopicForm = false;
+		};
+
+		return ViewForums;
+	}()) || _class);
+});
+define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../resources/utils/validation', '../../resources/utils/utils'], function (exports, _aureliaFramework, _social, _people, _validation, _utils) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.WriteBlogs = undefined;
+
+	var _validation2 = _interopRequireDefault(_validation);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var WriteBlogs = exports.WriteBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _validation2.default, _utils.Utils), _dec(_class = function () {
+		function WriteBlogs(social, people, validation, utils) {
+			_classCallCheck(this, WriteBlogs);
+
+			this.blogSelected = false;
+
+			this.social = social;
+			this.people = people;
+			this.validation = validation;
+			this.validation.initialize(this);
+			this.utils = utils;
+			this._setupValidation();
+		}
+
+		WriteBlogs.prototype.canActivate = function canActivate() {
+			this.userObj = JSON.parse(sessionStorage.getItem('user'));
+		};
+
+		WriteBlogs.prototype.attached = function attached() {
+			$('[data-toggle="tooltip"]').tooltip();
+		};
+
+		WriteBlogs.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true), this.social.getBlogArray("?filter=personId|eq|" + this.userObj._id + "&order=-dateCreated", true)]);
+
+							case 2:
+								responses = _context.sent;
+
+								this.social.selectBlog();
+
+							case 4:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		WriteBlogs.prototype.new = function _new() {
+			this.social.selectBlog();
+			this.blogSelected = true;
+		};
+
+		WriteBlogs.prototype.save = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var serverResponse;
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								if (!this.validation.validate(1)) {
+									_context2.next = 6;
+									break;
+								}
+
+								this.social.selectedBlog.personId = this.userObj._id;
+								_context2.next = 4;
+								return this.social.saveBlog();
+
+							case 4:
+								serverResponse = _context2.sent;
+
+								if (serverResponse && !serverResponse.error) {
+									this.utils.showNotification("The blog was saved");
+								}
+
+							case 6:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function save() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return save;
+		}();
+
+		WriteBlogs.prototype.selectBlog = function selectBlog(index) {
+			this.social.selectBlog(index);
+			this.blogSelected = true;
+		};
+
+		WriteBlogs.prototype.back = function back() {
+			this.blogSelected = false;
+		};
+
+		WriteBlogs.prototype._setupValidation = function _setupValidation() {
+			this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "social.selectedBlog.title" }]);
+			this.validation.addRule(1, "editTeaser", [{ "rule": "required", "message": "Teaser is required", "value": "social.selectedBlog.teaser" }]);
+			this.validation.addRule(1, "blogContent", [{ "rule": "required", "message": "Content is required", "value": "social.selectedBlog.text" }]);
+		};
+
+		return WriteBlogs;
+	}()) || _class);
+});
+define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Profile = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_is4ua.is4ua, _people.People, _aureliaRouter.Router, _utils.Utils, _validation2.default, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function Profile(is4ua, people, router, utils, validation, dialog) {
+            _classCallCheck(this, Profile);
+
+            this.is4ua = is4ua;
+            this.people = people;
+            this.router = router;
+            this.utils = utils;
+            this.dialog = dialog;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this._setupValidation();
+
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        }
+
+        Profile.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+            this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+
+            this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
+            this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
+            this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+                "valFunction": function valFunction(context) {
+                    return context.password === context.password_repeat;
+                } }], true);
+
+            this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+                "valFunction": function valFunction(context) {
+                    return context.complexPassword;
+                } }]);
+        };
+
+        Profile.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Profile.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getPerson(this.userObj._id), this.people.getInstitutionsArray('?fields=_id name&order=name'), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.user = this.people.selectedPerson;
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Profile.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty(this.user);
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: JSON.parse(sessionStorage.getItem('user'))._id
+                });
+            });
+        };
+
+        Profile.prototype.save = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context2.next = 8;
+                                    break;
+                                }
+
+                                if (this.password.length > 0) {
+                                    this.people.selectedPerson.password = this.password;
+                                }
+                                if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
+                                    this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+                                }
+                                this.buildAudit();
+                                _context2.next = 6;
+                                return this.people.savePerson();
+
+                            case 6:
+                                response = _context2.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("Your profile has been updated");
+                                    this.router.navigate("user");
+                                } else {
+                                    this.utils.showNotification("An error occurred updating your profile");
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function save() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Profile.prototype.changePassword = function changePassword() {
+            var _this2 = this;
+
+            var passwords = { password: "", password_repeat: "" };
+            return this.dialog.showPassword("Change Password", passwords, ['Submit', 'Cancel']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.savePassword(response.output.password);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+        };
+
+        Profile.prototype.savePassword = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(password) {
+                var obj, response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                obj = {
+                                    password: password
+                                };
+                                _context3.next = 3;
+                                return this.people.updatePassword(obj);
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("The password was updated");
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function savePassword(_x) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return savePassword;
+        }();
+
+        Profile.prototype.cancel = function cancel() {
+            this.utils.copyObject(this.users, this.people.selectedPerson);
+        };
+
+        return Profile;
+    }()) || _class);
+});
+define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _people, _jquery) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ResetPassword = undefined;
+
+	var _validation2 = _interopRequireDefault(_validation);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ResetPassword = exports.ResetPassword = (_dec = (0, _aureliaFramework.inject)(_people.People, _aureliaRouter.Router, _validation2.default, _utils.Utils), _dec(_class = function () {
+		function ResetPassword(people, router, validation, utils) {
+			_classCallCheck(this, ResetPassword);
+
+			this.people = people;
+			this.router = router;
+			this.validation = validation;
+			this.validation.initialize(this);
+			this._setupValidation();
+			this.utils = utils;
+			this.thresholdLength = 6;
+			this.threshold = 3;
+			this.showForm = true;
+			this.passwordReset = true;
+		}
+
+		ResetPassword.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(params) {
+				var validationCode, response;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								if (!params.id) this.router.navigate("home");
+								validationCode = atob(params.id).substring(0, 24);
+								_context.next = 4;
+								return this.people.getPasswordReset(validationCode);
+
+							case 4:
+								response = _context.sent;
+
+								if (response.code === 404) {
+									this.showForm = false;
+								}
+
+							case 6:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate(_x) {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ResetPassword.prototype.passwordComplexity = function passwordComplexity() {
+
+			var newValue = this.newPassword;
+
+			this.longPassword = newValue.length >= this.thresholdLength;
+
+			var strength = 0;
+			strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+			strength += /[a-z]+/.test(newValue) ? 1 : 0;
+			strength += /[0-9]+/.test(newValue) ? 1 : 0;
+			strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+			this.complexPassword = strength >= this.threshold && this.longPassword;
+			this.validation.validate(4);
+		};
+
+		ResetPassword.prototype.savePassword = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var obj, response;
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								if (!this.validation.validate(1)) {
+									_context2.next = 6;
+									break;
+								}
+
+								obj = {
+									password: this.newPassword
+								};
+								_context2.next = 4;
+								return this.people.updatePassword(obj);
+
+							case 4:
+								response = _context2.sent;
+
+								if (!response.error) {
+									this.utils.showNotification("The password was updated");
+									this.router.navigate("home");
+								}
+
+							case 6:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function savePassword() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return savePassword;
+		}();
+
+		ResetPassword.prototype._setupValidation = function _setupValidation() {
+			this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "newPassword" }]);
+			this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+				"valFunction": function valFunction(context) {
+					return context.newPassword === context.password_repeat;
+				} }], true);
+			this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+				"valFunction": function valFunction(context) {
+					return context.complexPassword;
+				} }]);
+		};
+
+		return ResetPassword;
+	}()) || _class);
+});
+define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.User = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests, _people.People), _dec(_class = function () {
+        function User(router, utils, config, siteinfo, sessions, helpTickets, requests, people) {
+            _classCallCheck(this, User);
+
+            this.router = router;
+            this.utils = utils;
+            this.config = config;
+            this.siteinfo = siteinfo;
+            this.sessions = sessions;
+            this.helpTickets = helpTickets;
+            this.requests = requests;
+            this.people = people;
+        }
+
+        User.prototype.attached = function attached() {
+            $('.carousel').carousel({
+                interval: 10000
+            });
+
+            this.updateTwitter(document, "script", "twitter-wjs");
+
+            this.alertIndex = this.utils.arrayContainsValue(this.siteinfo.siteArray, "itemType", "ALRT");
+            if (!sessionStorage.getItem('alert')) {
+                if (this.alertIndex > -1) {
+                    this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
+                }
+            }
+        };
+
+        User.prototype.updateTwitter = function updateTwitter(d, s, id) {
+            var js,
+                fjs = d.getElementsByTagName(s)[0],
+                p = /^http:/.test(d.location) ? 'http' : 'https';
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.src = p + "://platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        };
+
+        User.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.getData();
+
+                            case 2:
+
+                                this.helpTicketArray = [{
+                                    value: this.helpTickets.newHelpTickets || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "New"
+                                }, {
+                                    value: this.helpTickets.underReviewHelpTickets || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Under Review"
+                                }, {
+                                    value: this.helpTickets.customerActionHelpTickets || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                                this.clientRequestsArray = [{
+                                    value: this.requests.unassignedRequests || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "Unassigned"
+                                }, {
+                                    value: this.requests.updatedRequests || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Updated"
+                                }, {
+                                    value: this.requests.customerActionRequests || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        User.prototype.getData = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _this = this;
+
+                var currentDate, options, countOptions, responses, _responses, requestCountArray, weather, weatherObj, _weather, uccweather;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+
+                                if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
+                                    _context2.next = 15;
+                                    break;
+                                }
+
+                                countOptions = '';
+
+                                this.countHeader = "Recent Request History";
+                                _context2.next = 8;
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
+
+                            case 8:
+                                responses = _context2.sent;
+
+                                this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
+                                this.showHelpTickets = this.helpTickets.newHelpTickets;
+                                this.showCarousel = this.siteinfo.showCarousel();
+                                this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
+                                _context2.next = 23;
+                                break;
+
+                            case 15:
+                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
+
+                                this.countHeader = "Your Institution's Recent Request History";
+                                _context2.next = 19;
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
+
+                            case 19:
+                                _responses = _context2.sent;
+
+                                this.showRequests = this.requests.customerActionRequests;
+                                this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
+                                this.showCarousel = this.siteinfo.showCarousel();
+
+                            case 23:
+                                this.requestsCount = new Array();
+                                this.countLabels = new Array();
+                                _context2.next = 27;
+                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+
+                            case 27:
+                                requestCountArray = _context2.sent;
+
+                                if (requestCountArray) {
+                                    requestCountArray.forEach(function (item) {
+                                        _this.requestsCount.push(item.count);
+                                        _this.countLabels.push(item.session);
+                                    });
+                                }
+
+                                this.temp = undefined;
+
+                                if (sessionStorage.getItem('weather')) {
+                                    _context2.next = 42;
+                                    break;
+                                }
+
+                                if (!this.userObj.city) {
+                                    _context2.next = 40;
+                                    break;
+                                }
+
+                                _context2.next = 34;
+                                return this.siteinfo.getWeather(this.userObj.city);
+
+                            case 34:
+                                weather = _context2.sent;
+
+                                this.temp = parseFloat(weather.main.temp) - 273.15;
+                                if (this.config.TEMP_SCALE == 'C') {
+                                    this.temp = this.temp.toFixed(1) + '\xB0 C';
+                                } else {
+                                    this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + '\xB0 F';
+                                }
+                                this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" + weather.weather[0].icon + ".png";
+                                weatherObj = { temp: this.temp, url: this.weatherIcon };
+
+                                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
+
+                            case 40:
+                                _context2.next = 45;
+                                break;
+
+                            case 42:
+                                _weather = JSON.parse(sessionStorage.getItem('weather'));
+
+                                this.temp = _weather.temp;
+                                this.weatherIcon = _weather.url;
+
+                            case 45:
+                                if (sessionStorage.getItem('uccweather')) {
+                                    uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
+
+                                    this.ucctemp = parseFloat(uccweather.temp) - 273.15;
+                                    if (this.config.TEMP_SCALE == 'C') {
+                                        this.ucctemp = this.ucctemp.toFixed(1) + '\xB0 C';
+                                    } else {
+                                        this.ucctemp = (parseFloat(this.ucctemp) * 1.8 + 32).toFixed(1) + '\xB0 F';
+                                    }
+                                    this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL + 'icons/' + uccweather.icon + ".png";
+                                    console.log(this.uccweatherIcon);
+                                }
+
+                            case 46:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getData() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        User.prototype.moreInfoExists = function moreInfoExists(item) {
+            return item.url && item.url.length > 0;
+        };
+
+        return User;
+    }()) || _class);
+});
 define('resources/charts/bar-chart',['exports', './chart-element'], function (exports, _chartElement) {
   'use strict';
 
@@ -3016,13 +5733,6 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             this.FILE_URL = "http://localhost:5000/api/upload";
             this.FILE_DOWNLOAD_URL = "http://localhost:5000/";
             this.INSTITUTION_SERVICES = "institutions";
-            this.PEOPLE_SERVICE = "people";
-            this.PERSON_REGISTER = "people/register";
-            this.CHECK_EMAIL = 'people/checkEmail';
-            this.CHECK_NAME = 'people/checkName';
-            this.SEND_MAIL = 'people/sendMail';
-            this.PASSWORD_RESET = 'passwordReset';
-            this.NOTES_SERVICE = "notes";
             this.CURRICULUM_SERVICE = 'curriculum';
             this.CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
             this.SESSIONS_SERVICE = "sessions";
@@ -4908,7 +7618,6 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
         };
 
         HelpTickets.prototype.advancedSearch = function advancedSearch(searchObj) {
-            console.log(searchObj.type);
 
             var resultArray = this.utils.copyArray(this.helpTicketsArray);
 
@@ -4926,9 +7635,6 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
                     } else {
                         resultArray = resultArray.filter(function (item) {
                             var dt = (0, _moment2.default)(item.createdDate).format('YYYY-MM-DD');
-                            console.log(item.createdDate);
-                            console.log((0, _moment2.default)(item.createdDate).isAfter(searchObj.dateRange.dateFrom));
-                            console.log((0, _moment2.default)(item.createdDate).isBefore(searchObj.dateRange.dateTo));
                             return (0, _moment2.default)(item.createdDate).isAfter(searchObj.dateRange.dateFrom) && (0, _moment2.default)(item.createdDate).isBefore(searchObj.dateRange.dateTo);
                         });
                     }
@@ -5610,6 +8316,13 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             this.cleanObject = true;
             this.peopleArray = undefined;
             this.UCC_STAFF_SERVICE = 'uccStaff';
+            this.PEOPLE_SERVICE = "people";
+            this.PERSON_REGISTER = "people/register";
+            this.CHECK_EMAIL = 'people/checkEmail';
+            this.CHECK_NAME = 'people/checkName';
+            this.SEND_MAIL = 'people/sendMail';
+            this.PASSWORD_RESET = 'passwordReset';
+            this.NOTES_SERVICE = "notes";
 
             this.data = data;
             this.utils = utils;
@@ -5627,7 +8340,7 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                     break;
                                 }
 
-                                url = this.data.PEOPLE_SERVICE;
+                                url = this.PEOPLE_SERVICE;
 
                                 url += options ? options : "";
                                 _context.prev = 3;
@@ -5679,63 +8392,78 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
             return getPeopleArray;
         }();
 
-        People.prototype.getPerson = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(id) {
+        People.prototype.getPeopleBulkEmailArray = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options, refresh) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                url = this.data.PEOPLE_SERVICE + "/" + id;
-                                _context2.prev = 1;
-                                _context2.next = 4;
+                                if (!(!this.peopleBulkEmailArray || refresh)) {
+                                    _context2.next = 19;
+                                    break;
+                                }
+
+                                url = this.PEOPLE_SERVICE + '/bulkEmail';
+
+                                url += options ? options : "";
+                                _context2.prev = 3;
+                                _context2.next = 6;
                                 return this.data.get(url);
 
-                            case 4:
+                            case 6:
                                 serverResponse = _context2.sent;
 
-                                if (!serverResponse.error) {
-                                    this.selectedPerson = serverResponse;
-                                } else {
-                                    this.selectedPerson = undefined;
-                                    this.data.processError(serverResponse);
+                                if (serverResponse.error) {
+                                    _context2.next = 11;
+                                    break;
                                 }
-                                _context2.next = 12;
+
+                                this.peopleBulkEmailArray = serverResponse;
+                                _context2.next = 13;
                                 break;
 
-                            case 8:
-                                _context2.prev = 8;
-                                _context2.t0 = _context2['catch'](1);
-
-                                this.selectedPerson = undefined;
-                                console.log(_context2.t0);
-
-                            case 12:
-                                return _context2.abrupt('return', this.selectedPerson);
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context2.abrupt('return', undefined);
 
                             case 13:
+                                _context2.next = 19;
+                                break;
+
+                            case 15:
+                                _context2.prev = 15;
+                                _context2.t0 = _context2['catch'](3);
+
+                                console.log(_context2.t0);
+                                return _context2.abrupt('return', undefined);
+
+                            case 19:
+                                return _context2.abrupt('return', this.peopleBulkEmailArray);
+
+                            case 20:
                             case 'end':
                                 return _context2.stop();
                         }
                     }
-                }, _callee2, this, [[1, 8]]);
+                }, _callee2, this, [[3, 15]]);
             }));
 
-            function getPerson(_x3) {
+            function getPeopleBulkEmailArray(_x3, _x4) {
                 return _ref2.apply(this, arguments);
             }
 
-            return getPerson;
+            return getPeopleBulkEmailArray;
         }();
 
-        People.prototype.getUCCStaff = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(uccRoles) {
+        People.prototype.getPerson = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(id) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                url = this.UCC_STAFF_SERVICE + '/' + uccRoles;
+                                url = this.PEOPLE_SERVICE + "/" + id;
                                 _context3.prev = 1;
                                 _context3.next = 4;
                                 return this.data.get(url);
@@ -5743,107 +8471,156 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                             case 4:
                                 serverResponse = _context3.sent;
 
-                                if (serverResponse.error) {
-                                    _context3.next = 9;
-                                    break;
+                                if (!serverResponse.error) {
+                                    this.selectedPerson = serverResponse;
+                                } else {
+                                    this.selectedPerson = undefined;
+                                    this.data.processError(serverResponse);
                                 }
-
-                                this.uccPeople = serverResponse;
-                                _context3.next = 11;
+                                _context3.next = 12;
                                 break;
 
-                            case 9:
-                                this.data.processError(serverResponse);
-                                return _context3.abrupt('return', undefined);
-
-                            case 11:
-                                _context3.next = 17;
-                                break;
-
-                            case 13:
-                                _context3.prev = 13;
+                            case 8:
+                                _context3.prev = 8;
                                 _context3.t0 = _context3['catch'](1);
 
+                                this.selectedPerson = undefined;
                                 console.log(_context3.t0);
-                                return _context3.abrupt('return', undefined);
 
-                            case 17:
-                                return _context3.abrupt('return', this.uccPeople);
+                            case 12:
+                                return _context3.abrupt('return', this.selectedPerson);
 
-                            case 18:
+                            case 13:
                             case 'end':
                                 return _context3.stop();
                         }
                     }
-                }, _callee3, this, [[1, 13]]);
+                }, _callee3, this, [[1, 8]]);
             }));
 
-            function getUCCStaff(_x4) {
+            function getPerson(_x5) {
                 return _ref3.apply(this, arguments);
+            }
+
+            return getPerson;
+        }();
+
+        People.prototype.getUCCStaff = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(uccRoles) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                url = this.UCC_STAFF_SERVICE + '/' + uccRoles;
+                                _context4.prev = 1;
+                                _context4.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                serverResponse = _context4.sent;
+
+                                if (serverResponse.error) {
+                                    _context4.next = 9;
+                                    break;
+                                }
+
+                                this.uccPeople = serverResponse;
+                                _context4.next = 11;
+                                break;
+
+                            case 9:
+                                this.data.processError(serverResponse);
+                                return _context4.abrupt('return', undefined);
+
+                            case 11:
+                                _context4.next = 17;
+                                break;
+
+                            case 13:
+                                _context4.prev = 13;
+                                _context4.t0 = _context4['catch'](1);
+
+                                console.log(_context4.t0);
+                                return _context4.abrupt('return', undefined);
+
+                            case 17:
+                                return _context4.abrupt('return', this.uccPeople);
+
+                            case 18:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this, [[1, 13]]);
+            }));
+
+            function getUCCStaff(_x6) {
+                return _ref4.apply(this, arguments);
             }
 
             return getUCCStaff;
         }();
 
         People.prototype.getInstitutionPeople = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(options, refresh) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options, refresh) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 if (!(!this.peopleArray || refresh)) {
-                                    _context4.next = 19;
+                                    _context5.next = 19;
                                     break;
                                 }
 
-                                url = this.data.PEOPLE_SERVICE;
+                                url = this.PEOPLE_SERVICE;
 
                                 url += options ? options : "";
-                                _context4.prev = 3;
-                                _context4.next = 6;
+                                _context5.prev = 3;
+                                _context5.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context4.sent;
+                                serverResponse = _context5.sent;
 
                                 if (serverResponse.error) {
-                                    _context4.next = 11;
+                                    _context5.next = 11;
                                     break;
                                 }
 
                                 this.instutionPeopleArray = serverResponse;
-                                _context4.next = 13;
+                                _context5.next = 13;
                                 break;
 
                             case 11:
                                 this.data.processError(serverResponse);
-                                return _context4.abrupt('return', undefined);
+                                return _context5.abrupt('return', undefined);
 
                             case 13:
-                                _context4.next = 19;
+                                _context5.next = 19;
                                 break;
 
                             case 15:
-                                _context4.prev = 15;
-                                _context4.t0 = _context4['catch'](3);
+                                _context5.prev = 15;
+                                _context5.t0 = _context5['catch'](3);
 
-                                console.log(_context4.t0);
-                                return _context4.abrupt('return', undefined);
+                                console.log(_context5.t0);
+                                return _context5.abrupt('return', undefined);
 
                             case 19:
-                                return _context4.abrupt('return', this.peopleArray);
+                                return _context5.abrupt('return', this.peopleArray);
 
                             case 20:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this, [[3, 15]]);
+                }, _callee5, this, [[3, 15]]);
             }));
 
-            function getInstitutionPeople(_x5, _x6) {
-                return _ref4.apply(this, arguments);
+            function getInstitutionPeople(_x7, _x8) {
+                return _ref5.apply(this, arguments);
             }
 
             return getInstitutionPeople;
@@ -5912,62 +8689,19 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.checkEmail = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                if (!this.selectedPerson.email) {
-                                    _context5.next = 9;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.data.get(this.data.CHECK_EMAIL + '?email=' + this.selectedPerson.email);
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!(serverResponse.code === 409)) {
-                                    _context5.next = 8;
-                                    break;
-                                }
-
-                                return _context5.abrupt('return', true);
-
-                            case 8:
-                                return _context5.abrupt('return', false);
-
-                            case 9:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function checkEmail() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return checkEmail;
-        }();
-
-        People.prototype.checkName = function () {
             var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                if (!(this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId)) {
+                                if (!this.selectedPerson.email) {
                                     _context6.next = 9;
                                     break;
                                 }
 
                                 _context6.next = 3;
-                                return this.data.get(this.data.CHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+                                return this.data.get(this.CHECK_EMAIL + '?email=' + this.selectedPerson.email);
 
                             case 3:
                                 serverResponse = _context6.sent;
@@ -5990,36 +8724,79 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee6, this);
             }));
 
-            function checkName() {
+            function checkEmail() {
                 return _ref6.apply(this, arguments);
+            }
+
+            return checkEmail;
+        }();
+
+        People.prototype.checkName = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (!(this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId)) {
+                                    _context7.next = 9;
+                                    break;
+                                }
+
+                                _context7.next = 3;
+                                return this.data.get(thisCHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+
+                            case 3:
+                                serverResponse = _context7.sent;
+
+                                if (!(serverResponse.code === 409)) {
+                                    _context7.next = 8;
+                                    break;
+                                }
+
+                                return _context7.abrupt('return', true);
+
+                            case 8:
+                                return _context7.abrupt('return', false);
+
+                            case 9:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function checkName() {
+                return _ref7.apply(this, arguments);
             }
 
             return checkName;
         }();
 
         People.prototype.savePerson = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(register) {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(register) {
                 var url, _response, _response2;
 
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 if (this.selectedPerson._id) {
-                                    _context7.next = 9;
+                                    _context8.next = 9;
                                     break;
                                 }
 
                                 if (register) {
-                                    url = this.data.PERSON_REGISTER;
+                                    url = this.PERSON_REGISTER;
                                 } else {
-                                    url = this.data.PEOPLE_SERVICE;
+                                    url = this.PEOPLE_SERVICE;
                                 }
-                                _context7.next = 4;
+                                _context8.next = 4;
                                 return this.data.saveObject(this.selectedPerson, url, "post");
 
                             case 4:
-                                _response = _context7.sent;
+                                _response = _context8.sent;
 
                                 if (!_response.error) {
                                     if (this.peopleArray) {
@@ -6028,65 +8805,23 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(_response, "There was an error creating the account.");
                                 }
-                                return _context7.abrupt('return', _response);
+                                return _context8.abrupt('return', _response);
 
                             case 9:
-                                _context7.next = 11;
-                                return this.data.saveObject(this.selectedPerson, this.data.PEOPLE_SERVICE, "put");
+                                _context8.next = 11;
+                                return this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put");
 
                             case 11:
-                                _response2 = _context7.sent;
+                                _response2 = _context8.sent;
 
                                 if (!_response2.error) {
                                     if (this.peopleArray) {
                                         this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
                                     }
                                 }
-                                return _context7.abrupt('return', _response2);
+                                return _context8.abrupt('return', _response2);
 
                             case 14:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function savePerson(_x7) {
-                return _ref7.apply(this, arguments);
-            }
-
-            return savePerson;
-        }();
-
-        People.prototype.deletePerson = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (!this.selectedPerson._id) {
-                                    _context8.next = 6;
-                                    break;
-                                }
-
-                                _context8.next = 3;
-                                return this.data.deleteObject(this.data.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
-
-                            case 3:
-                                serverResponse = _context8.sent;
-
-                                if (!serverResponse.error) {
-                                    this.peopleArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                }
-                                return _context8.abrupt('return', serverResponse);
-
-                            case 6:
-                                return _context8.abrupt('return', null);
-
-                            case 7:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -6094,24 +8829,66 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee8, this);
             }));
 
-            function deletePerson() {
+            function savePerson(_x9) {
                 return _ref8.apply(this, arguments);
+            }
+
+            return savePerson;
+        }();
+
+        People.prototype.deletePerson = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                if (!this.selectedPerson._id) {
+                                    _context9.next = 6;
+                                    break;
+                                }
+
+                                _context9.next = 3;
+                                return this.data.deleteObject(this.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
+
+                            case 3:
+                                serverResponse = _context9.sent;
+
+                                if (!serverResponse.error) {
+                                    this.peopleArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                }
+                                return _context9.abrupt('return', serverResponse);
+
+                            case 6:
+                                return _context9.abrupt('return', null);
+
+                            case 7:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function deletePerson() {
+                return _ref9.apply(this, arguments);
             }
 
             return deletePerson;
         }();
 
         People.prototype.sendNewRegisterEmail = function sendNewRegisterEmail(email) {
-            this.data.saveObject(email, this.data.PERSON_REGISTER + "/facDev", 'post');
+            this.data.saveObject(email, this.PERSON_REGISTER + "/facDev", 'post');
         };
 
         People.prototype.activateAccountEmail = function activateAccountEmail(email) {
-            this.data.saveObject(email, this.data.PEOPLE_SERVICE + "/facDev/activate", 'post');
+            this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
         };
 
         People.prototype.updatePassword = function updatePassword(obj) {
             if (this.selectedPerson._id) {
-                return this.data.saveObject(obj, this.data.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
+                return this.data.saveObject(obj, this.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
             }
         };
 
@@ -6129,78 +8906,28 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.sendCustomerMessage = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(message) {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(message) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                if (!message.email) {
-                                    _context9.next = 7;
-                                    break;
-                                }
-
-                                _context9.next = 3;
-                                return this.data.saveObject(message, this.data.SEND_MAIL, "put");
-
-                            case 3:
-                                serverResponse = _context9.sent;
-                                return _context9.abrupt('return', serverResponse);
-
-                            case 7:
-                                return _context9.abrupt('return', { error: "no email" });
-
-                            case 8:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-
-            function sendCustomerMessage(_x8) {
-                return _ref9.apply(this, arguments);
-            }
-
-            return sendCustomerMessage;
-        }();
-
-        People.prototype.getInstitutionsArray = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(options, refresh) {
-                var url, _response3;
-
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                         switch (_context10.prev = _context10.next) {
                             case 0:
-                                if (!(!this.institutionsArray || refresh)) {
-                                    _context10.next = 14;
+                                if (!message.email) {
+                                    _context10.next = 7;
                                     break;
                                 }
 
-                                url = this.data.INSTITUTION_SERVICES;
+                                _context10.next = 3;
+                                return this.data.saveObject(message, this.SEND_MAIL, "put");
 
-                                url += options ? options : "";
-                                _context10.next = 5;
-                                return this.data.get(url);
+                            case 3:
+                                serverResponse = _context10.sent;
+                                return _context10.abrupt('return', serverResponse);
 
-                            case 5:
-                                _response3 = _context10.sent;
+                            case 7:
+                                return _context10.abrupt('return', { error: "no email" });
 
-                                if (_response3.error) {
-                                    _context10.next = 11;
-                                    break;
-                                }
-
-                                this.institutionsArray = _response3;
-                                return _context10.abrupt('return', this.institutionArray);
-
-                            case 11:
-                                this.institutionsArray = undefined;
-                                this.data.processError(_response3);
-                                return _context10.abrupt('return', this.institutionArray);
-
-                            case 14:
+                            case 8:
                             case 'end':
                                 return _context10.stop();
                         }
@@ -6208,38 +8935,58 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee10, this);
             }));
 
-            function getInstitutionsArray(_x9, _x10) {
+            function sendCustomerMessage(_x10) {
                 return _ref10.apply(this, arguments);
             }
 
-            return getInstitutionsArray;
+            return sendCustomerMessage;
         }();
 
-        People.prototype.getInstitution = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(id) {
-                var url, response;
+        People.prototype.sendBuikEmail = function sendBuikEmail(email) {
+            if (email.email) {
+                var serverResponse = this.data.saveObject(email, this.PEOPLE_SERVICE + '/sendBulkEmail', "post");
+                return serverResponse;
+            } else {
+                return { error: "no email" };
+            }
+        };
+
+        People.prototype.getInstitutionsArray = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(options, refresh) {
+                var url, _response3;
+
                 return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
                         switch (_context11.prev = _context11.next) {
                             case 0:
-                                url = this.data.INSTITUTION_SERVICES + '/' + id;
-                                _context11.next = 3;
-                                return this.data.get(url);
-
-                            case 3:
-                                response = _context11.sent;
-
-                                if (response.status) {
-                                    _context11.next = 8;
+                                if (!(!this.institutionsArray || refresh)) {
+                                    _context11.next = 14;
                                     break;
                                 }
 
-                                return _context11.abrupt('return', response);
+                                url = this.data.INSTITUTION_SERVICES;
 
-                            case 8:
-                                return _context11.abrupt('return', { institutionStatus: '99' });
+                                url += options ? options : "";
+                                _context11.next = 5;
+                                return this.data.get(url);
 
-                            case 9:
+                            case 5:
+                                _response3 = _context11.sent;
+
+                                if (_response3.error) {
+                                    _context11.next = 11;
+                                    break;
+                                }
+
+                                this.institutionsArray = _response3;
+                                return _context11.abrupt('return', this.institutionArray);
+
+                            case 11:
+                                this.institutionsArray = undefined;
+                                this.data.processError(_response3);
+                                return _context11.abrupt('return', this.institutionArray);
+
+                            case 14:
                             case 'end':
                                 return _context11.stop();
                         }
@@ -6247,8 +8994,47 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee11, this);
             }));
 
-            function getInstitution(_x11) {
+            function getInstitutionsArray(_x11, _x12) {
                 return _ref11.apply(this, arguments);
+            }
+
+            return getInstitutionsArray;
+        }();
+
+        People.prototype.getInstitution = function () {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(id) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
+                            case 0:
+                                url = this.data.INSTITUTION_SERVICES + '/' + id;
+                                _context12.next = 3;
+                                return this.data.get(url);
+
+                            case 3:
+                                response = _context12.sent;
+
+                                if (response.status) {
+                                    _context12.next = 8;
+                                    break;
+                                }
+
+                                return _context12.abrupt('return', response);
+
+                            case 8:
+                                return _context12.abrupt('return', { institutionStatus: '99' });
+
+                            case 9:
+                            case 'end':
+                                return _context12.stop();
+                        }
+                    }
+                }, _callee12, this);
+            }));
+
+            function getInstitution(_x13) {
+                return _ref12.apply(this, arguments);
             }
 
             return getInstitution;
@@ -6306,80 +9092,46 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveInstitution = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
                 var _response4, _response5;
 
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 if (this.selectedInstitution._id) {
-                                    _context12.next = 8;
+                                    _context13.next = 8;
                                     break;
                                 }
 
-                                _context12.next = 3;
+                                _context13.next = 3;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "post");
 
                             case 3:
-                                _response4 = _context12.sent;
+                                _response4 = _context13.sent;
 
                                 if (!_response4.error) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray.push(_response4);
                                     }
                                 }
-                                return _context12.abrupt('return', _response4);
+                                return _context13.abrupt('return', _response4);
 
                             case 8:
-                                _context12.next = 10;
+                                _context13.next = 10;
                                 return this.data.saveObject(this.selectedInstitution, this.data.INSTITUTION_SERVICES, "put");
 
                             case 10:
-                                _response5 = _context12.sent;
+                                _response5 = _context13.sent;
 
                                 if (!_response5.status) {
                                     if (this.institutionsArray) {
                                         this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
                                     }
                                 }
-                                return _context12.abrupt('return', _response5);
+                                return _context13.abrupt('return', _response5);
 
                             case 13:
-                            case 'end':
-                                return _context12.stop();
-                        }
-                    }
-                }, _callee12, this);
-            }));
-
-            function saveInstitution() {
-                return _ref12.apply(this, arguments);
-            }
-
-            return saveInstitution;
-        }();
-
-        People.prototype.deleteInstitution = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
-                    while (1) {
-                        switch (_context13.prev = _context13.next) {
-                            case 0:
-                                _context13.next = 2;
-                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
-
-                            case 2:
-                                serverResponse = _context13.sent;
-
-                                if (!serverResponse.error) {
-                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
-                                    this.editInstitutionIndex = -1;
-                                }
-                                return _context13.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context13.stop();
                         }
@@ -6387,8 +9139,42 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee13, this);
             }));
 
-            function deleteInstitution() {
+            function saveInstitution() {
                 return _ref13.apply(this, arguments);
+            }
+
+            return saveInstitution;
+        }();
+
+        People.prototype.deleteInstitution = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                _context14.next = 2;
+                                return this.data.deleteObject(this.data.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
+
+                            case 2:
+                                serverResponse = _context14.sent;
+
+                                if (!serverResponse.error) {
+                                    this.institutionsArray.splice(this.editInstitutionIndex, 1);
+                                    this.editInstitutionIndex = -1;
+                                }
+                                return _context14.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function deleteInstitution() {
+                return _ref14.apply(this, arguments);
             }
 
             return deleteInstitution;
@@ -6406,63 +9192,63 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.getCoursesArray = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(refresh, options, fields) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(refresh, options, fields) {
                 var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (!(!this.coursesArray || refresh)) {
-                                    _context14.next = 19;
+                                    _context15.next = 19;
                                     break;
                                 }
 
                                 url = this.data.COURSES_SERVICE;
 
                                 url += options ? options : "";
-                                _context14.prev = 3;
-                                _context14.next = 6;
+                                _context15.prev = 3;
+                                _context15.next = 6;
                                 return this.data.get(url);
 
                             case 6:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (serverResponse.error) {
-                                    _context14.next = 11;
+                                    _context15.next = 11;
                                     break;
                                 }
 
                                 this.coursesArray = serverResponse;
-                                _context14.next = 12;
+                                _context15.next = 12;
                                 break;
 
                             case 11:
-                                return _context14.abrupt('return', undefined);
+                                return _context15.abrupt('return', undefined);
 
                             case 12:
-                                _context14.next = 18;
+                                _context15.next = 18;
                                 break;
 
                             case 14:
-                                _context14.prev = 14;
-                                _context14.t0 = _context14['catch'](3);
+                                _context15.prev = 14;
+                                _context15.t0 = _context15['catch'](3);
 
-                                console.log(_context14.t0);
-                                return _context14.abrupt('return', undefined);
+                                console.log(_context15.t0);
+                                return _context15.abrupt('return', undefined);
 
                             case 18:
-                                return _context14.abrupt('return', this.coursesArray);
+                                return _context15.abrupt('return', this.coursesArray);
 
                             case 19:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this, [[3, 14]]);
+                }, _callee15, this, [[3, 14]]);
             }));
 
-            function getCoursesArray(_x12, _x13, _x14) {
-                return _ref14.apply(this, arguments);
+            function getCoursesArray(_x14, _x15, _x16) {
+                return _ref15.apply(this, arguments);
             }
 
             return getCoursesArray;
@@ -6492,31 +9278,31 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveCourse = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
                 var _serverResponse, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 if (this.selectedCourse) {
-                                    _context15.next = 2;
+                                    _context16.next = 2;
                                     break;
                                 }
 
-                                return _context15.abrupt('return');
+                                return _context16.abrupt('return');
 
                             case 2:
                                 if (this.selectedCourse._id) {
-                                    _context15.next = 10;
+                                    _context16.next = 10;
                                     break;
                                 }
 
-                                _context15.next = 5;
+                                _context16.next = 5;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "post");
 
                             case 5:
-                                _serverResponse = _context15.sent;
+                                _serverResponse = _context16.sent;
 
                                 if (!_serverResponse.error) {
                                     this.selectedCourse = this.utils.copyObject(_serverResponse);
@@ -6525,14 +9311,14 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error creating the product.");
                                 }
-                                return _context15.abrupt('return', _serverResponse);
+                                return _context16.abrupt('return', _serverResponse);
 
                             case 10:
-                                _context15.next = 12;
+                                _context16.next = 12;
                                 return this.data.saveObject(this.selectedCourse, this.data.COURSES_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context15.sent;
+                                serverResponse = _context16.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedCourse = this.utils.copyObject(serverResponse);
@@ -6540,18 +9326,18 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error updating the course.");
                                 }
-                                return _context15.abrupt('return', serverResponse);
+                                return _context16.abrupt('return', serverResponse);
 
                             case 15:
                             case 'end':
-                                return _context15.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee16, this);
             }));
 
             function saveCourse() {
-                return _ref15.apply(this, arguments);
+                return _ref16.apply(this, arguments);
             }
 
             return saveCourse;
@@ -6564,53 +9350,20 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.requestPasswordReset = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(obj) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
-                    while (1) {
-                        switch (_context16.prev = _context16.next) {
-                            case 0:
-                                _context16.next = 2;
-                                return this.data.saveObject(obj, this.data.PASSWORD_RESET, "post");
-
-                            case 2:
-                                serverResponse = _context16.sent;
-                                return _context16.abrupt('return', serverResponse);
-
-                            case 4:
-                            case 'end':
-                                return _context16.stop();
-                        }
-                    }
-                }, _callee16, this);
-            }));
-
-            function requestPasswordReset(_x15) {
-                return _ref16.apply(this, arguments);
-            }
-
-            return requestPasswordReset;
-        }();
-
-        People.prototype.getPasswordReset = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(validationCode) {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(obj) {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
                         switch (_context17.prev = _context17.next) {
                             case 0:
                                 _context17.next = 2;
-                                return this.data.get(this.data.PASSWORD_RESET + '/' + validationCode);
+                                return this.data.saveObject(obj, this.PASSWORD_RESET, "post");
 
                             case 2:
                                 serverResponse = _context17.sent;
-
-                                if (!serverResponse.code) {
-                                    this.selectedPerson = serverResponse;
-                                }
                                 return _context17.abrupt('return', serverResponse);
 
-                            case 5:
+                            case 4:
                             case 'end':
                                 return _context17.stop();
                         }
@@ -6618,87 +9371,59 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee17, this);
             }));
 
-            function getPasswordReset(_x16) {
+            function requestPasswordReset(_x17) {
                 return _ref17.apply(this, arguments);
+            }
+
+            return requestPasswordReset;
+        }();
+
+        People.prototype.getPasswordReset = function () {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(validationCode) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
+                    while (1) {
+                        switch (_context18.prev = _context18.next) {
+                            case 0:
+                                _context18.next = 2;
+                                return this.data.get(this.PASSWORD_RESET + '/' + validationCode);
+
+                            case 2:
+                                serverResponse = _context18.sent;
+
+                                if (!serverResponse.code) {
+                                    this.selectedPerson = serverResponse;
+                                }
+                                return _context18.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context18.stop();
+                        }
+                    }
+                }, _callee18, this);
+            }));
+
+            function getPasswordReset(_x18) {
+                return _ref18.apply(this, arguments);
             }
 
             return getPasswordReset;
         }();
 
         People.prototype.getNotesArray = function () {
-            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(options, refresh) {
-                var url, serverResponse;
-                return regeneratorRuntime.wrap(function _callee18$(_context18) {
-                    while (1) {
-                        switch (_context18.prev = _context18.next) {
-                            case 0:
-                                if (!(!this.notesArray || refresh)) {
-                                    _context18.next = 19;
-                                    break;
-                                }
-
-                                url = this.data.NOTES_SERVICE;
-
-                                url += options ? options : "";
-                                _context18.prev = 3;
-                                _context18.next = 6;
-                                return this.data.get(url);
-
-                            case 6:
-                                serverResponse = _context18.sent;
-
-                                if (serverResponse.error) {
-                                    _context18.next = 11;
-                                    break;
-                                }
-
-                                this.notesArray = serverResponse;
-                                _context18.next = 13;
-                                break;
-
-                            case 11:
-                                this.data.processError(serverResponse);
-                                return _context18.abrupt('return', undefined);
-
-                            case 13:
-                                _context18.next = 19;
-                                break;
-
-                            case 15:
-                                _context18.prev = 15;
-                                _context18.t0 = _context18['catch'](3);
-
-                                console.log(_context18.t0);
-                                return _context18.abrupt('return', undefined);
-
-                            case 19:
-                            case 'end':
-                                return _context18.stop();
-                        }
-                    }
-                }, _callee18, this, [[3, 15]]);
-            }));
-
-            function getNotesArray(_x17, _x18) {
-                return _ref18.apply(this, arguments);
-            }
-
-            return getNotesArray;
-        }();
-
-        People.prototype.getRemindersArray = function () {
             var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(options, refresh) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
                         switch (_context19.prev = _context19.next) {
                             case 0:
-                                if (!(!this.remindersArray || refresh)) {
-                                    _context19.next = 21;
+                                if (!(!this.notesArray || refresh)) {
+                                    _context19.next = 19;
                                     break;
                                 }
 
-                                url = this.data.NOTES_SERVICE;
+                                url = this.NOTES_SERVICE;
 
                                 url += options ? options : "";
                                 _context19.prev = 3;
@@ -6709,7 +9434,68 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 serverResponse = _context19.sent;
 
                                 if (serverResponse.error) {
-                                    _context19.next = 13;
+                                    _context19.next = 11;
+                                    break;
+                                }
+
+                                this.notesArray = serverResponse;
+                                _context19.next = 13;
+                                break;
+
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context19.abrupt('return', undefined);
+
+                            case 13:
+                                _context19.next = 19;
+                                break;
+
+                            case 15:
+                                _context19.prev = 15;
+                                _context19.t0 = _context19['catch'](3);
+
+                                console.log(_context19.t0);
+                                return _context19.abrupt('return', undefined);
+
+                            case 19:
+                            case 'end':
+                                return _context19.stop();
+                        }
+                    }
+                }, _callee19, this, [[3, 15]]);
+            }));
+
+            function getNotesArray(_x19, _x20) {
+                return _ref19.apply(this, arguments);
+            }
+
+            return getNotesArray;
+        }();
+
+        People.prototype.getRemindersArray = function () {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
+                    while (1) {
+                        switch (_context20.prev = _context20.next) {
+                            case 0:
+                                if (!(!this.remindersArray || refresh)) {
+                                    _context20.next = 21;
+                                    break;
+                                }
+
+                                url = this.NOTES_SERVICE;
+
+                                url += options ? options : "";
+                                _context20.prev = 3;
+                                _context20.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context20.sent;
+
+                                if (serverResponse.error) {
+                                    _context20.next = 13;
                                     break;
                                 }
 
@@ -6717,33 +9503,33 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 this.remindersArray = this.remindersArray.filter(function (item) {
                                     return item.isReminder;
                                 });
-                                return _context19.abrupt('return', serverResponse);
+                                return _context20.abrupt('return', serverResponse);
 
                             case 13:
                                 this.data.processError(serverResponse);
-                                return _context19.abrupt('return', undefined);
+                                return _context20.abrupt('return', undefined);
 
                             case 15:
-                                _context19.next = 21;
+                                _context20.next = 21;
                                 break;
 
                             case 17:
-                                _context19.prev = 17;
-                                _context19.t0 = _context19['catch'](3);
+                                _context20.prev = 17;
+                                _context20.t0 = _context20['catch'](3);
 
-                                console.log(_context19.t0);
-                                return _context19.abrupt('return', undefined);
+                                console.log(_context20.t0);
+                                return _context20.abrupt('return', undefined);
 
                             case 21:
                             case 'end':
-                                return _context19.stop();
+                                return _context20.stop();
                         }
                     }
-                }, _callee19, this, [[3, 17]]);
+                }, _callee20, this, [[3, 17]]);
             }));
 
-            function getRemindersArray(_x19, _x20) {
-                return _ref19.apply(this, arguments);
+            function getRemindersArray(_x21, _x22) {
+                return _ref20.apply(this, arguments);
             }
 
             return getRemindersArray;
@@ -6784,31 +9570,31 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
         };
 
         People.prototype.saveNote = function () {
-            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(index) {
+            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(index) {
                 var _serverResponse2, serverResponse;
 
-                return regeneratorRuntime.wrap(function _callee20$(_context20) {
+                return regeneratorRuntime.wrap(function _callee21$(_context21) {
                     while (1) {
-                        switch (_context20.prev = _context20.next) {
+                        switch (_context21.prev = _context21.next) {
                             case 0:
                                 if (this.selectedNote) {
-                                    _context20.next = 2;
+                                    _context21.next = 2;
                                     break;
                                 }
 
-                                return _context20.abrupt('return');
+                                return _context21.abrupt('return');
 
                             case 2:
                                 if (this.selectedNote._id) {
-                                    _context20.next = 10;
+                                    _context21.next = 10;
                                     break;
                                 }
 
-                                _context20.next = 5;
-                                return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "post");
+                                _context21.next = 5;
+                                return this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "post");
 
                             case 5:
-                                _serverResponse2 = _context20.sent;
+                                _serverResponse2 = _context21.sent;
 
                                 if (!_serverResponse2.error) {
                                     if (this.notesArray) {
@@ -6818,68 +9604,23 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error creating the note.");
                                 }
-                                return _context20.abrupt('return', _serverResponse2);
+                                return _context21.abrupt('return', _serverResponse2);
 
                             case 10:
-                                _context20.next = 12;
-                                return this.data.saveObject(this.selectedNote, this.data.NOTES_SERVICE, "put");
+                                _context21.next = 12;
+                                return this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "put");
 
                             case 12:
-                                serverResponse = _context20.sent;
+                                serverResponse = _context21.sent;
 
                                 if (!serverResponse.error) {
                                     this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
                                 } else {
                                     this.data.processError(response, "There was an error updating the course.");
                                 }
-                                return _context20.abrupt('return', serverResponse);
-
-                            case 15:
-                            case 'end':
-                                return _context20.stop();
-                        }
-                    }
-                }, _callee20, this);
-            }));
-
-            function saveNote(_x21) {
-                return _ref20.apply(this, arguments);
-            }
-
-            return saveNote;
-        }();
-
-        People.prototype.saveReminder = function () {
-            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(item, index) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee21$(_context21) {
-                    while (1) {
-                        switch (_context21.prev = _context21.next) {
-                            case 0:
-                                console.log(item);
-
-                                if (!(item === undefined)) {
-                                    _context21.next = 3;
-                                    break;
-                                }
-
-                                return _context21.abrupt('return');
-
-                            case 3:
-                                _context21.next = 5;
-                                return this.data.saveObject(item, this.data.NOTES_SERVICE, "put");
-
-                            case 5:
-                                serverResponse = _context21.sent;
-
-                                if (!serverResponse.error) {
-                                    this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
-                                } else {
-                                    this.data.processError(response, "There was an error updating the course.");
-                                }
                                 return _context21.abrupt('return', serverResponse);
 
-                            case 8:
+                            case 15:
                             case 'end':
                                 return _context21.stop();
                         }
@@ -6887,41 +9628,44 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee21, this);
             }));
 
-            function saveReminder(_x22, _x23) {
+            function saveNote(_x23) {
                 return _ref21.apply(this, arguments);
             }
 
-            return saveReminder;
+            return saveNote;
         }();
 
-        People.prototype.deleteNote = function () {
-            var _ref22 = _asyncToGenerator(regeneratorRuntime.mark(function _callee22() {
+        People.prototype.saveReminder = function () {
+            var _ref22 = _asyncToGenerator(regeneratorRuntime.mark(function _callee22(item, index) {
                 var serverResponse;
                 return regeneratorRuntime.wrap(function _callee22$(_context22) {
                     while (1) {
                         switch (_context22.prev = _context22.next) {
                             case 0:
-                                if (this.selectedNote) {
-                                    _context22.next = 2;
+                                console.log(item);
+
+                                if (!(item === undefined)) {
+                                    _context22.next = 3;
                                     break;
                                 }
 
                                 return _context22.abrupt('return');
 
-                            case 2:
-                                _context22.next = 4;
-                                return this.data.deleteObject(this.data.NOTES_SERVICE + '/' + this.selectedNote._id);
+                            case 3:
+                                _context22.next = 5;
+                                return this.data.saveObject(item, this.NOTES_SERVICE, "put");
 
-                            case 4:
+                            case 5:
                                 serverResponse = _context22.sent;
 
                                 if (!serverResponse.error) {
-                                    this.notesArray.splice(this.editNoteIndex, 1);
-                                    this.editNoteIndex = -1;
+                                    this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
+                                } else {
+                                    this.data.processError(response, "There was an error updating the course.");
                                 }
                                 return _context22.abrupt('return', serverResponse);
 
-                            case 7:
+                            case 8:
                             case 'end':
                                 return _context22.stop();
                         }
@@ -6929,12 +9673,138 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                 }, _callee22, this);
             }));
 
-            function deleteNote() {
+            function saveReminder(_x24, _x25) {
                 return _ref22.apply(this, arguments);
+            }
+
+            return saveReminder;
+        }();
+
+        People.prototype.deleteNote = function () {
+            var _ref23 = _asyncToGenerator(regeneratorRuntime.mark(function _callee23() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee23$(_context23) {
+                    while (1) {
+                        switch (_context23.prev = _context23.next) {
+                            case 0:
+                                if (this.selectedNote) {
+                                    _context23.next = 2;
+                                    break;
+                                }
+
+                                return _context23.abrupt('return');
+
+                            case 2:
+                                _context23.next = 4;
+                                return this.data.deleteObject(this.NOTES_SERVICE + '/' + this.selectedNote._id);
+
+                            case 4:
+                                serverResponse = _context23.sent;
+
+                                if (!serverResponse.error) {
+                                    this.notesArray.splice(this.editNoteIndex, 1);
+                                    this.editNoteIndex = -1;
+                                }
+                                return _context23.abrupt('return', serverResponse);
+
+                            case 7:
+                            case 'end':
+                                return _context23.stop();
+                        }
+                    }
+                }, _callee23, this);
+            }));
+
+            function deleteNote() {
+                return _ref23.apply(this, arguments);
             }
 
             return deleteNote;
         }();
+
+        People.prototype.advancedSearch = function advancedSearch(searchObj) {
+
+            var resultArray = this.utils.copyArray(this.helpTicketsArray);
+
+            if (searchObj.helpTicketNo.length > 0) {
+                resultArray = resultArray.filter(function (item) {
+                    return item.helpTicketNo == searchObj.helpTicketNo;
+                });
+            } else {
+                if (searchObj.dateRange && searchObj.dateRange.dateFrom !== "" && searchObj.dateRange.dateFrom !== "Invalid date") {
+                    if (!searchObj.dateRange.dateTo || searchObj.dateRange.dateTo == "Invalid date") {
+                        resultArray = resultArray.filter(function (item) {
+                            var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                            return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom);
+                        });
+                    } else {
+                        resultArray = resultArray.filter(function (item) {
+                            var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                            return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom) && moment(item.createdDate).isBefore(searchObj.dateRange.dateTo);
+                        });
+                    }
+                }
+
+                if (searchObj.status && searchObj.status.length > 0) {
+                    for (var i = 0; i < searchObj.status.length; i++) {
+                        searchObj.status[i] = parseInt(searchObj.status[i]);
+                    }
+                    resultArray = resultArray.filter(function (item) {
+                        return searchObj.status.indexOf(item.helpTicketStatus) > -1;
+                    });
+                }
+
+                if (searchObj.keyWords && searchObj.keyWords.length > 0) {
+                    var searchKeyword = searchObj.keyWords.toUpperCase();
+                    resultArray = resultArray.filter(function (item) {
+                        if (item.keyWords) {
+                            var htKeyword = item.keyWords.toUpperCase();
+                            return htKeyword.indexOf(searchKeyword) > -1;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+
+                if (searchObj.content && searchObj.content.length > 0) {
+                    var searchContent = searchObj.content.toUpperCase();
+                    resultArray = resultArray.filter(function (item) {
+                        for (var i = 0; i < item.content.length; i++) {
+                            if (item.content[i].content.comments.toUpperCase().indexOf(searchContent) > -1) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+
+                if (searchObj.type && searchObj.type != -1) {
+                    resultArray = resultArray.filter(function (item) {
+                        return searchObj.type == item.helpTicketType;
+                    });
+                }
+
+                if (searchObj.productIds && searchObj.productIds.length > 0) {
+                    resultArray = resultArray.filter(function (item) {
+                        return searchObj.productIds.indexOf(item.productId) > -1;
+                    });
+                }
+
+                if (searchObj.peopleIds && searchObj.peopleIds.length > 0) {
+                    resultArray = resultArray.filter(function (item) {
+                        return searchObj.peopleIds.indexOf(item.personId) > -1;
+                    });
+                }
+
+                if (searchObj.institutionIds && searchObj.institutionIds.length > 0) {
+                    resultArray = resultArray.filter(function (item) {
+                        return searchObj.institutionIds.indexOf(item.institutionId) > -1;
+                    });
+                }
+            }
+
+            return resultArray;
+        };
 
         return People;
     }()) || _class);
@@ -11911,7 +14781,6 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
 
     DataTable.prototype.backward = function backward() {
       $(".pagination").children().removeClass('active');
-
       this.currentPageElement = this.currentPageElement > 0 ? this.currentPageElement -= 1 : this.currentPageElement;
       if (this.currentPageElement == 0 && this.pageButtons[this.currentPageElement] != 1) {
         this.createPageButtons(this.pageButtons[0] - 1);
@@ -11986,6 +14855,42 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
       this.pageOne();
     };
 
+    DataTable.prototype.filterListExp = function filterListExp(el, options) {
+      el.preventDefault();
+      options.lookupArray = options.lookupArray || new Array();
+
+      this.filterValues = this.filterValues.filter(function (obj) {
+        return obj.options.filter !== options.filter;
+      });
+
+      var properties = options.collectionProperty.split('.');
+      var condition = "item";
+      for (var j = 0; j < properties.length; j++) {
+        if (properties[j].indexOf('[') > -1) {
+          condition += properties[j];
+        } else {
+          condition += "['" + properties[j] + "']";
+        }
+      }
+      options.collectionProperty = condition;
+
+      if (el.target.value !== "") {
+        this.filterValues.push({ options: options, value: el.target.value });
+      }
+
+      if (this.filterValues.length > 0) {
+        this.baseArray = this.filter2(this.filterValues);
+      } else {
+        this.baseArray = this.sourceArray;
+      }
+      this.startRecord = this.DEFAULT_START;
+      this.firstVisible = 1;
+      this.buildDisplayArray();
+      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+      this.pageOne();
+    };
+
     DataTable.prototype.externalFilter = function externalFilter(filters) {
       if (filters.length > 0) {
         this.baseArray = this.filter(filters);
@@ -12000,8 +14905,57 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
       this.pageOne();
     };
 
-    DataTable.prototype.filter = function filter(filters, lookupArray) {
+    DataTable.prototype.filter2 = function filter2(filters) {
       var _this = this;
+
+      var keep;
+      var index = 0;
+      return this.sourceArray.filter(function (item) {
+        keep = false;
+        for (var i = 0; i < filters.length; i++) {
+          var filterItem = filters[i];
+
+          if (filterItem.options.compare == 'lookup') {
+            var matchValue = _this.lookup2(filterItem, item);
+          } else if (filterItem.options.compare == 'array-or') {
+            var matchValue = true;
+          } else {
+            var matchValue = eval(filterItem.options.collectionProperty);
+          }
+
+          if (matchValue) {
+            switch (filterItem.options.type) {
+              case 'text':
+                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+                break;
+              case 'value':
+                keep = matchValue == filterItem.value;
+                break;
+              case 'array-or':
+                var propArray = eval(filterItem.options.collectionProperty);
+                for (var j = 0; j < propArray.length; j++) {
+                  if (propArray[j] == filterItem.value) keep = true;
+                }
+            }
+          }
+
+          if (!keep) break;
+        }
+        return keep;
+      });
+    };
+
+    DataTable.prototype.lookup2 = function lookup2(filterItem, item) {
+      for (var i = 0, x = filterItem.options.lookupArray.length; i < x; i++) {
+        if (filterItem.options.lookupArray[i][filterItem.options.lookupProperty] == eval(filterItem.options.collectionProperty)) {
+          return filterItem.options.lookupArray[i][filterItem.options.matchProperty];
+        }
+      }
+      return undefined;
+    };
+
+    DataTable.prototype.filter = function filter(filters, lookupArray) {
+      var _this2 = this;
 
       var keep;
       var index = 0;
@@ -12084,7 +15038,7 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
                       condition += "['" + properties[j] + "']";
                     }
                   }
-                  var _value = _this.lookup(eval(condition), arrayToLookup[1], lookupArray);
+                  var _value = _this2.lookup(eval(condition), arrayToLookup[1], lookupArray);
                   if (_value) {
                     keep = _value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                   }
@@ -12092,7 +15046,7 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
 
                 case 'lookup-array-item':
                   var array = filters[i].property.split('-');
-                  var _value = _this.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
+                  var _value = _this2.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
                   if (_value) {
                     keep = _value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
                   }
@@ -12175,7 +15129,7 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
     };
 
     DataTable.prototype.sortArray = function sortArray(propertyName, type, surrogateArray, surrogateProperty, sortProperty, sortDirectionParam) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (sortDirectionParam) this.sortDirecction = sortDirectionParam;
       if (propertyName === this.sortProperty) {
@@ -12189,13 +15143,13 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
 
         this.baseArray = this.baseArray.sort(function (a, b) {
           var result = a[propertyName] < b[propertyName] ? -1 : a[propertyName] > b[propertyName] ? 1 : 0;
-          return result * _this2.sortDirection;
+          return result * _this3.sortDirection;
         });
       } else if (type == 'id') {
 
         var sortArray = this.utils.copyArray(this.baseArray);
         sortArray.forEach(function (item) {
-          var obj = _this2.findObj(surrogateArray, surrogateProperty, eval('item.' + propertyName));
+          var obj = _this3.findObj(surrogateArray, surrogateProperty, eval('item.' + propertyName));
 
           item[sortProperty] = obj ? obj[sortProperty] : null;
         });
@@ -12209,7 +15163,7 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
           } else {
             result = a[sortProperty] < b[sortProperty] ? -1 : a[sortProperty] > b[sortProperty] ? 1 : 0;
           }
-          return result * _this2.sortDirection;
+          return result * _this3.sortDirection;
         });
       } else if (type == 'object') {
         this.sortProperty = propertyName;
@@ -12217,7 +15171,7 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
 
         this.baseArray = this.baseArray.sort(function (a, b) {
           var result = a[propertyName[0]][propertyName[1]] < b[propertyName[0]][propertyName[1]] ? -1 : a[propertyName[0]][propertyName[1]] > b[propertyName[0]][propertyName[1]] ? 1 : 0;
-          return result * _this2.sortDirection;
+          return result * _this3.sortDirection;
         });
       }
       this.startRecord = this.DEFAULT_START;
@@ -12236,15 +15190,15 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
     };
 
     DataTable.prototype.updateArray = function updateArray(sourceArray, sortProperty, sortDirection) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (sourceArray) {
         this.sourceArray = new Array();
         this.baseArray = new Array();
         this.active = true;
         sourceArray.forEach(function (item) {
-          _this3.sourceArray.push(item);
-          _this3.baseArray.push(item);
+          _this4.sourceArray.push(item);
+          _this4.baseArray.push(item);
         });
 
         this.baseArray.forEach(function (item, index) {
@@ -14084,2019 +17038,13 @@ define('resources/value-converters/ucc-title',["exports"], function (exports) {
 		return uccTitleValueConverter;
 	}();
 });
-define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
+define('modules/admin/customers/bulkEmails',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _validation, _jquery) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.EditPeople = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
-            _classCallCheck(this, EditPeople);
-
-            this.personSelected = false;
-            this.navControl = "peopleNavButtons";
-            this.spinnerHTML = "";
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.utils = utils;
-            this.people = people;
-            this.is4ua = is4ua;
-            this.dialog = dialog;
-        }
-
-        EditPeople.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditPeople.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        EditPeople.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-
-                                this.dataTable.updateArray(this.people.instutionPeopleArray);
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditPeople.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.people.instutionPeopleArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditPeople.prototype.buildAudit = function buildAudit() {
-            var _this = this;
-
-            var changes = this.people.isPersonDirty(this.originalPerson);
-            changes.forEach(function (item) {
-                _this.people.selectedPerson.audit.push({
-                    property: item.property,
-                    eventDate: new Date(),
-                    oldValue: item.oldValue,
-                    newValue: item.newValue,
-                    personId: _this.userObj._id
-                });
-            });
-        };
-
-        EditPeople.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.buildAudit();
-                                _context3.next = 3;
-                                return this.people.savePerson();
-
-                            case 3:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
-                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
-                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
-                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
-                                }
-                                this.personSelected = false;
-
-                            case 6:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
-            var email = {
-                email: this.people.selectedPerson.email,
-                name: this.people.selectedPerson.firstName
-            };
-            this.people.activateAccountEmail(email);
-        };
-
-        EditPeople.prototype.updateStatus = function updateStatus(person) {
-            this.people.selectedPersonFromId(person._id, 'i');
-            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
-            if (this.people.selectedPerson.personStatus === '01') {
-                this.people.selectedPerson.personStatus = '02';
-            } else {
-                this.people.selectedPerson.personStatus = '01';
-            }
-            this.save();
-        };
-
-        EditPeople.prototype.cancel = function cancel() {
-            this.people.selectPerson(this.editIndex);
-        };
-
-        EditPeople.prototype.back = function back() {
-            var _this2 = this;
-
-            if (this.people.isPersonDirty().length) {
-                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this2.save();
-                    } else {
-                        _this2.personSelected = false;
-                    }
-                });
-            } else {
-                this.personSelected = false;
-            }
-        };
-
-        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
-            (0, _jquery2.default)("#lastName").val("");
-            (0, _jquery2.default)("#roles").val("");
-            (0, _jquery2.default)("#personStatus").val("");
-        };
-
-        return EditPeople;
-    }()) || _class);
-});
-define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.FacCo = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function FacCo(router) {
-            _classCallCheck(this, FacCo);
-
-            this.router = router;
-        }
-
-        FacCo.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        FacCo.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'editPeople'],
-                moduleId: './editPeople',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editPeople',
-                title: 'People'
-            }, {
-                route: 'viewRequests',
-                moduleId: './viewRequests',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'viewRequests',
-                title: 'Clients Requests'
-            }]);
-
-            this.router = router;
-        };
-
-        return FacCo;
-    }()) || _class);
-});
-define('modules/facco/viewRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ViewRequests = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ViewRequests = exports.ViewRequests = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function ViewRequests(router, config, people, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, ViewRequests);
-
-            this.navControl = "requestsNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.config = config;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-        }
-
-        ViewRequests.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        ViewRequests.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        ViewRequests.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                            case 3:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        ViewRequests.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 7;
-                                    break;
-                                }
-
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 4;
-                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
-
-                            case 4:
-                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.dataTable.updateArray([]);
-
-                            case 8:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        ViewRequests.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.getRequests();
-
-                            case 3:
-                                this.spinnerHTML = "";
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        return ViewRequests;
-    }()) || _class);
-});
-define('modules/analytics/analytics',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Analytics = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Analytics = exports.Analytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function Analytics(router) {
-            _classCallCheck(this, Analytics);
-
-            this.router = router;
-        }
-
-        Analytics.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        Analytics.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'clientRequestsAnalytics'],
-                moduleId: './clientRequests',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'clientRequests',
-                title: 'Client Requests'
-            }, {
-                route: 'helpTicketAnalytics',
-                moduleId: './helpTickets',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'helpTickets',
-                title: 'Help Tickets'
-            }]);
-
-            this.router = router;
-        };
-
-        return Analytics;
-    }()) || _class);
-});
-define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ClientRequestAnalytics = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ClientRequestAnalytics = exports.ClientRequestAnalytics = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function ClientRequestAnalytics(router, config, people, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, ClientRequestAnalytics);
-
-            this.categories = [{
-                code: 0,
-                description: 'Requests by Institution'
-            }, {
-                code: 1,
-                description: 'Requests by Product'
-            }];
-
-            this.router = router;
-            this.config = config;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-        }
-
-        ClientRequestAnalytics.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        ClientRequestAnalytics.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        ClientRequestAnalytics.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getPeopleArray('?order=lastName'), this.people.getInstitutionsArray('?order=name'), this.products.getProductsArray('?order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                                this.selectedCategory = this.categories[0];
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        ClientRequestAnalytics.prototype.typeChanged = function typeChanged(category, el) {
-            this.selectedCategory = category;
-            (0, _jquery2.default)('.categoryButtons').removeClass('rowSelected');
-            (0, _jquery2.default)(el.target).addClass('rowSelected');
-            switch (category.code) {
-                case 0:
-                    (0, _jquery2.default)(el.target).css('background-color', 'blue');
-                    break;
-                case 1:
-                    break;
-            }
-        };
-
-        ClientRequestAnalytics.prototype.getInstitutionRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 8;
-                                    break;
-                                }
-
-                                this.numCols = this.config.REQUEST_STATUS.length + 1;
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 5;
-                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 5:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.requests.groupRequestsByInstitution();
-                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context2.next = 9;
-                                break;
-
-                            case 8:
-                                this.displayArray = new Array();
-
-                            case 9:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getInstitutionRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getInstitutionRequests;
-        }();
-
-        ClientRequestAnalytics.prototype.getProductsRequests = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context3.next = 8;
-                                    break;
-                                }
-
-                                this.numCols = this.config.REQUEST_STATUS.length + 1;
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context3.next = 5;
-                                return this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession);
-
-                            case 5:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.requests.groupRequestsByProduct();
-                                    this.dataTable.updateArray(this.requests.analyticsResultArray);
-                                } else {
-                                    this.displayArray = new Array();
-                                }
-                                _context3.next = 9;
-                                break;
-
-                            case 8:
-                                this.displayArray = new Array();
-
-                            case 9:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function getProductsRequests() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return getProductsRequests;
-        }();
-
-        return ClientRequestAnalytics;
-    }()) || _class);
-});
-define('modules/analytics/helpTickets',["exports"], function (exports) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var HelpTicketAnalytics = exports.HelpTicketAnalytics = function HelpTicketAnalytics() {
-        _classCallCheck(this, HelpTicketAnalytics);
-    };
-});
-define('modules/home/contact',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _siteInfo, _people, _appConfig) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.Contact = undefined;
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var Contact = exports.Contact = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _people.People, _appConfig.AppConfig), _dec(_class = function () {
-		function Contact(siteinfo, people, config) {
-			_classCallCheck(this, Contact);
-
-			this.siteinfo = siteinfo;
-			this.people = people;
-			this.config = config;
-		}
-
-		Contact.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var _this = this;
-
-				var uccRoles;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								uccRoles = "";
-
-								this.config.ROLES.forEach(function (item) {
-									if (item.UCConly) uccRoles += item.role + ":";
-								});
-
-								_context.next = 4;
-								return this.config.getConfig();
-
-							case 4:
-								_context.next = 6;
-								return this.people.getUCCStaff(uccRoles);
-
-							case 6:
-
-								this.showPersonalContactInfo = this.config.SHOW_STAFF_CONTACT == 0;
-
-								this.directors = new Array();
-								this.staff = new Array();
-								this.admin = new Array();
-								this.people.uccPeople.forEach(function (item) {
-									if (item.roles.indexOf('TMAN') > -1) {
-										_this.directors.push({ item: item, role: 'TMAN' });
-									} else if (item.roles.indexOf('EDIR') > -1) {
-										_this.directors.push({ item: item, role: 'EDIR' });
-									} else if (item.roles.indexOf('TDIR') > -1) {
-										_this.directors.push({ item: item, role: 'TDIR' });
-									} else if (item.roles.indexOf('TMGR') > -1) {
-										_this.directors.push({ item: item, role: 'TMGR' });
-									} else if (item.roles.indexOf('UCCT') > -1 && item.roles.indexOf('STUT') == -1) {
-										_this.staff.push(item);
-									} else if (item.roles.indexOf('UCCA') > -1) {
-										_this.admin.push(item);
-									}
-								});
-
-								this.staff = this.staff.sort(function (a, b) {
-									return a.lastName > b.lastName;
-								});
-
-								this.directors = this.directors.sort(function (a, b) {
-									return a.role > b.role;
-								});
-
-							case 13:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate() {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		return Contact;
-	}()) || _class);
-});
-define('modules/home/home',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _siteInfo, _sessions, _appConfig, _moment) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Home = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _sessions.Sessions, _appConfig.AppConfig), _dec(_class = function () {
-        function Home(siteinfo, sessions, config) {
-            _classCallCheck(this, Home);
-
-            this.email = '';
-            this.password = '';
-            this.loginError = '';
-
-            this.sessions = sessions;
-            this.siteinfo = siteinfo;
-            this.config = config;
-            this.config.getConfig(true);
-        }
-
-        Home.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var currentDate, options;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
-                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-                                _context.next = 4;
-                                return this.sessions.getSessionsArray('?order=startDate', true);
-
-                            case 4:
-                                _context.next = 6;
-                                return this.siteinfo.getInfoArray(true, options);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        return Home;
-    }()) || _class);
-});
-define('modules/home/logout',['exports', 'aurelia-framework', '../../resources/data/auth'], function (exports, _aureliaFramework, _auth) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Logout = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Logout = exports.Logout = (_dec = (0, _aureliaFramework.inject)(_auth.Auth), _dec(_class = function () {
-    function Logout(auth) {
-      _classCallCheck(this, Logout);
-
-      this.auth = auth;
-    }
-
-    Logout.prototype.activate = function activate() {
-      this.auth.logout();
-      this.router.navigate("home");
-    };
-
-    return Logout;
-  }()) || _class);
-});
-define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', '../../resources/utils/validation', '../../config/appConfig', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _people, _is4ua, _commonDialogs, _validation, _appConfig, _jquery) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Register = undefined;
-
-  var _validation2 = _interopRequireDefault(_validation);
-
-  var _jquery2 = _interopRequireDefault(_jquery);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _asyncToGenerator(fn) {
-    return function () {
-      var gen = fn.apply(this, arguments);
-      return new Promise(function (resolve, reject) {
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            return Promise.resolve(value).then(function (value) {
-              step("next", value);
-            }, function (err) {
-              step("throw", err);
-            });
-          }
-        }
-
-        return step("next");
-      });
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Register = exports.Register = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _people.People, _is4ua.is4ua, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
-    function Register(router, people, is4ua, utils, config, dialog, validation) {
-      _classCallCheck(this, Register);
-
-      this.router = router;
-      this.people = people;
-      this.is4ua = is4ua;
-      this.utils = utils;
-      this.validation = validation;
-      this.config = config;
-      this.dialog = dialog;
-      this.validation.initialize(this);
-
-      this.thresholdLength = 6;
-      this.threshold = 3;
-    }
-
-    Register.prototype.attached = function attached() {
-      this._setUpValidation();
-      (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-    };
-
-    Register.prototype.activate = function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
-
-              case 2:
-                _context.next = 4;
-                return this.is4ua.loadIs4ua();
-
-              case 4:
-                this.people.selectPerson();
-
-              case 5:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function activate() {
-        return _ref.apply(this, arguments);
-      }
-
-      return activate;
-    }();
-
-    Register.prototype.checkEmail = function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return this.people.checkEmail();
-
-              case 2:
-                if (!_context2.sent) {
-                  _context2.next = 7;
-                  break;
-                }
-
-                this.duplicateAccount = true;
-                this.validation.validate(2);
-                _context2.next = 9;
-                break;
-
-              case 7:
-                this.duplicateAccount = false;
-                this.validation.makeValid((0, _jquery2.default)("#register_email"));
-
-              case 9:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function checkEmail() {
-        return _ref2.apply(this, arguments);
-      }
-
-      return checkEmail;
-    }();
-
-    Register.prototype.checkName = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return this.people.checkName();
-
-              case 2:
-                if (!_context3.sent) {
-                  _context3.next = 7;
-                  break;
-                }
-
-                this.duplicateName = true;
-                this.validation.validate(3);
-                _context3.next = 9;
-                break;
-
-              case 7:
-                this.duplicateName = false;
-                this.validation.makeValid((0, _jquery2.default)("#register_institution"));
-
-              case 9:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function checkName() {
-        return _ref3.apply(this, arguments);
-      }
-
-      return checkName;
-    }();
-
-    Register.prototype.passwordComplexity = function passwordComplexity() {
-
-      var newValue = this.people.selectedPerson.password;
-
-      this.longPassword = newValue.length >= this.thresholdLength;
-
-      var strength = 0;
-      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
-      strength += /[a-z]+/.test(newValue) ? 1 : 0;
-      strength += /[0-9]+/.test(newValue) ? 1 : 0;
-      strength += /[\W]+/.test(newValue) ? 1 : 0;
-
-      this.complexPassword = strength >= this.threshold && this.longPassword;
-      this.validation.validate(4);
-    };
-
-    Register.prototype._setUpValidation = function _setUpValidation() {
-      this.validation.addRule(1, "register_firstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
-      this.validation.addRule(1, "register_lastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
-      this.validation.addRule(1, "register_email", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateAccount;
-        } }, { "rule": "custom", "message": "Enter a valid email address",
-        "valFunction": function valFunction(context) {
-          return (/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email)
-          );
-        }
-      }]);
-      this.validation.addRule(1, "register_phone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }, { "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.phone", "ruleValue": 10 }]);
-      this.validation.addRule(1, "register_mobile", [{ "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.mobile", "ruleValue": 10 }]);
-      this.validation.addRule(1, "register_institution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }, { "rule": "custom", "message": "An account with that name at this institution exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateName;
-        } }]);
-      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
-      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
-        "valFunction": function valFunction(context) {
-          return context.people.selectedPerson.password === context.password_repeat;
-        } }], true);
-      this.validation.addRule(2, "register_email", [{ "rule": "custom", "message": "An account with that email exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateAccount;
-        } }]);
-      this.validation.addRule(3, "register_institution", [{ "rule": "custom", "message": "An account with that name at this institution exists",
-        "valFunction": function valFunction(context) {
-          return !context.duplicateName;
-        } }]);
-      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
-        "valFunction": function valFunction(context) {
-          return context.complexPassword;
-        } }]);
-    };
-
-    Register.prototype.save = function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-        var _this = this;
-
-        var response;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                if (!this.validation.validate(1)) {
-                  _context4.next = 10;
-                  break;
-                }
-
-                this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
-                _context4.next = 4;
-                return this.people.savePerson('register');
-
-              case 4:
-                response = _context4.sent;
-
-                if (response.error) {
-                  _context4.next = 9;
-                  break;
-                }
-
-                return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).then(function (response) {
-                  _this.sendFacDevEmail();
-                }));
-
-              case 9:
-                this.utils.showNotification("An error occurred creating the account");
-
-              case 10:
-              case 'end':
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function save() {
-        return _ref4.apply(this, arguments);
-      }
-
-      return save;
-    }();
-
-    Register.prototype.sendFacDevEmail = function sendFacDevEmail() {
-      var email = new Object();
-      this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
-      email.email = this.people.selectedPerson.email;
-      email.institutionId = this.people.selectedPerson.institutionId;
-      email.institution = this.people.selectedInstitution.name;
-      email.fullName = this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName;
-      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-
-      this.people.sendNewRegisterEmail(email);
-      this.router.navigate("home");
-    };
-
-    Register.prototype.back = function back() {
-      window.history.back();
-    };
-
-    return Register;
-  }()) || _class);
-});
-define('modules/social/editBlog',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.EditBlogs = undefined;
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var EditBlogs = exports.EditBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
-		function EditBlogs(social, people, config) {
-			_classCallCheck(this, EditBlogs);
-
-			this.blogSelected = false;
-
-			this.social = social;
-			this.people = people;
-			this.config = config;
-		}
-
-		EditBlogs.prototype.attached = function attached() {
-			$('[data-toggle="tooltip"]').tooltip();
-		};
-
-		EditBlogs.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var responses;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true)]);
-
-							case 2:
-								responses = _context.sent;
-
-							case 3:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate() {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		EditBlogs.prototype.selectBlog = function selectBlog(index) {
-			this.social.selectBlog(index);
-			this.blogSelected = true;
-		};
-
-		EditBlogs.prototype.toggleActivation = function toggleActivation() {
-			this.social.selectedBlog.active = !this.social.selectedBlog.active;
-			this.social.saveBlog();
-		};
-
-		EditBlogs.prototype.back = function back() {
-			this.blogSelected = false;
-		};
-
-		return EditBlogs;
-	}()) || _class);
-});
-define('modules/social/social',['exports', 'aurelia-framework', 'aurelia-router', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Social = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var Social = exports.Social = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig), _dec(_class = function () {
-        function Social(router, config) {
-            _classCallCheck(this, Social);
-
-            this.router = router;
-            this.config = config;
-        }
-
-        Social.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-            this.blogAuthor = this.userObj.roles.indexOf('BLOG') > -1;
-            this.uccStaff = this.userObj.roles.indexOf('BLOG') > -1;
-        };
-
-        Social.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        Social.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'blogs'],
-                moduleId: './viewBlogs',
-                settings: { auth: false, roles: [] },
-                nav: true,
-                name: 'blogs',
-                title: 'Blogs'
-            }, {
-                route: 'forums',
-                moduleId: './viewForums',
-                settings: { auth: false, roles: [] },
-                nav: true,
-                name: 'forums',
-                title: 'Forums'
-            }, {
-                route: 'writeBlog',
-                moduleId: './writeBlog',
-                settings: { auth: false, roles: [] },
-                nav: false,
-                name: 'writeBlog',
-                title: 'writeBlog'
-            }, {
-                route: 'editBlog',
-                moduleId: './editBlog',
-                settings: { auth: false, roles: [] },
-                nav: false,
-                name: 'editBlog',
-                title: 'editBlog'
-            }]);
-
-            this.router = router;
-        };
-
-        return Social;
-    }()) || _class);
-});
-define('modules/social/viewBlogs',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _social, _people, _appConfig) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.ViewBlogs = undefined;
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var ViewBlogs = exports.ViewBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig), _dec(_class = function () {
-		function ViewBlogs(social, people, config) {
-			_classCallCheck(this, ViewBlogs);
-
-			this.blogSelected = false;
-
-			this.social = social;
-			this.people = people;
-			this.config = config;
-		}
-
-		ViewBlogs.prototype.attached = function attached() {
-			$('[data-toggle="tooltip"]').tooltip();
-		};
-
-		ViewBlogs.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var responses;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true)]);
-
-							case 2:
-								responses = _context.sent;
-
-							case 3:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate() {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		ViewBlogs.prototype.selectBlog = function selectBlog(index) {
-			this.selectedIndex = index;
-			this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
-			this.social.selectBlog(index);
-			this.social.saveBlog();
-			this.blogSelected = true;
-		};
-
-		ViewBlogs.prototype.like = function like(index) {
-			if (index === 999) index = this.selectedIndex;
-			this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
-			this.social.selectBlog(index);
-			this.social.saveBlog();
-		};
-
-		ViewBlogs.prototype.back = function back() {
-			this.blogSelected = false;
-		};
-
-		return ViewBlogs;
-	}()) || _class);
-});
-define('modules/social/viewForums',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../config/appConfig', '../../resources/utils/utils'], function (exports, _aureliaFramework, _social, _people, _appConfig, _utils) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.ViewForums = undefined;
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var ViewForums = exports.ViewForums = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _appConfig.AppConfig, _utils.Utils), _dec(_class = function () {
-		function ViewForums(social, people, config, utils) {
-			_classCallCheck(this, ViewForums);
-
-			this.forumSelected = false;
-			this.openNewForumForm = false;
-			this.openNewTopicForm = false;
-
-			this.social = social;
-			this.people = people;
-			this.config = config;
-			this.utils = utils;
-		}
-
-		ViewForums.prototype.attached = function attached() {
-			$('[data-toggle="tooltip"]').tooltip();
-		};
-
-		ViewForums.prototype.canActivate = function canActivate() {
-			this.userObj = JSON.parse(sessionStorage.getItem('user'));
-		};
-
-		ViewForums.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var responses;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray(), this.social.getForumArray('?order=-dateCreated', true)]);
-
-							case 2:
-								responses = _context.sent;
-
-							case 3:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate() {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		ViewForums.prototype.selectForum = function () {
-			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
-				return regeneratorRuntime.wrap(function _callee2$(_context2) {
-					while (1) {
-						switch (_context2.prev = _context2.next) {
-							case 0:
-								this.selectedIndex = index;
-								this.social.selectForum(index);
-								_context2.next = 4;
-								return this.social.getForumMessages('?filter=discusssionId|eq|' + this.social.selectedForum._id + '&order=-dateCreated', true);
-
-							case 4:
-								this.forumSelected = true;
-
-							case 5:
-							case 'end':
-								return _context2.stop();
-						}
-					}
-				}, _callee2, this);
-			}));
-
-			function selectForum(_x) {
-				return _ref2.apply(this, arguments);
-			}
-
-			return selectForum;
-		}();
-
-		ViewForums.prototype.newForum = function newForum() {
-			this.social.selectForum();
-			this.openNewForumForm = true;
-		};
-
-		ViewForums.prototype.saveForum = function () {
-			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-				var response;
-				return regeneratorRuntime.wrap(function _callee3$(_context3) {
-					while (1) {
-						switch (_context3.prev = _context3.next) {
-							case 0:
-								this.social.selectedForum.title = this.title;
-								this.social.selectedForum.text = this.text;
-								this.social.selectedForum.personId = this.userObj._id;
-								_context3.next = 5;
-								return this.social.saveForum();
-
-							case 5:
-								response = _context3.sent;
-
-								if (!response.error) {
-									this.utils.showNotification('The forum was saved');
-									this._cleanUp();
-								}
-
-							case 7:
-							case 'end':
-								return _context3.stop();
-						}
-					}
-				}, _callee3, this);
-			}));
-
-			function saveForum() {
-				return _ref3.apply(this, arguments);
-			}
-
-			return saveForum;
-		}();
-
-		ViewForums.prototype._cleanUp = function _cleanUp() {
-			this.openNewForumForm = false;
-			this.openNewTopicForm = false;
-		};
-
-		ViewForums.prototype.cancel = function cancel() {
-			this.text = "";
-			this.title = "";
-		};
-
-		ViewForums.prototype.newForumTopic = function newForumTopic() {
-			this.social.selectForumTopic();
-			this.openNewTopicForm = true;
-		};
-
-		ViewForums.prototype.saveForumTopic = function () {
-			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-				var response;
-				return regeneratorRuntime.wrap(function _callee4$(_context4) {
-					while (1) {
-						switch (_context4.prev = _context4.next) {
-							case 0:
-								this.social.selectedForumTopic.title = this.FormTopicTitle;
-								this.social.selectedForumTopic.text = this.ForumTopicText;
-								this.social.selectedForumTopic.personId = this.userObj._id;
-								this.social.selectedForumTopic.parentId = this.social.selectedForum._id;
-								_context4.next = 6;
-								return this.social.saveForumTopic();
-
-							case 6:
-								response = _context4.sent;
-
-								if (!response.error) {
-									this.utils.showNotification('The forum was saved');
-									this._cleanUp();
-								}
-
-							case 8:
-							case 'end':
-								return _context4.stop();
-						}
-					}
-				}, _callee4, this);
-			}));
-
-			function saveForumTopic() {
-				return _ref4.apply(this, arguments);
-			}
-
-			return saveForumTopic;
-		}();
-
-		ViewForums.prototype.back = function back() {
-			this.forumSelected = false;
-			this.openNewTopicForm = false;
-		};
-
-		return ViewForums;
-	}()) || _class);
-});
-define('modules/social/writeBlog',['exports', 'aurelia-framework', '../../resources/data/social', '../../resources/data/people', '../../resources/utils/validation', '../../resources/utils/utils'], function (exports, _aureliaFramework, _social, _people, _validation, _utils) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.WriteBlogs = undefined;
-
-	var _validation2 = _interopRequireDefault(_validation);
-
-	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj : {
-			default: obj
-		};
-	}
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var WriteBlogs = exports.WriteBlogs = (_dec = (0, _aureliaFramework.inject)(_social.Social, _people.People, _validation2.default, _utils.Utils), _dec(_class = function () {
-		function WriteBlogs(social, people, validation, utils) {
-			_classCallCheck(this, WriteBlogs);
-
-			this.blogSelected = false;
-
-			this.social = social;
-			this.people = people;
-			this.validation = validation;
-			this.validation.initialize(this);
-			this.utils = utils;
-			this._setupValidation();
-		}
-
-		WriteBlogs.prototype.canActivate = function canActivate() {
-			this.userObj = JSON.parse(sessionStorage.getItem('user'));
-		};
-
-		WriteBlogs.prototype.attached = function attached() {
-			$('[data-toggle="tooltip"]').tooltip();
-		};
-
-		WriteBlogs.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-				var responses;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray(), this.social.getBlogArray('?order=-dateCreated', true), this.social.getBlogArray("?filter=personId|eq|" + this.userObj._id + "&order=-dateCreated", true)]);
-
-							case 2:
-								responses = _context.sent;
-
-								this.social.selectBlog();
-
-							case 4:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate() {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		WriteBlogs.prototype.new = function _new() {
-			this.social.selectBlog();
-			this.blogSelected = true;
-		};
-
-		WriteBlogs.prototype.save = function () {
-			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-				var serverResponse;
-				return regeneratorRuntime.wrap(function _callee2$(_context2) {
-					while (1) {
-						switch (_context2.prev = _context2.next) {
-							case 0:
-								if (!this.validation.validate(1)) {
-									_context2.next = 6;
-									break;
-								}
-
-								this.social.selectedBlog.personId = this.userObj._id;
-								_context2.next = 4;
-								return this.social.saveBlog();
-
-							case 4:
-								serverResponse = _context2.sent;
-
-								if (serverResponse && !serverResponse.error) {
-									this.utils.showNotification("The blog was saved");
-								}
-
-							case 6:
-							case 'end':
-								return _context2.stop();
-						}
-					}
-				}, _callee2, this);
-			}));
-
-			function save() {
-				return _ref2.apply(this, arguments);
-			}
-
-			return save;
-		}();
-
-		WriteBlogs.prototype.selectBlog = function selectBlog(index) {
-			this.social.selectBlog(index);
-			this.blogSelected = true;
-		};
-
-		WriteBlogs.prototype.back = function back() {
-			this.blogSelected = false;
-		};
-
-		WriteBlogs.prototype._setupValidation = function _setupValidation() {
-			this.validation.addRule(1, "editTitle", [{ "rule": "required", "message": "Title is required", "value": "social.selectedBlog.title" }]);
-			this.validation.addRule(1, "editTeaser", [{ "rule": "required", "message": "Teaser is required", "value": "social.selectedBlog.teaser" }]);
-			this.validation.addRule(1, "blogContent", [{ "rule": "required", "message": "Content is required", "value": "social.selectedBlog.text" }]);
-		};
-
-		return WriteBlogs;
-	}()) || _class);
-});
-define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _commonDialogs, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Profile = undefined;
+    exports.BulkEmails = undefined;
 
     var _validation2 = _interopRequireDefault(_validation);
 
@@ -16145,44 +17093,31 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
 
     var _dec, _class;
 
-    var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_is4ua.is4ua, _people.People, _aureliaRouter.Router, _utils.Utils, _validation2.default, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function Profile(is4ua, people, router, utils, validation, dialog) {
-            _classCallCheck(this, Profile);
+    var BulkEmails = exports.BulkEmails = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
+        function BulkEmails(datatable, config, people, utils, is4ua, dialog, validation) {
+            _classCallCheck(this, BulkEmails);
 
-            this.is4ua = is4ua;
-            this.people = people;
-            this.router = router;
+            this.composeEmailPanel = false;
+            this.emailSubject = "";
+            this.emailMessage = "";
+            this.spinnerHTML = "";
+            this.email = new Object();
+            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
             this.utils = utils;
+            this.people = people;
+            this.is4ua = is4ua;
             this.dialog = dialog;
             this.validation = validation;
             this.validation.initialize(this);
-            this._setupValidation();
 
             this.userObj = JSON.parse(sessionStorage.getItem('user'));
         }
 
-        Profile.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
-            this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
-
-            this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
-            this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
-            this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
-                "valFunction": function valFunction(context) {
-                    return context.password === context.password_repeat;
-                } }], true);
-
-            this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
-                "valFunction": function valFunction(context) {
-                    return context.complexPassword;
-                } }]);
-        };
-
-        Profile.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        Profile.prototype.activate = function () {
+        BulkEmails.prototype.activate = function () {
             var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
                 var responses;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -16190,15 +17125,16 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return Promise.all([this.people.getPerson(this.userObj._id), this.people.getInstitutionsArray('?fields=_id name&order=name'), this.is4ua.loadIs4ua()]);
+                                return Promise.all([this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01'), this.people.getInstitutionsArray('?order=name', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
 
                             case 2:
                                 responses = _context.sent;
 
+                                this.activeFilterValue = "01";
+                                this.filteredArray = this.config.ROLES;
+                                this.dataTable.updateArray(this.people.peopleBulkEmailArray);
 
-                                this.user = this.people.selectedPerson;
-
-                            case 4:
+                            case 6:
                             case 'end':
                                 return _context.stop();
                         }
@@ -16213,54 +17149,20 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
             return activate;
         }();
 
-        Profile.prototype.buildAudit = function buildAudit() {
-            var _this = this;
-
-            var changes = this.people.isPersonDirty(this.user);
-            changes.forEach(function (item) {
-                _this.people.selectedPerson.audit.push({
-                    property: item.property,
-                    eventDate: new Date(),
-                    oldValue: item.oldValue,
-                    newValue: item.newValue,
-                    personId: JSON.parse(sessionStorage.getItem('user'))._id
-                });
-            });
-        };
-
-        Profile.prototype.save = function () {
+        BulkEmails.prototype.filterActive = function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var response;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                if (!this.validation.validate(1, this)) {
-                                    _context2.next = 8;
-                                    break;
-                                }
+                                this._clearFilters();
+                                _context2.next = 3;
+                                return this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
 
-                                if (this.password.length > 0) {
-                                    this.people.selectedPerson.password = this.password;
-                                }
-                                if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
-                                    this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
-                                }
-                                this.buildAudit();
-                                _context2.next = 6;
-                                return this.people.savePerson();
+                            case 3:
+                                this.dataTable.updateArray(this.people.peopleBulkEmailArray);
 
-                            case 6:
-                                response = _context2.sent;
-
-                                if (!response.error) {
-                                    this.utils.showNotification("Your profile has been updated");
-                                    this.router.navigate("user");
-                                } else {
-                                    this.utils.showNotification("An error occurred updating your profile");
-                                }
-
-                            case 8:
+                            case 4:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -16268,47 +17170,34 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
                 }, _callee2, this);
             }));
 
-            function save() {
+            function filterActive() {
                 return _ref2.apply(this, arguments);
             }
 
-            return save;
+            return filterActive;
         }();
 
-        Profile.prototype.changePassword = function changePassword() {
-            var _this2 = this;
-
-            var passwords = { password: "", password_repeat: "" };
-            return this.dialog.showPassword("Change Password", passwords, ['Submit', 'Cancel']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.savePassword(response.output.password);
-                } else {
-                    console.log("Cancelled");
-                }
-            });
+        BulkEmails.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
         };
 
-        Profile.prototype.savePassword = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(password) {
-                var obj, response;
+        BulkEmails.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                obj = {
-                                    password: password
-                                };
-                                _context3.next = 3;
-                                return this.people.updatePassword(obj);
+                                this._cleanUpFilters();
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 4;
+                                return this.people.getPeopleBulkEmailArray('?order=lastName&filter=personStatus|eq|01', true);
 
-                            case 3:
-                                response = _context3.sent;
+                            case 4:
+                                this.dataTable.updateArray(this.people.peopleBulkEmailArray);
 
-                                if (!response.error) {
-                                    this.utils.showNotification("The password was updated");
-                                }
+                                this.spinnerHTML = "";
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -16316,489 +17205,45 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
                 }, _callee3, this);
             }));
 
-            function savePassword(_x) {
+            function refresh() {
                 return _ref3.apply(this, arguments);
             }
 
-            return savePassword;
+            return refresh;
         }();
 
-        Profile.prototype.cancel = function cancel() {
-            this.utils.copyObject(this.users, this.people.selectedPerson);
+        BulkEmails.prototype._clearFilters = function _clearFilters() {
+            (0, _jquery2.default)(this.institutionFilter).val('');
+            (0, _jquery2.default)(this.institutionTypeFilter).val('');
+            (0, _jquery2.default)(this.memberTypeFilter).val("");
+            (0, _jquery2.default)(this.cityFilter).val("");
+            (0, _jquery2.default)(this.regionFilter).val("");
+            (0, _jquery2.default)(this.countryFilter).val("");
+            this.activeFilterValue = "01";
+            this.dataTable.updateArray(this.people.peopleBulkEmailArray);
         };
 
-        return Profile;
-    }()) || _class);
-});
-define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _people, _jquery) {
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.ResetPassword = undefined;
-
-	var _validation2 = _interopRequireDefault(_validation);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj : {
-			default: obj
-		};
-	}
-
-	function _asyncToGenerator(fn) {
-		return function () {
-			var gen = fn.apply(this, arguments);
-			return new Promise(function (resolve, reject) {
-				function step(key, arg) {
-					try {
-						var info = gen[key](arg);
-						var value = info.value;
-					} catch (error) {
-						reject(error);
-						return;
-					}
-
-					if (info.done) {
-						resolve(value);
-					} else {
-						return Promise.resolve(value).then(function (value) {
-							step("next", value);
-						}, function (err) {
-							step("throw", err);
-						});
-					}
-				}
-
-				return step("next");
-			});
-		};
-	}
-
-	function _classCallCheck(instance, Constructor) {
-		if (!(instance instanceof Constructor)) {
-			throw new TypeError("Cannot call a class as a function");
-		}
-	}
-
-	var _dec, _class;
-
-	var ResetPassword = exports.ResetPassword = (_dec = (0, _aureliaFramework.inject)(_people.People, _aureliaRouter.Router, _validation2.default, _utils.Utils), _dec(_class = function () {
-		function ResetPassword(people, router, validation, utils) {
-			_classCallCheck(this, ResetPassword);
-
-			this.people = people;
-			this.router = router;
-			this.validation = validation;
-			this.validation.initialize(this);
-			this._setupValidation();
-			this.utils = utils;
-			this.thresholdLength = 6;
-			this.threshold = 3;
-			this.showForm = true;
-			this.passwordReset = true;
-		}
-
-		ResetPassword.prototype.activate = function () {
-			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(params) {
-				var validationCode, response;
-				return regeneratorRuntime.wrap(function _callee$(_context) {
-					while (1) {
-						switch (_context.prev = _context.next) {
-							case 0:
-								if (!params.id) this.router.navigate("home");
-								validationCode = atob(params.id).substring(0, 24);
-								_context.next = 4;
-								return this.people.getPasswordReset(validationCode);
-
-							case 4:
-								response = _context.sent;
-
-								if (response.code === 404) {
-									this.showForm = false;
-								}
-
-							case 6:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function activate(_x) {
-				return _ref.apply(this, arguments);
-			}
-
-			return activate;
-		}();
-
-		ResetPassword.prototype.passwordComplexity = function passwordComplexity() {
-
-			var newValue = this.newPassword;
-
-			this.longPassword = newValue.length >= this.thresholdLength;
-
-			var strength = 0;
-			strength += /[A-Z]+/.test(newValue) ? 1 : 0;
-			strength += /[a-z]+/.test(newValue) ? 1 : 0;
-			strength += /[0-9]+/.test(newValue) ? 1 : 0;
-			strength += /[\W]+/.test(newValue) ? 1 : 0;
-
-			this.complexPassword = strength >= this.threshold && this.longPassword;
-			this.validation.validate(4);
-		};
-
-		ResetPassword.prototype.savePassword = function () {
-			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-				var obj, response;
-				return regeneratorRuntime.wrap(function _callee2$(_context2) {
-					while (1) {
-						switch (_context2.prev = _context2.next) {
-							case 0:
-								if (!this.validation.validate(1)) {
-									_context2.next = 6;
-									break;
-								}
-
-								obj = {
-									password: this.newPassword
-								};
-								_context2.next = 4;
-								return this.people.updatePassword(obj);
-
-							case 4:
-								response = _context2.sent;
-
-								if (!response.error) {
-									this.utils.showNotification("The password was updated");
-									this.router.navigate("home");
-								}
-
-							case 6:
-							case 'end':
-								return _context2.stop();
-						}
-					}
-				}, _callee2, this);
-			}));
-
-			function savePassword() {
-				return _ref2.apply(this, arguments);
-			}
-
-			return savePassword;
-		}();
-
-		ResetPassword.prototype._setupValidation = function _setupValidation() {
-			this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "newPassword" }]);
-			this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
-				"valFunction": function valFunction(context) {
-					return context.newPassword === context.password_repeat;
-				} }], true);
-			this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
-				"valFunction": function valFunction(context) {
-					return context.complexPassword;
-				} }]);
-		};
-
-		return ResetPassword;
-	}()) || _class);
-});
-define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.User = undefined;
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
+        BulkEmails.prototype.composeEmail = function composeEmail() {
+            this.composeEmailPanel = true;
         };
-    }
 
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
+        BulkEmails.prototype.cancel = function cancel() {
+            this.composeEmailPanel = false;
+            this.email.emailMessage = "";
+            this.email.subject = "";
         };
-    }
 
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests, _people.People), _dec(_class = function () {
-        function User(router, utils, config, siteinfo, sessions, helpTickets, requests, people) {
-            _classCallCheck(this, User);
-
-            this.router = router;
-            this.utils = utils;
-            this.config = config;
-            this.siteinfo = siteinfo;
-            this.sessions = sessions;
-            this.helpTickets = helpTickets;
-            this.requests = requests;
-            this.people = people;
-        }
-
-        User.prototype.attached = function attached() {
-            $('.carousel').carousel({
-                interval: 10000
+        BulkEmails.prototype.send = function send() {
+            var recipients = new Array();
+            this.dataTable.baseArray.forEach(function (item) {
+                recipients.push({ name: item.fullName, email: item.email });
             });
 
-            this.updateTwitter(document, "script", "twitter-wjs");
-
-            this.alertIndex = this.utils.arrayContainsValue(this.siteinfo.siteArray, "itemType", "ALRT");
-            if (!sessionStorage.getItem('alert')) {
-                if (this.alertIndex > -1) {
-                    this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
-                }
-            }
+            var email = { email: this.email, recipients: recipients };
+            this.people.sendBuikEmail(email);
         };
 
-        User.prototype.updateTwitter = function updateTwitter(d, s, id) {
-            var js,
-                fjs = d.getElementsByTagName(s)[0],
-                p = /^http:/.test(d.location) ? 'http' : 'https';
-            if (!d.getElementById(id)) {
-                js = d.createElement(s);
-                js.id = id;
-                js.src = p + "://platform.twitter.com/widgets.js";
-                fjs.parentNode.insertBefore(js, fjs);
-            }
-        };
-
-        User.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return this.getData();
-
-                            case 2:
-
-                                this.helpTicketArray = [{
-                                    value: this.helpTickets.newHelpTickets || 0,
-                                    color: "#F7464A",
-                                    highlight: "#FF5A5E",
-                                    label: "New"
-                                }, {
-                                    value: this.helpTickets.underReviewHelpTickets || 0,
-                                    color: "#46BFBD",
-                                    highlight: "#5AD3D1",
-                                    label: "Under Review"
-                                }, {
-                                    value: this.helpTickets.customerActionHelpTickets || 0,
-                                    color: "#FDB45C",
-                                    highlight: "#FFC870",
-                                    label: "Customer Action"
-                                }];
-
-                                this.clientRequestsArray = [{
-                                    value: this.requests.unassignedRequests || 0,
-                                    color: "#F7464A",
-                                    highlight: "#FF5A5E",
-                                    label: "Unassigned"
-                                }, {
-                                    value: this.requests.updatedRequests || 0,
-                                    color: "#46BFBD",
-                                    highlight: "#5AD3D1",
-                                    label: "Updated"
-                                }, {
-                                    value: this.requests.customerActionRequests || 0,
-                                    color: "#FDB45C",
-                                    highlight: "#FFC870",
-                                    label: "Customer Action"
-                                }];
-
-                            case 4:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        User.prototype.getData = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var _this = this;
-
-                var currentDate, options, countOptions, responses, _responses, requestCountArray, weather, weatherObj, _weather, uccweather;
-
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
-                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
-                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
-
-                                if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
-                                    _context2.next = 15;
-                                    break;
-                                }
-
-                                countOptions = '';
-
-                                this.countHeader = "Recent Request History";
-                                _context2.next = 8;
-                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
-
-                            case 8:
-                                responses = _context2.sent;
-
-                                this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
-                                this.showHelpTickets = this.helpTickets.newHelpTickets;
-                                this.showCarousel = this.siteinfo.showCarousel();
-                                this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
-                                _context2.next = 23;
-                                break;
-
-                            case 15:
-                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
-
-                                this.countHeader = "Your Institution's Recent Request History";
-                                _context2.next = 19;
-                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
-
-                            case 19:
-                                _responses = _context2.sent;
-
-                                this.showRequests = this.requests.customerActionRequests;
-                                this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
-                                this.showCarousel = this.siteinfo.showCarousel();
-
-                            case 23:
-                                this.requestsCount = new Array();
-                                this.countLabels = new Array();
-                                _context2.next = 27;
-                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
-
-                            case 27:
-                                requestCountArray = _context2.sent;
-
-                                if (requestCountArray) {
-                                    requestCountArray.forEach(function (item) {
-                                        _this.requestsCount.push(item.count);
-                                        _this.countLabels.push(item.session);
-                                    });
-                                }
-
-                                this.temp = undefined;
-
-                                if (sessionStorage.getItem('weather')) {
-                                    _context2.next = 42;
-                                    break;
-                                }
-
-                                if (!this.userObj.city) {
-                                    _context2.next = 40;
-                                    break;
-                                }
-
-                                _context2.next = 34;
-                                return this.siteinfo.getWeather(this.userObj.city);
-
-                            case 34:
-                                weather = _context2.sent;
-
-                                this.temp = parseFloat(weather.main.temp) - 273.15;
-                                if (this.config.TEMP_SCALE == 'C') {
-                                    this.temp = this.temp.toFixed(1) + '\xB0 C';
-                                } else {
-                                    this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + '\xB0 F';
-                                }
-                                this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" + weather.weather[0].icon + ".png";
-                                weatherObj = { temp: this.temp, url: this.weatherIcon };
-
-                                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
-
-                            case 40:
-                                _context2.next = 45;
-                                break;
-
-                            case 42:
-                                _weather = JSON.parse(sessionStorage.getItem('weather'));
-
-                                this.temp = _weather.temp;
-                                this.weatherIcon = _weather.url;
-
-                            case 45:
-                                if (sessionStorage.getItem('uccweather')) {
-                                    uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
-
-                                    this.ucctemp = parseFloat(uccweather.temp) - 273.15;
-                                    if (this.config.TEMP_SCALE == 'C') {
-                                        this.ucctemp = this.ucctemp.toFixed(1) + '\xB0 C';
-                                    } else {
-                                        this.ucctemp = (parseFloat(this.ucctemp) * 1.8 + 32).toFixed(1) + '\xB0 F';
-                                    }
-                                    this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL + 'icons/' + uccweather.icon + ".png";
-                                    console.log(this.uccweatherIcon);
-                                }
-
-                            case 46:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getData() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getData;
-        }();
-
-        User.prototype.moreInfoExists = function moreInfoExists(item) {
-            return item.url && item.url.length > 0;
-        };
-
-        return User;
+        return BulkEmails;
     }()) || _class);
 });
 define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
@@ -16849,6 +17294,13 @@ define('modules/admin/customers/customers',['exports', 'aurelia-framework', 'aur
                 nav: true,
                 name: 'editInstitutions',
                 title: 'Institutions'
+            }, {
+                route: 'bulkEmails',
+                moduleId: './bulkEmails',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'bulkEmails',
+                title: 'Bulk Emails'
             }]);
 
             this.router = router;
@@ -17271,6 +17723,7 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
             this.courseSelected = false;
             this.showPassword = false;
             this.customerEmail = false;
+            this.bulkEmailSelected = false;
             this.emailSubject = "";
             this.emailMessage = "";
             this.navControl = "peopleNavButtons";
@@ -17330,13 +17783,14 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                _context2.next = 2;
+                                this._clearFilters();
+                                _context2.next = 3;
                                 return this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
 
-                            case 2:
+                            case 3:
                                 this.dataTable.updateArray(this.people.peopleArray);
 
-                            case 3:
+                            case 4:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -18024,14 +18478,58 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
         EditPeople.prototype.bulkEmail = function bulkEmail() {
             var _this7 = this;
 
-            var email = { emailBody: "", emailSubject: "" };
-            return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this7.sendBulkEmail(response.output.email);
-                } else {
-                    console.log("Cancelled");
-                }
+            this.bulkEmailSelected = true;
+            this.bulkEmailArray = new Array();
+            this.bulkEmailArrayFiltered = new Array();
+            this.people.peopleArray.forEach(function (item) {
+                _this7.bulkEmailArray.push(item);
+                _this7.bulkEmailArrayFiltered.push(item);
             });
+        };
+
+        EditPeople.prototype.filterEmail = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(filter) {
+                var _this8 = this;
+
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                _context14.t0 = filter;
+                                _context14.next = _context14.t0 === 'personStatus' ? 3 : 9;
+                                break;
+
+                            case 3:
+                                _context14.next = 5;
+                                return this.filterActive();
+
+                            case 5:
+                                this.bulkEmailArrayFiltered = new Array();
+                                this._clearEmailFilters();
+                                this.people.peopleArray.forEach(function (item) {
+                                    _this8.bulkEmailArrayFiltered.push(item);
+                                });
+                                return _context14.abrupt('break', 9);
+
+                            case 9:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function filterEmail(_x2) {
+                return _ref14.apply(this, arguments);
+            }
+
+            return filterEmail;
+        }();
+
+        EditPeople.prototype._clearEmailFilters = function _clearEmailFilters() {};
+
+        EditPeople.prototype.backBuilkEmail = function backBuilkEmail() {
+            this.bulkEmailSelected = false;
         };
 
         EditPeople.prototype.sendBulkEmail = function sendBulkEmail(email) {
@@ -18039,14 +18537,14 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
         };
 
         EditPeople.prototype.toggleStatus = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(id, personStatus) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(id, personStatus) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
                                 if (!(id && personStatus)) {
-                                    _context14.next = 8;
+                                    _context15.next = 8;
                                     break;
                                 }
 
@@ -18058,11 +18556,11 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                                     newValue: this.people.selectedPerson.personStatus,
                                     personId: this.userObj._id
                                 });
-                                _context14.next = 6;
+                                _context15.next = 6;
                                 return this.people.savePerson();
 
                             case 6:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
@@ -18072,25 +18570,25 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
 
                             case 8:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee15, this);
             }));
 
-            function toggleStatus(_x2, _x3) {
-                return _ref14.apply(this, arguments);
+            function toggleStatus(_x3, _x4) {
+                return _ref15.apply(this, arguments);
             }
 
             return toggleStatus;
         }();
 
         EditPeople.prototype.changeTab = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(el, index) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(el, index) {
                 var target;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 (0, _jquery2.default)("#peopleFormListGroup.list-group").children().removeClass('active');
                                 target = (0, _jquery2.default)(el.target);
@@ -18099,27 +18597,27 @@ define('modules/admin/customers/editPeople',['exports', 'aurelia-framework', '..
                                 target.parent().addClass('active');
                                 (0, _jquery2.default)(".in").removeClass('active').removeClass('in');
                                 (0, _jquery2.default)("#" + target.html() + "Tab").addClass('in').addClass('active');
-                                _context15.t0 = target.attr('id');
-                                _context15.next = _context15.t0 === 'Courses' ? 9 : 12;
+                                _context16.t0 = target.attr('id');
+                                _context16.next = _context16.t0 === 'Courses' ? 9 : 12;
                                 break;
 
                             case 9:
-                                _context15.next = 11;
+                                _context16.next = 11;
                                 return this.refreshCourses();
 
                             case 11:
-                                return _context15.abrupt('break', 12);
+                                return _context16.abrupt('break', 12);
 
                             case 12:
                             case 'end':
-                                return _context15.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee16, this);
             }));
 
-            function changeTab(_x4, _x5) {
-                return _ref15.apply(this, arguments);
+            function changeTab(_x5, _x6) {
+                return _ref16.apply(this, arguments);
             }
 
             return changeTab;
@@ -19896,7 +20394,6 @@ define('modules/admin/site/editConfig',['exports', 'aurelia-framework', '../../.
                                 return this.siteConfig.getConfigArray(true);
 
                             case 2:
-
                                 this.dataTable.updateArray(this.siteConfig.configArray);
 
                             case 3:
@@ -19925,10 +20422,14 @@ define('modules/admin/site/editConfig',['exports', 'aurelia-framework', '../../.
                                 return this.siteConfig.getConfigArray(true);
 
                             case 3:
+                                _context2.next = 5;
+                                return this.config.getConfig(true);
+
+                            case 5:
                                 this.dataTable.updateArray(this.siteConfig.configArray);
                                 this.spinnerHTML = "";
 
-                            case 5:
+                            case 7:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -37046,15 +37547,15 @@ define('text!resources/editor/skins/moono-lisa/dialog_iequirks.css', ['module'],
 define('text!modules/home/home.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"${item.priority} textContainer banner\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\n        <h4 class=\"leftMargin\">${item.title}</h4>\n    </div>\n\n <div class=\"parallax1\">\n     <div class=\"caption\">\n         <span class=\"border\">${config.HOME_WELCOME}</span>\n    </div>\n </div>\n\n     <div class=\"row center-text\" style=\"color: #777;background-color:white;text-align:center;padding:25px 80px;text-align: justify;\">\n            <compose view=\"./components/uccInformation.html\"></compose>\n     </div>\n\n   <div class=\"parallax2\"></div>\n\n    <div class=\"row bigMarginTop\" style=\"color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;\">\n        <div class=\"col-lg-3 bigMarginTop\">\n            <h2 class=\"underline\">Useful Information</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\n                <compose view=\"./components/newsItem.html\"></compose>\n            </div>\n        </div>\n        <div class=\"col-lg-5 bigMarginTop leftMargin\">\n            <h2 class=\"underline bottomMargin\">Useful Links</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\n                <compose view=\"./components/homePageLinks.html\"></compose>\n            </div>\n        </div>\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\n            <h2 class=\"underline\">UCC and UA News</h2>\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\n                <compose view=\"./components/newsItem.html\"></compose>\n            </div>\n        </div>\n    </div>\n    </div>\n\n</template>"; });
 define('text!resources/editor/skins/moono-lisa/editor.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}"; });
 define('text!modules/home/logout.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Logout</h1>\n</template>"; });
-define('text!resources/editor/skins/moono-lisa/editor_gecko.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}.cke_bottom{padding-bottom:3px}.cke_combo_text{margin-bottom:-1px;margin-top:1px}"; });
 define('text!modules/home/register.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\"> \r\n            <div class=\"container-fluid\">\r\n                <div class=\"navbar-header\">\r\n                    <a class=\"navbar-brand\">Register</a>\r\n                </div>\r\n            </div>\r\n        </nav>\r\n     </div>\r\n  <div class=\"fluid-container col-lg-10 col-lg-offset-1\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-body\">\r\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Backve\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n        <div class=\"topMargin col-sm-12 col-lg-1\">\r\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n            <div class=\"topMargin\">\r\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\r\n            </div>\r\n        </div>\r\n    <div class=\"col-sm-12 col-lg-10\" style=\"margin-left:10px;\">\r\n        <form class=\"form-horizontal topMargin\">\r\n          <div class=\"row\">\r\n            <!-- Row 1 -->\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_firstName\" class=\"col-sm-3 control-label \">First Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"register_firstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_middletName\" class=\"col-sm-3 control-label \">Middle Name</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"register_middletName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-sm-12 col-lg-4\">\r\n              <div class=\"form-group\">\r\n                <label for=\"register_lastName\" class=\"col-sm-3 control-label \">Last Name *</label>\r\n                <div class=\"col-sm-8\">\r\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"register_lastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\r\n                </div>\r\n              </div>\r\n            </div>\r\n             <div class=\"col-lg-4\">\r\n                <div class=\"form-group\">\r\n                    <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                    <div class=\"col-sm-8\">\r\n                        <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\" />\r\n                    </div>\r\n                </div>\r\n            </div>\r\n          </div>\r\n\r\n\r\n          <!-- Row 2 -->\r\n          <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_phone\" class=\"col-sm-3 control-label \">Phone *</label>\r\n                            <div class=\"col-sm-8\">\r\n                             <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_mobile\" class=\"col-sm-3 control-label \">Mobile</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input id=\"register_mobile\" class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_email\" class=\"col-sm-3 control-label\">Email *</label>\r\n                            <div class=\"col-sm-8\">\r\n                            <input blur.trigger=\"checkEmail()\" value.bind=\"people.selectedPerson.email\" id=\"register_email\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <!--\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_gender\" class=\"col-sm-3 control-label\">Gender</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"register_gender\" class=\"form-control input-md\" placeholder=\"Gender\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option value=\"F\">Female</option>\r\n                                    <option value=\"M\">Male</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    -->\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_institution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"register_institution\" class=\"form-control input-md\" placeholder=\"Institution\">\r\n                                    <option value=\"\">Select an option</option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                </select>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password\" class=\"col-sm-3 control-label\">Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"people.selectedPerson.password\"\r\n                              blur.trigger=\"passwordComplexity()\" />\r\n                        </div>\r\n                      </div>\r\n                    </div>\r\n                     <div class=\"col-lg-12\">\r\n                      <div class=\"form-group\">\r\n                        <label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password *</label>\r\n                        <div class=\"col-md-8\">\r\n                          <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                              class=\"form-control input-md\"\r\n                              value.bind=\"password_repeat\" />\r\n                        </div>\r\n                    </div>\r\n                  </div>\r\n                </div>\r\n                \r\n\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address1\" class=\"col-sm-3 control-label \">Address 1</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"register_address1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_address2\" class=\"col-sm-3 control-label \">Address 2</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"register_address2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">City</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.city\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_region\" class=\"col-sm-3 control-label \">Region</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.region\" id=\"register_region\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_postal_code\" class=\"col-sm-3 control-label \">Postal Code</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"register_postal_code\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"col-lg-12\">\r\n                        <div class=\"form-group\">\r\n                            <label for=\"register_city\" class=\"col-sm-3 control-label \">Country</label>\r\n                            <div class=\"col-sm-8\">\r\n                                <input value.bind=\"people.selectedPerson.country\" id=\"register_city\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"topMargin\">Password should be at least ${thresholdLength} characters long and should contain a combination of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters</div>\r\n\r\n           <div class=\"row topMargin\">\r\n                <div class=\"col-lg-5\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_specialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"register_specialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"register_department\" class=\"col-sm-3 control-label\">Department</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"register_department\" class=\"form-control input-md\" placeholder=\"Department\">\r\n                                <option value=\"\">Select an option</option>\r\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n          </div> <!-- Row -->\r\n        </form>\r\n      </div>\r\n  </div>\r\n</template>\r\n\r\n<!--\r\n<template>\r\n  <div class=\"container topMargin\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-heading\">\r\n        <div class=\"panel-title\">\r\n          <h3>Create an Account</h3>\r\n        </div>\r\n      </div>\r\n        <div class=\"topMargin bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n      <div class=\"panel-body\">\r\n        <form role=\"form\" class=\"form-horizontal\">\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_firstName\" class=\"col-sm-2 form-control-label topMargin\">First Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_firstName\" type=\"text\" placeholder=\"First Name\"\r\n                   class=\"form-control\"\r\n                   value.bind=\"people.selectedPerson.firstName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group\">\r\n            <label for=\"register_middletName\" class=\"col-sm-2 form-control-label topMargin\">Middle Name</label>\r\n            <div class=\"col-sm-10\">\r\n              <input type=\"text\" placeholder=\"Middle Name\" id=\"register_middletName\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.middleName\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_lastName\" class=\"col-sm-2 form-control-label topMargin\">Last Name *</label>\r\n            <div class=\"col-sm-10\">\r\n              <input id=\"register_lastName\" type=\"text\" placeholder=\"Last Name\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.lastName\" />\r\n              </div>\r\n          </div> \r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">EMail *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_email\" type=\"text\" placeholder=\"eMail\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.email\"\r\n                   blur.trigger=\"checkEmail()\"/>\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Phone *</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_email\" class=\"col-sm-2 form-control-label topMargin\">Mobile</label>\r\n            <div class=\"col-md-10\">\r\n              <input class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password\" class=\"col-sm-2 form-control-label topMargin\">Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"people.selectedPerson.password\"\r\n                   blur.trigger=\"passwordComplexity()\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_password_repeat\" class=\"col-sm-2 form-control-label topMargin\">Repeat Password *</label>\r\n            <div class=\"col-md-10\">\r\n              <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                   class=\"form-control topMargin\"\r\n                   value.bind=\"password_repeat\" />\r\n            </div>\r\n          </div>\r\n          <div class=\"form-group row\">\r\n            <label for=\"register_institution\" class=\"col-sm-2 form-control-label topMargin\">Institution *</label>\r\n            <div class=\"col-md-10\">\r\n              <select id=\"register_institution\" change.delegate=\"checkName()\" value.bind=\"people.selectedPerson.institutionId\" id=\"iType\"\r\n                    class=\"form-control topMargin\" placeholder=\"Institution\">\r\n                <option value=\"\"></option>\r\n                <option repeat.for=\"institution of people.institutionsArray\"\r\n                        value=\"${institution._id}\">${institution.name}</option>\r\n              </select>\r\n            </div>\r\n          </div>\r\n        </form>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n-->"; });
-define('text!resources/editor/skins/moono-lisa/editor_ie.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}"; });
+define('text!resources/editor/skins/moono-lisa/editor_gecko.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}.cke_bottom{padding-bottom:3px}.cke_combo_text{margin-bottom:-1px;margin-top:1px}"; });
 define('text!modules/social/editBlog.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/blogListUCC.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogPageUCC.html\"></compose>\n            </div> \n      </div> \n</template>"; });
-define('text!resources/editor/skins/moono-lisa/editor_ie8.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.cke_toolbox_collapser .cke_arrow{border-width:4px}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{border-width:3px}.cke_toolbox_collapser .cke_arrow{margin-top:0}.cke_toolbar{position:relative}.cke_rtl .cke_toolbar_end{right:auto;left:0}.cke_toolbar_end:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:1px;right:2px}.cke_rtl .cke_toolbar_end:after{right:auto;left:2px}.cke_hc .cke_toolbar_end:after{top:2px;right:5px;border-color:#000}.cke_hc.cke_rtl .cke_toolbar_end:after{right:auto;left:5px}.cke_combo+.cke_toolbar_end:after,.cke_toolbar.cke_toolbar_last .cke_toolbar_end:after{content:none;border:0}.cke_combo+.cke_toolgroup+.cke_toolbar_end:after{right:0}.cke_rtl .cke_combo+.cke_toolgroup+.cke_toolbar_end:after{right:auto;left:0}"; });
 define('text!modules/social/social.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Social</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\"  repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                    <li if.bind=\"blogAuthor\" class=\"${row.isActive ? 'active' : ''}\"><a href=\"#/social/writeBlog\">Write a Blog</a></li>\n                    <li if.bind=\"userObj.userRole >= config.UCC_ROLE\" class=\"${row.isActive ? 'active' : ''}\"><a href=\"#/social/editBlog\">Edit Blogs</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
-define('text!resources/editor/skins/moono-lisa/editor_iequirks.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.cke_top,.cke_contents,.cke_bottom{width:100%}.cke_button_arrow{font-size:0}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_button,.cke_rtl .cke_button *,.cke_rtl .cke_combo,.cke_rtl .cke_combo *,.cke_rtl .cke_path_item,.cke_rtl .cke_path_item *,.cke_rtl .cke_path_empty{float:none}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_combo_button,.cke_rtl .cke_combo_button *,.cke_rtl .cke_button,.cke_rtl .cke_button_icon{display:inline-block;vertical-align:top}.cke_rtl .cke_button_icon{float:none}.cke_resizer{width:10px}.cke_source{white-space:normal}.cke_bottom{position:static}.cke_colorbox{font-size:0}"; });
+define('text!resources/editor/skins/moono-lisa/editor_ie.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}"; });
 define('text!modules/social/viewBlogs.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/blogList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogPage.html\"></compose>\n            </div> \n      </div> \n</template>\n"; });
+define('text!resources/editor/skins/moono-lisa/editor_ie8.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.cke_toolbox_collapser .cke_arrow{border-width:4px}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{border-width:3px}.cke_toolbox_collapser .cke_arrow{margin-top:0}.cke_toolbar{position:relative}.cke_rtl .cke_toolbar_end{right:auto;left:0}.cke_toolbar_end:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:1px;right:2px}.cke_rtl .cke_toolbar_end:after{right:auto;left:2px}.cke_hc .cke_toolbar_end:after{top:2px;right:5px;border-color:#000}.cke_hc.cke_rtl .cke_toolbar_end:after{right:auto;left:5px}.cke_combo+.cke_toolbar_end:after,.cke_toolbar.cke_toolbar_last .cke_toolbar_end:after{content:none;border:0}.cke_combo+.cke_toolgroup+.cke_toolbar_end:after{right:0}.cke_rtl .cke_combo+.cke_toolgroup+.cke_toolbar_end:after{right:auto;left:0}"; });
 define('text!modules/social/viewForums.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!forumSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/forumList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"forumSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/forumPage.html\"></compose>\n            </div> \n      </div> \n</template>"; });
+define('text!resources/editor/skins/moono-lisa/editor_iequirks.css', ['module'], function(module) { module.exports = "/*\r\nCopyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.\r\nFor licensing, see LICENSE.md or http://ckeditor.com/license\r\n*/\r\n.cke_reset{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none}.cke_reset_all,.cke_reset_all *,.cke_reset_all a,.cke_reset_all textarea{margin:0;padding:0;border:0;background:transparent;text-decoration:none;width:auto;height:auto;vertical-align:baseline;box-sizing:content-box;position:static;transition:none;border-collapse:collapse;font:normal normal normal 12px Arial,Helvetica,Tahoma,Verdana,Sans-Serif;color:#000;text-align:left;white-space:nowrap;cursor:auto;float:none}.cke_reset_all .cke_rtl *{text-align:right}.cke_reset_all iframe{vertical-align:inherit}.cke_reset_all textarea{white-space:pre-wrap}.cke_reset_all textarea,.cke_reset_all input[type=\"text\"],.cke_reset_all input[type=\"password\"]{cursor:text}.cke_reset_all textarea[disabled],.cke_reset_all input[type=\"text\"][disabled],.cke_reset_all input[type=\"password\"][disabled]{cursor:default}.cke_reset_all fieldset{padding:10px;border:2px groove #e0dfe3}.cke_reset_all select{box-sizing:border-box}.cke_reset_all table{table-layout:auto}.cke_chrome{display:block;border:1px solid #d1d1d1;padding:0}.cke_inner{display:block;background:#fff;padding:0;-webkit-touch-callout:none}.cke_float{border:0}.cke_float .cke_inner{padding-bottom:0}.cke_top,.cke_contents,.cke_bottom{display:block;overflow:hidden}.cke_top{border-bottom:1px solid #d1d1d1;background:#f8f8f8;padding:6px 8px 2px;white-space:normal}.cke_float .cke_top{border:1px solid #d1d1d1}.cke_bottom{padding:6px 8px 2px;position:relative;border-top:1px solid #d1d1d1;background:#f8f8f8}.cke_browser_ios .cke_contents{overflow-y:auto;-webkit-overflow-scrolling:touch}.cke_resizer{width:0;height:0;overflow:hidden;border-width:10px 10px 0 0;border-color:transparent #bcbcbc transparent transparent;border-style:dashed solid dashed dashed;font-size:0;vertical-align:bottom;margin-top:6px;margin-bottom:2px}.cke_hc .cke_resizer{font-size:15px;width:auto;height:auto;border-width:0}.cke_resizer_ltr{cursor:se-resize;float:right;margin-right:-4px}.cke_resizer_rtl{border-width:10px 0 0 10px;border-color:transparent transparent transparent #bcbcbc;border-style:dashed dashed dashed solid;cursor:sw-resize;float:left;margin-left:-4px;right:auto}.cke_wysiwyg_div{display:block;height:100%;overflow:auto;padding:0 8px;outline-style:none;box-sizing:border-box}.cke_panel{visibility:visible;width:120px;height:100px;overflow:hidden;background-color:#fff;border:1px solid #d1d1d1}.cke_menu_panel{padding:0;margin:0}.cke_combopanel{width:150px;height:170px}.cke_panel_frame{width:100%;height:100%;font-size:12px;overflow:auto;overflow-x:hidden}.cke_panel_container{overflow-y:auto;overflow-x:hidden}.cke_panel_block:focus{outline:0}.cke_panel_list{margin:0;padding:0;list-style-type:none;white-space:nowrap}.cke_panel_listItem{margin:0;padding:0}.cke_panel_listItem a{padding:6px 7px;display:block;color:inherit!important;text-decoration:none;overflow:hidden;text-overflow:ellipsis}.cke_hc .cke_panel_listItem a{border-style:none}.cke_panel_listItem.cke_selected a,.cke_panel_listItem a:hover,.cke_panel_listItem a:focus,.cke_panel_listItem a:active{background-color:#e9e9e9}.cke_panel_listItem a:focus{outline:1px dotted #000}.cke_hc .cke_panel_listItem a:hover,.cke_hc .cke_panel_listItem a:focus,.cke_hc .cke_panel_listItem a:active{border:2px solid;padding:4px 5px}.cke_panel_listItem p,.cke_panel_listItem h1,.cke_panel_listItem h2,.cke_panel_listItem h3,.cke_panel_listItem h4,.cke_panel_listItem h5,.cke_panel_listItem h6,.cke_panel_listItem pre{margin-top:0;margin-bottom:0}.cke_panel_grouptitle{cursor:default;font-size:11px;font-weight:bold;white-space:nowrap;margin:0;padding:6px 6px 7px 6px;color:#484848;border-bottom:1px solid #d1d1d1;background:#f8f8f8}.cke_colorblock{padding:10px;font-size:11px;font-family:'Microsoft Sans Serif',Tahoma,Arial,Verdana,Sans-Serif}.cke_colorblock,.cke_colorblock a{text-decoration:none;color:#000}a.cke_colorbox{padding:2px;float:left;width:20px;height:20px}.cke_rtl a.cke_colorbox{float:right}a:hover.cke_colorbox,a:focus.cke_colorbox,a:active.cke_colorbox{outline:0;padding:0;border:2px solid #139ff7}a:hover.cke_colorbox{border-color:#bcbcbc}span.cke_colorbox{width:20px;height:20px;float:left}.cke_rtl span.cke_colorbox{float:right}a.cke_colorauto,a.cke_colormore{border:#fff 1px solid;padding:3px;display:block;cursor:pointer}a.cke_colorauto{padding:0;border:1px solid transparent;margin-bottom:6px;height:26px;line-height:26px}a.cke_colormore{margin-top:10px;height:20px;line-height:19px}a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_colormore,a:active.cke_colorauto,a:active.cke_colormore{outline:0;border:#139ff7 1px solid;background-color:#f8f8f8}a:hover.cke_colorauto,a:hover.cke_colormore{border-color:#bcbcbc}.cke_colorauto span.cke_colorbox{width:18px;height:18px;border:1px solid #808080;margin-left:1px;margin-top:3px}.cke_rtl .cke_colorauto span.cke_colorbox{margin-left:0;margin-right:1px}span.cke_colorbox[style*=\"#ffffff\"],span.cke_colorbox[style*=\"#FFFFFF\"],span.cke_colorbox[style=\"background-color:#fff\"],span.cke_colorbox[style=\"background-color:#FFF\"],span.cke_colorbox[style*=\"rgb(255,255,255)\"],span.cke_colorbox[style*=\"rgb(255, 255, 255)\"]{border:1px solid #808080;width:18px;height:18px}.cke_toolbar{float:left}.cke_rtl .cke_toolbar{float:right}.cke_toolgroup{border:0;float:left;margin:1px 2px 6px 0;padding-right:3px}.cke_rtl .cke_toolgroup{float:right;margin:1px 0 6px 2px;padding-left:3px;padding-right:0}.cke_hc .cke_toolgroup{margin-right:5px;margin-bottom:5px}.cke_hc.cke_rtl .cke_toolgroup{margin-right:0;margin-left:5px}a.cke_button{display:inline-block;height:18px;padding:4px 6px;outline:0;cursor:default;float:left;border:0;position:relative}.cke_rtl a.cke_button{float:right}.cke_hc a.cke_button{border:1px solid black;padding:3px 5px;margin:0 3px 5px 0}.cke_hc.cke_rtl a.cke_button{margin:0 0 5px 3px}a.cke_button_on{background:#fff;border:1px #bcbcbc solid;padding:3px 5px}a.cke_button_off:hover,a.cke_button_off:focus,a.cke_button_off:active{background:#e5e5e5;border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active{background:#e5e5e5;border:3px solid #000;padding:1px 3px}a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{border:0;padding:4px 6px;background-color:transparent}a.cke_button_disabled:focus{border:1px #bcbcbc solid;padding:3px 5px}.cke_hc a.cke_button_disabled:hover,.cke_hc a.cke_button_disabled:focus,.cke_hc a.cke_button_disabled:active{border:1px solid #acacac;padding:3px 5px;margin:0 3px 5px 0}.cke_hc a.cke_button_disabled:focus{border:3px solid #000;padding:1px 3px}.cke_hc.cke_rtl a.cke_button_disabled:hover,.cke_hc.cke_rtl a.cke_button_disabled:focus,.cke_hc.cke_rtl a.cke_button_disabled:active{margin:0 0 5px 3px}a.cke_button_disabled .cke_button_icon,a.cke_button_disabled .cke_button_arrow{opacity:.3}.cke_hc a.cke_button_disabled{border-color:#acacac}.cke_hc a.cke_button_disabled .cke_button_icon,.cke_hc a.cke_button_disabled .cke_button_label{opacity:.5}.cke_toolgroup a.cke_button:last-child:after,.cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:4px;top:0;right:-3px}.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-right:0;right:auto;border-left:1px solid #bcbcbc;top:0;left:-3px}.cke_hc .cke_toolgroup a.cke_button:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{border-color:#000;top:0;right:-7px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_disabled:hover:last-child:after{top:0;right:auto;left:-7px}.cke_toolgroup a.cke_button:hover:last-child:after,.cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:-4px}.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-1px;right:auto;left:-4px}.cke_hc .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:-9px}.cke_hc.cke_rtl .cke_toolgroup a.cke_button:hover:last-child:after,.cke_hc.cke_rtl .cke_toolgroup a.cke_button.cke_button_on:last-child:after{top:-2px;right:auto;left:-9px}.cke_toolbar.cke_toolbar_last .cke_toolgroup a.cke_button:last-child:after{content:none;border:0;width:0;height:0}.cke_button_icon{cursor:inherit;background-repeat:no-repeat;margin-top:1px;width:16px;height:16px;float:left;display:inline-block}.cke_rtl .cke_button_icon{float:right}.cke_hc .cke_button_icon{display:none}.cke_button_label{display:none;padding-left:3px;margin-top:1px;line-height:17px;vertical-align:middle;float:left;cursor:default;color:#484848}.cke_rtl .cke_button_label{padding-right:3px;padding-left:0;float:right}.cke_hc .cke_button_label{padding:0;display:inline-block;font-size:12px}.cke_button_arrow{display:inline-block;margin:8px 0 0 1px;width:0;height:0;cursor:default;vertical-align:top;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_rtl .cke_button_arrow{margin-right:5px;margin-left:0}.cke_hc .cke_button_arrow{font-size:10px;margin:3px 0 0 3px;width:auto;border:0}.cke_toolbar_separator{float:left;background-color:#bcbcbc;margin:4px 2px 0 2px;height:18px;width:1px}.cke_rtl .cke_toolbar_separator{float:right}.cke_hc .cke_toolbar_separator{background-color:#000;margin-left:2px;margin-right:5px;margin-bottom:9px}.cke_hc.cke_rtl .cke_toolbar_separator{margin-left:5px;margin-right:2px}.cke_toolbar_break{display:block;clear:left}.cke_rtl .cke_toolbar_break{clear:right}a.cke_toolbox_collapser{width:12px;height:11px;float:right;margin:11px 0 0;font-size:0;cursor:default;text-align:center;border:1px solid #bcbcbc}.cke_rtl .cke_toolbox_collapser{float:left}.cke_toolbox_collapser:hover{background:#e5e5e5}.cke_toolbox_collapser.cke_toolbox_collapser_min{margin:0 2px 4px}.cke_toolbox_collapser .cke_arrow{display:inline-block;height:0;width:0;font-size:0;margin-top:1px;border:3px solid transparent;border-bottom-color:#484848}.cke_toolbox_collapser.cke_toolbox_collapser_min .cke_arrow{margin-top:4px;border-bottom-color:transparent;border-top-color:#484848}.cke_hc .cke_toolbox_collapser .cke_arrow{font-size:8px;width:auto;border:0;margin-top:0}.cke_menuitem span{cursor:default}.cke_menubutton{display:block}.cke_hc .cke_menubutton{padding:2px}.cke_menubutton:hover,.cke_menubutton:focus,.cke_menubutton:active{background-color:#e9e9e9;display:block;outline:1px dotted}.cke_menubutton:hover{outline:0}.cke_hc .cke_menubutton:hover,.cke_hc .cke_menubutton:focus,.cke_hc .cke_menubutton:active{border:2px solid;padding:0}.cke_menubutton_disabled:hover,.cke_menubutton_disabled:focus,.cke_menubutton_disabled:active{background-color:transparent;outline:0}.cke_menubutton_inner{display:table-row}.cke_menubutton_icon,.cke_menubutton_label,.cke_menuarrow{display:table-cell}.cke_menubutton_icon{background-color:#f8f8f8;padding:6px 4px}.cke_hc .cke_menubutton_icon{height:16px;width:0;padding:4px 0}.cke_menubutton:hover .cke_menubutton_icon,.cke_menubutton:focus .cke_menubutton_icon,.cke_menubutton:active .cke_menubutton_icon{background-color:#e9e9e9}.cke_menubutton_disabled:hover .cke_menubutton_icon,.cke_menubutton_disabled:focus .cke_menubutton_icon,.cke_menubutton_disabled:active .cke_menubutton_icon{background-color:#f8f8f8;outline:0}.cke_menuitem .cke_menubutton_on{background-color:#e9e9e9;border:1px solid #dedede;outline:0}.cke_menubutton_on .cke_menubutton_icon{padding-right:3px;background-color:#e9e9e9}.cke_menubutton_label{padding:0 5px;background-color:transparent;width:100%;vertical-align:middle}.cke_menubutton_shortcut{color:#979797}.cke_menubutton_disabled .cke_menubutton_label{opacity:.3;filter:alpha(opacity=30)}.cke_panel_frame .cke_menubutton_label{display:none}.cke_menuseparator{background-color:#d1d1d1;height:1px}.cke_menuarrow{background:transparent url(images/arrow.png) no-repeat 0 10px;padding:0 5px}.cke_rtl .cke_menuarrow{background-position:5px -13px;background-repeat:no-repeat}.cke_hc .cke_menuarrow{background-image:none}.cke_menuarrow span{display:none}.cke_hc .cke_menuarrow span{vertical-align:middle;display:inline}.cke_combo{display:inline-block;float:left;position:relative;margin-bottom:5px}.cke_rtl .cke_combo{float:right}.cke_hc .cke_combo{margin-top:1px;margin-bottom:10px}.cke_combo:after{content:\"\";position:absolute;height:18px;width:0;border-right:1px solid #bcbcbc;margin-top:5px;top:0;right:0}.cke_rtl .cke_combo:after{border-right:0;border-left:1px solid #bcbcbc;right:auto;left:0}.cke_hc .cke_combo:after{border-color:#000}a.cke_combo_button{cursor:default;display:inline-block;float:left;margin:0;padding:1px}.cke_rtl a.cke_combo_button{float:right}.cke_hc a.cke_combo_button{padding:4px}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:hover,.cke_combo_off a.cke_combo_button:focus,.cke_combo_off a.cke_combo_button:active{background:#e5e5e5;border:1px solid #bcbcbc;padding:0 0 0 1px;margin-left:-1px}.cke_combo_off a.cke_combo_button:focus{outline:0}.cke_combo_on a.cke_combo_button,.cke_combo_off a.cke_combo_button:active{background:#fff}.cke_rtl .cke_combo_on a.cke_combo_button,.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:0 1px 0 0;margin-left:0;margin-right:-1px}.cke_hc .cke_combo_on a.cke_combo_button,.cke_hc .cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_combo_off a.cke_combo_button:active{border:3px solid #000;padding:1px 1px 1px 2px}.cke_hc.cke_rtl .cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_combo_off a.cke_combo_button:active{padding:1px 2px 1px 1px}.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 0 0 3px;margin-left:-3px}.cke_rtl .cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_rtl .cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0 3px 0 0;margin-left:0;margin-right:-3px}.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 1px 1px 7px;margin-left:-6px}.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc.cke_rtl .cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px 7px 1px 1px;margin-left:0;margin-right:-6px}.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:0;margin:0}.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbox .cke_toolbar:first-child>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_on a.cke_combo_button,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:hover,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:focus,.cke_hc .cke_toolbar_break+.cke_toolbar>.cke_toolbar_start+.cke_combo_off a.cke_combo_button:active{padding:1px;margin:0}.cke_toolbar .cke_combo+.cke_toolbar_end,.cke_toolbar .cke_combo+.cke_toolgroup{margin-right:0;margin-left:2px}.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:2px}.cke_hc .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:5px}.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolbar_end,.cke_hc.cke_rtl .cke_toolbar .cke_combo+.cke_toolgroup{margin-left:0;margin-right:5px}.cke_toolbar.cke_toolbar_last .cke_combo:nth-last-child(-n+2):after{content:none;border:0;width:0;height:0}.cke_combo_text{line-height:26px;padding-left:10px;text-overflow:ellipsis;overflow:hidden;float:left;cursor:default;color:#484848;width:60px}.cke_rtl .cke_combo_text{float:right;text-align:right;padding-left:0;padding-right:10px}.cke_hc .cke_combo_text{line-height:18px;font-size:12px}.cke_combo_open{cursor:default;display:inline-block;font-size:0;height:19px;line-height:17px;margin:1px 10px 1px;width:5px}.cke_hc .cke_combo_open{height:12px}.cke_combo_arrow{cursor:default;margin:11px 0 0;float:left;height:0;width:0;font-size:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:3px solid #484848}.cke_hc .cke_combo_arrow{font-size:10px;width:auto;border:0;margin-top:3px}.cke_combo_label{display:none;float:left;line-height:26px;vertical-align:top;margin-right:5px}.cke_rtl .cke_combo_label{float:right;margin-left:5px;margin-right:0}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{opacity:.3}.cke_path{float:left;margin:-2px 0 2px}a.cke_path_item,span.cke_path_empty{display:inline-block;float:left;padding:3px 4px;margin-right:2px;cursor:default;text-decoration:none;outline:0;border:0;color:#484848;font-weight:bold;font-size:11px}.cke_rtl .cke_path,.cke_rtl .cke_path_item,.cke_rtl .cke_path_empty{float:right}a.cke_path_item:hover,a.cke_path_item:focus,a.cke_path_item:active{background-color:#e5e5e5}.cke_hc a.cke_path_item:hover,.cke_hc a.cke_path_item:focus,.cke_hc a.cke_path_item:active{border:2px solid;padding:1px 2px}.cke_button__source_label,.cke_button__sourcedialog_label{display:inline}.cke_combopanel__fontsize{width:135px}textarea.cke_source{font-family:'Courier New',Monospace;font-size:small;background-color:#fff;white-space:pre-wrap;border:0;padding:0;margin:0;display:block}.cke_wysiwyg_frame,.cke_wysiwyg_div{background-color:#fff}.cke_notifications_area{pointer-events:none}.cke_notification{pointer-events:auto;position:relative;margin:10px;width:300px;color:white;text-align:center;opacity:.95;filter:alpha(opacity = 95);-webkit-animation:fadeIn .7s;animation:fadeIn .7s}.cke_notification_message a{color:#12306f}@-webkit-keyframes fadeIn{from{opacity:.4}to{opacity:.95}}@keyframes fadeIn{from{opacity:.4}to{opacity:.95}}.cke_notification_success{background:#72b572;border:1px solid #63a563}.cke_notification_warning{background:#c83939;border:1px solid #902b2b}.cke_notification_info{background:#2e9ad0;border:1px solid #0f74a8}.cke_notification_info span.cke_notification_progress{background-color:#0f74a8;display:block;padding:0;margin:0;height:100%;overflow:hidden;position:absolute;z-index:1}.cke_notification_message{position:relative;margin:4px 23px 3px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;z-index:4;text-overflow:ellipsis;overflow:hidden}.cke_notification_close{background-image:url(images/close.png);background-repeat:no-repeat;background-position:50%;position:absolute;cursor:pointer;text-align:center;height:20px;width:20px;top:1px;right:1px;padding:0;margin:0;z-index:5;opacity:.6;filter:alpha(opacity = 60)}.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_notification_close span{display:none}.cke_notification_warning a.cke_notification_close{opacity:.8;filter:alpha(opacity = 80)}.cke_notification_warning a.cke_notification_close:hover{opacity:1;filter:alpha(opacity = 100)}.cke_chrome{visibility:inherit}.cke_voice_label{display:none}legend.cke_voice_label{display:none}.cke_button__about_icon{background:url(icons.png?t=H0CF) no-repeat 0 -0px!important}.cke_button__bold_icon{background:url(icons.png?t=H0CF) no-repeat 0 -24px!important}.cke_button__italic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -48px!important}.cke_button__strike_icon{background:url(icons.png?t=H0CF) no-repeat 0 -72px!important}.cke_button__subscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -96px!important}.cke_button__superscript_icon{background:url(icons.png?t=H0CF) no-repeat 0 -120px!important}.cke_button__underline_icon{background:url(icons.png?t=H0CF) no-repeat 0 -144px!important}.cke_button__bidiltr_icon{background:url(icons.png?t=H0CF) no-repeat 0 -168px!important}.cke_button__bidirtl_icon{background:url(icons.png?t=H0CF) no-repeat 0 -192px!important}.cke_button__blockquote_icon{background:url(icons.png?t=H0CF) no-repeat 0 -216px!important}.cke_rtl .cke_button__copy_icon,.cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -240px!important}.cke_ltr .cke_button__copy_icon{background:url(icons.png?t=H0CF) no-repeat 0 -264px!important}.cke_rtl .cke_button__cut_icon,.cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -288px!important}.cke_ltr .cke_button__cut_icon{background:url(icons.png?t=H0CF) no-repeat 0 -312px!important}.cke_rtl .cke_button__paste_icon,.cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -336px!important}.cke_ltr .cke_button__paste_icon{background:url(icons.png?t=H0CF) no-repeat 0 -360px!important}.cke_button__codesnippet_icon{background:url(icons.png?t=H0CF) no-repeat 0 -384px!important}.cke_button__bgcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -408px!important}.cke_button__textcolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -432px!important}.cke_button__copyformatting_icon{background:url(icons.png?t=H0CF) no-repeat 0 -456px!important}.cke_button__creatediv_icon{background:url(icons.png?t=H0CF) no-repeat 0 -480px!important}.cke_rtl .cke_button__docprops_icon,.cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -504px!important}.cke_ltr .cke_button__docprops_icon{background:url(icons.png?t=H0CF) no-repeat 0 -528px!important}.cke_button__embed_icon{background:url(icons.png?t=H0CF) no-repeat 0 -552px!important}.cke_button__embedsemantic_icon{background:url(icons.png?t=H0CF) no-repeat 0 -576px!important}.cke_rtl .cke_button__find_icon,.cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -600px!important}.cke_ltr .cke_button__find_icon{background:url(icons.png?t=H0CF) no-repeat 0 -624px!important}.cke_button__replace_icon{background:url(icons.png?t=H0CF) no-repeat 0 -648px!important}.cke_button__flash_icon{background:url(icons.png?t=H0CF) no-repeat 0 -672px!important}.cke_button__button_icon{background:url(icons.png?t=H0CF) no-repeat 0 -696px!important}.cke_button__checkbox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -720px!important}.cke_button__form_icon{background:url(icons.png?t=H0CF) no-repeat 0 -744px!important}.cke_button__hiddenfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -768px!important}.cke_button__imagebutton_icon{background:url(icons.png?t=H0CF) no-repeat 0 -792px!important}.cke_button__radio_icon{background:url(icons.png?t=H0CF) no-repeat 0 -816px!important}.cke_rtl .cke_button__select_icon,.cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -840px!important}.cke_ltr .cke_button__select_icon{background:url(icons.png?t=H0CF) no-repeat 0 -864px!important}.cke_rtl .cke_button__textarea_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -888px!important}.cke_ltr .cke_button__textarea_icon{background:url(icons.png?t=H0CF) no-repeat 0 -912px!important}.cke_rtl .cke_button__textfield_icon,.cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -936px!important}.cke_ltr .cke_button__textfield_icon{background:url(icons.png?t=H0CF) no-repeat 0 -960px!important}.cke_button__horizontalrule_icon{background:url(icons.png?t=H0CF) no-repeat 0 -984px!important}.cke_button__iframe_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1008px!important}.cke_button__image_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1032px!important}.cke_rtl .cke_button__indent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1056px!important}.cke_ltr .cke_button__indent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1080px!important}.cke_rtl .cke_button__outdent_icon,.cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1104px!important}.cke_ltr .cke_button__outdent_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1128px!important}.cke_button__justifyblock_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1152px!important}.cke_button__justifycenter_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1176px!important}.cke_button__justifyleft_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1200px!important}.cke_button__justifyright_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1224px!important}.cke_button__language_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1248px!important}.cke_rtl .cke_button__anchor_icon,.cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1272px!important}.cke_ltr .cke_button__anchor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1296px!important}.cke_button__link_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1320px!important}.cke_button__unlink_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1344px!important}.cke_rtl .cke_button__bulletedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1368px!important}.cke_ltr .cke_button__bulletedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1392px!important}.cke_rtl .cke_button__numberedlist_icon,.cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1416px!important}.cke_ltr .cke_button__numberedlist_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1440px!important}.cke_button__mathjax_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1464px!important}.cke_button__maximize_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1488px!important}.cke_rtl .cke_button__newpage_icon,.cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1512px!important}.cke_ltr .cke_button__newpage_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1536px!important}.cke_rtl .cke_button__pagebreak_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1560px!important}.cke_ltr .cke_button__pagebreak_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1584px!important}.cke_rtl .cke_button__pastefromword_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1608px!important}.cke_ltr .cke_button__pastefromword_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1632px!important}.cke_rtl .cke_button__pastetext_icon,.cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1656px!important}.cke_ltr .cke_button__pastetext_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1680px!important}.cke_button__placeholder_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1704px!important}.cke_rtl .cke_button__preview_icon,.cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1728px!important}.cke_ltr .cke_button__preview_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1752px!important}.cke_button__print_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1776px!important}.cke_button__removeformat_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1800px!important}.cke_button__save_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1824px!important}.cke_button__scayt_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1848px!important}.cke_button__selectall_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1872px!important}.cke_rtl .cke_button__showblocks_icon,.cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1896px!important}.cke_ltr .cke_button__showblocks_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1920px!important}.cke_button__smiley_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1944px!important}.cke_rtl .cke_button__source_icon,.cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1968px!important}.cke_ltr .cke_button__source_icon{background:url(icons.png?t=H0CF) no-repeat 0 -1992px!important}.cke_rtl .cke_button__sourcedialog_icon,.cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2016px!important}.cke_ltr .cke_button__sourcedialog_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2040px!important}.cke_button__specialchar_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2064px!important}.cke_button__table_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2088px!important}.cke_rtl .cke_button__templates_icon,.cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2112px!important}.cke_ltr .cke_button__templates_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2136px!important}.cke_button__uicolor_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2160px!important}.cke_rtl .cke_button__redo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2184px!important}.cke_ltr .cke_button__redo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2208px!important}.cke_rtl .cke_button__undo_icon,.cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2232px!important}.cke_ltr .cke_button__undo_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2256px!important}.cke_button__simplebox_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2280px!important}.cke_button__spellchecker_icon{background:url(icons.png?t=H0CF) no-repeat 0 -2304px!important}.cke_hidpi .cke_button__about_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -0px!important;background-size:16px!important}.cke_hidpi .cke_button__bold_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -24px!important;background-size:16px!important}.cke_hidpi .cke_button__italic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -48px!important;background-size:16px!important}.cke_hidpi .cke_button__strike_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -72px!important;background-size:16px!important}.cke_hidpi .cke_button__subscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -96px!important;background-size:16px!important}.cke_hidpi .cke_button__superscript_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -120px!important;background-size:16px!important}.cke_hidpi .cke_button__underline_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -144px!important;background-size:16px!important}.cke_hidpi .cke_button__bidiltr_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -168px!important;background-size:16px!important}.cke_hidpi .cke_button__bidirtl_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -192px!important;background-size:16px!important}.cke_hidpi .cke_button__blockquote_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -216px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__copy_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -240px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__copy_icon,.cke_ltr.cke_hidpi .cke_button__copy_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -264px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__cut_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -288px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__cut_icon,.cke_ltr.cke_hidpi .cke_button__cut_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -312px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__paste_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -336px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__paste_icon,.cke_ltr.cke_hidpi .cke_button__paste_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -360px!important;background-size:16px!important}.cke_hidpi .cke_button__codesnippet_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -384px!important;background-size:16px!important}.cke_hidpi .cke_button__bgcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -408px!important;background-size:16px!important}.cke_hidpi .cke_button__textcolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -432px!important;background-size:16px!important}.cke_hidpi .cke_button__copyformatting_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -456px!important;background-size:16px!important}.cke_hidpi .cke_button__creatediv_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -480px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__docprops_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -504px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__docprops_icon,.cke_ltr.cke_hidpi .cke_button__docprops_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -528px!important;background-size:16px!important}.cke_hidpi .cke_button__embed_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -552px!important;background-size:16px!important}.cke_hidpi .cke_button__embedsemantic_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -576px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__find_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -600px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__find_icon,.cke_ltr.cke_hidpi .cke_button__find_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -624px!important;background-size:16px!important}.cke_hidpi .cke_button__replace_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -648px!important;background-size:16px!important}.cke_hidpi .cke_button__flash_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -672px!important;background-size:16px!important}.cke_hidpi .cke_button__button_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -696px!important;background-size:16px!important}.cke_hidpi .cke_button__checkbox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -720px!important;background-size:16px!important}.cke_hidpi .cke_button__form_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -744px!important;background-size:16px!important}.cke_hidpi .cke_button__hiddenfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -768px!important;background-size:16px!important}.cke_hidpi .cke_button__imagebutton_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -792px!important;background-size:16px!important}.cke_hidpi .cke_button__radio_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -816px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__select_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -840px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__select_icon,.cke_ltr.cke_hidpi .cke_button__select_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -864px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textarea_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -888px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textarea_icon,.cke_ltr.cke_hidpi .cke_button__textarea_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -912px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__textfield_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -936px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__textfield_icon,.cke_ltr.cke_hidpi .cke_button__textfield_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -960px!important;background-size:16px!important}.cke_hidpi .cke_button__horizontalrule_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -984px!important;background-size:16px!important}.cke_hidpi .cke_button__iframe_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1008px!important;background-size:16px!important}.cke_hidpi .cke_button__image_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1032px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__indent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1056px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__indent_icon,.cke_ltr.cke_hidpi .cke_button__indent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1080px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__outdent_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1104px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__outdent_icon,.cke_ltr.cke_hidpi .cke_button__outdent_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1128px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyblock_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1152px!important;background-size:16px!important}.cke_hidpi .cke_button__justifycenter_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1176px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyleft_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1200px!important;background-size:16px!important}.cke_hidpi .cke_button__justifyright_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1224px!important;background-size:16px!important}.cke_hidpi .cke_button__language_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1248px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__anchor_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1272px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__anchor_icon,.cke_ltr.cke_hidpi .cke_button__anchor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1296px!important;background-size:16px!important}.cke_hidpi .cke_button__link_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1320px!important;background-size:16px!important}.cke_hidpi .cke_button__unlink_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1344px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__bulletedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1368px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__bulletedlist_icon,.cke_ltr.cke_hidpi .cke_button__bulletedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1392px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__numberedlist_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1416px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__numberedlist_icon,.cke_ltr.cke_hidpi .cke_button__numberedlist_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1440px!important;background-size:16px!important}.cke_hidpi .cke_button__mathjax_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1464px!important;background-size:16px!important}.cke_hidpi .cke_button__maximize_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1488px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__newpage_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1512px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__newpage_icon,.cke_ltr.cke_hidpi .cke_button__newpage_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1536px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pagebreak_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1560px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pagebreak_icon,.cke_ltr.cke_hidpi .cke_button__pagebreak_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1584px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastefromword_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1608px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastefromword_icon,.cke_ltr.cke_hidpi .cke_button__pastefromword_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1632px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__pastetext_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1656px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__pastetext_icon,.cke_ltr.cke_hidpi .cke_button__pastetext_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1680px!important;background-size:16px!important}.cke_hidpi .cke_button__placeholder_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1704px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__preview_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1728px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__preview_icon,.cke_ltr.cke_hidpi .cke_button__preview_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1752px!important;background-size:16px!important}.cke_hidpi .cke_button__print_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1776px!important;background-size:16px!important}.cke_hidpi .cke_button__removeformat_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1800px!important;background-size:16px!important}.cke_hidpi .cke_button__save_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1824px!important;background-size:16px!important}.cke_hidpi .cke_button__scayt_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1848px!important;background-size:16px!important}.cke_hidpi .cke_button__selectall_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1872px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__showblocks_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1896px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__showblocks_icon,.cke_ltr.cke_hidpi .cke_button__showblocks_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1920px!important;background-size:16px!important}.cke_hidpi .cke_button__smiley_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1944px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__source_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1968px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__source_icon,.cke_ltr.cke_hidpi .cke_button__source_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -1992px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__sourcedialog_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2016px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__sourcedialog_icon,.cke_ltr.cke_hidpi .cke_button__sourcedialog_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2040px!important;background-size:16px!important}.cke_hidpi .cke_button__specialchar_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2064px!important;background-size:16px!important}.cke_hidpi .cke_button__table_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2088px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__templates_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2112px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__templates_icon,.cke_ltr.cke_hidpi .cke_button__templates_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2136px!important;background-size:16px!important}.cke_hidpi .cke_button__uicolor_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2160px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__redo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2184px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2208px!important;background-size:16px!important}.cke_rtl.cke_hidpi .cke_button__undo_icon,.cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2232px!important;background-size:16px!important}.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2256px!important;background-size:16px!important}.cke_hidpi .cke_button__simplebox_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -4560px!important}.cke_hidpi .cke_button__spellchecker_icon{background:url(icons_hidpi.png?t=H0CF) no-repeat 0 -2304px!important;background-size:16px!important}a.cke_button_disabled,a.cke_button_disabled:hover,a.cke_button_disabled:focus,a.cke_button_disabled:active{filter:alpha(opacity = 30)}.cke_button_disabled .cke_button_icon{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00ffffff,endColorstr=#00ffffff)}.cke_button_off:hover,.cke_button_off:focus,.cke_button_off:active{filter:alpha(opacity = 100)}.cke_combo_disabled .cke_combo_inlinelabel,.cke_combo_disabled .cke_combo_open{filter:alpha(opacity = 30)}.cke_toolbox_collapser{border:1px solid #a6a6a6}.cke_toolbox_collapser .cke_arrow{margin-top:1px}.cke_hc .cke_top,.cke_hc .cke_bottom,.cke_hc .cke_combo_button,.cke_hc a.cke_combo_button:hover,.cke_hc a.cke_combo_button:focus,.cke_hc .cke_toolgroup,.cke_hc .cke_button_on,.cke_hc a.cke_button_off:hover,.cke_hc a.cke_button_off:focus,.cke_hc a.cke_button_off:active,.cke_hc .cke_toolbox_collapser,.cke_hc .cke_toolbox_collapser:hover,.cke_hc .cke_panel_grouptitle{filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.cke_top,.cke_contents,.cke_bottom{width:100%}.cke_button_arrow{font-size:0}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_button,.cke_rtl .cke_button *,.cke_rtl .cke_combo,.cke_rtl .cke_combo *,.cke_rtl .cke_path_item,.cke_rtl .cke_path_item *,.cke_rtl .cke_path_empty{float:none}.cke_rtl .cke_toolgroup,.cke_rtl .cke_toolbar_separator,.cke_rtl .cke_combo_button,.cke_rtl .cke_combo_button *,.cke_rtl .cke_button,.cke_rtl .cke_button_icon{display:inline-block;vertical-align:top}.cke_rtl .cke_button_icon{float:none}.cke_resizer{width:10px}.cke_source{white-space:normal}.cke_bottom{position:static}.cke_colorbox{font-size:0}"; });
 define('text!modules/social/writeBlog.html', ['module'], function(module) { module.exports = "<template>\n\t\t<div class=\"panel panel-info\">  \n      <div class=\"panel-body\">\n        <div class=\"row\">\n\t\t\t<div show.bind=\"!blogSelected\" class=\"container\">\n\t\t\t\t<compose view=\"./components/writeBlogList.html\"></compose>\n\t\t\t</div>\n            <div show.bind=\"blogSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/blogForm.html\"></compose>\n            </div> \n      </div> \n</template>"; });
 define('text!modules/user/profile.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Profile</a>\n            </div>\n        </nav>\n    </div>\n  <div class=\"fluid-container col-lg-8 col-lg-offset-2\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n             <span click.delegate=\"changePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Change Password\"><i class=\"fa fa-key fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>  \n        <div class=\"topMargin col-sm-12 col-lg-1\">\n            <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n            <div class=\"topMargin\">\n                <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\n            </div>\n        </div>\n    <div class=\"col-sm-12 col-lg-11\">\n        <form class=\"form-horizontal topMargin\">\n          <div class=\"row\">\n            <!-- Row 1 -->\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-4\">\n              <div class=\"form-group\">\n                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name</label>\n                <div class=\"col-sm-8\">\n                  <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\n                </div>\n              </div>\n            </div>\n          </div>\n\n          <!-- Row 2 -->\n          <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.phone| phoneNumber\" id=\"editPhone\" class=\"form-control input-md\" placeholder=\"Phone\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                     <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editext\" class=\"col-sm-3 control-label hideOnPhone\">Extension</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.ext\" id=\"editext\" class=\"form-control input-md\" placeholder=\"Extension\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\n                            <div class=\"col-sm-8\">\n                            <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control input-md\" placeholder=\"Mobile\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email</label>\n                            <div class=\"col-sm-8\">\n                            <input disabled value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editGender\" class=\"col-sm-3 control-label\">Gender</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.gender\" id=\"editGender\" class=\"form-control input-md\" placeholder=\"Gender\">\n                                    <option value=\"\">Select an option</option>\n                                    <option value=\"F\">Female</option>\n                                    <option value=\"M\">Male</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution</label>\n                            <div class=\"col-sm-8\">\n                                <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control input-md\" placeholder=\"Institution\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                            <div class=\"col-sm-8\">\n                                <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n           <div class=\"row topMargin\">\n                <div class=\"col-lg-5\">\n                    <div class=\"form-group\">\n                        <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"col-lg-5 col-lg-offset-1\">\n                    <div class=\"form-group\">\n                        <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\n                        <div class=\"col-sm-8\">\n                            <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control input-md\" placeholder=\"Department\">\n                                <option value=\"\">Select an option</option>\n                                <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n        \n\n          \n\n        </form>\n      </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/resetPassword.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"panel panel-primary topMargin\">\n\t\t\t<div class=\"panel-body\">\n\t\t\t\t<div show.bind=\"showForm\">\n\t\t\t\t\t<form>\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<label for=\"register_password\" class=\"control-label\">Password *</label>\n\t\t\t\t\t\t\t\t<input id=\"register_password\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"newPassword\"\n\t\t\t\t\t\t\t\t\tblur.trigger=\"passwordComplexity()\" />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t<label for=\"register_password_repeat\" class=\"control-label\">Repeat Password *</label>\n\t\t\t\t\t\t\t\t<input id=\"register_password_repeat\" type=\"password\" placeholder=\"Repeat Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class=\"btn btn-primary\" click.trigger=\"savePassword()\">Reset Password</button>\n\t\t\t\t\t</form>\n\t\t\t\t</div>\n\t\t\t\t<div show.bind=\"!showForm\">\n\t\t\t\t\t<h3>That validation code appears to have expired.</h2>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
@@ -37072,7 +37573,7 @@ define('text!resources/elements/add-systems.html', ['module'], function(module) 
 define('text!resources/elements/date-picker.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"eonasdan-bootstrap-datetimepicker/css/bootstrap-datetimepicker.css\"></require>\r\n\t<div class='input-group date' id=\"${controlid}\">\r\n\t\t<input disabled.bind=\"disabled\" type='text' class=\"form-control\" id=\"input-${controlid}\" placeholder='Enter date'/>\r\n\t\t<span class=\"input-group-addon\">\r\n\t\t\t<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i>\r\n\t\t</span>\r\n\t</div>\r\n</template>"; });
 define('text!resources/elements/edit-client.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"fluid-container topMargin\">\n        <ul class=\"nav nav-tabs\">\n            <li class=\"active\"><a data-toggle=\"tab\" href=\"#home\">Client</a></li>\n            <li><a data-toggle=\"tab\" href=\"#menu1\">Assignments</a></li>\n        </ul>\n       \n       <div class=\"tab-content\">\n           <div id=\"home\" class=\"tab-pane fade active in\">\n                <div class=\"bottomMargin topMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"deleteClient()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n                </div>  \n                \n                <fieldset>\n                    <div class=\"col-lg-12\">\n                        <div class=\"form-group\">\n                            <label for=\"client\" class=\"col-lg-2 control-label topMargin\">Client</label>\n                            <div class=\"col-lg-10\">\n                                <input readonly value.bind=\"clientObj.client\" id=\"client\" class=\"form-control topMargin\" placeholder=\"Product\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"idsavaialble\" class=\"col-lg-2 control-label topMargin\">IDs Available</label>\n                            <div class=\"col-lg-10\">\n                                <input disabled.bind=\"clientObj.status === config.ASSIGNED_REQUEST_CODE\" value.bind=\"clientObj.idsAvailable\" id=\"idsavaialble\" class=\"form-control topMargin\" placeholder=\"IDs Available\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"lastID\" class=\"col-lg-2 control-label topMargin\">Last ID Allocated</label>\n                            <div class=\"col-lg-10\">\n                                <input value.bind=\"clientObj.lastIdAllocated\" id=\"lastID\" class=\"form-control topMargin\" placeholder=\"Last ID Allocated\" type=\"text\" />\n                            </div>\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"status\" class=\"col-lg-2 control-label topMargin\">Status</label>\n                            <div class=\"col-lg-10\">\n                                <select value.bind=\"clientObj.clientStatus\" class=\"form-control topMargin\" id=\"status\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"name of config.CLIENT_STATUSES\"  value=\"${name.code}\">${name.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </fieldset>\n            </div>\n            <div id=\"menu1\" class=\"tab-pane fade\">\n                \n                <div show.bind=\"clientObj.assignments.length == 0\">\n                    <label>This client has no assignments for the selected session.</label>\n                </div>\n                <table show.bind=\"clientObj.assignments.length > 0\" id=\"assigmentsTable\" class=\"table\" style=\"font-size:small;\">\n                    <tbody>\n\n                        <tr repeat.for=\"assignment of clientObj.assignments\">\n                            <td><div class=\"col-lg-12 list-group-item\"><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>  \n    </div>\n     \n</template>"; });
 define('text!resources/elements/flat-picker.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <input style=\"background-color:white;\" id=\"${controlid}\" class=\"aurelia-flatpickr form-control\" type=\"text\" placeholder=\"Select Date..\">\n</template>"; });
-define('text!resources/elements/multiselect.html', ['module'], function(module) { module.exports = "<template>\n\t<label>${label}</label><br/>\n\t<select value.bind=\"value\" multiple ref=\"select\" class=\"selectpicker\">\n    \t<option repeat.for=\"option of options\" value.bind=\"option.code\">${option.description}</option>\n  \t</select>\n</template>"; });
+define('text!resources/elements/multiselect.html', ['module'], function(module) { module.exports = "<template>\n\t<label>${label}</label><br/>\n\t<select value.bind=\"value\" multiple ref=\"select\" class=\"selectpicker\" style=\"background-color:white;\">\n    \t<option repeat.for=\"option of options\" value.bind=\"option.code\">${option.description}</option>\n  \t</select>\n</template>"; });
 define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a if.bind=\"isAuthenticated\" class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                <a if.bind=\"!isAuthenticated\" class=\"navbar-brand\" href=\"#/home\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                             <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>  \n                   \n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n        </div>\n    </nav>\n</template>"; });
 define('text!resources/elements/numeric-input.html', ['module'], function(module) { module.exports = "<template>\n  <input class.bind=\"classes\" type=\"text\" value.bind=\"value\" placeholder.bind=\"placeholder\" maxlength.bind=\"maxlength\">\n</template>"; });
 define('text!resources/elements/rate-it.html', ['module'], function(module) { module.exports = "<template>\n    <fieldset class=\"rating\">\n\t\t<span repeat.for=\"rate of rates\" >\n\t\t\t<input  type=\"radio\" name=\"${rate.name}\" id=\"${rate.id}\" title=\"${rate.title}\" />\n\t\t\t<label click.delegate=\"rateIt(rate.value, $index)\" class=\"${rate.class}\" for=\"${rate.title}\" title=\"${rate.title}\"></label>\n\t\t</span>\n    </fieldset>\n\n\t<!--\n\t<fieldset class=\"rating\">\n\t\t<input click.trigger=\"rateIt(5)\" id=\"star5\" type=\"radio\"  name=\"rating\" value=\"5\" /><label class=\"full\" for=\"star5\"\n\t\t\ttitle=\"Awesome - 5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4.5)\" type=\"radio\" id=\"star4half\" name=\"rating\" value=\"4 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star4half\" title=\"Pretty good - 4.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(4)\" type=\"radio\" id=\"star4\" name=\"rating\" value=\"4\" /><label class=\"full\" for=\"star4\"\n\t\t\ttitle=\"Pretty good - 4 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3.5)\" type=\"radio\" id=\"star3half\" name=\"rating\" value=\"3 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star3half\" title=\"Meh - 3.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(3)\" type=\"radio\" id=\"star3\" name=\"rating\" value=\"3\" /><label class=\"full\" for=\"star3\"\n\t\t\ttitle=\"Meh - 3 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2.5)\" type=\"radio\" id=\"star2half\" name=\"rating\" value=\"2 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star2half\" title=\"Kinda bad - 2.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(2)\" type=\"radio\" id=\"star2\" name=\"rating\" value=\"2\" /><label class=\"full\" for=\"star2\"\n\t\t\ttitle=\"Kinda bad - 2 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1.5)\" type=\"radio\" id=\"star1half\" name=\"rating\" value=\"1 and a half\" /><label class=\"half\"\n\t\t\tfor=\"star1half\" title=\"Meh - 1.5 stars\"></label>\n\t\t<input click.trigger=\"rateIt(1)\" type=\"radio\" id=\"star1\" name=\"rating\" value=\"1\" /><label class=\"full\" for=\"star1\"\n\t\t\ttitle=\"Sucks big time - 1 star\"></label>\n\t\t<input click.trigger=\"rateIt(.5)\" type=\"radio\" id=\"starhalf\" name=\"rating\" value=\"half\" /><label class=\"half\" for=\"starhalf\"\n\t\t\ttitle=\"Sucks big time - 0.5 stars\"></label>\n\t</fieldset>\n\t-->\n</template>"; });
@@ -37081,11 +37582,12 @@ define('text!resources/elements/tiny-mce.html', ['module'], function(module) { m
 define('text!resources/elements/tree-node.html', ['module'], function(module) { module.exports = "<template>\n\t<require from=\"./tree-node.css\"></require>\n\t<li if.bind=\"visible\" class=\"list-group-item treeview ${selectedNode == data?'active':''}\" click.delegate=\"clickMe(data)\">\n\t\t<span class=\"indent\" repeat.for=\"i of level\"></span>\n\t\t<span if.bind=\"data.children\" class=\"icon glyphicon ${childrenVisible?'glyphicon-triangle-bottom':'glyphicon-triangle-right'}\" click.delegate=\"toggleExpand()\"></span>\n\t\t<span if.bind=\"!data.children\" class=\"icon glyphicon\"></span>\n\t\t ${data.name}<span if.bind=\"!childrenVisible && itemCount != 0\" class=\"badge\" click.delegate=\"toggleExpand()\">${itemCount}</span>\n\t\t <span if.bind=\"!data.children\" class=\"icon glyphicon glyphicon-trash pull-right\" click.delegate=\"callback(data)\"></span>\n\t</li>\n\t<tree-node if.bind=\"visible\"  callback.call=\"deleteFile2(node)\" selected-file.bind=\"selectedFile\" repeat.for=\"node of data.children\" data.bind=\"node\" level.bind=\"level + 1\" visible.bind=\"childrenVisible\" max-level.bind=\"maxLevel\" selected-node.bind=\"selectedNode\"></tree-node>\n</template>"; });
 define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people:100:1\"></div>\n\t<div class=\"smart-timeline-time\">\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \n\t</div>\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\n\t\t<div class=\"form-group\">\n\t\t\t<p>${event.personId | person:people:'fullName'}</p>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"well well-sm topMargin\">\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li>\n            <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId | gravatarUrlId:people:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <div class=\"form-group\">\n                  <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>\n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                      <span id=\"container\"></span>\n                      <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                      <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n                   \n                      <div class=\"form-group topMargin\">\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                              target=\"_blank\"\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n                          </div>\n                      </div>\n                     </div>\n                    <div class=\"col-lg-7\">\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\n                        <hr/>\n                        <h4 >Steps to reproduce the problem</h4>\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\n                      </div>\n                    </div>\n                </div>\n              </div>\n            </div>\n          </li>\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\n            <compose view=\"./response.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n</template>"; });
-define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Documents</a>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
+define('text!modules/admin/customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n\t\t<compose view=\"./components/selectionForm.html\"></compose>\n\t\t<compose view=\"./components/emailTable.html\"></compose>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Customers</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
-define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
+define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n             <div show.bind=\"!personSelected && bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/bulkEmail.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/test.html', ['module'], function(module) { module.exports = "<template>Test</template>"; });
+define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Documents</a>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Inventory</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/notes/notes.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Notes</a>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"noteSelected === 'No'\">\n                <compose view=\"./components/notesTable.html\"></compose>\n            </div> \n            <div show.bind=\"noteSelected === 'Yes'\" >\n                <compose view=\"./components/notesForm.html\"></compose>\n            </div>\n             <div show.bind=\"noteSelected === 'helpTicket'\" >\n                <compose view=\"./components/helpTicket.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>"; });
 define('text!modules/admin/site/admin.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"fluid-container\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-2\">\n\t\t\t\t<select  change.delegate=\"typeSelected()\" class=\"form-control\" value.bind=\"screenToShow\">\n\t\t\t\t\t<option value=\"\">Select an option</option>\n\t\t\t\t\t<option value=\"auth\">Authorization Log</option>\n\t\t\t\t\t<option value=\"log\">Transaction Log</option>\n\t\t\t\t\t<option value=\"files\">Files</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t<div show.bind=\"fileList.length\" class=\"panel panel-default\">\n\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"input-group\">\n\t\t\t\t\t\t\t\t\t<span click.delegate=\"deleteFiles()\" class=\"smallMarginRight input-group-addon\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete oldest files\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t\t\t\t\t<input value.bind=\"filesToDelete\" id=\"filesToDelete\" class=\"form-control\"  type=\"number\" ria-describedby=\"basic-addon1\"/>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<label>Files</label>\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\n                            <ul show.bind=\"screenToShow !== 'files'\" class=\"list-group\">\n                                <button click.trigger=\"fileSelected($index)\" type=\"button\" repeat.for=\"file of fileList\" id=\"${type.code}\" class=\"list-group-item\">${file}</button>\n                            </ul>\n\t\t\t\t\t\t\t <ul show.bind=\"screenToShow === 'files'\" class=\"list-group\">\n                                <button click.trigger=\"uploadedFileSelected(file)\" type=\"button\" repeat.for=\"file of fileList\" id=\"${$index}\" class=\"list-group-item\">${file.folder}</button>\n                            </ul>\n                        </div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"fileContents.length && screenToShow !== 'files'\" class=\"col-lg-9 topMargin\">\n\t\t\t\t<compose view='./components/logFileTable.html'></compose>\n\t\t\t</div>\n\t\t\t<div show.bind=\"showFileList && screenToShow === 'files'\" class=\"col-lg-9 topMargin\">\n\t\t\t\t<compose view='./components/uploadedFilesTable.html'></compose>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
@@ -37147,12 +37649,12 @@ define('text!modules/user/support/support.html', ['module'], function(module) { 
 define('text!modules/user/support/tutorials.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Tutorials Damn It!</h1>\n</template>"; });
 define('text!modules/user/support/usefulInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row\">\n      <div repeat.for=\"category of linkArray\" class=\"col-lg-3\">\n        <h2>${category.category}</h2>\n        <div>\n          <a repeat.for=\"link of category.links\" href=\"${link.url}\" class=\"list-group-item\" target=\"_blank\">\n            <h4 class=\"list-group-item-heading\">${link.title}</h4>\n            <p class=\"list-group-item-text\">${link.content}</p>\n          </a>\n        </div>\n      </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n   \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> \n           \n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> \n           \n        </div> \n      </div> \n    \n</template>"; });
-define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"panel-body\">\r\n                    <form class=\"form-horizontal topMargin\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <div class=\"checkbox\">\r\n                                            <label class=\"pull-left\">\r\n                                                            <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                                        </label>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\r\n                                            type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-lg-2 col-lg-offset-2\">\r\n                                <label class=\"btn btn-primary\">\r\n                                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"col-lg-6\">\r\n                                <ul show.bind=\"!uploading\" >\r\n                                    <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                                </ul>\r\n                                <div show.bind=\"uploading\" class=\"progress progress-striped active\">\r\n                                    <div id=\"progressBar\" class=\"progress-bar\" style=\"width: 0%\"></div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-6 col-lg-offset-2\">\r\n                            <div id=\"editFiles\"></div>\r\n                        </div>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n            <div class=\"row topMargin\">\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <th>Name</th>\r\n                                <th>Version</th>\r\n                                <th>Date Uploaded</th>\r\n                                <th>Uploaded By</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                                <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.code}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                                <td data-title=\"Version\">${item.version}</td>\r\n                                <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                                <td data-title=\"Person\">${item.personId | person:people.peopleArray:\"fullName\"}</td>\r\n                                <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                                <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n    </div>\r\n\r\n</template>"; });
-define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                    title=\"\" data-original-title=\"New Document\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Address.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"topMargin\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"copyInstAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Copy Instituion Address\"><i class=\"fa fa-files-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control \" placeholder=\"Address 1\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control \" placeholder=\"Address2\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control \" placeholder=\"City\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control \" placeholder=\"Region\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control \" placeholder=\"Postal Code\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control \" placeholder=\"Country\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
+define('text!modules/admin/customers/components/bulkEmail.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n\t\t<compose view=\"./selectionForm.html\"></compose>\n\t\t<compose view=\"./emailTable.html\"></compose>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                    <th style=\"width:15rem;\">Status</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"editACourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"name\">${course.number} </td>\n                    <td data-title=\"insitution\">${course.name}</td>\n                    <td data-tile=\"phone\">${course.active | translateStatus}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"courseSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <div class=\"checkbox\">\n                            <label class=\"pull-left\">\n                                <input id=\"activeProduct\" checked.bind=\"people.selectedCourse.active\" type=\"checkbox\"> Active\n                            </label>\n                        </div>\n                    </div>\n                </div>\n                \n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Email.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<fieldset class=\"form-group\">\n\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t<label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerEmail()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n\t\t\t  <div class=\"col-lg-11\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<Input class=\"form-control\" value.bind=\"emailSubject\" placeholder=\"Email Subject\" />\n\t\t\t\t</div>\n\t\t\t  </div>\n\t\t\t  <div class=\"col-lg-11\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<editor value.bind=\"emailMessage\" height=\"250\" toolbar.bind=\"toolbar\" ></editor>\n\t\t\t\t</div>\n\t\t\t  </div>\n\t\t\t</div>\n\t\t</fieldset>\n\t</div>\n</template>"; });
+define('text!modules/admin/customers/components/emailTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <div id=\"no-more-tables\">\n            <table class=\"table table-striped table-hover cf\">\n                <thead class=\"cf\">\n                    <tr colspan='7'>\n                            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                    </tr>                            \n                    <tr>\n                        <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>                              \n                        <th style=\"width:30rem;\">Institution</th>\n                        <th style=\"width:15rem;\">City <span click.trigger=\"dataTable.sortArray('city')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th style=\"width:15rem;\">Region <span click.trigger=\"dataTable.sortArray('region')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\n                        <th>Role</th>\n                        <th>Status</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr repeat.for=\"person of dataTable.displayArray\">\n                        <td  data-title=\"Name\">${person.firstName} ${person.lastName}</td>\n                        <td  data-title=\"Insitution\">${person.institutionId._id | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n                        <td  data-tile=\"City\">${person.institutionId.city}</td>\n                        <td  data-tile=\"Region\">${person.institutionId.region}</td>\n                        <td  data-title=\"Email\">${person.email}</td>\n                        <td  data-title=\"Role\">${person.roles}</td>\n                        <td  data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/instAddress.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row topMargin\">\n        <!-- Row 5 -->\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 1</label>\n                        <input value.bind=\"people.selectedInstitution.address1\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 1\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Address 2</label>\n                        <input value.bind=\"people.selectedInstitution.address2\" id=\"editAddress1\" class=\"form-control\" placeholder=\"Address 2\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>City</label>\n                        <input value.bind=\"people.selectedInstitution.city\" id=\"editCity\" class=\"form-control\" placeholder=\"City\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Region</label>\n                        <input value.bind=\"people.selectedInstitution.region\" id=\"editRegion\" class=\"form-control\" placeholder=\"Region\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Postal Code</label>\n                        <input value.bind=\"people.selectedInstitution.postalCode\" id=\"editPostalCode\" class=\"form-control\" placeholder=\"Postal Code\"\n                            type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Country</label>\n                        <input value.bind=\"people.selectedInstitution.country\" id=\"editCountry\" class=\"form-control\" placeholder=\"Country\" type=\"text\"\n                        />\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-6 topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>URL</label>\n                        <input value.bind=\"people.selectedInstitution.url\" id=\"editCountry\" class=\"form-control\" placeholder=\"URL\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <div class=\"col-sm-10\">\n                        <label>Time Zone</label>\n                        <select value.bind=\"people.selectedInstitution.timeZone\" class=\"form-control\">\n                            <option value=\"\">Select an option</option>\n                            <option repeat.for=\"zone of config.TIMEZONES\" value=\"${zone}\">${zone}</option>\n                    </select>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/instIs4ua.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-6 topMargin\">\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Institution Type *</label>\n                    <select value.bind=\"people.selectedInstitution.institutionType\" id=\"editInstitutionType\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.institutionTypes\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Member Type *</label>\n                    <select value.bind=\"people.selectedInstitution.memberType\" id=\"editMemberType\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.memberTypes\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n     <div class=\"col-lg-6 topMargin\">\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label class=\"left\">Highest Degree *</label>\n                    <select value.bind=\"people.selectedInstitution.highestDegree\" id=\"editHighestDegree\" class=\"form-control\">\n                        <option value=\"\">Select an option</option>\n                        <option repeat.for=\"status of is4ua.highestDegrees\" value=\"${status.code}\">${status.description}</option>\n                    </select>\n                </div>\n            </div>\n        </div>\n        <div class=\"col-lg-12\">\n            <div class=\"form-group\">\n                <div class=\"col-sm-10\">\n                    <label>Department</label>\n                    <input value.bind=\"people.selectedInstitution.universityDept\" id=\"editDepartment\" class=\"form-control\" placeholder=\"Department\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/institutionsForm.html', ['module'], function(module) { module.exports = "<<template>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"!newInstitution\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <div class=\"topMargin\">\n            <form class=\"form-horizontal\">\n                <!-- Row 1 -->\n                <div class=\"row\">\n                    <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-10\">\n                                <label>Name *</label>\n                                <input value.bind=\"people.selectedInstitution.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-10\">\n                                <label>Modifed Date</label>\n                                 <flat-picker controlid=\"modifiedDate\" config.bind=\"config\" value.bind=\"people.selectedInstitution.dateModified\"></flat-picker>\n                                 <!--\n                                <date-picker value.two-way=\"people.selectedInstitution.dateModified\"  controlid=\"modifiedDate\"></date-picker>\n                                -->\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-10\">\n                                <label>Date Joined</label>\n                                <flat-picker controlid=\"joinDate\" config.bind=\"config\" value.bind=\"people.selectedInstitution.joinDate\"></flat-picker>\n                                <!--\n                                <date-picker value.two-way=\"people.selectedInstitution.joinDate\"  controlid=\"joinDate\"></date-picker>\n                                -->\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\">\n                            <div class=\"col-sm-10\">\n                                <label>Date Dropped</label>\n                                 <flat-picker controlid=\"dropDate\" config.bind=\"config\" value.bind=\"people.selectedInstitution.dropDate\"></flat-picker>\n                                 <!--\n                                <date-picker value.two-way=\"people.selectedInstitution.dropDate\"  controlid=\"dropDate\"></date-picker>\n                                -->\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"row\">\n                    <div class=\"col-sm-12 col-lg-3\">\n                        <div class=\"form-group\"> \n                            <div class=\"col-sm-10\">\n                                <label class=\"left\">Status *</label>\n                                <select value.bind=\"people.selectedInstitution.institutionStatus\" id=\"editInstitutonStatusArray\" class=\"form-control\">\n                                    <option value=\"\">Select an option</option>\n                                    <option repeat.for=\"status of is4ua.institutonStatusArray\" value=\"${status.code}\">${status.description}</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"row topMargin\">\n                    <div class=\"col-lg-12\">\n                        <div class=\"row\">\n                            <div class=\"panel panel-default\">\n                                <div class=\"panel-body\">\n                                    <div class=\"col-lg-2\">\n                                        <div id=\"instFormListGroup\" class=\"list-group\">\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.title}</h4>\n                                            </a>\n                                        </div>\n                                    </div>\n\n                                    <div class=\"col-lg-10\">\n                                        <div class=\"tab-content\">\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\n                                            </div>\n                                        </div>\n                                    </div>\n\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n    </template>"; });
@@ -37163,6 +37665,9 @@ define('text!modules/admin/customers/components/Password.html', ['module'], func
 define('text!modules/admin/customers/components/peopleForm.html', ['module'], function(module) { module.exports = "<template>\r\n\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newPerson\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n        </div>\r\n\r\n\r\n        <div class=\"topMargin\">\r\n            <form class=\"form-horizontal topMargin\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-lg-1\">\r\n                        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n                    </div>\r\n                    <div class=\"col-lg-11\">\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editFirstName\" class=\"col-sm-3 control-label hideOnPhone\">First Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control \" placeholder=\"First Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMiddleName\" class=\"col-sm-3 control-label hideOnPhone\">Middle Name</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control \" placeholder=\"Middle Name\"\r\n                                        type=\"text\" />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Last Name *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Last Name\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editLastName\" class=\"col-sm-3 control-label hideOnPhone\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editLastName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label class=\"control-label col-sm-3 hideOnPhone\">Status *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select keypress.bind=\"setStatus($event)\" value.bind=\"people.selectedPerson.personStatus\" id=\"editStatus\" class=\"form-control \" placeholder=\"Status\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for='status of is4ua.personStatusArray' value=\"${status.code}\">${status.description}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editMobile\" class=\"col-sm-3 control-label hideOnPhone\">Mobile</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editMobile\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                         <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Phone *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editPhone\" class=\"col-sm-3 control-label hideOnPhone\">Extension</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input class=\"form-control\" id=\"editPhoneExt\" value.bind=\"people.selectedPerson.ext\"/>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editEmail\" class=\"col-sm-3 control-label hideOnPhone\">Email *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control \" placeholder=\"Email\" type=\"text\" blur.trigger=\"checkEmail()\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n \r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editInstitution\" class=\"col-sm-3 control-label\">Institution *</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select change.trigger=\"changeInstitution()\" value.bind=\"institutionId\" id=\"editInstitution\" class=\"form-control \" placeholder=\"Institution\">\r\n                                        <option value=\"\">Select an option</option>\r\n                                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editNickName\" class=\"col-sm-3 control-label\">Nickname</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editSpecialization\" class=\"col-sm-3 control-label\">Specialization</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control \" placeholder=\"Specializatin\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-4\">\r\n                            <div class=\"form-group\">\r\n                                <label for=\"editDepartment\" class=\"col-sm-3 control-label\">Department</label>\r\n                                <div class=\"col-sm-8\">\r\n                                    <select value.two-way=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control \" placeholder=\"Department\">\r\n                            <option value=\"\">Select an option</option>\r\n                            <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                        </select>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"row bigTopMargin\">\r\n                    <div class=\"col-lg-9 col-lg-offset-2\">\r\n                        <div class=\"row\">\r\n                            <div class=\"panel panel-default\">\r\n                                <div class=\"panel-body\">\r\n                                    <div class=\"col-lg-2\">\r\n                                        <div id=\"peopleFormListGroup\" class=\"list-group\">\r\n                                            <a class=\"${ $first ? 'active' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\r\n                                                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\r\n                                            </a>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                    <div class=\"col-lg-10\">\r\n                                        <div class=\"tab-content\">\r\n                                            <div repeat.for=\"tab of tabs\" id=\"${tab.id + 'Tab'}\" class=\"${ $first ? 'tab-pane fade in active' : 'tab-pane fade' }\">\r\n                                                <compose view=\"${tabPath + tab.id + '.html'}\"></compose>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n            </form>\r\n        </div>\r\n        <div>\r\n\r\n</template>"; });
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='7'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='7'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"bulkEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Bulk Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution</th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"fullName\" type=\"text\" placeholder=\"Filter Name\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"nickName\" type=\"text\" placeholder=\"Filter Nickname\" class=\"form-control\"> \r\n                                </th>\r\n                                <th>\r\n                                     <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\r\n                                     <!--\r\n                                    <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"institutionId\" compare=\"id\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                                    -->\r\n                                </select>\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"roles\" type=\"text\" placeholder=\"Filter Role\" class=\"form-control\"\r\n                                        compare=\"array\">\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\" data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
+define('text!modules/admin/customers/components/selectionForm.html', ['module'], function(module) { module.exports = "<template>\n <div class=\"col-lg-12\">\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t \ttitle=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"composeEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\ttitle=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t</div>\n\n\t<div show.bind=\"composeEmailPanel\" class=\"panel panel-info leftMargin rightMargin topMargin bottomMargin\">\n      <div class=\"panel-body\">\n\t   <div class=\"list-group-item col-md-12 topMargin\">\n\t\t\t<span click.delegate=\"send()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"col-lg-10 col-lg-offset-1 topMargin\">\n\t\t\t<input value.bind=\"email.subject\" class=\"form-control\" placeholder=\"Subject\"/>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<editor value.bind=\"email.emailMessage\" height=\"250\" toolbar.bind=\"toolbar\" ></editor>\n\t\t\t</div>\n\t\t</div>\n\t  </div>\n\t</div>\n\n\t<div class=\"panel panel-info leftMargin rightMargin\">\n      <div class=\"panel-body\">\n\t  \t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-labelhideOnPhone\">Status</label>\n\t\t\t<select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.personStatusArray' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Institution Type</label>\n\t\t\t<select value.bind=\"institutionTypeFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'value',  filter: 'institutionTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'institutionType', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.name', matchProperty:'institutionType', compare:'lookup'} )\" class=\"form-control \" ref=\"institutionTypeFilter\" id=\"institutionType\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.institutionTypes' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Member Type</label>\n\t\t\t<select value.bind=\"memberTypeFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )\" class=\"form-control \" ref=\"memberTypeFilter\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.memberTypes' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Institution</label>\n\t\t\t<input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"institutionFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">Region</label>\n\t\t\t<input value.bind=\"regionFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'text',  filter: 'regionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.region', matchProperty:'region', compare:'lookup'} )\"   class=\"form-control\" ref=\"regionFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">City</label>\n\t\t\t<input value.bind=\"cityFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'text',  filter: 'cityFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.city', matchProperty:'city', compare:'lookup'} )\"   class=\"form-control\" ref=\"cityFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">Country</label>\n\t\t\t<input value.bind=\"countryFilterValue\" input.delegate=\"dataTable.filterListExp($event, { type: 'text',  filter: 'countryFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.country', matchProperty:'country', compare:'lookup'} )\"   class=\"form-control\" ref=\"countryFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label>Roles</label><br/>\n\t\t\t<select value.bind=\"roleFilterValue\" ref=\"select\" class=\"form-control\" \n\t\t\t\tinput.delegate=\"dataTable.filterListExp($event, { type: 'array-or',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array-or'} )\">\n\t\t\t\t<option repeat.for=\"option of config.ROLES\" value.bind=\"option.role\">${option.label}</option>\n\t\t\t</select>\n\t\t</div>\n\t  </div>\n\t</div>\n\n</div>\n</template>\n"; });
+define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"panel-body\">\r\n                    <form class=\"form-horizontal topMargin\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <div class=\"checkbox\">\r\n                                            <label class=\"pull-left\">\r\n                                                            <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                                        </label>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\r\n                                            type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-lg-2 col-lg-offset-2\">\r\n                                <label class=\"btn btn-primary\">\r\n                                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"col-lg-6\">\r\n                                <ul show.bind=\"!uploading\" >\r\n                                    <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                                </ul>\r\n                                <div show.bind=\"uploading\" class=\"progress progress-striped active\">\r\n                                    <div id=\"progressBar\" class=\"progress-bar\" style=\"width: 0%\"></div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-6 col-lg-offset-2\">\r\n                            <div id=\"editFiles\"></div>\r\n                        </div>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n            <div class=\"row topMargin\">\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <th>Name</th>\r\n                                <th>Version</th>\r\n                                <th>Date Uploaded</th>\r\n                                <th>Uploaded By</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                                <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.code}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                                <td data-title=\"Version\">${item.version}</td>\r\n                                <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                                <td data-title=\"Person\">${item.personId | person:people.peopleArray:\"fullName\"}</td>\r\n                                <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                                <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n    </div>\r\n\r\n</template>"; });
+define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                    title=\"\" data-original-title=\"New Document\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });

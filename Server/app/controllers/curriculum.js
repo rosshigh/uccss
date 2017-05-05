@@ -51,7 +51,7 @@ module.exports = function (app) {
 
   router.put('/api/curriculum', function(req, res, next){
     logger.log('Update curriculum ' + req.body._id, "verbose");
-	req.body.dateModified = new Date();
+	  req.body.dateModified = new Date();
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -64,7 +64,7 @@ module.exports = function (app) {
   router.delete('/api/curriculum/:id', function(req, res, next){
     logger.log('Delete curriculum ' + req.params._id, "verbose");
 
-	Model.remove({ _id: req.params.id }, function(err, result){
+	  Model.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
       } else {
@@ -115,7 +115,7 @@ module.exports = function (app) {
 
   router.put('/api/curriculumcategory', function(req, res, next){
     logger.log('Update curriculum category ' + req.body._id, "verbose");
-	req.body.dateModified = new Date();
+	  req.body.dateModified = new Date();
     CurriculumCategory.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, result){
       if (err) {
         return next(err);
@@ -128,7 +128,7 @@ module.exports = function (app) {
   router.delete('/api/curriculumcategory/:id', function(req, res, next){
     logger.log('Delete curriculum category ' + req.params._id, "verbose");
 
-	CurriculumCategory.remove({ _id: req.params.id }, function(err, result){
+	  CurriculumCategory.remove({ _id: req.params.id }, function(err, result){
       if (err) {
          return next(err);
       } else {

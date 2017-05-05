@@ -99,12 +99,10 @@ export class DataTable{
 
   createPage(){
       $($(".pagination")[this.currentPage - 1]).addClass('active');
-    // $($("." + this.context.navControl)[this.currentPage - 1]).addClass('active');
   }
 
   backward(){
       $(".pagination").children().removeClass('active');
-    // $("#" + this.context.navControl).children().removeClass('active');
     this.currentPageElement = this.currentPageElement > 0 ? this.currentPageElement -= 1 : this.currentPageElement;
     if(this.currentPageElement == 0 && this.pageButtons[this.currentPageElement] != 1){
       this.createPageButtons(this.pageButtons[0] - 1)
@@ -185,6 +183,45 @@ export class DataTable{
     this.pageOne();
   }
 
+  filterListExp(el, options){
+    el.preventDefault();
+    options.lookupArray = options.lookupArray || new Array();
+    //If the property is already in filterValues, filter it out
+    this.filterValues = this.filterValues.filter(function (obj) {
+      return obj.options.filter !== options.filter;
+    });
+
+    //Parse collection property
+    var properties = options.collectionProperty.split('.');
+    var condition = "item"
+    for(var j = 0; j<properties.length; j++){
+      if(properties[j].indexOf('[') > -1 ) {
+        condition += properties[j];
+      } else {
+        condition += "['" + properties[j] + "']";
+      }
+    }
+    options.collectionProperty = condition;
+
+    //If the filter value is not set to empty, add it to filterValues
+    if(el.target.value !== ""){
+      this.filterValues.push({options: options, value:el.target.value});
+    }
+
+    //If there are no filters in filterValues, reset the displayArray to the original list
+    if(this.filterValues.length > 0){
+      this.baseArray = this.filter2(this.filterValues);
+    } else {
+      this.baseArray = this.sourceArray;
+    }
+    this.startRecord = this.DEFAULT_START;
+    this.firstVisible = 1;
+    this.buildDisplayArray();
+    this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+    this.pageOne();
+  }
+
   externalFilter(filters){
       if(filters.length > 0){
         this.baseArray = this.filter(filters);
@@ -197,6 +234,53 @@ export class DataTable{
       this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
 
       this.pageOne();
+  }
+
+  filter2(filters){
+    var keep;
+    var index = 0;
+    return this.sourceArray.filter(item => {
+      keep = false;
+      for(let i = 0; i < filters.length; i++) {
+        let filterItem = filters[i];
+
+        if(filterItem.options.compare == 'lookup'){
+          var matchValue = this.lookup2(filterItem, item);
+        } else if (filterItem.options.compare  == 'array-or') {
+          var matchValue = true;
+        } else  {
+          var matchValue = eval(filterItem.options.collectionProperty);
+        }
+
+        if(matchValue) {
+          switch(filterItem.options.type){
+            case 'text':
+              keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+              break;
+            case 'value':
+              keep = matchValue == filterItem.value;
+              break;  
+            case 'array-or':
+              var propArray = eval(filterItem.options.collectionProperty);
+              for(let j = 0; j < propArray.length; j++){
+                 if(propArray[j] == filterItem.value) keep = true;  
+              }
+          }
+        }
+
+       if(!keep) break;
+      }
+      return keep;
+      })
+  }
+
+  lookup2(filterItem, item){
+     for(var i = 0, x=filterItem.options.lookupArray.length; i < x; i++){
+        if(filterItem.options.lookupArray[i][filterItem.options.lookupProperty] == eval(filterItem.options.collectionProperty) ) {
+         return filterItem.options.lookupArray[i][filterItem.options.matchProperty];
+        }
+      }
+      return undefined;
   }
 
   filter(filters, lookupArray){
@@ -281,6 +365,7 @@ export class DataTable{
                 break;
               case 'lookup':
                 // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+                // Match personId with _id in people.peopleArray and then compare the filter value with the found item's fullName
                 var arrayToLookup = filters[i].property.split('-');
                 var properties = arrayToLookup[0].split('.');
                 var condition = "item"

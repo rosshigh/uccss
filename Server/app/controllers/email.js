@@ -11,38 +11,7 @@ var config = require('../../config/config'),
 
 module.exports = function (app) {
   
-    // sendMail = function(mailObject){
-    //   logger.log("sending email");
-    //   switch(mailObject.type){
-    //     case 'help-ticket-created':
-    //       helpTicketCreated(mailObject);
-    //       break;
-    //     case 'help-ticket=updated':
-    //       helpTicketUpdated(mailObject);
-    //       break;
-    //     case 'help-ticket-closed':
-    //       helpTicketClosed(mailObject);
-    //       break;
-    //     case 'welcome':
-    //       welcome(mailObject);
-    //       break;
-    //     case 'client-request-created':       
-    //       requestCreated(mailObject);
-    //       break;
-    //     case 'client-request-updated':       
-    //       requestUpdated(mailObject);
-    //       break;
-    //     case 'generic':       
-    //       genericEmail(mailObject);
-    //       break;
-    //     case 'annual-update-contact-info':
-    //       annualUpdateContactInfo(mailObject);
-    //       break;
-    //     case 'client-request-customer-action':        
-    //       customerAction(mailObject);
-    //       break;
-    //   }
-    // }
+
 
 };
 
@@ -563,6 +532,26 @@ if(env === 'development'){
           context: mailObject.context
       };
       nodeMailerSendMail(mail)   
+  }
+
+  bulkEmails = function(mailObject){
+    var messages = new Array();
+    mailObject.recipients.forEach(item => {
+      messages.push({
+        from: config.emailAddress,
+        to: item.email,
+        subject: mailObject.email.subject,
+        template: "generic",
+        context: { message: mailObject.email.emailMessage}
+      })
+    })
+    transporter.on('idle', function(){
+        // send next message from the pending queue
+        while (transporter.isIdle() && messages.length) {
+            transporter.sendMail (messages.shift());
+        }
+    });
+
   }
 
 }

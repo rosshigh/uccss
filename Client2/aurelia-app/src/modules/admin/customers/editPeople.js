@@ -15,6 +15,7 @@ export class EditPeople {
     courseSelected = false;
     showPassword = false;
     customerEmail = false;
+    bulkEmailSelected = false;
     emailSubject = "";
     emailMessage = "";
     navControl = "peopleNavButtons";
@@ -60,6 +61,7 @@ export class EditPeople {
     }
 
     async filterActive(){
+        this._clearFilters()
         await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
         this.dataTable.updateArray(this.people.peopleArray);
     }
@@ -456,18 +458,34 @@ export class EditPeople {
     }
 
     bulkEmail(){
-        let email = {emailBody: "", emailSubject: ""};
-        return this.dialog.showEmail(
-                "Enter Email",
-                email,
-                ['Submit', 'Cancel']
-            ).then(response => {
-                if (!response.wasCancelled) {
-                    this.sendBulkEmail(response.output.email);
-                } else {
-                    console.log("Cancelled");
-                }
-            });
+      this.bulkEmailSelected = true;
+      this.bulkEmailArray = new Array();
+      this.bulkEmailArrayFiltered = new Array();
+      this.people.peopleArray.forEach(item => {
+    this.bulkEmailArray.push(item);
+        this.bulkEmailArrayFiltered.push(item);
+      })
+    }
+
+    async filterEmail(filter){
+        switch(filter){
+            case 'personStatus':
+                await this.filterActive();
+                this.bulkEmailArrayFiltered = new Array();
+                this._clearEmailFilters();
+                this.people.peopleArray.forEach(item => {
+                    this.bulkEmailArrayFiltered.push(item);
+                })
+                break;
+        }
+    }
+
+    _clearEmailFilters(){
+
+    }
+
+    backBuilkEmail(){
+      this.bulkEmailSelected = false;        
     }
 
     sendBulkEmail(email){

@@ -25,14 +25,14 @@ export class EditConfig {
     }
 
     async activate() {
-        await this.siteConfig.getConfigArray(true)
-
+        await this.siteConfig.getConfigArray(true);
         this.dataTable.updateArray(this.siteConfig.configArray);
     }
 
     async refresh() {
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.siteConfig.getConfigArray(true);
+        await this.siteConfig.getConfigArray(true)
+        await this.config.getConfig(true);
         this.dataTable.updateArray(this.siteConfig.configArray);
         this.spinnerHTML = "";
     }

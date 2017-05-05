@@ -38,7 +38,7 @@ var PersonSchema = new Schema({
   timeZone: { type: String },
   language: { type: String },
   POBox: { type: String },
-  institutionId: { type: Schema.Types.ObjectId, required: true },
+  institutionId: { type: Schema.Types.ObjectId, required: true, ref: 'Institution' },
   noteCategories: [{ type: String }],
 
   //Site Status

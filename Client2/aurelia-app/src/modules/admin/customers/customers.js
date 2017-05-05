@@ -35,6 +35,14 @@ export class Customers{
             nav: true,
             name: 'editInstitutions',
             title: 'Institutions'
+        },
+        {
+            route: 'bulkEmails',
+            moduleId: './bulkEmails',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'bulkEmails',
+            title: 'Bulk Emails'
         }
         ]);
 
