@@ -1,0 +1,55 @@
+<template>
+   <div class='col-lg-10 col-lg-offset-1 bottomMargin'>
+      <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+      <div id="no-more-tables">
+          <table class="table table-striped table-hover cf">
+              <thead class="cf">
+                  <tr>
+                      <td colspan='7'>
+                          <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                          <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'lastName'})" style="width:20rem;">Name <span><i class="fa fa-sort"></i></span></th>
+                      <th style="width:15rem;">Phone</th>
+                      <th style="width:15rem;">Mobile</th>
+                      <th class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'email'})" style="width:20rem;">eMail <span><i class="fa fa-sort"></i></span></th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Change Status</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <th>
+                          <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', compare:'match'} )"  class="form-control" />
+                      </th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th>
+                         <input value.bind="roleFilter" input.delegate="dataTable.filterList(roleFilter, { type: 'custom', filter: customRoleFilter, compare: 'custom'})"  class="form-control" />
+                      </th>
+                      <th>
+                          <select value.bind="personStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'personStatusFilter',  collectionProperty: 'personStatus', displayProperty: 'personStatus',  compare:'match'} )" class="form-control" >
+                              <option value=""></option>
+                              <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>
+                          </select>
+                      </th>
+                      <th></th>
+                  </tr>
+                  <tr  repeat.for="person of dataTable.displayArray">
+                      <td  data-title="Name">${person.fullName}</td>
+                      <td  data-title="Phone">${person.phone | phoneNumber}</td>
+                      <td  data-title="Phone">${person.mobile | phoneNumber}</td>
+                      <td  data-title="Email">${person.email}</td>
+                      <td  data-title="Role">${person.roles}</td>
+                      <td  data-title="Status">${person.personStatus | lookupValue:is4ua.personStatusArray:"code":"description"}</td>
+                      <td data-title="Update" style="width: 100px" click.trigger="updateStatus(person)" innerhtml.bind="person.personStatus | personStatusButton">
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+</template>

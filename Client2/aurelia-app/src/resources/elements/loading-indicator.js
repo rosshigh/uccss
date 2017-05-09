@@ -8,11 +8,6 @@ export class LoadingIndicator {
 
   loadingChanged(newValue){
     newValue ? nprogress.start() : nprogress.done();
-    // if(newValue){
-    //   nprogress.start();
-    // }else{
-    //   nprogress.done();
-    // }
   }
 
   progressChanged(newValue){

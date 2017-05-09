@@ -14,12 +14,11 @@
         <h5>Email: ${people.selectedPerson.email}</h5>
       </div>
   </div>
-  <div class="col-lg-10 col-lg-offset-1">
-    <div class='row'>
+  <div class="col-lg-12 letMargin rightMargin">
       <table id="requestsTable" class="table table-striped table-hover">
         <thead>
           <tr>
-            <td colspan='6'>
+            <td colspan='7'>
                 <div class="checkbox">
                     <label>
                         <input checked.bind="isChecked" change.trigger="filterInAssigned()" type="checkbox"> Show assigned requests
@@ -43,11 +42,12 @@
             <th class="col-xs-1">No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Due <span click.trigger="dataTable.sortArray('requiredDate')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
-            <th  show.bind="config.SANDBOX_USED == 0" class="col-lg-1">Type</th>
+            <th show.bind="config.SANDBOX_USED == 0" class="col-lg-1">Type</th>
             <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')"><i class="fa fa-sort"></i></span></th>
             <th class="col-sm-1">IDS Requestd</th>
             <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')"><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1">Institution <span click.trigger="dataTable.sortArray('requestId.institutionId', 'id', people.institutionsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
           </tr>
         </thead>
         <tbody>
@@ -74,8 +74,10 @@
             </th>
             <th></th>
             <th>
-              <input input.delegate="dataTable.filterList($event, products.productsArray)" id="productId-name" type="text" compare="lookup" class="form-control" ref="productFilter"/>
+              <input value.bind="productFilterValue" input.delegate="filterTable($event, { type: 'text',  filter: 'productFilter', lookupArray: products.productsArray, lookupProperty: '_id', collectionProperty: 'productId', displayProperty: 'name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="productFilter"/>
               <!--
+              <input input.delegate="dataTable.filterList($event, products.productsArray)" id="productId-name" type="text" compare="lookup" class="form-control" ref="productFilter"/>
+             
               <select change.delegate="dataTable.filterList($event)" class="form-control " id="productId" type="id" compare="id">
                    <option value=""></option>
                    <option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
@@ -84,6 +86,10 @@
             </th>
             <th>
               <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+            </th>
+            <th>
+            <input value.bind="institutionFilterValue" input.delegate="filterTable($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="institutionFilter"/>
+            <!--  <input input.delegate="dataTable.filterList($event, people.institutionsArray)" id="requestId.institutionId-name" type="text" compare="lookup" class="form-control" ref="inameFilter"/> -->
             </th>
           </tr>
           <tr repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
@@ -95,10 +101,10 @@
             <td  click.trigger="selectRequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
             <td  click.trigger="selectRequest($index, $event, request)" data-title="product">${request.productId | productName:products.productsArray}</td>
             <td  class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId | personProperty:people.peopleArray:"fullName"}</td>
+            <td  data-title="Name">${request.requestId.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
   </div>
 </template>

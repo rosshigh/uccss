@@ -25,6 +25,7 @@ module.exports = function (app, config) {
   router.get('/api/people', requireAuth,  function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
+    query.populate('institutionId',{ name: 1 })
     query.exec( function(err, object){
         if (err) {
           res.status(500).json(err);
@@ -137,15 +138,12 @@ module.exports = function (app, config) {
   });
 
   router.post('/api/people/register/facDev',  function(req, res, next){
-    Model.find({institutionId: req.body.institutionId}, function(err, people){
+    Model.find({institutionId: req.body.institutionId, roles: "PRIM"}, function(err, people){
       if(err){
         return next(err);
-      } else {       
-        for(var i = 0; i < people.length; i++){
-          if(people[i].roles.indexOf('PRIM') > -1) {           
-            var facCoord = people[i];
-          }
-        }    
+      } else {     
+            
+        if(people) var facCoord = people[0];
         if(facCoord){
           var facCoordName = facCoord.fullName;
         }  else {
@@ -159,15 +157,16 @@ module.exports = function (app, config) {
 
         welcome(mailObj)
 
-        var context = {name: req.body.fullName, institution: req.body.institution};            
-        var mailObj = {
-          email: facCoord.email,
-          institution: req.body.institution,
-          cc: req.body.cc,
-          context: context
-        }                          
-                      
-        newCustomer(mailObj);
+        if(facCoord){
+            var context = {name: req.body.fullName, institution: req.body.institution};            
+            var mailObj = {
+              email: facCoord.email,
+              institution: req.body.institution,
+              cc: req.body.cc,
+              context: context
+            }                                                    
+            newCustomer(mailObj);
+        }
 
       }
       res.status(201).json({message: "Email sent"});
@@ -258,7 +257,8 @@ module.exports = function (app, config) {
   router.post('/api/people/sendBulkEmail', requireAuth, function(req, res, next){
     logger.log('Sending bulk email', 'verbose');
 
-    sendBulkEmail(req.body);
+    sendBulkEmails(req.body);
+    res.status(201).json({message: "Emails sent"});
   });
 
   router.post('/api/passwordReset',  function(req, res, next){

@@ -83,7 +83,7 @@ export class Register {
       }},
       {"rule":"custom","message":"Enter a valid email address",
       "valFunction":function(context){
-        return ( /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email));
+        return (context.people.selectedPerson.email.indexOf('@') > -1);
       }
       }]);
     this.validation.addRule(1,"register_phone",[{"rule":"required","message":"Phone number is required", "value": "people.selectedPerson.phone"},

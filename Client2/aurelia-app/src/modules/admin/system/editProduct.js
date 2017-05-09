@@ -168,10 +168,16 @@ export class EditProducts {
     }
 
     _cleanUpFilters(){
-        $("#name").val("");
-        $("#systems.sid").val("");
-        $("#sapName").val("");
-        $("#active").val("");
+        this.nameFilterValue = "";
+        this.systemFilterValue = "";
+        this.activeFilter = "";
+        this.sapNameFilterValue = "";
+
+        this.dataTable.updateArray(this.products.productsArray);
+    }
+
+    filter(el, options){
+        this.dataTable.filterListExV(el.target.value, options);
     }
 
     back() {

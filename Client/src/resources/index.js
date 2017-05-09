@@ -1,0 +1,20 @@
+export function configure(config) {
+  config.globalResources([
+    './elements/nav-bar',
+    './elements/loading-indicator',
+    './elements/table-navigation-bar',
+    './elements/flat-picker',
+    './value-converters/info-filter',
+    './value-converters/session-type',
+    './value-converters/date-format',
+    './value-converters/gravatar-url',
+    './value-converters/gravatar-url-id',
+    './value-converters/ucc-title',
+    './value-converters/phone-number',
+    './value-converters/lookup-value',
+     './value-converters/sandbox',
+    './value-converters/idsRequested',
+    './value-converters/person-status-button',
+    './value-converters/session-status-button'
+  ]);
+}

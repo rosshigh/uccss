@@ -157,11 +157,16 @@ export class EditPeople {
     }
 
     _cleanUpFilters(){
-        $("#name").val("");
-        $("#memberType").val("");
-        $("#institutionType").val("");
-        $("#highestDegree").val("");
+        this.nameFilterValue = "";
+        this.institutionTypeFilter = "";
+        this.memberTypeFilter = "";
+        this.highestDegreeFilter = "";
+
         $("#institutionStatus").val("");
+    }
+
+    filter(el, options){
+        this.dataTable.filterListExV(el.target.value, options);
     }
 
     async changeTab(el, index){

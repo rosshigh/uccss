@@ -534,23 +534,18 @@ if(env === 'development'){
       nodeMailerSendMail(mail)   
   }
 
-  bulkEmails = function(mailObject){
-    var messages = new Array();
+  sendBulkEmails = function(mailObject){
     mailObject.recipients.forEach(item => {
-      messages.push({
+     
+      var mail = {
         from: config.emailAddress,
         to: item.email,
         subject: mailObject.email.subject,
         template: "generic",
-        context: { message: mailObject.email.emailMessage}
-      })
-    })
-    transporter.on('idle', function(){
-        // send next message from the pending queue
-        while (transporter.isIdle() && messages.length) {
-            transporter.sendMail (messages.shift());
-        }
-    });
+        context: { name: item.name, message: mailObject.email.emailMessage}
+      }
+      nodeMailerSendMail(mail); 
+    })  
 
   }
 

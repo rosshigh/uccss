@@ -1,0 +1,73 @@
+<template>
+<div class="col-lg-10 col-lg-offset-1">
+    <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+      <div id="no-more-tables">
+        <table class="table table-striped table-hover cf">
+          <thead class="cf">
+            <tr>
+              <td colspan='7'>
+                <span click.delegate="refresh()" class="smallMarginRight"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+              </td>
+            </tr>
+            <tr>
+              <th class="col-xs-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestNo'})" class="col-xs-1">No <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requiredDate'})" >Due <span></i></span></thpropertyName>
+              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})" >Requested <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1">Type</th>
+              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestStatus'})" >Status <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-sm-1">IDS Requestd</th>
+              <th class="col-lg-2 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'name', searchProperty: 'productId', surrogateArray: products.productsArray, surrogateProperty: '_id', type: 'lookup'})">Product <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'fullName', searchProperty: 'requestId.personId', surrogateArray: people.instutionPeopleArray, surrogateProperty: '_id', type: 'lookup'})">Faculty <span><i class="fa fa-sort"></i></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>
+                <input value.bind="requiredDateFilter" change.delegate="dataTable.filterList(requiredDateFilter, { type: 'date',  filter: 'requiredDateFilter', collectionProperty: 'requiredDate', compare:'after' })" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              </th>
+              <th>
+                <input value.bind="createdDateFilter" change.delegate="dataTable.filterList(createdDateFilter, { type: 'date',  filter: 'createdDateFilter', collectionProperty: 'createdDate', compare:'after' })" type="date" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              </th>
+              <th>
+           		<select value.bind="courseFilter" input.delegate="dataTable.filterList($event, { type: 'custom',  filter: courseCustomFilter,  collectionProperty: 'requestId.courseId', displayProperty: 'courseId',  compare:'custom'} )" class="form-control" >
+                	<option value=""></option>
+                   <option  value="${config.SANDBOX_ID}">Sandbox</option>
+                   <option  value="Regular">Regular</option>
+              	</select>
+              </th>
+              <th>
+               	<select value.bind="requestStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )" class="form-control" >
+	                  <option value=""></option>
+	                   <option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
+	              </select>
+              </th>
+              <th></th>
+              <th>
+              	<select value.bind="productFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'productFilter',  collectionProperty: 'productId', displayProperty: 'name',  compare:'match'} )" class="form-control" >
+	                  <option value=""></option>
+	                  <option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
+	              </select>
+              </th>
+              <th>
+                <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'custom',  filter: nameCustomFilter, collectionProperty: 'fullName', compare:'custom'} )"  class="form-control" />
+              </th>
+            </tr>
+            <tr click.trigger="selectRequest($index, $event, request)" repeat.for="request of dataTable.displayArray">
+              <td data-title="Request No">${request.requestNo}</td>
+              <td data-title="Required Date">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+              <td data-title="Date Created">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
+              <td data-title="Course">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>
+              <td data-title="Status">${request.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+              <td data-title="IDs Requested">${request.requestId | idsRequested}
+              <td data-title="Product">${request.productId | lookupValue:products.productsArray:"_id":"name"}</td>
+              <td data-title="Person">${request.requestId.personId | lookupValue:people.instutionPeopleArray:"_id":"fullName"}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+</template>

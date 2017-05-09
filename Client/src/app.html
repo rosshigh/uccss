@@ -1,0 +1,9 @@
+<template>
+   <require from="resources/css/styles.css"></require>
+   <require from="humane-js/themes/flatty.css"></require>
+   <nav-bar></nav-bar>
+  <div class="page-host">
+    <loading-indicator progress.bind="data.progress" loading.bind="router.isNavigating || data.isRequesting"></loading-indicator>
+    <router-view></router-view>
+</div>
+</template>

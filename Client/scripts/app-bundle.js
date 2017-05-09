@@ -1,0 +1,16166 @@
+define('app',['exports', 'aurelia-framework', './config/routerConfig', './resources/data/dataServices'], function (exports, _aureliaFramework, _routerConfig, _dataServices) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.App = undefined;
+
+  var _routerConfig2 = _interopRequireDefault(_routerConfig);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var App = exports.App = (_dec = (0, _aureliaFramework.inject)(_routerConfig2.default, _dataServices.DataServices), _dec(_class = function () {
+    function App(appRouterConfig, data) {
+      _classCallCheck(this, App);
+
+      this.appRouterConfig = appRouterConfig;
+      this.data = data;
+      this.message = 'Hello World!';
+    }
+
+    App.prototype.activate = function activate() {
+      this.appRouterConfig.configure();
+    };
+
+    return App;
+  }()) || _class);
+});
+define('environment',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    debug: true,
+    testing: true
+  };
+});
+define('main',['exports', './environment', 'regenerator-runtime'], function (exports, _environment, _regeneratorRuntime) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.configure = configure;
+
+  var _environment2 = _interopRequireDefault(_environment);
+
+  var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  window.regeneratorRuntime = _regeneratorRuntime2.default;
+
+  Promise.config({
+    longStackTraces: _environment2.default.debug,
+    warnings: {
+      wForgottenReturn: false
+    }
+  });
+
+  function configure(aurelia) {
+    aurelia.use.standardConfiguration().globalResources("aurelia-mask").plugin("aurelia-dialog").plugin('aurelia-notification', function (config) {
+      config.configure({
+        translate: false,
+        notifications: {
+          'success': 'humane-libnotify-success',
+          'error': 'humane-libnotify-error',
+          'info': 'humane-libnotify-info'
+        }
+      });
+    }).feature('resources');
+
+    if (_environment2.default.debug) {
+      aurelia.use.developmentLogging();
+    }
+
+    if (_environment2.default.testing) {
+      aurelia.use.plugin('aurelia-testing');
+    }
+
+    aurelia.start().then(function () {
+      return aurelia.setRoot();
+    });
+  }
+});
+define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'], function (exports, _aureliaFramework, _aureliaHttpClient) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.AppConfig = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var AppConfig = exports.AppConfig = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = function () {
+        function AppConfig(http) {
+            _classCallCheck(this, AppConfig);
+
+            this.HOST = location.origin;
+            this.BASE_URL = "http://localhost:5000/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/';
+            this.INSTITUTIONS_ACTIVE = '01';
+            this.ACTIVE_PERSON = "01";
+            this.INACTIVE_PERSON = "02";
+            this.ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 }, { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 }, { role: 'LEGL', label: 'Legal', UCConly: false, authLevel: 2 }, { role: 'BUSI', label: 'Billing', UCConly: false, authLevel: 2 }, { role: 'PRIM', label: 'Primary', UCConly: false, authLevel: 4 }, { role: 'TECH', label: 'Technical', UCConly: false, authLevel: 2 }, { role: 'UCCT', label: 'UCC Technical Staff', UCConly: true, authLevel: 8 }, { role: 'UCCA', label: 'UCC Admin Staff', UCConly: true, authLevel: 6 }, { role: 'UCSA', label: 'UCCSS Admin', UCConly: true, authLevel: 11 }, { role: 'BLOG', label: 'Blog Author', UCConly: false, authLevel: 2 }, { role: "TMAN", label: "Director", UCConly: true, authLevel: 11 }, { role: "EDIR", label: "Executive Director", UCConly: true, authLevel: 11 }, { role: "TDIR", label: "Technical Director", UCConly: true, authLevel: 11 }, { role: "TMGR", label: "Technical Manager", UCConly: true, authLevel: 11 }, { role: "STUT", label: "Student Worker", UCConly: true, authLevel: 8 }];
+            this.UCC_ROLE = 6;
+            this.UCC_TECH_ROLE = 8;
+            this.USER_ROLE = 4;
+            this.PROV_USER = 1;
+            this.rowOptions = [5, 10, 15, 20, 50];
+            this.defaultPageSize = 20;
+            this.systemTypes = ['Switch', 'Router', 'Server', 'Storage', 'Other'];
+            this.SESSION_STATUSES = ["Closed", "Active", "Requests", "Next"];
+            this.SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';
+            this.ASSIGNED_REQUEST_CODE = 2;
+            this.UNASSIGNED_REQUEST_CODE = 1;
+            this.UPDATED_REQUEST_CODE = 3;
+            this.CUSTOMER_ACTION_REQUEST_CODE = 4;
+            this.CANCELLED_REQUEST_CODE = 5;
+            this.PROVISIONAL_REQUEST_CODE = 6;
+            this.REPLIED_REQUEST_CODE = 7;
+            this.REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: "" }, { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "info" }, { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning" }, { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: "" }, { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: "" }, { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" }];
+
+            this.http = http;
+        }
+
+        AppConfig.prototype.getConfig = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(refresh) {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(refresh || !this.configArray)) {
+                                    _context.next = 2;
+                                    break;
+                                }
+
+                                return _context.abrupt('return', this.http.createRequest('/config').asGet().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).send().then(function (response) {
+                                    if (!response.isSuccess) {
+                                        return response;
+                                    } else {
+                                        _this.configArray = JSON.parse(response.response);
+                                        _this.setParameters();
+                                    }
+                                }).catch(function (e) {
+                                    _this.configArray = new Array();
+                                    console.log(e);
+                                    return { error: true, code: e.statusCode, message: e.statusText };
+                                }));
+
+                            case 2:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function getConfig(_x) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getConfig;
+        }();
+
+        AppConfig.prototype.getSessions = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(refresh) {
+                var _this2 = this;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!(refresh || !this.SESSION_PARAMS)) {
+                                    _context2.next = 2;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return', this.http.createRequest('/semesterConfig').asGet().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).send().then(function (response) {
+                                    if (!response.isSuccess) {
+                                        return response;
+                                    } else {
+                                        _this2.SESSION_PARAMS = JSON.parse(response.response);
+                                    }
+                                }).catch(function (e) {
+                                    _this2.SESSION_PARAMS = new Array();
+                                    console.log(e);
+                                    return { error: true, code: e.statusCode, message: e.statusText };
+                                }));
+
+                            case 2:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getSessions(_x2) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getSessions;
+        }();
+
+        AppConfig.prototype.setParameters = function setParameters() {
+            this.DEFAULT_FACULTY_IDS = parseInt(this.getParameter('DEFAULT_FACULTY_IDS'));
+            this.REQUEST_LIMIT = parseInt(this.getParameter('REQUEST_LIMIT'));
+            this.REQUEST_LEEWAY = parseInt(this.getParameter('REQUEST_LEEWAY'));
+            this.REGULAR_ID_BUFFER = parseInt(this.getParameter('REGULAR_ID_BUFFER'));
+            this.REGULAR_ID_ALLOWANCE = parseInt(this.getParameter('REGULAR_ID_ALLOWANCE'));
+            this.SANDBOX_ID_BUFFER = parseInt(this.getParameter('SANDBOX_ID_BUFFER'));
+            this.SHARED_ID_BUFFER = parseInt(this.getParameter('SHARED_ID_BUFFER'));
+            this.SANDBOX_ID_COUNT = parseInt(this.getParameter('SANDBOX_ID_COUNT'));
+            this.CLIENT_INTERVAL = parseInt(this.getParameter('CLIENT_INTERVAL'));
+            this.DATE_FORMAT_TABLE = this.getParameter('DATE_FORMAT_TABLE');
+            this.UCC_HOME = this.getParameter('UCC_HOME');
+            this.SANDBOX_USED = this.getParameter('SANDBOX_USED');
+            this.HOME_WELCOME = this.getParameter('HOME_WELCOME');
+            this.DEFAULT_HOME_IMAGE = this.getParameter('DEFAULT_HOME_IMAGE');
+            this.WEATHER_API_KEY = this.getParameter('WEATHER_API_KEY');
+            this.UCC_PHONE = this.getParameter('UCC_PHONE');
+            this.UCC_EMAIL = this.getParameter('UCC_EMAIL');
+            this.UCC_ADMIN_PHONE = this.getParameter('UCC_ADMIN_PHONE');
+            this.UCC_ADMIN_EMAIL = this.getParameter('UCC_ADMIN_EMAIL');
+            this.UCC_ADDRESS = this.getParameter('UCC_ADDRESS');
+            this.SHOW_STAFF_CONTACT = this.getParameter('SHOW_STAFF_CONTACT');
+            this.UCC_HEADER_IMAGE = this.getParameter('UCC_HEADER_IMAGE');
+            this.CONTACT_CONTENT = this.getParameter('CONTACT_CONTENT');
+            this.SEND_EMAILS = this.getParameter('SEND_EMAILS');
+            this.TEMP_SCALE = this.getParameter('TEMP_SCALE');
+            this.HELP_TICKET_EMAIL_LIST = this.getParameter('HELP_TICKET_EMAIL_LIST');
+            this.SESSION_EXPLANATION = this.getParameter('SESSION_EXPLANATION');
+        };
+
+        AppConfig.prototype.getParameter = function getParameter(parameter) {
+            for (var i = 0; i < this.configArray.length; i++) {
+                if (this.configArray[i].parameter === parameter) {
+                    if (this.configArray[i].type === 'boolean') {
+                        return this.configArray[i].value == "true";
+                    } else {
+                        return this.configArray[i].value;
+                    }
+                }
+            }
+            return null;
+        };
+
+        return AppConfig;
+    }()) || _class);
+});
+define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var _default = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+    function _default(router) {
+      _classCallCheck(this, _default);
+
+      this.router = router;
+    }
+
+    _default.prototype.configure = function configure() {
+      var appRouterConfig = function appRouterConfig(config) {
+        config.addPipelineStep('authorize', AuthorizeStep);
+        config.map([{
+          route: ['', 'home'],
+          moduleId: './modules/home/home',
+          name: 'Home',
+          settings: { auth: false, roles: [] }
+        }, {
+          route: 'contact',
+          moduleId: './modules/home/contact',
+          name: 'Contact',
+          settings: { auth: false, roles: [] }
+        }, {
+          route: 'register',
+          moduleId: './modules/home/register',
+          name: 'Register',
+          settings: { auth: false, roles: [] }
+        }, {
+          route: 'user',
+          moduleId: './modules/user/user',
+          name: 'User',
+          settings: { auth: true, roles: [] }
+        }, {
+          route: 'profile',
+          moduleId: './modules/user/profile',
+          name: 'Profile',
+          settings: { auth: true, roles: [] }
+        }, {
+          route: 'resetPassword/:id',
+          moduleId: './modules/user/resetPassword',
+          name: 'ResetPassword',
+          settings: { auth: false, roles: [] }
+        }, {
+          route: 'system',
+          moduleId: './modules/admin/system/system',
+          name: 'system',
+          settings: { auth: true, roles: [] }
+        }, {
+          route: 'facco',
+          moduleId: './modules/facco/facco',
+          name: 'facco',
+          settings: { auth: true, roles: [] }
+        }]);
+
+        config.mapUnknownRoutes('home');
+      };
+      this.router.configure(appRouterConfig);
+    };
+
+    return _default;
+  }()) || _class);
+
+  exports.default = _default;
+
+  var AuthorizeStep = function () {
+    function AuthorizeStep() {
+      _classCallCheck(this, AuthorizeStep);
+    }
+
+    AuthorizeStep.prototype.run = function run(navigationInstruction, next) {
+      if (navigationInstruction.getAllInstructions().some(function (i) {
+        return i.config.settings.auth;
+      })) {
+        var role = sessionStorage.getItem('role');
+        if (!role) {
+          return next.cancel(new Redirect('home'));
+        }
+      }
+      return next();
+    };
+
+    return AuthorizeStep;
+  }();
+});
+define('resources/index',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.configure = configure;
+  function configure(config) {
+    config.globalResources(['./elements/nav-bar', './elements/loading-indicator', './elements/table-navigation-bar', './elements/flat-picker', './value-converters/info-filter', './value-converters/session-type', './value-converters/date-format', './value-converters/gravatar-url', './value-converters/gravatar-url-id', './value-converters/ucc-title', './value-converters/phone-number', './value-converters/lookup-value', './value-converters/sandbox', './value-converters/idsRequested', './value-converters/person-status-button', './value-converters/session-status-button']);
+  }
+});
+define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditPeople = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditPeople(dataTable, config, people, utils, is4ua, dialog) {
+            _classCallCheck(this, EditPeople);
+
+            this.spinnerHTML = "";
+
+            this.dataTable = dataTable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.utils = utils;
+            this.people = people;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+        }
+
+        EditPeople.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditPeople.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        EditPeople.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.pageSize = this.config.defaultPageSize;
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditPeople.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditPeople.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty(this.originalPerson);
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: _this.userObj._id
+                });
+            });
+        };
+
+        EditPeople.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.buildAudit();
+                                _context3.next = 3;
+                                return this.people.savePerson();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
+                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
+                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+                                }
+                                this.personSelected = false;
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
+            var email = {
+                email: this.people.selectedPerson.email,
+                name: this.people.selectedPerson.firstName
+            };
+            this.people.activateAccountEmail(email);
+        };
+
+        EditPeople.prototype.updateStatus = function updateStatus(person) {
+            this.people.selectedPersonFromId(person._id, 'i');
+            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
+            if (this.people.selectedPerson.personStatus === '01') {
+                this.people.selectedPerson.personStatus = '02';
+            } else {
+                this.people.selectedPerson.personStatus = '01';
+            }
+            this.save();
+        };
+
+        EditPeople.prototype.cancel = function cancel() {
+            this.people.selectPerson(this.editIndex);
+        };
+
+        EditPeople.prototype.back = function back() {
+            var _this2 = this;
+
+            if (this.people.isPersonDirty().length) {
+                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this2.save();
+                    } else {
+                        _this2.personSelected = false;
+                    }
+                });
+            } else {
+                this.personSelected = false;
+            }
+        };
+
+        EditPeople.prototype.customRoleFilter = function customRoleFilter(value, item) {
+            var value = value.toUpperCase();
+            for (var i = 0; i < item.roles.length; i++) {
+                if (item.roles[i].indexOf(value) > -1) return true;
+            }
+            return false;
+        };
+
+        EditPeople.prototype.customStatusFilter = function customStatusFilter(value, item) {
+            var value = value.toUpperCase();
+            for (var i = 0; i < item.roles.length; i++) {
+                if (item.roles[i].indexOf(value) > -1) return true;
+            }
+            return false;
+        };
+
+        return EditPeople;
+    }()) || _class);
+});
+define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.FacCo = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function FacCo(router) {
+            _classCallCheck(this, FacCo);
+
+            this.router = router;
+        }
+
+        FacCo.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        FacCo.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editPeople'],
+                moduleId: './editPeople',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editPeople',
+                title: 'People'
+            }, {
+                route: 'viewRequests',
+                moduleId: './viewRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'viewRequests',
+                title: 'Clients Requests'
+            }]);
+
+            this.router = router;
+        };
+
+        return FacCo;
+    }()) || _class);
+});
+define('modules/facco/viewRequests',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people'], function (exports, _aureliaFramework, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ViewRequests = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ViewRequests = exports.ViewRequests = (_dec = (0, _aureliaFramework.inject)(_appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function ViewRequests(config, people, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, ViewRequests);
+
+            this.spinnerHTML = "";
+
+            this.config = config;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+        }
+
+        ViewRequests.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        ViewRequests.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        ViewRequests.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=name'), this.systems.getSystemsArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                            case 3:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        ViewRequests.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
+
+                            case 4:
+                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.dataTable.updateArray([]);
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        ViewRequests.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        ViewRequests.prototype.courseCustomFilter = function courseCustomFilter(value, item, context) {
+            if (value == 'Regular' && item.requestId.courseId != context.config.SANDBOX_ID) return true;
+            if (value == context.config.SANDBOX_ID && item.requestId.courseId == context.config.SANDBOX_ID) return true;
+            return false;
+        };
+
+        ViewRequests.prototype.nameCustomFilter = function nameCustomFilter(value, item, context) {
+            for (var i = 0; i < context.people.instutionPeopleArray.length; i++) {
+                if (item.requestId.personId == context.people.instutionPeopleArray[i]._id) {
+                    return context.people.instutionPeopleArray[i].fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+                }
+            }
+            return false;
+        };
+
+        ViewRequests.prototype.customNameSorter = function customNameSorter(sortProperty, sortDirection, sortArray, context) {
+            var sortProperty = 'fullName';
+            sortArray.forEach(function (item) {
+                var obj = context.dataTable.findObj(context.people.instutionPeopleArray, '_id', item.requestId.personId);
+                item[sortProperty] = obj ? obj[sortProperty] : null;
+            });
+
+            return sortArray.sort(function (a, b) {
+                var result = a[sortProperty] < b[sortProperty] ? -1 : a[sortProperty] > b[sortProperty] ? 1 : 0;
+                return result * sortDirection;
+            });
+        };
+
+        ViewRequests.prototype.productSorter = function productSorter(sortProperty, sortDirection, sortArray, context) {
+            var sortProperty = 'name';
+            sortArray.forEach(function (item) {
+                var obj = context.dataTable.findObj(context.products.productsArray, '_id', item.productId);
+                item[sortProperty] = obj ? obj[sortProperty] : null;
+            });
+
+            return sortArray.sort(function (a, b) {
+                var result = a[sortProperty] < b[sortProperty] ? -1 : a[sortProperty] > b[sortProperty] ? 1 : 0;
+                return result * sortDirection;
+            });
+        };
+
+        return ViewRequests;
+    }()) || _class);
+});
+define('modules/home/contact',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _siteInfo, _people, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Contact = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var Contact = exports.Contact = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _people.People, _appConfig.AppConfig), _dec(_class = function () {
+		function Contact(siteinfo, people, config) {
+			_classCallCheck(this, Contact);
+
+			this.siteinfo = siteinfo;
+			this.people = people;
+			this.config = config;
+		}
+
+		Contact.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var _this = this;
+
+				var uccRoles;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								uccRoles = "";
+
+								this.config.ROLES.forEach(function (item) {
+									if (item.UCConly) uccRoles += item.role + ":";
+								});
+
+								_context.next = 4;
+								return this.config.getConfig();
+
+							case 4:
+								_context.next = 6;
+								return this.people.getUCCStaff(uccRoles);
+
+							case 6:
+
+								this.showPersonalContactInfo = this.config.SHOW_STAFF_CONTACT == 0;
+
+								this.directors = new Array();
+								this.staff = new Array();
+								this.admin = new Array();
+								this.people.uccPeople.forEach(function (item) {
+									if (item.roles.indexOf('TMAN') > -1) {
+										_this.directors.push({ item: item, role: 'TMAN' });
+									} else if (item.roles.indexOf('EDIR') > -1) {
+										_this.directors.push({ item: item, role: 'EDIR' });
+									} else if (item.roles.indexOf('TDIR') > -1) {
+										_this.directors.push({ item: item, role: 'TDIR' });
+									} else if (item.roles.indexOf('TMGR') > -1) {
+										_this.directors.push({ item: item, role: 'TMGR' });
+									} else if (item.roles.indexOf('UCCT') > -1 && item.roles.indexOf('STUT') == -1) {
+										_this.staff.push(item);
+									} else if (item.roles.indexOf('UCCA') > -1) {
+										_this.admin.push(item);
+									}
+								});
+
+								this.staff = this.staff.sort(function (a, b) {
+									return a.lastName > b.lastName;
+								});
+
+								this.directors = this.directors.sort(function (a, b) {
+									return a.role > b.role;
+								});
+
+							case 13:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		return Contact;
+	}()) || _class);
+});
+define('modules/home/home',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _siteInfo, _sessions, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Home = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_siteInfo.SiteInfo, _sessions.Sessions, _appConfig.AppConfig), _dec(_class = function () {
+        function Home(siteinfo, sessions, config) {
+            _classCallCheck(this, Home);
+
+            this.email = '';
+            this.password = '';
+            this.loginError = '';
+
+            this.sessions = sessions;
+            this.siteinfo = siteinfo;
+            this.config = config;
+            this.config.getConfig(true);
+        }
+
+        Home.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var currentDate, options, responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+                                _context.next = 4;
+                                return Promise.all([this.sessions.getSessionsArray('?order=startDate', true), this.siteinfo.getInfoArray(true, options)]);
+
+                            case 4:
+                                responses = _context.sent;
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        return Home;
+    }()) || _class);
+});
+define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', '../../resources/utils/validation', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _people, _is4ua, _commonDialogs, _validation, _appConfig) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Register = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Register = exports.Register = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _people.People, _is4ua.is4ua, _utils.Utils, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _validation2.default), _dec(_class = function () {
+    function Register(router, people, is4ua, utils, config, dialog, validation) {
+      _classCallCheck(this, Register);
+
+      this.router = router;
+      this.people = people;
+      this.is4ua = is4ua;
+      this.utils = utils;
+      this.validation = validation;
+      this.config = config;
+      this.dialog = dialog;
+      this.validation.initialize(this);
+
+      this.thresholdLength = 6;
+      this.threshold = 3;
+    }
+
+    Register.prototype.attached = function attached() {
+      this._setUpValidation();
+      $('[data-toggle="tooltip"]').tooltip();
+    };
+
+    Register.prototype.activate = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
+
+              case 2:
+                _context.next = 4;
+                return this.is4ua.loadIs4ua();
+
+              case 4:
+                this.people.selectPerson();
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function activate() {
+        return _ref.apply(this, arguments);
+      }
+
+      return activate;
+    }();
+
+    Register.prototype.checkEmail = function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.people.checkEmail();
+
+              case 2:
+                if (!_context2.sent) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                this.duplicateAccount = true;
+                this.validation.validate(2);
+                _context2.next = 9;
+                break;
+
+              case 7:
+                this.duplicateAccount = false;
+                this.validation.makeValid($("#register_email"));
+
+              case 9:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function checkEmail() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return checkEmail;
+    }();
+
+    Register.prototype.checkName = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.people.checkName();
+
+              case 2:
+                if (!_context3.sent) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                this.duplicateName = true;
+                this.validation.validate(3);
+                _context3.next = 9;
+                break;
+
+              case 7:
+                this.duplicateName = false;
+                this.validation.makeValid($("#register_institution"));
+
+              case 9:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function checkName() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return checkName;
+    }();
+
+    Register.prototype.passwordComplexity = function passwordComplexity() {
+
+      var newValue = this.people.selectedPerson.password;
+
+      this.longPassword = newValue.length >= this.thresholdLength;
+
+      var strength = 0;
+      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+      strength += /[a-z]+/.test(newValue) ? 1 : 0;
+      strength += /[0-9]+/.test(newValue) ? 1 : 0;
+      strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+      this.complexPassword = strength >= this.threshold && this.longPassword;
+      this.validation.validate(4);
+    };
+
+    Register.prototype._setUpValidation = function _setUpValidation() {
+      this.validation.addRule(1, "register_firstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+      this.validation.addRule(1, "register_lastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+      this.validation.addRule(1, "register_email", [{ "rule": "required", "message": "Email is required", "value": "people.selectedPerson.email" }, { "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }, { "rule": "custom", "message": "Enter a valid email address",
+        "valFunction": function valFunction(context) {
+          return context.people.selectedPerson.email.indexOf('@') > -1;
+        }
+      }]);
+      this.validation.addRule(1, "register_phone", [{ "rule": "required", "message": "Phone number is required", "value": "people.selectedPerson.phone" }, { "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.phone", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_mobile", [{ "rule": "length", "message": "Phone number isn't valid", "value": "people.selectedPerson.mobile", "ruleValue": 10 }]);
+      this.validation.addRule(1, "register_institution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }, { "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
+      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+        "valFunction": function valFunction(context) {
+          return context.people.selectedPerson.password === context.password_repeat;
+        } }], true);
+      this.validation.addRule(2, "register_email", [{ "rule": "custom", "message": "An account with that email exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateAccount;
+        } }]);
+      this.validation.addRule(3, "register_institution", [{ "rule": "custom", "message": "An account with that name at this institution exists",
+        "valFunction": function valFunction(context) {
+          return !context.duplicateName;
+        } }]);
+      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+        "valFunction": function valFunction(context) {
+          return context.complexPassword;
+        } }]);
+    };
+
+    Register.prototype.save = function () {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var _this = this;
+
+        var response;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.validation.validate(1)) {
+                  _context4.next = 10;
+                  break;
+                }
+
+                this.people.selectedPerson.personStatus = this.config.INACTIVE_PERSON;
+                _context4.next = 4;
+                return this.people.savePerson('register');
+
+              case 4:
+                response = _context4.sent;
+
+                if (response.error) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt('return', this.dialog.showMessage("Your account has been created.  Your faculty coordinator must activate the account before you can log on to the UCCSS.", "Account Created", ['OK']).whenClosed(function (response) {
+                  _this.sendFacDevEmail();
+                }));
+
+              case 9:
+                this.utils.showNotification("An error occurred creating the account");
+
+              case 10:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function save() {
+        return _ref4.apply(this, arguments);
+      }
+
+      return save;
+    }();
+
+    Register.prototype.sendFacDevEmail = function sendFacDevEmail() {
+      var email = new Object();
+      this.people.selectInstitutionByID(this.people.selectedPerson.institutionId);
+      email.email = this.people.selectedPerson.email;
+      email.institutionId = this.people.selectedPerson.institutionId;
+      email.institution = this.people.selectedInstitution.name;
+      email.fullName = this.people.selectedPerson.firstName + " " + this.people.selectedPerson.lastName;
+      email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+
+      this.people.sendNewRegisterEmail(email);
+      this.router.navigate("home");
+    };
+
+    Register.prototype.back = function back() {
+      window.history.back();
+    };
+
+    return Register;
+  }()) || _class);
+});
+define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', '../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _commonDialogs) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Profile = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_is4ua.is4ua, _people.People, _aureliaRouter.Router, _utils.Utils, _validation2.default, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function Profile(is4ua, people, router, utils, validation, dialog) {
+            _classCallCheck(this, Profile);
+
+            this.is4ua = is4ua;
+            this.people = people;
+            this.router = router;
+            this.utils = utils;
+            this.dialog = dialog;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this._setupValidation();
+
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        }
+
+        Profile.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editFirstName", [{ "rule": "required", "message": "First Name is required", "value": "people.selectedPerson.firstName" }]);
+            this.validation.addRule(1, "editLastName", [{ "rule": "required", "message": "Last Name is required", "value": "people.selectedPerson.lastName" }]);
+            this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "people.selectedPerson.institutionId" }]);
+            this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "people.selectedPerson.password" }]);
+            this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+                "valFunction": function valFunction(context) {
+                    return context.password === context.password_repeat;
+                } }], true);
+            this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+                "valFunction": function valFunction(context) {
+                    return context.complexPassword;
+                } }]);
+        };
+
+        Profile.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        Profile.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getPerson(this.userObj._id), this.people.getInstitutionsArray('?fields=_id name&order=name'), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.user = this.people.selectedPerson;
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        Profile.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty(this.user);
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: JSON.parse(sessionStorage.getItem('user'))._id
+                });
+            });
+        };
+
+        Profile.prototype.save = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.validation.validate(1, this)) {
+                                    _context2.next = 8;
+                                    break;
+                                }
+
+                                if (this.password && this.password.length > 0) {
+                                    this.people.selectedPerson.password = this.password;
+                                }
+                                if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
+                                    this.people.selectedPerson.roles.splice(this.people.selectedPerson.roles.indexOf("PROV"), 1);
+                                }
+                                this.buildAudit();
+                                _context2.next = 6;
+                                return this.people.savePerson();
+
+                            case 6:
+                                response = _context2.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("Your profile has been updated");
+                                    this.router.navigate("user");
+                                } else {
+                                    this.utils.showNotification("An error occurred updating your profile");
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function save() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        Profile.prototype.changePassword = function changePassword() {
+            var _this2 = this;
+
+            var passwords = { password: "", password_repeat: "" };
+            return this.dialog.showPassword("Change Password", passwords, ['Submit', 'Cancel']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.savePassword(response.output.password);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+        };
+
+        Profile.prototype.savePassword = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(password) {
+                var obj, response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                obj = {
+                                    password: password
+                                };
+                                _context3.next = 3;
+                                return this.people.updatePassword(obj);
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("The password was updated");
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function savePassword(_x) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return savePassword;
+        }();
+
+        Profile.prototype.cancel = function cancel() {
+            this.utils.copyObject(this.users, this.people.selectedPerson);
+        };
+
+        return Profile;
+    }()) || _class);
+});
+define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/people'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _people) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.ResetPassword = undefined;
+
+	var _validation2 = _interopRequireDefault(_validation);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var ResetPassword = exports.ResetPassword = (_dec = (0, _aureliaFramework.inject)(_people.People, _aureliaRouter.Router, _validation2.default, _utils.Utils), _dec(_class = function () {
+		function ResetPassword(people, router, validation, utils) {
+			_classCallCheck(this, ResetPassword);
+
+			this.people = people;
+			this.router = router;
+			this.validation = validation;
+			this.validation.initialize(this);
+			this._setupValidation();
+			this.utils = utils;
+			this.thresholdLength = 6;
+			this.threshold = 3;
+			this.showForm = true;
+			this.passwordReset = true;
+		}
+
+		ResetPassword.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(params) {
+				var validationCode, response;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								if (!params.id) this.router.navigate("home");
+								validationCode = atob(params.id).substring(0, 24);
+								_context.next = 4;
+								return this.people.getPasswordReset(validationCode);
+
+							case 4:
+								response = _context.sent;
+
+								if (response.code === 404) {
+									this.showForm = false;
+								}
+
+							case 6:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate(_x) {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		ResetPassword.prototype.passwordComplexity = function passwordComplexity() {
+
+			var newValue = this.newPassword;
+
+			this.longPassword = newValue.length >= this.thresholdLength;
+
+			var strength = 0;
+			strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+			strength += /[a-z]+/.test(newValue) ? 1 : 0;
+			strength += /[0-9]+/.test(newValue) ? 1 : 0;
+			strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+			this.complexPassword = strength >= this.threshold && this.longPassword;
+			this.validation.validate(4);
+		};
+
+		ResetPassword.prototype.savePassword = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var obj, response;
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								if (!this.validation.validate(1)) {
+									_context2.next = 6;
+									break;
+								}
+
+								obj = {
+									password: this.newPassword
+								};
+								_context2.next = 4;
+								return this.people.updatePassword(obj);
+
+							case 4:
+								response = _context2.sent;
+
+								if (!response.error) {
+									this.utils.showNotification("The password was updated");
+									this.router.navigate("home");
+								}
+
+							case 6:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function savePassword() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return savePassword;
+		}();
+
+		ResetPassword.prototype._setupValidation = function _setupValidation() {
+			this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "newPassword" }]);
+			this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+				"valFunction": function valFunction(context) {
+					return context.newPassword === context.password_repeat;
+				} }], true);
+			this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Password should be at least " + this.thresholdLength + " characters long and should contain " + (this.threshold < 4 ? "at least " + this.threshold + " of the following groups:" : "a combination of") + " of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters",
+				"valFunction": function valFunction(context) {
+					return context.complexPassword;
+				} }]);
+		};
+
+		return ResetPassword;
+	}()) || _class);
+});
+define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.User = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests, _people.People), _dec(_class = function () {
+        function User(router, utils, config, siteinfo, sessions, helpTickets, requests, people) {
+            _classCallCheck(this, User);
+
+            this.router = router;
+            this.utils = utils;
+            this.config = config;
+            this.siteinfo = siteinfo;
+            this.sessions = sessions;
+            this.helpTickets = helpTickets;
+            this.requests = requests;
+            this.people = people;
+        }
+
+        User.prototype.attached = function attached() {
+            $('.carousel').carousel({
+                interval: 10000
+            });
+
+            this.updateTwitter(document, "script", "twitter-wjs");
+
+            this.alertIndex = this.utils.arrayContainsValue(this.siteinfo.siteArray, "itemType", "ALRT");
+            if (!sessionStorage.getItem('alert')) {
+                if (this.alertIndex > -1) {
+                    this.openAlert(this.siteinfo.siteArray[this.alertIndex]);
+                }
+            }
+        };
+
+        User.prototype.updateTwitter = function updateTwitter(d, s, id) {
+            var js,
+                fjs = d.getElementsByTagName(s)[0],
+                p = /^http:/.test(d.location) ? 'http' : 'https';
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.src = p + "://platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        };
+
+        User.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.getData();
+
+                            case 2:
+
+                                this.helpTicketArray = [{
+                                    value: this.helpTickets.newHelpTickets || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "New"
+                                }, {
+                                    value: this.helpTickets.underReviewHelpTickets || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Under Review"
+                                }, {
+                                    value: this.helpTickets.customerActionHelpTickets || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                                this.clientRequestsArray = [{
+                                    value: this.requests.unassignedRequests || 0,
+                                    color: "#F7464A",
+                                    highlight: "#FF5A5E",
+                                    label: "Unassigned"
+                                }, {
+                                    value: this.requests.updatedRequests || 0,
+                                    color: "#46BFBD",
+                                    highlight: "#5AD3D1",
+                                    label: "Updated"
+                                }, {
+                                    value: this.requests.customerActionRequests || 0,
+                                    color: "#FDB45C",
+                                    highlight: "#FFC870",
+                                    label: "Customer Action"
+                                }];
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        User.prototype.getData = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _this = this;
+
+                var currentDate, options, countOptions, responses, _responses, requestCountArray, weather, weatherObj, _weather, uccweather;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
+                                currentDate = (0, _moment2.default)(new Date()).format("MM-DD-YYYY");
+                                options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
+
+                                if (!(this.userObj.userRole >= this.config.UCC_ROLE)) {
+                                    _context2.next = 15;
+                                    break;
+                                }
+
+                                countOptions = '';
+
+                                this.countHeader = "Recent Request History";
+                                _context2.next = 8;
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
+
+                            case 8:
+                                responses = _context2.sent;
+
+                                this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
+                                this.showHelpTickets = this.helpTickets.newHelpTickets;
+                                this.showCarousel = this.siteinfo.showCarousel();
+                                this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01', true);
+                                _context2.next = 23;
+                                break;
+
+                            case 15:
+                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
+
+                                this.countHeader = "Your Institution's Recent Request History";
+                                _context2.next = 19;
+                                return Promise.all([this.helpTickets.getCurrentCount('?filter=personId|eq|' + this.userObj._id), this.requests.getCurrentCount('?filter=audit[0].personId|eq|' + this.userObj._id), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
+
+                            case 19:
+                                _responses = _context2.sent;
+
+                                this.showRequests = this.requests.customerActionRequests;
+                                this.showHelpTickets = this.helpTickets.customerActionHelpTickets;
+                                this.showCarousel = this.siteinfo.showCarousel();
+
+                            case 23:
+                                this.requestsCount = new Array();
+                                this.countLabels = new Array();
+                                _context2.next = 27;
+                                return this.requests.getSessionCount(this.sessions.sessionsArray, 4, countOptions);
+
+                            case 27:
+                                requestCountArray = _context2.sent;
+
+                                if (requestCountArray) {
+                                    requestCountArray.forEach(function (item) {
+                                        _this.requestsCount.push(item.count);
+                                        _this.countLabels.push(item.session);
+                                    });
+                                }
+
+                                this.temp = undefined;
+
+                                if (sessionStorage.getItem('weather')) {
+                                    _context2.next = 42;
+                                    break;
+                                }
+
+                                if (!this.userObj.city) {
+                                    _context2.next = 40;
+                                    break;
+                                }
+
+                                _context2.next = 34;
+                                return this.siteinfo.getWeather(this.userObj.city);
+
+                            case 34:
+                                weather = _context2.sent;
+
+                                this.temp = parseFloat(weather.main.temp) - 273.15;
+                                if (this.config.TEMP_SCALE == 'C') {
+                                    this.temp = this.temp.toFixed(1) + '\xB0 C';
+                                } else {
+                                    this.temp = (parseFloat(this.temp) * 1.8 + 32).toFixed(1) + '\xB0 F';
+                                }
+                                this.weatherIcon = this.config.IMG_DOWNLOAD_URL + "icons/" + weather.weather[0].icon + ".png";
+                                weatherObj = { temp: this.temp, url: this.weatherIcon };
+
+                                sessionStorage.setItem('weather', JSON.stringify(weatherObj));
+
+                            case 40:
+                                _context2.next = 45;
+                                break;
+
+                            case 42:
+                                _weather = JSON.parse(sessionStorage.getItem('weather'));
+
+                                this.temp = _weather.temp;
+                                this.weatherIcon = _weather.url;
+
+                            case 45:
+                                if (sessionStorage.getItem('uccweather')) {
+                                    uccweather = JSON.parse(sessionStorage.getItem('uccweather'));
+
+                                    this.ucctemp = parseFloat(uccweather.temp) - 273.15;
+                                    if (this.config.TEMP_SCALE == 'C') {
+                                        this.ucctemp = this.ucctemp.toFixed(1) + '\xB0 C';
+                                    } else {
+                                        this.ucctemp = (parseFloat(this.ucctemp) * 1.8 + 32).toFixed(1) + '\xB0 F';
+                                    }
+                                    this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL + 'icons/' + uccweather.icon + ".png";
+                                    console.log(this.uccweatherIcon);
+                                }
+
+                            case 46:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getData() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getData;
+        }();
+
+        User.prototype.moreInfoExists = function moreInfoExists(item) {
+            return item.url && item.url.length > 0;
+        };
+
+        return User;
+    }()) || _class);
+});
+define('resources/data/auth',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './dataServices', '../../config/appConfig'], function (exports, _aureliaFramework, _aureliaEventAggregator, _dataServices, _appConfig) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Auth = undefined;
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var Auth = exports.Auth = (_dec = (0, _aureliaFramework.inject)(_aureliaEventAggregator.EventAggregator, _dataServices.DataServices, _appConfig.AppConfig), _dec(_class = function () {
+		function Auth(eventAggregator, data, config) {
+			_classCallCheck(this, Auth);
+
+			this.loginUrl = 'users/login';
+			this.logoutUrl = 'users/logout';
+
+			this.eventAggregator = eventAggregator;
+			this.data = data;
+			this.config = config;
+		}
+
+		Auth.prototype.login = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(email, password) {
+				var content, response;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								content = {
+									'email': email,
+									'password': password
+								};
+								_context.next = 3;
+								return this.data.login(content, this.loginUrl);
+
+							case 3:
+								response = _context.sent;
+
+								if (!response.error) {
+									response.user.userRole = this.setRole(response.user.roles);
+									sessionStorage.setItem('token', response.token);
+									sessionStorage.setItem('user', JSON.stringify(response.user));
+								}
+								this.eventAggregator.publish('auth:login', response);
+								return _context.abrupt('return', response);
+
+							case 7:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function login(_x, _x2) {
+				return _ref.apply(this, arguments);
+			}
+
+			return login;
+		}();
+
+		Auth.prototype.logout = function logout(email) {
+			this.data.saveObject({ email: email }, this.logoutUrl, 'post');
+			sessionStorage.removeItem('token');
+			sessionStorage.removeItem('user');
+			sessionStorage.removeItem('role');
+			sessionStorage.removeItem('alert');
+		};
+
+		Auth.prototype.isAuthenticated = function isAuthenticated() {
+			var token = sessionStorage.getItem('token');
+
+			if (!token) {
+				return false;
+			}
+
+			if (token.split('.').length !== 3) {
+				return true;
+			}
+
+			var exp = void 0;
+			try {
+				var base64Url = token.split('.')[1];
+				var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+				exp = JSON.parse(window.atob(base64)).exp;
+			} catch (error) {
+				return false;
+			}
+
+			if (exp) {
+				return Math.round(new Date().getTime() / 1000) <= exp;
+			}
+
+			return true;
+		};
+
+		Auth.prototype.setRole = function setRole(roles) {
+			var _this = this;
+
+			var userRole = 1;
+
+			var _loop = function _loop(i) {
+				_this.config.ROLES.forEach(function (item) {
+					if (roles[i] == item.role) {
+						userRole = item.authLevel > userRole ? item.authLevel : userRole;
+					}
+				});
+			};
+
+			for (var i = 0; i < roles.length; i++) {
+				_loop(i);
+			}
+			return userRole;
+		};
+
+		return Auth;
+	}()) || _class);
+});
+define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ClientRequests = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ClientRequests = exports.ClientRequests = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function ClientRequests(data, utils, config) {
+            _classCallCheck(this, ClientRequests);
+
+            this.CLIENT_REQUESTS_SERVICES = 'clientRequests';
+            this.CLIENT_REQUEST_DETAILS = 'clientRequestsDetails';
+            this.CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
+            this.CUSTOMER_ACTION = 'clientRequests/customerAction';
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        ClientRequests.prototype.getClientRequestsArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, fields, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.requestsArray || refresh)) {
+                                    _context.next = 13;
+                                    break;
+                                }
+
+                                url = this.CLIENT_REQUESTS_SERVICES;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.requestsArray = serverResponse;
+                                } else {
+                                    this.data.processError(serverResponse);
+                                }
+                                _context.next = 13;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getClientRequestsArray(_x, _x2, _x3) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getClientRequestsArray;
+        }();
+
+        ClientRequests.prototype.getCurrentCount = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                url = this.CLIENT_REQUESTS_SERVICES + '/current/count';
+
+                                url += options ? options : "";
+                                _context2.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                response = _context2.sent;
+
+                                if (response.error) {
+                                    _context2.next = 12;
+                                    break;
+                                }
+
+                                this.unassignedRequests = this.utils.countItems(this.config.UNASSIGNED_REQUEST_CODE, 'requestStatus', response);
+                                this.updatedRequests = this.utils.countItems(this.config.UPDATED_REQUEST_CODE, 'requestStatus', response);
+                                this.customerActionRequests = this.utils.countItems(this.config.CUSTOMER_ACTION_REQUEST_CODE, 'requestStatus', response);
+                                return _context2.abrupt('return', response.count);
+
+                            case 12:
+                                return _context2.abrupt('return', null);
+
+                            case 13:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getCurrentCount(_x4) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getCurrentCount;
+        }();
+
+        ClientRequests.prototype.getClientRequestsDetailsArray = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(!this.requestsArray || refresh)) {
+                                    _context3.next = 13;
+                                    break;
+                                }
+
+                                url = this.CLIENT_REQUEST_DETAILS;
+
+                                url += options ? options : "";
+                                _context3.prev = 3;
+                                _context3.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.requestsDetailsArray = serverResponse;
+                                }
+                                _context3.next = 13;
+                                break;
+
+                            case 10:
+                                _context3.prev = 10;
+                                _context3.t0 = _context3['catch'](3);
+
+                                console.log(_context3.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this, [[3, 10]]);
+            }));
+
+            function getClientRequestsDetailsArray(_x5, _x6) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return getClientRequestsDetailsArray;
+        }();
+
+        ClientRequests.prototype.getClientRequestsDetailFaccoArray = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(sessionId, institutionId) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + sessionId + '/' + institutionId);
+
+                            case 2:
+                                serverResponse = _context4.sent;
+
+                                if (serverResponse.error) {
+                                    _context4.next = 7;
+                                    break;
+                                }
+
+                                this.requestsDetailsArray = serverResponse;
+                                _context4.next = 8;
+                                break;
+
+                            case 7:
+                                return _context4.abrupt('return', undefined);
+
+                            case 8:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function getClientRequestsDetailFaccoArray(_x7, _x8) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return getClientRequestsDetailFaccoArray;
+        }();
+
+        ClientRequests.prototype.getSessionCount = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(sessionArray, numSessions, options, requestStatus) {
+                var url, response, sessions, sessionCount, i;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                url = this.CLIENT_REQUESTS_SERVICES;
+
+                                url += options ? options : "";
+                                _context5.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                response = _context5.sent;
+
+                                if (response.error) {
+                                    _context5.next = 13;
+                                    break;
+                                }
+
+                                sessions = new Array();
+                                sessionCount = new Array();
+
+                                numSessions = numSessions < sessionArray.length ? numSessions : sessionArray.length - 1;
+                                for (i = 0; i <= numSessions; i++) {
+                                    sessions.push(sessionArray[i]._id);
+                                    sessionCount.push({ count: 0, session: sessionArray[i].session });
+                                }
+                                requestStatus = requestStatus ? requestStatus.split(':') : undefined;
+                                response.forEach(function (request) {
+                                    var index = sessions.indexOf(request.sessionId);
+                                    if (index > -1) {
+                                        if (requestStatus) {
+                                            request.requestDetails.forEach(function (detail) {
+                                                if (requestStatus.indexOf(detail.requestStatus) > -1) {
+                                                    sessionCount[index].count += 1;
+                                                }
+                                            });
+                                        } else {
+                                            sessionCount[index].count += request.requestDetails.length;
+                                        }
+                                    }
+                                });
+                                return _context5.abrupt('return', sessionCount);
+
+                            case 13:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function getSessionCount(_x9, _x10, _x11, _x12) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return getSessionCount;
+        }();
+
+        return ClientRequests;
+    }()) || _class);
+});
+define('resources/data/config',['exports', 'aurelia-framework', './dataServices'], function (exports, _aureliaFramework, _dataServices) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Config = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Config = exports.Config = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices), _dec(_class = function () {
+        function Config(data) {
+            _classCallCheck(this, Config);
+
+            this.CONFIG_SERVICE = 'config';
+            this.SESSIONS_CONFIG_SERVICE = 'semesterConfig';
+
+            this.data = data;
+        }
+
+        Config.prototype.getConfigArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(refresh, options) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.configArray || refresh)) {
+                                    _context.next = 13;
+                                    break;
+                                }
+
+                                url = this.data.CONFIG_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.configArray = serverResponse;
+                                } else {
+                                    this.data.processError(serverResponse);
+                                }
+                                _context.next = 13;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getConfigArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getConfigArray;
+        }();
+
+        Config.prototype.saveAll = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(saveConfigArray) {
+                var saveObj, response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!saveConfigArray) {
+                                    _context2.next = 11;
+                                    break;
+                                }
+
+                                saveObj = { parameters: saveConfigArray };
+                                _context2.next = 4;
+                                return this.data.saveObject(saveObj, this.CONFIG_SERVICE + '/saveAll', "put");
+
+                            case 4:
+                                response = _context2.sent;
+
+                                if (response.error) {
+                                    _context2.next = 9;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return', response);
+
+                            case 9:
+                                this.data.processError(response, "There was an error updating the configuration.");
+
+                            case 10:
+                                return _context2.abrupt('return', response);
+
+                            case 11:
+                                return _context2.abrupt('return', null);
+
+                            case 12:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function saveAll(_x3) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return saveAll;
+        }();
+
+        Config.prototype.saveSessions = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(saveSessionArray) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!saveSessionArray) {
+                                    _context3.next = 10;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.data.saveObject(saveSessionArray, this.SESSIONS_CONFIG_SERVICE, "put");
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (response.error) {
+                                    _context3.next = 8;
+                                    break;
+                                }
+
+                                return _context3.abrupt('return', response);
+
+                            case 8:
+                                this.data.processError(response, "There was an error updating the configuration.");
+
+                            case 9:
+                                return _context3.abrupt('return', response);
+
+                            case 10:
+                                return _context3.abrupt('return', null);
+
+                            case 11:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function saveSessions(_x4) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return saveSessions;
+        }();
+
+        return Config;
+    }()) || _class);
+});
+define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-http-client', '../utils/utils', '../../config/appConfig', 'aurelia-event-aggregator'], function (exports, _aureliaFramework, _aureliaHttpClient, _utils, _appConfig, _aureliaEventAggregator) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.DataServices = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var DataServices = exports.DataServices = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _utils.Utils, _appConfig.AppConfig, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+        function DataServices(http, utils, config, eventAggregator) {
+            var _this = this;
+
+            _classCallCheck(this, DataServices);
+
+            this.isRequesting = false;
+            this.FILE_URL = "http://localhost:5000/api/upload";
+            this.FILE_DOWNLOAD_URL = "http://localhost:5000/";
+            this.INSTITUTION_SERVICES = "institutions";
+            this.CURRICULUM_SERVICE = 'curriculum';
+            this.CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
+            this.IS4UA = 'is4ua';
+            this.CLIENTS_SERVICE = 'clients';
+            this.DELETE_ALL_CLIENTS = 'clients/system/SYSTEMID';
+            this.DOWNLOADS_SERVICE = "apps";
+            this.APPLICATION_CATEGORY_SERVICE = "appsCategory";
+            this.DOCUMENTS_SERVICE = "documents";
+            this.DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
+            this.DOWNLOADS_UPLOADS = "downloads/upload";
+            this.COURSES_SERVICE = 'courses';
+            this.PERSON_COURSES_SERVICE = 'courses/person/PERSONID';
+            this.CONFIG_SERVICE = 'config';
+            this.SESSIONS_CONFIG_SERVICE = 'semesterConfig';
+            this.DOCUMENTS_FILE_UPLOAD = 'documents/file';
+
+            this.http = http;
+            this.utils = utils;
+            this.config = config;
+            this.eventAggregator = eventAggregator;
+
+            this.http.configure(function (x) {
+                x.withBaseUrl(_this.config.BASE_URL);
+            });
+        }
+
+        DataServices.prototype.activate = function activate() {};
+
+        DataServices.prototype.get = function get(url) {
+            var _this2 = this;
+
+            this.isRequesting = true;
+            return this.http.createRequest(url).asGet().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).send().then(function (response) {
+                _this2.isRequesting = false;
+                if (!response.isSuccess) {
+                    return response;
+                } else {
+                    return JSON.parse(response.response);
+                }
+            }).catch(function (e) {
+                _this2.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.getNoAuth = function getNoAuth(url) {
+            var _this3 = this;
+
+            this.isRequesting = true;
+            return this.http.createRequest(url).asGet().send().then(function (response) {
+                _this3.isRequesting = false;
+                if (!response.isSuccess) {
+                    return response;
+                } else {
+                    return JSON.parse(response.response);
+                }
+            }).catch(function (e) {
+                _this3.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.saveObject = function saveObject(content, url, method) {
+            var _this4 = this;
+
+            this.isRequesting = true;
+            if (method === 'put') {
+                return this.http.createRequest(url).asPut().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(content).send().then(function (response) {
+                    _this4.isRequesting = false;
+                    if (!response.isSuccess) {
+                        return response;
+                    } else {
+                        return JSON.parse(response.response);
+                    }
+                }).catch(function (e) {
+                    _this4.isRequesting = false;
+                    console.log(e);
+                    return { error: true, code: e.statusCode, message: e.statusText };
+                });
+            } else if (method === 'post') {
+                return this.http.createRequest(url).asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(content).send().then(function (response) {
+                    _this4.isRequesting = false;
+                    if (!response.isSuccess) {
+                        return response;
+                    } else {
+                        return JSON.parse(response.response);
+                    }
+                }).catch(function (e) {
+                    _this4.isRequesting = false;
+                    console.log(e);
+                    return { error: true, code: e.statusCode, message: e.statusText };
+                });
+            }
+        };
+
+        DataServices.prototype.deleteObject = function deleteObject(url) {
+            var _this5 = this;
+
+            this.isRequesting = true;
+            return this.http.createRequest(url).asDelete().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).send().then(function (response) {
+                _this5.isRequesting = false;
+                if (!response.isSuccess) {
+                    return response;
+                } else {
+                    if (response.statusCode === 204) {
+                        return response;
+                    } else {
+                        return JSON.parse(response.response);
+                    }
+                }
+            }).catch(function (e) {
+                _this5.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.sendMail = function sendMail(content) {
+            var _this6 = this;
+
+            this.isRequesting = true;
+            return this.http.createRequest('sendMail').asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(content).send().then(function (response) {
+                _this6.isRequesting = false;
+                if (!response.isSuccess) {
+                    return response;
+                } else {
+                    return JSON.parse(response.response);
+                }
+            }).catch(function (e) {
+                _this6.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.login = function login(content, url) {
+            var _this7 = this;
+
+            return this.http.createRequest(url).asPost().withContent(content).send().then(function (response) {
+                _this7.isRequesting = false;
+                return JSON.parse(response.response);
+            }).catch(function (e) {
+                _this7.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.uploadFiles = function uploadFiles(files, url) {
+            var _this8 = this;
+
+            this.progress = 0;
+            var formData = new FormData();
+
+            files.forEach(function (item, index) {
+                formData.append("file" + index, item);
+            });
+
+            return this.http.createRequest(url).asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(formData).skipContentProcessing().withProgressCallback(function (progress) {
+                _this8.eventAggregator.publish('upload-progress', { progress: progress.loaded, total: progress.total });
+                _this8.progress = progress.loaded / progress.total;
+            }).send().then(function (response) {
+                _this8.isRequesting = false;
+                if (!response.isSuccess) {
+                    return response;
+                } else {
+                    return JSON.parse(response.response);
+                }
+            }).catch(function (e) {
+                _this8.isRequesting = false;
+                console.log(e);
+                return { error: true, code: e.statusCode, message: e.statusText };
+            });
+        };
+
+        DataServices.prototype.processError = function processError(obj, message) {
+            console.log(obj);
+            var msg = (message ? message : "") + " ";
+            switch (obj.code) {
+                case 404:
+                    msg = undefined;
+                    break;
+                case 422:
+                    msg = msg += "The request was bad.  Contact your UCC.";
+                    break;
+                case 409:
+                    msg = msg += "The record already exists.";
+                    break;
+                case 500:
+                    msg = msg += "An unspecified error occured on the server.  Contact your UCC.";
+                    break;
+                default:
+                    msg = msg += "An unspecified error occured.  Contact your UCC.";
+            }
+            if (msg && msg.length > 0) this.utils.showNotification(msg);
+        };
+
+        return DataServices;
+    }()) || _class);
+});
+define('resources/data/documents',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.DocumentsServices = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var DocumentsServices = exports.DocumentsServices = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function DocumentsServices(data, utils, config) {
+            _classCallCheck(this, DocumentsServices);
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        DocumentsServices.prototype.getDocumentsArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(refresh, options) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.documentsArray || refresh)) {
+                                    _context.next = 18;
+                                    break;
+                                }
+
+                                url = this.data.DOCUMENTS_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (serverResponse.status) {
+                                    _context.next = 11;
+                                    break;
+                                }
+
+                                this.documentsArray = serverResponse;
+                                _context.next = 12;
+                                break;
+
+                            case 11:
+                                return _context.abrupt('return', undefined);
+
+                            case 12:
+                                _context.next = 18;
+                                break;
+
+                            case 14:
+                                _context.prev = 14;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+                                return _context.abrupt('return', undefined);
+
+                            case 18:
+                                return _context.abrupt('return', this.documentsArray);
+
+                            case 19:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 14]]);
+            }));
+
+            function getDocumentsArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getDocumentsArray;
+        }();
+
+        DocumentsServices.prototype.selectDocument = function selectDocument(index) {
+            if (!index && index != 0) {
+                this.selectedDocument = this.emptyDocument();
+            } else {
+                try {
+                    this.selectedDocument = this.utils.copyObject(this.documentsArray[index]);
+                    this.editDocumentIndex = index;
+                } catch (error) {
+                    this.selectedDocument = this.emptyDocument();
+                }
+            }
+        };
+
+        DocumentsServices.prototype.emptyDocument = function emptyDocument() {
+            var newObj = new Object();
+            newObj.name = "";
+            newObj.description = "";
+            newObj.type = 0;
+            newObj.files = new Array();
+            newObj.active = true;
+            newObj.createdDate = new Date();
+
+            return newObj;
+        };
+
+        DocumentsServices.prototype.saveDocument = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _serverResponse, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (this.selectedDocument) {
+                                    _context2.next = 2;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return');
+
+                            case 2:
+                                if (this.selectedDocument._id) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                _context2.next = 5;
+                                return this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse = _context2.sent;
+
+                                if (!_serverResponse.status) {
+                                    this.selectedDocument = _serverResponse;
+                                    this.documentsArray.push(this.selectedDocument);
+                                    this.editDocumentIndex = this.documentsArray.length - 1;
+                                }
+                                return _context2.abrupt('return', _serverResponse);
+
+                            case 10:
+                                _context2.next = 12;
+                                return this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.status) {
+                                    this.documentsArray[this.editDocumentIndex] = this.utils.copyObject(this.selectedDocument, this.documentsArray[this.editDocumentIndex]);
+                                }
+                                return _context2.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function saveDocument() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return saveDocument;
+        }();
+
+        DocumentsServices.prototype.uploadFile = function uploadFile(files, version) {
+            var path = this.selectedCat.code + '$@' + this.selectedDocument.name;
+            this.data.uploadFiles(files, this.data.DOCUMENTS_FILE_UPLOAD + "/" + path + '/' + version);
+        };
+
+        DocumentsServices.prototype.deleteFile = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(index) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(!this.selectedDocument || !this.selectedDocument._id)) {
+                                    _context3.next = 2;
+                                    break;
+                                }
+
+                                return _context3.abrupt('return');
+
+                            case 2:
+                                _context3.next = 4;
+                                return this.data.deleteObject(this.data.DOCUMENTS_FILE_UPLOAD + '/' + this.selectedDocument._id + '/' + index);
+
+                            case 4:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.status) {
+                                    this.selectedDocument.files.splice(index, 1);
+                                    this.documentsArray[this.editDocumentIndex] = this.utils.copyObject(this.selectedDocument, this.documentsArray[this.editDocumentIndex]);
+                                }
+                                return _context3.abrupt('return', serverResponse);
+
+                            case 7:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function deleteFile(_x3) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return deleteFile;
+        }();
+
+        DocumentsServices.prototype.deleteDocument = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.data.deleteObject(this.data.DOCUMENTS_SERVICE + '/' + this.selectedDocument._id);
+
+                            case 2:
+                                serverResponse = _context4.sent;
+
+                                if (serverResponse.status === 204) {
+                                    this.documentsArray.splice(this.editDocumentIndex, 1);
+                                    this.editDownloadIndex = -1;
+                                }
+                                return _context4.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function deleteDocument() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return deleteDocument;
+        }();
+
+        DocumentsServices.prototype.isDirty = function isDirty(obj) {
+            if (this.selectedDocument) {
+                if (!obj) {
+                    var obj = this.emptyDocument();
+                }
+                var skip = ['file'];
+                return this.utils.objectsEqual(this.selectedDocument, obj, skip);
+            }
+            return new Array();
+        };
+
+        DocumentsServices.prototype.getDocumentsCategoriesArray = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(refresh, options) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!(!this.docCatsArray || refresh)) {
+                                    _context5.next = 19;
+                                    break;
+                                }
+
+                                url = this.data.DOCUMENTS_CATEGORY_SERVICE;
+
+                                url += options ? options : "";;
+                                _context5.prev = 4;
+                                _context5.next = 7;
+                                return this.data.get(url);
+
+                            case 7:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.error) {
+                                    _context5.next = 12;
+                                    break;
+                                }
+
+                                this.docCatsArray = serverResponse;
+                                _context5.next = 13;
+                                break;
+
+                            case 12:
+                                return _context5.abrupt('return', undefined);
+
+                            case 13:
+                                _context5.next = 19;
+                                break;
+
+                            case 15:
+                                _context5.prev = 15;
+                                _context5.t0 = _context5['catch'](4);
+
+                                console.log(_context5.t0);
+                                return _context5.abrupt('return', undefined);
+
+                            case 19:
+                                return _context5.abrupt('return', this.docCatsArray);
+
+                            case 20:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this, [[4, 15]]);
+            }));
+
+            function getDocumentsCategoriesArray(_x4, _x5) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return getDocumentsCategoriesArray;
+        }();
+
+        DocumentsServices.prototype.selectCategory = function selectCategory(index) {
+            if (!index && index != 0) {
+                this.selectedCat = this.emptyCat();
+            } else {
+                try {
+                    this.selectedCat = this.utils.copyObject(this.docCatsArray[index]);
+                    this.editCatIndex = index;
+                } catch (error) {
+                    this.selectedCat = this.emptyCat();
+                }
+            }
+        };
+
+        DocumentsServices.prototype.selectCategoryByCode = function selectCategoryByCode(index) {
+            if (!index && index != 0) {
+                this.selectedCat = this.emptyCat();
+            } else {
+                try {
+                    for (var i = 0; i < this.docCatsArray.length; i++) {
+                        if (this.docCatsArray[i].code == index) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    this.selectedCat = this.utils.copyObject(this.docCatsArray[index]);
+                    this.editCatIndex = index;
+                } catch (error) {
+                    this.selectedCat = this.emptyCat();
+                }
+            }
+        };
+
+        DocumentsServices.prototype.emptyCat = function emptyCat() {
+            var newObj = new Object();
+            var newCode = 0;
+            for (var i = 0; i < this.docCatsArray.length; i++) {
+                if (this.docCatsArray[i].code > newCode) newCode = this.docCatsArray[i].code;
+            }
+            newObj.code = newCode + 1;
+            newObj.description = "";
+
+            return newObj;
+        };
+
+        DocumentsServices.prototype.saveCategory = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var _serverResponse2, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (this.selectedCat) {
+                                    _context6.next = 2;
+                                    break;
+                                }
+
+                                return _context6.abrupt('return');
+
+                            case 2:
+                                if (this.selectedCat._id) {
+                                    _context6.next = 10;
+                                    break;
+                                }
+
+                                _context6.next = 5;
+                                return this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse2 = _context6.sent;
+
+                                if (!_serverResponse2.status) {
+                                    this.docCatsArray.push(_serverResponse2);
+                                    this.editCatIndex = this.docCatsArray.length - 1;
+                                }
+                                return _context6.abrupt('return', _serverResponse2);
+
+                            case 10:
+                                _context6.next = 12;
+                                return this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context6.sent;
+
+                                if (!serverResponse.status) {
+                                    this.docCatsArray[this.editCatIndex] = this.utils.copyObject(this.selectedCat, this.docCatsArray[this.editCatIndex]);
+                                }
+                                return _context6.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function saveCategory() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return saveCategory;
+        }();
+
+        DocumentsServices.prototype.deleteCat = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (!this.selectedCat._id) {
+                                    _context7.next = 8;
+                                    break;
+                                }
+
+                                _context7.next = 3;
+                                return this.data.deleteObject(this.data.DOCUMENTS_CATEGORY_SERVICE + '/' + this.selectedCat._id);
+
+                            case 3:
+                                serverResponse = _context7.sent;
+
+                                if (serverResponse.status === 204) {
+                                    this.docCatsArray.splice(this.editCatIndex, 1);
+                                    this.editCatIndex = -1;
+                                }
+                                return _context7.abrupt('return', serverResponse);
+
+                            case 8:
+                                return _context7.abrupt('return', { error: "no category selected" });
+
+                            case 9:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function deleteCat() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return deleteCat;
+        }();
+
+        return DocumentsServices;
+    }()) || _class);
+});
+define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.HelpTickets = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var HelpTickets = exports.HelpTickets = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function HelpTickets(data, utils, config) {
+            _classCallCheck(this, HelpTickets);
+
+            this.newHelpTicket = false;
+            this.HELP_TICKET_SERVICES = 'helpTickets';
+            this.HELP_TICKET_CONTENT_SERVICES = "helpTickets/content/HELPTICKETID/STATUS";
+            this.HELP_TICKET_LOCK_SERVICES = "helpTicketLocks";
+            this.HELP_TICKET_TYPES = "helpTicketsTypes";
+            this.HELP_TICKET_EMAIL = "helpTickets/sendMail";
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        HelpTickets.prototype.getHelpTicketArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.helpTicketsArray || refresh)) {
+                                    _context.next = 13;
+                                    break;
+                                }
+
+                                url = this.HELP_TICKET_SERVICES;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.helpTicketsArray = serverResponse;
+                                }
+                                _context.next = 13;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getHelpTicketArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getHelpTicketArray;
+        }();
+
+        HelpTickets.prototype.getCurrentCount = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(options) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                url = this.HELP_TICKET_SERVICES + '/current/count';
+
+                                url += options ? "/" + options : "";
+                                _context2.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                response = _context2.sent;
+
+                                if (response.status) {
+                                    _context2.next = 12;
+                                    break;
+                                }
+
+                                this.newHelpTickets = this.utils.countItems(this.config.NEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
+                                this.underReviewHelpTickets = this.utils.countItems(this.config.UNDER_REVIEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
+                                this.customerActionHelpTickets = this.utils.countItems(this.config.CUSTOMER_ACTION_HELPTICKET_STATUS, 'helpTicketStatus', response);
+                                return _context2.abrupt('return', response.count);
+
+                            case 12:
+                                return _context2.abrupt('return', null);
+
+                            case 13:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getCurrentCount(_x3) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getCurrentCount;
+        }();
+
+        return HelpTickets;
+    }()) || _class);
+});
+define('resources/data/is4ua',['exports', 'aurelia-framework', './dataServices'], function (exports, _aureliaFramework, _dataServices) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.is4ua = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var is4ua = exports.is4ua = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices), _dec(_class = function () {
+        function is4ua(data) {
+            _classCallCheck(this, is4ua);
+
+            this.data = data;
+        }
+
+        is4ua.prototype.loadIs4ua = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (this.personStatusArray) {
+                                    _context.next = 14;
+                                    break;
+                                }
+
+                                _context.next = 3;
+                                return this.data.get(this.data.IS4UA);
+
+                            case 3:
+                                responses = _context.sent;
+
+
+                                this.personStatusArray = responses[0].personStatus;
+                                this.deptArray = responses[0].deptCat;
+                                this.specialArray = responses[0].personSpecialization;
+
+                                this.sapProductsArray = responses[0].sapProducts;
+                                this.uaCurriculumArray = responses[0].uaCurriculum;
+                                this.uaDataSetsArray = responses[0].uaDatasets;
+
+                                this.institutonStatusArray = responses[0].institutionStatus;
+                                this.institutionTypes = responses[0].institutionTypes;
+                                this.memberTypes = responses[0].memberTypes;
+                                this.highestDegrees = responses[0].highestDegree;
+
+                            case 14:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function loadIs4ua() {
+                return _ref.apply(this, arguments);
+            }
+
+            return loadIs4ua;
+        }();
+
+        is4ua.prototype.loadProductKeys = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                _context2.next = 2;
+                                return Promise.all([this.data.getAllObjects(this.data.SAP_PRODUCTS), this.data.getAllObjects(this.data.UA_CURRICULUM), this.data.getAllObjects(this.data.UA_DATA_SETS)]);
+
+                            case 2:
+                                responses = _context2.sent;
+
+                                this.sapProductsArray = responses[0];
+                                this.uaCurriculumArray = responses[1];
+                                this.uaDataSetsArray = responses[2];
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function loadProductKeys() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return loadProductKeys;
+        }();
+
+        is4ua.prototype.loadPeopleKeys = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                _context3.next = 2;
+                                return Promise.all([this.data.getAllObjects(this.data.UA_PERSON_STATUS), this.data.getAllObjects(this.data.UA_PERSON_DEPT), this.data.getAllObjects(this.data.UA_PERSON_SPECIAL)]);
+
+                            case 2:
+                                responses = _context3.sent;
+
+                                this.personStatusArray = responses[0];
+                                this.deptArray = responses[1];
+                                this.specialArray = responses[2];
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function loadPeopleKeys() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return loadPeopleKeys;
+        }();
+
+        is4ua.prototype.loadInstitutionKeys = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return Promise.all([this.data.getAllObjects(this.data.UA_INST_STATUS), this.data.getAllObjects(this.data.UA_INST_TYPES), this.data.getAllObjects(this.data.UA_MEMBER_TYPES), this.data.getAllObjects(this.data.UA_INST_DEGREES)]);
+
+                            case 2:
+                                responses = _context4.sent;
+
+                                this.institutonStatusArray = responses[0];
+                                this.institutionTypes = responses[1];
+                                this.memberTypes = responses[2];
+                                this.highestDegrees = responses[3];
+
+                            case 7:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function loadInstitutionKeys() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return loadInstitutionKeys;
+        }();
+
+        return is4ua;
+    }()) || _class);
+});
+define('resources/data/people',['exports', 'aurelia-framework', './dataServices', '../utils/utils'], function (exports, _aureliaFramework, _dataServices, _utils) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.People = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var People = exports.People = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils), _dec(_class = function () {
+        function People(data, utils) {
+            _classCallCheck(this, People);
+
+            this.newObject = false;
+            this.cleanObject = true;
+            this.peopleArray = undefined;
+            this.UCC_STAFF_SERVICE = 'uccStaff';
+            this.PEOPLE_SERVICE = "people";
+            this.PERSON_REGISTER = "people/register";
+            this.CHECK_EMAIL = 'people/checkEmail';
+            this.CHECK_NAME = 'people/checkName';
+            this.SEND_MAIL = 'people/sendMail';
+            this.PASSWORD_RESET = 'passwordReset';
+            this.NOTES_SERVICE = "notes";
+            this.INSTITUTION_SERVICES = "institutions";
+
+            this.data = data;
+            this.utils = utils;
+        }
+
+        People.prototype.getPeopleArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.peopleArray || refresh)) {
+                                    _context.next = 19;
+                                    break;
+                                }
+
+                                url = this.PEOPLE_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (serverResponse.error) {
+                                    _context.next = 11;
+                                    break;
+                                }
+
+                                this.peopleArray = serverResponse;
+                                _context.next = 13;
+                                break;
+
+                            case 11:
+                                this.data.processError(serverResponse);
+                                return _context.abrupt('return', undefined);
+
+                            case 13:
+                                _context.next = 19;
+                                break;
+
+                            case 15:
+                                _context.prev = 15;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+                                return _context.abrupt('return', undefined);
+
+                            case 19:
+                                return _context.abrupt('return', this.peopleArray);
+
+                            case 20:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 15]]);
+            }));
+
+            function getPeopleArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getPeopleArray;
+        }();
+
+        People.prototype.getUCCStaff = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(uccRoles) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                url = this.UCC_STAFF_SERVICE + '/' + uccRoles;
+                                _context2.prev = 1;
+                                _context2.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    this.uccPeople = serverResponse;
+                                } else {
+                                    this.data.processError(serverResponse);
+                                }
+                                _context2.next = 11;
+                                break;
+
+                            case 8:
+                                _context2.prev = 8;
+                                _context2.t0 = _context2['catch'](1);
+
+                                console.log(_context2.t0);
+
+                            case 11:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this, [[1, 8]]);
+            }));
+
+            function getUCCStaff(_x3) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getUCCStaff;
+        }();
+
+        People.prototype.getInstitutionPeople = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!(!this.peopleArray || refresh)) {
+                                    _context3.next = 13;
+                                    break;
+                                }
+
+                                url = this.PEOPLE_SERVICE;
+
+                                url += options ? options : "";
+                                _context3.prev = 3;
+                                _context3.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.instutionPeopleArray = serverResponse;
+                                }
+                                _context3.next = 13;
+                                break;
+
+                            case 10:
+                                _context3.prev = 10;
+                                _context3.t0 = _context3['catch'](3);
+
+                                console.log(_context3.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this, [[3, 10]]);
+            }));
+
+            function getInstitutionPeople(_x4, _x5) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return getInstitutionPeople;
+        }();
+
+        People.prototype.getPerson = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(id) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                url = this.PEOPLE_SERVICE + "/" + id;
+                                _context4.prev = 1;
+                                _context4.next = 4;
+                                return this.data.get(url);
+
+                            case 4:
+                                serverResponse = _context4.sent;
+
+                                if (!serverResponse.error) {
+                                    this.selectedPerson = serverResponse;
+                                } else {
+                                    this.selectedPerson = undefined;
+                                    this.data.processError(serverResponse);
+                                }
+                                _context4.next = 12;
+                                break;
+
+                            case 8:
+                                _context4.prev = 8;
+                                _context4.t0 = _context4['catch'](1);
+
+                                this.selectedPerson = undefined;
+                                console.log(_context4.t0);
+
+                            case 12:
+                                return _context4.abrupt('return', this.selectedPerson);
+
+                            case 13:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this, [[1, 8]]);
+            }));
+
+            function getPerson(_x6) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return getPerson;
+        }();
+
+        People.prototype.selectPerson = function selectPerson(index, array) {
+            if (index === undefined) {
+                this.selectedPerson = this.emptyPerson();
+            } else {
+                if (array && array === 'i') {
+                    this.selectedPerson = this.utils.copyObject(this.instutionPeopleArray[index]);
+                    this.editIndex = index;
+                } else {
+                    this.selectedPerson = this.utils.copyObject(this.peopleArray[index]);
+                    this.editIndex = index;
+                }
+            }
+        };
+
+        People.prototype.selectedPersonFromId = function selectedPersonFromId(id, array) {
+            var _this = this;
+
+            if (array && array === 'i') {
+                this.instutionPeopleArray.forEach(function (item, index) {
+                    if (item._id === id) {
+                        _this.editIndex = index;
+                        _this.selectedPerson = _this.utils.copyObject(item);
+                    }
+                });
+                return;
+            } else {
+                this.peopleArray.forEach(function (item, index) {
+                    if (item._id === id) {
+                        _this.editIndex = index;
+                        _this.selectedPerson = _this.utils.copyObject(item);
+                    }
+                });
+                return;
+            }
+        };
+
+        People.prototype.emptyPerson = function emptyPerson() {
+            var obj = new Object();
+            obj.lastName = "";
+            obj.firstName = "";
+            obj.middleName = "";
+            obj.lastName = "";
+            obj.nickName = "";
+            obj.status = "";
+            obj.phone = "";
+            obj.mobile = "";
+            obj.email = "";
+            obj.gender = "";
+            obj.roles = new Array();
+            obj.roles.push("USER");
+            obj.password = "";
+            obj.institution = "";
+            obj.active = false;
+            obj.coursesArray = new Array();
+            var auditObj = {
+                property: "Created",
+                eventDate: new Date()
+            };
+            obj.audit = [auditObj];
+            return obj;
+        };
+
+        People.prototype.checkEmail = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!this.selectedPerson.email) {
+                                    _context5.next = 9;
+                                    break;
+                                }
+
+                                _context5.next = 3;
+                                return this.data.get(this.CHECK_EMAIL + '?email=' + this.selectedPerson.email);
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!(serverResponse.code === 409)) {
+                                    _context5.next = 8;
+                                    break;
+                                }
+
+                                return _context5.abrupt('return', true);
+
+                            case 8:
+                                return _context5.abrupt('return', false);
+
+                            case 9:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function checkEmail() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return checkEmail;
+        }();
+
+        People.prototype.checkName = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!(this.selectedPerson.firstName && this.selectedPerson.lastName && this.selectedPerson.institutionId)) {
+                                    _context6.next = 9;
+                                    break;
+                                }
+
+                                _context6.next = 3;
+                                return this.data.get(thisCHECK_NAME + '?filter=[and]firstName|eq|' + this.selectedPerson.firstName + ':lastName|eq|' + this.selectedPerson.lastName + ':institutionId|eq|' + this.selectedPerson.institutionId);
+
+                            case 3:
+                                serverResponse = _context6.sent;
+
+                                if (!(serverResponse.code === 409)) {
+                                    _context6.next = 8;
+                                    break;
+                                }
+
+                                return _context6.abrupt('return', true);
+
+                            case 8:
+                                return _context6.abrupt('return', false);
+
+                            case 9:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function checkName() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return checkName;
+        }();
+
+        People.prototype.savePerson = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(register) {
+                var url, response, _response;
+
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                if (this.selectedPerson._id) {
+                                    _context7.next = 9;
+                                    break;
+                                }
+
+                                if (register) {
+                                    url = this.PERSON_REGISTER;
+                                } else {
+                                    url = this.PEOPLE_SERVICE;
+                                }
+                                _context7.next = 4;
+                                return this.data.saveObject(this.selectedPerson, url, "post");
+
+                            case 4:
+                                response = _context7.sent;
+
+                                if (!response.error) {
+                                    if (this.peopleArray) {
+                                        this.peopleArray.push(response);;
+                                    }
+                                } else {
+                                    this.data.processError(response, "There was an error creating the account.");
+                                }
+                                return _context7.abrupt('return', response);
+
+                            case 9:
+                                _context7.next = 11;
+                                return this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put");
+
+                            case 11:
+                                _response = _context7.sent;
+
+                                if (!_response.error) {
+                                    if (this.peopleArray) {
+                                        this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
+                                    }
+                                }
+                                return _context7.abrupt('return', _response);
+
+                            case 14:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function savePerson(_x7) {
+                return _ref7.apply(this, arguments);
+            }
+
+            return savePerson;
+        }();
+
+        People.prototype.isPersonDirty = function isPersonDirty(originalObj) {
+            if (this.selectedPerson) {
+                if (originalObj) {
+                    var obj = originalObj;
+                } else if (this.selectedPerson._id) {
+                    var obj = this.selectedPersonFromId(this.selectedPerson._id);
+                } else {
+                    var obj = this.emptyPerson();
+                }
+                return this.utils.objectsEqual(this.selectedPerson, obj);
+            }
+        };
+
+        People.prototype.updatePassword = function updatePassword(obj) {
+            if (this.selectedPerson._id) {
+                return this.data.saveObject(obj, this.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
+            }
+        };
+
+        People.prototype.activateAccountEmail = function activateAccountEmail(email) {
+            this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
+        };
+
+        People.prototype.getInstitutionsArray = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(options, refresh) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                if (!(!this.institutionsArray || refresh)) {
+                                    _context8.next = 7;
+                                    break;
+                                }
+
+                                url = this.data.INSTITUTION_SERVICES;
+
+                                url += options ? options : "";
+                                _context8.next = 5;
+                                return this.data.get(url);
+
+                            case 5:
+                                response = _context8.sent;
+
+                                if (!response.error) {
+                                    this.institutionsArray = response;
+                                } else {
+                                    this.institutionsArray = undefined;
+                                }
+
+                            case 7:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function getInstitutionsArray(_x8, _x9) {
+                return _ref8.apply(this, arguments);
+            }
+
+            return getInstitutionsArray;
+        }();
+
+        People.prototype.getInstitution = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(id) {
+                var url, response;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                url = this.INSTITUTION_SERVICES + '/' + id;
+                                _context9.next = 3;
+                                return this.data.get(url);
+
+                            case 3:
+                                response = _context9.sent;
+
+                                if (response.status) {
+                                    _context9.next = 8;
+                                    break;
+                                }
+
+                                return _context9.abrupt('return', response);
+
+                            case 8:
+                                return _context9.abrupt('return', { institutionStatus: '99' });
+
+                            case 9:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function getInstitution(_x10) {
+                return _ref9.apply(this, arguments);
+            }
+
+            return getInstitution;
+        }();
+
+        People.prototype.getRemindersArray = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                if (!(!this.remindersArray || refresh)) {
+                                    _context10.next = 13;
+                                    break;
+                                }
+
+                                url = this.NOTES_SERVICE;
+
+                                url += options ? options : "";
+                                _context10.prev = 3;
+                                _context10.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context10.sent;
+
+                                if (!serverResponse.error) {
+                                    this.remindersArray = serverResponse;
+                                    this.remindersArray = this.remindersArray.filter(function (item) {
+                                        return item.isReminder;
+                                    });
+                                }
+                                _context10.next = 13;
+                                break;
+
+                            case 10:
+                                _context10.prev = 10;
+                                _context10.t0 = _context10['catch'](3);
+
+                                console.log(_context10.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this, [[3, 10]]);
+            }));
+
+            function getRemindersArray(_x11, _x12) {
+                return _ref10.apply(this, arguments);
+            }
+
+            return getRemindersArray;
+        }();
+
+        return People;
+    }()) || _class);
+});
+define('resources/data/products',['exports', 'aurelia-framework', './dataServices', '../utils/utils'], function (exports, _aureliaFramework, _dataServices, _utils) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Products = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Products = exports.Products = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils), _dec(_class = function () {
+        function Products(data, utils) {
+            _classCallCheck(this, Products);
+
+            this.PRODUCTS_SERVICE = 'products';
+
+            this.data = data;
+            this.utils = utils;
+        }
+
+        Products.prototype.getProductsArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.productsArray || refresh)) {
+                                    _context.next = 13;
+                                    break;
+                                }
+
+                                url = this.PRODUCTS_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.productsArray = serverResponse;
+                                }
+                                _context.next = 13;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getProductsArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getProductsArray;
+        }();
+
+        Products.prototype.selectProduct = function selectProduct(index) {
+            if (index === undefined) {
+                this.selectedProduct = this.emptyProduct();
+                this.newSystem = true;
+            } else {
+                try {
+                    this.selectedProduct = this.utils.copyObject(this.productsArray[index]);
+                    this.newSystem = false;
+                    this.editIndex = index;
+                } catch (error) {
+                    console.log(error);
+                    this.selectedProduct = this.emptyProduct();
+                    this.newSystem = true;
+                }
+            }
+        };
+
+        Products.prototype.selectedProductFromId = function selectedProductFromId(id) {
+            var _this = this;
+
+            this.productsArray.forEach(function (item) {
+                if (item._id === id) {
+                    _this.selectedProduct = _this.utils.copyObject(item);
+                    return;
+                }
+            });
+            return null;
+        };
+
+        Products.prototype.emptyProduct = function emptyProduct() {
+            var newProduct = new Object();;
+            newProduct.clientKey = "";
+            newProduct.name = "";
+            newProduct.sapName = "";
+            newProduct.hostWhere = "";
+            newProduct.uaCurriculum = "";
+            newProduct.defaultStudentIdPrefix = "";
+            newProduct.defaultFacultyIdPrefix = "";
+            newProduct.defaultStudentPassword = "";
+            newProduct.defaultFacultyPassword = "";
+            newProduct.comment = "";
+            newProduct.Client_Info = "";
+            newProduct.fileName = "";
+            newProduct.dataset = "";
+            newProduct.idsAvailable = "";
+            newProduct.firstAllowableId = 1;
+            newProduct.active = true;
+            newProduct.systems = new Array();
+            return newProduct;
+        };
+
+        Products.prototype.getProductInfo = function getProductInfo(id) {
+            if (!id) return null;
+            for (var i = 0; i < this.productsArray.length; i++) {
+                if (this.productsArray[i]._id === id) {
+                    if (this.productsArray[i].productInfo) {
+                        return {
+                            info: this.productsArray[i].productInfo,
+                            productId: id,
+                            header: this.productsArray[i].name
+                        };
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            return null;
+        };
+
+        Products.prototype.saveProduct = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _serverResponse, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (this.selectedProduct) {
+                                    _context2.next = 2;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return');
+
+                            case 2:
+                                if (this.selectedProduct._id) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                _context2.next = 5;
+                                return this.data.saveObject(this.selectedProduct, this.PRODUCTS_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse = _context2.sent;
+
+                                if (!_serverResponse.error) {
+                                    this.productsArray.push(_serverResponse);
+                                    this.editIndex = this.productsArray.length - 1;
+                                } else {
+                                    this.data.processError(_serverResponse, "There was an error creating the product.");
+                                }
+                                return _context2.abrupt('return', _serverResponse);
+
+                            case 10:
+                                _context2.next = 12;
+                                return this.data.saveObject(this.selectedProduct, this.PRODUCTS_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    this.productsArray[this.editIndex] = this.utils.copyObject(this.selectedProduct, this.productsArray[this.editIndex]);
+                                } else {
+                                    this.data.processError(serverResponse, "There was an error updating the product.");
+                                }
+                                return _context2.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function saveProduct() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return saveProduct;
+        }();
+
+        Products.prototype.deleteProduct = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                _context3.next = 2;
+                                return this.data.deleteObject(this.PRODUCTS_SERVICE + '/' + this.selectedProduct._id);
+
+                            case 2:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.productsArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                }
+                                return _context3.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function deleteProduct() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return deleteProduct;
+        }();
+
+        Products.prototype.isDirty = function isDirty() {
+            if (this.selectedProduct) {
+                if (this.selectedProduct._id) {
+                    var obj = this.productsArray[this.editIndex];
+                } else {
+                    var obj = this.emptyProduct();
+                }
+                return this.utils.objectsEqual(this.selectedProduct, obj);
+            }
+        };
+
+        return Products;
+    }()) || _class);
+});
+define('resources/data/sessions',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Sessions = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Sessions = exports.Sessions = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function Sessions(data, utils, config) {
+            _classCallCheck(this, Sessions);
+
+            this.SESSIONS_SERVICE = "sessions";
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        Sessions.prototype.getSessionsArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.sessionsArray || refresh)) {
+                                    _context.next = 18;
+                                    break;
+                                }
+
+                                url = this.SESSIONS_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (serverResponse.error) {
+                                    _context.next = 11;
+                                    break;
+                                }
+
+                                this.sessionsArray = serverResponse;
+                                _context.next = 12;
+                                break;
+
+                            case 11:
+                                return _context.abrupt('return', undefined);
+
+                            case 12:
+                                _context.next = 18;
+                                break;
+
+                            case 14:
+                                _context.prev = 14;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+                                return _context.abrupt('return', undefined);
+
+                            case 18:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 14]]);
+            }));
+
+            function getSessionsArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getSessionsArray;
+        }();
+
+        Sessions.prototype.selectSession = function selectSession(index) {
+            if (!index && index != 0) {
+                this.selectedSession = this.emptySession();
+            } else {
+                try {
+                    this.selectedSession = this.utils.copyObject(this.sessionsArray[index]);
+                    this.editIndex = index;
+                } catch (error) {
+                    console.log(error);
+                    this.selectedSession = this.emptySesssion();
+                    this.newSession = true;
+                }
+            }
+        };
+
+        Sessions.prototype.selectSessionById = function selectSessionById(id) {
+            this.selectedSession = null;
+            for (var i = 0; i < this.sessionsArray.length; i++) {
+                if (this.sessionsArray[i]._id === id) {
+                    this.selectedSession = this.utils.copyObject(this.sessionsArray[i]);
+                    this.editIndex = i;
+                    break;
+                }
+            }
+        };
+
+        Sessions.prototype.emptySession = function emptySession() {
+            var newSessionObj = new Object();
+            newSessionObj.session = "";
+            newSessionObj.year = "";
+            newSessionObj.startDate = "";
+            newSessionObj.endDate = "";
+            newSessionObj.requestsOpenDate = "";
+            newSessionObj.sessionStatus = "Next";
+
+            var sessions = this.sessionsArray.sort(function (a, b) {
+                return (0, _moment2.default)(a.startDate).isBefore(b.startDate);
+            });
+
+            var nextSession = -1;
+
+            if (!sessions[0]) {
+                var today = new Date();
+                var month = today.getMonth();
+                var year = today.getFullYear();
+                nextSession = 1;
+
+                for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
+                    if (month >= parseInt(this.config.SESSION_PARAMS[i].startMonth) && month <= parseInt(this.config.SESSION_PARAMS[i].endMonth)) {
+                        nextSession = i + 1;
+                        break;
+                    }
+                }
+                var thisYear = nextSession != 4 ? year : year--;
+            } else {
+                for (var i = 0, x = this.config.SESSION_PARAMS.length; i < x; i++) {
+                    if (sessions[0].session === this.config.SESSION_PARAMS[i].session) {
+                        nextSession = i + 1;
+                        break;
+                    }
+                }
+                var thisYear = parseInt(sessions[0].year);
+            }
+
+            if (nextSession === 4) nextSession = 0;
+
+            newSessionObj.session = this.config.SESSION_PARAMS[nextSession].session;
+
+            if (nextSession === 0) thisYear++;
+            newSessionObj.year = thisYear;
+            if (nextSession === 3) {
+                newSessionObj.year = thisYear + "/" + (parseInt(thisYear) + 1);
+            }
+
+            newSessionObj.startDate = thisYear + "-" + this.config.SESSION_PARAMS[nextSession].startMonth + "-" + this.config.SESSION_PARAMS[nextSession].startDay;
+            if (nextSession === 3) {
+                thisYear = parseInt(thisYear) + 1;
+                newSessionObj.endDate = thisYear + "-" + this.config.SESSION_PARAMS[nextSession].endMonth + "-" + this.config.SESSION_PARAMS[nextSession].endDay;
+            } else {
+                newSessionObj.endDate = thisYear + "-" + this.config.SESSION_PARAMS[nextSession].endMonth + "-" + this.config.SESSION_PARAMS[nextSession].endDay;
+            }
+            newSessionObj.requestsOpenDate = thisYear + "-" + this.config.SESSION_PARAMS[nextSession].openMonth + "-" + this.config.SESSION_PARAMS[nextSession].openDay;
+
+            return newSessionObj;
+        };
+
+        Sessions.prototype.saveSession = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _serverResponse, serverResponse;
+
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (this.selectedSession) {
+                                    _context2.next = 2;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return');
+
+                            case 2:
+                                if (this.selectedSession._id) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                _context2.next = 5;
+                                return this.data.saveObject(this.selectedSession, this.SESSIONS_SERVICE, "post");
+
+                            case 5:
+                                _serverResponse = _context2.sent;
+
+                                if (!_serverResponse.error) {
+                                    this.sessionsArray.unshift(_serverResponse);
+                                }
+                                return _context2.abrupt('return', _serverResponse);
+
+                            case 10:
+                                _context2.next = 12;
+                                return this.data.saveObject(this.selectedSession, this.SESSIONS_SERVICE, "put");
+
+                            case 12:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    this.sessionsArray[this.editIndex] = this.utils.copyObject(this.selectedSession);
+                                }
+                                return _context2.abrupt('return', serverResponse);
+
+                            case 15:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function saveSession() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return saveSession;
+        }();
+
+        Sessions.prototype.isDirty = function isDirty() {
+
+            if (this.selectedSession) {
+                if (this.selectedSession._id) {
+                    var obj = this.sessionsArray[this.editIndex];
+                } else {
+                    var obj = this.emptySession();
+                }
+                return this.utils.objectsEqual(this.selectedSession, obj);
+            }
+        };
+
+        return Sessions;
+    }()) || _class);
+});
+define('resources/data/siteInfo',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.SiteInfo = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var SiteInfo = exports.SiteInfo = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function SiteInfo(data, utils, config) {
+            _classCallCheck(this, SiteInfo);
+
+            this.SITE_SERVICES = 'site';
+            this.MESSAGE_SERVICES = 'messages';
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        SiteInfo.prototype.getInfoArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(refresh, options) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.siteArray || refresh)) {
+                                    _context.next = 13;
+                                    break;
+                                }
+
+                                url = this.SITE_SERVICES;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.siteArray = serverResponse;
+                                }
+                                _context.next = 13;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+
+                            case 13:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getInfoArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getInfoArray;
+        }();
+
+        SiteInfo.prototype.getWeather = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(city) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                response = this.data.get('getWeather/' + city);
+                                return _context2.abrupt('return', response);
+
+                            case 2:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getWeather(_x3) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getWeather;
+        }();
+
+        SiteInfo.prototype.showCarousel = function showCarousel() {
+            for (var i = 0; i < this.siteArray.length; i++) {
+                if (this.siteArray[i].itemType === 'CARO') return true;
+            }
+            return false;
+        };
+
+        return SiteInfo;
+    }()) || _class);
+});
+define('resources/data/systems',['exports', 'aurelia-framework', './dataServices', '../utils/utils', '../../config/appConfig'], function (exports, _aureliaFramework, _dataServices, _utils, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Systems = undefined;
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Systems = exports.Systems = (_dec = (0, _aureliaFramework.inject)(_dataServices.DataServices, _utils.Utils, _appConfig.AppConfig), _dec(_class = function () {
+        function Systems(data, utils, config) {
+            _classCallCheck(this, Systems);
+
+            this.SYSTEMS_SERVICE = "systems";
+
+            this.data = data;
+            this.utils = utils;
+            this.config = config;
+        }
+
+        Systems.prototype.getSystemsArray = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(options, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                if (!(!this.systemsArray || refresh)) {
+                                    _context.next = 14;
+                                    break;
+                                }
+
+                                url = this.SYSTEMS_SERVICE;
+
+                                url += options ? options : "";
+                                _context.prev = 3;
+                                _context.next = 6;
+                                return this.data.get(url);
+
+                            case 6:
+                                serverResponse = _context.sent;
+
+                                if (!serverResponse.error) {
+                                    this.systemsArray = serverResponse;
+                                }
+                                _context.next = 14;
+                                break;
+
+                            case 10:
+                                _context.prev = 10;
+                                _context.t0 = _context['catch'](3);
+
+                                console.log(_context.t0);
+                                this.systemsArray = undefined;
+
+                            case 14:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[3, 10]]);
+            }));
+
+            function getSystemsArray(_x, _x2) {
+                return _ref.apply(this, arguments);
+            }
+
+            return getSystemsArray;
+        }();
+
+        return Systems;
+    }()) || _class);
+});
+define('resources/dialogs/common-dialogs',['exports', 'aurelia-framework', 'aurelia-dialog', './confirm-dialog', './message-dialog', './note-dialog', './email-dialog', './document-dialog', './password-dialog'], function (exports, _aureliaFramework, _aureliaDialog, _confirmDialog, _messageDialog, _noteDialog, _emailDialog, _documentDialog, _passwordDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.CommonDialogs = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var CommonDialogs = exports.CommonDialogs = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogService), _dec(_class = function () {
+    function CommonDialogs(dialogService) {
+      _classCallCheck(this, CommonDialogs);
+
+      this.noteBody = "";
+
+      this.dialogService = dialogService;
+    }
+
+    CommonDialogs.prototype.showMessage = function showMessage(message) {
+      var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Message';
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['Ok'];
+
+      return this.dialogService.open({ viewModel: _messageDialog.MessageDialog, model: { message: message, title: title, options: options } });
+    };
+
+    CommonDialogs.prototype.showNote = function showNote() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Enter Note';
+      var note = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _noteDialog.NoteDialog, model: { title: title, note: note, options: options } });
+    };
+
+    CommonDialogs.prototype.showEmail = function showEmail() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Enter Email';
+      var email = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _emailDialog.EmailDialog, model: { title: title, email: email, options: options } });
+    };
+
+    CommonDialogs.prototype.showDocument = function showDocument() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "Select Document";
+      var documents = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _documentDialog.DocumentDialog, model: { title: title, documents: documents, options: options } });
+    };
+
+    CommonDialogs.prototype.showPassword = function showPassword() {
+      var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "Change Password";
+      var passwords = arguments[1];
+      var options = arguments[2];
+
+      return this.dialogService.open({ viewModel: _passwordDialog.PasswordDialog, model: { title: title, passwords: passwords, options: options } });
+    };
+
+    return CommonDialogs;
+  }()) || _class);
+});
+define('resources/dialogs/confirm-dialog',["exports", "aurelia-framework", "aurelia-dialog"], function (exports, _aureliaFramework, _aureliaDialog) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ConfirmDialog = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ConfirmDialog = exports.ConfirmDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+        function ConfirmDialog(controller) {
+            _classCallCheck(this, ConfirmDialog);
+
+            this.message = "";
+
+            this.controller = controller;
+        }
+
+        ConfirmDialog.prototype.activate = function activate(data) {
+            this.message = data.message;
+            this.header = data.header == undefined ? "Confirmation" : data.header;
+        };
+
+        return ConfirmDialog;
+    }()) || _class);
+});
+define('resources/dialogs/document-dialog',['exports', 'aurelia-dialog', 'aurelia-framework', '../data/documents'], function (exports, _aureliaDialog, _aureliaFramework, _documents) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DocumentDialog = undefined;
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var DocumentDialog = exports.DocumentDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController, _documents.DocumentsServices), _dec(_class = function () {
+    function DocumentDialog(dialogController, documents) {
+      _classCallCheck(this, DocumentDialog);
+
+      this.dialogController = dialogController;
+      this.documents = documents;
+    }
+
+    DocumentDialog.prototype.activate = function activate(model) {
+      this.model = model;
+      this.filteredDocumentArray = model.documents.documentCats;
+    };
+
+    DocumentDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(this.model);
+      }
+    };
+
+    DocumentDialog.prototype.filterList = function filterList() {
+      if (this.filter) {
+        var thisFilter = this.filter;
+        this.filteredDocumentArray = this.model.documents.documentCats.filter(function (item) {
+          return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+        });
+      } else {
+        this.filteredDocumentArray = this.model.documents.documentCats;
+      }
+    };
+
+    DocumentDialog.prototype.typeChanged = function () {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(index) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(index >= 0)) {
+                  _context.next = 6;
+                  break;
+                }
+
+                this.categoryIndex = index;
+                this.documents.selectCategory(index);
+                _context.next = 5;
+                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+              case 5:
+                this.showDocuments = true;
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function typeChanged(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return typeChanged;
+    }();
+
+    DocumentDialog.prototype.chooseDocument = function chooseDocument(index, event) {
+      this.documents.selectDocument(index);
+
+      if (this.selectedRow) this.selectedRow.children().removeClass('info');
+      this.selectedRow = $(event.target).closest('tr');
+      this.selectedRow.children().addClass('info');
+      this.showDocumentForm = true;
+    };
+
+    DocumentDialog.prototype.addDocument = function addDocument(index) {
+      for (var i = 0; i < this.model.documents.documents.length; i++) {
+        if (this.model.documents.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
+          return;
+        }
+      }
+      var newDoc = {
+        categoryCode: this.documents.selectedDocument.categoryCode,
+        categoryName: this.documents.selectedDocument.name,
+        fileName: this.documents.selectedDocument.files[index].fileName,
+        default: true
+      };
+      this.model.documents.documents.push(newDoc);
+    };
+
+    DocumentDialog.prototype.removeDocument = function removeDocument(index) {
+      this.selectedDocuments.splice(index, 1);
+    };
+
+    return DocumentDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
+});
+define('resources/dialogs/email-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.EmailDialog = undefined;
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var EmailDialog = exports.EmailDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+		function EmailDialog(dialogController) {
+			_classCallCheck(this, EmailDialog);
+
+			this.dialogController = dialogController;
+		}
+
+		EmailDialog.prototype.activate = function activate(model) {
+			this.model = model;
+		};
+
+		EmailDialog.prototype.selectOption = function selectOption(option) {
+			if (isCancel(option)) {
+				this.dialogController.cancel(option);
+			} else {
+				this.dialogController.ok(this.model);
+			}
+		};
+
+		return EmailDialog;
+	}()) || _class);
+
+
+	function isCancel(option) {
+		return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+	}
+});
+define('resources/dialogs/message-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.MessageDialog = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var MessageDialog = exports.MessageDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+    function MessageDialog(dialogController) {
+      _classCallCheck(this, MessageDialog);
+
+      this.dialogController = dialogController;
+    }
+
+    MessageDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    MessageDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(option);
+      }
+    };
+
+    return MessageDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
+});
+define('resources/dialogs/note-dialog',['exports', 'aurelia-dialog', 'aurelia-framework'], function (exports, _aureliaDialog, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NoteDialog = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var NoteDialog = exports.NoteDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController), _dec(_class = function () {
+    function NoteDialog(dialogController) {
+      _classCallCheck(this, NoteDialog);
+
+      this.dialogController = dialogController;
+    }
+
+    NoteDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    NoteDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        this.dialogController.ok(this.model);
+      }
+    };
+
+    return NoteDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
+});
+define('resources/dialogs/password-dialog',['exports', 'aurelia-framework', 'aurelia-dialog', '../../resources/utils/validation'], function (exports, _aureliaFramework, _aureliaDialog, _validation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.PasswordDialog = undefined;
+
+  var _validation2 = _interopRequireDefault(_validation);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var PasswordDialog = exports.PasswordDialog = (_dec = (0, _aureliaFramework.inject)(_aureliaDialog.DialogController, _validation2.default), _dec(_class = function () {
+    function PasswordDialog(dialogController, validation) {
+      _classCallCheck(this, PasswordDialog);
+
+      this.dialogController = dialogController;
+      this.validation = validation;
+      this.validation.initialize(this);
+      this._setupValidation();
+
+      this.thresholdLength = 6;
+      this.threshold = 3;
+    }
+
+    PasswordDialog.prototype.activate = function activate(model) {
+      this.model = model;
+    };
+
+    PasswordDialog.prototype.passwordComplexity = function passwordComplexity() {
+
+      var newValue = this.password;
+
+      this.longPassword = newValue.length >= this.thresholdLength;
+
+      var strength = 0;
+      strength += /[A-Z]+/.test(newValue) ? 1 : 0;
+      strength += /[a-z]+/.test(newValue) ? 1 : 0;
+      strength += /[0-9]+/.test(newValue) ? 1 : 0;
+      strength += /[\W]+/.test(newValue) ? 1 : 0;
+
+      this.complexPassword = strength >= this.threshold && this.longPassword;
+      this.validation.validate(4);
+    };
+
+    PasswordDialog.prototype._setupValidation = function _setupValidation() {
+      this.validation.addRule(1, "register_password", [{ "rule": "required", "message": "Password is required", "value": "password" }]);
+      this.validation.addRule(1, "register_password_repeat", [{ "rule": "custom", "message": "Passwords must match",
+        "valFunction": function valFunction(context) {
+          return context.password === context.password_repeat;
+        } }], true);
+      this.validation.addRule(4, "register_password", [{ "rule": "custom", "message": "Insufficient Complexity",
+        "valFunction": function valFunction(context) {
+          return context.complexPassword;
+        } }]);
+    };
+
+    PasswordDialog.prototype.selectOption = function selectOption(option) {
+      if (isCancel(option)) {
+        this.dialogController.cancel(option);
+      } else {
+        if (this.validation.validate(1)) {
+          this.model.password = this.password;
+          this.model.password_repeat = this.password_repeat;
+          this.dialogController.ok(this.model);
+        }
+      }
+    };
+
+    return PasswordDialog;
+  }()) || _class);
+
+
+  function isCancel(option) {
+    return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
+  }
+});
+define('resources/elements/flat-picker',['exports', 'aurelia-framework', 'flatpickr'], function (exports, _aureliaFramework, _flatpickr) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.FlatPickerCustomElement = undefined;
+
+    var _flatpickr2 = _interopRequireDefault(_flatpickr);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+    } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+
+    function _initDefineProp(target, property, descriptor, context) {
+        if (!descriptor) return;
+        Object.defineProperty(target, property, {
+            enumerable: descriptor.enumerable,
+            configurable: descriptor.configurable,
+            writable: descriptor.writable,
+            value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+        });
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+        var desc = {};
+        Object['ke' + 'ys'](descriptor).forEach(function (key) {
+            desc[key] = descriptor[key];
+        });
+        desc.enumerable = !!desc.enumerable;
+        desc.configurable = !!desc.configurable;
+
+        if ('value' in desc || desc.initializer) {
+            desc.writable = true;
+        }
+
+        desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+            return decorator(target, property, desc) || desc;
+        }, desc);
+
+        if (context && desc.initializer !== void 0) {
+            desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+            desc.initializer = undefined;
+        }
+
+        if (desc.initializer === void 0) {
+            Object['define' + 'Property'](target, property, desc);
+            desc = null;
+        }
+
+        return desc;
+    }
+
+    function _initializerWarningHelper(descriptor, context) {
+        throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+    }
+
+    var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5;
+
+    var FlatPickerCustomElement = exports.FlatPickerCustomElement = (_dec = (0, _aureliaFramework.inject)(Element), _dec2 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = (_class2 = function () {
+        function FlatPickerCustomElement(element) {
+            _classCallCheck(this, FlatPickerCustomElement);
+
+            _initDefineProp(this, 'config', _descriptor, this);
+
+            _initDefineProp(this, 'startdate', _descriptor2, this);
+
+            _initDefineProp(this, 'enddate', _descriptor3, this);
+
+            _initDefineProp(this, 'controlid', _descriptor4, this);
+
+            _initDefineProp(this, 'value', _descriptor5, this);
+
+            this.element = element;
+        }
+
+        FlatPickerCustomElement.prototype.bind = function bind() {
+            var defaultConfig = {
+                altInput: true,
+                altFormat: "F j, Y",
+                minDate: this.startdate,
+                maxDate: this.enddate
+            };
+
+            this._config = Object.assign({}, defaultConfig, this.config);
+            this._config.onChange = this._config.onMonthChange = this._config.onYearChange = this.onChange.bind(this);
+        };
+
+        FlatPickerCustomElement.prototype.attached = function attached() {
+            this.flatpickr = new _flatpickr2.default(this.element.querySelector('.aurelia-flatpickr'), this._config);
+            this.valueChanged();
+        };
+
+        FlatPickerCustomElement.prototype.fireEvent = function fireEvent(element, type, data) {
+            var changeEvent = void 0;
+
+            if (window.CustomEvent) {
+                changeEvent = new CustomEvent('change', {
+                    detail: {
+                        value: data
+                    },
+                    bubbles: true
+                });
+            } else {
+                changeEvent = document.createEvent('CustomEvent');
+                changeEvent.initCustomEvent('change', true, true, {
+                    detail: {
+                        value: data
+                    }
+                });
+            }
+            this.element.dispatchEvent(changeEvent);
+        };
+
+        FlatPickerCustomElement.prototype.startdateChanged = function startdateChanged(newValue, oldValue) {
+            if (this.flatpickr) {
+                this.flatpickr.set("minDate", newValue);
+            }
+        };
+
+        FlatPickerCustomElement.prototype.enddateChanged = function enddateChanged(newValue, oldValue) {
+            if (this.flatpickr) {
+                this.flatpickr.set("maxDate", newValue);
+            }
+        };
+
+        FlatPickerCustomElement.prototype.onChange = function onChange(selectedDates, dateStr, instance) {
+            var _this = this;
+
+            if (!this._datesAreSynced(this.value, selectedDates)) {
+
+                switch (selectedDates.length) {
+                    case 0:
+                        this.value = undefined;
+                        break;
+                    case 1:
+                        this.value = this._cloneDate(selectedDates[0]);
+                        break;
+                    default:
+                        this.value = selectedDates.map(function (d) {
+                            return _this._cloneDate(d);
+                        });
+                        break;
+                }
+            }
+            this.fireEvent(this.element, 'changeBeginDate', { date: this.value });
+        };
+
+        FlatPickerCustomElement.prototype.valueChanged = function valueChanged() {
+            var _this2 = this;
+
+            if (!this.flatpickr) {
+                return;
+            }
+
+            if (this._datesAreSynced(this.value, this.flatpickr.selectedDates)) {
+                return;
+            }
+
+            var newDate = void 0;
+
+            if (!this.value) {
+                newDate = undefined;
+            } else if (!Array.isArray(this.value)) {
+                newDate = this._cloneDate(this.value);
+            } else {
+                newDate = this.value.map(function (d) {
+                    return _this2._cloneDate(d);
+                });
+            }
+
+            this.flatpickr.setDate(newDate);
+        };
+
+        FlatPickerCustomElement.prototype._datesAreSynced = function _datesAreSynced(model, view) {
+            model = model || [];
+
+            var modelDates = Array.isArray(model) ? model : [model];
+
+            var _loop = function _loop(d) {
+                var modelDate = modelDates[d];
+
+                if (view.findIndex(function (v) {
+                    return v.valueOf() === modelDate.valueOf();
+                }) > -1) {
+                    return 'continue';
+                }
+
+                return {
+                    v: false
+                };
+            };
+
+            for (var d = 0; d < modelDates.length; d++) {
+                var _ret = _loop(d);
+
+                switch (_ret) {
+                    case 'continue':
+                        continue;
+
+                    default:
+                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                }
+            }
+
+            var _loop2 = function _loop2(d) {
+                var viewDate = view[d];
+
+                if (modelDates.findIndex(function (m) {
+                    return m.valueOf() === viewDate.valueOf();
+                }) > -1) {
+                    return 'continue';
+                }
+
+                return {
+                    v: false
+                };
+            };
+
+            for (var d = 0; d < view.length; d++) {
+                var _ret2 = _loop2(d);
+
+                switch (_ret2) {
+                    case 'continue':
+                        continue;
+
+                    default:
+                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                }
+            }
+
+            return true;
+        };
+
+        FlatPickerCustomElement.prototype._cloneDate = function _cloneDate(d) {
+            return new Date(d.getTime ? d.valueOf() : d);
+        };
+
+        return FlatPickerCustomElement;
+    }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'config', [_aureliaFramework.bindable], {
+        enumerable: true,
+        initializer: function initializer() {
+            return {};
+        }
+    }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'startdate', [_aureliaFramework.bindable], {
+        enumerable: true,
+        initializer: null
+    }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'enddate', [_aureliaFramework.bindable], {
+        enumerable: true,
+        initializer: null
+    }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'controlid', [_aureliaFramework.bindable], {
+        enumerable: true,
+        initializer: null
+    }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, 'value', [_dec2], {
+        enumerable: true,
+        initializer: null
+    })), _class2)) || _class);
+});
+define('resources/elements/loading-indicator',['exports', 'nprogress', 'aurelia-framework'], function (exports, _nprogress, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.LoadingIndicator = undefined;
+
+  var nprogress = _interopRequireWildcard(_nprogress);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _class, _desc, _value, _class2, _descriptor, _descriptor2;
+
+  var LoadingIndicator = exports.LoadingIndicator = (_dec = (0, _aureliaFramework.noView)(['nprogress/nprogress.css']), _dec(_class = (_class2 = function () {
+    function LoadingIndicator() {
+      _classCallCheck(this, LoadingIndicator);
+
+      _initDefineProp(this, 'loading', _descriptor, this);
+
+      _initDefineProp(this, 'progress', _descriptor2, this);
+    }
+
+    LoadingIndicator.prototype.loadingChanged = function loadingChanged(newValue) {
+      newValue ? nprogress.start() : nprogress.done();
+    };
+
+    LoadingIndicator.prototype.progressChanged = function progressChanged(newValue) {
+      nprogress.set(newValue);
+    };
+
+    return LoadingIndicator;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'loading', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: function initializer() {
+      return false;
+    }
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'progress', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: function initializer() {
+      return 0;
+    }
+  })), _class2)) || _class);
+});
+define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../data/auth', '../../resources/utils/utils', '../../resources/data/people', '../../config/appConfig', '../dialogs/common-dialogs', 'moment', 'toastr'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaEventAggregator, _auth, _utils, _people, _appConfig, _commonDialogs, _moment, _toastr) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.NavBar = undefined;
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var toastr = _interopRequireWildcard(_toastr);
+
+    function _interopRequireWildcard(obj) {
+        if (obj && obj.__esModule) {
+            return obj;
+        } else {
+            var newObj = {};
+
+            if (obj != null) {
+                for (var key in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+                }
+            }
+
+            newObj.default = obj;
+            return newObj;
+        }
+    }
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var NavBar = exports.NavBar = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaEventAggregator.EventAggregator, _aureliaFramework.BindingEngine, _auth.Auth, _utils.Utils, _people.People, _appConfig.AppConfig, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function NavBar(router, eventAggregator, bindingEngine, auth, utils, people, config, dialog) {
+            _classCallCheck(this, NavBar);
+
+            this.isAuthenticated = false;
+            this.subscription = {};
+
+            this.eventAggregator = eventAggregator;
+            this.router = router;
+            this.bindingEngine = bindingEngine;
+            this.auth = auth;
+            this.utils = utils;
+            this.people = people;
+            this.config = config;
+            this.dialog = dialog;
+
+            this.isAuthenticated = this.auth.isAuthenticated();
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        }
+
+        NavBar.prototype.attached = function attached() {
+            $(".dropdown-toggle").dropdown();
+        };
+
+        NavBar.prototype.login = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.auth.login(this.email, this.password);
+
+                            case 2:
+                                response = _context.sent;
+
+                                if (!response.error) {
+                                    sessionStorage.setItem('uccweather', JSON.stringify({ temp: response.temp, icon: response.icon }));
+                                    this.loginError = "";
+                                    this.loginSuccess();
+                                    this.isAuthenticated = this.auth.isAuthenticated();
+                                } else {
+                                    this.loginError = "Invalid credentials.";
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function login() {
+                return _ref.apply(this, arguments);
+            }
+
+            return login;
+        }();
+
+        NavBar.prototype.logout = function logout() {
+            this.auth.logout(this.userObj.email);
+            this.userObj = new Object();
+            this.isAuthenticated = this.auth.isAuthenticated();
+            this.router.navigate("home");
+        };
+
+        NavBar.prototype.loginSuccess = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                var _this = this;
+
+                var instObj;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.userObj = JSON.parse(sessionStorage.getItem('user'));
+
+                                if (!this.userObj) {
+                                    _context2.next = 20;
+                                    break;
+                                }
+
+                                _context2.next = 4;
+                                return this.people.getInstitution(this.userObj.institutionId);
+
+                            case 4:
+                                instObj = _context2.sent;
+
+                                if (!(instObj.institutionStatus !== this.config.INSTITUTIONS_ACTIVE)) {
+                                    _context2.next = 10;
+                                    break;
+                                }
+
+                                this.utils.showNotification("You must belong to an active institution to access the web site");
+                                this.logout();
+                                _context2.next = 18;
+                                break;
+
+                            case 10:
+                                if (!(this.userObj.personStatus !== this.config.ACTIVE_PERSON)) {
+                                    _context2.next = 14;
+                                    break;
+                                }
+
+                                return _context2.abrupt('return', this.dialog.showMessage("You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.", "Account Not Active", ['OK']).then(function (response) {
+                                    _this.logout();
+                                }));
+
+                            case 14:
+                                if (!this.userObj.userRole) this.logout();
+                                sessionStorage.setItem('role', this.userObj.userRole);
+                                this.reminders();
+                                this.router.navigate("user");
+
+                            case 18:
+                                _context2.next = 22;
+                                break;
+
+                            case 20:
+                                this.utils.showNotification("There was a problem validating your account");
+                                this.router.navigate("home");
+
+                            case 22:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function loginSuccess() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return loginSuccess;
+        }();
+
+        NavBar.prototype.requestPasswordReset = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.email) {
+                                    _context3.next = 7;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.people.requestPasswordReset({ email: this.email });
+
+                            case 3:
+                                response = _context3.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
+                                } else if (response.status = 404) {
+                                    this.utils.showNotification("There is no registered user with that email address");
+                                } else if (response.status = 401) {
+                                    this.utils.showNotification("The account with the provided address has been deactivated.  Please contact your faculty coordinator.");
+                                }
+                                _context3.next = 8;
+                                break;
+
+                            case 7:
+                                this.utils.showNotification("Please enter an email address");
+
+                            case 8:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function requestPasswordReset() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return requestPasswordReset;
+        }();
+
+        NavBar.prototype.enterNote = function enterNote() {
+            var _this2 = this;
+
+            var note = { noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0 };
+            return this.dialog.showNote("Enter Note", note, ['Submit', 'Cancel']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.saveNote(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+        };
+
+        NavBar.prototype.saveNote = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(note) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this.people.selectNote();
+                                this.people.selectedNote.personId = this.userObj._id;
+                                this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+                                this.people.selectedNote.note = note.note.noteBody;
+                                _context4.next = 6;
+                                return this.people.saveNote();
+
+                            case 6:
+                                response = _context4.sent;
+
+                                if (!response.error) {
+                                    this.utils.showNotification('The note was saved');
+                                }
+
+                            case 8:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function saveNote(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return saveNote;
+        }();
+
+        NavBar.prototype.openAlert = function openAlert(alert) {
+            this.alert = alert;
+            $(".hoverProfile").css("top", 100);
+            $(".hoverProfile").css("left", 100);
+            $(".hoverProfile").css("display", "block");
+            sessionStorage.setItem('alert', true);
+        };
+
+        NavBar.prototype.hideAlert = function hideAlert() {
+            $(".hoverProfile").css("display", "none");
+        };
+
+        NavBar.prototype.reminders = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this3 = this;
+
+                var response, now, weekDay, monthDay;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                _context5.next = 2;
+                                return this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+
+                            case 2:
+                                response = _context5.sent;
+
+                                if (!response.error && this.people) {
+                                    toastr.options.closeButton = true;
+                                    toastr.options.closeMethod = 'fadeOut';
+                                    toastr.options.closeDuration = 300;
+                                    toastr.options.closeEasing = 'swing';
+                                    this.timeReminders = new Array();
+                                    now = new Date();
+                                    weekDay = now.getDay();
+                                    monthDay = now.getDate();
+
+                                    this.reccurentReminders = new Array();
+                                    this.people.remindersArray.forEach(function (item, index) {
+                                        switch (item.reminderType) {
+                                            case "D":
+                                                if (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day')) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "W":
+                                                if (item.reminderDay == weekDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "M":
+                                                if (item.reminderDay == monthDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "A":
+                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item, index);
+                                                }
+                                                break;
+                                            case "T":
+                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
+                                                    var diff = (0, _moment2.default)(now).diff(item.dateStartRemind, 'minutes');
+                                                    if (diff >= -15) {
+                                                        if (item.priority == 1) {
+                                                            toastr.error(item.note, "Reminder");
+                                                        } else {
+                                                            toastr.info(item.note, "Reminder");
+                                                        }
+                                                        item.lastSeen = now;
+                                                        _this3.people.saveReminder(item, index);
+                                                    } else {
+                                                        _this3.timeReminders.push({ item: item, index: index });
+                                                    }
+                                                }
+                                        }
+                                    });
+
+                                    if (this.timeReminders.length > 0) {
+                                        setInterval(function () {
+                                            console.log('Checked reminders');
+                                            var now = new Date();
+                                            _this3.timeReminders.forEach(function (item) {
+                                                var diff = (0, _moment2.default)().diff(item.item.dateStartRemind, 'minutes');
+                                                if (diff >= -15) {
+                                                    if (item.priority == 1) {
+                                                        toastr.error(item.item.note, "Reminder");
+                                                    } else {
+                                                        toastr.info(item.note, "Reminder");
+                                                    }
+                                                    item.lastSeen = now;
+                                                    _this3.people.saveReminder(item.item, item.index);
+                                                }
+                                            });
+                                        }, 10000);
+                                    }
+                                }
+
+                            case 4:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function reminders() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return reminders;
+        }();
+
+        return NavBar;
+    }()) || _class);
+});
+define('resources/elements/table-navigation-bar',['exports', 'aurelia-framework'], function (exports, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TableNavigationBar = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3;
+
+  var TableNavigationBar = exports.TableNavigationBar = (_class = function TableNavigationBar() {
+    _classCallCheck(this, TableNavigationBar);
+
+    _initDefineProp(this, 'columnspan', _descriptor, this);
+
+    _initDefineProp(this, 'dataTable', _descriptor2, this);
+
+    _initDefineProp(this, 'pagebuttons', _descriptor3, this);
+  }, (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'columnspan', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'dataTable', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, 'pagebuttons', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class);
+});
+define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', './utils'], function (exports, _aureliaFramework, _moment, _utils) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DataTable = undefined;
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _dec2, _class;
+
+  var DataTable = exports.DataTable = (_dec = (0, _aureliaFramework.transient)(), _dec2 = (0, _aureliaFramework.inject)(_utils.Utils), _dec(_class = _dec2(_class = function () {
+    function DataTable(utils) {
+      _classCallCheck(this, DataTable);
+
+      this.currentPage = 0;
+      this.pages = [];
+      this.rowOptions = [5, 10, 15, 20, 50];
+      this.filterValues = [];
+      this.DEFAULT_TAKE = 20;
+      this.DEFAULT_START = 0;
+      this.sortProperty = '';
+      this.sortDirection = 1;
+      this.currentPageElement = 0;
+      this.startRecord = this.DEFAULT_START;
+      this.take = this.DEFAULT_TAKE;
+      this.firstVisible = this.startRecord + 1;
+      this.lastVisible = this.startRecord + this.take - 1;
+      this.numRowsShown = this.take.toString();
+      this.active = false;
+
+      this.utils = utils;
+    }
+
+    DataTable.prototype.initialize = function initialize(context) {
+      this.context = context;
+    };
+
+    DataTable.prototype.pageOne = function pageOne() {
+      setTimeout(function () {
+        $(".pagination").children().removeClass('active');
+        $($(".pagination").children()[1]).addClass('active');
+      }, 100);
+    };
+
+    DataTable.prototype.createPageButtons = function createPageButtons(start) {
+      this.displayLength = this.baseArray.length;
+      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+      var maxButtons = 7;
+      this.currentPage = 1;
+      this.pageButtons = [];
+      this.numPageButtons = Math.ceil((this.displayLength - (start - 1) * this.take) / this.take);
+      for (var j = 1; j < this.numPageButtons; j++) {
+        this.pages[j] = j;
+      }
+
+      if (this.numPageButtons <= maxButtons + 1) {
+        for (var i = start; i < this.numPageButtons + start; i++) {
+          this.pageButtons.push(i);
+        }
+      } else {
+        for (var i = start; i < maxButtons + start; i++) {
+          this.pageButtons.push(i);
+        }
+        this.pageButtons.push('...');
+        this.pageButtons.push(this.pages.length);
+      }
+    };
+
+    DataTable.prototype.buildDisplayArray = function buildDisplayArray() {
+      this.displayArray = new Array();
+      for (var i = 0; i <= this.take; i++) {
+        if (i + this.startRecord >= this.baseArray.length) break;
+        this.displayArray.push(this.baseArray[i + this.startRecord]);
+      }
+      this.createPageButtons(1);
+    };
+
+    DataTable.prototype.forward = function forward() {
+      $(".pagination").children().removeClass('active');
+
+      this.currentPageElement = this.currentPageElement < this.pageButtons.length - 1 ? this.currentPageElement += 1 : this.currentPageElement;
+      if (this.pageButtons[this.currentPageElement] == "...") {
+        this.createPageButtons(this.pageButtons[0] + 1);
+        this.currentPageElement -= 1;
+      }
+      $($(".pagination").children()[this.currentPageElement + 1]).addClass('active');
+
+      var start = parseInt(this.startRecord);
+      var tk = parseInt(this.take);
+      this.startRecord = start + tk > this.baseArray.length ? start : start + tk;
+      this.firstVisible = this.startRecord + 1;
+      this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.displayArray.length ? this.displayArray.length : parseInt(this.firstVisible) + tk - 1;
+      this.buildDisplayArray();
+    };
+
+    DataTable.prototype.createPage = function createPage() {
+      $($(".pagination")[this.currentPage - 1]).addClass('active');
+    };
+
+    DataTable.prototype.backward = function backward() {
+      $(".pagination").children().removeClass('active');
+      this.currentPageElement = this.currentPageElement > 0 ? this.currentPageElement -= 1 : this.currentPageElement;
+      if (this.currentPageElement == 0 && this.pageButtons[this.currentPageElement] != 1) {
+        this.createPageButtons(this.pageButtons[0] - 1);
+      }
+      if (this.pageButtons[this.currentPageElement] == "...") {
+        var start = this.numPageButtons >= 8 ? this.numPageButtons - 8 : 1;
+        this.createPageButtons(start);
+      }
+      $($(".pagination").children()[this.currentPageElement + 1]).addClass('active');
+
+      var start = parseInt(this.startRecord);
+      var tk = parseInt(this.take);
+      this.startRecord = start - tk < 0 ? 0 : this.startRecord = start - tk;
+      this.firstVisible = this.startRecord + 1;
+      this.lastVisible = parseInt(this.firstVisible) + tk - 1;
+      this.buildDisplayArray();
+    };
+
+    DataTable.prototype.pageButton = function pageButton(index, el) {
+      $(".pagination").children().removeClass('active');
+
+      $(el.target).closest('li').addClass('active');
+      this.currentPageElement = index;
+      var start = parseInt(this.startRecord);
+      var tk = parseInt(this.take);
+      if (this.pageButtons[index] !== '...') {
+        this.startRecord = (this.pageButtons[index] - 1) * tk;
+        this.firstVisible = this.startRecord + 1;
+        this.lastVisible = parseInt(this.firstVisible) + tk - 1 > this.displayArray.length ? this.displayArray.length : parseInt(this.firstVisible) + tk - 1;
+      }
+
+      this.buildDisplayArray();
+    };
+
+    DataTable.prototype.updateTake = function updateTake(el) {
+      this.take = this.numRowsShown;
+      this.startRecord = 0;
+      this.lastVisible = parseInt(this.firstVisible) + parseInt(this.take) - 1;
+      this.createPageButtons(1);
+      this.pageOne();
+      this.buildDisplayArray();
+    };
+
+    DataTable.prototype.filterList = function filterList(el, array) {
+      el.preventDefault();
+      array = array || new Array();
+
+      this.filterValues = this.filterValues.filter(function (obj) {
+        return obj.property !== el.target.id;
+      });
+
+      if (el.target.value !== "") {
+        switch (el.target.type) {
+          case 'select-one':
+            this.filterValues.push({ property: el.target.id, value: el.target.options[el.target.selectedIndex].value, type: el.target.type, compare: $(el.target).attr("compare") });
+            break;
+          default:
+            this.filterValues.push({ property: el.target.id, value: el.target.value, type: el.target.type, compare: $(el.target).attr("compare") });
+        }
+      }
+
+      if (this.filterValues.length > 0) {
+        this.baseArray = this.filter(this.filterValues, array);
+      } else {
+        this.baseArray = this.sourceArray;
+      }
+      this.startRecord = this.DEFAULT_START;
+      this.firstVisible = 1;
+      this.buildDisplayArray();
+      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+      this.pageOne();
+    };
+
+    DataTable.prototype.filterList = function filterList(value, options) {
+      options.lookupArray = options.lookupArray || new Array();
+
+      this.filterValues = this.filterValues.filter(function (obj) {
+        return obj.options.filter !== options.filter;
+      });
+
+      if (options.type.indexOf('obj') == -1 && options.type != 'custom') {
+        var properties = options.collectionProperty.split('.');
+        var condition = "item";
+        for (var j = 0; j < properties.length; j++) {
+          if (properties[j].indexOf('[') > -1) {
+            condition += properties[j];
+          } else {
+            condition += "['" + properties[j] + "']";
+          }
+        }
+        options.collectionProperty = condition;
+      }
+
+      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == 'object') value = value.target.value;
+      if (value !== "") {
+        this.filterValues.push({ options: options, value: value });
+      }
+
+      if (this.filterValues.length > 0) {
+        this.baseArray = this.filter(this.filterValues);
+      } else {
+        this.baseArray = this.sourceArray;
+      }
+      this.startRecord = this.DEFAULT_START;
+      this.firstVisible = 1;
+      this.buildDisplayArray();
+      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+      this.pageOne();
+    };
+
+    DataTable.prototype.filter = function filter(filters) {
+      var keep;
+      var index = 0;
+      var that = this;
+      return this.sourceArray.filter(function (item) {
+        keep = false;
+        for (var i = 0; i < filters.length; i++) {
+          var filterItem = filters[i];
+          var matchValue = undefined;
+          if (filterItem.options.compare.indexOf('custom') > -1) {
+            matchValue = true;
+          } else {
+            matchValue = eval(filterItem.options.collectionProperty);
+          }
+
+          if (matchValue != undefined) {
+            switch (filterItem.options.type) {
+              case 'custom':
+                return filterItem.options.filter(filterItem.value, item, that.context);
+              case 'text':
+                if (filterItem.options.compare.indexOf('not') > -1) {
+                  keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
+                } else {
+                  keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+                }
+                break;
+              case 'value':
+                if (filterItem.options.compare.indexOf('not') > -1) {
+                  keep = matchValue != filterItem.value;
+                } else {
+                  keep = matchValue == filterItem.value;
+                }
+                break;
+              case "boolean":
+                keep = matchValue === eval(filterItem.value);
+                break;
+              case "date":
+                switch (filterItem.options.compare) {
+                  case 'after':
+                    if (matchValue) {
+                      var dt = (0, _moment2.default)(matchValue).format('YYYY-MM-DD');
+                      keep = (0, _moment2.default)(dt).isAfter(filters[i].value);
+                    }
+                    break;
+                  default:
+                    if (matchValue) {
+                      var dt = (0, _moment2.default)(matchValue).format('YYYY-MM-DD');
+                      keep = (0, _moment2.default)(dt).isSame(filters[i].value);
+                    }
+                }
+            }
+          }
+
+          if (!keep) break;
+        }
+        return keep;
+      });
+    };
+
+    DataTable.prototype.sortArray = function sortArray(el, options) {
+      var _this = this;
+
+      if (options.sortDirectionParam) this.sortDirection = sortDirectionParam;
+      this.sortProperty = options.propertyName;
+      if (options.propertyName === this.sortProperty) {
+        this.sortDirection *= -1;
+      } else {
+        this.sortDirection = 1;
+      }
+
+      $(".sortable").children().html('<i class="fa fa-sort"></i>');
+      if (this.sortDirection < 0) {
+        var icon = '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i>';
+      } else {
+        var icon = '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i>';
+      }
+      $(el.target).children().html(icon);
+
+      if (!options.type) {
+        if (options.propertyName.indexOf('.') > -1) {
+          var array = options.propertyName.split('.');
+        }
+
+        if (array) {
+          this.baseArray = this.baseArray.sort(function (a, b) {
+            var result = a[array[0]][array[1]] < b[array[0]][array[1]] ? -1 : a[array[0]][array[1]] > b[array[0]][array[1]] ? 1 : 0;
+            return result * _this.sortDirection;
+          });
+        } else {
+          this.baseArray = this.baseArray.sort(function (a, b) {
+            var result = a[options.propertyName] < b[options.propertyName] ? -1 : a[options.propertyName] > b[options.propertyName] ? 1 : 0;
+            return result * _this.sortDirection;
+          });
+        }
+      } else if (options.type == 'custom') {
+        if (typeof options.sorter == 'function') {
+          var sortArray = this.utils.copyArray(this.baseArray);
+          this.baseArray = options.sorter(this.sortProperty, this.sortDirection, sortArray, this.context);
+        }
+      } else {
+        var properties = options.searchProperty.split('.');
+        var condition = "item";
+        for (var j = 0; j < properties.length; j++) {
+          if (properties[j].indexOf('[') > -1) {
+            condition += properties[j];
+          } else {
+            condition += "['" + properties[j] + "']";
+          }
+        }
+        var sortArray = this.utils.copyArray(this.baseArray);
+        sortArray.forEach(function (item) {
+          var obj = _this.findObj(options.surrogateArray, options.surrogateProperty, eval(condition));
+          item[options.propertyName] = obj ? obj[options.propertyName] : null;
+        });
+
+        this.baseArray = sortArray.sort(function (a, b) {
+          var result = a[options.propertyName] < b[options.propertyName] ? -1 : a[options.propertyName] > b[options.propertyName] ? 1 : 0;
+          return result * _this.sortDirection;
+        });
+      }
+
+      this.startRecord = this.DEFAULT_START;
+      this.firstVisible = 1;
+      this.buildDisplayArray();
+      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+      this.pageOne();
+    };
+
+    DataTable.prototype.findObj = function findObj(surrogateArray, surrogateProperty, propertyValue) {
+      for (var i = 0, x = surrogateArray.length; i < x; i++) {
+        if (surrogateArray[i][surrogateProperty] == propertyValue) return surrogateArray[i];
+      }
+      return null;
+    };
+
+    DataTable.prototype.updateArray = function updateArray(sourceArray, sortProperty, sortDirection) {
+      var _this2 = this;
+
+      if (sourceArray) {
+        this.sourceArray = new Array();
+        this.baseArray = new Array();
+        this.active = true;
+        this.filterValues = new Array();
+        sourceArray.forEach(function (item) {
+          _this2.sourceArray.push(item);
+          _this2.baseArray.push(item);
+        });
+
+        this.baseArray.forEach(function (item, index) {
+          item.baseIndex = index;
+          item.originalIndex = index;
+        });
+
+        if (sortProperty) {
+          this.baseArray.sort(function (a, b) {
+            var result = a[sortProperty] - b[sortProperty];
+            return result * sortDirection;
+          });
+        }
+
+        this.buildDisplayArray();
+      }
+    };
+
+    DataTable.prototype.getOriginalIndex = function getOriginalIndex(index) {
+      return this.displayArray[index].originalIndex;
+    };
+
+    return DataTable;
+  }()) || _class) || _class);
+});
+define('resources/utils/lookup-value',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var LookupValueValueConverter = exports.LookupValueValueConverter = function () {
+    function LookupValueValueConverter() {
+      _classCallCheck(this, LookupValueValueConverter);
+    }
+
+    LookupValueValueConverter.prototype.toView = function toView(value, array, key, property) {
+      if (value && array && property && key) {
+        for (var i = 0; i < array.length; i++) {
+          if (value === array[i][key]) {
+            return array[i][property];
+          }
+        }
+      }
+      return "";
+    };
+
+    return LookupValueValueConverter;
+  }();
+});
+define('resources/utils/utils',['exports', 'aurelia-framework', 'jquery', 'aurelia-notification', 'moment', '../../config/appConfig'], function (exports, _aureliaFramework, _jquery, _aureliaNotification, _moment, _appConfig) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Utils = undefined;
+
+  var _jquery2 = _interopRequireDefault(_jquery);
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Utils = exports.Utils = (_dec = (0, _aureliaFramework.inject)(_aureliaNotification.Notification, _appConfig.AppConfig), _dec(_class = function () {
+    function Utils(notification, config) {
+      _classCallCheck(this, Utils);
+
+      this.config = config;
+      this.notification = notification;
+      this.notification.waitForMove = true;
+    }
+
+    Utils.prototype.showNotification = function showNotification(msg) {
+      this.notification.note(msg);
+    };
+
+    Utils.prototype.setRole = function setRole(roles) {
+      var _this = this;
+
+      var userRole = 1;
+
+      var _loop = function _loop(i) {
+        _this.config.ROLES.forEach(function (item) {
+          if (roles[i] == item.role) {
+            userRole = item.authLevel > userRole ? item.authLevel : userRole;
+          }
+        });
+      };
+
+      for (var i = 0; i < roles.length; i++) {
+        _loop(i);
+      }
+      return userRole;
+    };
+
+    Utils.prototype.countItems = function countItems(value, property, itemArray) {
+      var countArray = itemArray.filter(function (item) {
+        return item[property] == value;
+      });
+      return countArray.length;
+    };
+
+    Utils.prototype.arrayContainsValue = function arrayContainsValue(array, property, value) {
+      for (var i = 0, x = array.length; i < x; i++) {
+        if (array[i][property] == value) {
+          return i;
+        }
+      }
+      return -1;
+    };
+
+    Utils.prototype.objectsEqual = function objectsEqual(obj1, obj2, skip) {
+      var changes = new Array();
+      var skipArray = skip || new Array();
+      for (var property in obj1) {
+        if (obj1.hasOwnProperty(property)) {
+          if (!obj1[property] && !obj2[property] || skipArray.indexOf(property) !== -1) {
+            continue;
+          } else if (Array.isArray(obj1[property])) {
+            if (!this.arraysEqual(obj1[property], obj2[property])) {
+              changes.push({
+                property: property,
+                oldValue: obj2[property].length,
+                newValue: obj1[property].length
+              });
+            }
+          } else if (property.indexOf('Date') > -1 || property.indexOf('date') > -1 || obj1[property] instanceof Date) {
+            var date1 = new Date(obj1[property]);
+            var date2 = new Date(obj2[property]);
+            if (!(0, _moment2.default)(date1).isSame(date2, 'year') || !(0, _moment2.default)(date1).isSame(date2, 'month') || !(0, _moment2.default)(date1).isSame(date2, 'day')) {
+              changes.push({
+                property: property,
+                oldValue: obj2[property],
+                newValue: obj1[property]
+              });
+            }
+          } else {
+            if (obj1[property] != obj2[property]) {
+              if (!(obj1[property] === "" && obj2[property] === undefined)) {
+                changes.push({
+                  property: property,
+                  oldValue: obj2[property],
+                  newValue: obj1[property]
+                });
+              }
+            }
+          }
+        }
+      }
+      return changes;
+    };
+
+    Utils.prototype.arraysEqual = function arraysEqual(array1, array2) {
+      var arraysEqual = true;
+      if (array1.length != array2.length) {
+        return false;
+      } else {
+        var newArray = new Array();
+        for (var i = 0; i < array1.length; i++) {
+          newArray[i] = JSON.stringify(array1[i]);
+        }
+        for (var i = 0; i < array1.length; i++) {
+          if (newArray.indexOf(JSON.stringify(array2[i])) == -1) {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+
+    Utils.prototype.copyObject = function copyObject(objFrom, objTo, properties) {
+      objTo = objTo || new Object();;
+      if (!properties) {
+        for (var property in objFrom) {
+          if (objFrom.hasOwnProperty(property)) {
+            if (Array.isArray(objFrom[property])) {
+              objTo[property] = this.copyArray(objFrom[property]);
+            } else if (objFrom[property] instanceof Date) {
+              objTo[property] = objFrom[property];
+            } else if (this.isObject(objFrom[property])) {
+              objTo[property] = this.copyObject(objFrom[property]);
+            } else {
+              objTo[property] = objFrom[property];
+            }
+          }
+        }
+      } else {
+        for (var i = 0, x = properties.length; i < x; i++) {
+          if (objFrom.hasOwnProperty(properties[i])) {
+            if (Array.isArray(objFrom[property])) {
+              objTo[property] = this.copyArray(objFrom[property]);
+            } else if (objFrom[property] instanceof Date) {
+              objTo[property] = objFrom[property];
+            } else if (this.isObject(objFrom[property])) {
+              objTo[property] = this.copyObject(objFrom[property]);
+            } else {
+              objTo[property] = objFrom[property];
+            }
+          }
+        }
+      }
+      return objTo;
+    };
+
+    Utils.prototype.copyArray = function copyArray(array) {
+      var _this2 = this;
+
+      if (array) {
+        var newArray = new Array();
+        array.forEach(function (item) {
+          if (Array.isArray(item)) {
+            newArray.push(_this2.copyArray(item));
+          } else if (_this2.isObject(item)) {
+            newArray.push(_this2.copyObject(item));
+          } else {
+            newArray.push(item);
+          }
+        });
+        return newArray;
+      }
+      return null;
+    };
+
+    Utils.prototype.isObject = function isObject(obj) {
+      return obj === Object(obj);
+    };
+
+    return Utils;
+  }()) || _class);
+});
+define('resources/utils/validation',["exports", "aurelia-framework"], function (exports, _aureliaFramework) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var _default = (_dec = (0, _aureliaFramework.transient)(), _dec(_class = function () {
+    function _default() {
+      _classCallCheck(this, _default);
+
+      this.ruleGroups = [];
+      this.rules = [];
+
+      this.addRule = function (ruleGroup, field, rule, blur) {
+
+        if (blur) {
+          var that = this;
+          $("#" + field).blur(function () {
+            that.validateRule(rule, field);
+          });
+        }
+
+        var index = -1;
+
+        for (var k = 0; k < this.rules.length; k++) {
+          if (this.rules[k].ruleGroup === ruleGroup) {
+            index = k;
+            break;
+          }
+        }
+
+        var fieldArray = [];
+        var ruleArray = [];
+        if (index === -1) {
+          this.rules.push({ ruleGroup: ruleGroup, fields: fieldArray });
+          this.rules[this.rules.length - 1].fields[0] = { field: field, rules: ruleArray };
+          this.rules[this.rules.length - 1].fields[0].rules = rule;
+        } else {
+          var found = false;
+
+          if (!found) {
+            this.rules[index].fields.push({ field: field, rules: ruleArray });
+            this.rules[index].fields[this.rules[index].fields.length - 1].rules = rule;
+          }
+        }
+      };
+
+      this.validate = function (ruleGroup) {
+        var index = -1;
+        for (var k = 0; k < this.rules.length; k++) {
+          if (this.rules[k].ruleGroup == ruleGroup) {
+            index = k;
+            break;
+          }
+        }
+
+        if (index === -1) {
+          return true;
+        } else {
+          var valid = true;
+          for (var i = 0; i < this.rules[index].fields.length; i++) {
+            var fields = this.rules[index].fields[i];
+            var thisValid = true;
+            for (var k = 0; k < fields.rules.length; k++) {
+              thisValid = true;
+              var rules = fields.rules[k];
+              thisValid = this.validateRule(rules, fields.field);
+              if (!thisValid) {
+                valid = false;
+                break;
+              }
+            }
+          }
+        }
+        return valid;
+      };
+
+      this._inValidate = function (field, rule) {
+        var el = $("#" + field);
+        if (el.next().is("span.help-block")) {
+          el.next().html(rule.message);
+        } else {
+          var msg = "<span class='help-block'>{message}</span>".replace("{message}", rule.message);
+        }
+
+        if (el.is(':visible')) {
+          if (!el.parent().hasClass("has-error")) {
+            el.parent().addClass("has-error");
+            if (!el.next().is("span.help-block")) {
+              el.after(msg);
+            }
+          }
+        }
+      };
+
+      this.makeValid = function (field) {
+        field.parent().removeClass("has-error");
+        if (field.next().is("span.help-block")) {
+          field.next().html("");
+        }
+      };
+
+      this.makeAllValid = function (ruleGroup) {
+        var index = -1;
+        for (var k = 0; k < this.rules.length; k++) {
+          if (this.rules[k].ruleGroup == ruleGroup) {
+            index = k;
+            break;
+          }
+        }
+
+        if (index === -1) {
+          return true;
+        } else {
+          for (var i = 0; i < this.rules[index].fields.length; i++) {
+            this.makeValid($('#' + this.rules[index].fields[i].field));
+          }
+        }
+      };
+    }
+
+    _default.prototype.initialize = function initialize(context) {
+      this.context = context;
+    };
+
+    _default.prototype.validateRule = function validateRule(rules, field) {
+      var thisValid = true;
+      switch (rules.rule) {
+        case "custom":
+          thisValid = rules.valFunction(this.context);
+          break;
+        case "required":
+          if (!eval('this.context.' + rules.value) || eval('this.context.' + rules.value).length === 0) {
+            thisValid = false;
+          }
+          break;
+        case "min":
+          if (eval('this.context.' + rules.value) < rules.ruleValue) {
+            thisValid = false;
+          }
+          break;
+        case "max":
+          if (eval('this.context.' + rules.value) > rules.ruleValue) {
+            thisValid = false;
+          }
+          break;
+        case "length":
+          if (eval('this.context.' + rules.value).length > 0 && eval('this.context.' + rules.value).length < rules.ruleValue) {
+            thisValid = false;
+          }
+          break;
+      }
+      if (thisValid) {
+        if (thisValid) this.makeValid($("#" + field));
+      } else {
+        this._inValidate(field, rules);
+      }
+      return thisValid;
+    };
+
+    _default.prototype.clearRules = function clearRules() {
+      this.ruleGroups = [];
+      this.rules = [];
+    };
+
+    return _default;
+  }()) || _class);
+
+  exports.default = _default;
+});
+define('resources/value-converters/date-format',['exports', 'moment'], function (exports, _moment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DateFormatValueConverter = undefined;
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var DateFormatValueConverter = exports.DateFormatValueConverter = function () {
+    function DateFormatValueConverter() {
+      _classCallCheck(this, DateFormatValueConverter);
+    }
+
+    DateFormatValueConverter.prototype.toView = function toView(value) {
+      var format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'MMM Do YYYY';
+      var fromNow = arguments[2];
+
+      if (value === undefined || value === null) {
+        return;
+      }
+
+      if (fromNow) {
+        var formattedDate = (0, _moment2.default)(value).calendar();
+      } else {
+        var formattedDate = (0, _moment2.default)(value).format(format);
+      }
+      return formattedDate === "Invalid date" ? "" : formattedDate;
+    };
+
+    return DateFormatValueConverter;
+  }();
+});
+define('resources/value-converters/gravatar-url-id',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var GravatarUrlIdValueConverter = exports.GravatarUrlIdValueConverter = function () {
+    function GravatarUrlIdValueConverter() {
+      _classCallCheck(this, GravatarUrlIdValueConverter);
+    }
+
+    GravatarUrlIdValueConverter.prototype.toView = function toView(id, array, size, alt) {
+      var email = "";
+      if (id !== undefined && array !== undefined) {
+        for (var i = 0; i < array.length; i++) {
+          if (id === array[i]._id) {
+            email = array[i].email;
+            break;
+          }
+        }
+        var size = size || 80;
+        return '<img src="https://secure.gravatar.com/avatar/' + CryptoJS.MD5(email.toLowerCase()) + '.jpg?s=' + size + '"/>';
+      } else {
+        switch (alt) {
+          case 1:
+          case 6:
+            return "<i class='fa fa-file-text'></i>";
+        }
+      }
+    };
+
+    return GravatarUrlIdValueConverter;
+  }();
+});
+define('resources/value-converters/gravatar-url',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var GravatarUrlValueConverter = exports.GravatarUrlValueConverter = function () {
+    function GravatarUrlValueConverter() {
+      _classCallCheck(this, GravatarUrlValueConverter);
+    }
+
+    GravatarUrlValueConverter.prototype.toView = function toView(email, size) {
+      if (email !== undefined) {
+        var size = size || 80;
+        var html = '<img class="img-circle" src="https://secure.gravatar.com/avatar/' + CryptoJS.MD5(email.toLowerCase()) + '.jpg?s=' + size + '"/>';
+        return html;
+      } else {
+        return "<i class='fa fa-file-text'></i>";
+      }
+    };
+
+    return GravatarUrlValueConverter;
+  }();
+});
+define('resources/value-converters/idsRequested',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var IdsRequestedValueConverter = exports.IdsRequestedValueConverter = function () {
+    function IdsRequestedValueConverter() {
+      _classCallCheck(this, IdsRequestedValueConverter);
+    }
+
+    IdsRequestedValueConverter.prototype.toView = function toView(value) {
+      if (value) {
+        return parseInt(value.graduateIds) + parseInt(value.undergradIds);
+      }
+      return 0;
+    };
+
+    return IdsRequestedValueConverter;
+  }();
+});
+define('resources/value-converters/info-filter',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var InfoFilterValueConverter = exports.InfoFilterValueConverter = function () {
+    function InfoFilterValueConverter() {
+      _classCallCheck(this, InfoFilterValueConverter);
+    }
+
+    InfoFilterValueConverter.prototype.toView = function toView(array, value, length) {
+      if (value && array) {
+        return array.filter(function (item) {
+          return item.itemType == value;
+        });
+      }
+      return length ? array.length > 0 : array;
+    };
+
+    return InfoFilterValueConverter;
+  }();
+});
+define('resources/value-converters/lookup-value',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var LookupValueValueConverter = exports.LookupValueValueConverter = function () {
+    function LookupValueValueConverter() {
+      _classCallCheck(this, LookupValueValueConverter);
+    }
+
+    LookupValueValueConverter.prototype.toView = function toView(value, array, key, property) {
+      if (value && array && property && key) {
+        for (var i = 0; i < array.length; i++) {
+          if (value == array[i][key]) {
+            return array[i][property];
+          }
+        }
+      }
+      return "";
+    };
+
+    return LookupValueValueConverter;
+  }();
+});
+define('resources/value-converters/person-status-button',['exports'], function (exports) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var PersonStatusButtonValueConverter = exports.PersonStatusButtonValueConverter = function () {
+		function PersonStatusButtonValueConverter() {
+			_classCallCheck(this, PersonStatusButtonValueConverter);
+		}
+
+		PersonStatusButtonValueConverter.prototype.toView = function toView(value) {
+			if (!value) return;
+
+			switch (value) {
+				case '01':
+					return '<span bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Deactivate"><i class="fa fa-toggle-off" aria-hidden="true"></i></span>';
+					break;
+				case '02':
+					return '<span bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Activate"><i class="fa fa-toggle-on" aria-hidden="true"></i></span>';
+					break;
+				default:
+					return "";
+			}
+		};
+
+		return PersonStatusButtonValueConverter;
+	}();
+});
+define('resources/value-converters/phone-number',["exports"], function (exports) {
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var PhoneNumberValueConverter = exports.PhoneNumberValueConverter = function () {
+		function PhoneNumberValueConverter() {
+			_classCallCheck(this, PhoneNumberValueConverter);
+		}
+
+		PhoneNumberValueConverter.prototype.toView = function toView(value) {
+			var mask = "___-___-____";
+			if (value) {
+
+				value = value.replace(/-/g, '');
+				if (value.length > 10) value = value.substr(0, 10);
+				if (value.length === 0) {
+					return mask;
+				} else if (value.length <= 3) {
+					return value;
+				} else if (value.length > 3 && value.length <= 6) {
+					return value.substr(0, 3) + "-" + value.substr(3, value.length - 3);
+				} else {
+					return value.substr(0, 3) + "-" + value.substr(3, 3) + "-" + value.substr(6, value.length);
+				}
+			}
+		};
+
+		return PhoneNumberValueConverter;
+	}();
+});
+define('resources/value-converters/sandbox',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var SandboxValueConverter = exports.SandboxValueConverter = function () {
+    function SandboxValueConverter() {
+      _classCallCheck(this, SandboxValueConverter);
+    }
+
+    SandboxValueConverter.prototype.toView = function toView(value, sandbox) {
+      if (value && sandbox) {
+        if (value === sandbox) {
+          return "Sandbox";
+        } else {
+          return 'Regular';
+        }
+      }
+    };
+
+    return SandboxValueConverter;
+  }();
+});
+define('resources/value-converters/session-status-button',['exports'], function (exports) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var SessionStatusButtonValueConverter = exports.SessionStatusButtonValueConverter = function () {
+		function SessionStatusButtonValueConverter() {
+			_classCallCheck(this, SessionStatusButtonValueConverter);
+		}
+
+		SessionStatusButtonValueConverter.prototype.toView = function toView(value) {
+			if (!value) return;
+
+			switch (value) {
+				case 'Active':
+					return '<span bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-hourglass-end" aria-hidden="true"></i></span>';
+					break;
+				case 'Requests':
+					return '<span bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Activate"><i class="fa fa-check-square-o" aria-hidden="true"></i></span>';
+					break;
+				case 'Next':
+					return '<span bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Open"><i class="fa fa-cart-plus" aria-hidden="true"></i></span>';
+					break;
+				default:
+					return "";
+			}
+		};
+
+		return SessionStatusButtonValueConverter;
+	}();
+});
+define('resources/value-converters/session-type',['exports'], function (exports) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var SessionTypeValueConverter = exports.SessionTypeValueConverter = function () {
+		function SessionTypeValueConverter() {
+			_classCallCheck(this, SessionTypeValueConverter);
+		}
+
+		SessionTypeValueConverter.prototype.toView = function toView(array, value) {
+			var sessions = [];
+			var statuses = value.split(':');
+			if (value === undefined || array === undefined) return sessions;
+			array.forEach(function (session) {
+				if (statuses.indexOf(session.sessionStatus) > -1) {
+					sessions.push(session);
+				}
+			});
+			return sessions;
+		};
+
+		return SessionTypeValueConverter;
+	}();
+});
+define('resources/value-converters/ucc-title',["exports"], function (exports) {
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var uccTitleValueConverter = exports.uccTitleValueConverter = function () {
+		function uccTitleValueConverter() {
+			_classCallCheck(this, uccTitleValueConverter);
+		}
+
+		uccTitleValueConverter.prototype.toView = function toView(value, array) {
+			for (var i = 0; i < array.length; i++) {
+				if (value == array[i].role) return array[i].label;
+			}
+			return "";
+		};
+
+		return uccTitleValueConverter;
+	}();
+});
+define('modules/admin/system/editProducts',[], function () {
+  "use strict";
+
+  editProducts.js;
+});
+define('modules/admin/system/editSession',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/config', '../../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _validation, _dataTable, _appConfig, _config, _commonDialogs) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSessions = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSessions = exports.EditSessions = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _config.Config, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditSessions(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
+            _classCallCheck(this, EditSessions);
+
+            this.navControl = "sessionNavButtons";
+            this.showScreen = 'sessionTable';
+            this.spinnerHTML = "";
+            this.isChecked = true;
+
+            this.router = router;
+            this.sessions = sessions;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.siteConfig = siteConfig;
+
+            this._setupValidation();
+        }
+
+        EditSessions.prototype.attached = function attached() {
+            this.toolTips();
+        };
+
+        EditSessions.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?order=startDate:DSC', true), this.config.getConfig(), this.config.getSessions()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.filterOutClosed();
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSessions.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.sessions.getSessionsArray('?order=startDate', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.filterOutClosed();
+                                this.spinnerHTML = "";
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditSessions.prototype.new = function _new() {
+            this.sessions.selectSession();
+            this.showScreen = 'editSession';
+            this.sessionSelected = true;
+            this.editSystem = true;
+            this.newSession = true;
+            $("#editSession").focus();
+            if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
+        };
+
+        EditSessions.prototype.edit = function edit(index, el) {
+            this.showScreen = 'editSession';
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            this.editSession = true;
+            $("#editSession").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        EditSessions.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context3.next = 5;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.sessions.saveSession();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                    this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
+                                    this.showScreen = 'sessionTable';
+                                    this.toolTips();
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditSessions.prototype.refreshConfig = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.config.getSessions(true);
+
+                            case 2:
+                                this.editSessionConfig();
+
+                            case 3:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function refreshConfig() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return refreshConfig;
+        }();
+
+        EditSessions.prototype.editSessionConfig = function editSessionConfig() {
+            var _this = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this.editSessionConfigArray.push(_this.utils.copyObject(item));
+            });
+            this.showScreen = 'editConfig';
+        };
+
+        EditSessions.prototype.saveConfig = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this2 = this;
+
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!this.editSessionConfigArray) {
+                                    _context5.next = 5;
+                                    break;
+                                }
+
+                                _context5.next = 3;
+                                return this.siteConfig.saveSessions(this.editSessionConfigArray);
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.editSessionConfigArray.forEach(function (item, index) {
+                                        _this2.config.SESSION_PARAMS[index] = item;
+                                    });
+                                    this.utils.showNotification("Session configuration updated");
+                                    this.showScreen = 'sessionTable';
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function saveConfig() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return saveConfig;
+        }();
+
+        EditSessions.prototype.updateStatus = function updateStatus(index, session, el) {
+            if (session.sessionStatus === "Closed") return;
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            switch (session.sessionStatus) {
+                case "Next":
+                    this.editStatus = "Requests";
+                    break;
+                case "Requests":
+                    this.editStatus = "Active";
+                    break;
+                case "Active":
+                    this.editStatus = "Closed";
+                    break;
+            }
+            this.sessions.selectedSession.sessionStatus = this.editStatus;
+            this.save();
+        };
+
+        EditSessions.prototype.filterOutClosed = function filterOutClosed() {
+            if (this.isChecked) {
+                this.dataTable.filterList("Closed", { type: 'text', filter: 'sessionStatus', collectionProperty: 'sessionStatus', compare: 'not-match' });
+            } else {
+                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+            }
+            this.toolTips();
+        };
+
+        EditSessions.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", { "rule": "required", "message": "Session name is required", "value": "sessions.selectedSession.session" });
+            this.validation.addRule(1, "editYear", { "rule": "required", "message": "Session year is required", "value": "sessions.selectedSession.year" });
+            this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
+            this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
+            this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
+        };
+
+        EditSessions.prototype.cancel = function cancel() {
+            this.sessions.selectSession(this.editIndex);
+        };
+
+        EditSessions.prototype.cancelConfig = function cancelConfig() {
+            var _this3 = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this3.editSessionConfigArray.push(_this3.utils.copyObject(item));
+            });
+        };
+
+        EditSessions.prototype.backConfig = function backConfig() {
+            this.showScreen = 'sessionTable';
+        };
+
+        EditSessions.prototype.back = function back() {
+            var _this4 = this;
+
+            if (this.sessions.isDirty().length) {
+                return this.dialog.showMessage("The session has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        _this4.save();
+                    } else {
+                        _this4.showScreen = 'sessionTable';
+                    }
+                });
+            } else {
+                this.showScreen = 'sessionTable';
+            }
+        };
+
+        EditSessions.prototype.toolTips = function toolTips() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        return EditSessions;
+    }()) || _class);
+});
+define('modules/admin/system/editSystems',[], function () {
+  "use strict";
+
+  editSystems.js;
+});
+define('modules/admin/system/system',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.System = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var System = exports.System = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function System(router) {
+            _classCallCheck(this, System);
+
+            this.router = router;
+        }
+
+        System.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        System.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editSessions'],
+                moduleId: './editSession',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSessions',
+                title: 'Sessions'
+            }, {
+                route: 'editSystems',
+                moduleId: './editSystem',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSystems',
+                title: 'Systems'
+            }, {
+                route: 'editProducts',
+                moduleId: './editProduct',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editProducts',
+                title: 'Products'
+            }]);
+
+            this.router = router;
+        };
+
+        return System;
+    }()) || _class);
+});
+define('aurelia-templating-resources/compose',['exports', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-templating', 'aurelia-pal'], function (exports, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaTemplating, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Compose = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+
+  var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
+    function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
+      
+
+      _initDefineProp(this, 'model', _descriptor, this);
+
+      _initDefineProp(this, 'view', _descriptor2, this);
+
+      _initDefineProp(this, 'viewModel', _descriptor3, this);
+
+      _initDefineProp(this, 'swapOrder', _descriptor4, this);
+
+      this.element = element;
+      this.container = container;
+      this.compositionEngine = compositionEngine;
+      this.viewSlot = viewSlot;
+      this.viewResources = viewResources;
+      this.taskQueue = taskQueue;
+      this.currentController = null;
+      this.currentViewModel = null;
+    }
+
+    Compose.prototype.created = function created(owningView) {
+      this.owningView = owningView;
+    };
+
+    Compose.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.bindingContext = bindingContext;
+      this.overrideContext = overrideContext;
+      processInstruction(this, createInstruction(this, {
+        view: this.view,
+        viewModel: this.viewModel,
+        model: this.model
+      }));
+    };
+
+    Compose.prototype.unbind = function unbind(bindingContext, overrideContext) {
+      this.bindingContext = null;
+      this.overrideContext = null;
+      var returnToCache = true;
+      var skipAnimation = true;
+      this.viewSlot.removeAll(returnToCache, skipAnimation);
+    };
+
+    Compose.prototype.modelChanged = function modelChanged(newValue, oldValue) {
+      var _this = this;
+
+      if (this.currentInstruction) {
+        this.currentInstruction.model = newValue;
+        return;
+      }
+
+      this.taskQueue.queueMicroTask(function () {
+        if (_this.currentInstruction) {
+          _this.currentInstruction.model = newValue;
+          return;
+        }
+
+        var vm = _this.currentViewModel;
+
+        if (vm && typeof vm.activate === 'function') {
+          vm.activate(newValue);
+        }
+      });
+    };
+
+    Compose.prototype.viewChanged = function viewChanged(newValue, oldValue) {
+      var _this2 = this;
+
+      var instruction = createInstruction(this, {
+        view: newValue,
+        viewModel: this.currentViewModel || this.viewModel,
+        model: this.model
+      });
+
+      if (this.currentInstruction) {
+        this.currentInstruction = instruction;
+        return;
+      }
+
+      this.currentInstruction = instruction;
+      this.taskQueue.queueMicroTask(function () {
+        return processInstruction(_this2, _this2.currentInstruction);
+      });
+    };
+
+    Compose.prototype.viewModelChanged = function viewModelChanged(newValue, oldValue) {
+      var _this3 = this;
+
+      var instruction = createInstruction(this, {
+        viewModel: newValue,
+        view: this.view,
+        model: this.model
+      });
+
+      if (this.currentInstruction) {
+        this.currentInstruction = instruction;
+        return;
+      }
+
+      this.currentInstruction = instruction;
+      this.taskQueue.queueMicroTask(function () {
+        return processInstruction(_this3, _this3.currentInstruction);
+      });
+    };
+
+    return Compose;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'model', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'view', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'viewModel', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class) || _class) || _class);
+
+
+  function createInstruction(composer, instruction) {
+    return Object.assign(instruction, {
+      bindingContext: composer.bindingContext,
+      overrideContext: composer.overrideContext,
+      owningView: composer.owningView,
+      container: composer.container,
+      viewSlot: composer.viewSlot,
+      viewResources: composer.viewResources,
+      currentController: composer.currentController,
+      host: composer.element,
+      swapOrder: composer.swapOrder
+    });
+  }
+
+  function processInstruction(composer, instruction) {
+    composer.currentInstruction = null;
+    composer.compositionEngine.compose(instruction).then(function (controller) {
+      composer.currentController = controller;
+      composer.currentViewModel = controller ? controller.viewModel : null;
+    });
+  }
+});
+define('aurelia-templating-resources/if',['exports', 'aurelia-templating', 'aurelia-dependency-injection'], function (exports, _aureliaTemplating, _aureliaDependencyInjection) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.If = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function If(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.showing = false;
+      this.view = null;
+      this.bindingContext = null;
+      this.overrideContext = null;
+    }
+
+    If.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.bindingContext = bindingContext;
+      this.overrideContext = overrideContext;
+      this.valueChanged(this.value);
+    };
+
+    If.prototype.valueChanged = function valueChanged(newValue) {
+      var _this = this;
+
+      if (this.__queuedChanges) {
+        this.__queuedChanges.push(newValue);
+        return;
+      }
+
+      var maybePromise = this._runValueChanged(newValue);
+      if (maybePromise instanceof Promise) {
+        (function () {
+          var queuedChanges = _this.__queuedChanges = [];
+
+          var runQueuedChanges = function runQueuedChanges() {
+            if (!queuedChanges.length) {
+              _this.__queuedChanges = undefined;
+              return;
+            }
+
+            var nextPromise = _this._runValueChanged(queuedChanges.shift()) || Promise.resolve();
+            nextPromise.then(runQueuedChanges);
+          };
+
+          maybePromise.then(runQueuedChanges);
+        })();
+      }
+    };
+
+    If.prototype._runValueChanged = function _runValueChanged(newValue) {
+      var _this2 = this;
+
+      if (!newValue) {
+        var viewOrPromise = void 0;
+        if (this.view !== null && this.showing) {
+          viewOrPromise = this.viewSlot.remove(this.view);
+          if (viewOrPromise instanceof Promise) {
+            viewOrPromise.then(function () {
+              return _this2.view.unbind();
+            });
+          } else {
+            this.view.unbind();
+          }
+        }
+
+        this.showing = false;
+        return viewOrPromise;
+      }
+
+      if (this.view === null) {
+        this.view = this.viewFactory.create();
+      }
+
+      if (!this.view.isBound) {
+        this.view.bind(this.bindingContext, this.overrideContext);
+      }
+
+      if (!this.showing) {
+        this.showing = true;
+        return this.viewSlot.add(this.view);
+      }
+
+      return undefined;
+    };
+
+    If.prototype.unbind = function unbind() {
+      if (this.view === null) {
+        return;
+      }
+
+      this.view.unbind();
+
+      if (!this.viewFactory.isCaching) {
+        return;
+      }
+
+      if (this.showing) {
+        this.showing = false;
+        this.viewSlot.remove(this.view, true, true);
+      }
+      this.view.returnToCache();
+      this.view = null;
+    };
+
+    return If;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/with',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-binding'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.With = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var With = exports.With = (_dec = (0, _aureliaTemplating.customAttribute)('with'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function With(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.parentOverrideContext = null;
+      this.view = null;
+    }
+
+    With.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.parentOverrideContext = overrideContext;
+      this.valueChanged(this.value);
+    };
+
+    With.prototype.valueChanged = function valueChanged(newValue) {
+      var overrideContext = (0, _aureliaBinding.createOverrideContext)(newValue, this.parentOverrideContext);
+      if (!this.view) {
+        this.view = this.viewFactory.create();
+        this.view.bind(newValue, overrideContext);
+        this.viewSlot.add(this.view);
+      } else {
+        this.view.bind(newValue, overrideContext);
+      }
+    };
+
+    With.prototype.unbind = function unbind() {
+      this.parentOverrideContext = null;
+
+      if (this.view) {
+        this.view.unbind();
+      }
+    };
+
+    return With;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/repeat',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-templating', './repeat-strategy-locator', './repeat-utilities', './analyze-view-factory', './abstract-repeater'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaTemplating, _repeatStrategyLocator, _repeatUtilities, _analyzeViewFactory, _abstractRepeater) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Repeat = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+
+  var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('repeat'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.TargetInstruction, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaBinding.ObserverLocator, _repeatStrategyLocator.RepeatStrategyLocator), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = (_class2 = function (_AbstractRepeater) {
+    _inherits(Repeat, _AbstractRepeater);
+
+    function Repeat(viewFactory, instruction, viewSlot, viewResources, observerLocator, strategyLocator) {
+      
+
+      var _this = _possibleConstructorReturn(this, _AbstractRepeater.call(this, {
+        local: 'item',
+        viewsRequireLifecycle: (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory)
+      }));
+
+      _initDefineProp(_this, 'items', _descriptor, _this);
+
+      _initDefineProp(_this, 'local', _descriptor2, _this);
+
+      _initDefineProp(_this, 'key', _descriptor3, _this);
+
+      _initDefineProp(_this, 'value', _descriptor4, _this);
+
+      _this.viewFactory = viewFactory;
+      _this.instruction = instruction;
+      _this.viewSlot = viewSlot;
+      _this.lookupFunctions = viewResources.lookupFunctions;
+      _this.observerLocator = observerLocator;
+      _this.key = 'key';
+      _this.value = 'value';
+      _this.strategyLocator = strategyLocator;
+      _this.ignoreMutation = false;
+      _this.sourceExpression = (0, _repeatUtilities.getItemsSourceExpression)(_this.instruction, 'repeat.for');
+      _this.isOneTime = (0, _repeatUtilities.isOneTime)(_this.sourceExpression);
+      _this.viewsRequireLifecycle = (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory);
+      return _this;
+    }
+
+    Repeat.prototype.call = function call(context, changes) {
+      this[context](this.items, changes);
+    };
+
+    Repeat.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.scope = { bindingContext: bindingContext, overrideContext: overrideContext };
+      this.matcherBinding = this._captureAndRemoveMatcherBinding();
+      this.itemsChanged();
+    };
+
+    Repeat.prototype.unbind = function unbind() {
+      this.scope = null;
+      this.items = null;
+      this.matcherBinding = null;
+      this.viewSlot.removeAll(true);
+      this._unsubscribeCollection();
+    };
+
+    Repeat.prototype._unsubscribeCollection = function _unsubscribeCollection() {
+      if (this.collectionObserver) {
+        this.collectionObserver.unsubscribe(this.callContext, this);
+        this.collectionObserver = null;
+        this.callContext = null;
+      }
+    };
+
+    Repeat.prototype.itemsChanged = function itemsChanged() {
+      this._unsubscribeCollection();
+
+      if (!this.scope) {
+        return;
+      }
+
+      var items = this.items;
+      this.strategy = this.strategyLocator.getStrategy(items);
+      if (!this.strategy) {
+        throw new Error('Value for \'' + this.sourceExpression + '\' is non-repeatable');
+      }
+
+      if (!this.isOneTime && !this._observeInnerCollection()) {
+        this._observeCollection();
+      }
+      this.strategy.instanceChanged(this, items);
+    };
+
+    Repeat.prototype._getInnerCollection = function _getInnerCollection() {
+      var expression = (0, _repeatUtilities.unwrapExpression)(this.sourceExpression);
+      if (!expression) {
+        return null;
+      }
+      return expression.evaluate(this.scope, null);
+    };
+
+    Repeat.prototype.handleCollectionMutated = function handleCollectionMutated(collection, changes) {
+      if (!this.collectionObserver) {
+        return;
+      }
+      this.strategy.instanceMutated(this, collection, changes);
+    };
+
+    Repeat.prototype.handleInnerCollectionMutated = function handleInnerCollectionMutated(collection, changes) {
+      var _this2 = this;
+
+      if (!this.collectionObserver) {
+        return;
+      }
+
+      if (this.ignoreMutation) {
+        return;
+      }
+      this.ignoreMutation = true;
+      var newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
+      this.observerLocator.taskQueue.queueMicroTask(function () {
+        return _this2.ignoreMutation = false;
+      });
+
+      if (newItems === this.items) {
+        this.itemsChanged();
+      } else {
+        this.items = newItems;
+      }
+    };
+
+    Repeat.prototype._observeInnerCollection = function _observeInnerCollection() {
+      var items = this._getInnerCollection();
+      var strategy = this.strategyLocator.getStrategy(items);
+      if (!strategy) {
+        return false;
+      }
+      this.collectionObserver = strategy.getCollectionObserver(this.observerLocator, items);
+      if (!this.collectionObserver) {
+        return false;
+      }
+      this.callContext = 'handleInnerCollectionMutated';
+      this.collectionObserver.subscribe(this.callContext, this);
+      return true;
+    };
+
+    Repeat.prototype._observeCollection = function _observeCollection() {
+      var items = this.items;
+      this.collectionObserver = this.strategy.getCollectionObserver(this.observerLocator, items);
+      if (this.collectionObserver) {
+        this.callContext = 'handleCollectionMutated';
+        this.collectionObserver.subscribe(this.callContext, this);
+      }
+    };
+
+    Repeat.prototype._captureAndRemoveMatcherBinding = function _captureAndRemoveMatcherBinding() {
+      if (this.viewFactory.viewFactory) {
+        var instructions = this.viewFactory.viewFactory.instructions;
+        var instructionIds = Object.keys(instructions);
+        for (var i = 0; i < instructionIds.length; i++) {
+          var expressions = instructions[instructionIds[i]].expressions;
+          if (expressions) {
+            for (var ii = 0; i < expressions.length; i++) {
+              if (expressions[ii].targetProperty === 'matcher') {
+                var matcherBinding = expressions[ii];
+                expressions.splice(ii, 1);
+                return matcherBinding;
+              }
+            }
+          }
+        }
+      }
+
+      return undefined;
+    };
+
+    Repeat.prototype.viewCount = function viewCount() {
+      return this.viewSlot.children.length;
+    };
+
+    Repeat.prototype.views = function views() {
+      return this.viewSlot.children;
+    };
+
+    Repeat.prototype.view = function view(index) {
+      return this.viewSlot.children[index];
+    };
+
+    Repeat.prototype.matcher = function matcher() {
+      return this.matcherBinding ? this.matcherBinding.sourceExpression.evaluate(this.scope, this.matcherBinding.lookupFunctions) : null;
+    };
+
+    Repeat.prototype.addView = function addView(bindingContext, overrideContext) {
+      var view = this.viewFactory.create();
+      view.bind(bindingContext, overrideContext);
+      this.viewSlot.add(view);
+    };
+
+    Repeat.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
+      var view = this.viewFactory.create();
+      view.bind(bindingContext, overrideContext);
+      this.viewSlot.insert(index, view);
+    };
+
+    Repeat.prototype.moveView = function moveView(sourceIndex, targetIndex) {
+      this.viewSlot.move(sourceIndex, targetIndex);
+    };
+
+    Repeat.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
+      return this.viewSlot.removeAll(returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
+      return this.viewSlot.removeMany(viewsToRemove, returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
+      return this.viewSlot.removeAt(index, returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.updateBindings = function updateBindings(view) {
+      var j = view.bindings.length;
+      while (j--) {
+        (0, _repeatUtilities.updateOneTimeBinding)(view.bindings[j]);
+      }
+      j = view.controllers.length;
+      while (j--) {
+        var k = view.controllers[j].boundProperties.length;
+        while (k--) {
+          var binding = view.controllers[j].boundProperties[k].binding;
+          (0, _repeatUtilities.updateOneTimeBinding)(binding);
+        }
+      }
+    };
+
+    return Repeat;
+  }(_abstractRepeater.AbstractRepeater), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'items', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'local', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'key', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'value', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/repeat-strategy-locator',['exports', './null-repeat-strategy', './array-repeat-strategy', './map-repeat-strategy', './set-repeat-strategy', './number-repeat-strategy'], function (exports, _nullRepeatStrategy, _arrayRepeatStrategy, _mapRepeatStrategy, _setRepeatStrategy, _numberRepeatStrategy) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RepeatStrategyLocator = undefined;
+
+  
+
+  var RepeatStrategyLocator = exports.RepeatStrategyLocator = function () {
+    function RepeatStrategyLocator() {
+      
+
+      this.matchers = [];
+      this.strategies = [];
+
+      this.addStrategy(function (items) {
+        return items === null || items === undefined;
+      }, new _nullRepeatStrategy.NullRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Array;
+      }, new _arrayRepeatStrategy.ArrayRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Map;
+      }, new _mapRepeatStrategy.MapRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Set;
+      }, new _setRepeatStrategy.SetRepeatStrategy());
+      this.addStrategy(function (items) {
+        return typeof items === 'number';
+      }, new _numberRepeatStrategy.NumberRepeatStrategy());
+    }
+
+    RepeatStrategyLocator.prototype.addStrategy = function addStrategy(matcher, strategy) {
+      this.matchers.push(matcher);
+      this.strategies.push(strategy);
+    };
+
+    RepeatStrategyLocator.prototype.getStrategy = function getStrategy(items) {
+      var matchers = this.matchers;
+
+      for (var i = 0, ii = matchers.length; i < ii; ++i) {
+        if (matchers[i](items)) {
+          return this.strategies[i];
+        }
+      }
+
+      return null;
+    };
+
+    return RepeatStrategyLocator;
+  }();
+});
+define('aurelia-templating-resources/null-repeat-strategy',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var NullRepeatStrategy = exports.NullRepeatStrategy = function () {
+    function NullRepeatStrategy() {
+      
+    }
+
+    NullRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      repeat.removeAllViews(true);
+    };
+
+    NullRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {};
+
+    return NullRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/array-repeat-strategy',['exports', './repeat-utilities', 'aurelia-binding'], function (exports, _repeatUtilities, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ArrayRepeatStrategy = undefined;
+
+  
+
+  var ArrayRepeatStrategy = exports.ArrayRepeatStrategy = function () {
+    function ArrayRepeatStrategy() {
+      
+    }
+
+    ArrayRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getArrayObserver(items);
+    };
+
+    ArrayRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var itemsLength = items.length;
+
+      if (!items || itemsLength === 0) {
+        repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+        return;
+      }
+
+      var children = repeat.views();
+      var viewsLength = children.length;
+
+      if (viewsLength === 0) {
+        this._standardProcessInstanceChanged(repeat, items);
+        return;
+      }
+
+      if (repeat.viewsRequireLifecycle) {
+        (function () {
+          var childrenSnapshot = children.slice(0);
+          var itemNameInBindingContext = repeat.local;
+          var matcher = repeat.matcher();
+
+          var itemsPreviouslyInViews = [];
+          var viewsToRemove = [];
+
+          for (var index = 0; index < viewsLength; index++) {
+            var view = childrenSnapshot[index];
+            var oldItem = view.bindingContext[itemNameInBindingContext];
+
+            if ((0, _repeatUtilities.indexOf)(items, oldItem, matcher) === -1) {
+              viewsToRemove.push(view);
+            } else {
+              itemsPreviouslyInViews.push(oldItem);
+            }
+          }
+
+          var updateViews = void 0;
+          var removePromise = void 0;
+
+          if (itemsPreviouslyInViews.length > 0) {
+            removePromise = repeat.removeViews(viewsToRemove, true, !repeat.viewsRequireLifecycle);
+            updateViews = function updateViews() {
+              for (var _index = 0; _index < itemsLength; _index++) {
+                var item = items[_index];
+                var indexOfView = (0, _repeatUtilities.indexOf)(itemsPreviouslyInViews, item, matcher, _index);
+                var _view = void 0;
+
+                if (indexOfView === -1) {
+                  var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_index], _index, itemsLength);
+                  repeat.insertView(_index, overrideContext.bindingContext, overrideContext);
+
+                  itemsPreviouslyInViews.splice(_index, 0, undefined);
+                } else if (indexOfView === _index) {
+                  _view = children[indexOfView];
+                  itemsPreviouslyInViews[indexOfView] = undefined;
+                } else {
+                  _view = children[indexOfView];
+                  repeat.moveView(indexOfView, _index);
+                  itemsPreviouslyInViews.splice(indexOfView, 1);
+                  itemsPreviouslyInViews.splice(_index, 0, undefined);
+                }
+
+                if (_view) {
+                  (0, _repeatUtilities.updateOverrideContext)(_view.overrideContext, _index, itemsLength);
+                }
+              }
+
+              _this._inPlaceProcessItems(repeat, items);
+            };
+          } else {
+            removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            updateViews = function updateViews() {
+              return _this._standardProcessInstanceChanged(repeat, items);
+            };
+          }
+
+          if (removePromise instanceof Promise) {
+            removePromise.then(updateViews);
+          } else {
+            updateViews();
+          }
+        })();
+      } else {
+        this._inPlaceProcessItems(repeat, items);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._standardProcessInstanceChanged = function _standardProcessInstanceChanged(repeat, items) {
+      for (var i = 0, ii = items.length; i < ii; i++) {
+        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[i], i, ii);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._inPlaceProcessItems = function _inPlaceProcessItems(repeat, items) {
+      var itemsLength = items.length;
+      var viewsLength = repeat.viewCount();
+
+      while (viewsLength > itemsLength) {
+        viewsLength--;
+        repeat.removeView(viewsLength, true, !repeat.viewsRequireLifecycle);
+      }
+
+      var local = repeat.local;
+
+      for (var i = 0; i < viewsLength; i++) {
+        var view = repeat.view(i);
+        var last = i === itemsLength - 1;
+        var middle = i !== 0 && !last;
+
+        if (view.bindingContext[local] === items[i] && view.overrideContext.$middle === middle && view.overrideContext.$last === last) {
+          continue;
+        }
+
+        view.bindingContext[local] = items[i];
+        view.overrideContext.$middle = middle;
+        view.overrideContext.$last = last;
+        repeat.updateBindings(view);
+      }
+
+      for (var _i = viewsLength; _i < itemsLength; _i++) {
+        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_i], _i, itemsLength);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, array, splices) {
+      var _this2 = this;
+
+      if (repeat.__queuedSplices) {
+        for (var i = 0, ii = splices.length; i < ii; ++i) {
+          var _splices$i = splices[i],
+              index = _splices$i.index,
+              removed = _splices$i.removed,
+              addedCount = _splices$i.addedCount;
+
+          (0, _aureliaBinding.mergeSplice)(repeat.__queuedSplices, index, removed, addedCount);
+        }
+
+        repeat.__array = array.slice(0);
+        return;
+      }
+
+      var maybePromise = this._runSplices(repeat, array.slice(0), splices);
+      if (maybePromise instanceof Promise) {
+        (function () {
+          var queuedSplices = repeat.__queuedSplices = [];
+
+          var runQueuedSplices = function runQueuedSplices() {
+            if (!queuedSplices.length) {
+              repeat.__queuedSplices = undefined;
+              repeat.__array = undefined;
+              return;
+            }
+
+            var nextPromise = _this2._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
+            queuedSplices = repeat.__queuedSplices = [];
+            nextPromise.then(runQueuedSplices);
+          };
+
+          maybePromise.then(runQueuedSplices);
+        })();
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._runSplices = function _runSplices(repeat, array, splices) {
+      var _this3 = this;
+
+      var removeDelta = 0;
+      var rmPromises = [];
+
+      for (var i = 0, ii = splices.length; i < ii; ++i) {
+        var splice = splices[i];
+        var removed = splice.removed;
+
+        for (var j = 0, jj = removed.length; j < jj; ++j) {
+          var viewOrPromise = repeat.removeView(splice.index + removeDelta + rmPromises.length, true);
+          if (viewOrPromise instanceof Promise) {
+            rmPromises.push(viewOrPromise);
+          }
+        }
+        removeDelta -= splice.addedCount;
+      }
+
+      if (rmPromises.length > 0) {
+        return Promise.all(rmPromises).then(function () {
+          var spliceIndexLow = _this3._handleAddedSplices(repeat, array, splices);
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
+        });
+      }
+
+      var spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
+      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
+
+      return undefined;
+    };
+
+    ArrayRepeatStrategy.prototype._handleAddedSplices = function _handleAddedSplices(repeat, array, splices) {
+      var spliceIndex = void 0;
+      var spliceIndexLow = void 0;
+      var arrayLength = array.length;
+      for (var i = 0, ii = splices.length; i < ii; ++i) {
+        var splice = splices[i];
+        var addIndex = spliceIndex = splice.index;
+        var end = splice.index + splice.addedCount;
+
+        if (typeof spliceIndexLow === 'undefined' || spliceIndexLow === null || spliceIndexLow > splice.index) {
+          spliceIndexLow = spliceIndex;
+        }
+
+        for (; addIndex < end; ++addIndex) {
+          var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, array[addIndex], addIndex, arrayLength);
+          repeat.insertView(addIndex, overrideContext.bindingContext, overrideContext);
+        }
+      }
+
+      return spliceIndexLow;
+    };
+
+    return ArrayRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/repeat-utilities',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.updateOverrideContexts = updateOverrideContexts;
+  exports.createFullOverrideContext = createFullOverrideContext;
+  exports.updateOverrideContext = updateOverrideContext;
+  exports.getItemsSourceExpression = getItemsSourceExpression;
+  exports.unwrapExpression = unwrapExpression;
+  exports.isOneTime = isOneTime;
+  exports.updateOneTimeBinding = updateOneTimeBinding;
+  exports.indexOf = indexOf;
+
+
+  var oneTime = _aureliaBinding.bindingMode.oneTime;
+
+  function updateOverrideContexts(views, startIndex) {
+    var length = views.length;
+
+    if (startIndex > 0) {
+      startIndex = startIndex - 1;
+    }
+
+    for (; startIndex < length; ++startIndex) {
+      updateOverrideContext(views[startIndex].overrideContext, startIndex, length);
+    }
+  }
+
+  function createFullOverrideContext(repeat, data, index, length, key) {
+    var bindingContext = {};
+    var overrideContext = (0, _aureliaBinding.createOverrideContext)(bindingContext, repeat.scope.overrideContext);
+
+    if (typeof key !== 'undefined') {
+      bindingContext[repeat.key] = key;
+      bindingContext[repeat.value] = data;
+    } else {
+      bindingContext[repeat.local] = data;
+    }
+    updateOverrideContext(overrideContext, index, length);
+    return overrideContext;
+  }
+
+  function updateOverrideContext(overrideContext, index, length) {
+    var first = index === 0;
+    var last = index === length - 1;
+    var even = index % 2 === 0;
+
+    overrideContext.$index = index;
+    overrideContext.$first = first;
+    overrideContext.$last = last;
+    overrideContext.$middle = !(first || last);
+    overrideContext.$odd = !even;
+    overrideContext.$even = even;
+  }
+
+  function getItemsSourceExpression(instruction, attrName) {
+    return instruction.behaviorInstructions.filter(function (bi) {
+      return bi.originalAttrName === attrName;
+    })[0].attributes.items.sourceExpression;
+  }
+
+  function unwrapExpression(expression) {
+    var unwrapped = false;
+    while (expression instanceof _aureliaBinding.BindingBehavior) {
+      expression = expression.expression;
+    }
+    while (expression instanceof _aureliaBinding.ValueConverter) {
+      expression = expression.expression;
+      unwrapped = true;
+    }
+    return unwrapped ? expression : null;
+  }
+
+  function isOneTime(expression) {
+    while (expression instanceof _aureliaBinding.BindingBehavior) {
+      if (expression.name === 'oneTime') {
+        return true;
+      }
+      expression = expression.expression;
+    }
+    return false;
+  }
+
+  function updateOneTimeBinding(binding) {
+    if (binding.call && binding.mode === oneTime) {
+      binding.call(_aureliaBinding.sourceContext);
+    } else if (binding.updateOneTimeBindings) {
+      binding.updateOneTimeBindings();
+    }
+  }
+
+  function indexOf(array, item, matcher, startIndex) {
+    if (!matcher) {
+      return array.indexOf(item);
+    }
+    var length = array.length;
+    for (var index = startIndex || 0; index < length; index++) {
+      if (matcher(array[index], item)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+});
+define('aurelia-templating-resources/map-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.MapRepeatStrategy = undefined;
+
+  
+
+  var MapRepeatStrategy = exports.MapRepeatStrategy = function () {
+    function MapRepeatStrategy() {
+      
+    }
+
+    MapRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getMapObserver(items);
+    };
+
+    MapRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, items);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, items);
+    };
+
+    MapRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
+      var index = 0;
+      var overrideContext = void 0;
+
+      items.forEach(function (value, key) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size, key);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+        ++index;
+      });
+    };
+
+    MapRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, map, records) {
+      var key = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var removeIndex = void 0;
+      var record = void 0;
+      var rmPromises = [];
+      var viewOrPromise = void 0;
+
+      for (i = 0, ii = records.length; i < ii; ++i) {
+        record = records[i];
+        key = record.key;
+        switch (record.type) {
+          case 'update':
+            removeIndex = this._getViewIndexByKey(repeat, key);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), removeIndex, map.size, key);
+            repeat.insertView(removeIndex, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'add':
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), map.size - 1, map.size, key);
+            repeat.insertView(map.size - 1, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'delete':
+            if (record.oldValue === undefined) {
+              return;
+            }
+            removeIndex = this._getViewIndexByKey(repeat, key);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            break;
+          case 'clear':
+            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            break;
+          default:
+            continue;
+        }
+      }
+
+      if (rmPromises.length > 0) {
+        Promise.all(rmPromises).then(function () {
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+        });
+      } else {
+        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+      }
+    };
+
+    MapRepeatStrategy.prototype._getViewIndexByKey = function _getViewIndexByKey(repeat, key) {
+      var i = void 0;
+      var ii = void 0;
+      var child = void 0;
+
+      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
+        child = repeat.view(i);
+        if (child.bindingContext[repeat.key] === key) {
+          return i;
+        }
+      }
+
+      return undefined;
+    };
+
+    return MapRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/set-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SetRepeatStrategy = undefined;
+
+  
+
+  var SetRepeatStrategy = exports.SetRepeatStrategy = function () {
+    function SetRepeatStrategy() {
+      
+    }
+
+    SetRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getSetObserver(items);
+    };
+
+    SetRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, items);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, items);
+    };
+
+    SetRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
+      var index = 0;
+      var overrideContext = void 0;
+
+      items.forEach(function (value) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+        ++index;
+      });
+    };
+
+    SetRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, set, records) {
+      var value = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var removeIndex = void 0;
+      var record = void 0;
+      var rmPromises = [];
+      var viewOrPromise = void 0;
+
+      for (i = 0, ii = records.length; i < ii; ++i) {
+        record = records[i];
+        value = record.value;
+        switch (record.type) {
+          case 'add':
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, set.size - 1, set.size);
+            repeat.insertView(set.size - 1, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'delete':
+            removeIndex = this._getViewIndexByValue(repeat, value);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            break;
+          case 'clear':
+            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            break;
+          default:
+            continue;
+        }
+      }
+
+      if (rmPromises.length > 0) {
+        Promise.all(rmPromises).then(function () {
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+        });
+      } else {
+        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+      }
+    };
+
+    SetRepeatStrategy.prototype._getViewIndexByValue = function _getViewIndexByValue(repeat, value) {
+      var i = void 0;
+      var ii = void 0;
+      var child = void 0;
+
+      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
+        child = repeat.view(i);
+        if (child.bindingContext[repeat.local] === value) {
+          return i;
+        }
+      }
+
+      return undefined;
+    };
+
+    return SetRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/number-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NumberRepeatStrategy = undefined;
+
+  
+
+  var NumberRepeatStrategy = exports.NumberRepeatStrategy = function () {
+    function NumberRepeatStrategy() {
+      
+    }
+
+    NumberRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver() {
+      return null;
+    };
+
+    NumberRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, value) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, value);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, value);
+    };
+
+    NumberRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, value) {
+      var childrenLength = repeat.viewCount();
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var viewsToRemove = void 0;
+
+      value = Math.floor(value);
+      viewsToRemove = childrenLength - value;
+
+      if (viewsToRemove > 0) {
+        if (viewsToRemove > childrenLength) {
+          viewsToRemove = childrenLength;
+        }
+
+        for (i = 0, ii = viewsToRemove; i < ii; ++i) {
+          repeat.removeView(childrenLength - (i + 1), true, !repeat.viewsRequireLifecycle);
+        }
+
+        return;
+      }
+
+      for (i = childrenLength, ii = value; i < ii; ++i) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, i, i, ii);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+
+      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+    };
+
+    return NumberRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/analyze-view-factory',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.viewsRequireLifecycle = viewsRequireLifecycle;
+  var lifecycleOptionalBehaviors = exports.lifecycleOptionalBehaviors = ['focus', 'if', 'repeat', 'show', 'with'];
+
+  function behaviorRequiresLifecycle(instruction) {
+    var t = instruction.type;
+    var name = t.elementName !== null ? t.elementName : t.attributeName;
+    return lifecycleOptionalBehaviors.indexOf(name) === -1 && (t.handlesAttached || t.handlesBind || t.handlesCreated || t.handlesDetached || t.handlesUnbind) || t.viewFactory && viewsRequireLifecycle(t.viewFactory) || instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
+  }
+
+  function targetRequiresLifecycle(instruction) {
+    var behaviors = instruction.behaviorInstructions;
+    if (behaviors) {
+      var i = behaviors.length;
+      while (i--) {
+        if (behaviorRequiresLifecycle(behaviors[i])) {
+          return true;
+        }
+      }
+    }
+
+    return instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
+  }
+
+  function viewsRequireLifecycle(viewFactory) {
+    if ('_viewsRequireLifecycle' in viewFactory) {
+      return viewFactory._viewsRequireLifecycle;
+    }
+
+    viewFactory._viewsRequireLifecycle = false;
+
+    if (viewFactory.viewFactory) {
+      viewFactory._viewsRequireLifecycle = viewsRequireLifecycle(viewFactory.viewFactory);
+      return viewFactory._viewsRequireLifecycle;
+    }
+
+    if (viewFactory.template.querySelector('.au-animate')) {
+      viewFactory._viewsRequireLifecycle = true;
+      return true;
+    }
+
+    for (var id in viewFactory.instructions) {
+      if (targetRequiresLifecycle(viewFactory.instructions[id])) {
+        viewFactory._viewsRequireLifecycle = true;
+        return true;
+      }
+    }
+
+    viewFactory._viewsRequireLifecycle = false;
+    return false;
+  }
+});
+define('aurelia-templating-resources/abstract-repeater',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var AbstractRepeater = exports.AbstractRepeater = function () {
+    function AbstractRepeater(options) {
+      
+
+      Object.assign(this, {
+        local: 'items',
+        viewsRequireLifecycle: true
+      }, options);
+    }
+
+    AbstractRepeater.prototype.viewCount = function viewCount() {
+      throw new Error('subclass must implement `viewCount`');
+    };
+
+    AbstractRepeater.prototype.views = function views() {
+      throw new Error('subclass must implement `views`');
+    };
+
+    AbstractRepeater.prototype.view = function view(index) {
+      throw new Error('subclass must implement `view`');
+    };
+
+    AbstractRepeater.prototype.matcher = function matcher() {
+      throw new Error('subclass must implement `matcher`');
+    };
+
+    AbstractRepeater.prototype.addView = function addView(bindingContext, overrideContext) {
+      throw new Error('subclass must implement `addView`');
+    };
+
+    AbstractRepeater.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
+      throw new Error('subclass must implement `insertView`');
+    };
+
+    AbstractRepeater.prototype.moveView = function moveView(sourceIndex, targetIndex) {
+      throw new Error('subclass must implement `moveView`');
+    };
+
+    AbstractRepeater.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeAllViews`');
+    };
+
+    AbstractRepeater.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeView`');
+    };
+
+    AbstractRepeater.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeView`');
+    };
+
+    AbstractRepeater.prototype.updateBindings = function updateBindings(view) {
+      throw new Error('subclass must implement `updateBindings`');
+    };
+
+    return AbstractRepeater;
+  }();
+});
+define('aurelia-templating-resources/show',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Show = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+    function Show(element, animator, domBoundary) {
+      
+
+      this.element = element;
+      this.animator = animator;
+      this.domBoundary = domBoundary;
+    }
+
+    Show.prototype.created = function created() {
+      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
+    };
+
+    Show.prototype.valueChanged = function valueChanged(newValue) {
+      if (newValue) {
+        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      } else {
+        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      }
+    };
+
+    Show.prototype.bind = function bind(bindingContext) {
+      this.valueChanged(this.value);
+    };
+
+    return Show;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/aurelia-hide-style',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.aureliaHideClassName = undefined;
+  exports.injectAureliaHideStyleAtHead = injectAureliaHideStyleAtHead;
+  exports.injectAureliaHideStyleAtBoundary = injectAureliaHideStyleAtBoundary;
+  var aureliaHideClassName = exports.aureliaHideClassName = 'aurelia-hide';
+
+  var aureliaHideClass = '.' + aureliaHideClassName + ' { display:none !important; }';
+
+  function injectAureliaHideStyleAtHead() {
+    _aureliaPal.DOM.injectStyles(aureliaHideClass);
+  }
+
+  function injectAureliaHideStyleAtBoundary(domBoundary) {
+    if (_aureliaPal.FEATURE.shadowDOM && domBoundary && !domBoundary.hasAureliaHideStyle) {
+      domBoundary.hasAureliaHideStyle = true;
+      _aureliaPal.DOM.injectStyles(aureliaHideClass, domBoundary);
+    }
+  }
+});
+define('aurelia-templating-resources/hide',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Hide = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+    function Hide(element, animator, domBoundary) {
+      
+
+      this.element = element;
+      this.animator = animator;
+      this.domBoundary = domBoundary;
+    }
+
+    Hide.prototype.created = function created() {
+      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
+    };
+
+    Hide.prototype.valueChanged = function valueChanged(newValue) {
+      if (newValue) {
+        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      } else {
+        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      }
+    };
+
+    Hide.prototype.bind = function bind(bindingContext) {
+      this.valueChanged(this.value);
+    };
+
+    return Hide;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/sanitize-html',['exports', 'aurelia-binding', 'aurelia-dependency-injection', './html-sanitizer'], function (exports, _aureliaBinding, _aureliaDependencyInjection, _htmlSanitizer) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SanitizeHTMLValueConverter = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var SanitizeHTMLValueConverter = exports.SanitizeHTMLValueConverter = (_dec = (0, _aureliaBinding.valueConverter)('sanitizeHTML'), _dec2 = (0, _aureliaDependencyInjection.inject)(_htmlSanitizer.HTMLSanitizer), _dec(_class = _dec2(_class = function () {
+    function SanitizeHTMLValueConverter(sanitizer) {
+      
+
+      this.sanitizer = sanitizer;
+    }
+
+    SanitizeHTMLValueConverter.prototype.toView = function toView(untrustedMarkup) {
+      if (untrustedMarkup === null || untrustedMarkup === undefined) {
+        return null;
+      }
+
+      return this.sanitizer.sanitize(untrustedMarkup);
+    };
+
+    return SanitizeHTMLValueConverter;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/html-sanitizer',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+
+  var HTMLSanitizer = exports.HTMLSanitizer = function () {
+    function HTMLSanitizer() {
+      
+    }
+
+    HTMLSanitizer.prototype.sanitize = function sanitize(input) {
+      return input.replace(SCRIPT_REGEX, '');
+    };
+
+    return HTMLSanitizer;
+  }();
+});
+define('aurelia-templating-resources/replaceable',['exports', 'aurelia-dependency-injection', 'aurelia-templating'], function (exports, _aureliaDependencyInjection, _aureliaTemplating) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Replaceable = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Replaceable = exports.Replaceable = (_dec = (0, _aureliaTemplating.customAttribute)('replaceable'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function Replaceable(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.view = null;
+    }
+
+    Replaceable.prototype.bind = function bind(bindingContext, overrideContext) {
+      if (this.view === null) {
+        this.view = this.viewFactory.create();
+        this.viewSlot.add(this.view);
+      }
+
+      this.view.bind(bindingContext, overrideContext);
+    };
+
+    Replaceable.prototype.unbind = function unbind() {
+      this.view.unbind();
+    };
+
+    return Replaceable;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/focus',['exports', 'aurelia-templating', 'aurelia-binding', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaBinding, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Focus = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue), _dec(_class = _dec2(_class = function () {
+    function Focus(element, taskQueue) {
+      var _this = this;
+
+      
+
+      this.element = element;
+      this.taskQueue = taskQueue;
+      this.isAttached = false;
+      this.needsApply = false;
+
+      this.focusListener = function (e) {
+        _this.value = true;
+      };
+      this.blurListener = function (e) {
+        if (_aureliaPal.DOM.activeElement !== _this.element) {
+          _this.value = false;
+        }
+      };
+    }
+
+    Focus.prototype.valueChanged = function valueChanged(newValue) {
+      if (this.isAttached) {
+        this._apply();
+      } else {
+        this.needsApply = true;
+      }
+    };
+
+    Focus.prototype._apply = function _apply() {
+      var _this2 = this;
+
+      if (this.value) {
+        this.taskQueue.queueMicroTask(function () {
+          if (_this2.value) {
+            _this2.element.focus();
+          }
+        });
+      } else {
+        this.element.blur();
+      }
+    };
+
+    Focus.prototype.attached = function attached() {
+      this.isAttached = true;
+      if (this.needsApply) {
+        this.needsApply = false;
+        this._apply();
+      }
+      this.element.addEventListener('focus', this.focusListener);
+      this.element.addEventListener('blur', this.blurListener);
+    };
+
+    Focus.prototype.detached = function detached() {
+      this.isAttached = false;
+      this.element.removeEventListener('focus', this.focusListener);
+      this.element.removeEventListener('blur', this.blurListener);
+    };
+
+    return Focus;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/css-resource',['exports', 'aurelia-templating', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-path', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaLoader, _aureliaDependencyInjection, _aureliaPath, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports._createCSSResource = _createCSSResource;
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  
+
+  var cssUrlMatcher = /url\((?!['"]data)([^)]+)\)/gi;
+
+  function fixupCSSUrls(address, css) {
+    if (typeof css !== 'string') {
+      throw new Error('Failed loading required CSS file: ' + address);
+    }
+    return css.replace(cssUrlMatcher, function (match, p1) {
+      var quote = p1.charAt(0);
+      if (quote === '\'' || quote === '"') {
+        p1 = p1.substr(1, p1.length - 2);
+      }
+      return 'url(\'' + (0, _aureliaPath.relativeToFile)(p1, address) + '\')';
+    });
+  }
+
+  var CSSResource = function () {
+    function CSSResource(address) {
+      
+
+      this.address = address;
+      this._scoped = null;
+      this._global = false;
+      this._alreadyGloballyInjected = false;
+    }
+
+    CSSResource.prototype.initialize = function initialize(container, target) {
+      this._scoped = new target(this);
+    };
+
+    CSSResource.prototype.register = function register(registry, name) {
+      if (name === 'scoped') {
+        registry.registerViewEngineHooks(this._scoped);
+      } else {
+        this._global = true;
+      }
+    };
+
+    CSSResource.prototype.load = function load(container) {
+      var _this = this;
+
+      return container.get(_aureliaLoader.Loader).loadText(this.address).catch(function (err) {
+        return null;
+      }).then(function (text) {
+        text = fixupCSSUrls(_this.address, text);
+        _this._scoped.css = text;
+        if (_this._global) {
+          _this._alreadyGloballyInjected = true;
+          _aureliaPal.DOM.injectStyles(text);
+        }
+      });
+    };
+
+    return CSSResource;
+  }();
+
+  var CSSViewEngineHooks = function () {
+    function CSSViewEngineHooks(owner) {
+      
+
+      this.owner = owner;
+      this.css = null;
+    }
+
+    CSSViewEngineHooks.prototype.beforeCompile = function beforeCompile(content, resources, instruction) {
+      if (instruction.targetShadowDOM) {
+        _aureliaPal.DOM.injectStyles(this.css, content, true);
+      } else if (_aureliaPal.FEATURE.scopedCSS) {
+        var styleNode = _aureliaPal.DOM.injectStyles(this.css, content, true);
+        styleNode.setAttribute('scoped', 'scoped');
+      } else if (!this.owner._alreadyGloballyInjected) {
+        _aureliaPal.DOM.injectStyles(this.css);
+        this.owner._alreadyGloballyInjected = true;
+      }
+    };
+
+    return CSSViewEngineHooks;
+  }();
+
+  function _createCSSResource(address) {
+    var _dec, _class;
+
+    var ViewCSS = (_dec = (0, _aureliaTemplating.resource)(new CSSResource(address)), _dec(_class = function (_CSSViewEngineHooks) {
+      _inherits(ViewCSS, _CSSViewEngineHooks);
+
+      function ViewCSS() {
+        
+
+        return _possibleConstructorReturn(this, _CSSViewEngineHooks.apply(this, arguments));
+      }
+
+      return ViewCSS;
+    }(CSSViewEngineHooks)) || _class);
+
+    return ViewCSS;
+  }
+});
+define('aurelia-templating-resources/attr-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AttrBindingBehavior = undefined;
+
+  
+
+  var AttrBindingBehavior = exports.AttrBindingBehavior = function () {
+    function AttrBindingBehavior() {
+      
+    }
+
+    AttrBindingBehavior.prototype.bind = function bind(binding, source) {
+      binding.targetObserver = new _aureliaBinding.DataAttributeObserver(binding.target, binding.targetProperty);
+    };
+
+    AttrBindingBehavior.prototype.unbind = function unbind(binding, source) {};
+
+    return AttrBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/binding-mode-behaviors',['exports', 'aurelia-binding', 'aurelia-metadata'], function (exports, _aureliaBinding, _aureliaMetadata) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = undefined;
+
+  
+
+  var _dec, _class, _dec2, _class2, _dec3, _class3;
+
+  var modeBindingBehavior = {
+    bind: function bind(binding, source, lookupFunctions) {
+      binding.originalMode = binding.mode;
+      binding.mode = this.mode;
+    },
+    unbind: function unbind(binding, source) {
+      binding.mode = binding.originalMode;
+      binding.originalMode = null;
+    }
+  };
+
+  var OneTimeBindingBehavior = exports.OneTimeBindingBehavior = (_dec = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec(_class = function OneTimeBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.oneTime;
+  }) || _class);
+  var OneWayBindingBehavior = exports.OneWayBindingBehavior = (_dec2 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec2(_class2 = function OneWayBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.oneWay;
+  }) || _class2);
+  var TwoWayBindingBehavior = exports.TwoWayBindingBehavior = (_dec3 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec3(_class3 = function TwoWayBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.twoWay;
+  }) || _class3);
+});
+define('aurelia-templating-resources/throttle-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ThrottleBindingBehavior = undefined;
+
+  
+
+  function throttle(newValue) {
+    var _this = this;
+
+    var state = this.throttleState;
+    var elapsed = +new Date() - state.last;
+    if (elapsed >= state.delay) {
+      clearTimeout(state.timeoutId);
+      state.timeoutId = null;
+      state.last = +new Date();
+      this.throttledMethod(newValue);
+      return;
+    }
+    state.newValue = newValue;
+    if (state.timeoutId === null) {
+      state.timeoutId = setTimeout(function () {
+        state.timeoutId = null;
+        state.last = +new Date();
+        _this.throttledMethod(state.newValue);
+      }, state.delay - elapsed);
+    }
+  }
+
+  var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = function () {
+    function ThrottleBindingBehavior() {
+      
+    }
+
+    ThrottleBindingBehavior.prototype.bind = function bind(binding, source) {
+      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+
+      var methodToThrottle = 'updateTarget';
+      if (binding.callSource) {
+        methodToThrottle = 'callSource';
+      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
+        methodToThrottle = 'updateSource';
+      }
+
+      binding.throttledMethod = binding[methodToThrottle];
+      binding.throttledMethod.originalName = methodToThrottle;
+
+      binding[methodToThrottle] = throttle;
+
+      binding.throttleState = {
+        delay: delay,
+        last: 0,
+        timeoutId: null
+      };
+    };
+
+    ThrottleBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var methodToRestore = binding.throttledMethod.originalName;
+      binding[methodToRestore] = binding.throttledMethod;
+      binding.throttledMethod = null;
+      clearTimeout(binding.throttleState.timeoutId);
+      binding.throttleState = null;
+    };
+
+    return ThrottleBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/debounce-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DebounceBindingBehavior = undefined;
+
+  
+
+  function debounce(newValue) {
+    var _this = this;
+
+    var state = this.debounceState;
+    if (state.immediate) {
+      state.immediate = false;
+      this.debouncedMethod(newValue);
+      return;
+    }
+    clearTimeout(state.timeoutId);
+    state.timeoutId = setTimeout(function () {
+      return _this.debouncedMethod(newValue);
+    }, state.delay);
+  }
+
+  var DebounceBindingBehavior = exports.DebounceBindingBehavior = function () {
+    function DebounceBindingBehavior() {
+      
+    }
+
+    DebounceBindingBehavior.prototype.bind = function bind(binding, source) {
+      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+
+      var methodToDebounce = 'updateTarget';
+      if (binding.callSource) {
+        methodToDebounce = 'callSource';
+      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
+        methodToDebounce = 'updateSource';
+      }
+
+      binding.debouncedMethod = binding[methodToDebounce];
+      binding.debouncedMethod.originalName = methodToDebounce;
+
+      binding[methodToDebounce] = debounce;
+
+      binding.debounceState = {
+        delay: delay,
+        timeoutId: null,
+        immediate: methodToDebounce === 'updateTarget' };
+    };
+
+    DebounceBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var methodToRestore = binding.debouncedMethod.originalName;
+      binding[methodToRestore] = binding.debouncedMethod;
+      binding.debouncedMethod = null;
+      clearTimeout(binding.debounceState.timeoutId);
+      binding.debounceState = null;
+    };
+
+    return DebounceBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/self-binding-behavior',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  function findOriginalEventTarget(event) {
+    return event.path && event.path[0] || event.deepPath && event.deepPath[0] || event.target;
+  }
+
+  function handleSelfEvent(event) {
+    var target = findOriginalEventTarget(event);
+    if (this.target !== target) return;
+    this.selfEventCallSource(event);
+  }
+
+  var SelfBindingBehavior = exports.SelfBindingBehavior = function () {
+    function SelfBindingBehavior() {
+      
+    }
+
+    SelfBindingBehavior.prototype.bind = function bind(binding, source) {
+      if (!binding.callSource || !binding.targetEvent) throw new Error('Self binding behavior only supports event.');
+      binding.selfEventCallSource = binding.callSource;
+      binding.callSource = handleSelfEvent;
+    };
+
+    SelfBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      binding.callSource = binding.selfEventCallSource;
+      binding.selfEventCallSource = null;
+    };
+
+    return SelfBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/signal-binding-behavior',['exports', './binding-signaler'], function (exports, _bindingSignaler) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SignalBindingBehavior = undefined;
+
+  
+
+  var SignalBindingBehavior = exports.SignalBindingBehavior = function () {
+    SignalBindingBehavior.inject = function inject() {
+      return [_bindingSignaler.BindingSignaler];
+    };
+
+    function SignalBindingBehavior(bindingSignaler) {
+      
+
+      this.signals = bindingSignaler.signals;
+    }
+
+    SignalBindingBehavior.prototype.bind = function bind(binding, source) {
+      if (!binding.updateTarget) {
+        throw new Error('Only property bindings and string interpolation bindings can be signaled.  Trigger, delegate and call bindings cannot be signaled.');
+      }
+      if (arguments.length === 3) {
+        var name = arguments[2];
+        var bindings = this.signals[name] || (this.signals[name] = []);
+        bindings.push(binding);
+        binding.signalName = name;
+      } else if (arguments.length > 3) {
+        var names = Array.prototype.slice.call(arguments, 2);
+        var i = names.length;
+        while (i--) {
+          var _name = names[i];
+          var _bindings = this.signals[_name] || (this.signals[_name] = []);
+          _bindings.push(binding);
+        }
+        binding.signalName = names;
+      } else {
+        throw new Error('Signal name is required.');
+      }
+    };
+
+    SignalBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var name = binding.signalName;
+      binding.signalName = null;
+      if (Array.isArray(name)) {
+        var names = name;
+        var i = names.length;
+        while (i--) {
+          var n = names[i];
+          var bindings = this.signals[n];
+          bindings.splice(bindings.indexOf(binding), 1);
+        }
+      } else {
+        var _bindings2 = this.signals[name];
+        _bindings2.splice(_bindings2.indexOf(binding), 1);
+      }
+    };
+
+    return SignalBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/binding-signaler',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.BindingSignaler = undefined;
+
+  
+
+  var BindingSignaler = exports.BindingSignaler = function () {
+    function BindingSignaler() {
+      
+
+      this.signals = {};
+    }
+
+    BindingSignaler.prototype.signal = function signal(name) {
+      var bindings = this.signals[name];
+      if (!bindings) {
+        return;
+      }
+      var i = bindings.length;
+      while (i--) {
+        bindings[i].call(_aureliaBinding.sourceContext);
+      }
+    };
+
+    return BindingSignaler;
+  }();
+});
+define('aurelia-templating-resources/update-trigger-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.UpdateTriggerBindingBehavior = undefined;
+
+  
+
+  var _class, _temp;
+
+  var eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
+  var notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way bindings on input/select elements.';
+
+  var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = (_temp = _class = function () {
+    function UpdateTriggerBindingBehavior(eventManager) {
+      
+
+      this.eventManager = eventManager;
+    }
+
+    UpdateTriggerBindingBehavior.prototype.bind = function bind(binding, source) {
+      for (var _len = arguments.length, events = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+        events[_key - 2] = arguments[_key];
+      }
+
+      if (events.length === 0) {
+        throw new Error(eventNamesRequired);
+      }
+      if (binding.mode !== _aureliaBinding.bindingMode.twoWay) {
+        throw new Error(notApplicableMessage);
+      }
+
+      var targetObserver = binding.observerLocator.getObserver(binding.target, binding.targetProperty);
+      if (!targetObserver.handler) {
+        throw new Error(notApplicableMessage);
+      }
+      binding.targetObserver = targetObserver;
+
+      targetObserver.originalHandler = binding.targetObserver.handler;
+
+      var handler = this.eventManager.createElementHandler(events);
+      targetObserver.handler = handler;
+    };
+
+    UpdateTriggerBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      binding.targetObserver.handler = binding.targetObserver.originalHandler;
+      binding.targetObserver.originalHandler = null;
+    };
+
+    return UpdateTriggerBindingBehavior;
+  }(), _class.inject = [_aureliaBinding.EventManager], _temp);
+});
+define('aurelia-templating-resources/html-resource-plugin',['exports', 'aurelia-templating', './dynamic-element'], function (exports, _aureliaTemplating, _dynamicElement) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getElementName = getElementName;
+  exports.configure = configure;
+  function getElementName(address) {
+    return (/([^\/^\?]+)\.html/i.exec(address)[1].toLowerCase()
+    );
+  }
+
+  function configure(config) {
+    var viewEngine = config.container.get(_aureliaTemplating.ViewEngine);
+    var loader = config.aurelia.loader;
+
+    viewEngine.addResourcePlugin('.html', {
+      'fetch': function fetch(address) {
+        return loader.loadTemplate(address).then(function (registryEntry) {
+          var _ref;
+
+          var bindable = registryEntry.template.getAttribute('bindable');
+          var elementName = getElementName(address);
+
+          if (bindable) {
+            bindable = bindable.split(',').map(function (x) {
+              return x.trim();
+            });
+            registryEntry.template.removeAttribute('bindable');
+          } else {
+            bindable = [];
+          }
+
+          return _ref = {}, _ref[elementName] = (0, _dynamicElement._createDynamicElement)(elementName, address, bindable), _ref;
+        });
+      }
+    });
+  }
+});
+define('aurelia-templating-resources/dynamic-element',['exports', 'aurelia-templating'], function (exports, _aureliaTemplating) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports._createDynamicElement = _createDynamicElement;
+
+  
+
+  function _createDynamicElement(name, viewUrl, bindableNames) {
+    var _dec, _dec2, _class;
+
+    var DynamicElement = (_dec = (0, _aureliaTemplating.customElement)(name), _dec2 = (0, _aureliaTemplating.useView)(viewUrl), _dec(_class = _dec2(_class = function () {
+      function DynamicElement() {
+        
+      }
+
+      DynamicElement.prototype.bind = function bind(bindingContext) {
+        this.$parent = bindingContext;
+      };
+
+      return DynamicElement;
+    }()) || _class) || _class);
+
+    for (var i = 0, ii = bindableNames.length; i < ii; ++i) {
+      (0, _aureliaTemplating.bindable)(bindableNames[i])(DynamicElement);
+    }
+    return DynamicElement;
+  }
+});
+define('aurelia-i18n/i18n',['exports', 'i18next', 'aurelia-pal', 'aurelia-event-aggregator', 'aurelia-templating-resources'], function (exports, _i18next, _aureliaPal, _aureliaEventAggregator, _aureliaTemplatingResources) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.I18N = undefined;
+
+  var _i18next2 = _interopRequireDefault(_i18next);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  
+
+  var _class, _temp;
+
+  var I18N = exports.I18N = (_temp = _class = function () {
+    function I18N(ea, signaler) {
+      var _this = this;
+
+      
+
+      this.globalVars = {};
+      this.params = {};
+      this.i18nextDefered = {
+        resolve: null,
+        promise: null
+      };
+
+      this.i18next = _i18next2.default;
+      this.ea = ea;
+      this.Intl = window.Intl;
+      this.signaler = signaler;
+      this.i18nextDefered.promise = new Promise(function (resolve) {
+        return _this.i18nextDefered.resolve = resolve;
+      });
+    }
+
+    I18N.prototype.setup = function setup(options) {
+      var _this2 = this;
+
+      var defaultOptions = {
+        compatibilityAPI: 'v1',
+        compatibilityJSON: 'v1',
+        lng: 'en',
+        attributes: ['t', 'i18n'],
+        fallbackLng: 'en',
+        debug: false
+      };
+
+      _i18next2.default.init(options || defaultOptions, function (err, t) {
+        if (_i18next2.default.options.attributes instanceof String) {
+          _i18next2.default.options.attributes = [_i18next2.default.options.attributes];
+        }
+
+        _this2.i18nextDefered.resolve(_this2.i18next);
+      });
+
+      return this.i18nextDefered.promise;
+    };
+
+    I18N.prototype.i18nextReady = function i18nextReady() {
+      return this.i18nextDefered.promise;
+    };
+
+    I18N.prototype.setLocale = function setLocale(locale) {
+      var _this3 = this;
+
+      return new Promise(function (resolve) {
+        var oldLocale = _this3.getLocale();
+        _this3.i18next.changeLanguage(locale, function (err, tr) {
+          _this3.ea.publish('i18n:locale:changed', { oldValue: oldLocale, newValue: locale });
+          _this3.signaler.signal('aurelia-translation-signal');
+          resolve(tr);
+        });
+      });
+    };
+
+    I18N.prototype.getLocale = function getLocale() {
+      return this.i18next.language;
+    };
+
+    I18N.prototype.nf = function nf(options, locales) {
+      return new this.Intl.NumberFormat(locales || this.getLocale(), options || {});
+    };
+
+    I18N.prototype.uf = function uf(number, locale) {
+      var nf = this.nf({}, locale || this.getLocale());
+      var comparer = nf.format(10000 / 3);
+
+      var thousandSeparator = comparer[1];
+      var decimalSeparator = comparer[5];
+
+      var result = number.replace(thousandSeparator, '').replace(/[^\d.,-]/g, '').replace(decimalSeparator, '.');
+
+      return Number(result);
+    };
+
+    I18N.prototype.df = function df(options, locales) {
+      return new this.Intl.DateTimeFormat(locales || this.getLocale(), options);
+    };
+
+    I18N.prototype.tr = function tr(key, options) {
+      var fullOptions = this.globalVars;
+
+      if (options !== undefined) {
+        fullOptions = Object.assign(Object.assign({}, this.globalVars), options);
+      }
+
+      return this.i18next.t(key, fullOptions);
+    };
+
+    I18N.prototype.registerGlobalVariable = function registerGlobalVariable(key, value) {
+      this.globalVars[key] = value;
+    };
+
+    I18N.prototype.unregisterGlobalVariable = function unregisterGlobalVariable(key) {
+      delete this.globalVars[key];
+    };
+
+    I18N.prototype.updateTranslations = function updateTranslations(el) {
+      if (!el || !el.querySelectorAll) {
+        return;
+      }
+
+      var i = void 0;
+      var l = void 0;
+
+      var selector = [].concat(this.i18next.options.attributes);
+      for (i = 0, l = selector.length; i < l; i++) {
+        selector[i] = '[' + selector[i] + ']';
+      }selector = selector.join(',');
+
+      var nodes = el.querySelectorAll(selector);
+      for (i = 0, l = nodes.length; i < l; i++) {
+        var node = nodes[i];
+        var keys = void 0;
+
+        for (var i2 = 0, l2 = this.i18next.options.attributes.length; i2 < l2; i2++) {
+          keys = node.getAttribute(this.i18next.options.attributes[i2]);
+          if (keys) break;
+        }
+
+        if (!keys) continue;
+
+        this.updateValue(node, keys);
+      }
+    };
+
+    I18N.prototype.updateValue = function updateValue(node, value, params) {
+      if (value === null || value === undefined) {
+        return;
+      }
+
+      var keys = value.split(';');
+      var i = keys.length;
+
+      while (i--) {
+        var key = keys[i];
+
+        var re = /\[([a-z\-]*)\]/ig;
+
+        var m = void 0;
+        var attr = 'text';
+
+        if (node.nodeName === 'IMG') attr = 'src';
+
+        while ((m = re.exec(key)) !== null) {
+          if (m.index === re.lastIndex) {
+            re.lastIndex++;
+          }
+          if (m) {
+            key = key.replace(m[0], '');
+            attr = m[1];
+          }
+        }
+
+        if (!node._textContent) node._textContent = node.textContent;
+        if (!node._innerHTML) node._innerHTML = node.innerHTML;
+
+        var attrCC = attr.replace(/-([a-z])/g, function (g) {
+          return g[1].toUpperCase();
+        });
+
+        switch (attr) {
+          case 'text':
+            var newChild = _aureliaPal.DOM.createTextNode(this.tr(key, params));
+            if (node._newChild) {
+              node.removeChild(node._newChild);
+            }
+
+            node._newChild = newChild;
+            while (node.firstChild) {
+              node.removeChild(node.firstChild);
+            }
+            node.appendChild(node._newChild);
+            break;
+          case 'prepend':
+            var prependParser = _aureliaPal.DOM.createElement('div');
+            prependParser.innerHTML = this.tr(key, params);
+            for (var ni = node.childNodes.length - 1; ni >= 0; ni--) {
+              if (node.childNodes[ni]._prepended) {
+                node.removeChild(node.childNodes[ni]);
+              }
+            }
+
+            for (var pi = prependParser.childNodes.length - 1; pi >= 0; pi--) {
+              prependParser.childNodes[pi]._prepended = true;
+              if (node.firstChild) {
+                node.insertBefore(prependParser.childNodes[pi], node.firstChild);
+              } else {
+                node.appendChild(prependParser.childNodes[pi]);
+              }
+            }
+            break;
+          case 'append':
+            var appendParser = _aureliaPal.DOM.createElement('div');
+            appendParser.innerHTML = this.tr(key, params);
+            for (var _ni = node.childNodes.length - 1; _ni >= 0; _ni--) {
+              if (node.childNodes[_ni]._appended) {
+                node.removeChild(node.childNodes[_ni]);
+              }
+            }
+
+            while (appendParser.firstChild) {
+              appendParser.firstChild._appended = true;
+              node.appendChild(appendParser.firstChild);
+            }
+            break;
+          case 'html':
+            node.innerHTML = this.tr(key, params);
+            break;
+          default:
+            if (node.au && node.au.controller && node.au.controller.viewModel && attrCC in node.au.controller.viewModel) {
+              node.au.controller.viewModel[attrCC] = this.tr(key, params);
+            } else {
+              node.setAttribute(attr, this.tr(key, params));
+            }
+
+            break;
+        }
+      }
+    };
+
+    return I18N;
+  }(), _class.inject = [_aureliaEventAggregator.EventAggregator, _aureliaTemplatingResources.BindingSignaler], _temp);
+});
+define('i18next/i18next',['require','exports','module','./logger','./EventEmitter','./ResourceStore','./Translator','./LanguageUtils','./PluralResolver','./Interpolator','./BackendConnector','./CacheConnector','./defaults','./postProcessor','./compatibility/v1'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _EventEmitter2 = require('./EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+var _ResourceStore = require('./ResourceStore');
+
+var _ResourceStore2 = _interopRequireDefault(_ResourceStore);
+
+var _Translator = require('./Translator');
+
+var _Translator2 = _interopRequireDefault(_Translator);
+
+var _LanguageUtils = require('./LanguageUtils');
+
+var _LanguageUtils2 = _interopRequireDefault(_LanguageUtils);
+
+var _PluralResolver = require('./PluralResolver');
+
+var _PluralResolver2 = _interopRequireDefault(_PluralResolver);
+
+var _Interpolator = require('./Interpolator');
+
+var _Interpolator2 = _interopRequireDefault(_Interpolator);
+
+var _BackendConnector = require('./BackendConnector');
+
+var _BackendConnector2 = _interopRequireDefault(_BackendConnector);
+
+var _CacheConnector = require('./CacheConnector');
+
+var _CacheConnector2 = _interopRequireDefault(_CacheConnector);
+
+var _defaults2 = require('./defaults');
+
+var _postProcessor = require('./postProcessor');
+
+var _postProcessor2 = _interopRequireDefault(_postProcessor);
+
+var _v = require('./compatibility/v1');
+
+var compat = _interopRequireWildcard(_v);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
+function noop() {};
+
+var I18n = function (_EventEmitter) {
+  _inherits(I18n, _EventEmitter);
+
+  function I18n() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments[1];
+
+    _classCallCheck(this, I18n);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this.options = (0, _defaults2.transformOptions)(options);
+    _this.services = {};
+    _this.logger = _logger2.default;
+    _this.modules = { external: [] };
+
+    if (callback && !_this.isInitialized && !options.isClone) {
+      var _ret;
+
+      // https://github.com/i18next/i18next/issues/879
+      if (!_this.options.initImmediate) return _ret = _this.init(options, callback), _possibleConstructorReturn(_this, _ret);
+      setTimeout(function () {
+        _this.init(options, callback);
+      }, 0);
+    }
+    return _this;
+  }
+
+  I18n.prototype.init = function init(options, callback) {
+    var _this2 = this;
+
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    if (!options) options = {};
+
+    if (options.compatibilityAPI === 'v1') {
+      this.options = _extends({}, (0, _defaults2.get)(), (0, _defaults2.transformOptions)(compat.convertAPIOptions(options)), {});
+    } else if (options.compatibilityJSON === 'v1') {
+      this.options = _extends({}, (0, _defaults2.get)(), (0, _defaults2.transformOptions)(compat.convertJSONOptions(options)), {});
+    } else {
+      this.options = _extends({}, (0, _defaults2.get)(), this.options, (0, _defaults2.transformOptions)(options));
+    }
+    if (!callback) callback = noop;
+
+    function createClassOnDemand(ClassOrObject) {
+      if (!ClassOrObject) return;
+      if (typeof ClassOrObject === 'function') return new ClassOrObject();
+      return ClassOrObject;
+    }
+
+    // init services
+    if (!this.options.isClone) {
+      if (this.modules.logger) {
+        _logger2.default.init(createClassOnDemand(this.modules.logger), this.options);
+      } else {
+        _logger2.default.init(null, this.options);
+      }
+
+      var lu = new _LanguageUtils2.default(this.options);
+      this.store = new _ResourceStore2.default(this.options.resources, this.options);
+
+      var s = this.services;
+      s.logger = _logger2.default;
+      s.resourceStore = this.store;
+      s.resourceStore.on('added removed', function (lng, ns) {
+        s.cacheConnector.save();
+      });
+      s.languageUtils = lu;
+      s.pluralResolver = new _PluralResolver2.default(lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON, simplifyPluralSuffix: this.options.simplifyPluralSuffix });
+      s.interpolator = new _Interpolator2.default(this.options);
+
+      s.backendConnector = new _BackendConnector2.default(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options);
+      // pipe events from backendConnector
+      s.backendConnector.on('*', function (event) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      s.backendConnector.on('loaded', function (loaded) {
+        s.cacheConnector.save();
+      });
+
+      s.cacheConnector = new _CacheConnector2.default(createClassOnDemand(this.modules.cache), s.resourceStore, s, this.options);
+      // pipe events from backendConnector
+      s.cacheConnector.on('*', function (event) {
+        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          args[_key2 - 1] = arguments[_key2];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      if (this.modules.languageDetector) {
+        s.languageDetector = createClassOnDemand(this.modules.languageDetector);
+        s.languageDetector.init(s, this.options.detection, this.options);
+      }
+
+      this.translator = new _Translator2.default(this.services, this.options);
+      // pipe events from translator
+      this.translator.on('*', function (event) {
+        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      this.modules.external.forEach(function (m) {
+        if (m.init) m.init(_this2);
+      });
+    }
+
+    // append api
+    var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle'];
+    storeApi.forEach(function (fcName) {
+      _this2[fcName] = function () {
+        return this.store[fcName].apply(this.store, arguments);
+      };
+    });
+
+    // TODO: COMPATIBILITY remove this
+    if (this.options.compatibilityAPI === 'v1') compat.appendBackwardsAPI(this);
+
+    var load = function load() {
+      _this2.changeLanguage(_this2.options.lng, function (err, t) {
+        _this2.isInitialized = true;
+        _this2.logger.log('initialized', _this2.options);
+        _this2.emit('initialized', _this2.options);
+
+        callback(err, t);
+      });
+    };
+
+    if (this.options.resources || !this.options.initImmediate) {
+      load();
+    } else {
+      setTimeout(load, 0);
+    }
+
+    return this;
+  };
+
+  I18n.prototype.loadResources = function loadResources() {
+    var _this3 = this;
+
+    var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+
+    if (!this.options.resources) {
+      var _ret2 = function () {
+        if (_this3.language && _this3.language.toLowerCase() === 'cimode') return {
+            v: callback()
+          }; // avoid loading resources for cimode
+
+        var toLoad = [];
+
+        var append = function append(lng) {
+          if (!lng) return;
+          var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
+          lngs.forEach(function (l) {
+            if (toLoad.indexOf(l) < 0) toLoad.push(l);
+          });
+        };
+
+        if (!_this3.language) {
+          // at least load fallbacks in this case
+          var fallbacks = _this3.services.languageUtils.getFallbackCodes(_this3.options.fallbackLng);
+          fallbacks.forEach(function (l) {
+            return append(l);
+          });
+        } else {
+          append(_this3.language);
+        }
+
+        if (_this3.options.preload) {
+          _this3.options.preload.forEach(function (l) {
+            return append(l);
+          });
+        }
+
+        _this3.services.cacheConnector.load(toLoad, _this3.options.ns, function () {
+          _this3.services.backendConnector.load(toLoad, _this3.options.ns, callback);
+        });
+      }();
+
+      if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+    } else {
+      callback(null);
+    }
+  };
+
+  I18n.prototype.reloadResources = function reloadResources(lngs, ns) {
+    if (!lngs) lngs = this.languages;
+    if (!ns) ns = this.options.ns;
+    this.services.backendConnector.reload(lngs, ns);
+  };
+
+  I18n.prototype.use = function use(module) {
+    if (module.type === 'backend') {
+      this.modules.backend = module;
+    }
+
+    if (module.type === 'cache') {
+      this.modules.cache = module;
+    }
+
+    if (module.type === 'logger' || module.log && module.warn && module.error) {
+      this.modules.logger = module;
+    }
+
+    if (module.type === 'languageDetector') {
+      this.modules.languageDetector = module;
+    }
+
+    if (module.type === 'postProcessor') {
+      _postProcessor2.default.addPostProcessor(module);
+    }
+
+    if (module.type === '3rdParty') {
+      this.modules.external.push(module);
+    }
+
+    return this;
+  };
+
+  I18n.prototype.changeLanguage = function changeLanguage(lng, callback) {
+    var _this4 = this;
+
+    var done = function done(err) {
+      if (lng) {
+        _this4.emit('languageChanged', lng);
+        _this4.logger.log('languageChanged', lng);
+      }
+
+      if (callback) callback(err, function () {
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          args[_key4] = arguments[_key4];
+        }
+
+        return _this4.t.apply(_this4, args);
+      });
+    };
+
+    if (!lng && this.services.languageDetector) lng = this.services.languageDetector.detect();
+
+    if (lng) {
+      this.language = lng;
+      this.languages = this.services.languageUtils.toResolveHierarchy(lng);
+
+      this.translator.changeLanguage(lng);
+
+      if (this.services.languageDetector) this.services.languageDetector.cacheUserLanguage(lng);
+    }
+
+    this.loadResources(function (err) {
+      done(err);
+    });
+  };
+
+  I18n.prototype.getFixedT = function getFixedT(lng, ns) {
+    var _this5 = this;
+
+    var fixedT = function fixedT(key) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      var options = _extends({}, opts);
+      options.lng = options.lng || fixedT.lng;
+      options.ns = options.ns || fixedT.ns;
+      return _this5.t(key, options);
+    };
+    fixedT.lng = lng;
+    fixedT.ns = ns;
+    return fixedT;
+  };
+
+  I18n.prototype.t = function t() {
+    return this.translator && this.translator.translate.apply(this.translator, arguments);
+  };
+
+  I18n.prototype.exists = function exists() {
+    return this.translator && this.translator.exists.apply(this.translator, arguments);
+  };
+
+  I18n.prototype.setDefaultNamespace = function setDefaultNamespace(ns) {
+    this.options.defaultNS = ns;
+  };
+
+  I18n.prototype.loadNamespaces = function loadNamespaces(ns, callback) {
+    var _this6 = this;
+
+    if (!this.options.ns) return callback && callback();
+    if (typeof ns === 'string') ns = [ns];
+
+    ns.forEach(function (n) {
+      if (_this6.options.ns.indexOf(n) < 0) _this6.options.ns.push(n);
+    });
+
+    this.loadResources(callback);
+  };
+
+  I18n.prototype.loadLanguages = function loadLanguages(lngs, callback) {
+    if (typeof lngs === 'string') lngs = [lngs];
+    var preloaded = this.options.preload || [];
+
+    var newLngs = lngs.filter(function (lng) {
+      return preloaded.indexOf(lng) < 0;
+    });
+    // Exit early if all given languages are already preloaded
+    if (!newLngs.length) return callback();
+
+    this.options.preload = preloaded.concat(newLngs);
+    this.loadResources(callback);
+  };
+
+  I18n.prototype.dir = function dir(lng) {
+    if (!lng) lng = this.language;
+    if (!lng) return 'rtl';
+
+    var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
+
+    return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
+  };
+
+  I18n.prototype.createInstance = function createInstance() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments[1];
+
+    return new I18n(options, callback);
+  };
+
+  I18n.prototype.cloneInstance = function cloneInstance() {
+    var _this7 = this;
+
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
+
+    var mergedOptions = _extends({}, options, this.options, { isClone: true });
+    var clone = new I18n(mergedOptions, callback);
+    var membersToCopy = ['store', 'services', 'language'];
+    membersToCopy.forEach(function (m) {
+      clone[m] = _this7[m];
+    });
+    clone.translator = new _Translator2.default(clone.services, clone.options);
+    clone.translator.on('*', function (event) {
+      for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+        args[_key5 - 1] = arguments[_key5];
+      }
+
+      clone.emit.apply(clone, [event].concat(args));
+    });
+    clone.init(mergedOptions, callback);
+
+    return clone;
+  };
+
+  return I18n;
+}(_EventEmitter3.default);
+
+exports.default = new I18n();
+});
+
+define('i18next/logger',['require','exports','module'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var consoleLogger = {
+  type: 'logger',
+
+  log: function log(args) {
+    this._output('log', args);
+  },
+  warn: function warn(args) {
+    this._output('warn', args);
+  },
+  error: function error(args) {
+    this._output('error', args);
+  },
+  _output: function _output(type, args) {
+    if (console && console[type]) console[type].apply(console, Array.prototype.slice.call(args));
+  }
+};
+
+var Logger = function () {
+  function Logger(concreteLogger) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Logger);
+
+    this.init(concreteLogger, options);
+  }
+
+  Logger.prototype.init = function init(concreteLogger) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    this.prefix = options.prefix || 'i18next:';
+    this.logger = concreteLogger || consoleLogger;
+    this.options = options;
+    this.debug = options.debug === false ? false : true;
+  };
+
+  Logger.prototype.setDebug = function setDebug(bool) {
+    this.debug = bool;
+  };
+
+  Logger.prototype.log = function log() {
+    this.forward(arguments, 'log', '', true);
+  };
+
+  Logger.prototype.warn = function warn() {
+    this.forward(arguments, 'warn', '', true);
+  };
+
+  Logger.prototype.error = function error() {
+    this.forward(arguments, 'error', '');
+  };
+
+  Logger.prototype.deprecate = function deprecate() {
+    this.forward(arguments, 'warn', 'WARNING DEPRECATED: ', true);
+  };
+
+  Logger.prototype.forward = function forward(args, lvl, prefix, debugOnly) {
+    if (debugOnly && !this.debug) return;
+    if (typeof args[0] === 'string') args[0] = prefix + this.prefix + ' ' + args[0];
+    this.logger[lvl](args);
+  };
+
+  Logger.prototype.create = function create(moduleName) {
+    var sub = new Logger(this.logger, _extends({ prefix: this.prefix + ':' + moduleName + ':' }, this.options));
+
+    return sub;
+  };
+
+  // createInstance(options = {}) {
+  //   return new Logger(options, callback);
+  // }
+
+  return Logger;
+}();
+
+;
+
+exports.default = new Logger();
+});
+
+define('i18next/EventEmitter',['require','exports','module'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EventEmitter = function () {
+	function EventEmitter() {
+		_classCallCheck(this, EventEmitter);
+
+		this.observers = {};
+	}
+
+	EventEmitter.prototype.on = function on(events, listener) {
+		var _this = this;
+
+		events.split(' ').forEach(function (event) {
+			_this.observers[event] = _this.observers[event] || [];
+			_this.observers[event].push(listener);
+		});
+	};
+
+	EventEmitter.prototype.off = function off(event, listener) {
+		var _this2 = this;
+
+		if (!this.observers[event]) {
+			return;
+		}
+
+		this.observers[event].forEach(function () {
+			if (!listener) {
+				delete _this2.observers[event];
+			} else {
+				var index = _this2.observers[event].indexOf(listener);
+				if (index > -1) {
+					_this2.observers[event].splice(index, 1);
+				}
+			}
+		});
+	};
+
+	EventEmitter.prototype.emit = function emit(event) {
+		for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+			args[_key - 1] = arguments[_key];
+		}
+
+		if (this.observers[event]) {
+			var cloned = [].concat(this.observers[event]);
+			cloned.forEach(function (observer) {
+				observer.apply(undefined, args);
+			});
+		}
+
+		if (this.observers['*']) {
+			var _cloned = [].concat(this.observers['*']);
+			_cloned.forEach(function (observer) {
+				var _ref;
+
+				observer.apply(observer, (_ref = [event]).concat.apply(_ref, args));
+			});
+		}
+	};
+
+	return EventEmitter;
+}();
+
+exports.default = EventEmitter;
+});
+
+define('i18next/ResourceStore',['require','exports','module','./EventEmitter','./utils'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _EventEmitter2 = require('./EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+var _utils = require('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
+var ResourceStore = function (_EventEmitter) {
+  _inherits(ResourceStore, _EventEmitter);
+
+  function ResourceStore() {
+    var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ns: ['translation'], defaultNS: 'translation' };
+
+    _classCallCheck(this, ResourceStore);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this.data = data;
+    _this.options = options;
+    return _this;
+  }
+
+  ResourceStore.prototype.addNamespaces = function addNamespaces(ns) {
+    if (this.options.ns.indexOf(ns) < 0) {
+      this.options.ns.push(ns);
+    }
+  };
+
+  ResourceStore.prototype.removeNamespaces = function removeNamespaces(ns) {
+    var index = this.options.ns.indexOf(ns);
+    if (index > -1) {
+      this.options.ns.splice(index, 1);
+    }
+  };
+
+  ResourceStore.prototype.getResource = function getResource(lng, ns, key) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    var keySeparator = options.keySeparator || this.options.keySeparator;
+    if (keySeparator === undefined) keySeparator = '.';
+
+    var path = [lng, ns];
+    if (key && typeof key !== 'string') path = path.concat(key);
+    if (key && typeof key === 'string') path = path.concat(keySeparator ? key.split(keySeparator) : key);
+
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+    }
+
+    return utils.getPath(this.data, path);
+  };
+
+  ResourceStore.prototype.addResource = function addResource(lng, ns, key, value) {
+    var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : { silent: false };
+
+    var keySeparator = this.options.keySeparator;
+    if (keySeparator === undefined) keySeparator = '.';
+
+    var path = [lng, ns];
+    if (key) path = path.concat(keySeparator ? key.split(keySeparator) : key);
+
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+      value = ns;
+      ns = path[1];
+    }
+
+    this.addNamespaces(ns);
+
+    utils.setPath(this.data, path, value);
+
+    if (!options.silent) this.emit('added', lng, ns, key, value);
+  };
+
+  ResourceStore.prototype.addResources = function addResources(lng, ns, resources) {
+    for (var m in resources) {
+      if (typeof resources[m] === 'string') this.addResource(lng, ns, m, resources[m], { silent: true });
+    }
+    this.emit('added', lng, ns, resources);
+  };
+
+  ResourceStore.prototype.addResourceBundle = function addResourceBundle(lng, ns, resources, deep, overwrite) {
+    var path = [lng, ns];
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+      deep = resources;
+      resources = ns;
+      ns = path[1];
+    }
+
+    this.addNamespaces(ns);
+
+    var pack = utils.getPath(this.data, path) || {};
+
+    if (deep) {
+      utils.deepExtend(pack, resources, overwrite);
+    } else {
+      pack = _extends({}, pack, resources);
+    }
+
+    utils.setPath(this.data, path, pack);
+
+    this.emit('added', lng, ns, resources);
+  };
+
+  ResourceStore.prototype.removeResourceBundle = function removeResourceBundle(lng, ns) {
+    if (this.hasResourceBundle(lng, ns)) {
+      delete this.data[lng][ns];
+    }
+    this.removeNamespaces(ns);
+
+    this.emit('removed', lng, ns);
+  };
+
+  ResourceStore.prototype.hasResourceBundle = function hasResourceBundle(lng, ns) {
+    return this.getResource(lng, ns) !== undefined;
+  };
+
+  ResourceStore.prototype.getResourceBundle = function getResourceBundle(lng, ns) {
+    if (!ns) ns = this.options.defaultNS;
+
+    // TODO: COMPATIBILITY remove extend in v2.1.0
+    if (this.options.compatibilityAPI === 'v1') return _extends({}, this.getResource(lng, ns));
+
+    return this.getResource(lng, ns);
+  };
+
+  ResourceStore.prototype.toJSON = function toJSON() {
+    return this.data;
+  };
+
+  return ResourceStore;
+}(_EventEmitter3.default);
+
+exports.default = ResourceStore;
+});
+
+define('i18next/utils',['require','exports','module'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makeString = makeString;
+exports.copy = copy;
+exports.setPath = setPath;
+exports.pushPath = pushPath;
+exports.getPath = getPath;
+exports.deepExtend = deepExtend;
+exports.regexEscape = regexEscape;
+exports.escape = escape;
+function makeString(object) {
+  if (object == null) return '';
+  return '' + object;
+}
+
+function copy(a, s, t) {
+  a.forEach(function (m) {
+    if (s[m]) t[m] = s[m];
+  });
+}
+
+function getLastOfPath(object, path, Empty) {
+  function cleanKey(key) {
+    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  }
+
+  function canNotTraverseDeeper() {
+    return !object || typeof object === 'string';
+  }
+
+  var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
+  while (stack.length > 1) {
+    if (canNotTraverseDeeper()) return {};
+
+    var key = cleanKey(stack.shift());
+    if (!object[key] && Empty) object[key] = new Empty();
+    object = object[key];
+  }
+
+  if (canNotTraverseDeeper()) return {};
+  return {
+    obj: object,
+    k: cleanKey(stack.shift())
+  };
+}
+
+function setPath(object, path, newValue) {
+  var _getLastOfPath = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath.obj,
+      k = _getLastOfPath.k;
+
+  obj[k] = newValue;
+}
+
+function pushPath(object, path, newValue, concat) {
+  var _getLastOfPath2 = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath2.obj,
+      k = _getLastOfPath2.k;
+
+  obj[k] = obj[k] || [];
+  if (concat) obj[k] = obj[k].concat(newValue);
+  if (!concat) obj[k].push(newValue);
+}
+
+function getPath(object, path) {
+  var _getLastOfPath3 = getLastOfPath(object, path),
+      obj = _getLastOfPath3.obj,
+      k = _getLastOfPath3.k;
+
+  if (!obj) return undefined;
+  return obj[k];
+}
+
+function deepExtend(target, source, overwrite) {
+  for (var prop in source) {
+    if (prop in target) {
+      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
+      if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
+        if (overwrite) target[prop] = source[prop];
+      } else {
+        deepExtend(target[prop], source[prop], overwrite);
+      }
+    } else {
+      target[prop] = source[prop];
+    }
+  }return target;
+}
+
+function regexEscape(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+}
+
+/* eslint-disable */
+var _entityMap = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': '&quot;',
+  "'": '&#39;',
+  "/": '&#x2F;'
+};
+/* eslint-enable */
+
+function escape(data) {
+  if (typeof data === 'string') {
+    return data.replace(/[&<>"'\/]/g, function (s) {
+      return _entityMap[s];
+    });
+  } else {
+    return data;
+  }
+}
+});
+
+define('i18next/Translator',['require','exports','module','./logger','./EventEmitter','./postProcessor','./compatibility/v1','./utils'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _EventEmitter2 = require('./EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+var _postProcessor = require('./postProcessor');
+
+var _postProcessor2 = _interopRequireDefault(_postProcessor);
+
+var _v = require('./compatibility/v1');
+
+var compat = _interopRequireWildcard(_v);
+
+var _utils = require('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
+var Translator = function (_EventEmitter) {
+  _inherits(Translator, _EventEmitter);
+
+  function Translator(services) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Translator);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    utils.copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector'], services, _this);
+
+    _this.options = options;
+    _this.logger = _logger2.default.create('translator');
+    return _this;
+  }
+
+  Translator.prototype.changeLanguage = function changeLanguage(lng) {
+    if (lng) this.language = lng;
+  };
+
+  Translator.prototype.exists = function exists(key) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { interpolation: {} };
+
+    if (this.options.compatibilityAPI === 'v1') {
+      options = compat.convertTOptions(options);
+    }
+
+    return this.resolve(key, options) !== undefined;
+  };
+
+  Translator.prototype.extractFromKey = function extractFromKey(key, options) {
+    var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+    if (nsSeparator === undefined) nsSeparator = ':';
+    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
+
+    var namespaces = options.ns || this.options.defaultNS;
+    if (nsSeparator && key.indexOf(nsSeparator) > -1) {
+      var parts = key.split(nsSeparator);
+      if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) namespaces = parts.shift();
+      key = parts.join(keySeparator);
+    }
+    if (typeof namespaces === 'string') namespaces = [namespaces];
+
+    return {
+      key: key,
+      namespaces: namespaces
+    };
+  };
+
+  Translator.prototype.translate = function translate(keys) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+      options = this.options.overloadTranslationOptionHandler(arguments);
+    } else if (this.options.compatibilityAPI === 'v1') {
+      options = compat.convertTOptions(options);
+    }
+
+    // non valid keys handling
+    if (keys === undefined || keys === null || keys === '') return '';
+    if (typeof keys === 'number') keys = String(keys);
+    if (typeof keys === 'string') keys = [keys];
+
+    // separators
+    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
+
+    // get namespace(s)
+
+    var _extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
+        key = _extractFromKey.key,
+        namespaces = _extractFromKey.namespaces;
+
+    var namespace = namespaces[namespaces.length - 1];
+
+    // return key on CIMode
+    var lng = options.lng || this.language;
+    var appendNamespaceToCIMode = options.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
+    if (lng && lng.toLowerCase() === 'cimode') {
+      if (appendNamespaceToCIMode) {
+        var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+        return namespace + nsSeparator + key;
+      }
+
+      return key;
+    }
+
+    // resolve from store
+    var res = this.resolve(keys, options);
+
+    var resType = Object.prototype.toString.apply(res);
+    var noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
+    var joinArrays = options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays;
+
+    // object
+    if (res && typeof res !== 'string' && noObject.indexOf(resType) < 0 && !(joinArrays && resType === '[object Array]')) {
+      if (!options.returnObjects && !this.options.returnObjects) {
+        this.logger.warn('accessing an object - but returnObjects options is not enabled!');
+        return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(key, res, options) : 'key \'' + key + ' (' + this.language + ')\' returned an object instead of string.';
+      }
+
+      // if we got a separator we loop over children - else we just return object as is
+      // as having it set to false means no hierarchy so no lookup for nested values
+      if (options.keySeparator || this.options.keySeparator) {
+        var copy = resType === '[object Array]' ? [] : {}; // apply child translation on a copy
+
+        for (var m in res) {
+          if (res.hasOwnProperty(m)) {
+            copy[m] = this.translate('' + key + keySeparator + m, _extends({}, options, { joinArrays: false, ns: namespaces }));
+          }
+        }
+        res = copy;
+      }
+    }
+    // array special treatment
+    else if (joinArrays && resType === '[object Array]') {
+        res = res.join(joinArrays);
+        if (res) res = this.extendTranslation(res, key, options);
+      }
+      // string, empty or null
+      else {
+          var usedDefault = false,
+              usedKey = false;
+
+          // fallback value
+          if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
+            usedDefault = true;
+            res = options.defaultValue;
+          }
+          if (!this.isValidLookup(res)) {
+            usedKey = true;
+            res = key;
+          }
+
+          // save missing
+          if (usedKey || usedDefault) {
+            this.logger.log('missingKey', lng, namespace, key, res);
+
+            var lngs = [];
+            var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options.lng || this.language);
+            if (this.options.saveMissingTo === 'fallback' && fallbackLngs && fallbackLngs[0]) {
+              for (var i = 0; i < fallbackLngs.length; i++) {
+                lngs.push(fallbackLngs[i]);
+              }
+            } else if (this.options.saveMissingTo === 'all') {
+              lngs = this.languageUtils.toResolveHierarchy(options.lng || this.language);
+            } else {
+              //(this.options.saveMissingTo === 'current' || (this.options.saveMissingTo === 'fallback' && this.options.fallbackLng[0] === false) ) {
+              lngs.push(options.lng || this.language);
+            }
+
+            if (this.options.saveMissing) {
+              if (this.options.missingKeyHandler) {
+                this.options.missingKeyHandler(lngs, namespace, key, res);
+              } else if (this.backendConnector && this.backendConnector.saveMissing) {
+                this.backendConnector.saveMissing(lngs, namespace, key, res);
+              }
+            }
+
+            this.emit('missingKey', lngs, namespace, key, res);
+          }
+
+          // extend
+          res = this.extendTranslation(res, key, options);
+
+          // append namespace if still key
+          if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = namespace + ':' + key;
+
+          // parseMissingKeyHandler
+          if (usedKey && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
+        }
+
+    // return
+    return res;
+  };
+
+  Translator.prototype.extendTranslation = function extendTranslation(res, key, options) {
+    var _this2 = this;
+
+    if (options.interpolation) this.interpolator.init(_extends({}, options, { interpolation: _extends({}, this.options.interpolation, options.interpolation) }));
+
+    // interpolate
+    var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
+    if (this.options.interpolation.defaultVariables) data = _extends({}, this.options.interpolation.defaultVariables, data);
+    res = this.interpolator.interpolate(res, data, options.lng || this.language);
+
+    // nesting
+    if (options.nest !== false) res = this.interpolator.nest(res, function () {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return _this2.translate.apply(_this2, args);
+    }, options);
+
+    if (options.interpolation) this.interpolator.reset();
+
+    // post process
+    var postProcess = options.postProcess || this.options.postProcess;
+    var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
+
+    if (res !== undefined && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
+      res = _postProcessor2.default.handle(postProcessorNames, res, key, options, this);
+    }
+
+    return res;
+  };
+
+  Translator.prototype.resolve = function resolve(keys) {
+    var _this3 = this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var found = void 0;
+
+    if (typeof keys === 'string') keys = [keys];
+
+    // forEach possible key
+    keys.forEach(function (k) {
+      if (_this3.isValidLookup(found)) return;
+
+      var _extractFromKey2 = _this3.extractFromKey(k, options),
+          key = _extractFromKey2.key,
+          namespaces = _extractFromKey2.namespaces;
+
+      if (_this3.options.fallbackNS) namespaces = namespaces.concat(_this3.options.fallbackNS);
+
+      var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+      var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+
+      var codes = options.lngs ? options.lngs : _this3.languageUtils.toResolveHierarchy(options.lng || _this3.language);
+
+      namespaces.forEach(function (ns) {
+        if (_this3.isValidLookup(found)) return;
+
+        codes.forEach(function (code) {
+          if (_this3.isValidLookup(found)) return;
+
+          var finalKey = key;
+          var finalKeys = [finalKey];
+
+          var pluralSuffix = void 0;
+          if (needsPluralHandling) pluralSuffix = _this3.pluralResolver.getSuffix(code, options.count);
+
+          // fallback for plural if context not found
+          if (needsPluralHandling && needsContextHandling) finalKeys.push(finalKey + pluralSuffix);
+
+          // get key for context if needed
+          if (needsContextHandling) finalKeys.push(finalKey += '' + _this3.options.contextSeparator + options.context);
+
+          // get key for plural if needed
+          if (needsPluralHandling) finalKeys.push(finalKey += pluralSuffix);
+
+          // iterate over finalKeys starting with most specific pluralkey (-> contextkey only) -> singularkey only
+          var possibleKey = void 0;
+          while (possibleKey = finalKeys.pop()) {
+            if (_this3.isValidLookup(found)) continue;
+            found = _this3.getResource(code, ns, possibleKey, options);
+          }
+        });
+      });
+    });
+
+    return found;
+  };
+
+  Translator.prototype.isValidLookup = function isValidLookup(res) {
+    return res !== undefined && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === '');
+  };
+
+  Translator.prototype.getResource = function getResource(code, ns, key) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    return this.resourceStore.getResource(code, ns, key, options);
+  };
+
+  return Translator;
+}(_EventEmitter3.default);
+
+exports.default = Translator;
+});
+
+define('i18next/postProcessor',['require','exports','module'],function (require, exports, module) {"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
+
+  processors: {},
+
+  addPostProcessor: function addPostProcessor(module) {
+    this.processors[module.name] = module;
+  },
+  handle: function handle(processors, value, key, options, translator) {
+    var _this = this;
+
+    processors.forEach(function (processor) {
+      if (_this.processors[processor]) value = _this.processors[processor].process(value, key, options, translator);
+    });
+
+    return value;
+  }
+};
+});
+
+define('i18next/compatibility/v1',['require','exports','module','../logger'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.convertAPIOptions = convertAPIOptions;
+exports.convertJSONOptions = convertJSONOptions;
+exports.convertTOptions = convertTOptions;
+exports.appendBackwardsAPI = appendBackwardsAPI;
+
+var _logger = require('../logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function convertInterpolation(options) {
+
+  options.interpolation = {
+    unescapeSuffix: 'HTML'
+  };
+
+  options.interpolation.prefix = options.interpolationPrefix || '__';
+  options.interpolation.suffix = options.interpolationSuffix || '__';
+  options.interpolation.escapeValue = options.escapeInterpolation || false;
+
+  options.interpolation.nestingPrefix = options.reusePrefix || '$t(';
+  options.interpolation.nestingSuffix = options.reuseSuffix || ')';
+
+  return options;
+}
+
+function convertAPIOptions(options) {
+  if (options.resStore) options.resources = options.resStore;
+
+  if (options.ns && options.ns.defaultNs) {
+    options.defaultNS = options.ns.defaultNs;
+    options.ns = options.ns.namespaces;
+  } else {
+    options.defaultNS = options.ns || 'translation';
+  }
+
+  if (options.fallbackToDefaultNS && options.defaultNS) options.fallbackNS = options.defaultNS;
+
+  options.saveMissing = options.sendMissing;
+  options.saveMissingTo = options.sendMissingTo || 'current';
+  options.returnNull = options.fallbackOnNull ? false : true;
+  options.returnEmptyString = options.fallbackOnEmpty ? false : true;
+  options.returnObjects = options.returnObjectTrees;
+  options.joinArrays = '\n';
+
+  options.returnedObjectHandler = options.objectTreeKeyHandler;
+  options.parseMissingKeyHandler = options.parseMissingKey;
+  options.appendNamespaceToMissingKey = true;
+
+  options.nsSeparator = options.nsseparator || ':';
+  options.keySeparator = options.keyseparator || '.';
+
+  if (options.shortcutFunction === 'sprintf') {
+    options.overloadTranslationOptionHandler = function (args) {
+      var values = [];
+
+      for (var i = 1; i < args.length; i++) {
+        values.push(args[i]);
+      }
+
+      return {
+        postProcess: 'sprintf',
+        sprintf: values
+      };
+    };
+  }
+
+  options.whitelist = options.lngWhitelist;
+  options.preload = options.preload;
+  if (options.load === 'current') options.load = 'currentOnly';
+  if (options.load === 'unspecific') options.load = 'languageOnly';
+
+  // backend
+  options.backend = options.backend || {};
+  options.backend.loadPath = options.resGetPath || 'locales/__lng__/__ns__.json';
+  options.backend.addPath = options.resPostPath || 'locales/add/__lng__/__ns__';
+  options.backend.allowMultiLoading = options.dynamicLoad;
+
+  // cache
+  options.cache = options.cache || {};
+  options.cache.prefix = 'res_';
+  options.cache.expirationTime = 7 * 24 * 60 * 60 * 1000;
+  options.cache.enabled = options.useLocalStorage ? true : false;
+
+  options = convertInterpolation(options);
+  if (options.defaultVariables) options.interpolation.defaultVariables = options.defaultVariables;
+
+  // TODO: deprecation
+  // if (options.getAsync === false) throw deprecation error
+
+  return options;
+}
+
+function convertJSONOptions(options) {
+  options = convertInterpolation(options);
+  options.joinArrays = '\n';
+
+  return options;
+}
+
+function convertTOptions(options) {
+  if (options.interpolationPrefix || options.interpolationSuffix || options.escapeInterpolation) {
+    options = convertInterpolation(options);
+  }
+
+  options.nsSeparator = options.nsseparator;
+  options.keySeparator = options.keyseparator;
+
+  options.returnObjects = options.returnObjectTrees;
+
+  return options;
+}
+
+function appendBackwardsAPI(i18n) {
+  i18n.lng = function () {
+    _logger2.default.deprecate('i18next.lng() can be replaced by i18next.language for detected language or i18next.languages for languages ordered by translation lookup.');
+    return i18n.services.languageUtils.toResolveHierarchy(i18n.language)[0];
+  };
+
+  i18n.preload = function (lngs, cb) {
+    _logger2.default.deprecate('i18next.preload() can be replaced with i18next.loadLanguages()');
+    i18n.loadLanguages(lngs, cb);
+  };
+
+  i18n.setLng = function (lng, options, callback) {
+    _logger2.default.deprecate('i18next.setLng() can be replaced with i18next.changeLanguage() or i18next.getFixedT() to get a translation function with fixed language or namespace.');
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    if (!options) options = {};
+
+    if (options.fixLng === true) {
+      if (callback) return callback(null, i18n.getFixedT(lng));
+    }
+
+    i18n.changeLanguage(lng, callback);
+  };
+
+  i18n.addPostProcessor = function (name, fc) {
+    _logger2.default.deprecate('i18next.addPostProcessor() can be replaced by i18next.use({ type: \'postProcessor\', name: \'name\', process: fc })');
+    i18n.use({
+      type: 'postProcessor',
+      name: name,
+      process: fc
+    });
+  };
+}
+});
+
+define('i18next/LanguageUtils',['require','exports','module','./logger'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+var LanguageUtil = function () {
+  function LanguageUtil(options) {
+    _classCallCheck(this, LanguageUtil);
+
+    this.options = options;
+
+    this.whitelist = this.options.whitelist || false;
+    this.logger = _logger2.default.create('languageUtils');
+  }
+
+  LanguageUtil.prototype.getScriptPartFromCode = function getScriptPartFromCode(code) {
+    if (!code || code.indexOf('-') < 0) return null;
+
+    var p = code.split('-');
+    if (p.length === 2) return null;
+    p.pop();
+    return this.formatLanguageCode(p.join('-'));
+  };
+
+  LanguageUtil.prototype.getLanguagePartFromCode = function getLanguagePartFromCode(code) {
+    if (!code || code.indexOf('-') < 0) return code;
+
+    var p = code.split('-');
+    return this.formatLanguageCode(p[0]);
+  };
+
+  LanguageUtil.prototype.formatLanguageCode = function formatLanguageCode(code) {
+    // http://www.iana.org/assignments/language-tags/language-tags.xhtml
+    if (typeof code === 'string' && code.indexOf('-') > -1) {
+      var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
+      var p = code.split('-');
+
+      if (this.options.lowerCaseLng) {
+        p = p.map(function (part) {
+          return part.toLowerCase();
+        });
+      } else if (p.length === 2) {
+        p[0] = p[0].toLowerCase();
+        p[1] = p[1].toUpperCase();
+
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+      } else if (p.length === 3) {
+        p[0] = p[0].toLowerCase();
+
+        // if lenght 2 guess it's a country
+        if (p[1].length === 2) p[1] = p[1].toUpperCase();
+        if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
+
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+        if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
+      }
+
+      return p.join('-');
+    } else {
+      return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
+    }
+  };
+
+  LanguageUtil.prototype.isWhitelisted = function isWhitelisted(code) {
+    if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
+      code = this.getLanguagePartFromCode(code);
+    }
+    return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
+  };
+
+  LanguageUtil.prototype.getFallbackCodes = function getFallbackCodes(fallbacks, code) {
+    if (!fallbacks) return [];
+    if (typeof fallbacks === 'string') fallbacks = [fallbacks];
+    if (Object.prototype.toString.apply(fallbacks) === '[object Array]') return fallbacks;
+
+    if (!code) return fallbacks.default || [];
+
+    // asume we have an object defining fallbacks
+    var found = fallbacks[code];
+    if (!found) found = fallbacks[this.getScriptPartFromCode(code)];
+    if (!found) found = fallbacks[this.formatLanguageCode(code)];
+    if (!found) found = fallbacks.default;
+
+    return found || [];
+  };
+
+  LanguageUtil.prototype.toResolveHierarchy = function toResolveHierarchy(code, fallbackCode) {
+    var _this = this;
+
+    var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code);
+
+    var codes = [];
+    var addCode = function addCode(code) {
+      if (!code) return;
+      if (_this.isWhitelisted(code)) {
+        codes.push(code);
+      } else {
+        _this.logger.warn('rejecting non-whitelisted language code: ' + code);
+      }
+    };
+
+    if (typeof code === 'string' && code.indexOf('-') > -1) {
+      if (this.options.load !== 'languageOnly') addCode(this.formatLanguageCode(code));
+      if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') addCode(this.getScriptPartFromCode(code));
+      if (this.options.load !== 'currentOnly') addCode(this.getLanguagePartFromCode(code));
+    } else if (typeof code === 'string') {
+      addCode(this.formatLanguageCode(code));
+    }
+
+    fallbackCodes.forEach(function (fc) {
+      if (codes.indexOf(fc) < 0) addCode(_this.formatLanguageCode(fc));
+    });
+
+    return codes;
+  };
+
+  return LanguageUtil;
+}();
+
+;
+
+exports.default = LanguageUtil;
+});
+
+define('i18next/PluralResolver',['require','exports','module','./logger'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// definition http://translate.sourceforge.net/wiki/l10n/pluralforms
+/* eslint-disable */
+var sets = [{ lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'tg', 'ti', 'tr', 'uz', 'wa'], nr: [1, 2], fc: 1 }, { lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'es_ar', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'he', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt', 'pt_br', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'], nr: [1, 2], fc: 2 }, { lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'], nr: [1], fc: 3 }, { lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'], nr: [1, 2, 5], fc: 4 }, { lngs: ['ar'], nr: [0, 1, 2, 3, 11, 100], fc: 5 }, { lngs: ['cs', 'sk'], nr: [1, 2, 5], fc: 6 }, { lngs: ['csb', 'pl'], nr: [1, 2, 5], fc: 7 }, { lngs: ['cy'], nr: [1, 2, 3, 8], fc: 8 }, { lngs: ['fr'], nr: [1, 2], fc: 9 }, { lngs: ['ga'], nr: [1, 2, 3, 7, 11], fc: 10 }, { lngs: ['gd'], nr: [1, 2, 3, 20], fc: 11 }, { lngs: ['is'], nr: [1, 2], fc: 12 }, { lngs: ['jv'], nr: [0, 1], fc: 13 }, { lngs: ['kw'], nr: [1, 2, 3, 4], fc: 14 }, { lngs: ['lt'], nr: [1, 2, 10], fc: 15 }, { lngs: ['lv'], nr: [1, 2, 0], fc: 16 }, { lngs: ['mk'], nr: [1, 2], fc: 17 }, { lngs: ['mnk'], nr: [0, 1, 2], fc: 18 }, { lngs: ['mt'], nr: [1, 2, 11, 20], fc: 19 }, { lngs: ['or'], nr: [2, 1], fc: 2 }, { lngs: ['ro'], nr: [1, 2, 20], fc: 20 }, { lngs: ['sl'], nr: [5, 1, 2, 3], fc: 21 }];
+
+var _rulesPluralsTypes = {
+  1: function _(n) {
+    return Number(n > 1);
+  },
+  2: function _(n) {
+    return Number(n != 1);
+  },
+  3: function _(n) {
+    return 0;
+  },
+  4: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  5: function _(n) {
+    return Number(n === 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5);
+  },
+  6: function _(n) {
+    return Number(n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2);
+  },
+  7: function _(n) {
+    return Number(n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  8: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n != 8 && n != 11 ? 2 : 3);
+  },
+  9: function _(n) {
+    return Number(n >= 2);
+  },
+  10: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4);
+  },
+  11: function _(n) {
+    return Number(n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3);
+  },
+  12: function _(n) {
+    return Number(n % 10 != 1 || n % 100 == 11);
+  },
+  13: function _(n) {
+    return Number(n !== 0);
+  },
+  14: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n == 3 ? 2 : 3);
+  },
+  15: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  16: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
+  },
+  17: function _(n) {
+    return Number(n == 1 || n % 10 == 1 ? 0 : 1);
+  },
+  18: function _(n) {
+    return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
+  },
+  19: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 1 && n % 100 < 11 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3);
+  },
+  20: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2);
+  },
+  21: function _(n) {
+    return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
+  }
+};
+/* eslint-enable */
+
+function createRules() {
+  var l,
+      rules = {};
+  sets.forEach(function (set) {
+    set.lngs.forEach(function (l) {
+      return rules[l] = {
+        numbers: set.nr,
+        plurals: _rulesPluralsTypes[set.fc]
+      };
+    });
+  });
+  return rules;
+}
+
+var PluralResolver = function () {
+  function PluralResolver(languageUtils) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, PluralResolver);
+
+    this.languageUtils = languageUtils;
+    this.options = options;
+
+    this.logger = _logger2.default.create('pluralResolver');
+
+    this.rules = createRules();
+  }
+
+  PluralResolver.prototype.addRule = function addRule(lng, obj) {
+    this.rules[lng] = obj;
+  };
+
+  PluralResolver.prototype.getRule = function getRule(code) {
+    return this.rules[this.languageUtils.getLanguagePartFromCode(code)];
+  };
+
+  PluralResolver.prototype.needsPlural = function needsPlural(code) {
+    var rule = this.getRule(code);
+
+    return rule && rule.numbers.length <= 1 ? false : true;
+  };
+
+  PluralResolver.prototype.getSuffix = function getSuffix(code, count) {
+    var _this = this;
+
+    var rule = this.getRule(code);
+
+    if (rule) {
+      var _ret = function () {
+        if (rule.numbers.length === 1) return {
+            v: ''
+          }; // only singular
+
+        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
+        var suffix = rule.numbers[idx];
+
+        // special treatment for lngs only having singular and plural
+        if (_this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          if (suffix === 2) {
+            suffix = 'plural';
+          } else if (suffix === 1) {
+            suffix = '';
+          }
+        }
+
+        var returnSuffix = function returnSuffix() {
+          return _this.options.prepend && suffix.toString() ? _this.options.prepend + suffix.toString() : suffix.toString();
+        };
+
+        // COMPATIBILITY JSON
+        // v1
+        if (_this.options.compatibilityJSON === 'v1') {
+          if (suffix === 1) return {
+              v: ''
+            };
+          if (typeof suffix === 'number') return {
+              v: '_plural_' + suffix.toString()
+            };
+          return {
+            v: returnSuffix()
+          };
+        }
+        // v2
+        else if (_this.options.compatibilityJSON === 'v2' || rule.numbers.length === 2 && rule.numbers[0] === 1) {
+            return {
+              v: returnSuffix()
+            };
+          }
+          // v3 - gettext index
+          else if (rule.numbers.length === 2 && rule.numbers[0] === 1) {
+              return {
+                v: returnSuffix()
+              };
+            }
+        return {
+          v: _this.options.prepend && idx.toString() ? _this.options.prepend + idx.toString() : idx.toString()
+        };
+      }();
+
+      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+    } else {
+      this.logger.warn('no plural rule found for: ' + code);
+      return '';
+    }
+  };
+
+  return PluralResolver;
+}();
+
+;
+
+exports.default = PluralResolver;
+});
+
+define('i18next/Interpolator',['require','exports','module','./utils','./logger'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _utils = require('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Interpolator = function () {
+  function Interpolator() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Interpolator);
+
+    this.logger = _logger2.default.create('interpolator');
+
+    this.init(options, true);
+  }
+
+  Interpolator.prototype.init = function init() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var reset = arguments[1];
+
+    if (reset) {
+      this.options = options;
+      this.format = options.interpolation && options.interpolation.format || function (value) {
+        return value;
+      };
+      this.escape = options.interpolation && options.interpolation.escape || utils.escape;
+    }
+    if (!options.interpolation) options.interpolation = { escapeValue: true };
+
+    var iOpts = options.interpolation;
+
+    this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
+
+    this.prefix = iOpts.prefix ? utils.regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
+    this.suffix = iOpts.suffix ? utils.regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
+
+    this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
+
+    this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
+    this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
+
+    this.nestingPrefix = iOpts.nestingPrefix ? utils.regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || utils.regexEscape('$t(');
+    this.nestingSuffix = iOpts.nestingSuffix ? utils.regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || utils.regexEscape(')');
+
+    // the regexp
+    this.resetRegExp();
+  };
+
+  Interpolator.prototype.reset = function reset() {
+    if (this.options) this.init(this.options);
+  };
+
+  Interpolator.prototype.resetRegExp = function resetRegExp() {
+    // the regexp
+    var regexpStr = this.prefix + '(.+?)' + this.suffix;
+    this.regexp = new RegExp(regexpStr, 'g');
+
+    var regexpUnescapeStr = this.prefix + this.unescapePrefix + '(.+?)' + this.unescapeSuffix + this.suffix;
+    this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
+
+    var nestingRegexpStr = this.nestingPrefix + '(.+?)' + this.nestingSuffix;
+    this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
+  };
+
+  Interpolator.prototype.interpolate = function interpolate(str, data, lng) {
+    var _this = this;
+
+    var match = void 0,
+        value = void 0;
+
+    function regexSafe(val) {
+      return val.replace(/\$/g, '$$$$');
+    }
+
+    var handleFormat = function handleFormat(key) {
+      if (key.indexOf(_this.formatSeparator) < 0) return utils.getPath(data, key);
+
+      var p = key.split(_this.formatSeparator);
+      var k = p.shift().trim();
+      var f = p.join(_this.formatSeparator).trim();
+
+      return _this.format(utils.getPath(data, k), f, lng);
+    };
+
+    this.resetRegExp();
+
+    // unescape if has unescapePrefix/Suffix
+    while (match = this.regexpUnescape.exec(str)) {
+      var _value = handleFormat(match[1].trim());
+      str = str.replace(match[0], _value);
+      this.regexpUnescape.lastIndex = 0;
+    }
+
+    // regular escape on demand
+    while (match = this.regexp.exec(str)) {
+      value = handleFormat(match[1].trim());
+      if (typeof value !== 'string') value = utils.makeString(value);
+      if (!value) {
+        this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
+        value = '';
+      }
+      value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
+      str = str.replace(match[0], value);
+      this.regexp.lastIndex = 0;
+    }
+    return str;
+  };
+
+  Interpolator.prototype.nest = function nest(str, fc) {
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var match = void 0,
+        value = void 0;
+
+    var clonedOptions = _extends({}, options);
+    clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
+
+    function regexSafe(val) {
+      return val.replace(/\$/g, '$$$$');
+    }
+
+    // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
+    function handleHasOptions(key) {
+      if (key.indexOf(',') < 0) return key;
+
+      var p = key.split(',');
+      key = p.shift();
+      var optionsString = p.join(',');
+      optionsString = this.interpolate(optionsString, clonedOptions);
+      optionsString = optionsString.replace(/'/g, '"');
+
+      try {
+        clonedOptions = JSON.parse(optionsString);
+      } catch (e) {
+        this.logger.error('failed parsing options string in nesting for key ' + key, e);
+      }
+
+      return key;
+    }
+
+    // regular escape on demand
+    while (match = this.nestingRegexp.exec(str)) {
+      value = fc(handleHasOptions.call(this, match[1].trim()), clonedOptions);
+      if (typeof value !== 'string') value = utils.makeString(value);
+      if (!value) {
+        this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
+        value = '';
+      }
+      // Nested keys should not be escaped by default #854
+      // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
+      str = str.replace(match[0], value);
+      this.regexp.lastIndex = 0;
+    }
+    return str;
+  };
+
+  return Interpolator;
+}();
+
+exports.default = Interpolator;
+});
+
+define('i18next/BackendConnector',['require','exports','module','./utils','./logger','./EventEmitter'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _utils = require('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _EventEmitter2 = require('./EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
+function remove(arr, what) {
+  var found = arr.indexOf(what);
+
+  while (found !== -1) {
+    arr.splice(found, 1);
+    found = arr.indexOf(what);
+  }
+}
+
+var Connector = function (_EventEmitter) {
+  _inherits(Connector, _EventEmitter);
+
+  function Connector(backend, store, services) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    _classCallCheck(this, Connector);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this.backend = backend;
+    _this.store = store;
+    _this.services = services;
+    _this.options = options;
+    _this.logger = _logger2.default.create('backendConnector');
+
+    _this.state = {};
+    _this.queue = [];
+
+    _this.backend && _this.backend.init && _this.backend.init(services, options.backend, options);
+    return _this;
+  }
+
+  Connector.prototype.queueLoad = function queueLoad(languages, namespaces, callback) {
+    var _this2 = this;
+
+    // find what needs to be loaded
+    var toLoad = [],
+        pending = [],
+        toLoadLanguages = [],
+        toLoadNamespaces = [];
+
+    languages.forEach(function (lng) {
+      var hasAllNamespaces = true;
+
+      namespaces.forEach(function (ns) {
+        var name = lng + '|' + ns;
+
+        if (_this2.store.hasResourceBundle(lng, ns)) {
+          _this2.state[name] = 2; // loaded
+        } else if (_this2.state[name] < 0) {
+          // nothing to do for err
+        } else if (_this2.state[name] === 1) {
+          if (pending.indexOf(name) < 0) pending.push(name);
+        } else {
+          _this2.state[name] = 1; // pending
+
+          hasAllNamespaces = false;
+
+          if (pending.indexOf(name) < 0) pending.push(name);
+          if (toLoad.indexOf(name) < 0) toLoad.push(name);
+          if (toLoadNamespaces.indexOf(ns) < 0) toLoadNamespaces.push(ns);
+        }
+      });
+
+      if (!hasAllNamespaces) toLoadLanguages.push(lng);
+    });
+
+    if (toLoad.length || pending.length) {
+      this.queue.push({
+        pending: pending,
+        loaded: {},
+        errors: [],
+        callback: callback
+      });
+    }
+
+    return {
+      toLoad: toLoad,
+      pending: pending,
+      toLoadLanguages: toLoadLanguages,
+      toLoadNamespaces: toLoadNamespaces
+    };
+  };
+
+  Connector.prototype.loaded = function loaded(name, err, data) {
+    var _this3 = this;
+
+    var _name$split = name.split('|'),
+        _name$split2 = _slicedToArray(_name$split, 2),
+        lng = _name$split2[0],
+        ns = _name$split2[1];
+
+    if (err) this.emit('failedLoading', lng, ns, err);
+
+    if (data) {
+      this.store.addResourceBundle(lng, ns, data);
+    }
+
+    // set loaded
+    this.state[name] = err ? -1 : 2;
+    // callback if ready
+    this.queue.forEach(function (q) {
+      utils.pushPath(q.loaded, [lng], ns);
+      remove(q.pending, name);
+
+      if (err) q.errors.push(err);
+
+      if (q.pending.length === 0 && !q.done) {
+        _this3.emit('loaded', q.loaded);
+        q.errors.length ? q.callback(q.errors) : q.callback();
+        q.done = true;
+      }
+    });
+
+    // remove done load requests
+    this.queue = this.queue.filter(function (q) {
+      return !q.done;
+    });
+  };
+
+  Connector.prototype.read = function read(lng, ns, fcName, tried, wait, callback) {
+    var _this4 = this;
+
+    if (!tried) tried = 0;
+    if (!wait) wait = 250;
+
+    if (!lng.length) return callback(null, {}); // noting to load
+
+    this.backend[fcName](lng, ns, function (err, data) {
+      if (err && data /* = retryFlag */ && tried < 5) {
+        setTimeout(function () {
+          _this4.read.call(_this4, lng, ns, fcName, ++tried, wait * 2, callback);
+        }, wait);
+        return;
+      }
+      callback(err, data);
+    });
+  };
+
+  Connector.prototype.load = function load(languages, namespaces, callback) {
+    var _this5 = this;
+
+    if (!this.backend) {
+      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
+      return callback && callback();
+    }
+    var options = _extends({}, this.backend.options, this.options.backend);
+
+    if (typeof languages === 'string') languages = this.services.languageUtils.toResolveHierarchy(languages);
+    if (typeof namespaces === 'string') namespaces = [namespaces];
+
+    var toLoad = this.queueLoad(languages, namespaces, callback);
+    if (!toLoad.toLoad.length) {
+      if (!toLoad.pending.length) callback(); // nothing to load and no pendings...callback now
+      return; // pendings will trigger callback
+    }
+
+    // load with multi-load
+    if (options.allowMultiLoading && this.backend.readMulti) {
+      this.read(toLoad.toLoadLanguages, toLoad.toLoadNamespaces, 'readMulti', null, null, function (err, data) {
+        if (err) _this5.logger.warn('loading namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading failed', err);
+        if (!err && data) _this5.logger.log('loaded namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading', data);
+
+        toLoad.toLoad.forEach(function (name) {
+          var _name$split3 = name.split('|'),
+              _name$split4 = _slicedToArray(_name$split3, 2),
+              l = _name$split4[0],
+              n = _name$split4[1];
+
+          var bundle = utils.getPath(data, [l, n]);
+          if (bundle) {
+            _this5.loaded(name, err, bundle);
+          } else {
+            var _err = 'loading namespace ' + n + ' for language ' + l + ' via multiloading failed';
+            _this5.loaded(name, _err);
+            _this5.logger.error(_err);
+          }
+        });
+      });
+    }
+
+    // load one by one
+    else {
+        (function () {
+          var readOne = function readOne(name) {
+            var _this6 = this;
+
+            var _name$split5 = name.split('|'),
+                _name$split6 = _slicedToArray(_name$split5, 2),
+                lng = _name$split6[0],
+                ns = _name$split6[1];
+
+            this.read(lng, ns, 'read', null, null, function (err, data) {
+              if (err) _this6.logger.warn('loading namespace ' + ns + ' for language ' + lng + ' failed', err);
+              if (!err && data) _this6.logger.log('loaded namespace ' + ns + ' for language ' + lng, data);
+
+              _this6.loaded(name, err, data);
+            });
+          };
+
+          ;
+
+          toLoad.toLoad.forEach(function (name) {
+            readOne.call(_this5, name);
+          });
+        })();
+      }
+  };
+
+  Connector.prototype.reload = function reload(languages, namespaces) {
+    var _this7 = this;
+
+    if (!this.backend) {
+      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
+    }
+    var options = _extends({}, this.backend.options, this.options.backend);
+
+    if (typeof languages === 'string') languages = this.services.languageUtils.toResolveHierarchy(languages);
+    if (typeof namespaces === 'string') namespaces = [namespaces];
+
+    // load with multi-load
+    if (options.allowMultiLoading && this.backend.readMulti) {
+      this.read(languages, namespaces, 'readMulti', null, null, function (err, data) {
+        if (err) _this7.logger.warn('reloading namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading failed', err);
+        if (!err && data) _this7.logger.log('reloaded namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading', data);
+
+        languages.forEach(function (l) {
+          namespaces.forEach(function (n) {
+            var bundle = utils.getPath(data, [l, n]);
+            if (bundle) {
+              _this7.loaded(l + '|' + n, err, bundle);
+            } else {
+              var _err2 = 'reloading namespace ' + n + ' for language ' + l + ' via multiloading failed';
+              _this7.loaded(l + '|' + n, _err2);
+              _this7.logger.error(_err2);
+            }
+          });
+        });
+      });
+    }
+
+    // load one by one
+    else {
+        (function () {
+          var readOne = function readOne(name) {
+            var _this8 = this;
+
+            var _name$split7 = name.split('|'),
+                _name$split8 = _slicedToArray(_name$split7, 2),
+                lng = _name$split8[0],
+                ns = _name$split8[1];
+
+            this.read(lng, ns, 'read', null, null, function (err, data) {
+              if (err) _this8.logger.warn('reloading namespace ' + ns + ' for language ' + lng + ' failed', err);
+              if (!err && data) _this8.logger.log('reloaded namespace ' + ns + ' for language ' + lng, data);
+
+              _this8.loaded(name, err, data);
+            });
+          };
+
+          ;
+
+          languages.forEach(function (l) {
+            namespaces.forEach(function (n) {
+              readOne.call(_this7, l + '|' + n);
+            });
+          });
+        })();
+      }
+  };
+
+  Connector.prototype.saveMissing = function saveMissing(languages, namespace, key, fallbackValue) {
+    if (this.backend && this.backend.create) this.backend.create(languages, namespace, key, fallbackValue);
+
+    // write to store to avoid resending
+    if (!languages || !languages[0]) return;
+    this.store.addResource(languages[0], namespace, key, fallbackValue);
+  };
+
+  return Connector;
+}(_EventEmitter3.default);
+
+exports.default = Connector;
+});
+
+define('i18next/CacheConnector',['require','exports','module','./utils','./logger','./EventEmitter'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _utils = require('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _EventEmitter2 = require('./EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
+var Connector = function (_EventEmitter) {
+  _inherits(Connector, _EventEmitter);
+
+  function Connector(cache, store, services) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    _classCallCheck(this, Connector);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this.cache = cache;
+    _this.store = store;
+    _this.services = services;
+    _this.options = options;
+    _this.logger = _logger2.default.create('cacheConnector');
+
+    _this.cache && _this.cache.init && _this.cache.init(services, options.cache, options);
+    return _this;
+  }
+
+  Connector.prototype.load = function load(languages, namespaces, callback) {
+    var _this2 = this;
+
+    if (!this.cache) return callback && callback();
+    var options = _extends({}, this.cache.options, this.options.cache);
+
+    if (typeof languages === 'string') languages = this.services.languageUtils.toResolveHierarchy(languages);
+    if (typeof namespaces === 'string') namespaces = [namespaces];
+
+    if (options.enabled) {
+      this.cache.load(languages, function (err, data) {
+        if (err) _this2.logger.error('loading languages ' + languages.join(', ') + ' from cache failed', err);
+        if (data) {
+          for (var l in data) {
+            for (var n in data[l]) {
+              if (n === 'i18nStamp') continue;
+              var bundle = data[l][n];
+              if (bundle) _this2.store.addResourceBundle(l, n, bundle);
+            }
+          }
+        }
+        if (callback) callback();
+      });
+    } else {
+      if (callback) callback();
+    }
+  };
+
+  Connector.prototype.save = function save() {
+    if (this.cache && this.options.cache && this.options.cache.enabled) this.cache.save(this.store.data);
+  };
+
+  return Connector;
+}(_EventEmitter3.default);
+
+exports.default = Connector;
+});
+
+define('i18next/defaults',['require','exports','module'],function (require, exports, module) {'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.get = get;
+exports.transformOptions = transformOptions;
+function get() {
+  return {
+    debug: false,
+    initImmediate: true,
+
+    ns: ['translation'],
+    defaultNS: ['translation'],
+    fallbackLng: ['dev'],
+    fallbackNS: false, // string or array of namespaces
+
+    whitelist: false, // array with whitelisted languages
+    nonExplicitWhitelist: false,
+    load: 'all', // | currentOnly | languageOnly
+    preload: false, // array with preload languages
+
+    simplifyPluralSuffix: true,
+    keySeparator: '.',
+    nsSeparator: ':',
+    pluralSeparator: '_',
+    contextSeparator: '_',
+
+    saveMissing: false, // enable to send missing values
+    saveMissingTo: 'fallback', // 'current' || 'all'
+    missingKeyHandler: false, // function(lng, ns, key, fallbackValue) -> override if prefer on handling
+
+    postProcess: false, // string or array of postProcessor names
+    returnNull: true, // allows null value as valid translation
+    returnEmptyString: true, // allows empty string value as valid translation
+    returnObjects: false,
+    joinArrays: false, // or string to join array
+    returnedObjectHandler: function returnedObjectHandler() {}, // function(key, value, options) triggered if key returns object but returnObjects is set to false
+    parseMissingKeyHandler: false, // function(key) parsed a key that was not found in t() before returning
+    appendNamespaceToMissingKey: false,
+    appendNamespaceToCIMode: false,
+    overloadTranslationOptionHandler: function overloadTranslationOptionHandler(args) {
+      return { defaultValue: args[1] };
+    },
+
+    interpolation: {
+      escapeValue: true,
+      format: function format(value, _format, lng) {
+        return value;
+      },
+      prefix: '{{',
+      suffix: '}}',
+      formatSeparator: ',',
+      // prefixEscaped: '{{',
+      // suffixEscaped: '}}',
+      // unescapeSuffix: '',
+      unescapePrefix: '-',
+
+      nestingPrefix: '$t(',
+      nestingSuffix: ')',
+      // nestingPrefixEscaped: '$t(',
+      // nestingSuffixEscaped: ')',
+      defaultVariables: undefined // object that can have values to interpolate on - extends passed in interpolation data
+    }
+  };
+}
+
+function transformOptions(options) {
+  // create namespace object if namespace is passed in as string
+  if (typeof options.ns === 'string') options.ns = [options.ns];
+  if (typeof options.fallbackLng === 'string') options.fallbackLng = [options.fallbackLng];
+  if (typeof options.fallbackNS === 'string') options.fallbackNS = [options.fallbackNS];
+
+  // extend whitelist with cimode
+  if (options.whitelist && options.whitelist.indexOf('cimode') < 0) options.whitelist.push('cimode');
+
+  return options;
+}
+});
+
+define('aurelia-i18n/relativeTime',['exports', './i18n', './defaultTranslations/relative.time', 'aurelia-event-aggregator'], function (exports, _i18n, _relative, _aureliaEventAggregator) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RelativeTime = undefined;
+
+  
+
+  var RelativeTime = exports.RelativeTime = function () {
+    RelativeTime.inject = function inject() {
+      return [_i18n.I18N, _aureliaEventAggregator.EventAggregator];
+    };
+
+    function RelativeTime(i18n, ea) {
+      var _this = this;
+
+      
+
+      this.service = i18n;
+      this.ea = ea;
+
+      this.service.i18nextReady().then(function () {
+        _this.setup();
+      });
+      this.ea.subscribe('i18n:locale:changed', function (locales) {
+        _this.setup(locales);
+      });
+    }
+
+    RelativeTime.prototype.setup = function setup(locales) {
+      var trans = _relative.translations.default || _relative.translations;
+      var key = locales && locales.newValue ? locales.newValue : this.service.getLocale();
+      var fallbackLng = this.service.i18next.fallbackLng;
+      var index = 0;
+
+      if ((index = key.indexOf('-')) >= 0) {
+        var baseLocale = key.substring(0, index);
+
+        if (trans[baseLocale]) {
+          this.addTranslationResource(baseLocale, trans[baseLocale].translation);
+        }
+      }
+
+      if (trans[key]) {
+        this.addTranslationResource(key, trans[key].translation);
+      }
+      if (trans[fallbackLng]) {
+        this.addTranslationResource(key, trans[fallbackLng].translation);
+      }
+    };
+
+    RelativeTime.prototype.addTranslationResource = function addTranslationResource(key, translation) {
+      var options = this.service.i18next.options;
+
+      if (options.interpolation && options.interpolation.prefix !== '__' || options.interpolation.suffix !== '__') {
+        for (var subkey in translation) {
+          translation[subkey] = translation[subkey].replace('__count__', (options.interpolation.prefix || '{{') + 'count' + (options.interpolation.suffix || '}}'));
+        }
+      }
+
+      this.service.i18next.addResources(key, options.defaultNS, translation);
+    };
+
+    RelativeTime.prototype.getRelativeTime = function getRelativeTime(time) {
+      var now = new Date();
+      var diff = now.getTime() - time.getTime();
+
+      var timeDiff = this.getTimeDiffDescription(diff, 'year', 31104000000);
+      if (!timeDiff) {
+        timeDiff = this.getTimeDiffDescription(diff, 'month', 2592000000);
+        if (!timeDiff) {
+          timeDiff = this.getTimeDiffDescription(diff, 'day', 86400000);
+          if (!timeDiff) {
+            timeDiff = this.getTimeDiffDescription(diff, 'hour', 3600000);
+            if (!timeDiff) {
+              timeDiff = this.getTimeDiffDescription(diff, 'minute', 60000);
+              if (!timeDiff) {
+                timeDiff = this.getTimeDiffDescription(diff, 'second', 1000);
+                if (!timeDiff) {
+                  timeDiff = this.service.tr('now');
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return timeDiff;
+    };
+
+    RelativeTime.prototype.getTimeDiffDescription = function getTimeDiffDescription(diff, unit, timeDivisor) {
+      var unitAmount = (diff / timeDivisor).toFixed(0);
+      if (unitAmount > 0) {
+        return this.service.tr(unit, { count: parseInt(unitAmount, 10), context: 'ago' });
+      } else if (unitAmount < 0) {
+        var abs = Math.abs(unitAmount);
+        return this.service.tr(unit, { count: abs, context: 'in' });
+      }
+
+      return null;
+    };
+
+    return RelativeTime;
+  }();
+});
+define('aurelia-i18n/defaultTranslations/relative.time',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var translations = exports.translations = {
+    ar: {
+      translation: {
+        'now': 'الآن',
+        'second_ago': 'منذ __count__ ثانية',
+        'second_ago_plural': 'منذ __count__ ثواني',
+        'second_in': 'في __count__ ثانية',
+        'second_in_plural': 'في __count__ ثواني',
+        'minute_ago': 'منذ __count__ دقيقة',
+        'minute_ago_plural': 'منذ __count__ دقائق',
+        'minute_in': 'في __count__ دقيقة',
+        'minute_in_plural': 'في __count__ دقائق',
+        'hour_ago': 'منذ __count__ ساعة',
+        'hour_ago_plural': 'منذ __count__ ساعات',
+        'hour_in': 'في __count__ ساعة',
+        'hour_in_plural': 'في __count__ ساعات',
+        'day_ago': 'منذ __count__ يوم',
+        'day_ago_plural': 'منذ __count__ أيام',
+        'day_in': 'في __count__ يوم',
+        'day_in_plural': 'في __count__ أيام'
+      }
+    },
+    en: {
+      translation: {
+        'now': 'just now',
+        'second_ago': '__count__ second ago',
+        'second_ago_plural': '__count__ seconds ago',
+        'second_in': 'in __count__ second',
+        'second_in_plural': 'in __count__ seconds',
+        'minute_ago': '__count__ minute ago',
+        'minute_ago_plural': '__count__ minutes ago',
+        'minute_in': 'in __count__ minute',
+        'minute_in_plural': 'in __count__ minutes',
+        'hour_ago': '__count__ hour ago',
+        'hour_ago_plural': '__count__ hours ago',
+        'hour_in': 'in __count__ hour',
+        'hour_in_plural': 'in __count__ hours',
+        'day_ago': '__count__ day ago',
+        'day_ago_plural': '__count__ days ago',
+        'day_in': 'in __count__ day',
+        'day_in_plural': 'in __count__ days',
+        'month_ago': '__count__ month ago',
+        'month_ago_plural': '__count__ months ago',
+        'month_in': 'in __count__ month',
+        'month_in_plural': 'in __count__ months',
+        'year_ago': '__count__ year ago',
+        'year_ago_plural': '__count__ years ago',
+        'year_in': 'in __count__ year',
+        'year_in_plural': 'in __count__ years'
+      }
+    },
+    it: {
+      translation: {
+        'now': 'adesso',
+        'second_ago': '__count__ secondo fa',
+        'second_ago_plural': '__count__ secondi fa',
+        'second_in': 'in __count__ secondo',
+        'second_in_plural': 'in __count__ secondi',
+        'minute_ago': '__count__ minuto fa',
+        'minute_ago_plural': '__count__ minuti fa',
+        'minute_in': 'in __count__ minuto',
+        'minute_in_plural': 'in __count__ minuti',
+        'hour_ago': '__count__ ora fa',
+        'hour_ago_plural': '__count__ ore fa',
+        'hour_in': 'in __count__ ora',
+        'hour_in_plural': 'in __count__ ore',
+        'day_ago': '__count__ giorno fa',
+        'day_ago_plural': '__count__ giorni fa',
+        'day_in': 'in __count__ giorno',
+        'day_in_plural': 'in __count__ giorni',
+        'month_ago': '__count__ mese fa',
+        'month_ago_plural': '__count__ mesi fa',
+        'month_in': 'in __count__ mese',
+        'month_in_plural': 'in __count__ mesi',
+        'year_ago': '__count__ anno fa',
+        'year_ago_plural': '__count__ anni fa',
+        'year_in': 'in __count__ anno',
+        'year_in_plural': 'in __count__ anni'
+      }
+    },
+    de: {
+      translation: {
+        'now': 'jetzt gerade',
+        'second_ago': 'vor __count__ Sekunde',
+        'second_ago_plural': 'vor __count__ Sekunden',
+        'second_in': 'in __count__ Sekunde',
+        'second_in_plural': 'in __count__ Sekunden',
+        'minute_ago': 'vor __count__ Minute',
+        'minute_ago_plural': 'vor __count__ Minuten',
+        'minute_in': 'in __count__ Minute',
+        'minute_in_plural': 'in __count__ Minuten',
+        'hour_ago': 'vor __count__ Stunde',
+        'hour_ago_plural': 'vor __count__ Stunden',
+        'hour_in': 'in __count__ Stunde',
+        'hour_in_plural': 'in __count__ Stunden',
+        'day_ago': 'vor __count__ Tag',
+        'day_ago_plural': 'vor __count__ Tagen',
+        'day_in': 'in __count__ Tag',
+        'day_in_plural': 'in __count__ Tagen',
+        'month_ago': 'vor __count__ Monat',
+        'month_ago_plural': 'vor __count__ Monaten',
+        'month_in': 'in __count__ Monat',
+        'month_in_plural': 'in __count__ Monaten',
+        'year_ago': 'vor __count__ Jahr',
+        'year_ago_plural': 'vor __count__ Jahren',
+        'year_in': 'in __count__ Jahr',
+        'year_in_plural': 'in __count__ Jahren'
+      }
+    },
+    nl: {
+      translation: {
+        'now': 'zonet',
+        'second_ago': '__count__ seconde geleden',
+        'second_ago_plural': '__count__ seconden geleden',
+        'second_in': 'in __count__ seconde',
+        'second_in_plural': 'in __count__ seconden',
+        'minute_ago': '__count__ minuut geleden',
+        'minute_ago_plural': '__count__ minuten geleden',
+        'minute_in': 'in __count__ minuut',
+        'minute_in_plural': 'in __count__ minuten',
+        'hour_ago': '__count__ uur geleden',
+        'hour_ago_plural': '__count__ uren geleden',
+        'hour_in': 'in __count__ uur',
+        'hour_in_plural': 'in __count__ uren',
+        'day_ago': '__count__ dag geleden',
+        'day_ago_plural': '__count__ dagen geleden',
+        'day_in': 'in __count__ dag',
+        'day_in_plural': 'in __count__ dagen',
+        'month_ago': '__count__ maand geleden',
+        'month_ago_plural': '__count__ maanden geleden',
+        'month_in': 'in __count__ maand',
+        'month_in_plural': 'in __count__ maanden',
+        'year_ago': '__count__ jaar geleden',
+        'year_ago_plural': '__count__ jaren geleden',
+        'year_in': 'in __count__ jaar',
+        'year_in_plural': 'in __count__ jaren'
+      }
+    },
+    fr: {
+      translation: {
+        'now': 'maintenant',
+        'second_ago': '__count__ seconde plus tôt',
+        'second_ago_plural': '__count__ secondes plus tôt',
+        'second_in': 'en __count__ seconde',
+        'second_in_plural': 'en __count__ secondes',
+        'minute_ago': '__count__ minute plus tôt',
+        'minute_ago_plural': '__count__ minutes plus tôt',
+        'minute_in': 'en __count__ minute',
+        'minute_in_plural': 'en __count__ minutes',
+        'hour_ago': '__count__ heure plus tôt',
+        'hour_ago_plural': '__count__ heures plus tôt',
+        'hour_in': 'en __count__ heure',
+        'hour_in_plural': 'en __count__ heures',
+        'day_ago': '__count__ jour plus tôt',
+        'day_ago_plural': '__count__ jours plus tôt',
+        'day_in': 'en __count__ jour',
+        'day_in_plural': 'en __count__ jours'
+      }
+    },
+    th: {
+      translation: {
+        'now': 'เมื่อกี้',
+        'second_ago': '__count__ วินาที ที่ผ่านมา',
+        'second_ago_plural': '__count__ วินาที ที่ผ่านมา',
+        'second_in': 'อีก __count__ วินาที',
+        'second_in_plural': 'อีก __count__ วินาที',
+        'minute_ago': '__count__ นาที ที่ผ่านมา',
+        'minute_ago_plural': '__count__ นาที ที่ผ่านมา',
+        'minute_in': 'อีก __count__ นาที',
+        'minute_in_plural': 'อีก __count__ นาที',
+        'hour_ago': '__count__ ชั่วโมง ที่ผ่านมา',
+        'hour_ago_plural': '__count__ ชั่วโมง ที่ผ่านมา',
+        'hour_in': 'อีก __count__ ชั่วโมง',
+        'hour_in_plural': 'อีก __count__ ชั่วโมง',
+        'day_ago': '__count__ วัน ที่ผ่านมา',
+        'day_ago_plural': '__count__ วัน ที่ผ่านมา',
+        'day_in': 'อีก __count__ วัน',
+        'day_in_plural': 'อีก __count__ วัน'
+      }
+    },
+    sv: {
+      translation: {
+        'now': 'just nu',
+        'second_ago': '__count__ sekund sedan',
+        'second_ago_plural': '__count__ sekunder sedan',
+        'second_in': 'om __count__ sekund',
+        'second_in_plural': 'om __count__ sekunder',
+        'minute_ago': '__count__ minut sedan',
+        'minute_ago_plural': '__count__ minuter sedan',
+        'minute_in': 'om __count__ minut',
+        'minute_in_plural': 'om __count__ minuter',
+        'hour_ago': '__count__ timme sedan',
+        'hour_ago_plural': '__count__ timmar sedan',
+        'hour_in': 'om __count__ timme',
+        'hour_in_plural': 'om __count__ timmar',
+        'day_ago': '__count__ dag sedan',
+        'day_ago_plural': '__count__ dagar sedan',
+        'day_in': 'om __count__ dag',
+        'day_in_plural': 'om __count__ dagar'
+      }
+    },
+    da: {
+      translation: {
+        'now': 'lige nu',
+        'second_ago': '__count__ sekunder siden',
+        'second_ago_plural': '__count__ sekunder siden',
+        'second_in': 'om __count__ sekund',
+        'second_in_plural': 'om __count__ sekunder',
+        'minute_ago': '__count__ minut siden',
+        'minute_ago_plural': '__count__ minutter siden',
+        'minute_in': 'om __count__ minut',
+        'minute_in_plural': 'om __count__ minutter',
+        'hour_ago': '__count__ time siden',
+        'hour_ago_plural': '__count__ timer siden',
+        'hour_in': 'om __count__ time',
+        'hour_in_plural': 'om __count__ timer',
+        'day_ago': '__count__ dag siden',
+        'day_ago_plural': '__count__ dage siden',
+        'day_in': 'om __count__ dag',
+        'day_in_plural': 'om __count__ dage'
+      }
+    },
+    no: {
+      translation: {
+        'now': 'akkurat nå',
+        'second_ago': '__count__ sekund siden',
+        'second_ago_plural': '__count__ sekunder siden',
+        'second_in': 'om __count__ sekund',
+        'second_in_plural': 'om __count__ sekunder',
+        'minute_ago': '__count__ minutt siden',
+        'minute_ago_plural': '__count__ minutter siden',
+        'minute_in': 'om __count__ minutt',
+        'minute_in_plural': 'om __count__ minutter',
+        'hour_ago': '__count__ time siden',
+        'hour_ago_plural': '__count__ timer siden',
+        'hour_in': 'om __count__ time',
+        'hour_in_plural': 'om __count__ timer',
+        'day_ago': '__count__ dag siden',
+        'day_ago_plural': '__count__ dager siden',
+        'day_in': 'om __count__ dag',
+        'day_in_plural': 'om __count__ dager'
+      }
+    },
+    jp: {
+      translation: {
+        'now': 'たった今',
+        'second_ago': '__count__ 秒前',
+        'second_ago_plural': '__count__ 秒前',
+        'second_in': 'あと __count__ 秒',
+        'second_in_plural': 'あと __count__ 秒',
+        'minute_ago': '__count__ 分前',
+        'minute_ago_plural': '__count__ 分前',
+        'minute_in': 'あと __count__ 分',
+        'minute_in_plural': 'あと __count__ 分',
+        'hour_ago': '__count__ 時間前',
+        'hour_ago_plural': '__count__ 時間前',
+        'hour_in': 'あと __count__ 時間',
+        'hour_in_plural': 'あと __count__ 時間',
+        'day_ago': '__count__ 日間前',
+        'day_ago_plural': '__count__ 日間前',
+        'day_in': 'あと __count__ 日間',
+        'day_in_plural': 'あと __count__ 日間'
+      }
+    },
+    pt: {
+      translation: {
+        'now': 'neste exato momento',
+        'second_ago': '__count__ segundo atrás',
+        'second_ago_plural': '__count__ segundos atrás',
+        'second_in': 'em __count__ segundo',
+        'second_in_plural': 'em __count__ segundos',
+        'minute_ago': '__count__ minuto atrás',
+        'minute_ago_plural': '__count__ minutos atrás',
+        'minute_in': 'em __count__ minuto',
+        'minute_in_plural': 'em __count__ minutos',
+        'hour_ago': '__count__ hora atrás',
+        'hour_ago_plural': '__count__ horas atrás',
+        'hour_in': 'em __count__ hora',
+        'hour_in_plural': 'em __count__ horas',
+        'day_ago': '__count__ dia atrás',
+        'day_ago_plural': '__count__ dias atrás',
+        'day_in': 'em __count__ dia',
+        'day_in_plural': 'em __count__ dias',
+        'month_ago': '__count__ mês atrás',
+        'month_ago_plural': '__count__ meses atrás',
+        'month_in': 'em __count__ mês',
+        'month_in_plural': 'em __count__ meses',
+        'year_ago': '__count__ ano atrás',
+        'year_ago_plural': '__count__ anos atrás',
+        'year_in': 'em __count__ ano',
+        'year_in_plural': 'em __count__ anos'
+      }
+    },
+    zh: {
+      translation: {
+        'now': '刚才',
+        'second_ago': '__count__ 秒钟前',
+        'second_ago_plural': '__count__ 秒钟前',
+        'second_in': '__count__ 秒内',
+        'second_in_plural': '__count__ 秒内',
+        'minute_ago': '__count__ 分钟前',
+        'minute_ago_plural': '__count__ 分钟前',
+        'minute_in': '__count__ 分钟内',
+        'minute_in_plural': '__count__ 分钟内',
+        'hour_ago': '__count__ 小时前',
+        'hour_ago_plural': '__count__ 小时前',
+        'hour_in': '__count__ 小时内',
+        'hour_in_plural': '__count__ 小时内',
+        'day_ago': '__count__ 天前',
+        'day_ago_plural': '__count__ 天前',
+        'day_in': '__count__ 天内',
+        'day_in_plural': '__count__ 天内',
+        'month_ago': '__count__ 月前',
+        'month_ago_plural': '__count__ 月前',
+        'month_in': '__count__ 月内',
+        'month_in_plural': '__count__ 月内',
+        'year_ago': '__count__ 年前',
+        'year_ago_plural': '__count__ 年前',
+        'year_in': '__count__ 年内',
+        'year_in_plural': '__count__ 年内'
+      }
+    },
+    'zh-CN': {
+      translation: {
+        'now': '刚才',
+        'second_ago': '__count__ 秒钟前',
+        'second_ago_plural': '__count__ 秒钟前',
+        'second_in': '__count__ 秒内',
+        'second_in_plural': '__count__ 秒内',
+        'minute_ago': '__count__ 分钟前',
+        'minute_ago_plural': '__count__ 分钟前',
+        'minute_in': '__count__ 分钟内',
+        'minute_in_plural': '__count__ 分钟内',
+        'hour_ago': '__count__ 小时前',
+        'hour_ago_plural': '__count__ 小时前',
+        'hour_in': '__count__ 小时内',
+        'hour_in_plural': '__count__ 小时内',
+        'day_ago': '__count__ 天前',
+        'day_ago_plural': '__count__ 天前',
+        'day_in': '__count__ 天内',
+        'day_in_plural': '__count__ 天内',
+        'month_ago': '__count__ 月前',
+        'month_ago_plural': '__count__ 月前',
+        'month_in': '__count__ 月内',
+        'month_in_plural': '__count__ 月内',
+        'year_ago': '__count__ 年前',
+        'year_ago_plural': '__count__ 年前',
+        'year_in': '__count__ 年内',
+        'year_in_plural': '__count__ 年内'
+      }
+    },
+    'zh-HK': {
+      translation: {
+        'now': '剛才',
+        'second_ago': '__count__ 秒鐘前',
+        'second_ago_plural': '__count__ 秒鐘前',
+        'second_in': '__count__ 秒內',
+        'second_in_plural': '__count__ 秒內',
+        'minute_ago': '__count__ 分鐘前',
+        'minute_ago_plural': '__count__ 分鐘前',
+        'minute_in': '__count__ 分鐘內',
+        'minute_in_plural': '__count__ 分鐘內',
+        'hour_ago': '__count__ 小時前',
+        'hour_ago_plural': '__count__ 小時前',
+        'hour_in': '__count__ 小時內',
+        'hour_in_plural': '__count__ 小時內',
+        'day_ago': '__count__ 天前',
+        'day_ago_plural': '__count__ 天前',
+        'day_in': '__count__ 天內',
+        'day_in_plural': '__count__ 天內',
+        'month_ago': '__count__ 月前',
+        'month_ago_plural': '__count__ 月前',
+        'month_in': '__count__ 月內',
+        'month_in_plural': '__count__ 月內',
+        'year_ago': '__count__ 年前',
+        'year_ago_plural': '__count__ 年前',
+        'year_in': '__count__ 年內',
+        'year_in_plural': '__count__ 年內'
+      }
+    },
+    'zh-TW': {
+      translation: {
+        'now': '剛才',
+        'second_ago': '__count__ 秒鐘前',
+        'second_ago_plural': '__count__ 秒鐘前',
+        'second_in': '__count__ 秒內',
+        'second_in_plural': '__count__ 秒內',
+        'minute_ago': '__count__ 分鐘前',
+        'minute_ago_plural': '__count__ 分鐘前',
+        'minute_in': '__count__ 分鐘內',
+        'minute_in_plural': '__count__ 分鐘內',
+        'hour_ago': '__count__ 小時前',
+        'hour_ago_plural': '__count__ 小時前',
+        'hour_in': '__count__ 小時內',
+        'hour_in_plural': '__count__ 小時內',
+        'day_ago': '__count__ 天前',
+        'day_ago_plural': '__count__ 天前',
+        'day_in': '__count__ 天內',
+        'day_in_plural': '__count__ 天內',
+        'month_ago': '__count__ 月前',
+        'month_ago_plural': '__count__ 月前',
+        'month_in': '__count__ 月內',
+        'month_in_plural': '__count__ 月內',
+        'year_ago': '__count__ 年前',
+        'year_ago_plural': '__count__ 年前',
+        'year_in': '__count__ 年內',
+        'year_in_plural': '__count__ 年內'
+      }
+    }
+  };
+});
+define('aurelia-i18n/df',['exports', 'aurelia-logging', './i18n', 'aurelia-templating-resources', 'aurelia-binding', './utils'], function (exports, _aureliaLogging, _i18n, _aureliaTemplatingResources, _aureliaBinding, _utils) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DfBindingBehavior = exports.DfValueConverter = undefined;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var DfValueConverter = exports.DfValueConverter = function () {
+    DfValueConverter.inject = function inject() {
+      return [_i18n.I18N];
+    };
+
+    function DfValueConverter(i18n) {
+      
+
+      this.service = i18n;
+    }
+
+    DfValueConverter.prototype.toView = function toView(value, dfOrOptions, locale, df) {
+      if (value === null || typeof value === 'undefined' || typeof value === 'string' && value.trim() === '') {
+        return value;
+      }
+
+      if (dfOrOptions && typeof dfOrOptions.format === 'function') {
+        return dfOrOptions.format(value);
+      } else if (df) {
+        var i18nLogger = LogManager.getLogger('i18n');
+        i18nLogger.warn('This ValueConverter signature is depcrecated and will be removed in future releases. Please use the signature [dfOrOptions, locale]');
+      } else {
+        df = this.service.df(dfOrOptions, locale || this.service.getLocale());
+      }
+
+      if (typeof value === 'string' && isNaN(value) && !(0, _utils.isInteger)(value)) {
+        value = new Date(value);
+      }
+
+      return df.format(value);
+    };
+
+    return DfValueConverter;
+  }();
+
+  var DfBindingBehavior = exports.DfBindingBehavior = function () {
+    DfBindingBehavior.inject = function inject() {
+      return [_aureliaTemplatingResources.SignalBindingBehavior];
+    };
+
+    function DfBindingBehavior(signalBindingBehavior) {
+      
+
+      this.signalBindingBehavior = signalBindingBehavior;
+    }
+
+    DfBindingBehavior.prototype.bind = function bind(binding, source) {
+      this.signalBindingBehavior.bind(binding, source, 'aurelia-translation-signal');
+
+      var sourceExpression = binding.sourceExpression;
+
+      if (sourceExpression.rewritten) {
+        return;
+      }
+      sourceExpression.rewritten = true;
+
+      var expression = sourceExpression.expression;
+      sourceExpression.expression = new _aureliaBinding.ValueConverter(expression, 'df', sourceExpression.args, [expression].concat(sourceExpression.args));
+    };
+
+    DfBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      this.signalBindingBehavior.unbind(binding, source);
+    };
+
+    return DfBindingBehavior;
+  }();
+});
+define('aurelia-i18n/utils',['exports', 'aurelia-dependency-injection'], function (exports, _aureliaDependencyInjection) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.LazyOptional = exports.assignObjectToKeys = exports.isInteger = exports.extend = undefined;
+
+  
+
+  var _dec, _class;
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  var extend = exports.extend = function extend(destination, source) {
+    for (var property in source) {
+      destination[property] = source[property];
+    }
+
+    return destination;
+  };
+
+  var isInteger = exports.isInteger = Number.isInteger || function (value) {
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+  };
+
+  var assignObjectToKeys = exports.assignObjectToKeys = function assignObjectToKeys(root, obj) {
+    if (obj === undefined || obj === null) {
+      return obj;
+    }
+
+    var opts = {};
+
+    Object.keys(obj).map(function (key) {
+      if (_typeof(obj[key]) === 'object') {
+        extend(opts, assignObjectToKeys(key, obj[key]));
+      } else {
+        opts[root !== '' ? root + '.' + key : key] = obj[key];
+      }
+    });
+
+    return opts;
+  };
+
+  var LazyOptional = exports.LazyOptional = (_dec = (0, _aureliaDependencyInjection.resolver)(), _dec(_class = function () {
+    function LazyOptional(key) {
+      
+
+      this.key = key;
+    }
+
+    LazyOptional.prototype.get = function get(container) {
+      var _this = this;
+
+      return function () {
+        if (container.hasResolver(_this.key, false)) {
+          return container.get(_this.key);
+        }
+        return null;
+      };
+    };
+
+    LazyOptional.of = function of(key) {
+      return new LazyOptional(key);
+    };
+
+    return LazyOptional;
+  }()) || _class);
+});
+define('aurelia-i18n/nf',['exports', 'aurelia-logging', './i18n', 'aurelia-templating-resources', 'aurelia-binding'], function (exports, _aureliaLogging, _i18n, _aureliaTemplatingResources, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NfBindingBehavior = exports.NfValueConverter = undefined;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var NfValueConverter = exports.NfValueConverter = function () {
+    NfValueConverter.inject = function inject() {
+      return [_i18n.I18N];
+    };
+
+    function NfValueConverter(i18n) {
+      
+
+      this.service = i18n;
+    }
+
+    NfValueConverter.prototype.toView = function toView(value, nfOrOptions, locale, nf) {
+      if (value === null || typeof value === 'undefined' || typeof value === 'string' && value.trim() === '') {
+        return value;
+      }
+
+      if (nfOrOptions && typeof nfOrOptions.format === 'function') {
+        return nfOrOptions.format(value);
+      } else if (nf) {
+        var i18nLogger = LogManager.getLogger('i18n');
+        i18nLogger.warn('This ValueConverter signature is depcrecated and will be removed in future releases. Please use the signature [nfOrOptions, locale]');
+      } else {
+        nf = this.service.nf(nfOrOptions, locale || this.service.getLocale());
+      }
+
+      return nf.format(value);
+    };
+
+    return NfValueConverter;
+  }();
+
+  var NfBindingBehavior = exports.NfBindingBehavior = function () {
+    NfBindingBehavior.inject = function inject() {
+      return [_aureliaTemplatingResources.SignalBindingBehavior];
+    };
+
+    function NfBindingBehavior(signalBindingBehavior) {
+      
+
+      this.signalBindingBehavior = signalBindingBehavior;
+    }
+
+    NfBindingBehavior.prototype.bind = function bind(binding, source) {
+      this.signalBindingBehavior.bind(binding, source, 'aurelia-translation-signal');
+
+      var sourceExpression = binding.sourceExpression;
+
+      if (sourceExpression.rewritten) {
+        return;
+      }
+      sourceExpression.rewritten = true;
+
+      var expression = sourceExpression.expression;
+      sourceExpression.expression = new _aureliaBinding.ValueConverter(expression, 'nf', sourceExpression.args, [expression].concat(sourceExpression.args));
+    };
+
+    NfBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      this.signalBindingBehavior.unbind(binding, source);
+    };
+
+    return NfBindingBehavior;
+  }();
+});
+define('aurelia-i18n/rt',['exports', './relativeTime', 'aurelia-templating-resources', 'aurelia-binding'], function (exports, _relativeTime, _aureliaTemplatingResources, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RtBindingBehavior = exports.RtValueConverter = undefined;
+
+  
+
+  var RtValueConverter = exports.RtValueConverter = function () {
+    RtValueConverter.inject = function inject() {
+      return [_relativeTime.RelativeTime];
+    };
+
+    function RtValueConverter(relativeTime) {
+      
+
+      this.service = relativeTime;
+    }
+
+    RtValueConverter.prototype.toView = function toView(value) {
+      if (value === null || typeof value === 'undefined' || typeof value === 'string' && value.trim() === '') {
+        return value;
+      }
+
+      if (typeof value === 'string' && isNaN(value) && !Number.isInteger(value)) {
+        value = new Date(value);
+      }
+
+      return this.service.getRelativeTime(value);
+    };
+
+    return RtValueConverter;
+  }();
+
+  var RtBindingBehavior = exports.RtBindingBehavior = function () {
+    RtBindingBehavior.inject = function inject() {
+      return [_aureliaTemplatingResources.SignalBindingBehavior];
+    };
+
+    function RtBindingBehavior(signalBindingBehavior) {
+      
+
+      this.signalBindingBehavior = signalBindingBehavior;
+    }
+
+    RtBindingBehavior.prototype.bind = function bind(binding, source) {
+      this.signalBindingBehavior.bind(binding, source, 'aurelia-translation-signal');
+
+      var sourceExpression = binding.sourceExpression;
+
+      if (sourceExpression.rewritten) {
+        return;
+      }
+      sourceExpression.rewritten = true;
+
+      var expression = sourceExpression.expression;
+      sourceExpression.expression = new _aureliaBinding.ValueConverter(expression, 'rt', sourceExpression.args, [expression].concat(sourceExpression.args));
+    };
+
+    RtBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      this.signalBindingBehavior.unbind(binding, source);
+    };
+
+    return RtBindingBehavior;
+  }();
+});
+define('aurelia-i18n/t',['exports', './i18n', 'aurelia-event-aggregator', 'aurelia-metadata', 'aurelia-templating', 'aurelia-templating-resources', 'aurelia-binding', './utils'], function (exports, _i18n, _aureliaEventAggregator, _aureliaMetadata, _aureliaTemplating, _aureliaTemplatingResources, _aureliaBinding, _utils) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TBindingBehavior = exports.TCustomAttribute = exports.TParamsCustomAttribute = exports.TValueConverter = undefined;
+
+  var _dec, _class, _class2, _temp, _dec2, _class3, _class4, _temp2, _class5, _temp3;
+
+  
+
+  var TValueConverter = exports.TValueConverter = function () {
+    TValueConverter.inject = function inject() {
+      return [_i18n.I18N];
+    };
+
+    function TValueConverter(i18n) {
+      
+
+      this.service = i18n;
+    }
+
+    TValueConverter.prototype.toView = function toView(value, options) {
+      return this.service.tr(value, options);
+    };
+
+    return TValueConverter;
+  }();
+
+  var TParamsCustomAttribute = exports.TParamsCustomAttribute = (_dec = (0, _aureliaTemplating.customAttribute)('t-params'), _dec(_class = (_temp = _class2 = function () {
+    TParamsCustomAttribute.configureAliases = function configureAliases(aliases) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, _aureliaTemplating.HtmlBehaviorResource, TParamsCustomAttribute);
+      r.aliases = aliases;
+    };
+
+    function TParamsCustomAttribute(element) {
+      
+
+      this.element = element;
+    }
+
+    TParamsCustomAttribute.prototype.valueChanged = function valueChanged() {};
+
+    return TParamsCustomAttribute;
+  }(), _class2.inject = [Element], _temp)) || _class);
+  var TCustomAttribute = exports.TCustomAttribute = (_dec2 = (0, _aureliaTemplating.customAttribute)('t'), _dec2(_class3 = (_temp2 = _class4 = function () {
+    TCustomAttribute.configureAliases = function configureAliases(aliases) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, _aureliaTemplating.HtmlBehaviorResource, TCustomAttribute);
+      r.aliases = aliases;
+    };
+
+    function TCustomAttribute(element, i18n, ea, tparams) {
+      
+
+      this.element = element;
+      this.service = i18n;
+      this.ea = ea;
+      this.lazyParams = tparams;
+    }
+
+    TCustomAttribute.prototype.bind = function bind() {
+      var _this = this;
+
+      this.params = this.lazyParams();
+
+      if (this.params) {
+        this.params.valueChanged = function (newParams, oldParams) {
+          _this.paramsChanged(_this.value, newParams, oldParams);
+        };
+      }
+
+      var p = this.params !== null ? this.params.value : undefined;
+      this.subscription = this.ea.subscribe('i18n:locale:changed', function () {
+        _this.service.updateValue(_this.element, _this.value, _this.params !== null ? _this.params.value : undefined);
+      });
+
+      this.service.updateValue(this.element, this.value, p);
+    };
+
+    TCustomAttribute.prototype.paramsChanged = function paramsChanged(newValue, newParams) {
+      this.service.updateValue(this.element, newValue, newParams);
+    };
+
+    TCustomAttribute.prototype.valueChanged = function valueChanged(newValue) {
+      var p = this.params !== null ? this.params.value : undefined;
+      this.service.updateValue(this.element, newValue, p);
+    };
+
+    TCustomAttribute.prototype.unbind = function unbind() {
+      if (this.subscription) {
+        this.subscription.dispose();
+      }
+    };
+
+    return TCustomAttribute;
+  }(), _class4.inject = [Element, _i18n.I18N, _aureliaEventAggregator.EventAggregator, _utils.LazyOptional.of(TParamsCustomAttribute)], _temp2)) || _class3);
+  var TBindingBehavior = exports.TBindingBehavior = (_temp3 = _class5 = function () {
+    function TBindingBehavior(signalBindingBehavior) {
+      
+
+      this.signalBindingBehavior = signalBindingBehavior;
+    }
+
+    TBindingBehavior.prototype.bind = function bind(binding, source) {
+      this.signalBindingBehavior.bind(binding, source, 'aurelia-translation-signal');
+
+      var sourceExpression = binding.sourceExpression;
+
+      if (sourceExpression.rewritten) {
+        return;
+      }
+      sourceExpression.rewritten = true;
+
+      var expression = sourceExpression.expression;
+      sourceExpression.expression = new _aureliaBinding.ValueConverter(expression, 't', sourceExpression.args, [expression].concat(sourceExpression.args));
+    };
+
+    TBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      this.signalBindingBehavior.unbind(binding, source);
+    };
+
+    return TBindingBehavior;
+  }(), _class5.inject = [_aureliaTemplatingResources.SignalBindingBehavior], _temp3);
+});
+define('aurelia-i18n/base-i18n',['exports', './i18n', 'aurelia-event-aggregator'], function (exports, _i18n, _aureliaEventAggregator) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.BaseI18N = undefined;
+
+  
+
+  var _class, _temp;
+
+  var BaseI18N = exports.BaseI18N = (_temp = _class = function () {
+    function BaseI18N(i18n, element, ea) {
+      var _this = this;
+
+      
+
+      this.i18n = i18n;
+      this.element = element;
+
+      this.__i18nDisposer = ea.subscribe('i18n:locale:changed', function () {
+        _this.i18n.updateTranslations(_this.element);
+      });
+    }
+
+    BaseI18N.prototype.attached = function attached() {
+      this.i18n.updateTranslations(this.element);
+    };
+
+    BaseI18N.prototype.detached = function detached() {
+      this.__i18nDisposer.dispose();
+    };
+
+    return BaseI18N;
+  }(), _class.inject = [_i18n.I18N, Element, _aureliaEventAggregator.EventAggregator], _temp);
+});
+define('aurelia-i18n/aurelia-i18n-loader',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var _class, _temp;
+
+  var Backend = exports.Backend = (_temp = _class = function () {
+    Backend.with = function _with(loader) {
+      this.loader = loader;
+      return this;
+    };
+
+    function Backend(services) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      
+
+      this.init(services, options);
+      this.type = 'backend';
+    }
+
+    Backend.prototype.init = function init(services) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      this.services = services;
+      this.options = defaults(options, this.options || {}, getDefaults());
+    };
+
+    Backend.prototype.readMulti = function readMulti(languages, namespaces, callback) {
+      var loadPath = this.options.loadPath;
+
+      if (typeof this.options.loadPath === 'function') {
+        loadPath = this.options.loadPath(languages, namespaces);
+      }
+
+      var url = this.services.interpolator.interpolate(loadPath, { lng: languages.join('+'), ns: namespaces.join('+') });
+
+      this.loadUrl(url, callback);
+    };
+
+    Backend.prototype.read = function read(language, namespace, callback) {
+      var loadPath = this.options.loadPath;
+
+      if (typeof this.options.loadPath === 'function') {
+        loadPath = this.options.loadPath([language], [namespace]);
+      }
+
+      var url = this.services.interpolator.interpolate(loadPath, { lng: language, ns: namespace });
+
+      this.loadUrl(url, callback);
+    };
+
+    Backend.prototype.loadUrl = function loadUrl(url, callback) {
+      var _this = this;
+
+      this.constructor.loader.loadText(url).then(function (response) {
+        var ret = void 0;
+        var err = void 0;
+        try {
+          ret = _this.options.parse(response, url);
+        } catch (e) {
+          err = 'failed parsing ' + url + ' to json';
+        }
+        if (err) return callback(err, false);
+        callback(null, ret);
+      }, function (response) {
+        return callback('failed loading ' + url, false);
+      });
+    };
+
+    Backend.prototype.create = function create(languages, namespace, key, fallbackValue) {};
+
+    return Backend;
+  }(), _class.loader = null, _temp);
+
+
+  Backend.type = 'backend';
+  exports.default = Backend;
+
+  var arr = [];
+  var each = arr.forEach;
+  var slice = arr.slice;
+
+  function getDefaults() {
+    return {
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      addPath: 'locales/add/{{lng}}/{{ns}}',
+      allowMultiLoading: false,
+      parse: JSON.parse
+    };
+  }
+
+  function defaults(obj) {
+    each.call(slice.call(arguments, 1), function (source) {
+      if (source) {
+        for (var prop in source) {
+          if (obj[prop] === undefined) obj[prop] = source[prop];
+        }
+      }
+    });
+    return obj;
+  }
+});
+define('regenerator-runtime/runtime',['require','exports','module'],function (require, exports, module) {/**
+ * Copyright (c) 2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * https://raw.github.com/facebook/regenerator/master/LICENSE file. An
+ * additional grant of patent rights can be found in the PATENTS file in
+ * the same directory.
+ */
+
+!(function(global) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  var inModule = typeof module === "object";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    if (inModule) {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  runtime.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  runtime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  runtime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  runtime.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return Promise.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return Promise.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration. If the Promise is rejected, however, the
+          // result for this iteration will be rejected with the same
+          // reason. Note that rejections of yielded Promises are not
+          // thrown back into the generator function, as is the case
+          // when an awaited Promise is rejected. This difference in
+          // behavior between yield and await is important, because it
+          // allows the consumer to decide what to do with the yielded
+          // rejection (swallow it and continue, manually .throw it back
+          // into the generator, abandon iteration, whatever). With
+          // await, by contrast, there is no opportunity to examine the
+          // rejection reason outside the generator function, so the
+          // only option is to throw it from the await expression, and
+          // let the generator function handle the exception.
+          result.value = unwrapped;
+          resolve(result);
+        }, reject);
+      }
+    }
+
+    if (typeof global.process === "object" && global.process.domain) {
+      invoke = global.process.domain.bind(invoke);
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  runtime.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return runtime.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        if (delegate.iterator.return) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  runtime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  runtime.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+})(
+  // Among the various tricks for obtaining a reference to the global
+  // object, this seems to be the most reliable technique that does not
+  // use indirect eval (which violates Content Security Policy).
+  typeof global === "object" ? global :
+  typeof window === "object" ? window :
+  typeof self === "object" ? self : this
+);
+
+});
+
+define('aurelia-dialog/dialog-configuration',["require", "exports", "./renderer", "./dialog-settings", "./dialog-renderer", "aurelia-pal"], function (require, exports, renderer_1, dialog_settings_1, dialog_renderer_1, aurelia_pal_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var defaultRenderer = dialog_renderer_1.DialogRenderer;
+    var resources = {
+        'ux-dialog': aurelia_pal_1.PLATFORM.moduleName('./ux-dialog'),
+        'ux-dialog-header': aurelia_pal_1.PLATFORM.moduleName('./ux-dialog-header'),
+        'ux-dialog-body': aurelia_pal_1.PLATFORM.moduleName('./ux-dialog-body'),
+        'ux-dialog-footer': aurelia_pal_1.PLATFORM.moduleName('./ux-dialog-footer'),
+        'attach-focus': aurelia_pal_1.PLATFORM.moduleName('./attach-focus')
+    };
+    // tslint:disable-next-line:max-line-length
+    var defaultCSSText = "ux-dialog-container,ux-dialog-overlay{position:fixed;top:0;right:0;bottom:0;left:0}ux-dialog-overlay{opacity:0}ux-dialog-overlay.active{opacity:1}ux-dialog-container{display:block;transition:opacity .2s linear;opacity:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}ux-dialog-container.active{opacity:1}ux-dialog-container>div{padding:30px}ux-dialog-container>div>div{display:block;min-width:300px;width:-moz-fit-content;width:-webkit-fit-content;width:fit-content;height:-moz-fit-content;height:-webkit-fit-content;height:fit-content;margin:auto}ux-dialog-container,ux-dialog-container>div,ux-dialog-container>div>div{outline:0}ux-dialog{display:table;box-shadow:0 5px 15px rgba(0,0,0,.5);border:1px solid rgba(0,0,0,.2);border-radius:5px;padding:3px;min-width:300px;width:-moz-fit-content;width:-webkit-fit-content;width:fit-content;height:-moz-fit-content;height:-webkit-fit-content;height:fit-content;margin:auto;border-image-source:initial;border-image-slice:initial;border-image-width:initial;border-image-outset:initial;border-image-repeat:initial;background:#fff}ux-dialog>ux-dialog-header{display:block;padding:16px;border-bottom:1px solid #e5e5e5}ux-dialog>ux-dialog-header>button{float:right;border:none;display:block;width:32px;height:32px;background:0 0;font-size:22px;line-height:16px;margin:-14px -16px 0 0;padding:0;cursor:pointer}ux-dialog>ux-dialog-body{display:block;padding:16px}ux-dialog>ux-dialog-footer{display:block;padding:6px;border-top:1px solid #e5e5e5;text-align:right}ux-dialog>ux-dialog-footer button{color:#333;background-color:#fff;padding:6px 12px;font-size:14px;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid #ccc;border-radius:4px;margin:5px 0 5px 5px}ux-dialog>ux-dialog-footer button:disabled{cursor:default;opacity:.45}ux-dialog>ux-dialog-footer button:hover:enabled{color:#333;background-color:#e6e6e6;border-color:#adadad}.ux-dialog-open{overflow:hidden}";
+    /**
+     * A configuration builder for the dialog plugin.
+     */
+    var DialogConfiguration = (function () {
+        function DialogConfiguration(frameworkConfiguration, applySetter) {
+            var _this = this;
+            this.resources = [];
+            this.fwConfig = frameworkConfiguration;
+            this.settings = this.fwConfig.container.get(dialog_settings_1.DefaultDialogSettings);
+            applySetter(function () { return _this._apply(); });
+        }
+        DialogConfiguration.prototype._apply = function () {
+            var _this = this;
+            this.fwConfig.transient(renderer_1.Renderer, this.renderer);
+            this.resources.forEach(function (resourceName) { return _this.fwConfig.globalResources(resources[resourceName]); });
+            if (this.cssText) {
+                aurelia_pal_1.DOM.injectStyles(this.cssText);
+            }
+        };
+        /**
+         * Selects the Aurelia conventional defaults for the dialog plugin.
+         * @return This instance.
+         */
+        DialogConfiguration.prototype.useDefaults = function () {
+            return this.useRenderer(defaultRenderer)
+                .useCSS(defaultCSSText)
+                .useStandardResources();
+        };
+        /**
+         * Exports the standard set of dialog behaviors to Aurelia's global resources.
+         * @return This instance.
+         */
+        DialogConfiguration.prototype.useStandardResources = function () {
+            return this.useResource('ux-dialog')
+                .useResource('ux-dialog-header')
+                .useResource('ux-dialog-body')
+                .useResource('ux-dialog-footer')
+                .useResource('attach-focus');
+        };
+        /**
+         * Exports the chosen dialog element or view to Aurelia's global resources.
+         * @param resourceName The name of the dialog resource to export.
+         * @return This instance.
+         */
+        DialogConfiguration.prototype.useResource = function (resourceName) {
+            this.resources.push(resourceName);
+            return this;
+        };
+        /**
+         * Configures the plugin to use a specific dialog renderer.
+         * @param renderer A type that implements the Renderer interface.
+         * @param settings Global settings for the renderer.
+         * @return This instance.
+         */
+        DialogConfiguration.prototype.useRenderer = function (renderer, settings) {
+            this.renderer = renderer;
+            if (settings) {
+                Object.assign(this.settings, settings);
+            }
+            return this;
+        };
+        /**
+         * Configures the plugin to use specific css.
+         * @param cssText The css to use in place of the default styles.
+         * @return This instance.
+         */
+        DialogConfiguration.prototype.useCSS = function (cssText) {
+            this.cssText = cssText;
+            return this;
+        };
+        return DialogConfiguration;
+    }());
+    exports.DialogConfiguration = DialogConfiguration;
+});
+
+define('aurelia-dialog/renderer',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * An abstract base class for implementors of the basic Renderer API.
+     */
+    var Renderer = (function () {
+        function Renderer() {
+        }
+        /**
+         * Gets an anchor for the ViewSlot to insert a view into.
+         * @returns A DOM element.
+         */
+        Renderer.prototype.getDialogContainer = function () {
+            throw new Error('DialogRenderer must implement getDialogContainer().');
+        };
+        /**
+         * Displays the dialog.
+         * @returns Promise A promise that resolves when the dialog has been displayed.
+         */
+        Renderer.prototype.showDialog = function (dialogController) {
+            throw new Error('DialogRenderer must implement showDialog().');
+        };
+        /**
+         * Hides the dialog.
+         * @returns Promise A promise that resolves when the dialog has been hidden.
+         */
+        Renderer.prototype.hideDialog = function (dialogController) {
+            throw new Error('DialogRenderer must implement hideDialog().');
+        };
+        return Renderer;
+    }());
+    exports.Renderer = Renderer;
+});
+
+define('aurelia-dialog/dialog-settings',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * @internal
+     */
+    var DefaultDialogSettings = (function () {
+        function DefaultDialogSettings() {
+            this.lock = true;
+            this.startingZIndex = 1000;
+            this.centerHorizontalOnly = false;
+            this.rejectOnCancel = false;
+            this.ignoreTransitions = false;
+        }
+        return DefaultDialogSettings;
+    }());
+    exports.DefaultDialogSettings = DefaultDialogSettings;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/dialog-renderer',["require", "exports", "aurelia-pal", "aurelia-dependency-injection"], function (require, exports, aurelia_pal_1, aurelia_dependency_injection_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var containerTagName = 'ux-dialog-container';
+    var overlayTagName = 'ux-dialog-overlay';
+    exports.transitionEvent = (function () {
+        var transition;
+        return function () {
+            if (transition) {
+                return transition;
+            }
+            var el = aurelia_pal_1.DOM.createElement('fakeelement');
+            var transitions = {
+                transition: 'transitionend',
+                OTransition: 'oTransitionEnd',
+                MozTransition: 'transitionend',
+                WebkitTransition: 'webkitTransitionEnd'
+            };
+            for (var t in transitions) {
+                if (el.style[t] !== undefined) {
+                    transition = transitions[t];
+                    return transition;
+                }
+            }
+            return '';
+        };
+    })();
+    exports.hasTransition = (function () {
+        var unprefixedName = 'transitionDuration';
+        var el = aurelia_pal_1.DOM.createElement('fakeelement');
+        var prefixedNames = ['webkitTransitionDuration', 'oTransitionDuration'];
+        var transitionDurationName;
+        if (unprefixedName in el.style) {
+            transitionDurationName = unprefixedName;
+        }
+        else {
+            transitionDurationName = prefixedNames.find(function (prefixed) { return (prefixed in el.style); });
+        }
+        return function (element) {
+            return !!transitionDurationName && !!(aurelia_pal_1.DOM.getComputedStyle(element)[transitionDurationName]
+                .split(',')
+                .find(function (duration) { return !!parseFloat(duration); }));
+        };
+    })();
+    var body = aurelia_pal_1.DOM.querySelectorAll('body')[0];
+    function getActionKey(e) {
+        if ((e.code || e.key) === 'Escape' || e.keyCode === 27) {
+            return 'Escape';
+        }
+        if ((e.code || e.key) === 'Enter' || e.keyCode === 13) {
+            return 'Enter';
+        }
+        return undefined;
+    }
+    var DialogRenderer = DialogRenderer_1 = (function () {
+        function DialogRenderer() {
+        }
+        DialogRenderer.keyboardEventHandler = function (e) {
+            var key = getActionKey(e);
+            if (!key) {
+                return;
+            }
+            var top = DialogRenderer_1.dialogControllers[DialogRenderer_1.dialogControllers.length - 1];
+            if (!top || !top.settings.keyboard) {
+                return;
+            }
+            var keyboard = top.settings.keyboard;
+            if (key === 'Escape'
+                && (keyboard === true || keyboard === key || (Array.isArray(keyboard) && keyboard.indexOf(key) > -1))) {
+                top.cancel();
+            }
+            else if (key === 'Enter' && (keyboard === key || (Array.isArray(keyboard) && keyboard.indexOf(key) > -1))) {
+                top.ok();
+            }
+        };
+        DialogRenderer.trackController = function (dialogController) {
+            if (!DialogRenderer_1.dialogControllers.length) {
+                aurelia_pal_1.DOM.addEventListener('keyup', DialogRenderer_1.keyboardEventHandler, false);
+            }
+            DialogRenderer_1.dialogControllers.push(dialogController);
+        };
+        DialogRenderer.untrackController = function (dialogController) {
+            var i = DialogRenderer_1.dialogControllers.indexOf(dialogController);
+            if (i !== -1) {
+                DialogRenderer_1.dialogControllers.splice(i, 1);
+            }
+            if (!DialogRenderer_1.dialogControllers.length) {
+                aurelia_pal_1.DOM.removeEventListener('keyup', DialogRenderer_1.keyboardEventHandler, false);
+            }
+        };
+        DialogRenderer.prototype.getOwnElements = function (parent, selector) {
+            var elements = parent.querySelectorAll(selector);
+            var own = [];
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].parentElement === parent) {
+                    own.push(elements[i]);
+                }
+            }
+            return own;
+        };
+        DialogRenderer.prototype.attach = function (dialogController) {
+            var spacingWrapper = aurelia_pal_1.DOM.createElement('div'); // TODO: check if redundant
+            spacingWrapper.appendChild(this.anchor);
+            this.dialogContainer = aurelia_pal_1.DOM.createElement(containerTagName);
+            this.dialogContainer.appendChild(spacingWrapper);
+            this.dialogOverlay = aurelia_pal_1.DOM.createElement(overlayTagName);
+            var zIndex = typeof dialogController.settings.startingZIndex === 'number'
+                ? dialogController.settings.startingZIndex + ''
+                : null;
+            this.dialogOverlay.style.zIndex = zIndex;
+            this.dialogContainer.style.zIndex = zIndex;
+            var lastContainer = this.getOwnElements(this.host, containerTagName).pop();
+            if (lastContainer && lastContainer.parentElement) {
+                this.host.insertBefore(this.dialogContainer, lastContainer.nextSibling);
+                this.host.insertBefore(this.dialogOverlay, lastContainer.nextSibling);
+            }
+            else {
+                this.host.insertBefore(this.dialogContainer, this.host.firstChild);
+                this.host.insertBefore(this.dialogOverlay, this.host.firstChild);
+            }
+            dialogController.controller.attached();
+            this.host.classList.add('ux-dialog-open');
+        };
+        DialogRenderer.prototype.detach = function (dialogController) {
+            this.host.removeChild(this.dialogOverlay);
+            this.host.removeChild(this.dialogContainer);
+            dialogController.controller.detached();
+            if (!DialogRenderer_1.dialogControllers.length) {
+                this.host.classList.remove('ux-dialog-open');
+            }
+        };
+        DialogRenderer.prototype.setAsActive = function () {
+            this.dialogOverlay.classList.add('active');
+            this.dialogContainer.classList.add('active');
+        };
+        DialogRenderer.prototype.setAsInactive = function () {
+            this.dialogOverlay.classList.remove('active');
+            this.dialogContainer.classList.remove('active');
+        };
+        DialogRenderer.prototype.setupClickHandling = function (dialogController) {
+            this.stopPropagation = function (e) { e._aureliaDialogHostClicked = true; };
+            this.closeDialogClick = function (e) {
+                if (dialogController.settings.overlayDismiss && !e._aureliaDialogHostClicked) {
+                    dialogController.cancel();
+                }
+            };
+            this.dialogContainer.addEventListener('click', this.closeDialogClick);
+            this.anchor.addEventListener('click', this.stopPropagation);
+        };
+        DialogRenderer.prototype.clearClickHandling = function () {
+            this.dialogContainer.removeEventListener('click', this.closeDialogClick);
+            this.anchor.removeEventListener('click', this.stopPropagation);
+        };
+        DialogRenderer.prototype.centerDialog = function () {
+            var child = this.dialogContainer.children[0];
+            var vh = Math.max(aurelia_pal_1.DOM.querySelectorAll('html')[0].clientHeight, window.innerHeight || 0);
+            child.style.marginTop = Math.max((vh - child.offsetHeight) / 2, 30) + 'px';
+            child.style.marginBottom = Math.max((vh - child.offsetHeight) / 2, 30) + 'px';
+        };
+        DialogRenderer.prototype.awaitTransition = function (setActiveInactive, ignore) {
+            var _this = this;
+            return new Promise(function (resolve) {
+                var renderer = _this;
+                var eventName = exports.transitionEvent();
+                function onTransitionEnd(e) {
+                    if (e.target !== renderer.dialogContainer) {
+                        return;
+                    }
+                    renderer.dialogContainer.removeEventListener(eventName, onTransitionEnd);
+                    resolve();
+                }
+                if (ignore || !exports.hasTransition(_this.dialogContainer)) {
+                    resolve();
+                }
+                else {
+                    _this.dialogContainer.addEventListener(eventName, onTransitionEnd);
+                }
+                setActiveInactive();
+            });
+        };
+        DialogRenderer.prototype.getDialogContainer = function () {
+            return this.anchor || (this.anchor = aurelia_pal_1.DOM.createElement('div'));
+        };
+        DialogRenderer.prototype.showDialog = function (dialogController) {
+            var _this = this;
+            if (dialogController.settings.host) {
+                this.host = dialogController.settings.host;
+            }
+            else {
+                this.host = body;
+            }
+            var settings = dialogController.settings;
+            this.attach(dialogController);
+            if (typeof settings.position === 'function') {
+                settings.position(this.dialogContainer, this.dialogOverlay);
+            }
+            else if (!settings.centerHorizontalOnly) {
+                this.centerDialog();
+            }
+            DialogRenderer_1.trackController(dialogController);
+            this.setupClickHandling(dialogController);
+            return this.awaitTransition(function () { return _this.setAsActive(); }, dialogController.settings.ignoreTransitions);
+        };
+        DialogRenderer.prototype.hideDialog = function (dialogController) {
+            var _this = this;
+            this.clearClickHandling();
+            DialogRenderer_1.untrackController(dialogController);
+            return this.awaitTransition(function () { return _this.setAsInactive(); }, dialogController.settings.ignoreTransitions)
+                .then(function () { _this.detach(dialogController); });
+        };
+        return DialogRenderer;
+    }());
+    DialogRenderer.dialogControllers = [];
+    DialogRenderer = DialogRenderer_1 = __decorate([
+        aurelia_dependency_injection_1.transient()
+    ], DialogRenderer);
+    exports.DialogRenderer = DialogRenderer;
+    var DialogRenderer_1;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/ux-dialog',["require", "exports", "aurelia-templating"], function (require, exports, aurelia_templating_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialog = (function () {
+        function UxDialog() {
+        }
+        return UxDialog;
+    }());
+    UxDialog = __decorate([
+        aurelia_templating_1.customElement('ux-dialog'),
+        aurelia_templating_1.inlineView("\n  <template>\n    <slot></slot>\n  </template>\n")
+    ], UxDialog);
+    exports.UxDialog = UxDialog;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/ux-dialog-header',["require", "exports", "aurelia-templating", "./dialog-controller"], function (require, exports, aurelia_templating_1, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogHeader = (function () {
+        function UxDialogHeader(controller) {
+            this.controller = controller;
+        }
+        UxDialogHeader.prototype.bind = function () {
+            if (typeof this.showCloseButton !== 'boolean') {
+                this.showCloseButton = !this.controller.settings.lock;
+            }
+        };
+        return UxDialogHeader;
+    }());
+    /**
+     * @internal
+     */
+    UxDialogHeader.inject = [dialog_controller_1.DialogController];
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], UxDialogHeader.prototype, "showCloseButton", void 0);
+    UxDialogHeader = __decorate([
+        aurelia_templating_1.customElement('ux-dialog-header'),
+        aurelia_templating_1.inlineView("\n  <template>\n    <button\n      type=\"button\"\n      class=\"dialog-close\"\n      aria-label=\"Close\"\n      if.bind=\"showCloseButton\"\n      click.trigger=\"controller.cancel()\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n\n    <div class=\"dialog-header-content\">\n      <slot></slot>\n    </div>\n  </template>\n")
+    ], UxDialogHeader);
+    exports.UxDialogHeader = UxDialogHeader;
+});
+
+define('aurelia-dialog/dialog-controller',["require", "exports", "./renderer", "./lifecycle", "./dialog-cancel-error"], function (require, exports, renderer_1, lifecycle_1, dialog_cancel_error_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * A controller object for a Dialog instance.
+     */
+    var DialogController = (function () {
+        /**
+         * Creates an instance of DialogController.
+         */
+        function DialogController(renderer, settings, resolve, reject) {
+            this.resolve = resolve;
+            this.reject = reject;
+            this.settings = settings;
+            this.renderer = renderer;
+        }
+        /**
+         * @internal
+         */
+        DialogController.prototype.releaseResources = function () {
+            var _this = this;
+            return lifecycle_1.invokeLifecycle(this.controller.viewModel || {}, 'deactivate')
+                .then(function () { return _this.renderer.hideDialog(_this); })
+                .then(function () { _this.controller.unbind(); });
+        };
+        /**
+         * @internal
+         */
+        DialogController.prototype.cancelOperation = function () {
+            if (!this.settings.rejectOnCancel) {
+                return { wasCancelled: true };
+            }
+            throw dialog_cancel_error_1.createDialogCancelError();
+        };
+        /**
+         * Closes the dialog with a successful output.
+         * @param output The returned success output.
+         */
+        DialogController.prototype.ok = function (output) {
+            return this.close(true, output);
+        };
+        /**
+         * Closes the dialog with a cancel output.
+         * @param output The returned cancel output.
+         */
+        DialogController.prototype.cancel = function (output) {
+            return this.close(false, output);
+        };
+        /**
+         * Closes the dialog with an error result.
+         * @param message An error message.
+         * @returns Promise An empty promise object.
+         */
+        DialogController.prototype.error = function (message) {
+            var _this = this;
+            return this.releaseResources().then(function () { _this.reject(message); });
+        };
+        /**
+         * Closes the dialog.
+         * @param ok Whether or not the user input signified success.
+         * @param output The specified output.
+         * @returns Promise An empty promise object.
+         */
+        DialogController.prototype.close = function (ok, output) {
+            var _this = this;
+            if (this.closePromise) {
+                return this.closePromise;
+            }
+            return this.closePromise = lifecycle_1.invokeLifecycle(this.controller.viewModel || {}, 'canDeactivate').catch(function (reason) {
+                _this.closePromise = undefined;
+                return Promise.reject(reason);
+            }).then(function (canDeactivate) {
+                if (!canDeactivate) {
+                    _this.closePromise = undefined; // we are done, do not block consecutive calls
+                    return _this.cancelOperation();
+                }
+                return _this.releaseResources().then(function () {
+                    if (!_this.settings.rejectOnCancel || ok) {
+                        _this.resolve({ wasCancelled: !ok, output: output });
+                    }
+                    else {
+                        _this.reject(dialog_cancel_error_1.createDialogCancelError(output));
+                    }
+                    return { wasCancelled: false };
+                }).catch(function (reason) {
+                    _this.closePromise = undefined;
+                    return Promise.reject(reason);
+                });
+            });
+        };
+        return DialogController;
+    }());
+    /**
+     * @internal
+     */
+    DialogController.inject = [renderer_1.Renderer];
+    exports.DialogController = DialogController;
+});
+
+define('aurelia-dialog/lifecycle',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Call a lifecycle method on a viewModel if it exists.
+     * @function
+     * @param instance The viewModel instance.
+     * @param name The lifecycle method name.
+     * @param model The model to pass to the lifecycle method.
+     * @returns Promise The result of the lifecycle method.
+     */
+    function invokeLifecycle(instance, name, model) {
+        if (typeof instance[name] === 'function') {
+            return new Promise(function (resolve) {
+                resolve(instance[name](model));
+            }).then(function (result) {
+                if (result !== null && result !== undefined) {
+                    return result;
+                }
+                return true;
+            });
+        }
+        return Promise.resolve(true);
+    }
+    exports.invokeLifecycle = invokeLifecycle;
+});
+
+define('aurelia-dialog/dialog-cancel-error',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * @internal
+     */
+    function createDialogCancelError(output) {
+        var error = new Error('Operation cancelled.');
+        error.wasCancelled = true;
+        error.output = output;
+        return error;
+    }
+    exports.createDialogCancelError = createDialogCancelError;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/ux-dialog-body',["require", "exports", "aurelia-templating"], function (require, exports, aurelia_templating_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UxDialogBody = (function () {
+        function UxDialogBody() {
+        }
+        return UxDialogBody;
+    }());
+    UxDialogBody = __decorate([
+        aurelia_templating_1.customElement('ux-dialog-body'),
+        aurelia_templating_1.inlineView("\n  <template>\n    <slot></slot>\n  </template>\n")
+    ], UxDialogBody);
+    exports.UxDialogBody = UxDialogBody;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/ux-dialog-footer',["require", "exports", "aurelia-templating", "./dialog-controller"], function (require, exports, aurelia_templating_1, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * View-model for footer of Dialog.
+     */
+    var UxDialogFooter = UxDialogFooter_1 = (function () {
+        function UxDialogFooter(controller) {
+            this.controller = controller;
+            this.buttons = [];
+            this.useDefaultButtons = false;
+        }
+        UxDialogFooter.isCancelButton = function (value) {
+            return value === 'Cancel';
+        };
+        UxDialogFooter.prototype.close = function (buttonValue) {
+            if (UxDialogFooter_1.isCancelButton(buttonValue)) {
+                this.controller.cancel(buttonValue);
+            }
+            else {
+                this.controller.ok(buttonValue);
+            }
+        };
+        UxDialogFooter.prototype.useDefaultButtonsChanged = function (newValue) {
+            if (newValue) {
+                this.buttons = ['Cancel', 'Ok'];
+            }
+        };
+        return UxDialogFooter;
+    }());
+    /**
+     * @internal
+     */
+    UxDialogFooter.inject = [dialog_controller_1.DialogController];
+    __decorate([
+        aurelia_templating_1.bindable
+    ], UxDialogFooter.prototype, "buttons", void 0);
+    __decorate([
+        aurelia_templating_1.bindable
+    ], UxDialogFooter.prototype, "useDefaultButtons", void 0);
+    UxDialogFooter = UxDialogFooter_1 = __decorate([
+        aurelia_templating_1.customElement('ux-dialog-footer'),
+        aurelia_templating_1.inlineView("\n  <template>\n    <slot></slot>\n    <template if.bind=\"buttons.length > 0\">\n      <button type=\"button\"\n        class=\"btn btn-default\"\n        repeat.for=\"button of buttons\"\n        click.trigger=\"close(button)\">\n        ${button}\n      </button>\n    </template>\n  </template>\n")
+    ], UxDialogFooter);
+    exports.UxDialogFooter = UxDialogFooter;
+    var UxDialogFooter_1;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+define('aurelia-dialog/attach-focus',["require", "exports", "aurelia-templating", "aurelia-pal"], function (require, exports, aurelia_templating_1, aurelia_pal_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AttachFocus = (function () {
+        function AttachFocus(element) {
+            this.element = element;
+            this.value = true;
+        }
+        AttachFocus.prototype.attached = function () {
+            if (this.value && this.value !== 'false') {
+                this.element.focus();
+            }
+        };
+        AttachFocus.prototype.valueChanged = function (newValue) {
+            this.value = newValue;
+        };
+        return AttachFocus;
+    }());
+    /**
+     * @internal
+     */
+    AttachFocus.inject = [aurelia_pal_1.DOM.Element];
+    AttachFocus = __decorate([
+        aurelia_templating_1.customAttribute('attach-focus')
+    ], AttachFocus);
+    exports.AttachFocus = AttachFocus;
+});
+
+define('aurelia-dialog/dialog-service',["require", "exports", "aurelia-dependency-injection", "aurelia-metadata", "aurelia-templating", "./dialog-settings", "./dialog-cancel-error", "./lifecycle", "./dialog-controller"], function (require, exports, aurelia_dependency_injection_1, aurelia_metadata_1, aurelia_templating_1, dialog_settings_1, dialog_cancel_error_1, lifecycle_1, dialog_controller_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /* tslint:enable:max-line-length */
+    function whenClosed(onfulfilled, onrejected) {
+        return this.then(function (r) { return r.wasCancelled ? r : r.closeResult; }).then(onfulfilled, onrejected);
+    }
+    function asDialogOpenPromise(promise) {
+        promise.whenClosed = whenClosed;
+        return promise;
+    }
+    /**
+     * A service allowing for the creation of dialogs.
+     */
+    var DialogService = (function () {
+        function DialogService(container, compositionEngine, defaultSettings) {
+            /**
+             * The current dialog controllers
+             */
+            this.controllers = [];
+            /**
+             * Is there an open dialog
+             */
+            this.hasOpenDialog = false;
+            this.hasActiveDialog = false;
+            this.container = container;
+            this.compositionEngine = compositionEngine;
+            this.defaultSettings = defaultSettings;
+        }
+        DialogService.prototype.validateSettings = function (settings) {
+            if (!settings.viewModel && !settings.view) {
+                throw new Error('Invalid Dialog Settings. You must provide "viewModel", "view" or both.');
+            }
+        };
+        // tslint:disable-next-line:max-line-length
+        DialogService.prototype.createCompositionContext = function (childContainer, host, settings) {
+            return {
+                container: childContainer.parent,
+                childContainer: childContainer,
+                bindingContext: null,
+                viewResources: null,
+                model: settings.model,
+                view: settings.view,
+                viewModel: settings.viewModel,
+                viewSlot: new aurelia_templating_1.ViewSlot(host, true),
+                host: host
+            };
+        };
+        DialogService.prototype.ensureViewModel = function (compositionContext) {
+            if (typeof compositionContext.viewModel === 'function') {
+                compositionContext.viewModel = aurelia_metadata_1.Origin.get(compositionContext.viewModel).moduleId;
+            }
+            if (typeof compositionContext.viewModel === 'string') {
+                return this.compositionEngine.ensureViewModel(compositionContext);
+            }
+            return Promise.resolve(compositionContext);
+        };
+        DialogService.prototype._cancelOperation = function (rejectOnCancel) {
+            if (!rejectOnCancel) {
+                return { wasCancelled: true };
+            }
+            throw dialog_cancel_error_1.createDialogCancelError();
+        };
+        // tslint:disable-next-line:max-line-length
+        DialogService.prototype.composeAndShowDialog = function (compositionContext, dialogController) {
+            var _this = this;
+            if (!compositionContext.viewModel) {
+                // provide access to the dialog controller for view only dialogs
+                compositionContext.bindingContext = { controller: dialogController };
+            }
+            return this.compositionEngine.compose(compositionContext).then(function (controller) {
+                dialogController.controller = controller;
+                return dialogController.renderer.showDialog(dialogController).then(function () {
+                    _this.controllers.push(dialogController);
+                    _this.hasActiveDialog = _this.hasOpenDialog = !!_this.controllers.length;
+                }, function (reason) {
+                    if (controller.viewModel) {
+                        lifecycle_1.invokeLifecycle(controller.viewModel, 'deactivate');
+                    }
+                    return Promise.reject(reason);
+                });
+            });
+        };
+        /**
+         * @internal
+         */
+        DialogService.prototype.createSettings = function (settings) {
+            settings = Object.assign({}, this.defaultSettings, settings);
+            if (typeof settings.keyboard !== 'boolean' && !settings.keyboard) {
+                settings.keyboard = !settings.lock;
+            }
+            if (typeof settings.overlayDismiss !== 'boolean') {
+                settings.overlayDismiss = !settings.lock;
+            }
+            Object.defineProperty(settings, 'rejectOnCancel', {
+                writable: false,
+                configurable: true,
+                enumerable: true
+            });
+            this.validateSettings(settings);
+            return settings;
+        };
+        DialogService.prototype.open = function (settings) {
+            var _this = this;
+            if (settings === void 0) { settings = {}; }
+            // tslint:enable:max-line-length
+            settings = this.createSettings(settings);
+            var childContainer = settings.childContainer || this.container.createChild();
+            var resolveCloseResult;
+            var rejectCloseResult;
+            var closeResult = new Promise(function (resolve, reject) {
+                resolveCloseResult = resolve;
+                rejectCloseResult = reject;
+            });
+            var dialogController = childContainer.invoke(dialog_controller_1.DialogController, [settings, resolveCloseResult, rejectCloseResult]);
+            childContainer.registerInstance(dialog_controller_1.DialogController, dialogController);
+            closeResult.then(function () {
+                removeController(_this, dialogController);
+            }, function () {
+                removeController(_this, dialogController);
+            });
+            var compositionContext = this.createCompositionContext(childContainer, dialogController.renderer.getDialogContainer(), dialogController.settings);
+            var openResult = this.ensureViewModel(compositionContext).then(function (compositionContext) {
+                if (!compositionContext.viewModel) {
+                    return true;
+                }
+                return lifecycle_1.invokeLifecycle(compositionContext.viewModel, 'canActivate', dialogController.settings.model);
+            }).then(function (canActivate) {
+                if (!canActivate) {
+                    return _this._cancelOperation(dialogController.settings.rejectOnCancel);
+                }
+                // if activation granted, compose and show
+                return _this.composeAndShowDialog(compositionContext, dialogController)
+                    .then(function () { return ({ controller: dialogController, closeResult: closeResult, wasCancelled: false }); });
+            });
+            return asDialogOpenPromise(openResult);
+        };
+        /**
+         * Closes all open dialogs at the time of invocation.
+         * @return Promise<DialogController[]> All controllers whose close operation was cancelled.
+         */
+        DialogService.prototype.closeAll = function () {
+            return Promise.all(this.controllers.slice(0).map(function (controller) {
+                if (!controller.settings.rejectOnCancel) {
+                    return controller.cancel().then(function (result) {
+                        if (result.wasCancelled) {
+                            return controller;
+                        }
+                        return;
+                    });
+                }
+                return controller.cancel().then(function () { return; }).catch(function (reason) {
+                    if (reason.wasCancelled) {
+                        return controller;
+                    }
+                    return Promise.reject(reason);
+                });
+            })).then(function (unclosedControllers) { return unclosedControllers.filter(function (unclosed) { return !!unclosed; }); });
+        };
+        return DialogService;
+    }());
+    /**
+     * @internal
+     */
+    DialogService.inject = [aurelia_dependency_injection_1.Container, aurelia_templating_1.CompositionEngine, dialog_settings_1.DefaultDialogSettings];
+    exports.DialogService = DialogService;
+    function removeController(service, dialogController) {
+        var i = service.controllers.indexOf(dialogController);
+        if (i !== -1) {
+            service.controllers.splice(i, 1);
+            service.hasActiveDialog = service.hasOpenDialog = !!service.controllers.length;
+        }
+    }
+});
+
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\n   <require from=\"resources/css/styles.css\"></require>\n   <require from=\"humane-js/themes/flatty.css\"></require>\n   <nav-bar></nav-bar>\n  <div class=\"page-host\">\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n</div>\n</template>\n"; });
+define('text!modules/facco/editPeople.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"panel panel-info\">\r\n    <div class=\"panel-body\">\r\n      <div class=\"row\">\r\n          <div class=\"col-lg-12\">\r\n              <compose view=\"./components/peopleTable.html\"></compose>\r\n          </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!resources/css/styles.css', ['module'], function(module) { module.exports = "@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);\r\n\r\n.banner {\r\n    height: 50px;\r\n    width: 100%;\r\n    background-color: white;\r\n    border-bottom-style: solid;\r\n    border-bottom-width: 1px;\r\n}\r\n\r\n.browse .textContainer {\r\n    height: 430px;\r\n    line-height: 400px;\r\n}\r\n\r\n.textContainer h4 {\r\n    vertical-align: middle;\r\n    display: inline-block;\r\n}\r\n\r\n.topMargin {\r\n    margin-top: 25px;\r\n}\r\n\r\n.bottomMargin {\r\n    margin-bottom: 25px;\r\n}\r\n\r\n.leftMargin {\r\n    margin-left: 25px;\r\n}\r\n\r\n.rightMargin {\r\n  margin-right: 25px;\r\n}\r\n\r\n.smallLeftMargin {\r\n    margin-left: 10px;\r\n}\r\n\r\n.bigTopMargin {\r\n    margin-top: 50px;\r\n}\r\n\r\n.smallMarginRight {\r\n    margin-right: 10px;\r\n}\r\n\r\n.parallax1 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax1.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 300px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.parallax2 {\r\n    /* The image used */\r\n    background-image: url(\"/img/parallax2.jpg\");\r\n\r\n    /* Set a specific height */\r\n    min-height: 200px;\r\n\r\n    /* Create the parallax scrolling effect */\r\n    background-attachment: fixed;\r\n    background-position: center;\r\n    background-repeat: no-repeat;\r\n    background-size: cover;\r\n}\r\n\r\n.caption span.border {\r\n    background-color: #111;\r\n    color: #fff;\r\n    padding: 18px;\r\n    font-size: 25px;\r\n    letter-spacing: 10px;\r\n}\r\n\r\n.caption {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 25%;\r\n  width: 100%;\r\n  text-align: center;\r\n  color: #000;\r\n}\r\n\r\n.center-text {\r\n   text-align: center;\r\n}\r\n\r\n.home-page-header{\r\n    text-align: center;\r\n    font-size: 30px;\r\n}\r\n\r\n.underline {\r\n    text-decoration: underline;\r\n}\r\n\r\n.subMenu{\r\n    position: relative;\r\n    top: -5px;\r\n    left: 0px;\r\n    width: 100%;\r\n}\r\n\r\n.subMenu-container {\r\n    position: fixed; /* Set the navbar to fixed position */\r\n    top: 5rem;\r\n    width: 100%;\r\n    z-index:99;\r\n}\r\n\r\n.hover {\r\n    position:absolute;\r\n    height: 200px;\r\n    width: 600px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n}\r\n\r\n.hoverProfile {\r\n    position:absolute;\r\n    height: 250px;\r\n    width: 500px;\r\n    z-index:99;\r\n    display:none;\r\n    box-shadow: 10px 10px 5px #888888;\r\n    overflow: hidden;\r\n    background-color: white;\r\n    padding: 10px;\r\n}\r\n\r\n.carouselSize {\r\n    width:700px;\r\n    height:500px;\r\n}\r\n\r\n.carouselImage {\r\n    height:500px;\r\n}\r\n\r\n.weatherIcon {\r\n    height: 50px;\r\n    width: 50px;\r\n}\r\n\r\n.page-host {\r\n    margin-top: 10rem;\r\n}\r\n\r\nspan i {\r\n    cursor: pointer;\r\n}\r\n\r\n.sortable {\r\n    cursor: pointer;   \r\n}\r\n\r\n.aurelia-flatpickr {\r\n    background-color: white !important;\r\n}\r\n\r\n/* Dropdown Button */\r\n.dropbtn {\r\n    border: none;\r\n    cursor: pointer;\r\n}\r\n\r\n/* The container <div> - needed to position the dropdown content */\r\n.dropdown {\r\n    position: relative;\r\n    display: inline-block;\r\n}\r\n\r\n/* Dropdown Content (Hidden by Default) */\r\n.dropdown-content {\r\n    display: none;\r\n    position: absolute;\r\n    background-color: #f9f9f9;\r\n    min-width: 160px;\r\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\r\n    z-index: 1;\r\n}\r\n\r\n/* Links inside the dropdown */\r\n.dropdown-content a {\r\n    color: black;\r\n    padding: 12px 16px;\r\n    text-decoration: none;\r\n    display: block;\r\n}\r\n\r\n/* Change color of dropdown links on hover */\r\n.dropdown-content a:hover {background-color: #f1f1f1}\r\n\r\n/* Show the dropdown menu on hover */\r\n.dropdown:hover .dropdown-content {\r\n    display: block;\r\n}\r\n\r\n/* Change the background color of the dropdown button when the dropdown content is shown */\r\n.dropdown:hover .dropbtn {\r\n    background-color: #3e8e41;\r\n}\r\n"; });
+define('text!modules/facco/facco.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"subMenu-container\">\r\n    <nav class=\"navbar navbar-inverse subMenu\">\r\n        <div class=\"navbar-header\">\r\n            <a class=\"navbar-brand\">Faculty Coordinator</a>\r\n        </div>\r\n        <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\r\n            <ul class=\"nav navbar-nav\">\r\n                <li  class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\r\n            </ul>\r\n        </div>\r\n    </nav>\r\n  </div>\r\n\r\n  <div class=\"col-lg-12\">\r\n      <router-view></router-view>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/facco/viewRequests.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class=\"panel panel-default rightMargin leftMargin\">\r\n    <div class=\"panel-body\">\r\n            <compose view=\"./components/viewRequestsTable.html\"></compose>\r\n    </div> <!-- Panel Body -->\r\n   </div>\r\n</template>\r\n"; });
+define('text!modules/home/contact.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"subMenu-container\">\r\n\t\t<nav class=\"navbar navbar-inverse subMenu\">\r\n\t\t\t<div class=\"container-fluid\">\r\n\t\t\t\t<div class=\"navbar-header\">\r\n\t\t\t\t\t<a class=\"navbar-brand\">Contact Information</a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</nav>\r\n\t</div>\r\n\r\n\t<div class=\"fluid-container col-lg-10 col-lg-offset-1\">\r\n\t\t<div class=\"panel panel-primary topMargin\">\r\n\t\t\t<div class=\"panel-body\">\r\n\t\t\t\t\t<div class=\"col-lg-4\">\r\n\t\t\t\t\t\t<div innerhtml.bind=\"config.UCC_ADDRESS\"></div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div show.bind=\"config.IMG_DOWNLOAD_URL.length && config.IMG_DOWNLOAD_URL.length > 0\" class=\"col-lg-8 center\">\r\n\t\t\t\t\t\t<img src=\"${config.IMG_DOWNLOAD_URL}${config.UCC_HEADER_IMAGE}\" class=\"img-responsive pull-right\">\r\n\t\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6\">\r\n\t\t\t<div class=\"col-lg-12\" show.bind=\"directors.length > 0\">\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li class=\"list-group-item  topMargin\" repeat.for=\"person of directors\">\r\n\t\t\t\t\t\t<div class=\"media-left\" innerhtml='${person.item.email | gravatarUrl:100:1}'></div>\r\n\t\t\t\t\t\t<div class=\"media-body\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<h4>${person.item.fullName}</h4>\r\n\t\t\t\t\t\t\t\t<h5>${person.role | uccTitle:config.ROLES}</h5>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span>${person.item.phone | phoneNumber}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span><a href=\"mailto:${person.item.email}\">${person.item.email}</a></span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12 bigTopMargin\" show.bind=\"staff.length > 0\">\r\n\t\t\t\t<h3>Technical Staff</h3>\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li class=\"list-group-item  topMargin\" repeat.for=\"person of staff\">\r\n\t\t\t\t\t\t<div class=\"media-left\" innerhtml='${person.email | gravatarUrl:100:1}'></div>\r\n\t\t\t\t\t\t<div class=\"media-body\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<h4>${person.fullName}</h4>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span show.bind=\"!showPersonalContactInfo\">${config.UCC_PHONE | phoneNumber}</span>\r\n\t\t\t\t\t\t\t\t<span show.bind=\"showPersonalContactInfo\">${person.phone | phoneNumber}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span show.bind=\"!showPersonalContactInfo\"><a href=\"mailto:${config.UCC_EMAIL}\">${config.UCC_EMAIL}</a></span>\r\n\t\t\t\t\t\t\t\t<span show.bind=\"showPersonalContactInfo\"><a href=\"mailto:${person.email}\">${person.email}</a></span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-lg-12 bigTopMargin bottomMargin\" show.bind=\"admin.length > 0\">\r\n\t\t\t\t<h3>Administrative Support</h3>\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li class=\"list-group-item topMargin\" repeat.for=\"person of admin\">\r\n\t\t\t\t\t\t<div class=\"media-left\" innerhtml='${person.email | gravatarUrl:100:1}'></div>\r\n\t\t\t\t\t\t<div class=\"media-body\">\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<h4>${person.fullName}</h4>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span show.bind=\"!showPersonalContactInfo\">${config.UCC_ADMIN_PHONE | phoneNumber}</span>\r\n\t\t\t\t\t\t\t\t<span show.bind=\"showPersonalContactInfo\">${person.phone | phoneNumber}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"col-lg-12\">\r\n\t\t\t\t\t\t\t\t<span show.bind=\"!showPersonalContactInfo\"><a href=\"mailto:${config.UCC_ADMIN_EMAIL}\">${config.UCC_ADMIN_EMAIL}</a></span>\r\n\t\t\t\t\t\t\t\t<span show.bind=\"showPersonalContactInfo\"><a href=\"mailto:${person.email}\">${person.email}</a></span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"col-lg-6 bigTopMargin\" innerhtml.bind=\"config.CONTACT_CONTENT\">\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n"; });
+define('text!modules/home/home.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"${item.priority} textContainer banner\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\r\n      <h4 class=\"leftMargin\">${item.title}</h4>\r\n  </div>\r\n\r\n  <div class=\"parallax1\">\r\n    <div class=\"caption\">\r\n        <span class=\"border\">${config.HOME_WELCOME}</span>\r\n   </div>\r\n</div>\r\n\r\n<div class=\"row center-text\" style=\"color: #777;background-color:white;text-align:center;padding:25px 80px;text-align: justify;\">\r\n       <compose view=\"./components/uccInformation.html\"></compose>\r\n</div>\r\n\r\n <div class=\"parallax2\"></div>\r\n\r\n <div class=\"row bigMarginTop\" style=\"color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;\">\r\n        <div class=\"col-lg-3 bigMarginTop\">\r\n            <h2 class=\"underline\">Useful Information</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\r\n                <compose view=\"./components/newsItem.html\"></compose>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-5 bigMarginTop leftMargin\">\r\n            <h2 class=\"underline bottomMargin\">Useful Links</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\r\n                <compose view=\"./components/homePageLinks.html\"></compose>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-md-3 bigMarginTop leftMargin\">\r\n            <h2 class=\"underline\">UCC and UA News</h2>\r\n            <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\r\n                <compose view=\"./components/newsItem.html\"></compose>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!modules/home/register.html', ['module'], function(module) { module.exports = "<template>\r\n     <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"container-fluid\">\r\n                <div class=\"navbar-header\">\r\n                    <a class=\"navbar-brand\">Register</a>\r\n                </div>\r\n            </div>\r\n        </nav>\r\n     </div>\r\n     <div class=\"col-lg-10 col-lg-offset-1\">\r\n      <div class=\"panel panel-primary topMargin\">\r\n        <div class=\"panel-body\">\r\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n              <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Backve\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n              <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          </div>\r\n          <div class=\"topMargin col-lg-1\">\r\n           <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n           <div class=\"topMargin\">\r\n               <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\r\n           </div>\r\n         </div>\r\n         <div class=\"col-sm-12 col-lg-10 leftMargin topMargin\">\r\n           <form class=\"form-horizontal\">\r\n               <!-- Row 1 -->\r\n               <div class=\"col-lg-3\">\r\n                 <label for=\"register_firstName\" class=\"control-label \">First Name *</label>\r\n                 <input value.bind=\"people.selectedPerson.firstName\" id=\"register_firstName\" class=\"form-control\" placeholder=\"First Name\" type=\"text\" />\r\n               </div>\r\n               <div class=\"col-lg-3\">\r\n                  <label for=\"register_middletName\" class=\"control-label \">Middle Name</label>\r\n                  <input value.bind=\"people.selectedPerson.middleName\" id=\"register_middletName\" class=\"form-control\" placeholder=\"Middle Name\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-3\">\r\n                <label for=\"register_lastName\" class=\"control-label \">Last Name *</label>\r\n                <input value.bind=\"people.selectedPerson.lastName\" id=\"register_lastName\" class=\"form-control\" placeholder=\"Last Name\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-3\">\r\n                <label for=\"editNickName\" class=\"control-label\">Nickname</label>\r\n                <input value.bind=\"people.selectedPerson.nickName\" id=\"editNickName\" class=\"form-control \" placeholder=\"Nickname\" type=\"text\" />\r\n              </div>\r\n              <div class=\"row\">\r\n                <div class=\"col-lg-5\">\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_phone\" class=\"control-label \">Phone *</label>\r\n                    <input class=\"form-control\" id=\"register_phone\" masked=\"value.bind: people.selectedPerson.phone; mask: 999-999-9999; placeholder: *\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_mobile\" class=\"control-label \">Mobile</label>\r\n                    <input id=\"register_mobile\" class=\"form-control\" masked=\"value.bind: people.selectedPerson.mobile; mask: 999-999-9999; placeholder: *\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_email\" class=\"control-label\">Email *</label>\r\n                    <input blur.trigger=\"checkEmail()\" value.bind=\"people.selectedPerson.email\" id=\"register_email\" class=\"form-control\" placeholder=\"Email\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_institution\" class=\"control-label\">Institution *</label>\r\n                    <select value.bind=\"people.selectedPerson.institutionId\" id=\"register_institution\" class=\"form-control\" placeholder=\"Institution\">\r\n                        <option value=\"\">Select an option</option>\r\n                        <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                    </select>\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_password\" class=\"control-label\">Password *</label>\r\n                    <input id=\"register_password\" type=\"password\" placeholder=\"Password\"\r\n                        class=\"form-control\"\r\n                        value.bind=\"people.selectedPerson.password\"\r\n                        blur.trigger=\"passwordComplexity()\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_password_repeat\" class=\"control-label\">Repeat Password *</label>\r\n                    <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\"\r\n                        class=\"form-control\"\r\n                        value.bind=\"password_repeat\" />\r\n                  </div>\r\n                </div>\r\n                <div class=\"col-lg-5 col-lg-offset-1\">\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_address1\" class=\"control-label \">Address 1</label>\r\n                    <input value.bind=\"people.selectedPerson.address1\" id=\"register_address1\" class=\"form-control\" placeholder=\"Address 1\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_address2\" class=\"control-label \">Address 2</label>\r\n                    <input value.bind=\"people.selectedPerson.address2\" id=\"register_address2\" class=\"form-control\" placeholder=\"Address2\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_city\" class=\"control-label \">City</label>\r\n                    <input value.bind=\"people.selectedPerson.city\" id=\"register_city\" class=\"form-control\" placeholder=\"City\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_region\" class=\"control-label \">Region</label>\r\n                    <input value.bind=\"people.selectedPerson.region\" id=\"register_region\" class=\"form-control\" placeholder=\"Region\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_postal_code\" class=\"control-label \">Postal Code</label>\r\n                    <input value.bind=\"people.selectedPerson.postalCode\" id=\"register_postal_code\" class=\"form-control\" placeholder=\"Postal Code\" type=\"text\" />\r\n                  </div>\r\n                  <div class=\"col-lg-12\">\r\n                    <label for=\"register_city\" class=\"control-label \">Country</label>\r\n                    <input value.bind=\"people.selectedPerson.country\" id=\"register_city\" class=\"form-control\" placeholder=\"Country\" type=\"text\" />\r\n                  </div>\r\n                </div>\r\n              </div>\r\n              <div class=\"topMargin\">Password should be at least ${thresholdLength} characters long and should contain a combination of the following groups: a combination of lowercase letters, uppercase letters, digits or special characters</div>\r\n              <div class=\"row topMargin\">\r\n               <div class=\"col-lg-5\">\r\n                 <label for=\"register_specialization\" class=\"control-label\">Specialization</label>\r\n                 <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"register_specialization\" class=\"form-control\" placeholder=\"Specializatin\">\r\n                     <option value=\"\">Select an option</option>\r\n                     <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n                 </select>\r\n               </div>\r\n               <div class=\"col-lg-5 col-lg-offset-1\">\r\n                 <label for=\"register_department\" class=\"control-label\">Department</label>\r\n                 <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"register_department\" class=\"form-control\" placeholder=\"Department\">\r\n                     <option value=\"\">Select an option</option>\r\n                     <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n                 </select>\r\n               </div>\r\n           </div>\r\n         </form>\r\n         </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/user/profile.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"subMenu-container\">\r\n       <nav class=\"navbar navbar-inverse subMenu\">\r\n           <div class=\"navbar-header\">\r\n               <a class=\"navbar-brand\">Profile</a>\r\n           </div>\r\n       </nav>\r\n   </div>\r\n <div class=\"col-lg-8 col-lg-offset-2\">\r\n  <div class=\"panel panel-primary topMargin\">\r\n    <div class=\"panel-body\">\r\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.delegate=\"changePassword()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Change Password\"><i class=\"fa fa-key fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n          <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      </div>\r\n      <div class=\"topMargin col-lg-1\">\r\n          <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\r\n          <div class=\"topMargin\">\r\n              <h6>Register your email with <a href=\"https://en.gravatar.com/\">gravatar.com</a> to show your image.</h6>\r\n          </div>\r\n      </div>\r\n      <div class=\"col-sm-12 col-lg-10 leftMargin topMargin\">\r\n        <form class=\"form-horizontal\">\r\n          <div class=\"row\">\r\n            <!-- Row 1 -->\r\n            <div class=\"col-lg-4\">\r\n              <label for=\"editFirstName\" class=\"control-label hideOnPhone\">Name</label>\r\n              <input value.bind=\"people.selectedPerson.firstName\" id=\"editFirstName\" class=\"form-control input-md\" placeholder=\"First Name\" type=\"text\" />\r\n            </div>\r\n            <div class=\"col-lg-4\">\r\n              <label for=\"editMiddleName\" class=\"control-label hideOnPhone\">Middle Name</label>\r\n              <input value.bind=\"people.selectedPerson.middleName\" id=\"editMiddleName\" class=\"form-control input-md\" placeholder=\"Middle Name\" type=\"text\" />\r\n            </div>\r\n            <div class=\"col-lg-4\">\r\n              <label for=\"editLastName\" class=\"control-label hideOnPhone\">Last Name</label>\r\n              <input value.bind=\"people.selectedPerson.lastName\" id=\"editLastName\" class=\"form-control input-md\" placeholder=\"Last Name\" type=\"text\" />\r\n            </div>\r\n          </div>\r\n          <!-- Row 2 -->\r\n          <div class=\"row topMargin\">\r\n            <div class=\"col-lg-5\">\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editPhone\" class=\"control-label hideOnPhone\">Phone</label>\r\n                  <input value.bind=\"people.selectedPerson.phone| phoneNumber\" id=\"editPhone\" class=\"form-control input-md\" placeholder=\"Phone\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editext\" class=\"control-label hideOnPhone\">Extension</label>\r\n                  <input value.bind=\"people.selectedPerson.ext\" id=\"editext\" class=\"form-control input-md\" placeholder=\"Extension\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editMobile\" class=\"control-label hideOnPhone\">Mobile</label>\r\n                  <input value.bind=\"people.selectedPerson.mobile | phoneNumber\" id=\"editMobile\" class=\"form-control input-md\" placeholder=\"Mobile\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editEmail\" class=\"control-label hideOnPhone\">Email</label>\r\n                  <input disabled value.bind=\"people.selectedPerson.email\" id=\"editEmail\" class=\"form-control input-md\" placeholder=\"Email\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editInstitution\" class=\"control-label\">Institution</label>\r\n                  <select value.bind=\"people.selectedPerson.institutionId\" id=\"editInstitution\" class=\"form-control input-md\" placeholder=\"Institution\">\r\n                      <option value=\"\">Select an option</option>\r\n                      <option repeat.for=\"institution of people.institutionsArray\" value=\"${institution._id}\">${institution.name}</option>\r\n                  </select>\r\n              </div>\r\n            </div>\r\n            <div class=\"col-lg-5 col-lg-offset-1\">\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editAddress1\" class=\"control-label hideOnPhone\">Address 1</label>\r\n                  <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control input-md\" placeholder=\"Address 1\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editAddress2\" class=\"control-label hideOnPhone\">Address 2</label>\r\n                  <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control input-md\" placeholder=\"Address2\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editCity\" class=\"control-label hideOnPhone\">City</label>\r\n                  <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control input-md\" placeholder=\"City\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editRegion\" class=\"control-label hideOnPhone\">Region</label>\r\n                  <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control input-md\" placeholder=\"Region\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editPostalCode\" class=\"control-label hideOnPhone\">Postal Code</label>\r\n                  <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control input-md\" placeholder=\"Postal Code\" type=\"text\" />\r\n              </div>\r\n              <div class=\"col-lg-12\">\r\n                  <label for=\"editCountry\" class=\"control-label hideOnPhone\">Country</label>\r\n                  <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control input-md\" placeholder=\"Country\" type=\"text\" />\r\n              </div>\r\n          </div>\r\n            <div class=\"row topMargin\">\r\n              <div class=\"col-lg-5\">\r\n               <label for=\"editSpecialization\" class=\"control-label\">Specialization</label>\r\n               <select value.bind=\"people.selectedPerson.personSpecialization\" id=\"editSpecialization\" class=\"form-control input-md\" placeholder=\"Specializatin\">\r\n                   <option value=\"\">Select an option</option>\r\n                   <option repeat.for=\"name of is4ua.specialArray\" value=\"${name.code}\">${name.description}</option>\r\n               </select>\r\n              </div>\r\n              <div class=\"col-lg-5 col-lg-offset-1\">\r\n               <label for=\"editDepartment\" class=\"control-label\">Department</label>\r\n               <select value.bind=\"people.selectedPerson.departmentCategory\" id=\"editDepartment\" class=\"form-control input-md\" placeholder=\"Department\">\r\n                   <option value=\"\">Select an option</option>\r\n                   <option repeat.for=\"name of is4ua.deptArray\" value=\"${name.code}\">${name.description}</option>\r\n               </select>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </form>\r\n     </div>\r\n   </div>\r\n </div>\r\n</div>\r\n</template>\r\n"; });
+define('text!modules/user/resetPassword.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"container\">\r\n    <div class=\"panel panel-primary topMargin\">\r\n      <div class=\"panel-body\">\r\n        <div show.bind=\"showForm\">\r\n          <form>\r\n            <div class=\"form-group\">\r\n              <label for=\"register_password\" class=\"control-label\">Password *</label>\r\n                <input id=\"register_password\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"newPassword\"\r\n                  blur.trigger=\"passwordComplexity()\" />\r\n            </div>\r\n            <div class=\"form-group\">\r\n              <label for=\"register_password_repeat\" class=\"control-label\">Repeat Password *</label>\r\n                <input id=\"register_password_repeat\" type=\"password\" placeholder=\"Repeat Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\r\n                />\r\n            </div>\r\n            <button class=\"btn btn-primary\" click.trigger=\"savePassword()\">Reset Password</button>\r\n          </form>\r\n        </div>\r\n        <div show.bind=\"!showForm\">\r\n          <h3>That validation code appears to have expired.</h2>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/user/user.html', ['module'], function(module) { module.exports = "<template>\r\n  <compose view=\"./components/banner.html\"></compose>\r\n\r\n  <div class=\"fluid-container\">\r\n        <div class=\"hoverProfile\" style=\"background-color:cyan\">\r\n            <span  click.delegate=\"hideAlert()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\r\n            <h4 class=\"pull-right\">${alert.title}</h4>\r\n            <hr/>\r\n            <div innerhtml.bind=\"alert.content\"></div>\r\n        </div>\r\n\r\n        <div class=\"row\">\r\n            <div class=\"col-lg-3 bigTopMargin leftMargin\">\r\n                <div class=\"bigMarginTop leftMargin\">\r\n                    <compose view=\"./components/uccInformation.html\"></compose>\r\n                </div>\r\n\r\n                <h2 class=\"underline bottomMargin\">Useful Links</h2>\r\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'OLNK'\">\r\n                    <compose view=\"./components/homePageLinks.html\"></compose>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"col-lg-4\">\r\n                <div style=\"height:500px;\">\r\n                    <compose view=\"./components/carousel.html\"></compose>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"col-lg-3 col-lg-offset-1\">\r\n                <a class=\"twitter-timeline\"  href=\"https://twitter.com/hashtag/SAPNextGen\" data-widget-id=\"826153620517376000\">#SAPNextGen Tweets</a>\r\n\r\n                <div>\r\n                    <h2 show.bind=\"siteinfo.siteArray | infoFilter:'NEWS':true\" class=\"underline topMargin\">UCC and UA News</h2>\r\n                    <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'NEWS'\">\r\n                        <compose view=\"./components/newsItem.html\"></compose>\r\n                    </div>\r\n                </div>\r\n\r\n                <h2 class=\"underline topMargin\">Useful Information</h2>\r\n                <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'DLNK'\">\r\n                    <compose view=\"./components/newsItem.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!resources/dialogs/confirm-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <div tabindex=\"-1\" role=\"dialog\">\n        <div class=\"modal-dialog\">\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <button type=\"button\" click.trigger=\"controller.cancel()\" class=\"close\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                    <h4 class=\"modal-title\">${header}</h4>\n                </div>\n                <div class=\"modal-body\">\n                   ${message}?\n                </div>\n                <div class=\"modal-footer\">\n                    <button type=\"button\" class=\"btn btn-default\" click.trigger=\"controller.cancel()\">No!</button>\n                    <button type=\"button\" class=\"btn btn-danger\" click.trigger=\"controller.ok()\">Yes</button>\n                </div>\n            </div><!-- /.modal-content  -->\n        </div><!-- /.modal-dialog -->\n    </div><!-- /.modal -->\n</template>"; });
+define('text!resources/dialogs/document-dialog.html', ['module'], function(module) { module.exports = "<template>\n\t<ux-dialog style=\"width:800px;\">\n\t\t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body>\n\t\t\t<div class=\"panel panel-default\">\n\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-lg-4\">\n\t\t\t\t\t\t\t<div show.bind=\"!categoryForm\">\n\t\t\t\t\t\t\t\t<label>Avuxlable Categories</label>\n\t\t\t\t\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t\t\t\t\t<input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t\t\t\t\t<button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"col-lg-8\" style='padding:15px;'>\n\t\t\t\t\t\t\t<table show.bind=\"model.documents.documents.length > 0\" id=\"coursesTable\" class=\"table table-striped table-hover\">\n\t\t\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t<th>Document </th>\n\t\t\t\t\t\t\t\t\t\t<th></th>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t<tr repeat.for=\"document of model.documents.documents\">\n\t\t\t\t\t\t\t\t\t\t<td data-title=\"name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\">${document.fileName}</a></td>\n\t\t\t\t\t\t\t\t\t\t<td click.trigger=\"removeDocument($index)\"><i class=\"fa fa-trash\"></i></td>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t<div show.bind=\"showDocuments\">\n\t\t\t\t\t\t\t\t<div show.bind=\"showDocumentForm\">\n\t\t\t\t\t\t\t\t\t<compose view=\"./documentForm.html\"></compose>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<div class=\"pull-right topMargin bottomMargin rightMargin\">\n\t\t\t\t<button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t\t</div>\n\t\t</ux-dialog-footer>\n\t</ux-dialog>\n</template>\n"; });
+define('text!resources/dialogs/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
+define('text!resources/dialogs/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!resources/dialogs/email-dialog.html', ['module'], function(module) { module.exports = "<template>\n\t<ux-dialog style=\"max-width: 600px\">\n    \t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body>\n\t\t\t<input class=\"form-control bottomMargin\" value.bind=\"model.emuxl.emuxlSubject\" placeholder=\"Subject\"/>\n\t\t\t<editor value.bind=\"model.emuxl.emuxlBody\" height=\"250\"></editor>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<button class=\"btn btn-primary\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t</ux-dialog-footer>\n  \t</ux-dialog>\n</template>\n"; });
+define('text!resources/dialogs/message-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ux-dialog style=\"max-width: 325px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n      ${model.message}\n    </ux-dialog-body>\n\n    <ux-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>\n"; });
+define('text!resources/dialogs/note-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <ux-dialog style=\"max-width: 600px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n\t\t<select class=\"form-control\" value.bind=\"model.selectedCategory\">\n\t\t\t<option repeat.for=\"option of model.note.noteCategories\" model.bind=\"$index\">${option}</option>\n\t\t</select>\n      \t<editor value.bind=\"model.note.noteBody\" height=\"250\"></editor>\n    </ux-dialog-body>\n\n    <ux-dialog-footer>\n      <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>\n"; });
+define('text!resources/dialogs/password-dialog.html', ['module'], function(module) { module.exports = "<template>\n\t<ux-dialog style=\"width: 600px;\">\n\t\t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body style=\"height:300px;\">\n\t\t\t<h6>Password should be at least ${thresholdLength} characters long and should contuxn a combination of the following groups:  </h6>\n\t\t\t\t<ul>\n\t\t\t\t\t<li><h6>lowercase letters</h6></li>\n\t\t\t\t\t<li><h6>uppercase letters</h6></li>\n\t\t\t\t\t<li><h6> digits or special characters</h6></li>\n\t\t\t\t</ul>\n\t\t\t<div class=\"topMargin\" style=\"height:50px;\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<label for=\"register_password\" class=\"col-sm-3 control-label\">Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password\" type=\"password\" attach-focus=\"true\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password\"\n\t\t\t\t\t\tblur.trigger=\"passwordComplexity()\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<div class=\"form-group topMargin\" >\n\t\t\t\t\t<label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t</ux-dialog-footer>\n\t</ux-dialog>\n</template>\n"; });
+define('text!resources/elements/flat-picker.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <input style=\"background-color:white;\" id=\"${controlid}\" class=\"aurelia-flatpickr form-control\" type=\"text\" placeholder=\"Select Date..\">\n</template>"; });
+define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                <a if.bind=\"isAuthenticated\" class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                <a if.bind=\"!isAuthenticated\" class=\"navbar-brand\" href=\"#/home\"><i class=\"fa fa-home\"></i> UCCSS</a>\n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                             <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>  \n                   \n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li><a href=\"#/contact\">Contact Us</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n        </div>\n    </nav>\n</template>"; });
+define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake($event)\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/admin/system/editProducts.html', ['module'], function(module) { module.exports = "editProducts.html\r\n<template>\r\n</template>"; });
+define('text!modules/admin/system/editSession.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-info\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"row\">\r\n            <div show.bind=\"showScreen == 'sessionTable'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionTable.html\"></compose>\r\n            </div> <!-- Table Div -->\r\n            <div show.bind=\"showScreen == 'editSession'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionForm.html\"></compose>\r\n            </div> <!-- Form Div -->\r\n            <div show.bind=\"showScreen == 'editConfig'\" class=\"col-lg-12\">\r\n                <compose view=\"./components/sessionConfigTable.html\"></compose>\r\n            </div>\r\n        </div> \r\n      </div> \r\n</template>"; });
+define('text!modules/admin/system/editSystems.html', ['module'], function(module) { module.exports = "editSystems.html\r\n<template>\r\n</template>"; });
+define('text!modules/admin/system/system.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">System</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n   \n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
+define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n      <div id=\"no-more-tables\">\r\n          <table class=\"table table-striped table-hover cf\">\r\n              <thead class=\"cf\">\r\n                  <tr>\r\n                      <td colspan='7'>\r\n                          <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                          <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                      </td>\r\n                  </tr>\r\n                  <tr>\r\n                      <th class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'lastName'})\" style=\"width:20rem;\">Name <span><i class=\"fa fa-sort\"></i></span></th>\r\n                      <th style=\"width:15rem;\">Phone</th>\r\n                      <th style=\"width:15rem;\">Mobile</th>\r\n                      <th class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'email'})\" style=\"width:20rem;\">eMail <span><i class=\"fa fa-sort\"></i></span></th>\r\n                      <th>Role</th>\r\n                      <th>Status</th>\r\n                      <th>Change Status</th>\r\n                  </tr>\r\n              </thead>\r\n              <tbody>\r\n                  <tr>\r\n                      <th>\r\n                          <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', compare:'match'} )\"  class=\"form-control\" />\r\n                      </th>\r\n                      <th></th>\r\n                      <th></th>\r\n                      <th></th>\r\n                      <th>\r\n                         <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterList(roleFilter, { type: 'custom', filter: customRoleFilter, compare: 'custom'})\"  class=\"form-control\" />\r\n                      </th>\r\n                      <th>\r\n                          <select value.bind=\"personStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'personStatusFilter',  collectionProperty: 'personStatus', displayProperty: 'personStatus',  compare:'match'} )\" class=\"form-control\" >\r\n                              <option value=\"\"></option>\r\n                              <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                          </select>\r\n                      </th>\r\n                      <th></th>\r\n                  </tr>\r\n                  <tr  repeat.for=\"person of dataTable.displayArray\">\r\n                      <td  data-title=\"Name\">${person.fullName}</td>\r\n                      <td  data-title=\"Phone\">${person.phone | phoneNumber}</td>\r\n                      <td  data-title=\"Phone\">${person.mobile | phoneNumber}</td>\r\n                      <td  data-title=\"Email\">${person.email}</td>\r\n                      <td  data-title=\"Role\">${person.roles}</td>\r\n                      <td  data-title=\"Status\">${person.personStatus | lookupValue:is4ua.personStatusArray:\"code\":\"description\"}</td>\r\n                      <td data-title=\"Update\" style=\"width: 100px\" click.trigger=\"updateStatus(person)\" innerhtml.bind=\"person.personStatus | personStatusButton\">\r\n                  </tr>\r\n              </tbody>\r\n          </table>\r\n      </div>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"col-lg-5\" show.bind=\"showRequest\">\r\n    \t<div class=\"panel panel-primary topMargin\">\r\n      \t\t<div class=\"panel-heading\">\r\n        \t\t<h3 class=\"panel-title\">${selectedProductID | lookupValue:products.productsArray:\"_id\":\"name\"}</h3>\r\n      \t\t</div>\r\n\t      \t<div class=\"panel-body\">\r\n\t        \t<h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"desscription\"}</h5>\r\n\t        \t<h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n\t        \t<h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n\t      \t</div>\r\n    \t</div>\r\n  \t</div>\r\n</template>"; });
+define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n<div class=\"col-lg-10 col-lg-offset-1\">\r\n    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n      <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n          <thead class=\"cf\">\r\n            <tr>\r\n              <td colspan='7'>\r\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n              </td>\r\n            </tr>\r\n            <tr>\r\n              <th class=\"col-xs-1 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestNo'})\" class=\"col-xs-1\">No <span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th class=\"col-lg-1 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requiredDate'})\" >Due <span></i></span></thpropertyName>\r\n              <th class=\"col-lg-1 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\" >Requested <span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th class=\"col-lg-1\">Type</th>\r\n              <th class=\"col-lg-1 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestStatus'})\" >Status <span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th class=\"col-sm-1\">IDS Requestd</th>\r\n              <th class=\"col-lg-2 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name', searchProperty: 'productId', surrogateArray: products.productsArray, surrogateProperty: '_id', type: 'lookup'})\">Product <span><i class=\"fa fa-sort\"></i></span></th>\r\n              <th class=\"col-lg-1 sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'fullName', searchProperty: 'requestId.personId', surrogateArray: people.instutionPeopleArray, surrogateProperty: '_id', type: 'lookup'})\">Faculty <span><i class=\"fa fa-sort\"></i></span></th>\r\n            </tr>\r\n          </thead>\r\n          <tbody>\r\n            <tr>\r\n              <th></th>\r\n              <th>\r\n                <input value.bind=\"requiredDateFilter\" change.delegate=\"dataTable.filterList(requiredDateFilter, { type: 'date',  filter: 'requiredDateFilter', collectionProperty: 'requiredDate', compare:'after' })\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"createdDateFilter\" change.delegate=\"dataTable.filterList(createdDateFilter, { type: 'date',  filter: 'createdDateFilter', collectionProperty: 'createdDate', compare:'after' })\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n              </th>\r\n              <th>\r\n           \t\t<select value.bind=\"courseFilter\" input.delegate=\"dataTable.filterList($event, { type: 'custom',  filter: courseCustomFilter,  collectionProperty: 'requestId.courseId', displayProperty: 'courseId',  compare:'custom'} )\" class=\"form-control\" >\r\n                \t<option value=\"\"></option>\r\n                   <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\r\n                   <option  value=\"Regular\">Regular</option>\r\n              \t</select>\r\n              </th>\r\n              <th>\r\n               \t<select value.bind=\"requestStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )\" class=\"form-control\" >\r\n\t                  <option value=\"\"></option>\r\n\t                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n\t              </select>\r\n              </th>\r\n              <th></th>\r\n              <th>\r\n              \t<select value.bind=\"productFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'productFilter',  collectionProperty: 'productId', displayProperty: 'name',  compare:'match'} )\" class=\"form-control\" >\r\n\t                  <option value=\"\"></option>\r\n\t                  <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\r\n\t              </select>\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: nameCustomFilter, collectionProperty: 'fullName', compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n            </tr>\r\n            <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\r\n              <td data-title=\"Request No\">${request.requestNo}</td>\r\n              <td data-title=\"Required Date\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n              <td data-title=\"Date Created\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n              <td data-title=\"Course\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\r\n              <td data-title=\"Status\">${request.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n              <td data-title=\"IDs Requested\">${request.requestId | idsRequested}\r\n              <td data-title=\"Product\">${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</td>\r\n              <td data-title=\"Person\">${request.requestId.personId | lookupValue:people.instutionPeopleArray:\"_id\":\"fullName\"}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n</template>"; });
+define('text!modules/facco/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"row\">\r\n      <div class=\"col-lg-4\">\r\n        <div class=\"form-group topMargin leftMargin\">\r\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\r\n              <option value=\"\">Select a session</option>\r\n              <option repeat.for=\"session of sessions.sessionsArray\"\r\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\r\n            </select>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n      <div show.bind=\"selectedSession != ''\">\r\n        <div class=\"row\">\r\n          <div class=\"col-lg-12\">\r\n            <!-- Request Table -->\r\n            <compose view=\"./requestsTable.html\"></compose>\r\n          </div>\r\n      </div>\r\n  </div>\r\n\r\n  <compose view=\"./requestDetailDetails.html\"></compose>\r\n</template>"; });
+define('text!modules/home/components/homeContent.html', ['module'], function(module) { module.exports = "<template>\n  <div  style=\"margin-top:20px;\">\n    <div class=\"col-md-12\">\n      <h2>${heading}</h2>\n    <div class=\"col-md-12 \">\n      <img class=\"col-md-12\" src=\"img/DataCenter.jpg\" class=\"homePageImage\" />\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ucc_logo.jpg\" style=\"height:100px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/sap_ua2.PNG\" style=\"height:75px;\"/></div>\n      <div class=\"col-md-4 topMargin\"><img class=\"center-block\" src=\"/img/ibm_LOGO.PNG\" style=\"height:75px;\"/></div>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/home/components/homePageLinks.html', ['module'], function(module) { module.exports = "<template>\n  <div>\n    <div class=\"col-md-6 bottomMargin\">\n      <a href.bind=item.url target=\"_blank\">${item.title}</a>\n      <br>${item.content}\n    </div>\n  </div>\n</template>"; });
+define('text!modules/home/components/newsItem.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin\">\n    <span class=\"col-md-12 newsTitle topMargin\">${item.title}</span>\n    <span innerhtml.bind=\"item.content\"></span>\n    <span class=\"newsUrl\"><a href.bind=\"item.url\" target=\"_blank\">more info...</a></span>\n  </div>\n</template>"; });
+define('text!modules/home/components/uccInformation.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"home-page-header underline\">UCC Session Information</div>\r\n\t<div class=\"col-lg-3\">\r\n\t\t<h3 class=\"underline\">Current Sessions</h3>\r\n\t\t<div class=\"list-group\">\r\n\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray | sessionType:'Active:Requests:Next'\">\r\n\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\r\n\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t</a>\r\n\t\t</div>\r\n\t</div>\r\n\t<div class=\"col-lg-4 col-lg-offset-1\">\r\n\t\t<h3 class=\"underline\">Sessions Schedule</h3>\r\n\t\t<div repeat.for=\"item of siteinfo.siteArray | infoFilter:'INFO'\">\r\n\t\t\t<h3>${item.title}</h3>\r\n\t\t\t<span innerhtml=\"${item.content}\"></span>\r\n\t\t</div>\r\n\t</div>\r\n\t<div class=\"col-lg-3\">\r\n\t\t<h3 class=\"underline\">UCC Sessions</h3>\r\n\t\t<span innerhtml.bind=\"config.SESSION_EXPLANATION\"></span>\r\n\t</div>\r\n\r\n</template>\r\n"; });
+define('text!modules/user/components/banner.html', ['module'], function(module) { module.exports = "<template>\r\n  <div class=\"subMenu-container\">\r\n    <div class=\"textContainer banner subMenu\">\r\n      <span show.bind=\"temp\" class=\"leftMargin\">\r\n        <h4>${userObj.city} weather: ${temp} </h4>\r\n        <img src=\"${weatherIcon}\" class=\"weatherIcon smallLeftMargin\">\r\n      </span>\r\n      <span show.bind=\"ucctemp\" class=\"leftMargin\">\r\n        <h4>UCC weather: ${ucctemp} </h4>\r\n        <img src=\"${uccweatherIcon}\" class=\"weatherIcon smallLeftMargin\">\r\n      </span>\r\n      <div class=\"pull-right\">\r\n        <a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>\r\n        <a href=\"#/support\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\r\n        <span show.bind=\"alertIndex > -1\" click.delegate=\"openAlert(siteinfo.siteArray[alertIndex])\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n          title=\"\" data-original-title=\"Alerts\"><i class=\"fa fa-bell-o fa-border\" aria-hidden=\"true\"></i></span>\r\n        <span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n"; });
+define('text!modules/user/components/carousel.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"showCarousel\" id=\"carousel-example-generic\" class=\"carousel slide bigTopMargin carouselSize\" data-ride=\"carousel\">\n    <!-- Indicators -->\n    <ol class=\"carousel-indicators\">\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"${$index}\" class=\"$firts ? 'active' : '''\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\"></li>\n    </ol>\n\n    <!-- Wrapper for slides -->\n    <div class=\"carousel-inner\" role=\"listbox\">\n      <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\" class=\"${$first ? 'item active' : 'item'}\">\n        <img src=\"${item.url}\" class=\"d-block img-fluid img-responsive\"  alt=\"${item.title}\">\n        <div class=\"carousel-caption\">\n          <h3>${item.title}</h3>\n        </div>\n      </div>\n    </div>\n\n    <!-- Controls -->\n    <a class=\"left carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"prev\">\n      <span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Previous</span>\n    </a>\n    <a class=\"right carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"next\">\n      <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Next</span>\n    </a>\n  </div>\n  <div  class=\"carouselSize\" show.bind=\"!showCarousel\">\n    <img src=\"${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}\" class=\"img-responsive\">\n  </div>\n"; });
+define('text!modules/user/components/homePageLinks.html', ['module'], function(module) { module.exports = "<template>\r\n  <blockquote>\r\n    <h6>${item.title}</h6>\r\n     <p innerhtml.bind=\"item.content\"></p>\r\n    <small show.bind=\"moreInfoExists(item)\"><a show.bind=\"moreInfoExists(item)\" href.bind=\"item.url\" target=\"_blank\">more info...</a></small>\r\n  </blockquote>\r\n</template>"; });
+define('text!modules/user/components/newsItem.html', ['module'], function(module) { module.exports = "<template>\n  <blockquote>\n    <p innerhtml.bind=\"item.content\"></p>\n    <small show.bind=\"moreInfoExists(item)\"><a show.bind=\"moreInfoExists(item)\" href.bind=\"item.url\" target=\"_blank\">more info...</a></small>\n  </blockquote>\n</template>"; });
+define('text!modules/user/components/uccInformation.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div>\r\n\t\t<h2 class=\"underline\">UCC Information</h2>\r\n\t\t<div class=\"${item.priority}\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'SYST'\">\r\n\t\t\t<h3>${item.title}</h3>\r\n\t\t\t<span innerhtml=\"${item.content}\"></span>\r\n\t\t\t<hr/>\r\n\t\t</div>\r\n\t\t<div repeat.for=\"item of siteinfo.siteArray | infoFilter:'INFO'\">\r\n\t\t\t<h3>${item.title}</h3>\r\n\t\t\t<span innerhtml=\"${item.content}\"></span>\r\n\t\t\t<hr/>\r\n\t\t</div>\r\n\t\t<div class=\"bigTopMargin\">\r\n\t\t\t<h2 class=\"underline\">Sessions</h2>\r\n\t\t\t<div class=\"list-group\">\r\n\t\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray | sessionType:'Active:Requests:Next'\">\r\n\t\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\r\n\t\t\t\t</a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>"; });
+define('text!modules/admin/system/components/sessionConfigTable.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\r\n        <div class='row'>\r\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                <span click.delegate=\"backConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"saveConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"cancelConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>   \r\n            <div class='col-lg-12 bottomMargin'>\r\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                <div id=\"no-more-tables\">\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <td colspan='5'>\r\n                                    <span click.delegate=\"refreshConfig()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                        title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th>Session</th>\r\n                                <th>Start Day</th>\r\n                                <th>Start Month</th>\r\n\t\t\t\t\t\t\t\t<th>End Day</th>\r\n\t\t\t\t\t\t\t\t<th>End Month</th>\r\n\t\t\t\t\t\t\t\t<th>Open Day</th>\r\n\t\t\t\t\t\t\t\t<th>Open Month</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr  repeat.for=\"item of editSessionConfigArray\">\r\n                                <td><input value.bind=\"item.session\" class=\"form-control\" type=\"text\" /></td>\r\n                                <td><input value.bind=\"item.startDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.startMonth\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.endDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.endMonth\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.openDay\" class=\"form-control\" type=\"text\" /></td>\r\n\t\t\t\t\t\t\t\t<td><input value.bind=\"item.openMonth\" class=\"form-control\" type=\"text\" /></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!modules/admin/system/components/sessionForm.html', ['module'], function(module) { module.exports = "<template>\r\n <div class=\"container\">\r\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n      <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n      <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n    </div> \r\n\r\n    <div class=\"topMargin\">\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t      <label for=\"editSession\" class=\"form-control-label\">Session</label>\r\n\t      <select value.bind=\"sessions.selectedSession.session\" class=\"form-control\" id=\"editSession\">\r\n\t        <option></option>\r\n\t        <option repeat.for=\"session of config.SESSION_PARAMS\">${session.session}</option>\r\n\t      </select>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t     \t<label for=\"editYear\" class=\"form-control-label \">Year</label>\r\n\t    \t<input value.bind=\"sessions.selectedSession.year\" id=\"editYear\" class=\" form-control\" placeholder=\"Year\" type=\"text\" />\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t    \t<label class=\"form-control-label \">Start Date</label>\r\n        \t<flat-picker controlid=\"startDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.startDate\"></flat-picker>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t    \t<label class=\"form-control-label \">End Date</label>\r\n        \t<flat-picker controlid=\"endDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.endDate\"></flat-picker>\r\n\t    </div>\r\n\t    <div class=\"col-lg-5 topMargin\">\r\n\t    \t<label class=\"form-control-label \">Requests Open</label>\r\n            <flat-picker controlid=\"requestsOpenDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.requestsOpenDate\"></flat-picker>\r\n\t    </div>\r\n\t     <div class=\"col-lg-5 col-lg-offset-1 topMargin\">\r\n\t     \t<label for=\"editStatus\" class=\"form-control-label\">Status</label>\r\n            <select value.bind=\"sessions.selectedSession.sessionStatus\" id=\"editStatus\" class=\"form-control\" id=\"editStatus\">\r\n              <option repeat.for=\"session of config.SESSION_STATUSES\" value.bind=\"session\">${session}</option>\r\n            </select>\r\n\t     </div>\r\n    </div>\r\n    <!--\r\n      <div class=\"form-group row\">\r\n        <label for=\"editYear\" class=\"form-control-label \">Year</label>\r\n\r\n          <input value.bind=\"sessions.selectedSession.year\" id=\"editYear\" class=\" form-control\" placeholder=\"Year\" type=\"text\" />\r\n        </div>\r\n      </div>\r\n      <div class=\"form-group row\">\r\n        <label class=\"form-control-label \">Start Date</label>\r\n\r\n           <flat-picker controlid=\"startDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.startDate\"></flat-picker>\r\n\r\n        </div>\r\n      </div>\r\n      <div class=\"form-group row\">\r\n        <label class=\"form-control-label \">End Date</label>\r\n\r\n          <flat-picker controlid=\"endDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.endDate\"></flat-picker>\r\n\r\n        </div>\r\n      </div>\r\n      <div class=\"form-group row\">\r\n        <label class=\"form-control-label \">Requests Open</label>\r\n\r\n           <flat-picker controlid=\"requestsOpenDate\" config.bind=\"config\" value.bind=\"sessions.selectedSession.requestsOpenDate\"></flat-picker>\r\n\r\n        </div>\r\n      </div>\r\n      <div class=\"form-group row\">\r\n        <label for=\"editStatus\" class=\"form-control-label  bottomMargin\">Status</label>\r\n\r\n          <select value.bind=\"sessions.selectedSession.sessionStatus\" id=\"editStatus\" class=\"form-control bottomMargin\" id=\"editStatus\">\r\n            <option repeat.for=\"session of config.SESSION_STATUSES\" value.bind=\"session\">${session}</option>\r\n          </select>\r\n        </div>\r\n      </div> \r\n      -->\r\n </div>\t\r\n</template>"; });
+define('text!modules/admin/system/components/sessionTable.html', ['module'], function(module) { module.exports = "sessionTable.html\r\n<template>\r\n\t<div class='row'>\r\n\t        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n\t            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n\t            <div id=\"no-more-tables\">\r\n\t                <table id=\"sessionsTable\" class=\"table table-striped table-hover cf\">\r\n\t                    <thead class=\"cf\">\r\n\t                        <tr>\r\n\t                            <td colspan='6'>\r\n\t                                <div class=\"checkbox\">\r\n\t                                    <label>\r\n\t                                        <input checked.bind=\"isChecked\" change.trigger=\"filterOutClosed()\" type=\"checkbox\"> Hide inactive sessions\r\n\t                                    </label>\r\n\t                                </div>\r\n\t                            </td>\r\n\t                            <tr>\r\n\t                                <td colspan='6'>\r\n\t                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"smallMarginRight fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span click.delegate=\"editSessionConfig()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Config\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\r\n\t                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n\t                                </td>\r\n\t                            </tr>\r\n\t                            <tr>\r\n\t                                <th class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'startDate'})\">Session <span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'startDate'})\">Start Date <span click.trigger=\"dataTable.sortArray('startDate')\"><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'endDate'})\">End Date <span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestsOpenDate'})\">Requests Open <span><i class=\"fa fa-sort\"></i></span></th>\r\n\t                                <th>Status</th>\r\n\t                                <th></th>\r\n\t                            </tr>\r\n\t                    </thead>\r\n\t                    <tbody>\r\n\t                        <tr repeat.for=\"session of dataTable.displayArray\">\r\n\t                            <td data-title=\"Session\" click.trigger=\"edit($index, $event)\">${session.session} - ${session.year}</td>\r\n\t                            <td data-title=\"StartDate\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t                            </td>\r\n\t                            <td data-title=\"EndDate\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t                            </td>\r\n\t                            <td data-title=\"RequestsOpen\" click.trigger=\"edit($index, $event)\">\r\n\t                                <div style=\"width: 100px\">${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</div>\r\n\t                            </td>\r\n\t                            <td data-title=\"createdDate\" click.trigger=\"edit($index, $event)\">${session.sessionStatus}</td>\r\n\t                            <td data-title=\"Update\" style=\"width: 100px\" click.trigger=\"updateStatus($index, session, $event)\" innerhtml.bind=\"session.sessionStatus | sessionStatusButton\">\r\n\t                            </td>\r\n\t                        </tr>\r\n\t                    </tbody>\r\n\t                </table>\r\n\t            </div>\r\n\t        </div>\r\n\t    </div>\r\n\t</div>\r\n</template>\t"; });
+//# sourceMappingURL=app-bundle.js.map

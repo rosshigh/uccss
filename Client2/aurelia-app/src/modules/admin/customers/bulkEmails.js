@@ -71,13 +71,14 @@ export class BulkEmails {
     }
 
 	_clearFilters(){
-		$(this.institutionFilter).val('');
-        $(this.institutionTypeFilter).val('');
-        $(this.memberTypeFilter).val("");
-        $(this.cityFilter).val("");
-        $(this.regionFilter).val("");
-        $(this.countryFilter).val("");
-        this.activeFilterValue = "01";
+		this.institutionFilter = "";
+        this.institutionTypeFilter = "";
+        this.memberTypeFilter = "";
+        this.cityFilter = "";
+        this.regionFilter = "";
+        this.countryFilter = "";
+        this.roleFilterValue = "";
+        // this.activeFilterValue = "01";
         this.dataTable.updateArray(this.people.peopleBulkEmailArray);
         // this.filterActive();
 	}
@@ -100,5 +101,9 @@ export class BulkEmails {
 
         var email = {email: this.email, recipients: recipients};
         this.people.sendBuikEmail(email);
+    }
+
+    filter(el, options){
+        this.dataTable.filterListExV(el.target.value, options);
     }
 }

@@ -84,11 +84,11 @@ export class ViewHelpTickets {
        return item.code !== this.config.CLOSED_HELPTICKET_STATUS;
     })
 
-    if(params.id) {
-      this.notesHistory = true;
-      this.helpTickets.selectHelpTicketByID(params.id);
-      this.openHelpTicket();
-    }
+    // if(params.id) {
+    //   this.notesHistory = true;
+    //   this.helpTickets.selectHelpTicketByID(params.id);
+    //   this.openHelpTicket();
+    // }
 
     this.helpTicketTypeLookupArray = new Array();
     this.helpTickets.helpTicketTypesArray.forEach(item => {

@@ -280,10 +280,11 @@ export class EditSystem {
     }
 
     _cleanUpFilters(){
-        $("#sid").val("");
-        $("#description").val("");
-        $("#server").val("");
-        this.dataTable.updateArray(this.systems.systemsArray,'sid',1);
+        this.sidFilterValue = "";
+        this.descriptionFilterValue = "";
+        this.serverFilterValue = "";
+        this.activeFilter = "";
+        this.dataTable.updateArray(this.systems.systemsArray);
     }
 
     back() {
@@ -352,5 +353,9 @@ export class EditSystem {
                 return !found;
             }}]);
         this.validation.addRule(1,"editInst",[{"rule":"required","message":"Instance is required", "value": "systems.selectedSystem.instance"}]);
+    }
+
+    filter(el, options){
+        this.dataTable.filterListExV(el.target.value, options);
     }
 }

@@ -183,8 +183,46 @@ export class DataTable{
     this.pageOne();
   }
 
-  filterListExp(el, options){
-    el.preventDefault();
+  // filterListExp(el, options){
+  //   el.preventDefault();
+  //   options.lookupArray = options.lookupArray || new Array();
+  //   //If the property is already in filterValues, filter it out
+  //   this.filterValues = this.filterValues.filter(function (obj) {
+  //     return obj.options.filter !== options.filter;
+  //   });
+
+  //   //Parse collection property
+  //   var properties = options.collectionProperty.split('.');
+  //   var condition = "item"
+  //   for(var j = 0; j<properties.length; j++){
+  //     if(properties[j].indexOf('[') > -1 ) {
+  //       condition += properties[j];
+  //     } else {
+  //       condition += "['" + properties[j] + "']";
+  //     }
+  //   }
+  //   options.collectionProperty = condition;
+
+  //   //If the filter value is not set to empty, add it to filterValues
+  //   if(el.target.value !== ""){
+  //     this.filterValues.push({options: options, value:el.target.value});
+  //   }
+
+  //   //If there are no filters in filterValues, reset the displayArray to the original list
+  //   if(this.filterValues.length > 0){
+  //     this.baseArray = this.filter2(this.filterValues);
+  //   } else {
+  //     this.baseArray = this.sourceArray;
+  //   }
+  //   this.startRecord = this.DEFAULT_START;
+  //   this.firstVisible = 1;
+  //   this.buildDisplayArray();
+  //   this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+  //   this.pageOne();
+  // }
+
+   filterListExV(value, options){
     options.lookupArray = options.lookupArray || new Array();
     //If the property is already in filterValues, filter it out
     this.filterValues = this.filterValues.filter(function (obj) {
@@ -192,20 +230,22 @@ export class DataTable{
     });
 
     //Parse collection property
-    var properties = options.collectionProperty.split('.');
-    var condition = "item"
-    for(var j = 0; j<properties.length; j++){
-      if(properties[j].indexOf('[') > -1 ) {
-        condition += properties[j];
-      } else {
-        condition += "['" + properties[j] + "']";
+    if(options.type.indexOf('obj') == -1){
+      var properties = options.collectionProperty.split('.');
+      var condition = "item"
+      for(var j = 0; j<properties.length; j++){
+        if(properties[j].indexOf('[') > -1 ) {
+          condition += properties[j];
+        } else {
+          condition += "['" + properties[j] + "']";
+        }
       }
+      options.collectionProperty = condition;
     }
-    options.collectionProperty = condition;
 
     //If the filter value is not set to empty, add it to filterValues
-    if(el.target.value !== ""){
-      this.filterValues.push({options: options, value:el.target.value});
+    if(value !== ""){
+      this.filterValues.push({options: options, value: value});
     }
 
     //If there are no filters in filterValues, reset the displayArray to the original list
@@ -243,28 +283,55 @@ export class DataTable{
       keep = false;
       for(let i = 0; i < filters.length; i++) {
         let filterItem = filters[i];
-
-        if(filterItem.options.compare == 'lookup'){
-          var matchValue = this.lookup2(filterItem, item);
-        } else if (filterItem.options.compare  == 'array-or') {
-          var matchValue = true;
+        var matchValue = undefined;
+        if(filterItem.options.compare.indexOf('lookup') > -1){
+          matchValue = this.lookup2(filterItem, item);
+        } else if (filterItem.options.compare.indexOf('array') > -1) {
+          matchValue = true;
         } else  {
-          var matchValue = eval(filterItem.options.collectionProperty);
+          matchValue = eval(filterItem.options.collectionProperty);
         }
 
-        if(matchValue) {
+        if(matchValue != undefined) {
           switch(filterItem.options.type){
             case 'text':
-              keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+              if(filterItem.options.compare.indexOf('not') > -1){
+                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
+              } else {
+                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+              }
               break;
             case 'value':
-              keep = matchValue == filterItem.value;
+              if(filterItem.options.compare.indexOf('not') > -1){
+                  keep = matchValue != filterItem.value;
+                } else {
+                   keep = matchValue == filterItem.value;
+                }
               break;  
-            case 'array-or':
+            case 'array':
               var propArray = eval(filterItem.options.collectionProperty);
               for(let j = 0; j < propArray.length; j++){
-                 if(propArray[j] == filterItem.value) keep = true;  
+                 if(propArray[j].toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1) {
+                   keep = true;  
+                   break;
+                 }
               }
+              break;
+            case "boolean":
+                keep = matchValue === eval(filterItem.value);
+                break;
+            case "array-obj":
+              var properties = filterItem.options.collectionProperty.split('.')
+              var propArray = eval("item." + properties[0]);
+              if(propArray){
+                for(let l = 0;  l < propArray.length; l++){
+                  if(propArray[l][properties[1]].indexOf(filterItem.value.toUpperCase()) > -1){
+                    keep = true;
+                    break;
+                  }
+                }
+              }
+              break;
           }
         }
 
@@ -497,12 +564,24 @@ export class DataTable{
 
     if(!type){
         this.sortProperty=propertyName;
+        if(propertyName.indexOf('.') > -1){
+          var array = propertyName.split('.');          
+        }
 
-        this.baseArray = this.baseArray
+        if(array){
+           this.baseArray = this.baseArray
+          .sort((a, b) => {
+            var result = (a[array[0]][array[1]] < b[array[0]][array[1]]) ? -1 : (a[array[0]][array[1]] > b[array[0]][array[1]]) ? 1 : 0;
+            return result * this.sortDirection;
+          });
+        } else {
+          this.baseArray = this.baseArray
           .sort((a, b) => {
             var result = (a[propertyName] < b[propertyName]) ? -1 : (a[propertyName] > b[propertyName]) ? 1 : 0;
             return result * this.sortDirection;
           });
+        }
+
       
     } else if (type == 'id'){
       
@@ -555,6 +634,7 @@ export class DataTable{
       this.sourceArray = new Array();
       this.baseArray = new Array();
       this.active = true;
+      this.filterValues = new Array();
       sourceArray.forEach(item => {
         this.sourceArray.push(item);
         this.baseArray.push(item);

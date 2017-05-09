@@ -35,38 +35,38 @@
 		</div>
 		<div class="col-lg-3">
 			<label class="control-label hideOnPhone">Institution Type</label>
-			<select value.bind="institutionTypeFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'value',  filter: 'institutionTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'institutionType', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.name', matchProperty:'institutionType', compare:'lookup'} )" class="form-control " ref="institutionTypeFilter" id="institutionType">
+			<select value.bind="institutionTypeFilterValue" input.delegate="filter($event, { type: 'value',  filter: 'institutionTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'institutionType', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.name', matchProperty:'institutionType', compare:'lookup'} )" class="form-control " ref="institutionTypeFilter" id="institutionType">
 				<option value=""></option>
 				<option repeat.for='item of is4ua.institutionTypes' value='${item.code}'>${item.description}</option>
 			</select>
 		</div>
 		<div class="col-lg-3">
 			<label class="control-label hideOnPhone">Member Type</label>
-			<select value.bind="memberTypeFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )" class="form-control " ref="memberTypeFilter">
+			<select value.bind="memberTypeFilterValue" input.delegate="filter($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )" class="form-control " ref="memberTypeFilter">
 				<option value=""></option>
 				<option repeat.for='item of is4ua.memberTypes' value='${item.code}'>${item.description}</option>
 			</select>
 		</div>
 		<div class="col-lg-3">
 			<label class="control-label hideOnPhone">Institution</label>
-			<input value.bind="institutionFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="institutionFilter"/>
+			<input value.bind="institutionFilterValue" input.delegate="dataTable.filterListExV(institutionFilterValue, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="institutionFilter"/>
 		</div>
 		<div class="col-lg-3 topMargin">
 			<label class="control-label hideOnPhone">Region</label>
-			<input value.bind="regionFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'text',  filter: 'regionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.region', matchProperty:'region', compare:'lookup'} )"   class="form-control" ref="regionFilter"/>
+			<input value.bind="regionFilterValue" input.delegate="dataTable.filterListExV(regionFilterValue, { type: 'text',  filter: 'regionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.region', matchProperty:'region', compare:'lookup'} )"   class="form-control" ref="regionFilter"/>
 		</div>
 		<div class="col-lg-3 topMargin">
 			<label class="control-label hideOnPhone">City</label>
-			<input value.bind="cityFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'text',  filter: 'cityFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.city', matchProperty:'city', compare:'lookup'} )"   class="form-control" ref="cityFilter"/>
+			<input value.bind="cityFilterValue" input.delegate="dataTable.filterListExV(cityFilterValue, { type: 'text',  filter: 'cityFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.city', matchProperty:'city', compare:'lookup'} )"   class="form-control" ref="cityFilter"/>
 		</div>
 		<div class="col-lg-3 topMargin">
 			<label class="control-label hideOnPhone">Country</label>
-			<input value.bind="countryFilterValue" input.delegate="dataTable.filterListExp($event, { type: 'text',  filter: 'countryFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.country', matchProperty:'country', compare:'lookup'} )"   class="form-control" ref="countryFilter"/>
+			<input value.bind="countryFilterValue" input.delegate="dataTable.filterListExV(countryFilterValue, { type: 'text',  filter: 'countryFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.country', matchProperty:'country', compare:'lookup'} )"   class="form-control" ref="countryFilter"/>
 		</div>
 		<div class="col-lg-3 topMargin">
 			<label>Roles</label><br/>
 			<select value.bind="roleFilterValue" ref="select" class="form-control" 
-				input.delegate="dataTable.filterListExp($event, { type: 'array-or',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array-or'} )">
+				input.delegate="filter($event, { type: 'array',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array'} )">
 				<option repeat.for="option of config.ROLES" value.bind="option.role">${option.label}</option>
 			</select>
 		</div>

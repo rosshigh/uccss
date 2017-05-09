@@ -1,0 +1,14 @@
+<template>
+	<ux-dialog style="max-width: 600px">
+    	<ux-dialog-header>${model.title}</ux-dialog-header>
+
+		<ux-dialog-body>
+			<input class="form-control bottomMargin" value.bind="model.emuxl.emuxlSubject" placeholder="Subject"/>
+			<editor value.bind="model.emuxl.emuxlBody" height="250"></editor>
+		</ux-dialog-body>
+
+		<ux-dialog-footer>
+			<button class="btn btn-primary" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+		</ux-dialog-footer>
+  	</ux-dialog>
+</template>

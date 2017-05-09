@@ -354,7 +354,7 @@ export class EditPeople {
             },
             {"rule":"custom","message":"Enter a valid email address",
                 "valFunction":function(context){
-                    return ( /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(context.people.selectedPerson.email));
+                    return (context.people.selectedPerson.email.indexOf('@') > -1);
                 }
             }]);
         this.validation.addRule(1, "editInstitution", [{ "rule": "required", "message": "Institution is required", "value": "institutionId" }]);
@@ -386,10 +386,11 @@ export class EditPeople {
     }
 
     _cleanUpFilters() {
-        $("#fullName").val("");
-        $("#institutionId-name").val("");
-        $("#roles").val("");
-        $("#personStatus").val("");
+        this.roleFilter = "";
+        this.nameFilterValue = "";
+        this.nickNameFilterValue = "";
+        this.institutionFilterValue = "";
+        this.activeFilterValue = "";
     }
 
     cancelCustomerEmail(){
@@ -455,41 +456,6 @@ export class EditPeople {
                 this.utils.showNotification("The message was sent");
             }
         } 
-    }
-
-    bulkEmail(){
-      this.bulkEmailSelected = true;
-      this.bulkEmailArray = new Array();
-      this.bulkEmailArrayFiltered = new Array();
-      this.people.peopleArray.forEach(item => {
-    this.bulkEmailArray.push(item);
-        this.bulkEmailArrayFiltered.push(item);
-      })
-    }
-
-    async filterEmail(filter){
-        switch(filter){
-            case 'personStatus':
-                await this.filterActive();
-                this.bulkEmailArrayFiltered = new Array();
-                this._clearEmailFilters();
-                this.people.peopleArray.forEach(item => {
-                    this.bulkEmailArrayFiltered.push(item);
-                })
-                break;
-        }
-    }
-
-    _clearEmailFilters(){
-
-    }
-
-    backBuilkEmail(){
-      this.bulkEmailSelected = false;        
-    }
-
-    sendBulkEmail(email){
-        console.log(email);
     }
 
     async toggleStatus(id, personStatus){

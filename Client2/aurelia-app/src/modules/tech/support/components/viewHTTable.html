@@ -102,7 +102,7 @@
               <td  data-title="Created Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               <td  data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
               <td class="dropbtn" style="width:10rem;" data-title="Customer" click.delegate="showProfile(helpTicket, $event)"  >${helpTicket.personId | person:peopleArray:"fullName"}</td>
-              <td  data-title="Insitution">${helpTicket.institutionId | lookupValue:peopleArray.institutionsArray:"_id":"name"}</td>
+              <td  data-title="Insitution">${helpTicket.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
               <td class="dropbtn"  click.delegate="sendAnEmail(helpTicket.personId)" data-title="Email" >${helpTicket.personId | person:peopleArray:"email"}</td>
             </tr>
           </tbody>

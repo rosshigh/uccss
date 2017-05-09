@@ -72,8 +72,9 @@ export class Assignments {
             this.sessions.selectSessionById(this.selectedSession);
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
-                this.filterInAssigned();
-                // this.dataTable.updateArray(this.requests.requestsDetailsArray);
+              
+                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                  this.filterInAssigned();
             } else {
                 this.displayArray = new Array();
             }
@@ -1000,12 +1001,27 @@ export class Assignments {
         this.showAudit = !this.showAudit;
     }
 
+    filterTable(el, options){
+        this.dataTable.filterListExpV(el.target.value, options);
+    }
+
     filterInAssigned() {
         if (!this.isChecked) {
-            this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
-            var filterValues = new Array();
-            filterValues.push({ property: "requestStatus", value: this.config.ASSIGNED_REQUEST_CODE.toString(), type: 'text', compare: 'not' });
-            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+            
+            var options = { type: 'value',  
+                        filter: 'statusFilter', 
+                        lookupArray: this.config.REQUEST_STATUS, 
+                        lookupProperty: 'code', 
+                        collectionProperty: 'requestStatus', 
+                        displayProperty: 'description', 
+                        matchProperty:'code', 
+                        compare:'not-lookup'}
+            this.dataTable.filterListExV(this.config.ASSIGNED_REQUEST_CODE.toString(), options);
+            
+        //     this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
+        //     var filterValues = new Array();
+        //     filterValues.push({ property: "requestStatus", value: this.config.ASSIGNED_REQUEST_CODE.toString(), type: 'text', compare: 'not' });
+        //     if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
         } else {
              this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
             // this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);

@@ -28,29 +28,29 @@
                         <tbody>
                             <tr>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="name" type="text" placeholder="Filter Name" class="form-control">
+                                <input value.bind="nameFilterValue" input.delegate="dataTable.filterListExV(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'fullnameName', matchProperty:'', compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionType" compare="status">
+                                    <select value.bind="institutionTypeFilter" input.delegate="filter($event, { type: 'value',  filter: 'institutionTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionType', displayProperty: 'institutionType', matchProperty:'', compare:'match'} )" class="form-control">
                                         <option value=""></option>
                                         <option repeat.for="institution of is4ua.institutionTypes" value="${institution.code}">${institution.description}</option>
                                     </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="memberType" compare="status">
+                                    <select value.bind="memberTypeFilter" input.delegate="filter($event, { type: 'value',  filter: 'memberTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'memberType', displayProperty: 'memberType', matchProperty:'', compare:'match'} )" class="form-control">
                                         <option value=""></option>
                                         <option repeat.for="institution of is4ua.memberTypes" value="${institution.code}">${institution.description}</option>
                                     </select>
                                 </th>
                                 <th></th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="highestDegree" compare="status">
+                                <select value.bind="highestDegreeFilter" input.delegate="filter($event, { type: 'value',  filter: 'highestDegreeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'highestDegree', displayProperty: 'highestDegree', matchProperty:'', compare:'match'} )" class="form-control">
                                         <option value=""></option>
                                         <option repeat.for="institution of is4ua.highestDegrees" value="${institution.code}">${institution.description}</option>
                                     </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="institutionStatus" compare="status">
+                                    <select value.bind="institutionStatusFilter" input.delegate="filter($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionStatus', displayProperty: 'institutionStatus', matchProperty:'', compare:'match'} )" class="form-control">
                                         <option value=""></option>
                                         <option repeat.for='status of is4ua.institutonStatusArray' value='${status.code}'>${status.description}</option>
                                     </select>
