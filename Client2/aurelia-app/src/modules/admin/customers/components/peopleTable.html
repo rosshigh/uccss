@@ -54,7 +54,7 @@
                             <tr repeat.for="person of dataTable.displayArray">
                                 <td click.trigger="edit($index, $event)" data-title="Name">${person.firstName} ${person.lastName}</td>
                                 <td click.trigger="edit($index, $event)" data-title="Nickname">${person.nickName}</td>
-                                <td click.trigger="edit($index, $event)" data-title="Insitution">${person.institutionId.name}</d> 
+                                <td click.trigger="edit($index, $event)" data-title="Insitution">${person.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</d> 
                                 <!-- | lookupValue:people.institutionsArray:"_id":"name"}</td> -->
                                 <td click.trigger="edit($index, $event)" data-tile="Phone">${person.phone | phoneNumber}</td>
                                 <td class="dropbtn" data-title="Email" click.delegate="sendAnEmail(person._id)">${person.email}</td>

@@ -64,7 +64,6 @@ export class People {
         return this.peopleBulkEmailArray;
     }
 
-
     async getPerson(id) {
         var url = this.PEOPLE_SERVICE + "/" + id;
         try {
@@ -100,7 +99,7 @@ export class People {
     }
 
     async getInstitutionPeople(options, refresh){
-        if (!this.peopleArray || refresh) {
+        if (!this.instutionPeopleArray || refresh) {
             var url = this.PEOPLE_SERVICE;
             url += options ? options : "";
             try {
@@ -360,7 +359,7 @@ export class People {
         }
 
         this.peopleInstArray = this.peopleArray.filter((item) => {
-            return item.institutionId === id;
+            return item.institutionId._id === id;
         });
     }
 

@@ -153,7 +153,7 @@ export class EditSystem {
         }
         var start = parseInt(this.editFirstClient);
         var end = parseInt(this.editLastClient);
-        if(end <= start){
+        if(end < start){
              return this.dialog.showMessage(
                 "The first client number must be less than the last client number.", 
                 "Invalid Client Number", 

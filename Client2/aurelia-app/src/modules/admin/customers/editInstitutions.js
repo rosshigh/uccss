@@ -58,7 +58,7 @@ export class EditPeople {
         this.people.selectInstitution(this.editIndex);
         this.newInstitution = false;
 
-        this.people.getInstitutionPeople(this.people.selectedInstitution._id);
+        this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.people.selectedInstitution._id, true);
 
         $("#editName").focus();
 

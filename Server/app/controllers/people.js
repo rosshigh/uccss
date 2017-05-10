@@ -25,14 +25,13 @@ module.exports = function (app, config) {
   router.get('/api/people', requireAuth,  function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
-    query.populate('institutionId',{ name: 1 })
     query.exec( function(err, object){
         if (err) {
           res.status(500).json(err);
         } else {
           res.status(200).json(object);
         }
-      });
+      }); 
   });
 
   router.get('/api/people/bulkEmail', function(req, res, next){

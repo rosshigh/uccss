@@ -98,6 +98,11 @@ export class Systems{
         return serverResponse;
     }
 
+    async saveProductChanges(obj){
+        let response = await this.data.saveObject(obj, this.SYSTEMS_SERVICE + '/product/', "put");
+        return response;
+    }
+
     isDirty(){
         if(this.selectedSystem){
             if(this.selectedSystem._id){
@@ -122,7 +127,7 @@ export class Systems{
 
         this.selectedSystem.clients = this.selectedSystem.clients || new Array();
         var lastClientIndex = this.selectedSystem.clients.length - 1;
-        if( start > 0 &&  end > 0 && end > start){
+        if( start > 0 &&  end > 0 && end >= start){
             for(var i = start; i <= end; i += this.config.CLIENT_INTERVAL){
                 if(this._findClient(i, 0, lastClientIndex) < 0){
                     this.selectedSystem.clients.push(this.emptyClient(i, status));
