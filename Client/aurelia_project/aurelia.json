@@ -217,6 +217,11 @@
               "themes/material_blue.css"
             ]
           },
+          {
+            "name": "summernote",
+            "path": "../node_modules/summernote/dist/",
+            "main": "summernote"
+          },
          "extend",
          "moment"
         ]

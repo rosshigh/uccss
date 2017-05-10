@@ -71,34 +71,15 @@ module.exports = function (app) {
       var newClients = req.body.clients;
       req.body.clients = new Array();
       var system =  new Model(req.body);
-
-      if(newClients.length > 0){
-        var clients = new Array();
-        var tasks = new Array();
-        newClients.forEach(function(client, index){
-          var obj = new Client(client);
-          system.clients.push(obj._id);
-          clients.push(obj);
-        });
-        
-        clients.forEach(item => {
-          tasks.push(item.save());
-        })
-      }
-
       system.save( function ( err, object ){      
         if (err) {
           console.log(err)
           return next(err);
         } else {
-          Promise.all(tasks)
-            .then(function(results) {
-              res.status(200).json(object);
-            })
+          res.status(200).json(object);
         }
       });
-    }
-    
+    } 
   });
 
   router.put('/api/systems/product', requireAuth, function(req, res, next){

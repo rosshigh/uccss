@@ -62,6 +62,17 @@ export class AppConfig {
                       { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
                       { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" }];
 
+    ASSIGNED_CLIENT_CODE = 4;
+    UNASSIGNED_CLIENT_CODE = 1;
+    SHARED_CLIENT_CODE = 2;
+    REFRESHED_CLIENT_CODE = 3;
+    SANDBOX_CLIENT_CODE = 5;
+    CLIENT_STATUSES = [{ code: 1, description: "Unassigned", OKToDelete: true, lock: false },
+        { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
+        { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
+        { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
+        { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];                      
+
     constructor(http){
         this.http = http;
     }

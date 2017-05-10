@@ -11,14 +11,14 @@
               </td>
             </tr>
             <tr>
-              <th class="col-xs-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestNo'})" class="col-xs-1">No <span><i class="fa fa-sort"></i></span></th>
-              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requiredDate'})" >Due <span></i></span></thpropertyName>
-              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})" >Requested <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-xs-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestNo'})">No </span> <i class="fa fa-sort"></i></th>
+              <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requiredDate'})">Due </span><i class="fa fa-sort"></i></th>
+              <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Created </span><i class="fa fa-sort"></i></th>
               <th class="col-lg-1">Type</th>
-              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestStatus'})" >Status <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestStatus'})">Status </span><i class="fa fa-sort"></i></th>
               <th class="col-sm-1">IDS Requestd</th>
-              <th class="col-lg-2 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'name', searchProperty: 'productId', surrogateArray: products.productsArray, surrogateProperty: '_id', type: 'lookup'})">Product <span><i class="fa fa-sort"></i></span></th>
-              <th class="col-lg-1 sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'fullName', searchProperty: 'requestId.personId', surrogateArray: people.instutionPeopleArray, surrogateProperty: '_id', type: 'lookup'})">Faculty <span><i class="fa fa-sort"></i></span></th>
+              <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'name', searchProperty: 'productId', surrogateArray: products.productsArray, surrogateProperty: '_id', type: 'lookup'})">Product </span> <i class="fa fa-sort"></i></th>
+              <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'fullName', searchProperty: 'requestId.personId', surrogateArray: people.instutionPeopleArray, surrogateProperty: '_id', type: 'lookup'})">Faculty </span><i class="fa fa-sort"></i></th>
             </tr>
           </thead>
           <tbody>

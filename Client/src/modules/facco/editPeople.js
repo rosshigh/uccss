@@ -102,7 +102,7 @@ export class EditPeople {
                "The account has been changed. Do you want to save your changes?",
                "Save Changes",
                ['Yes', 'No']
-               ).then(response => {
+               ).whenClosed(response => {
                    if(!response.wasCancelled){
                        this.save();
                    } else {

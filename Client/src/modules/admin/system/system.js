@@ -34,11 +34,11 @@ export class System{
             title: 'Systems'
         },
         {
-            route: 'editProducts',
+            route: 'editProduct',
             moduleId: './editProduct',
             settings: { auth: true, roles: [] },
             nav: true,
-            name: 'editProducts',
+            name: 'editProduct',
             title: 'Products'
         }
         ]);

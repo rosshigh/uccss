@@ -74,7 +74,7 @@ export class Profile {
 
     async save() {
         if(this.validation.validate(1,this)) {
-            if(this.password.length > 0){
+            if(this.password && this.password.length > 0){
                 this.people.selectedPerson.password = this.password;
             }
             if(this.people.selectedPerson.roles.indexOf("PROV") > -1){

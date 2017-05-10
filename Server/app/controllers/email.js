@@ -314,7 +314,7 @@ if(env === 'development'){
         to: mailObject.email,
         subject: 'UWM UCC Account Created',
         template: 'welcome',
-        context: context
+        context: mailObject.context
       };
 
     nodeMailerSendMail(mail);

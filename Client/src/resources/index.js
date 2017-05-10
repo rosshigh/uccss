@@ -1,9 +1,11 @@
 export function configure(config) {
   config.globalResources([
+    './editor/editor',
     './elements/nav-bar',
     './elements/loading-indicator',
     './elements/table-navigation-bar',
     './elements/flat-picker',
+     './elements/add-systems',
     './value-converters/info-filter',
     './value-converters/session-type',
     './value-converters/date-format',
@@ -15,6 +17,11 @@ export function configure(config) {
      './value-converters/sandbox',
     './value-converters/idsRequested',
     './value-converters/person-status-button',
-    './value-converters/session-status-button'
+    './value-converters/session-status-button',
+    './value-converters/translate-status',
+    './value-converters/to-uppercase',
+    './value-converters/sort-array',
+    './value-converters/system-list',
+     './value-converters/check-box'
   ]);
 }

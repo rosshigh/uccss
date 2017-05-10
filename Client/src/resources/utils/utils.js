@@ -196,4 +196,12 @@ export class Utils{
   isObject(obj) {
      return obj === Object(obj);
   }
+
+  toCamelCase(str) {
+    return str.toLowerCase()
+      .replace( /['"]/g, '' )
+      .replace( /\W+/g, ' ' )
+      .replace( / (.)/g, function($1) { return $1.toUpperCase(); })
+      .replace( / /g, '' );
+  }
 }

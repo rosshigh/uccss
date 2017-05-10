@@ -302,15 +302,15 @@ export class DataTable{
       this.sortDirection = 1;
     }
 
-    $(".sortable").children().html('<i class="fa fa-sort"></i>');
+    $(".sortable").next().replaceWith('<i class="fa fa-sort"></i>');
     if(this.sortDirection < 0){
       var icon = '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i>';  
     } else {
       var icon = '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i>';
     }
-    $(el.target).children().html(icon);
+   
+   $(el.target).next().replaceWith(icon);
     
-
     if(!options.type){
         if(options.propertyName.indexOf('.') > -1){
           var array = options.propertyName.split('.');          

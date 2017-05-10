@@ -2731,7 +2731,7 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
                                     break;
                                 }
 
-                                if (this.password.length > 0) {
+                                if (this.password && this.password.length > 0) {
                                     this.people.selectedPerson.password = this.password;
                                 }
                                 if (this.people.selectedPerson.roles.indexOf("PROV") > -1) {
@@ -27270,7 +27270,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Promise.all([this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.products.getProductsArray('?filter=active|eq|true&order=name'), this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true), this.config.getConfig()]);
+                return Promise.all([this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.products.getProductsArray('?filter=active|eq|true&order=name', true), this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true), this.config.getConfig()]);
 
               case 2:
                 responses = _context.sent;

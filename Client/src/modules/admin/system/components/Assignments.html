@@ -1,0 +1,51 @@
+<template>
+  <div class="col-lg-12">
+      <div class="col-lg-6">
+    
+          <div class="form-group">
+            <label for="editStudentId" class="control-label hideOnPhone">Student ID Prefix</label>
+            <input value.bind="products.selectedProduct.defaultStudentIdPrefix" id="editStudentId" class="form-control " placeholder="Student ID Prefix" type="text" />
+          </div>
+          <div class="form-group">
+            <label for="editFacultyId" class="control-label">Faculty ID Prefix</label>
+            <input value.bind="products.selectedProduct.defaultFacultyIdPrefix" id="editFacultyId" class="form-control " placeholder="Faculty ID Prefix" type="text" />
+          </div>
+          <div class="form-group ">
+            <label for="editIdsAvailable " class="control-label ">Number of IDs</label>
+            <input value.bind="products.selectedProduct.idsAvailable " id="editIdsAvailable " class="form-control" placeholder="Number of IDs " type="text " />
+          </div>
+          <div class="form-group ">
+            <label for="editFirstUsableID " class="control-label ">First usable ID</label>
+            <input value.bind="products.selectedProduct.firstAllowableId " id="editFirstUsableID " class="form-control " placeholder="First Usable ID " type="number " />
+          </div>
+
+        
+      </div>
+           
+      <div class="col-lg-5 col-sm-offset-1">  
+        <div class="form-group">
+            <label for="editStudentPassword" class="control-label">Student Password</label>
+            <input value.bind="products.selectedProduct.defaultStudentPassword" id="editStudentPassword" class="form-control " placeholder="Student Password" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="editFacultyPassword" class="control-label">Faculty Password</label>
+            <input value.bind="products.selectedProduct.defaultFacultyPassword" id="editFacultyPassword" class="form-control " placeholder="Faculty Password" type="text" />
+        </div>
+        <div class="form-group">
+        <label class="control-label hideOnPhone">Clients</label>
+          <div class="checkbox">
+            <label class="pull-left">
+              <input  id="clientRelevant" checked.bind="products.selectedProduct.clientRelevant" type="checkbox"> Required
+            </label>
+          </div>
+        </div>
+        <div class="form-group ">
+            <label for="editLastUsableID " class="control-label ">Last usable ID</label>
+            <input value.bind="products.selectedProduct.lastAllowableId " id="editLastUsableID " class="form-control " placeholder="Last Usable ID " type="number " />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <editor value.bind="products.selectedProduct.productInfo" height="250"></editor>
+    </div>
+</template>
