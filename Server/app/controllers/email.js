@@ -370,14 +370,15 @@ if(env === 'development'){
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
-     
+
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
         from: config.emailAddress,
-        to: mailObject.email,
+        to: toEmail,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
         context: mailObject.context
@@ -394,6 +395,7 @@ if(env === 'development'){
 
   helpTicketUpdated = function(mailObject){
       logger.log("Help Ticket Update email", "verbose");
+      
       var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.HOST = emailConfig.HOST;

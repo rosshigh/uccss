@@ -1,0 +1,35 @@
+<template>
+    <div class="topMargin">
+         <form>
+      <div class="col-md-5 topMargin">
+        <label>Roles</label>
+        <div class="well well2 overFlow" style="height:400px;">
+            <ul class="list-group">
+              <button click.trigger="selectRole($event, role)" type="button" repeat.for="role of filteredArray" id="${role.role}"
+                      class="list-group-item">${role.label}</button>
+            </ul>
+        </div>
+      </div>
+      <div class="col-md-5 topMargin col-md-offset-1">
+        <label>Assigned Roles</label>
+        <div class="well well2 overFlow" style="height:400px;">
+          <ul class="list-group">
+            <button click.trigger="removeRole($index, role)" type="button" repeat.for="role of people.selectedPerson.roles" id="${role}"
+                    class="list-group-item">${role | lookupValue:config.ROLES:'role':'label'}</button>
+          </ul>
+        </div>
+      </div>
+    </form>
+        <!--
+        <div class="col-sm-12 col-lg-12">
+            <label class="control-label col-sm-1">Roles</label>
+        </div>
+        <div class="col-sm-12 col-lg-6 col-sm-offset-3">
+            <label class="checkbox" repeat.for="role of config.ROLES">
+                <input type="checkbox" 
+                    value.one-way="role.role" id="editRoles"
+                    checked.bind="hasRole(role.role)">${role.label}
+            </label>
+        </div>
+    </div>  -->
+</template

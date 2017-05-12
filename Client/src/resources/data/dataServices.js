@@ -219,7 +219,7 @@ export class DataServices {
     FILE_DOWNLOAD_URL = "http://localhost:5000/";
 
     // //Institution Services
-    INSTITUTION_SERVICES = "institutions";
+    // INSTITUTION_SERVICES = "institutions";
 
     // //People Services
     // PEOPLE_SERVICE = "people";
@@ -256,11 +256,11 @@ export class DataServices {
     // HELP_TICKET_TYPES = "helpTicketsTypes";
 
     // //Downloads
-    DOWNLOADS_SERVICE = "apps";
-    APPLICATION_CATEGORY_SERVICE = "appsCategory";
-    DOCUMENTS_SERVICE = "documents";
-    DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
-    DOWNLOADS_UPLOADS = "downloads/upload";
+    // DOWNLOADS_SERVICE = "apps";
+    // APPLICATION_CATEGORY_SERVICE = "appsCategory";
+    // DOCUMENTS_SERVICE = "documents";
+    // DOCUMENTS_CATEGORY_SERVICE = "documentCategory";
+    // DOWNLOADS_UPLOADS = "downloads/upload";
 
     // //Clientrequests Services
     COURSES_SERVICE = 'courses';

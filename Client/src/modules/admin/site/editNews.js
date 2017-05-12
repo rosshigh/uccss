@@ -5,12 +5,10 @@ import {Utils} from '../../../resources/utils/utils';
 import {SiteInfo} from '../../../resources/data/siteInfo';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import $ from 'jquery';
 
 @inject(DataTable, SiteInfo, Utils, CommonDialogs, Validation, AppConfig)
 export class EditNews {
     newsItemSelected = false;
-    navControl = "newsNavButtons"; 
     spinnerHTML = "";
     isInformationItem = false;
     isChecked = true;
@@ -34,6 +32,8 @@ export class EditNews {
         this.validation = validation;
         this.validation.initialize(this);
         this._setupValidation();
+
+		this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
     attached(){
@@ -41,7 +41,7 @@ export class EditNews {
     }
 
     async activate() {
-        await this.siteinfo.getInfoArray(true, '?order=sortOrder');
+        await this.siteinfo.getInfoArray(true, '?order=createdDate');
         await this.config.getConfig();
         this.dataTable.updateArray(this.siteinfo.siteArray);
         this.filterOutExpired();
@@ -62,8 +62,7 @@ export class EditNews {
     }
 
     async edit(index, el) {
-         this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
-        // this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
         this.siteinfo.selectSiteItem(this.editIndex);
         this.originalSiteInfo = this.utils.copyObject(this.siteinfo.selectedItem);
 
@@ -87,7 +86,6 @@ export class EditNews {
 
     async save() {
         if(this.validation.validate(1)){
-
             let serverResponse = await this.siteinfo.saveInfoItem();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.siteinfo.siteArray);
@@ -107,10 +105,9 @@ export class EditNews {
         this.filesToUpload.push(this.files[0]);
         this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL  + this.filesToUpload[0].name;  
         this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
-        console.log(this.filesToUpload)
     }
 
-    removeFile(index){
+	removeFile(index){
         this.filesToUpload.splice(index,1);
     }
 
@@ -119,7 +116,7 @@ export class EditNews {
             "Are you sure you want to delete the item?", 
             "Delete Item", 
             ['Yes', 'No']
-            ).then(response => {
+            ).whenClosed(response => {
                 if(!response.wasCancelled){
                     this.deleteItem();    
                 }
@@ -129,7 +126,7 @@ export class EditNews {
     async deleteItem(){
         let serverResponse = await this.siteinfo.deleteItem();
         if (!serverResponse.error) {
-                 this.dataTable.updateArray(this.siteinfo.siteArray);
+                this.dataTable.updateArray(this.siteinfo.siteArray);
                 this.utils.showNotification("The Item was deleted");
         }
         this.newsItemSelected = false;
@@ -145,7 +142,7 @@ export class EditNews {
                 "The item has been changed. Do you want to save your changes?", 
                 "Save Changes", 
                 ['Yes', 'No']
-                ).then(response => {
+                ).whenClosed(response => {
                     if(!response.wasCancelled){
                         this.save();    
                     } else {
@@ -167,11 +164,12 @@ export class EditNews {
     }
 
     _cleanUpFilters(){
-        $("#title").val("");
-        $("#createdDate").val("");
-        $("#expiredDate").val("");
-        $(this.itemTypes).val("");
-        $("#url").val("");
+		this.urlFilterValue = "";
+		this.itemTypeFilter = "";
+		this.expiredDateFilterValue = "";
+		this.createdDateFilterValue = "";
+		this.titleFilterValue = "";
+		this.urlFilterValue = "";
          this.dataTable.updateArray(this.siteinfo.siteArray);
     }
 
@@ -182,9 +180,7 @@ export class EditNews {
     //TODO: Fix This
     filterOutExpired(){
         if (this.isChecked) {
-            var filterValues = new Array();
-            filterValues.push({ property: "expiredDate", value: new Date(), type: 'date', compare: 'after' });
-            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+			this.dataTable.filterList(new Date(), {type: 'date', filter: "expiredFilter",  collectionProperty: 'expiredDate', compare: 'after'});
         } else {
             this.dataTable.updateArray(this.siteinfo.siteArray);
         }

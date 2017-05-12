@@ -2,7 +2,7 @@ import {inject} from 'aurelia-framework';
 import {DataServices} from './dataServices';
 import {Utils} from '../utils/utils';
 import {AppConfig} from '../../config/appConfig';
-import moment from 'moment';
+import moment from 'moment'; 
 
 @inject(DataServices, Utils, AppConfig)
 export class SiteInfo {

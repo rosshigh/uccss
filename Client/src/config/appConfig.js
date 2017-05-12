@@ -71,7 +71,49 @@ export class AppConfig {
         { code: this.SHARED_CLIENT_CODE, description: "Shared", OKToDelete: false, lock: false },
         { code: this.REFRESHED_CLIENT_CODE, description: "Refresh", OKToDelete: true, lock: true },
         { code: this.ASSIGNED_CLIENT_CODE, description: "Assigned", OKToDelete: false, lock: true },
-        { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];                      
+        { code: this.SANDBOX_CLIENT_CODE, description: "SANDBOX", OKToDelete: false, lock: false }];          
+
+    SITE_INFO_TYPES = [
+        {
+            'type': 'INFO',
+            'description': 'Session Information'
+        },
+        {
+            'type': 'NEWS',
+            'description': 'UCC and UA News'
+        },
+        {
+            'type': 'ILNK',
+            'description': 'Useful Links - Useful Info Page'
+        },
+        {
+            'type': 'OLNK',
+            'description': 'Useful Links - Home Page'
+        },
+        {
+            'type': 'SYST',
+            'description': 'System Status'
+        },
+        {
+            'type': "DLNK",
+            'description': 'Useful Information - Home Page'
+        },
+        {
+            'type': "ALRT",
+            'description': 'Alerts'
+        },
+        {
+            'type': "CARO",
+            'description': 'Carousel'
+        },
+        {
+            'type': "CONT",
+            'description': 'Contact Info'
+        }
+    ];
+
+    //Message types
+    MESSAGE_TYPES = ['CLIENT_REQUESTS', 'HELP_TICKETS'];            
 
     constructor(http){
         this.http = http;

@@ -204,8 +204,8 @@ export class DataTable{
       options.collectionProperty = condition;
     }
 
-    //If the filter value is not set to empty, add it to filterValues
-    if(typeof value == 'object') value = value.target.value;
+    //If the filter value is not set to empty, add it to filterValues 
+    if(typeof value == 'object' && !(value instanceof Date)) value = value.target.value;
     if(value !== ""){
       this.filterValues.push({options: options, value: value});
     }
@@ -243,7 +243,8 @@ export class DataTable{
         if(matchValue != undefined) {
           switch(filterItem.options.type){
             case 'custom':
-              return filterItem.options.filter(filterItem.value, item, that.context);
+              keep = filterItem.options.filter(filterItem.value, item, that.context);
+              break;
             case 'text':
               if(filterItem.options.compare.indexOf('not') > -1){
                 keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;

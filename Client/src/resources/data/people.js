@@ -17,6 +17,7 @@ export class People {
     PASSWORD_RESET = 'passwordReset';
     NOTES_SERVICE = "notes";
     INSTITUTION_SERVICES = "institutions";
+    COURSES_SERVICE = 'courses';
 
     constructor(data, utils) {
         this.data = data;
@@ -65,6 +66,23 @@ export class People {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
                     this.instutionPeopleArray = serverResponse;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    async getPeopleBulkEmailArray(options, refresh) { 
+        if (!this.peopleBulkEmailArray || refresh) {
+            var url = this.PEOPLE_SERVICE + '/bulkEmail';
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.peopleBulkEmailArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
                 }
             } catch (error) {
                 console.log(error);
@@ -198,6 +216,18 @@ export class People {
        }
    }
 
+    async deletePerson(){
+        if(this.selectedPerson._id){
+            let serverResponse = await this.data.deleteObject(this.PEOPLE_SERVICE + '/' + this.selectedPerson._id);
+            if (!serverResponse.error) {
+                this.peopleArray.splice(this.editIndex, 1);
+                this.editIndex = - 1;
+            }
+            return serverResponse;
+        }
+        return null;
+    }
+
    isPersonDirty(originalObj){
        if(this.selectedPerson){
            if(originalObj){
@@ -211,7 +241,25 @@ export class People {
        }
    }
 
-   updatePassword(obj){
+    async sendCustomerMessage(message){
+        if(message.email){
+            var serverResponse = await this.data.saveObject(message, this.SEND_MAIL, "put");
+            return serverResponse;
+        } else {
+            return {error: "no email"};
+        }
+    }
+
+    sendBuikEmail(email){
+        if(email.email){
+            var serverResponse = this.data.saveObject(email, this.PEOPLE_SERVICE + '/sendBulkEmail', "post");
+            return serverResponse;
+        } else {
+            return {error: "no email"};
+        }
+    }
+
+    updatePassword(obj){
         if (this.selectedPerson._id) {
             return this.data.saveObject(obj, this.PEOPLE_SERVICE + '/password/' + this.selectedPerson._id, "put");
         }
@@ -224,18 +272,18 @@ export class People {
 
     //Institutions
     async getInstitutionsArray(options, refresh) {
-       if (!this.institutionsArray || refresh) {
-           var url = this.data.INSTITUTION_SERVICES;
-           url += options ? options : "";
-           let response = await this.data.get(url)
-           if (!response.error) {
-               this.institutionsArray = response;
-           } else {
-               this.institutionsArray = undefined;
-           }
+        if (!this.institutionsArray || refresh) {
+            var url = this.INSTITUTION_SERVICES;
+            url += options ? options : "";
+            let response = await this.data.get(url)
+            if (!response.error) {
+                this.institutionsArray = response;
+            } else {
+                this.institutionsArray = undefined;
+            }
 
-       }
-   }
+        }
+    }
 
     async getInstitution(id){
         var url = this.INSTITUTION_SERVICES + '/' + id;
@@ -244,6 +292,82 @@ export class People {
             return response;
         } else {
             return {institutionStatus: '99'};
+        }
+    }
+
+    selectInstitution(index) {
+        if (index === undefined) {
+            this.selectedInstitution = this.emptyInstitution();
+            this.newInstitution = true;
+        } else {
+            try {
+                this.selectedInstitution = this.utils.copyObject(this.institutionsArray[index]);
+                this.newInstitution = false;
+                this.editInstitutionIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedInstitution = this.emptyInstitution();
+                this.newInstitution = true;
+            }
+
+        }
+    }
+
+    selectInstitutionByID(id){
+        this.institutionsArray.forEach((item, index) => {
+          if(item._id === id){
+            this.selectedInstitution = this.utils.copyObject(item);
+            this.editInstitutionIndex = index;
+            return;
+          }
+        });
+        return null;
+    }
+
+    emptyInstitution() {
+        var newInstitution = new Object();
+        newInstitution.joinDate =  new Date();
+        newInstitution.name = "";
+        return newInstitution;
+    }
+
+    async saveInstitution() {
+        if (!this.selectedInstitution._id) {
+            let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "post")
+                if (!response.error) {
+                    if(this.institutionsArray){
+                        this.institutionsArray.push(response);
+                    }
+                } 
+                return response;
+        } else {
+            let response = await this.data.saveObject(this.selectedInstitution, this.INSTITUTION_SERVICES, "put")
+                if (!response.status) {
+                    if(this.institutionsArray){
+                        this.institutionsArray[this.editInstitutionIndex] = this.utils.copyObject(this.selectedInstitution, this.institutionsArray[this.editInstitutionIndex]);
+                    }
+                }  
+                return response;
+        }
+    }
+
+    async deleteInstitution(){
+         let serverResponse = await this.data.deleteObject(this.INSTITUTION_SERVICES + '/' + this.selectedInstitution._id);
+            if (!serverResponse.error) {
+                this.institutionsArray.splice(this.editInstitutionIndex, 1);
+                this.editInstitutionIndex = - 1;
+            }
+            return serverResponse;
+    }
+
+    isInstitutionDirty(){
+        if(this.selectedInstitution){
+            if(this.selectedInstitution._id){
+                var obj = this.institutionsArray[this.editInstitutionIndex];
+            } else {
+                var obj = this.emptyInstitution();
+            }
+            return this.utils.objectsEqual(this.selectedInstitution, obj);
         }
     }
 
@@ -265,5 +389,78 @@ export class People {
            }
        }
    }
+
+   //courses
+    async getCoursesArray(refresh, options, fields) { 
+        if (!this.coursesArray || refresh) {
+              var url = this.COURSES_SERVICE;
+              url += options ? options : "";
+              try {
+                  let serverResponse = await this.data.get(url);
+                  if (!serverResponse.error) {
+                      this.coursesArray = serverResponse;
+                  } 
+              } catch (error) {
+                  console.log(error);
+              };
+        }
+    }
+
+    selectCourse(index) {
+        if (index === undefined) {
+            this.selectedCourse = this.emptyCourse();
+        } else {
+            try {
+                this.selectedCourse = this.utils.copyObject(this.coursesArray[index]);
+                this.editCourseIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedCourse = this.emptyCourse();
+            }
+
+        }
+    }
+
+    emptyCourse() {
+        var newObj = new Object();;
+        newObj.name = "";
+        newObj.description = "";
+        newObj.number = "";
+        newObj.active = true;
+        return newObj;
+    }
+
+    async saveCourse() {
+        if(!this.selectedCourse){
+            return;
+        }
+
+        if(!this.selectedCourse._id){
+            let serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "post");
+            if (!serverResponse.error) {
+                this.selectedCourse = this.utils.copyObject(serverResponse);
+                if(this.coursesArray) this.coursesArray.push(this.selectedCourse);
+                this.editIneditCourseIndex = this.coursesArray.length - 1;
+            } else {
+                this.data.processError(response, "There was an error creating the product.");
+                }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedCourse, this.COURSES_SERVICE, "put");
+            if (!serverResponse.error) {
+                this.selectedCourse = this.utils.copyObject(serverResponse);
+                this.coursesArray[this.editCourseIndex] = this.utils.copyObject(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
+            } else {
+                this.data.processError(response, "There was an error updating the course.");
+            }
+            return serverResponse;
+        }
+    }
+
+    isCourseDirty(){
+        if(this.editCourseIndex >= 0 && this.selectedCourse){
+            return this.utils.objectsEqual(this.selectedCourse, this.coursesArray[this.editCourseIndex]);
+        }
+    }
 
 }

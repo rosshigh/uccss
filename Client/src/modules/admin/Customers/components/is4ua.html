@@ -1,0 +1,27 @@
+<template>
+    <div class="topMargin">
+        <!-- Row 4 -->
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="editSpecialization" class="col-sm-3 control-label">Specialization</label>
+                    <div class="col-sm-8">
+                        <select value.two-way="people.selectedPerson.personSpecialization" id="editSpecialization" class="form-control " placeholder="Specializatin">
+                            <option value="">Select an option</option>
+                            <option repeat.for="name of is4ua.specialArray" value="${name.code}">${name.description}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="editDepartment" class="col-sm-3 control-label">Department</label>
+                    <div class="col-sm-8">
+                        <select value.two-way="people.selectedPerson.departmentCategory" id="editDepartment" class="form-control " placeholder="Department">
+                            <option value="">Select an option</option>
+                            <option repeat.for="name of is4ua.deptArray" value="${name.code}">${name.description}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+    </div>
+</template>

@@ -404,7 +404,7 @@ export class People {
     }
 
     //courses
-     async getCoursesArray(refresh, options, fields) { 
+    async getCoursesArray(refresh, options, fields) { 
         if (!this.coursesArray || refresh) {
               var url = this.data.COURSES_SERVICE;
               url += options ? options : "";
