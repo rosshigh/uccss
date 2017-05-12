@@ -257,7 +257,8 @@ module.exports = function (app, config) {
             email: req.body.email,
             cc: req.body.cc,
             context: context
-          }                                 
+          }         
+                                 
           helpTicketCreated(mailObj);
           break;
         case 2:

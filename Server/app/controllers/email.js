@@ -1,5 +1,5 @@
-var config = require('../../config/config'),
-    mongoose = require('mongoose'),
+// var config = require('../../config/config'),
+var    mongoose = require('mongoose'),
     Promise = require('bluebird'),
     Person = mongoose.model('Person'),
     Institution = mongoose.model('Institution'),
@@ -19,7 +19,7 @@ module.exports = function (app) {
 var env = process.env.NODE_ENV || 'development';
 
 if(env === 'development'){
-  var sg = require('sendgrid')(config.sg_key);
+  var sg = require('sendgrid')(emailConfig.sg_key);
 
   var viewPath = path.resolve(__dirname, '../views');
   var WelcomeTemplate = fs.readFileSync(viewPath + "/welcome.handlebars", 'utf-8');
@@ -56,7 +56,7 @@ if(env === 'development'){
     mailObject.body = mailObject.body.split('&lt;').join('<').split('&gt;').join('>'); 
     if(mailObject.email){
         var helper = require('sendgrid').mail;
-        var from_email = new helper.Email(config.emailAddress);
+        var from_email = new helper.Email(emailConfig.emailAddress);
         var to_email = new helper.Email(mailObject.email);
         var content = new helper.Content('text/html', mailObject.body);
 
@@ -278,7 +278,7 @@ if(env === 'development'){
         exphbs = require('nodemailer-express-handlebars');
 
   var smtpConfig = {
-    host: config.smtp,
+    host: emailConfig.smtp,
     pool: true
   }   
 
@@ -310,7 +310,7 @@ if(env === 'development'){
     mailObject.context.WELCOME_MESSAGE = emailConfig.WELCOME_MESSAGE;
 
     var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to: mailObject.email,
         subject: 'UWM UCC Account Created',
         template: 'welcome',
@@ -329,7 +329,7 @@ if(env === 'development'){
     mailObject.context.ACTIVATE_MESSAGE = emailConfig.ACTIVATE_MESSAGE;
 
     var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to: mailObject.email,
         subject: 'UCCSS Account Activated',
         template: 'activate-customer',
@@ -348,7 +348,7 @@ if(env === 'development'){
     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
 
     var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to: mailObject.email,
         subject: 'UCCSS account created',
         template: 'new-customer',
@@ -358,7 +358,7 @@ if(env === 'development'){
 
     if(mailObject.cc) {   
       var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to:  mailObject.cc,
         subject: 'UCCSS account created',
         template: 'new-customer',
@@ -377,7 +377,7 @@ if(env === 'development'){
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to: toEmail,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
@@ -403,7 +403,7 @@ if(env === 'development'){
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
-          from: config.emailAddress,
+          from: emailemailConfig.emailAddress,
           to: toEmail,
           subject: 'Help Ticket Updated',
           template: 'help-ticket-updated',
@@ -422,7 +422,7 @@ if(env === 'development'){
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
      var mail = {
-          from: config.emailAddress,
+          from: emailemailConfig.emailAddress,
           to: toEmail,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
@@ -439,7 +439,7 @@ if(env === 'development'){
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
-            from: config.emailAddress,
+            from: emailConfig.emailAddress,
             to: mailObject.email,
             subject: 'Product Request Created',
             template: 'client-request-created',
@@ -454,7 +454,7 @@ if(env === 'development'){
     logger.log("Request Update email", "verbose");
     // return new Promise(function(resolve, reject) {
       var mail = {
-          from: config.emailAddress,
+          from: emailConfig.emailAddress,
           to: mailObject.email,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
@@ -476,7 +476,7 @@ if(env === 'development'){
     logger.log("Customer Action email", "verbose");
     //  return new Promise(function(resolve, reject) {
         var mail = {
-            from: config.emailAddress,
+            from: emailConfig.emailAddress,
             to: mailObject.email,
             subject: 'Customer Action Required',
             template: 'client-request-customer-action',
@@ -498,7 +498,7 @@ if(env === 'development'){
     logger.log("Generic email", "verbose");  
     // return new Promise(function(resolve, reject) {
       var mail = {
-          from: config.emailAddress,
+          from: emailConfig.emailAddress,
           to: mailObject.email,
           subject: mailObject.subject,
           template: 'generic',
@@ -527,7 +527,7 @@ if(env === 'development'){
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
     
       var mail = {
-          from: config.emailAddress,
+          from: emailConfig.emailAddress,
           to: mailObject.email,
           subject: mailObject.subject,
           template: 'password-reset',
@@ -540,7 +540,7 @@ if(env === 'development'){
     mailObject.recipients.forEach(item => {
      
       var mail = {
-        from: config.emailAddress,
+        from: emailConfig.emailAddress,
         to: item.email,
         subject: mailObject.email.subject,
         template: "generic",

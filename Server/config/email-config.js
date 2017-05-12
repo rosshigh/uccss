@@ -2,6 +2,9 @@
 var HOST = "http://129.89.93.81/"
 
 var emailConfig = {
+	smtp: 'smtprelay.uwm.edu',
+    emailAddress: 'ucc@uwm.edu',
+	 sg_key: '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',
 	UCCSS_NAME: "University of Wisconsin-Milwaukee UCCSS",
 	UCC_LOGO: HOST + 'img/uwm_logo.jpg',
 	HOST: "http://129.89.93.81/",
