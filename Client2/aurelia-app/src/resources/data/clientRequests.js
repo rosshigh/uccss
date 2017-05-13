@@ -5,7 +5,10 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(DataServices, Utils, AppConfig)
 export class ClientRequests {
-    editIndex;              //Index of selected product
+   CLIENT_REQUESTS_SERVICES = 'clientRequests';
+    CLIENT_REQUEST_DETAILS='clientRequestsDetails';
+    CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
+    CUSTOMER_ACTION = 'clientRequests/customerAction'; 
 
     constructor(data, utils, config) {
         this.data = data;
@@ -238,7 +241,6 @@ export class ClientRequests {
         if(!this.selectedRequest){
             return;
         }
-        // var url =  this.data.CLIENT_REQUESTS_SERVICES;
         var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
        
 
@@ -330,6 +332,28 @@ export class ClientRequests {
             that.analyticsResultArray[that.analyticsResultArray.length-1][item.requestStatus] += 1;
         })
         
+    }
+
+    async saveRequestDetail(){
+        if(!this.selectedRequestDetail){
+            return;
+        }
+        let response = await this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
+        if(!response.error){
+            this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
+            return response;
+        }
+    }
+
+    isRequestDetailDirty(obj){
+      if(this.selectedRequestDetail){
+          if(!obj){
+              var obj = this.emptyRequestDetail();
+          }
+            var skip = ['audit'];
+            return this.utils.objectsEqual(this.selectedRequestDetail, obj, skip);
+        }
+        return new Array();
     }
 
     groupRequestsByProduct(){

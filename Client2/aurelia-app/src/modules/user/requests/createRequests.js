@@ -56,17 +56,9 @@ export class ViewHelpTickets {
     this.dialog = dialog;
     this.ea = ea;
 
-    this.subscription = this.ea.subscribe('date-change', response => {
-        console.log(response);
-        console.log("IN HERE")
-        // This should yield: Object {testValue: "What just happened?"}
-    });
+     this.userObj = JSON.parse(sessionStorage.getItem('user'));;
 
   };
-
-  canActivate(){
-    this.userObj = JSON.parse(sessionStorage.getItem('user'));
-  }
 
   async activate() {
     let responses =  await Promise.all([

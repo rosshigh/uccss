@@ -381,6 +381,17 @@ module.exports = function (app) {
       })
   });
 
+  router.put('/api/clientRequestsDetails', function(req, res, next){
+    logger.log('Update request detail', 'verbose');   
+    Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
+      if(err) return next(err);
+        ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){
+          if(err) return next(err);
+        });
+        res.status(200).json({message: "request updated"});
+    }); 
+  });
+
   router.delete('/api/clientRequestsDetails/:id/:requestid', requireAuth, function(req, res, next){
     logger.log('Delete clientRequestsDetails ', req.params.id);
 

@@ -1,5 +1,6 @@
 import {inject, bindable, bindingMode} from 'aurelia-framework';
 import Flatpickr from 'flatpickr';
+import moment from 'moment';
 
 
 @inject(Element)
@@ -108,31 +109,38 @@ export class FlatPickerCustomElement {
     }
 
     _datesAreSynced(model, view) {
-        model = model || [];
+        // model = model || [];
 
-        let modelDates = Array.isArray(model) ? model : [model];
+        // let modelDates = Array.isArray(model) ? model : [model];
 
-        for(let d = 0; d < modelDates.length; d++) {
-            let modelDate = modelDates[d];
+        // for(let d = 0; d < modelDates.length; d++) {
+        //     let modelDate = modelDates[d];
 
-            if (view.findIndex(v => v.valueOf() === modelDate.valueOf()) > -1) {
-                continue;
+        if(moment(model).isSame(view[0], 'year')
+            && moment(model).isSame(view[0], 'month')
+            && moment(model).isSame(view[0], 'day') ) {
+                return true;
             }
+        return false;
 
-            return false;
-        }
+        //     if (view.findIndex(v => v.valueOf() === modelDate.valueOf()) > -1) {
+        //         continue;
+        //     }
 
-        for(let d = 0; d < view.length; d++) {
-            let viewDate = view[d];
+        //     return false;
+        // }
 
-            if (modelDates.findIndex(m => m.valueOf() === viewDate.valueOf()) > -1) {
-                continue;
-            }
+        // for(let d = 0; d < view.length; d++) {
+        //     let viewDate = view[d];
 
-            return false;
-        }
+        //     if (modelDates.findIndex(m => m.valueOf() === viewDate.valueOf()) > -1) {
+        //         continue;
+        //     }
 
-        return true;
+        //     return false;
+        // }
+
+        // return true;
     }
 
     _cloneDate(d) {

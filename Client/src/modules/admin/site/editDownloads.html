@@ -1,0 +1,13 @@
+<template>
+    <div class="panel panel-info">
+      <div class="panel-body">
+        <div class="row">
+            <div show.bind="!downloadSelected" class="col-lg-12">
+                <compose view="./components/downloadTable.html"></compose>
+            </div> <!-- Table Div -->
+            <div show.bind="downloadSelected" class="col-lg-12">
+                <compose view="./components/downloadForm.html"></compose>
+            </div> <!-- Form Div -->
+        </div> <!-- Row -->
+      </div> <!-- Panel Body -->
+</template>

@@ -10,11 +10,14 @@
     <div class="panel panel-default rightMargin leftMargin">
       <div class="panel-body">
         <div class="row">
-            <div show.bind="!requestSelected">
+            <div show.bind="requestSelected == 'table'">
                 <compose view="./components/viewRequestsTable.html"></compose>
             </div> 
-            <div show.bind="requestSelected" >
+            <div show.bind="requestSelected == 'form'" >
                 <compose view="./components/viewRequestsForm.html"></compose>
+            </div>
+            <div show.bind="requestSelected == 'edit'" >
+                <compose view="./components/editRequestsForm.html"></compose>
             </div>
         </div> 
       </div> 

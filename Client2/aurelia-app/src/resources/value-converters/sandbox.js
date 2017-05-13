@@ -1,8 +1,8 @@
 export class SandboxValueConverter {
-  toView(value, sandbox) {
+  toView(value, sandbox, name) {
     if(value && sandbox){
       if(value === sandbox){
-        return "Sandbox";
+        return name;
       } else {
         return 'Regular';
       }

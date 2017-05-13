@@ -130,7 +130,7 @@ export class EditPeople {
                 eventDate: new Date(),
                 oldValue: item.oldValue,
                 newValue: item.newValue,
-                personId: JSON.parse(sessionStorage.getItem('user'))._id
+                personId: this.userObj._id
             })
         });
     }

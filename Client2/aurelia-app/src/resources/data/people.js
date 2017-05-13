@@ -179,7 +179,7 @@ export class People {
         return obj;
     }
 
-	 async checkEmail() {
+	async checkEmail() {
         if (this.selectedPerson.email) {
             let serverResponse = await this.data.get(this.CHECK_EMAIL + '?email=' +  this.selectedPerson.email);
             if (serverResponse.code === 409) {
@@ -346,8 +346,6 @@ export class People {
     emptyInstitution() {
         var newInstitution = new Object();
         newInstitution.joinDate =  new Date();
-        // moment(this.utils.convertUTCDateToLocalDate(new Date().toString(0,10))).format("YYYY-MM-DD");
-
         newInstitution.name = "";
         return newInstitution;
     }

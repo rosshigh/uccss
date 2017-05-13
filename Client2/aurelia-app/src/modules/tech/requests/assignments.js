@@ -11,11 +11,11 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 
-import $ from 'jquery';
+import moment from 'moment';
 
 @inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
 export class Assignments {
-    requestSelected = false;
+    requestSelected = 'table';
     showAddStudentTemplate = false;
     manualMode = false;
     roundTo10 = false;
@@ -23,8 +23,13 @@ export class Assignments {
     lastIDidsRemaining = -1;
     isChecked = false;
 
-    navControl = "requestsNavButtons";
     spinnerHTML = "";
+
+    minStartDate = "1/1/1900";
+    maxStartDate = "1/1/9999";
+    editStartDate = "";
+    startDate = "";
+    dateConfig = {};
 
     constructor(router, config, validation, people, dialog, datatable, utils, sessions, products, systems, requests) {
         this.router = router;
@@ -53,7 +58,7 @@ export class Assignments {
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
-            this.people.getPeopleArray('?order=lastName'),
+            this.people.getPeopleArray('?filter=personStatus|eq|01&order=lastName'),
             this.people.getInstitutionsArray( '?order=name'),
             this.products.getProductsArray('?filter=active|eq|true&order=Category'),
             this.systems.getSystemsArray(),
@@ -70,6 +75,7 @@ export class Assignments {
     async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
+             this.setDates(false);
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
               
@@ -88,7 +94,6 @@ export class Assignments {
         await this.getRequests();
         this.spinnerHTML = "";
     }
-
 
     clearFilters(){
         $(this.courseFilter).val("");
@@ -114,7 +119,7 @@ export class Assignments {
         
         //Initiate interface flags
         this.enableButton = false;
-        this.requestSelected = true;
+        this.requestSelected = 'form';
 
         //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
@@ -368,31 +373,6 @@ export class Assignments {
         }
         
         this.calcFacIDRangeFromTemplate();
-
-        //If there is no template configured for faculty ids or if this is a sandbox request set the faculty ids to empty string
-        // if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
-        //     || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
-        //     || this.facultyIDTemplates.length == 0) {
-        //     this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-        // } else {
-        //     var selectedFacultyIDTemplates = new Array();
-        //     if (this.selectedStudentIDTemplate.length == 0){
-        //       selectedFacultyIDTemplates.push(this.studentIDTemplates[0]);  
-        //     } else {
-        //        for(var k = 0; k < this.selectedStudentIDTemplate.length; k++){
-        //            selectedFacultyIDTemplates.push(this.facultyIDTemplates[parseInt(this.selectedStudentIDTemplate[k])]); 
-        //        } 
-        //     }
-            
-        //     this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = "";
-        //     for (i = 0; i < selectedFacultyIDTemplates.length; i++) {
-        //         var firstFacID = this.getID(selectedFacultyIDTemplates[i],  this.assignmentDetails[this.assignmentDetailIndex].firstFacID);
-        //         var lastFacID = this.getID(selectedFacultyIDTemplates[i],  this.assignmentDetails[this.assignmentDetailIndex].lastFacID);
-        //         this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds += firstFacID + " to " + lastFacID + ":";
-        //     }
-        //     //Strip off the last colon
-        //      this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.substring(0,this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds.length-1);
-        // }
 
     }
     
@@ -664,13 +644,15 @@ export class Assignments {
         });
     }
 
-     async deleteRequest() {
+    async deleteRequest() {
         let serverResponse = await this.requests.deleteRequest();
         if (!serverResponse.error) {
             this.filterInAssigned()
             this.utils.showNotification("The request was deleted");
+            this.dataTable.updateArray(this.requests.requestsDetailsArray);
+            this.filterInAssigned();
         }
-       this.requestSelected = false;
+       this.requestSelected = 'table';
     }
 
     /*****************************************************************************************************
@@ -706,17 +688,19 @@ export class Assignments {
                         if(this.assignmentDetails[i].assignedDate){
                             //If there are more than one assignment, make the client shared
                             //Search for the assignment in the client and update it
-                            for(var k = 0; k<this.proposedClient[j].assignments.length; k++){
-                                if(this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id){
-                                    var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                    this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
-                                    this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
-                                    this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
-                                    this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
-                                    this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                    // this.proposedClient[j].assignments[k].firstFacID = this.assignmentDetails[i].firstFacID;
-                                    // this.proposedClient[j].assignments[k].lastFacID = this.assignmentDetails[i].lastFacID;
-                                    this.systems.updateClient(this.proposedClient[j]);
+                            if(this.proposedClient[j].assignments){
+                                for(var k = 0; k<this.proposedClient[j].assignments.length; k++){
+                                    if(this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id){
+                                        var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
+                                        this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
+                                        this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
+                                        this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
+                                        this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
+                                        this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                        // this.proposedClient[j].assignments[k].firstFacID = this.assignmentDetails[i].firstFacID;
+                                        // this.proposedClient[j].assignments[k].lastFacID = this.assignmentDetails[i].lastFacID;
+                                        this.systems.updateClient(this.proposedClient[j]);
+                                    }
                                 }
                             }
                         } else {
@@ -789,6 +773,97 @@ export class Assignments {
         return true;
     }
     
+    async saveEdit(){
+        var email = false;
+        this.buildAuditDetail();
+        // this.requests.setSelectedRequest(this.requestToSave);
+        // let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
+        let serverResponse = await this.requests.saveRequestDetail(email);
+        if (!serverResponse.error) {
+            this.utils.showNotification("The request was updated");
+            this.dataTable.updateArray(this.requests.requestsDetailsArray);
+            this.filterInAssigned();
+            this._cleanUp();
+        }
+
+    }
+
+    buildAuditDetail(){
+        var obj = this.requests.selectedRequestDetail;
+        if(obj.productId != this.originalRequestDetail.productId){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: "productId",
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.productId,
+                newValue: obj.productId,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requestStatus != this.originalRequestDetail.requestStatus){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: 'requestStatus',
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requestStatus,
+                newValue: obj.requestStatus,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requestId.undergradIds != this.originalRequestDetail.requestId.undergradIds){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: "undergradIds",
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requestId.undergradIds,
+                newValue: obj.requestId.undergradIds,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requestId.graduateIds != this.originalRequestDetail.requestId.graduateIds){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: "graduateIds",
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requestId.graduateIds,
+                newValue: obj.requestId.graduateIds,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requestId.startDate != this.originalRequestDetail.requestId.startDate){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: 'startDate',
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetailrequestId.startDate,
+                newValue: obj.requestId.startDate,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requestId.endDate != this.originalRequestDetail.requestId.endDate){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: 'endDate',
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requestId.endDate,
+                newValue: obj.requestId.endDate,
+                personId: this.userObj._id
+            })
+        }
+        if(obj.requiredDate != this.originalRequestDetail.requiredDate){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: "requiredDate",
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requiredDate,
+                newValue: obj.requiredDate,
+                personId: this.userObj._id
+            })
+        }
+         if(obj.requestId.courseId != this.originalRequestDetail.requestId.courseId){
+            this.requests.selectedRequestDetail.requestId.audit.push({
+                property: 'courseId',
+                eventDate: new Date(),
+                oldValue: this.originalRequestDetail.requestId.courseId,
+                newValue: obj.requestId.courseId,
+                personId: this.userObj._id
+            })
+        }
+    }
+
     /*****************************************************************************************************
      * Check to see if an id range overlaps other assignments in the same client
      ****************************************************************************************************/
@@ -807,8 +882,7 @@ export class Assignments {
             }
         }
         return valid;
-    }
-    
+    }   
 
     back() {
         this._cleanUp();
@@ -823,11 +897,10 @@ export class Assignments {
         this.selectedAssignedClient = "";
         this.firstID = 0;
         this.lastID = 0;
-        this.requestSelected = false;
+        this.requestSelected = 'table';
         this.customerMessage = false;
     }
 
-    
     findAssignedClients(){
         this.assignmentDetails.forEach(item => {
             this.systems.selectClientFromID(item.systemId, item.client);
@@ -990,8 +1063,10 @@ export class Assignments {
         this.validation.addRule(1,"errorRange",[{"rule":"custom","message":"Invalid ID range",
             "valFunction":function(context){
                 var valid = true;
-                for(var i = 0; i < context.assignmentDetails.length; i++){
-                    if(context.assignmentDetails[i].notValid == 'danger') valid = false;
+                if(context.assignmentDetails){
+                    for(var i = 0; i < context.assignmentDetails.length; i++){
+                        if(context.assignmentDetails[i].notValid == 'danger') valid = false;
+                    }
                 }
                 return valid;
             }}]);
@@ -1001,9 +1076,6 @@ export class Assignments {
         this.showAudit = !this.showAudit;
     }
 
-    filterTable(el, options){
-        this.dataTable.filterListExpV(el.target.value, options);
-    }
 
     filterInAssigned() {
         if (!this.isChecked) {
@@ -1017,15 +1089,52 @@ export class Assignments {
                         matchProperty:'code', 
                         compare:'not-lookup'}
             this.dataTable.filterListExV(this.config.ASSIGNED_REQUEST_CODE.toString(), options);
-            
-        //     this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
-        //     var filterValues = new Array();
-        //     filterValues.push({ property: "requestStatus", value: this.config.ASSIGNED_REQUEST_CODE.toString(), type: 'text', compare: 'not' });
-        //     if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
         } else {
              this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
-            // this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         }
     }
+
+    editRequest(index){
+       
+        this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.requests.selectRequestDetail(this.editIndex);
+        this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+        this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+        this.editStartDate = this.requests.selectedRequestDetail.requestId.startDate;
+        this.originalRequestDetail = this.utils.copyObject(this.requests.selectedRequestDetail);
+        this.personCourses = this.people.coursesArray.filter(item => {
+            return item.personId == this.requests.selectedRequestDetail.requestId.personId;
+        })
+
+        this.requestSelected = 'edit';
+    }
+
+    backEdit(){
+        this.requestSelected = 'table';
+    }
+
+    setDates(session){ 
+        if(session){
+            $("#input-startDate").val("")
+            $("#input-endDate").val("")
+        }  
+        this.minStartDate = this.sessions.selectedSession.startDate;
+        this.maxStartDate = this.sessions.selectedSession.endDate;
+        this.minEndDate = this.sessions.selectedSession.startDate;
+        this.maxEndDate = this.sessions.selectedSession.endDate;
+
+        var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY,'days');
+        this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
+        this.minRequiredDate = moment(this.minRequiredDate._d).format('YYYY-MM-DD');
+        this.maxRequiredDate = this.sessions.selectedSession.endDate;
+    }
+
+     changeBeginDate(evt){
+        if(evt.detail && evt.detail.value.date !== ""){
+        this.minEndDate = moment(evt.detail.value.date).format("MM/DD/YYYY");
+        this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+    }
+    
+  }
 
 }
