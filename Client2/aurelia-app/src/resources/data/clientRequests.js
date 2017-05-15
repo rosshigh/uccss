@@ -5,10 +5,12 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(DataServices, Utils, AppConfig)
 export class ClientRequests {
-   CLIENT_REQUESTS_SERVICES = 'clientRequests';
+    CLIENT_REQUESTS_SERVICES = 'clientRequests';
     CLIENT_REQUEST_DETAILS='clientRequestsDetails';
     CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
     CUSTOMER_ACTION = 'clientRequests/customerAction'; 
+    CLIENT_REQIEST_EMAIL = "clientRequests/sendMail";
+
 
     constructor(data, utils, config) {
         this.data = data;
@@ -241,12 +243,17 @@ export class ClientRequests {
         if(!this.selectedRequest){
             return;
         }
-        var url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
+        var url =  this.data.CLIENT_REQUESTS_SERVICES;
        
 
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
             if(!serverResponse.error){
+                if(email.email){
+                    email.clientRequestNo = serverResponse.clientRequestNo;
+                    email.reason = 1;
+                    this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                }
                 if(this.requestsArray){
                     this.requestsArray.push(this.selectedRequest);
                 }
@@ -255,9 +262,14 @@ export class ClientRequests {
         } else {
             var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
             if(!serverResponse.error){
-                 if(this.requestsArray && this.editRequestIndex){
+                 if(email.email){
+                    email.requestNo = this.selectedRequest.requestNo;
+                     email.reason = 2;
+                    this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                }
+                if(this.requestsArray && this.editRequestIndex){
                     this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
-                 }
+                }
             }
             return serverResponse;
         }

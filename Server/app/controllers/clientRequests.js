@@ -101,20 +101,14 @@ module.exports = function (app) {
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('Create clientRequest','verbose');  
     var clientRequest = new Model(req.body);
-    var tasks = new Array();
-    var products = new Array();    
+    var tasks = new Array();   
 
     clientRequest.requestDetails = new Array();
     req.body.requestDetails.forEach(function(detail, index){
       var obj = new ClientRequestDetail(detail);
       obj.requestId = clientRequest._id;
       clientRequest.requestDetails.push(obj._id);
-      tasks.push(ClientRequestDetail.create(obj));
-      var date = new Date(detail.requiredDate);
-      var day = date.getDate();
-      var month = date.getMonth();
-      var year = date.getFullYear();
-      products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: detail.productName})    
+      tasks.push(ClientRequestDetail.create(obj)); 
     });
 
     Promise.all(tasks)
@@ -122,37 +116,64 @@ module.exports = function (app) {
         clientRequest.save(function (err, result) {        
           if (err) {
             return next(err);
-          } else {          
-            if(req.query.email == 1){            
-              Person.findById(clientRequest.personId, function(err, person){
-                if(err){
-                  return next(err);
-                } else {   
-                  if(person){                                          
-                    var context = {
-                      products: products,
-                      numStudents: parseInt(clientRequest.undergradIds) + parseInt(clientRequest.graduateIds),
-                      requestNo: clientRequest.clientRequestNo,
-                      comments: clientRequest.comments
-                    }                  
-                    var cc = req.query.cc ? req.query.cc : ""; 
-                    var mailObj = {
-                      email: person.email,
-                      cc: cc,
-                      context: context
-                    }                   
-                    requestCreated(mailObj) 
-                  }                       
-                  res.status(200).json({message: "request created"});
-                }
-              })
-            } else {
-              res.status(200).json({message: "request created"});
-            }
+          } else {                                
+            res.status(200).json({message: "request created"});
           }
         }) 
       })
   });
+
+  router.post('/api/clientRequests/sendMail', requireAuth, function(req, res, next){
+    writeLog.log("Send email to " + req.body.email, 'verbose');
+
+    if(req.body){
+       switch(req.body.reason){
+         case 1: //request created
+           var context = {
+                      products: req.body.products,
+                      numStudents: req.body.numStudents,
+                      requestNo: req.body.clientRequestNo,
+                      comments: req.body.comments
+                    }   
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context 
+          }                                     
+          requestCreated(mailObj);
+          break;
+        case 2:
+          var context = {
+                      products: req.body.products,
+                      numStudents: req.body.numStudents,
+                      requestNo: req.body.clientRequestNo,
+                      name: req.body.name,
+                      comments: req.body.comments
+                    }   
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context 
+          }                                     
+          requestUpdated(mailObj);
+          break;
+        case 3:
+           var context = {
+                      products: req.body.products,
+                      requestNo: req.body.clientRequestNo,
+                      name: req.body.name,
+                    }   
+          var mailObj = {
+            email: req.body.email,
+            cc: req.body.cc,
+            context: context 
+          }                                     
+          requestDeleted(mailObj);
+          break;
+       }
+    }
+    res.status(201).json({message: "Email sent"});
+  })
 
   router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
     logger.log('Assign clientRequest ' + req.body._id);          
@@ -221,7 +242,8 @@ module.exports = function (app) {
             let obj = new ClientRequestDetail(detail);
             clientRequest.requestDetails.push(obj._id);               
             obj.requestId = clientRequest._id;
-            tasks.push(ClientRequestDetail.create(obj));           
+            tasks.push(ClientRequestDetail.create(obj));  
+
          }
        });
     }        
@@ -548,39 +570,11 @@ module.exports = function (app) {
 };
 
   function updateRequest(clientRequest, req, res, next){
-
-
       Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
         if(error){
           return next(error);
         } else { 
-          if(req.query.email == 1 && request._id){
-            var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
-              .then(requestResult => {  
-                Person.findById(requestResult.personId, function(error, person){
-                  if(error){
-                    return next(error);
-                  } else {
-                      var mailObj = {
-                      email: person.email,
-                      context: request
-                    }                    
-                    requestUpdated(mailObj)
-                      // .then(result => {                      
-                          res.status(200).json(requestResult);                                
-                      // })
-                      // .catch(error => {
-                      //     return next(error); 
-                      // });
-                  }           
-                })
-              })
-              .catch(error => { //Promise
-                return next(error);
-              }) 
-          } else {
-            res.status(200).json(request);
-          }
+          res.status(200).json(request);
         }
     })
   }
@@ -590,28 +584,7 @@ module.exports = function (app) {
         if(error){
           return next(error);
         } else { 
-          if(req.query.email == 1 && request._id){
-            var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
-              .then(requestResult => {  
-                Person.findById(requestResult.personId, function(error, person){
-                  if(error){
-                    return next(error);
-                  } else {
-                      var mailObj = {
-                      email: person.email,
-                      context: request
-                    }                    
-                    requestUpdated(mailObj)                    
-                      res.status(200).json(requestResult);                                
-                  }           
-                })
-              })
-              .catch(error => { //Promise
-                return next(error);
-              }) 
-          } else {
             res.status(200).json(request);
-          }
         }
     })
   }

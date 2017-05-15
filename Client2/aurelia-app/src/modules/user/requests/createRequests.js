@@ -103,7 +103,7 @@ export class ViewHelpTickets {
             this.ILockedIt = true;
             this.existingRequest = true;
             if(this.requests.requestsArray && this.requests.requestsArray.length > 0){
-              let dateFoo = moment(new Date(this.requests.selectedRequest.requestDetails[0].dateCreated)).format(this.config.DATE_FORMAT_TABLE);
+              let dateFoo = moment(new Date(this.requests.selectedRequest.requestDetails[0].createdDate)).format(this.config.DATE_FORMAT_TABLE);
               let existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
               $("#existingRequestInfo").html('').append(existingMsg).fadeIn();
             } else {
@@ -281,12 +281,12 @@ export class ViewHelpTickets {
             this.requests.selectedRequest.requestDetails.push(newObj);
             this.products.selectedProductFromId(newObj.productId);
             this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
-            var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
-            if(productInfo) this.productInfo.push({
-              info: productInfo,
-              productId: newObj.productId,
-              header: this.products.selectedProduct.name
-            });
+            // var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
+            // if(productInfo) this.productInfo.push({
+            //   info: productInfo,
+            //   productId: newObj.productId,
+            //   header: this.products.selectedProduct.name
+            // });
           }
       }
     
@@ -439,14 +439,11 @@ export class ViewHelpTickets {
     this.requests.selectedRequest.requestStatus = this.config.UPDATED_REQUEST_CODE;
   }
 
-  // getProductName(id){
-  //   for(let i = 0; i < this)
-  // }
-
   async save(){
     if(this.validation.validate(1)){
       this._buildRequest();
-      let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
+      let email = this._buildEmailObject();
+      let serverResponse = await this.requests.saveRequest(email);
       if (!serverResponse.status) {
           this.utils.showNotification("The product request was updated");
           this.systemSelected = false;
@@ -455,6 +452,34 @@ export class ViewHelpTickets {
 
     this._cleanUp();
   }
+
+  _buildEmailObject(){
+		var mailObject = new Object();
+    if(this.config.SEND_EMAILS) {
+      mailObject.products = new Array();
+      this.requests.selectedRequest.requestDetails.forEach((detail, index) => {
+        this.products.selectedProductFromId(detail.productId);
+        var date = new Date(detail.requiredDate);
+        var day = date.getDate();
+        var month = date.getMonth();
+        var year = date.getFullYear();
+        mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
+      });
+
+      mailObject.comments = this.requests.selectedRequest.comments;
+      mailObject.name = this.userObj.fullName;
+      mailObject.numStudents =  parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+      mailObject.email = this.userObj.email
+      mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
+    	// mailObject.message = "The status was changed to " + description;
+    }
+		
+		return mailObject;
+	}
+
+  // buildEmailContext(){
+  //   products = 
+  // }
 
   _cleanUp(){
     this.requests.selectRequest();
@@ -466,6 +491,7 @@ export class ViewHelpTickets {
     this.courseId = "-1";
     this.sessionId = -1;
     this.requestType = -1;
+    $("#existingRequestInfo").hide();
     $('.wizard').wizard('selectedItem', {
       step: 1
     })

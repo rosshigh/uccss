@@ -10,9 +10,9 @@
         <div class="well well2 overFlow" style="height:400px;">
           <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products"/>
           <ul class="list-group">
-            <a click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray" id="${product._id}"
+            <a  click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray" id="${product._id}"
                     mouseover.delegate="showCurriculum(product, $event)" mouseout.delegate="hideCurriculum()"
-                    class="list-group-item">${product.name}</a>
+                    class="list-group-item dropbtn">${product.name}</a>
           </ul>
         </div>
       </div>
@@ -20,8 +20,8 @@
         <label id="requestProductsLabel">Requested Products</label>
         <div class="well well2 overflow" style="height:400px;">
           <ul class="list-group">
-            <a  show.bind="!product.delete" click.trigger="removeProduct($event)" type="button" repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
-                    class="list-group-item">${product.productId | productName:products.productsArray}</a>
+            <a show.bind="!product.delete" click.trigger="removeProduct($event)" type="button" repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
+                    class="list-group-item dropbtn">${product.productId | productName:products.productsArray}</a>
           </ul>
         </div>
       </div>

@@ -533,7 +533,7 @@ define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'],
             var appRouterConfig = function appRouterConfig(config) {
                 config.addPipelineStep('authorize', AuthorizeStep);
                 config.title = 'UCCSS';
-                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'contact', moduleId: './modules/home/contact', name: 'Contact', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'inventory', moduleId: './modules/admin/inventory/editInventory', name: 'inventory', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'notes', moduleId: './modules/admin/notes/notes', name: 'notes', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/assignments', name: 'techRq', settings: { auth: true, roles: [] } }, { route: 'social', moduleId: './modules/social/social', name: 'social', settings: { auth: true, roles: [] } }, { route: 'htNote/:id', moduleId: './modules/tech/support/support', name: 'htNote', settings: { auth: true, roles: [] } }]);
+                config.map([{ route: ['', 'home'], moduleId: './modules/home/home', name: 'Home', settings: { auth: false, roles: [] } }, { route: 'contact', moduleId: './modules/home/contact', name: 'Contact', settings: { auth: false, roles: [] } }, { route: 'register', moduleId: './modules/home/register', name: 'Register', settings: { auth: false, roles: [] } }, { route: 'user', moduleId: './modules/user/user', name: 'User', settings: { auth: true, roles: [] } }, { route: 'profile', moduleId: './modules/user/profile', name: 'Profile', settings: { auth: true, roles: [] } }, { route: 'resetPassword/:id', moduleId: './modules/user/resetPassword', name: 'ResetPassword', settings: { auth: false, roles: [] } }, { route: 'system', moduleId: './modules/admin/system/system', name: 'system', settings: { auth: true, roles: [] } }, { route: 'customers', moduleId: './modules/admin/customers/customers', name: 'customers', settings: { auth: true, roles: [] } }, { route: 'inventory', moduleId: './modules/admin/inventory/editInventory', name: 'inventory', settings: { auth: true, roles: [] } }, { route: 'site', moduleId: './modules/admin/site/site', name: 'site', settings: { auth: true, roles: [] } }, { route: 'documents', moduleId: './modules/admin/documents/documents', name: 'documents', settings: { auth: true, roles: [] } }, { route: 'notes', moduleId: './modules/admin/notes/notes', name: 'notes', settings: { auth: true, roles: [] } }, { route: 'logout', moduleId: './modules/home/logout', name: 'logout', settings: { auth: true, roles: [] } }, { route: 'facco', moduleId: './modules/facco/facco', name: 'facco', settings: { auth: true, roles: [] } }, { route: 'support', moduleId: './modules/user/support/support', name: 'support', settings: { auth: true, roles: [] } }, { route: 'analytics', moduleId: './modules/analytics/analytics', name: 'analytics', settings: { auth: true, roles: [] } }, { route: 'clientRequests', moduleId: './modules/user/requests/clientRequests', name: 'clientRequests', settings: { auth: true, roles: [] } }, { route: 'techHt', moduleId: './modules/tech/support/support', name: 'techHt', settings: { auth: true, roles: [] } }, { route: 'techRq', moduleId: './modules/tech/requests/techRequests', name: 'techRq', settings: { auth: true, roles: [] } }, { route: 'social', moduleId: './modules/social/social', name: 'social', settings: { auth: true, roles: [] } }, { route: 'htNote/:id', moduleId: './modules/tech/support/support', name: 'htNote', settings: { auth: true, roles: [] } }]);
 
                 config.mapUnknownRoutes('home');
             };
@@ -867,476 +867,6 @@ define('modules/analytics/helpTickets',["exports"], function (exports) {
     var HelpTicketAnalytics = exports.HelpTicketAnalytics = function HelpTicketAnalytics() {
         _classCallCheck(this, HelpTicketAnalytics);
     };
-});
-define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditPeople = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
-            _classCallCheck(this, EditPeople);
-
-            this.personSelected = false;
-            this.navControl = "peopleNavButtons";
-            this.spinnerHTML = "";
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.utils = utils;
-            this.people = people;
-            this.is4ua = is4ua;
-            this.dialog = dialog;
-        }
-
-        EditPeople.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditPeople.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        EditPeople.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-
-                                this.dataTable.updateArray(this.people.instutionPeopleArray);
-
-                                this.dataTable.createPageButtons(1);
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditPeople.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.people.instutionPeopleArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditPeople.prototype.buildAudit = function buildAudit() {
-            var _this = this;
-
-            var changes = this.people.isPersonDirty(this.originalPerson);
-            changes.forEach(function (item) {
-                _this.people.selectedPerson.audit.push({
-                    property: item.property,
-                    eventDate: new Date(),
-                    oldValue: item.oldValue,
-                    newValue: item.newValue,
-                    personId: _this.userObj._id
-                });
-            });
-        };
-
-        EditPeople.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.buildAudit();
-                                _context3.next = 3;
-                                return this.people.savePerson();
-
-                            case 3:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
-                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
-                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
-                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
-                                }
-                                this.personSelected = false;
-
-                            case 6:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
-            var email = {
-                email: this.people.selectedPerson.email,
-                name: this.people.selectedPerson.firstName
-            };
-            this.people.activateAccountEmail(email);
-        };
-
-        EditPeople.prototype.updateStatus = function updateStatus(person) {
-            this.people.selectedPersonFromId(person._id, 'i');
-            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
-            if (this.people.selectedPerson.personStatus === '01') {
-                this.people.selectedPerson.personStatus = '02';
-            } else {
-                this.people.selectedPerson.personStatus = '01';
-            }
-            this.save();
-        };
-
-        EditPeople.prototype.cancel = function cancel() {
-            this.people.selectPerson(this.editIndex);
-        };
-
-        EditPeople.prototype.back = function back() {
-            var _this2 = this;
-
-            if (this.people.isPersonDirty().length) {
-                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this2.save();
-                    } else {
-                        _this2.personSelected = false;
-                    }
-                });
-            } else {
-                this.personSelected = false;
-            }
-        };
-
-        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
-            (0, _jquery2.default)("#lastName").val("");
-            (0, _jquery2.default)("#roles").val("");
-            (0, _jquery2.default)("#personStatus").val("");
-        };
-
-        return EditPeople;
-    }()) || _class);
-});
-define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.FacCo = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function FacCo(router) {
-            _classCallCheck(this, FacCo);
-
-            this.router = router;
-        }
-
-        FacCo.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        FacCo.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'editPeople'],
-                moduleId: './editPeople',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editPeople',
-                title: 'People'
-            }, {
-                route: 'viewRequests',
-                moduleId: './viewRequests',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'viewRequests',
-                title: 'Clients Requests'
-            }]);
-
-            this.router = router;
-        };
-
-        return FacCo;
-    }()) || _class);
-});
-define('modules/facco/viewRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.ViewRequests = undefined;
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var ViewRequests = exports.ViewRequests = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
-        function ViewRequests(router, config, people, datatable, utils, sessions, products, systems, requests) {
-            _classCallCheck(this, ViewRequests);
-
-            this.navControl = "requestsNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.config = config;
-            this.people = people;
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.sessions = sessions;
-            this.products = products;
-            this.requests = requests;
-            this.systems = systems;
-        }
-
-        ViewRequests.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        ViewRequests.prototype.canActivate = function canActivate() {
-            this.userObj = JSON.parse(sessionStorage.getItem('user'));
-        };
-
-        ViewRequests.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                            case 3:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        ViewRequests.prototype.getRequests = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.selectedSession) {
-                                    _context2.next = 7;
-                                    break;
-                                }
-
-                                this.sessions.selectSessionById(this.selectedSession);
-                                _context2.next = 4;
-                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
-
-                            case 4:
-                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                                _context2.next = 8;
-                                break;
-
-                            case 7:
-                                this.dataTable.updateArray([]);
-
-                            case 8:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function getRequests() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return getRequests;
-        }();
-
-        ViewRequests.prototype.refresh = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context3.next = 3;
-                                return this.getRequests();
-
-                            case 3:
-                                this.spinnerHTML = "";
-
-                            case 4:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function refresh() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        return ViewRequests;
-    }()) || _class);
 });
 define('modules/home/contact',['exports', 'aurelia-framework', '../../resources/data/siteInfo', '../../resources/data/people', '../../config/appConfig'], function (exports, _aureliaFramework, _siteInfo, _people, _appConfig) {
 	'use strict';
@@ -1900,6 +1430,476 @@ define('modules/home/register',['exports', 'aurelia-framework', 'aurelia-router'
 
     return Register;
   }()) || _class);
+});
+define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resources/utils/dataTable', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', '../../resources/data/is4ua', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _people, _is4ua, _commonDialogs, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditPeople = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditPeople = exports.EditPeople = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _appConfig.AppConfig, _people.People, _utils.Utils, _is4ua.is4ua, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditPeople(datatable, config, people, utils, is4ua, dialog) {
+            _classCallCheck(this, EditPeople);
+
+            this.personSelected = false;
+            this.navControl = "peopleNavButtons";
+            this.spinnerHTML = "";
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.utils = utils;
+            this.people = people;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+        }
+
+        EditPeople.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditPeople.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        EditPeople.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true), this.is4ua.loadIs4ua()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+
+                                this.dataTable.createPageButtons(1);
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditPeople.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditPeople.prototype.buildAudit = function buildAudit() {
+            var _this = this;
+
+            var changes = this.people.isPersonDirty(this.originalPerson);
+            changes.forEach(function (item) {
+                _this.people.selectedPerson.audit.push({
+                    property: item.property,
+                    eventDate: new Date(),
+                    oldValue: item.oldValue,
+                    newValue: item.newValue,
+                    personId: _this.userObj._id
+                });
+            });
+        };
+
+        EditPeople.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.buildAudit();
+                                _context3.next = 3;
+                                return this.people.savePerson();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    if (this.people.selectedPerson.personStatus === '01') this.sendActivateEmail();
+                                    this.people.instutionPeopleArray[this.people.editIndex] = this.utils.copyObject(this.people.selectedPerson);
+                                    this.dataTable.updateArray(this.people.instutionPeopleArray);
+                                    this.utils.showNotification(serverResponse.firstName + " " + serverResponse.lastName + " was updated");
+                                }
+                                this.personSelected = false;
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditPeople.prototype.sendActivateEmail = function sendActivateEmail() {
+            var email = {
+                email: this.people.selectedPerson.email,
+                name: this.people.selectedPerson.firstName
+            };
+            this.people.activateAccountEmail(email);
+        };
+
+        EditPeople.prototype.updateStatus = function updateStatus(person) {
+            this.people.selectedPersonFromId(person._id, 'i');
+            this.originalPerson = this.utils.copyObject(this.people.selectedPerson);
+            if (this.people.selectedPerson.personStatus === '01') {
+                this.people.selectedPerson.personStatus = '02';
+            } else {
+                this.people.selectedPerson.personStatus = '01';
+            }
+            this.save();
+        };
+
+        EditPeople.prototype.cancel = function cancel() {
+            this.people.selectPerson(this.editIndex);
+        };
+
+        EditPeople.prototype.back = function back() {
+            var _this2 = this;
+
+            if (this.people.isPersonDirty().length) {
+                return this.dialog.showMessage("The account has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this2.save();
+                    } else {
+                        _this2.personSelected = false;
+                    }
+                });
+            } else {
+                this.personSelected = false;
+            }
+        };
+
+        EditPeople.prototype._cleanUpFilters = function _cleanUpFilters() {
+            (0, _jquery2.default)("#lastName").val("");
+            (0, _jquery2.default)("#roles").val("");
+            (0, _jquery2.default)("#personStatus").val("");
+        };
+
+        return EditPeople;
+    }()) || _class);
+});
+define('modules/facco/facco',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.FacCo = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var FacCo = exports.FacCo = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function FacCo(router) {
+            _classCallCheck(this, FacCo);
+
+            this.router = router;
+        }
+
+        FacCo.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        FacCo.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editPeople'],
+                moduleId: './editPeople',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editPeople',
+                title: 'People'
+            }, {
+                route: 'viewRequests',
+                moduleId: './viewRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'viewRequests',
+                title: 'Clients Requests'
+            }]);
+
+            this.router = router;
+        };
+
+        return FacCo;
+    }()) || _class);
+});
+define('modules/facco/viewRequests',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/dataTable', '../../resources/data/sessions', '../../resources/data/systems', '../../resources/data/products', '../../resources/data/clientRequests', '../../config/appConfig', '../../resources/utils/utils', '../../resources/data/people', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.ViewRequests = undefined;
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var ViewRequests = exports.ViewRequests = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _people.People, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _systems.Systems, _clientRequests.ClientRequests), _dec(_class = function () {
+        function ViewRequests(router, config, people, datatable, utils, sessions, products, systems, requests) {
+            _classCallCheck(this, ViewRequests);
+
+            this.navControl = "requestsNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.config = config;
+            this.people = people;
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.sessions = sessions;
+            this.products = products;
+            this.requests = requests;
+            this.systems = systems;
+        }
+
+        ViewRequests.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        ViewRequests.prototype.canActivate = function canActivate() {
+            this.userObj = JSON.parse(sessionStorage.getItem('user'));
+        };
+
+        ViewRequests.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true), this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'), this.products.getProductsArray('?filter=active|eq|true&order=Category'), this.systems.getSystemsArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                            case 3:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        ViewRequests.prototype.getRequests = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!this.selectedSession) {
+                                    _context2.next = 7;
+                                    break;
+                                }
+
+                                this.sessions.selectSessionById(this.selectedSession);
+                                _context2.next = 4;
+                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
+
+                            case 4:
+                                this.dataTable.updateArray(this.requests.requestsDetailsArray);
+                                _context2.next = 8;
+                                break;
+
+                            case 7:
+                                this.dataTable.updateArray([]);
+
+                            case 8:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function getRequests() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getRequests;
+        }();
+
+        ViewRequests.prototype.refresh = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context3.next = 3;
+                                return this.getRequests();
+
+                            case 3:
+                                this.spinnerHTML = "";
+
+                            case 4:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function refresh() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        return ViewRequests;
+    }()) || _class);
 });
 define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/validation', '../../resources/utils/utils', '../../resources/data/is4ua', '../../resources/data/people', '../../resources/dialogs/common-dialogs', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _validation, _utils, _is4ua, _people, _commonDialogs, _jquery) {
     'use strict';
@@ -4153,6 +4153,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             this.CLIENT_REQUEST_DETAILS = 'clientRequestsDetails';
             this.CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
             this.CUSTOMER_ACTION = 'clientRequests/customerAction';
+            this.CLIENT_REQIEST_EMAIL = "clientRequests/sendMail";
 
             this.data = data;
             this.utils = utils;
@@ -4700,7 +4701,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 return _context10.abrupt('return');
 
                             case 2:
-                                url = email ? this.data.CLIENT_REQUESTS_SERVICES + '?email=1' : this.data.CLIENT_REQUESTS_SERVICES;
+                                url = this.data.CLIENT_REQUESTS_SERVICES;
 
                                 if (this.selectedRequest._id) {
                                     _context10.next = 11;
@@ -4714,6 +4715,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 _serverResponse = _context10.sent;
 
                                 if (!_serverResponse.error) {
+                                    if (email.email) {
+                                        email.clientRequestNo = _serverResponse.clientRequestNo;
+                                        email.reason = 1;
+                                        this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                                    }
                                     if (this.requestsArray) {
                                         this.requestsArray.push(this.selectedRequest);
                                     }
@@ -4728,6 +4734,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 serverResponse = _context10.sent;
 
                                 if (!serverResponse.error) {
+                                    if (email.email) {
+                                        email.requestNo = this.selectedRequest.requestNo;
+                                        email.reason = 2;
+                                        this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                                    }
                                     if (this.requestsArray && this.editRequestIndex) {
                                         this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
                                     }
@@ -12406,6 +12417,173 @@ define('resources/dialogs/password-dialog',['exports', 'aurelia-framework', 'aur
     return ['cancel', 'no'].indexOf(option.toLowerCase()) !== -1;
   }
 });
+define('resources/editor/editor',["exports", "aurelia-framework", "aurelia-binding", "jquery", "summernote"], function (exports, _aureliaFramework, _aureliaBinding, _jquery) {
+		"use strict";
+
+		Object.defineProperty(exports, "__esModule", {
+				value: true
+		});
+		exports.Editor = undefined;
+
+		var _jquery2 = _interopRequireDefault(_jquery);
+
+		function _interopRequireDefault(obj) {
+				return obj && obj.__esModule ? obj : {
+						default: obj
+				};
+		}
+
+		function _initDefineProp(target, property, descriptor, context) {
+				if (!descriptor) return;
+				Object.defineProperty(target, property, {
+						enumerable: descriptor.enumerable,
+						configurable: descriptor.configurable,
+						writable: descriptor.writable,
+						value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+				});
+		}
+
+		function _classCallCheck(instance, Constructor) {
+				if (!(instance instanceof Constructor)) {
+						throw new TypeError("Cannot call a class as a function");
+				}
+		}
+
+		function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+				var desc = {};
+				Object['ke' + 'ys'](descriptor).forEach(function (key) {
+						desc[key] = descriptor[key];
+				});
+				desc.enumerable = !!desc.enumerable;
+				desc.configurable = !!desc.configurable;
+
+				if ('value' in desc || desc.initializer) {
+						desc.writable = true;
+				}
+
+				desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+						return decorator(target, property, desc) || desc;
+				}, desc);
+
+				if (context && desc.initializer !== void 0) {
+						desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+						desc.initializer = undefined;
+				}
+
+				if (desc.initializer === void 0) {
+						Object['define' + 'Property'](target, property, desc);
+						desc = null;
+				}
+
+				return desc;
+		}
+
+		function _initializerWarningHelper(descriptor, context) {
+				throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+		}
+
+		var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3;
+
+		var Editor = exports.Editor = (_dec = (0, _aureliaFramework.inject)(Element, _aureliaBinding.ObserverLocator), _dec2 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = (_class2 = function () {
+				function Editor(element, observerLocator) {
+						var _this = this;
+
+						_classCallCheck(this, Editor);
+
+						_initDefineProp(this, "value", _descriptor, this);
+
+						_initDefineProp(this, "height", _descriptor2, this);
+
+						_initDefineProp(this, "toolbar", _descriptor3, this);
+
+						this.editorId = null;
+						this.editor = null;
+
+						this.element = element;
+						this.editorId = "summernote-" + this.guid();
+						this.subscriptions = [observerLocator.getObserver(this, 'value').subscribe(function (newValue) {
+								if (_this.editor && newValue !== _this.editor.summernote('code')) {
+										_this.editor.summernote('code', newValue);
+								}
+						})];
+				}
+
+				Editor.prototype.attached = function attached() {
+						var that = this;
+						this.editor = (0, _jquery2.default)("#" + this.editorId);
+						this.editor.data('view-model', this);
+						this.editor.summernote({
+								height: this.height,
+								toolbar: this.toolbar,
+								callbacks: {
+										onChange: function onChange(contents) {
+												that.value = contents;
+										}
+								}
+						});
+						this.editor.summernote('code', this.value);
+				};
+
+				Editor.prototype.detached = function detached() {
+						this.editor.summernote('destroy');
+				};
+
+				Editor.prototype.guid = function guid() {
+						function s4() {
+								return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+						}
+						return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+				};
+
+				return Editor;
+		}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "value", [_dec2], {
+				enumerable: true,
+				initializer: null
+		}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "height", [_aureliaFramework.bindable], {
+				enumerable: true,
+				initializer: function initializer() {
+						return 250;
+				}
+		}), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "toolbar", [_aureliaFramework.bindable], {
+				enumerable: true,
+				initializer: function initializer() {
+						return [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen']]];
+				}
+		})), _class2)) || _class);
+});
+define('resources/editor/styles',[], function () {
+	'use strict';
+
+	CKEDITOR.stylesSet.add('default', [{ name: 'Italic Title', element: 'h2', styles: { 'font-style': 'italic' } }, { name: 'Subtitle', element: 'h3', styles: { 'color': '#aaa', 'font-style': 'italic' } }, {
+		name: 'Special Container',
+		element: 'div',
+		styles: {
+			padding: '5px 10px',
+			background: '#eee',
+			border: '1px solid #ccc'
+		}
+	}, { name: 'Marker', element: 'span', attributes: { 'class': 'marker' } }, { name: 'Big', element: 'big' }, { name: 'Small', element: 'small' }, { name: 'Typewriter', element: 'tt' }, { name: 'Computer Code', element: 'code' }, { name: 'Keyboard Phrase', element: 'kbd' }, { name: 'Sample Text', element: 'samp' }, { name: 'Variable', element: 'var' }, { name: 'Deleted Text', element: 'del' }, { name: 'Inserted Text', element: 'ins' }, { name: 'Cited Work', element: 'cite' }, { name: 'Inline Quotation', element: 'q' }, { name: 'Language: RTL', element: 'span', attributes: { 'dir': 'rtl' } }, { name: 'Language: LTR', element: 'span', attributes: { 'dir': 'ltr' } }, {
+		name: 'Styled Image (left)',
+		element: 'img',
+		attributes: { 'class': 'left' }
+	}, {
+		name: 'Styled Image (right)',
+		element: 'img',
+		attributes: { 'class': 'right' }
+	}, {
+		name: 'Compact Table',
+		element: 'table',
+		attributes: {
+			cellpadding: '5',
+			cellspacing: '0',
+			border: '1',
+			bordercolor: '#ccc'
+		},
+		styles: {
+			'border-collapse': 'collapse'
+		}
+	}, { name: 'Borderless Table', element: 'table', styles: { 'border-style': 'hidden', 'background-color': '#E6E6FA' } }, { name: 'Square Bulleted List', element: 'ul', styles: { 'list-style-type': 'square' } }, { name: 'Clean Image', type: 'widget', widget: 'image', attributes: { 'class': 'image-clean' } }, { name: 'Grayscale Image', type: 'widget', widget: 'image', attributes: { 'class': 'image-grayscale' } }, { name: 'Featured Snippet', type: 'widget', widget: 'codeSnippet', attributes: { 'class': 'code-featured' } }, { name: 'Featured Formula', type: 'widget', widget: 'mathjax', attributes: { 'class': 'math-featured' } }, { name: '240p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-240p' }, group: 'size' }, { name: '360p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-360p' }, group: 'size' }, { name: '480p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-480p' }, group: 'size' }, { name: '720p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-720p' }, group: 'size' }, { name: '1080p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-1080p' }, group: 'size' }, { name: '240p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-240p' }, group: 'size' }, { name: '360p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-360p' }, group: 'size' }, { name: '480p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-480p' }, group: 'size' }, { name: '720p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-720p' }, group: 'size' }, { name: '1080p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-1080p' }, group: 'size' }]);
+});
 define('resources/elements/add-systems',['exports', '../data/dataServices', 'aurelia-framework'], function (exports, _dataServices, _aureliaFramework) {
   'use strict';
 
@@ -14499,173 +14677,6 @@ define('resources/elements/tree-node',['exports', 'aurelia-framework', 'aurelia-
 		enumerable: true,
 		initializer: null
 	}), _applyDecoratedDescriptor(_class2.prototype, 'itemCount', [_dec5], Object.getOwnPropertyDescriptor(_class2.prototype, 'itemCount'), _class2.prototype)), _class2)) || _class) || _class);
-});
-define('resources/editor/editor',["exports", "aurelia-framework", "aurelia-binding", "jquery", "summernote"], function (exports, _aureliaFramework, _aureliaBinding, _jquery) {
-		"use strict";
-
-		Object.defineProperty(exports, "__esModule", {
-				value: true
-		});
-		exports.Editor = undefined;
-
-		var _jquery2 = _interopRequireDefault(_jquery);
-
-		function _interopRequireDefault(obj) {
-				return obj && obj.__esModule ? obj : {
-						default: obj
-				};
-		}
-
-		function _initDefineProp(target, property, descriptor, context) {
-				if (!descriptor) return;
-				Object.defineProperty(target, property, {
-						enumerable: descriptor.enumerable,
-						configurable: descriptor.configurable,
-						writable: descriptor.writable,
-						value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-				});
-		}
-
-		function _classCallCheck(instance, Constructor) {
-				if (!(instance instanceof Constructor)) {
-						throw new TypeError("Cannot call a class as a function");
-				}
-		}
-
-		function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-				var desc = {};
-				Object['ke' + 'ys'](descriptor).forEach(function (key) {
-						desc[key] = descriptor[key];
-				});
-				desc.enumerable = !!desc.enumerable;
-				desc.configurable = !!desc.configurable;
-
-				if ('value' in desc || desc.initializer) {
-						desc.writable = true;
-				}
-
-				desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-						return decorator(target, property, desc) || desc;
-				}, desc);
-
-				if (context && desc.initializer !== void 0) {
-						desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-						desc.initializer = undefined;
-				}
-
-				if (desc.initializer === void 0) {
-						Object['define' + 'Property'](target, property, desc);
-						desc = null;
-				}
-
-				return desc;
-		}
-
-		function _initializerWarningHelper(descriptor, context) {
-				throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-		}
-
-		var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3;
-
-		var Editor = exports.Editor = (_dec = (0, _aureliaFramework.inject)(Element, _aureliaBinding.ObserverLocator), _dec2 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = (_class2 = function () {
-				function Editor(element, observerLocator) {
-						var _this = this;
-
-						_classCallCheck(this, Editor);
-
-						_initDefineProp(this, "value", _descriptor, this);
-
-						_initDefineProp(this, "height", _descriptor2, this);
-
-						_initDefineProp(this, "toolbar", _descriptor3, this);
-
-						this.editorId = null;
-						this.editor = null;
-
-						this.element = element;
-						this.editorId = "summernote-" + this.guid();
-						this.subscriptions = [observerLocator.getObserver(this, 'value').subscribe(function (newValue) {
-								if (_this.editor && newValue !== _this.editor.summernote('code')) {
-										_this.editor.summernote('code', newValue);
-								}
-						})];
-				}
-
-				Editor.prototype.attached = function attached() {
-						var that = this;
-						this.editor = (0, _jquery2.default)("#" + this.editorId);
-						this.editor.data('view-model', this);
-						this.editor.summernote({
-								height: this.height,
-								toolbar: this.toolbar,
-								callbacks: {
-										onChange: function onChange(contents) {
-												that.value = contents;
-										}
-								}
-						});
-						this.editor.summernote('code', this.value);
-				};
-
-				Editor.prototype.detached = function detached() {
-						this.editor.summernote('destroy');
-				};
-
-				Editor.prototype.guid = function guid() {
-						function s4() {
-								return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-						}
-						return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-				};
-
-				return Editor;
-		}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "value", [_dec2], {
-				enumerable: true,
-				initializer: null
-		}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "height", [_aureliaFramework.bindable], {
-				enumerable: true,
-				initializer: function initializer() {
-						return 250;
-				}
-		}), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "toolbar", [_aureliaFramework.bindable], {
-				enumerable: true,
-				initializer: function initializer() {
-						return [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen']]];
-				}
-		})), _class2)) || _class);
-});
-define('resources/editor/styles',[], function () {
-	'use strict';
-
-	CKEDITOR.stylesSet.add('default', [{ name: 'Italic Title', element: 'h2', styles: { 'font-style': 'italic' } }, { name: 'Subtitle', element: 'h3', styles: { 'color': '#aaa', 'font-style': 'italic' } }, {
-		name: 'Special Container',
-		element: 'div',
-		styles: {
-			padding: '5px 10px',
-			background: '#eee',
-			border: '1px solid #ccc'
-		}
-	}, { name: 'Marker', element: 'span', attributes: { 'class': 'marker' } }, { name: 'Big', element: 'big' }, { name: 'Small', element: 'small' }, { name: 'Typewriter', element: 'tt' }, { name: 'Computer Code', element: 'code' }, { name: 'Keyboard Phrase', element: 'kbd' }, { name: 'Sample Text', element: 'samp' }, { name: 'Variable', element: 'var' }, { name: 'Deleted Text', element: 'del' }, { name: 'Inserted Text', element: 'ins' }, { name: 'Cited Work', element: 'cite' }, { name: 'Inline Quotation', element: 'q' }, { name: 'Language: RTL', element: 'span', attributes: { 'dir': 'rtl' } }, { name: 'Language: LTR', element: 'span', attributes: { 'dir': 'ltr' } }, {
-		name: 'Styled Image (left)',
-		element: 'img',
-		attributes: { 'class': 'left' }
-	}, {
-		name: 'Styled Image (right)',
-		element: 'img',
-		attributes: { 'class': 'right' }
-	}, {
-		name: 'Compact Table',
-		element: 'table',
-		attributes: {
-			cellpadding: '5',
-			cellspacing: '0',
-			border: '1',
-			bordercolor: '#ccc'
-		},
-		styles: {
-			'border-collapse': 'collapse'
-		}
-	}, { name: 'Borderless Table', element: 'table', styles: { 'border-style': 'hidden', 'background-color': '#E6E6FA' } }, { name: 'Square Bulleted List', element: 'ul', styles: { 'list-style-type': 'square' } }, { name: 'Clean Image', type: 'widget', widget: 'image', attributes: { 'class': 'image-clean' } }, { name: 'Grayscale Image', type: 'widget', widget: 'image', attributes: { 'class': 'image-grayscale' } }, { name: 'Featured Snippet', type: 'widget', widget: 'codeSnippet', attributes: { 'class': 'code-featured' } }, { name: 'Featured Formula', type: 'widget', widget: 'mathjax', attributes: { 'class': 'math-featured' } }, { name: '240p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-240p' }, group: 'size' }, { name: '360p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-360p' }, group: 'size' }, { name: '480p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-480p' }, group: 'size' }, { name: '720p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-720p' }, group: 'size' }, { name: '1080p', type: 'widget', widget: 'embedSemantic', attributes: { 'class': 'embed-1080p' }, group: 'size' }, { name: '240p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-240p' }, group: 'size' }, { name: '360p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-360p' }, group: 'size' }, { name: '480p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-480p' }, group: 'size' }, { name: '720p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-720p' }, group: 'size' }, { name: '1080p ', type: 'widget', widget: 'embed', attributes: { 'class': 'embed-1080p' }, group: 'size' }]);
 });
 define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', './utils'], function (exports, _aureliaFramework, _moment, _utils) {
   'use strict';
@@ -19838,6 +19849,1409 @@ define('modules/admin/notes/notes',['exports', 'aurelia-framework', 'aurelia-rou
 		return Notes;
 	}()) || _class);
 });
+define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', '../../../resources/data/documents', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _systems, _products, _is4ua, _commonDialogs, _validation, _documents, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditProducts = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditProducts = exports.EditProducts = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _products.Products, _utils.Utils, _systems.Systems, _is4ua.is4ua, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig, _documents.DocumentsServices), _dec(_class = function () {
+        function EditProducts(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
+            _classCallCheck(this, EditProducts);
+
+            this.productSelected = false;
+            this.filesSelected = "";
+            this.interfaceUpdate = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+            this.navControl = "productNavButtons";
+            this.removedFiles = new Array();
+            this.spinnerHTML = "";
+            this.tabs = [{ id: 'Systems' }, { id: 'Assignments' }, { id: 'is4ua' }, { id: 'Documents' }, { id: 'Notes' }];
+            this.tabPath = './';
+            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.products = products;
+            this.systems = systems;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+            this.config = config;
+            this.documents = documents;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this._setupValidation();
+
+            this.systemChanges = new Array();
+        }
+
+        EditProducts.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditProducts.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.products.getProductsArray('?order=name'), this.systems.getSystemsArray('?order=sid'), this.is4ua.loadIs4ua(), this.documents.getDocumentsCategoriesArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.products.productsArray);
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+                                this.dataTable.createPageButtons(1);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditProducts.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.products.getProductsArray('?order=name', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.products.productsArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditProducts.prototype.new = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.editIndex = -1;
+                                this.products.selectProduct();
+                                this.editSystemsString = "";
+                                this.newProduct = true;
+                                this.selectedProductSystems = new Array();
+                                if (this.files && this.files.length !== 0) {
+                                    (0, _jquery2.default)("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
+                                    (0, _jquery2.default)("#uploadFiles").unwrap();
+                                    this.files = [];
+                                }
+                                (0, _jquery2.default)("#editClientKey").focus();
+                                this.productSelected = true;
+
+                            case 8:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function _new() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return _new;
+        }();
+
+        EditProducts.prototype.edit = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this.editIndex = this.dataTable.getOriginalIndex(index);
+                                this.products.selectProduct(this.editIndex);
+                                this.newProduct = false;
+
+                                if (!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
+                                if (!this.products.selectedProduct.clientInfo) this.products.selectedProduct.clientInfo = "";
+                                if (!this.products.selectedProduct.productInfo) this.products.selectedProduct.productInfo = "";
+
+                                this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
+
+                                (0, _jquery2.default)("#editClientKey").focus();
+
+                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+                                this.selectedRow.children().addClass('info');
+                                this.productSelected = true;
+
+                            case 12:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function edit(_x, _x2) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return edit;
+        }();
+
+        EditProducts.prototype.cancel = function cancel() {
+            this.products.selectProduct(this.editIndex);
+        };
+
+        EditProducts.prototype.save = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var _this = this;
+
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context6.next = 2;
+                                    break;
+                                }
+
+                                return _context6.delegateYield(regeneratorRuntime.mark(function _callee5() {
+                                    var serverResponse, response;
+                                    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                                        while (1) {
+                                            switch (_context5.prev = _context5.next) {
+                                                case 0:
+                                                    _context5.next = 2;
+                                                    return _this.products.saveProduct();
+
+                                                case 2:
+                                                    serverResponse = _context5.sent;
+
+                                                    if (serverResponse.error) {
+                                                        _context5.next = 13;
+                                                        break;
+                                                    }
+
+                                                    if (!(_this.systemChanges.length > 0)) {
+                                                        _context5.next = 9;
+                                                        break;
+                                                    }
+
+                                                    if (_this.newProduct) {
+                                                        _this.systemChanges.forEach(function (item) {
+                                                            item.productId = serverResponse._id;
+                                                        });
+                                                    }
+                                                    _context5.next = 8;
+                                                    return _this.systems.saveProductChanges(_this.systemChanges);
+
+                                                case 8:
+                                                    response = _context5.sent;
+
+                                                case 9:
+                                                    _this.dataTable.updateArray(_this.products.productsArray);
+                                                    _this.utils.showNotification("Product " + serverResponse.name + " was updated");
+                                                    _context5.next = 14;
+                                                    break;
+
+                                                case 13:
+                                                    _this.utils.showNotification("There was a problem updating the product");
+
+                                                case 14:
+                                                    _this._cleanUp();
+
+                                                case 15:
+                                                case 'end':
+                                                    return _context5.stop();
+                                            }
+                                        }
+                                    }, _callee5, _this);
+                                })(), 't0', 2);
+
+                            case 2:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function save() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditProducts.prototype.delete = function _delete() {
+            var _this2 = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the product?", "Delete Product", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.deleteProduct();
+                }
+            });
+        };
+
+        EditProducts.prototype.deleteProduct = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var name, serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                name = this.products.selectedProduct.name;
+                                _context7.next = 3;
+                                return this.products.deleteProduct();
+
+                            case 3:
+                                serverResponse = _context7.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.products.productsArray);
+                                    this.utils.showNotification("Product " + name + " was deleted");
+                                }
+                                this._cleanUp();
+                                this.productSelected = false;
+
+                            case 7:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function deleteProduct() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return deleteProduct;
+        }();
+
+        EditProducts.prototype._cleanUp = function _cleanUp() {
+            this.newProduct = false;
+            this.productSelected = false;
+            this.systemChanges = new Array();
+            this._cleanUpFilters();
+            this.validation.makeAllValid(1);
+        };
+
+        EditProducts.prototype._cleanUpFilters = function _cleanUpFilters() {
+            this.nameFilterValue = "";
+            this.systemFilterValue = "";
+            this.activeFilter = "";
+            this.sapNameFilterValue = "";
+
+            this.dataTable.updateArray(this.products.productsArray);
+        };
+
+        EditProducts.prototype.filter = function filter(el, options) {
+            this.dataTable.filterListExV(el.target.value, options);
+        };
+
+        EditProducts.prototype.back = function back() {
+            var _this3 = this;
+
+            if (this.products.isDirty().length) {
+                return this.dialog.showMessage("The product has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this3.save();
+                    } else {
+                        _this3.productSelected = false;
+                        _this3._cleanUp();
+                    }
+                });
+            } else {
+                this.productSelected = false;
+                this._cleanUp();
+            }
+        };
+
+        EditProducts.prototype.addDocument = function addDocument(index) {
+            if (!this.products.selectedProduct.documents) this.products.selectedProduct.documents = new Array();
+            for (var i = 0; i < this.products.selectedProduct.documents.length; i++) {
+                if (this.products.selectedProduct.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
+                    return;
+                }
+            }
+            var newDoc = {
+                categoryCode: this.documents.selectedDocument.categoryCode,
+                categoryName: this.documents.selectedDocument.name,
+                fileName: this.documents.selectedDocument.files[index].fileName,
+                default: true
+            };
+            this.products.selectedProduct.documents.push(newDoc);
+        };
+
+        EditProducts.prototype.chooseDocument = function chooseDocument(index, event) {
+            this.documents.selectDocument(index);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(event.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        EditProducts.prototype.toggleDefault = function toggleDefault(index) {
+            this.products.selectedProduct.documents[index].default = !this.products.selectedProduct.documents[index].default;
+        };
+
+        EditProducts.prototype.removeDocument = function removeDocument(index) {
+            this.products.selectedProduct.documents.splice(index, 1);
+        };
+
+        EditProducts.prototype.typeChanged = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(index) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context8.next = 6;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context8.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.showDocuments = true;
+
+                            case 6:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function typeChanged(_x3) {
+                return _ref7.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        EditProducts.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Product name is required", "value": "products.selectedProduct.name" }, { "rule": "custom", "message": "A product with that name already exists",
+                "valFunction": function valFunction(context) {
+                    var found = false;
+                    for (var i = 0; i < context.products.productsArray.length; i++) {
+                        if (context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()) {
+                            if (context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id) {
+                                found = true;
+                            } else if (!context.products.selectedProduct._id) {
+                                found = true;
+                            }
+                        }
+                    }
+                    return !found;
+                } }]);
+        };
+
+        EditProducts.prototype.changeTab = function changeTab(el, index) {
+            (0, _jquery2.default)("#productListGroup.list-group").children().removeClass('active');
+            var target = (0, _jquery2.default)(event.target);
+            if (target.is('a')) target = (0, _jquery2.default)(target.children()[0]);
+            target.parent().addClass('active');
+            (0, _jquery2.default)(".in").removeClass('active').removeClass('in');
+            (0, _jquery2.default)("#" + target.html() + "Tab").addClass('in').addClass('active');
+        };
+
+        return EditProducts;
+    }()) || _class);
+});
+define('modules/admin/system/editSession',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/config', '../../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _validation, _dataTable, _appConfig, _config, _commonDialogs) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSessions = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSessions = exports.EditSessions = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _config.Config, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditSessions(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
+            _classCallCheck(this, EditSessions);
+
+            this.navControl = "sessionNavButtons";
+            this.showScreen = 'sessionTable';
+            this.spinnerHTML = "";
+            this.isChecked = true;
+
+            this.router = router;
+            this.sessions = sessions;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.siteConfig = siteConfig;
+
+            this._setupValidation();
+        }
+
+        EditSessions.prototype.attached = function attached() {
+            this.toolTips();
+        };
+
+        EditSessions.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return this.sessions.getSessionsArray('?order=startDate:DSC', true);
+
+                            case 2:
+                                _context.next = 4;
+                                return this.config.getConfig();
+
+                            case 4:
+                                _context.next = 6;
+                                return this.config.getSessions();
+
+                            case 6:
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.filterOutClosed();
+
+                            case 8:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSessions.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.sessions.getSessionsArray('?order=startDate', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditSessions.prototype.new = function _new() {
+            this.sessions.selectSession();
+            this.showScreen = 'editSession';
+            this.sessionSelected = true;
+            this.editSystem = true;
+            this.newSession = true;
+            $("#editSession").focus();
+            if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
+        };
+
+        EditSessions.prototype.edit = function edit(index, el) {
+            this.showScreen = 'editSession';
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            this.editSession = true;
+            $("#editSession").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        EditSessions.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context3.next = 5;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.sessions.saveSession();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                    this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
+                                    this.showScreen = 'sessionTable';
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditSessions.prototype.refreshConfig = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.config.getSessions(true);
+
+                            case 2:
+                                this.editSessionConfig();
+
+                            case 3:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function refreshConfig() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return refreshConfig;
+        }();
+
+        EditSessions.prototype.editSessionConfig = function editSessionConfig() {
+            var _this = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this.editSessionConfigArray.push(_this.utils.copyObject(item));
+            });
+            this.showScreen = 'editConfig';
+        };
+
+        EditSessions.prototype.saveConfig = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this2 = this;
+
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!this.editSessionConfigArray) {
+                                    _context5.next = 5;
+                                    break;
+                                }
+
+                                _context5.next = 3;
+                                return this.siteConfig.saveSessions(this.editSessionConfigArray);
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.editSessionConfigArray.forEach(function (item, index) {
+                                        _this2.config.SESSION_PARAMS[index] = item;
+                                    });
+                                    this.utils.showNotification("Session configuration updated");
+                                    this.showScreen = 'sessionTable';
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function saveConfig() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return saveConfig;
+        }();
+
+        EditSessions.prototype.updateStatus = function updateStatus(index, session, el) {
+            if (session.sessionStatus === "Closed") return;
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            switch (session.sessionStatus) {
+                case "Next":
+                    this.editStatus = "Requests";
+                    break;
+                case "Requests":
+                    this.editStatus = "Active";
+                    break;
+                case "Active":
+                    this.editStatus = "Closed";
+                    break;
+            }
+            this.sessions.selectedSession.sessionStatus = this.editStatus;
+            this.save();
+        };
+
+        EditSessions.prototype.filterOutClosed = function filterOutClosed() {
+            if (this.isChecked) {
+                var filterValues = new Array();
+                filterValues.push({ property: "sessionStatus", value: "Closed", type: 'text', compare: 'not' });
+                if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+            } else {
+                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+            }
+            this.toolTips();
+        };
+
+        EditSessions.prototype.cancel = function cancel() {
+            this.sessions.selectSession(this.editIndex);
+        };
+
+        EditSessions.prototype.cancelConfig = function cancelConfig() {
+            var _this3 = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this3.editSessionConfigArray.push(_this3.utils.copyObject(item));
+            });
+        };
+
+        EditSessions.prototype.backConfig = function backConfig() {
+            this.showScreen = 'sessionTable';
+        };
+
+        EditSessions.prototype.back = function back() {
+            var _this4 = this;
+
+            if (this.sessions.isDirty().length) {
+                return this.dialog.showMessage("The session has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this4.save();
+                    } else {
+                        _this4.showScreen = 'sessionTable';
+                    }
+                });
+            } else {
+                this.showScreen = 'sessionTable';
+            }
+        };
+
+        EditSessions.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", { "rule": "required", "message": "Session name is required", "value": "sessions.selectedSession.session" });
+            this.validation.addRule(1, "editYear", { "rule": "required", "message": "Session year is required", "value": "sessions.selectedSession.year" });
+            this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
+            this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
+            this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
+        };
+
+        EditSessions.prototype.toolTips = function toolTips() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        return EditSessions;
+    }()) || _class);
+});
+define('modules/admin/system/editSystem',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _utils, _systems, _sessions, _products, _validation, _dataTable, _appConfig, _moment, _jquery) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSystem = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    var _jquery2 = _interopRequireDefault(_jquery);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _systems.Systems, _products.Products, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _sessions.Sessions), _dec(_class = function () {
+        function EditSystem(router, systems, products, validation, utils, datatable, config, dialog, sessions) {
+            _classCallCheck(this, EditSystem);
+
+            this.systemSelected = false;
+            this.editClients = false;
+            this.navControl = "systemNavButtons";
+            this.spinnerHTML = "";
+
+            this.router = router;
+            this.systems = systems;
+            this.products = products;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.sessions = sessions;
+            this._setupValidation();
+        }
+
+        EditSystem.prototype.attached = function attached() {
+            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditSystem.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.systems.getSystemsArray('?order=sid'), this.products.getProductsArray('?filter=active|eq|true'), this.sessions.getSessionsArray(), this.config.getConfig(), this.config.getSessions()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.systems.systemsArray);
+
+                            case 4:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSystem.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.systems.getSystemsArray('?order=sid', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.systems.systemsArray);
+                                this.spinnerHTML = "";
+                                this._cleanUpFilters();
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditSystem.prototype.new = function _new() {
+            this.editIndex = -1;
+            this.displayIndex = -1;
+            this.systems.selectSystem();
+            this.editStatus = true;
+
+            (0, _jquery2.default)("#editSid").focus();
+            this.systemSelected = true;
+            this.newSystem = true;
+        };
+
+        EditSystem.prototype.edit = function edit(index, el) {
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.systems.selectSystem(this.editIndex);
+            this.editSystem = true;
+            this.systemSelected = true;
+            this.newSystem = false;
+            (0, _jquery2.default)("#editSid").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showTable = false;
+            setTimeout(function () {
+                (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
+            }, 500);
+        };
+
+        EditSystem.prototype.editClientsButton = function editClientsButton() {
+            this.editClients = !this.editClients;
+        };
+
+        EditSystem.prototype.generateClients = function generateClients() {
+            if (!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3) {
+                return this.dialog.showMessage("Clients must have three digits", "Invalid Client Number", ['OK']).then(function (response) {
+                    return;
+                });
+            }
+            var start = parseInt(this.editFirstClient);
+            var end = parseInt(this.editLastClient);
+            if (end <= start) {
+                return this.dialog.showMessage("The first client number must be less than the last client number.", "Invalid Client Number", ['OK']).then(function (response) {
+                    return;
+                });
+            }
+            var result = this.systems.generateClients(start, end, this.editClientStatus);
+
+            if (result.error) {
+                this.utils.showNotification(result.error);
+            }
+        };
+
+        EditSystem.prototype.refreshClients = function refreshClients() {
+            var _this = this;
+
+            if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
+                return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).then(function (response) {
+                    return;
+                });
+            }
+            return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this.systems.refreshClients(_this.config.UNASSIGNED_REQUEST_CODE);
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteClients = function deleteClients() {
+            var _this2 = this;
+
+            return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this2.deleteAllClients();
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteAllClients = function deleteAllClients() {
+            this.systems.deleteAllClients();
+            this.utils.showNotification("You must save the system to complete the deletion");
+        };
+
+        EditSystem.prototype.editAClient = function editAClient(client, index, el) {
+            this.selectedClientIndex = index;
+            this.selectedClient = client;
+            this.systems.selectClient(index);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.interfaceUpdate = true;
+        };
+
+        EditSystem.prototype.deleteClient = function deleteClient(index) {
+            var _this3 = this;
+
+            if (!this._okToDeleteClient(this.systems.selectedSystem.clients[index])) {
+                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
+            } else {
+                return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this3.systems.selectedSystem.clients.splice(index, 1);
+                    }
+                });
+            }
+        };
+
+        EditSystem.prototype._okToDeleteClient = function _okToDeleteClient(client) {
+            if (client.assignments.length > 0) return false;
+            var status = client.clientStatus;
+            for (var i = 0; i < this.config.CLIENT_STATUSES.length; i++) {
+                if (this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        EditSystem.prototype.deleteC = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.systems.deleteClient();
+                                this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
+
+                            case 2:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function deleteC() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return deleteC;
+        }();
+
+        EditSystem.prototype.cancel = function cancel() {
+            if (this.editIndex == -1) {
+                this.new();;
+            } else {
+                this.systems.selectSystem(this.editIndex);
+            }
+        };
+
+        EditSystem.prototype.save = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context4.next = 7;
+                                    break;
+                                }
+
+                                this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
+                                this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
+                                _context4.next = 5;
+                                return this.systems.saveSystem();
+
+                            case 5:
+                                serverResponse = _context4.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
+                                    this._cleanUp();
+                                }
+
+                            case 7:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function save() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditSystem.prototype.toggleSandBox = function toggleSandBox(index) {
+            if (this.systems.selectedSystem.clients[index].assignments.length > 0) {
+                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
+            } else {
+                this.systems.selectedSystem.clients[index].clientStatus = this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
+            }
+        };
+
+        EditSystem.prototype.refreshClient = function refreshClient(index) {
+            var _this4 = this;
+
+            return this.dialog.showMessage("This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this4.systems.selectedSystem.clients[index].clientStatus = _this4.config.UNASSIGNED_REQUEST_CODE;
+                    _this4.systems.selectedSystem.clients[index].assignments = new Array();
+                    _this4.systems.selectedSystem.clients[index].idsAvailable = _this4.systems.selectedSystem.idsAvailable;
+                }
+            });
+        };
+
+        EditSystem.prototype.delete = function _delete() {
+            var _this5 = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the system?", "Delete System", ['Yes', 'No']).then(function (response) {
+                if (!response.wasCancelled) {
+                    _this5.deleteSystem();
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteSystem = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var name, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                name = this.systems.selectedSystem.sid;
+                                _context5.next = 3;
+                                return this.systems.deleteSystem();
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.systems.systemsArray);
+                                    this.utils.showNotification("System " + name + " was deleted");
+                                }
+                                this._cleanUp();
+                                this.systemSelected = false;
+
+                            case 7:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteSystem() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteSystem;
+        }();
+
+        EditSystem.prototype._cleanUp = function _cleanUp() {
+            this.systemSelected = false;
+            this.newSystem = false;
+            this.validation.makeAllValid(1);
+        };
+
+        EditSystem.prototype._cleanUpFilters = function _cleanUpFilters() {
+            this.sidFilterValue = "";
+            this.descriptionFilterValue = "";
+            this.serverFilterValue = "";
+            this.activeFilter = "";
+            this.dataTable.updateArray(this.systems.systemsArray);
+        };
+
+        EditSystem.prototype.back = function back() {
+            var _this6 = this;
+
+            if (this.systems.isDirty().length) {
+                return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                    if (!response.wasCancelled) {
+                        _this6.save();
+                    } else {
+                        _this6._cleanUp();
+                    }
+                });
+            } else {
+                this._cleanUp();
+            }
+        };
+
+        EditSystem.prototype.selectClient = function selectClient(client, index) {
+            this.selectedClient = this.utils.copyObject(client);
+            this.clientSelected = true;
+            this.selectedClientIndex = index;
+        };
+
+        EditSystem.prototype.backClient = function backClient() {
+            this.clientSelected = false;
+        };
+
+        EditSystem.prototype.saveClient = function saveClient() {
+            this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
+            this.clientSelected = false;
+        };
+
+        EditSystem.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editSid", [{ "rule": "required", "message": "SID is required", "value": "systems.selectedSystem.sid" }, { "rule": "custom", "message": "A system with that SID already exists",
+                "valFunction": function valFunction(context) {
+                    var found = false;
+                    for (var i = 0; i < context.systems.systemsArray.length; i++) {
+                        if (context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()) {
+                            if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
+                                found = true;
+                            } else if (!context.systems.selectedSystem._id) {
+                                found = true;
+                            }
+                        }
+                    }
+                    return !found;
+                } }], true);
+            this.validation.addRule(1, "editDesc", [{ "rule": "required", "message": "Description is required", "value": "systems.selectedSystem.description" }]);
+            this.validation.addRule(1, "editServer", [{ "rule": "required", "message": "Server is required", "value": "systems.selectedSystem.server" }, { "rule": "custom", "message": "A system with that server already exists",
+                "valFunction": function valFunction(context) {
+                    var found = false;
+                    for (var i = 0; i < context.systems.systemsArray.length; i++) {
+                        if (context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()) {
+                            if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
+                                found = true;
+                            } else if (!context.systems.selectedSystem._id) {
+                                found = true;
+                            }
+                        }
+                    }
+                    return !found;
+                } }]);
+            this.validation.addRule(1, "editInst", [{ "rule": "required", "message": "Instance is required", "value": "systems.selectedSystem.instance" }]);
+        };
+
+        EditSystem.prototype.filter = function filter(el, options) {
+            this.dataTable.filterListExV(el.target.value, options);
+        };
+
+        return EditSystem;
+    }()) || _class);
+});
+define('modules/admin/system/system',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.System = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var System = exports.System = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function System(router) {
+            _classCallCheck(this, System);
+
+            this.router = router;
+        }
+
+        System.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        System.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editSessions'],
+                moduleId: './editSession',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSessions',
+                title: 'Sessions'
+            }, {
+                route: 'editSystems',
+                moduleId: './editSystem',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSystems',
+                title: 'Systems'
+            }, {
+                route: 'editProducts',
+                moduleId: './editProduct',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editProducts',
+                title: 'Products'
+            }]);
+
+            this.router = router;
+        };
+
+        return System;
+    }()) || _class);
+});
 define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/admin', '../../../resources/dialogs/common-dialogs', 'aurelia-event-aggregator', 'moment'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _admin, _commonDialogs, _aureliaEventAggregator, _moment) {
 	'use strict';
 
@@ -22537,1409 +23951,6 @@ define('modules/admin/site/site',["exports", "aurelia-framework", "aurelia-route
         };
 
         return Site;
-    }()) || _class);
-});
-define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', '../../../resources/data/documents', 'jquery'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _systems, _products, _is4ua, _commonDialogs, _validation, _documents, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditProducts = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditProducts = exports.EditProducts = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _products.Products, _utils.Utils, _systems.Systems, _is4ua.is4ua, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig, _documents.DocumentsServices), _dec(_class = function () {
-        function EditProducts(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
-            _classCallCheck(this, EditProducts);
-
-            this.productSelected = false;
-            this.filesSelected = "";
-            this.interfaceUpdate = false;
-            this.showDocumentForm = false;
-            this.showDocuments = false;
-            this.navControl = "productNavButtons";
-            this.removedFiles = new Array();
-            this.spinnerHTML = "";
-            this.tabs = [{ id: 'Systems' }, { id: 'Assignments' }, { id: 'is4ua' }, { id: 'Documents' }, { id: 'Notes' }];
-            this.tabPath = './';
-            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.products = products;
-            this.systems = systems;
-            this.is4ua = is4ua;
-            this.dialog = dialog;
-            this.config = config;
-            this.documents = documents;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this._setupValidation();
-
-            this.systemChanges = new Array();
-        }
-
-        EditProducts.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditProducts.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.products.getProductsArray('?order=name'), this.systems.getSystemsArray('?order=sid'), this.is4ua.loadIs4ua(), this.documents.getDocumentsCategoriesArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.filteredDocumentArray = this.documents.docCatsArray;
-                                this.dataTable.createPageButtons(1);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditProducts.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.products.getProductsArray('?order=name', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditProducts.prototype.new = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.editIndex = -1;
-                                this.products.selectProduct();
-                                this.editSystemsString = "";
-                                this.newProduct = true;
-                                this.selectedProductSystems = new Array();
-                                if (this.files && this.files.length !== 0) {
-                                    (0, _jquery2.default)("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
-                                    (0, _jquery2.default)("#uploadFiles").unwrap();
-                                    this.files = [];
-                                }
-                                (0, _jquery2.default)("#editClientKey").focus();
-                                this.productSelected = true;
-
-                            case 8:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function _new() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return _new;
-        }();
-
-        EditProducts.prototype.edit = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                this.editIndex = this.dataTable.getOriginalIndex(index);
-                                this.products.selectProduct(this.editIndex);
-                                this.newProduct = false;
-
-                                if (!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
-                                if (!this.products.selectedProduct.clientInfo) this.products.selectedProduct.clientInfo = "";
-                                if (!this.products.selectedProduct.productInfo) this.products.selectedProduct.productInfo = "";
-
-                                this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
-
-                                (0, _jquery2.default)("#editClientKey").focus();
-
-                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                                this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-                                this.selectedRow.children().addClass('info');
-                                this.productSelected = true;
-
-                            case 12:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function edit(_x, _x2) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return edit;
-        }();
-
-        EditProducts.prototype.cancel = function cancel() {
-            this.products.selectProduct(this.editIndex);
-        };
-
-        EditProducts.prototype.save = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var _this = this;
-
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context6.next = 2;
-                                    break;
-                                }
-
-                                return _context6.delegateYield(regeneratorRuntime.mark(function _callee5() {
-                                    var serverResponse, response;
-                                    return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                                        while (1) {
-                                            switch (_context5.prev = _context5.next) {
-                                                case 0:
-                                                    _context5.next = 2;
-                                                    return _this.products.saveProduct();
-
-                                                case 2:
-                                                    serverResponse = _context5.sent;
-
-                                                    if (serverResponse.error) {
-                                                        _context5.next = 13;
-                                                        break;
-                                                    }
-
-                                                    if (!(_this.systemChanges.length > 0)) {
-                                                        _context5.next = 9;
-                                                        break;
-                                                    }
-
-                                                    if (_this.newProduct) {
-                                                        _this.systemChanges.forEach(function (item) {
-                                                            item.productId = serverResponse._id;
-                                                        });
-                                                    }
-                                                    _context5.next = 8;
-                                                    return _this.systems.saveProductChanges(_this.systemChanges);
-
-                                                case 8:
-                                                    response = _context5.sent;
-
-                                                case 9:
-                                                    _this.dataTable.updateArray(_this.products.productsArray);
-                                                    _this.utils.showNotification("Product " + serverResponse.name + " was updated");
-                                                    _context5.next = 14;
-                                                    break;
-
-                                                case 13:
-                                                    _this.utils.showNotification("There was a problem updating the product");
-
-                                                case 14:
-                                                    _this._cleanUp();
-
-                                                case 15:
-                                                case 'end':
-                                                    return _context5.stop();
-                                            }
-                                        }
-                                    }, _callee5, _this);
-                                })(), 't0', 2);
-
-                            case 2:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function save() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditProducts.prototype.delete = function _delete() {
-            var _this2 = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the product?", "Delete Product", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.deleteProduct();
-                }
-            });
-        };
-
-        EditProducts.prototype.deleteProduct = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                name = this.products.selectedProduct.name;
-                                _context7.next = 3;
-                                return this.products.deleteProduct();
-
-                            case 3:
-                                serverResponse = _context7.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.products.productsArray);
-                                    this.utils.showNotification("Product " + name + " was deleted");
-                                }
-                                this._cleanUp();
-                                this.productSelected = false;
-
-                            case 7:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function deleteProduct() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return deleteProduct;
-        }();
-
-        EditProducts.prototype._cleanUp = function _cleanUp() {
-            this.newProduct = false;
-            this.productSelected = false;
-            this.systemChanges = new Array();
-            this._cleanUpFilters();
-            this.validation.makeAllValid(1);
-        };
-
-        EditProducts.prototype._cleanUpFilters = function _cleanUpFilters() {
-            this.nameFilterValue = "";
-            this.systemFilterValue = "";
-            this.activeFilter = "";
-            this.sapNameFilterValue = "";
-
-            this.dataTable.updateArray(this.products.productsArray);
-        };
-
-        EditProducts.prototype.filter = function filter(el, options) {
-            this.dataTable.filterListExV(el.target.value, options);
-        };
-
-        EditProducts.prototype.back = function back() {
-            var _this3 = this;
-
-            if (this.products.isDirty().length) {
-                return this.dialog.showMessage("The product has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this3.save();
-                    } else {
-                        _this3.productSelected = false;
-                        _this3._cleanUp();
-                    }
-                });
-            } else {
-                this.productSelected = false;
-                this._cleanUp();
-            }
-        };
-
-        EditProducts.prototype.addDocument = function addDocument(index) {
-            if (!this.products.selectedProduct.documents) this.products.selectedProduct.documents = new Array();
-            for (var i = 0; i < this.products.selectedProduct.documents.length; i++) {
-                if (this.products.selectedProduct.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
-                    return;
-                }
-            }
-            var newDoc = {
-                categoryCode: this.documents.selectedDocument.categoryCode,
-                categoryName: this.documents.selectedDocument.name,
-                fileName: this.documents.selectedDocument.files[index].fileName,
-                default: true
-            };
-            this.products.selectedProduct.documents.push(newDoc);
-        };
-
-        EditProducts.prototype.chooseDocument = function chooseDocument(index, event) {
-            this.documents.selectDocument(index);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(event.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showDocumentForm = true;
-        };
-
-        EditProducts.prototype.toggleDefault = function toggleDefault(index) {
-            this.products.selectedProduct.documents[index].default = !this.products.selectedProduct.documents[index].default;
-        };
-
-        EditProducts.prototype.removeDocument = function removeDocument(index) {
-            this.products.selectedProduct.documents.splice(index, 1);
-        };
-
-        EditProducts.prototype.typeChanged = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(index) {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (!(index >= 0)) {
-                                    _context8.next = 6;
-                                    break;
-                                }
-
-                                this.categoryIndex = index;
-                                this.documents.selectCategory(index);
-                                _context8.next = 5;
-                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-
-                            case 5:
-                                this.showDocuments = true;
-
-                            case 6:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function typeChanged(_x3) {
-                return _ref7.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        EditProducts.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Product name is required", "value": "products.selectedProduct.name" }, { "rule": "custom", "message": "A product with that name already exists",
-                "valFunction": function valFunction(context) {
-                    var found = false;
-                    for (var i = 0; i < context.products.productsArray.length; i++) {
-                        if (context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()) {
-                            if (context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id) {
-                                found = true;
-                            } else if (!context.products.selectedProduct._id) {
-                                found = true;
-                            }
-                        }
-                    }
-                    return !found;
-                } }]);
-        };
-
-        EditProducts.prototype.changeTab = function changeTab(el, index) {
-            (0, _jquery2.default)("#productListGroup.list-group").children().removeClass('active');
-            var target = (0, _jquery2.default)(event.target);
-            if (target.is('a')) target = (0, _jquery2.default)(target.children()[0]);
-            target.parent().addClass('active');
-            (0, _jquery2.default)(".in").removeClass('active').removeClass('in');
-            (0, _jquery2.default)("#" + target.html() + "Tab").addClass('in').addClass('active');
-        };
-
-        return EditProducts;
-    }()) || _class);
-});
-define('modules/admin/system/editSession',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/config', '../../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _validation, _dataTable, _appConfig, _config, _commonDialogs) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditSessions = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditSessions = exports.EditSessions = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _config.Config, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function EditSessions(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
-            _classCallCheck(this, EditSessions);
-
-            this.navControl = "sessionNavButtons";
-            this.showScreen = 'sessionTable';
-            this.spinnerHTML = "";
-            this.isChecked = true;
-
-            this.router = router;
-            this.sessions = sessions;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.dialog = dialog;
-            this.siteConfig = siteConfig;
-
-            this._setupValidation();
-        }
-
-        EditSessions.prototype.attached = function attached() {
-            this.toolTips();
-        };
-
-        EditSessions.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return this.sessions.getSessionsArray('?order=startDate:DSC', true);
-
-                            case 2:
-                                _context.next = 4;
-                                return this.config.getConfig();
-
-                            case 4:
-                                _context.next = 6;
-                                return this.config.getSessions();
-
-                            case 6:
-                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                this.filterOutClosed();
-
-                            case 8:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditSessions.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.sessions.getSessionsArray('?order=startDate', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditSessions.prototype.new = function _new() {
-            this.sessions.selectSession();
-            this.showScreen = 'editSession';
-            this.sessionSelected = true;
-            this.editSystem = true;
-            this.newSession = true;
-            $("#editSession").focus();
-            if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
-        };
-
-        EditSessions.prototype.edit = function edit(index, el) {
-            this.showScreen = 'editSession';
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.sessions.selectSession(this.editIndex);
-
-            this.editSession = true;
-            $("#editSession").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
-
-        EditSessions.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context3.next = 5;
-                                    break;
-                                }
-
-                                _context3.next = 3;
-                                return this.sessions.saveSession();
-
-                            case 3:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                    this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
-                                    this.showScreen = 'sessionTable';
-                                }
-
-                            case 5:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditSessions.prototype.refreshConfig = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                _context4.next = 2;
-                                return this.config.getSessions(true);
-
-                            case 2:
-                                this.editSessionConfig();
-
-                            case 3:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function refreshConfig() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return refreshConfig;
-        }();
-
-        EditSessions.prototype.editSessionConfig = function editSessionConfig() {
-            var _this = this;
-
-            this.editSessionConfigArray = new Array();
-            this.config.SESSION_PARAMS.forEach(function (item) {
-                _this.editSessionConfigArray.push(_this.utils.copyObject(item));
-            });
-            this.showScreen = 'editConfig';
-        };
-
-        EditSessions.prototype.saveConfig = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var _this2 = this;
-
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                if (!this.editSessionConfigArray) {
-                                    _context5.next = 5;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.siteConfig.saveSessions(this.editSessionConfigArray);
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.editSessionConfigArray.forEach(function (item, index) {
-                                        _this2.config.SESSION_PARAMS[index] = item;
-                                    });
-                                    this.utils.showNotification("Session configuration updated");
-                                    this.showScreen = 'sessionTable';
-                                }
-
-                            case 5:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function saveConfig() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return saveConfig;
-        }();
-
-        EditSessions.prototype.updateStatus = function updateStatus(index, session, el) {
-            if (session.sessionStatus === "Closed") return;
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.sessions.selectSession(this.editIndex);
-
-            switch (session.sessionStatus) {
-                case "Next":
-                    this.editStatus = "Requests";
-                    break;
-                case "Requests":
-                    this.editStatus = "Active";
-                    break;
-                case "Active":
-                    this.editStatus = "Closed";
-                    break;
-            }
-            this.sessions.selectedSession.sessionStatus = this.editStatus;
-            this.save();
-        };
-
-        EditSessions.prototype.filterOutClosed = function filterOutClosed() {
-            if (this.isChecked) {
-                var filterValues = new Array();
-                filterValues.push({ property: "sessionStatus", value: "Closed", type: 'text', compare: 'not' });
-                if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
-            } else {
-                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-            }
-            this.toolTips();
-        };
-
-        EditSessions.prototype.cancel = function cancel() {
-            this.sessions.selectSession(this.editIndex);
-        };
-
-        EditSessions.prototype.cancelConfig = function cancelConfig() {
-            var _this3 = this;
-
-            this.editSessionConfigArray = new Array();
-            this.config.SESSION_PARAMS.forEach(function (item) {
-                _this3.editSessionConfigArray.push(_this3.utils.copyObject(item));
-            });
-        };
-
-        EditSessions.prototype.backConfig = function backConfig() {
-            this.showScreen = 'sessionTable';
-        };
-
-        EditSessions.prototype.back = function back() {
-            var _this4 = this;
-
-            if (this.sessions.isDirty().length) {
-                return this.dialog.showMessage("The session has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this4.save();
-                    } else {
-                        _this4.showScreen = 'sessionTable';
-                    }
-                });
-            } else {
-                this.showScreen = 'sessionTable';
-            }
-        };
-
-        EditSessions.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editName", { "rule": "required", "message": "Session name is required", "value": "sessions.selectedSession.session" });
-            this.validation.addRule(1, "editYear", { "rule": "required", "message": "Session year is required", "value": "sessions.selectedSession.year" });
-            this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
-            this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
-            this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
-        };
-
-        EditSessions.prototype.toolTips = function toolTips() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        return EditSessions;
-    }()) || _class);
-});
-define('modules/admin/system/editSystem',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', 'moment', 'jquery'], function (exports, _aureliaFramework, _aureliaRouter, _commonDialogs, _utils, _systems, _sessions, _products, _validation, _dataTable, _appConfig, _moment, _jquery) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditSystem = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    var _jquery2 = _interopRequireDefault(_jquery);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _systems.Systems, _products.Products, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _sessions.Sessions), _dec(_class = function () {
-        function EditSystem(router, systems, products, validation, utils, datatable, config, dialog, sessions) {
-            _classCallCheck(this, EditSystem);
-
-            this.systemSelected = false;
-            this.editClients = false;
-            this.navControl = "systemNavButtons";
-            this.spinnerHTML = "";
-
-            this.router = router;
-            this.systems = systems;
-            this.products = products;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.dialog = dialog;
-            this.sessions = sessions;
-            this._setupValidation();
-        }
-
-        EditSystem.prototype.attached = function attached() {
-            (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditSystem.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.systems.getSystemsArray('?order=sid'), this.products.getProductsArray('?filter=active|eq|true'), this.sessions.getSessionsArray(), this.config.getConfig(), this.config.getSessions()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.systems.systemsArray);
-
-                            case 4:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditSystem.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.systems.getSystemsArray('?order=sid', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.systems.systemsArray);
-                                this.spinnerHTML = "";
-                                this._cleanUpFilters();
-
-                            case 6:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditSystem.prototype.new = function _new() {
-            this.editIndex = -1;
-            this.displayIndex = -1;
-            this.systems.selectSystem();
-            this.editStatus = true;
-
-            (0, _jquery2.default)("#editSid").focus();
-            this.systemSelected = true;
-            this.newSystem = true;
-        };
-
-        EditSystem.prototype.edit = function edit(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.systems.selectSystem(this.editIndex);
-            this.editSystem = true;
-            this.systemSelected = true;
-            this.newSystem = false;
-            (0, _jquery2.default)("#editSid").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showTable = false;
-            setTimeout(function () {
-                (0, _jquery2.default)('[data-toggle="tooltip"]').tooltip();
-            }, 500);
-        };
-
-        EditSystem.prototype.editClientsButton = function editClientsButton() {
-            this.editClients = !this.editClients;
-        };
-
-        EditSystem.prototype.generateClients = function generateClients() {
-            if (!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3) {
-                return this.dialog.showMessage("Clients must have three digits", "Invalid Client Number", ['OK']).then(function (response) {
-                    return;
-                });
-            }
-            var start = parseInt(this.editFirstClient);
-            var end = parseInt(this.editLastClient);
-            if (end <= start) {
-                return this.dialog.showMessage("The first client number must be less than the last client number.", "Invalid Client Number", ['OK']).then(function (response) {
-                    return;
-                });
-            }
-            var result = this.systems.generateClients(start, end, this.editClientStatus);
-
-            if (result.error) {
-                this.utils.showNotification(result.error);
-            }
-        };
-
-        EditSystem.prototype.refreshClients = function refreshClients() {
-            var _this = this;
-
-            if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
-                return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).then(function (response) {
-                    return;
-                });
-            }
-            return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this.systems.refreshClients(_this.config.UNASSIGNED_REQUEST_CODE);
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteClients = function deleteClients() {
-            var _this2 = this;
-
-            return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this2.deleteAllClients();
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteAllClients = function deleteAllClients() {
-            this.systems.deleteAllClients();
-            this.utils.showNotification("You must save the system to complete the deletion");
-        };
-
-        EditSystem.prototype.editAClient = function editAClient(client, index, el) {
-            this.selectedClientIndex = index;
-            this.selectedClient = client;
-            this.systems.selectClient(index);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = (0, _jquery2.default)(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.interfaceUpdate = true;
-        };
-
-        EditSystem.prototype.deleteClient = function deleteClient(index) {
-            var _this3 = this;
-
-            if (!this._okToDeleteClient(this.systems.selectedSystem.clients[index])) {
-                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
-            } else {
-                return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this3.systems.selectedSystem.clients.splice(index, 1);
-                    }
-                });
-            }
-        };
-
-        EditSystem.prototype._okToDeleteClient = function _okToDeleteClient(client) {
-            if (client.assignments.length > 0) return false;
-            var status = client.clientStatus;
-            for (var i = 0; i < this.config.CLIENT_STATUSES.length; i++) {
-                if (this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        EditSystem.prototype.deleteC = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.systems.deleteClient();
-                                this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
-
-                            case 2:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function deleteC() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return deleteC;
-        }();
-
-        EditSystem.prototype.cancel = function cancel() {
-            if (this.editIndex == -1) {
-                this.new();;
-            } else {
-                this.systems.selectSystem(this.editIndex);
-            }
-        };
-
-        EditSystem.prototype.save = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context4.next = 7;
-                                    break;
-                                }
-
-                                this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
-                                this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
-                                _context4.next = 5;
-                                return this.systems.saveSystem();
-
-                            case 5:
-                                serverResponse = _context4.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
-                                    this._cleanUp();
-                                }
-
-                            case 7:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function save() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditSystem.prototype.toggleSandBox = function toggleSandBox(index) {
-            if (this.systems.selectedSystem.clients[index].assignments.length > 0) {
-                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
-            } else {
-                this.systems.selectedSystem.clients[index].clientStatus = this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
-            }
-        };
-
-        EditSystem.prototype.refreshClient = function refreshClient(index) {
-            var _this4 = this;
-
-            return this.dialog.showMessage("This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this4.systems.selectedSystem.clients[index].clientStatus = _this4.config.UNASSIGNED_REQUEST_CODE;
-                    _this4.systems.selectedSystem.clients[index].assignments = new Array();
-                    _this4.systems.selectedSystem.clients[index].idsAvailable = _this4.systems.selectedSystem.idsAvailable;
-                }
-            });
-        };
-
-        EditSystem.prototype.delete = function _delete() {
-            var _this5 = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the system?", "Delete System", ['Yes', 'No']).then(function (response) {
-                if (!response.wasCancelled) {
-                    _this5.deleteSystem();
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteSystem = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                name = this.systems.selectedSystem.sid;
-                                _context5.next = 3;
-                                return this.systems.deleteSystem();
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.systems.systemsArray);
-                                    this.utils.showNotification("System " + name + " was deleted");
-                                }
-                                this._cleanUp();
-                                this.systemSelected = false;
-
-                            case 7:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteSystem() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteSystem;
-        }();
-
-        EditSystem.prototype._cleanUp = function _cleanUp() {
-            this.systemSelected = false;
-            this.newSystem = false;
-            this.validation.makeAllValid(1);
-        };
-
-        EditSystem.prototype._cleanUpFilters = function _cleanUpFilters() {
-            this.sidFilterValue = "";
-            this.descriptionFilterValue = "";
-            this.serverFilterValue = "";
-            this.activeFilter = "";
-            this.dataTable.updateArray(this.systems.systemsArray);
-        };
-
-        EditSystem.prototype.back = function back() {
-            var _this6 = this;
-
-            if (this.systems.isDirty().length) {
-                return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
-                    if (!response.wasCancelled) {
-                        _this6.save();
-                    } else {
-                        _this6._cleanUp();
-                    }
-                });
-            } else {
-                this._cleanUp();
-            }
-        };
-
-        EditSystem.prototype.selectClient = function selectClient(client, index) {
-            this.selectedClient = this.utils.copyObject(client);
-            this.clientSelected = true;
-            this.selectedClientIndex = index;
-        };
-
-        EditSystem.prototype.backClient = function backClient() {
-            this.clientSelected = false;
-        };
-
-        EditSystem.prototype.saveClient = function saveClient() {
-            this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
-            this.clientSelected = false;
-        };
-
-        EditSystem.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editSid", [{ "rule": "required", "message": "SID is required", "value": "systems.selectedSystem.sid" }, { "rule": "custom", "message": "A system with that SID already exists",
-                "valFunction": function valFunction(context) {
-                    var found = false;
-                    for (var i = 0; i < context.systems.systemsArray.length; i++) {
-                        if (context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()) {
-                            if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
-                                found = true;
-                            } else if (!context.systems.selectedSystem._id) {
-                                found = true;
-                            }
-                        }
-                    }
-                    return !found;
-                } }], true);
-            this.validation.addRule(1, "editDesc", [{ "rule": "required", "message": "Description is required", "value": "systems.selectedSystem.description" }]);
-            this.validation.addRule(1, "editServer", [{ "rule": "required", "message": "Server is required", "value": "systems.selectedSystem.server" }, { "rule": "custom", "message": "A system with that server already exists",
-                "valFunction": function valFunction(context) {
-                    var found = false;
-                    for (var i = 0; i < context.systems.systemsArray.length; i++) {
-                        if (context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()) {
-                            if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
-                                found = true;
-                            } else if (!context.systems.selectedSystem._id) {
-                                found = true;
-                            }
-                        }
-                    }
-                    return !found;
-                } }]);
-            this.validation.addRule(1, "editInst", [{ "rule": "required", "message": "Instance is required", "value": "systems.selectedSystem.instance" }]);
-        };
-
-        EditSystem.prototype.filter = function filter(el, options) {
-            this.dataTable.filterListExV(el.target.value, options);
-        };
-
-        return EditSystem;
-    }()) || _class);
-});
-define('modules/admin/system/system',["exports", "aurelia-framework", "aurelia-router"], function (exports, _aureliaFramework, _aureliaRouter) {
-    "use strict";
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.System = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var System = exports.System = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-        function System(router) {
-            _classCallCheck(this, System);
-
-            this.router = router;
-        }
-
-        System.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        System.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'editSessions'],
-                moduleId: './editSession',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editSessions',
-                title: 'Sessions'
-            }, {
-                route: 'editSystems',
-                moduleId: './editSystem',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editSystems',
-                title: 'Systems'
-            }, {
-                route: 'editProducts',
-                moduleId: './editProduct',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editProducts',
-                title: 'Products'
-            }]);
-
-            this.router = router;
-        };
-
-        return System;
     }()) || _class);
 });
 define('modules/home/components/success-dialog',['exports', 'aurelia-framework', 'aurelia-dialog'], function (exports, _aureliaFramework, _aureliaDialog) {
@@ -27511,7 +27522,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
                 this.ILockedIt = true;
                 this.existingRequest = true;
                 if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
-                  dateFoo = (0, _moment2.default)(new Date(this.requests.selectedRequest.requestDetails[0].dateCreated)).format(this.config.DATE_FORMAT_TABLE);
+                  dateFoo = (0, _moment2.default)(new Date(this.requests.selectedRequest.requestDetails[0].createdDate)).format(this.config.DATE_FORMAT_TABLE);
                   existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
 
                   $("#existingRequestInfo").html('').append(existingMsg).fadeIn();
@@ -27829,12 +27840,6 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
           this.requests.selectedRequest.requestDetails.push(newObj);
           this.products.selectedProductFromId(newObj.productId);
           this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
-          var productInfo = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
-          if (productInfo) this.productInfo.push({
-            info: productInfo,
-            productId: newObj.productId,
-            header: this.products.selectedProduct.name
-          });
         }
       }
 
@@ -27965,21 +27970,22 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
 
     ViewHelpTickets.prototype.save = function () {
       var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-        var serverResponse;
+        var email, serverResponse;
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 if (!this.validation.validate(1)) {
-                  _context8.next = 6;
+                  _context8.next = 7;
                   break;
                 }
 
                 this._buildRequest();
-                _context8.next = 4;
-                return this.requests.saveRequest(this.config.SEND_EMAILS);
+                email = this._buildEmailObject();
+                _context8.next = 5;
+                return this.requests.saveRequest(email);
 
-              case 4:
+              case 5:
                 serverResponse = _context8.sent;
 
                 if (!serverResponse.status) {
@@ -27987,11 +27993,11 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
                   this.systemSelected = false;
                 }
 
-              case 6:
+              case 7:
 
                 this._cleanUp();
 
-              case 7:
+              case 8:
               case 'end':
                 return _context8.stop();
             }
@@ -28006,6 +28012,31 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       return save;
     }();
 
+    ViewHelpTickets.prototype._buildEmailObject = function _buildEmailObject() {
+      var _this3 = this;
+
+      var mailObject = new Object();
+      if (this.config.SEND_EMAILS) {
+        mailObject.products = new Array();
+        this.requests.selectedRequest.requestDetails.forEach(function (detail, index) {
+          _this3.products.selectedProductFromId(detail.productId);
+          var date = new Date(detail.requiredDate);
+          var day = date.getDate();
+          var month = date.getMonth();
+          var year = date.getFullYear();
+          mailObject.products.push({ id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: _this3.products.selectedProduct.name });
+        });
+
+        mailObject.comments = this.requests.selectedRequest.comments;
+        mailObject.name = this.userObj.fullName;
+        mailObject.numStudents = parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+        mailObject.email = this.userObj.email;
+        mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
+      }
+
+      return mailObject;
+    };
+
     ViewHelpTickets.prototype._cleanUp = function _cleanUp() {
       this.requests.selectRequest();
       this.productInfo = new Array();
@@ -28016,6 +28047,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       this.courseId = "-1";
       this.sessionId = -1;
       this.requestType = -1;
+      $("#existingRequestInfo").hide();
       $('.wizard').wizard('selectedItem', {
         step: 1
       });
@@ -37695,6 +37727,756 @@ define('aurelia-dialog/dialog-service',['exports', 'aurelia-metadata', 'aurelia-
     }
   }
 });
+define('modules/tech/requests/techRequests',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.Customers = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var Customers = exports.Customers = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+        function Customers(router) {
+            _classCallCheck(this, Customers);
+
+            this.tabs = [{ id: 'editPeople', label: 'People' }, { id: 'editInstitutions', label: 'Institutions' }];
+            this.tabPath = "modules/admin/customers/";
+
+            this.router = router;
+        }
+
+        Customers.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        Customers.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'assignments'],
+                moduleId: './assignments',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'assignments',
+                title: "Assignments"
+            }, {
+                route: 'createRequest',
+                moduleId: './createRequest',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'createRequest',
+                title: 'Create Request'
+            }]);
+
+            this.router = router;
+        };
+
+        return Customers;
+    }()) || _class);
+});
+define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/data/siteInfo', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', '../../../resources/utils/validation', '../../../resources/dialogs/common-dialogs', 'flatpickr', 'aurelia-event-aggregator', 'fuelux', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _dataTable, _sessions, _products, _siteInfo, _clientRequests, _appConfig, _utils, _people, _validation, _commonDialogs, _flatpickr, _aureliaEventAggregator, _fuelux, _moment) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.CreateRequestTech = undefined;
+
+	var _validation2 = _interopRequireDefault(_validation);
+
+	var _flatpickr2 = _interopRequireDefault(_flatpickr);
+
+	var _fuelux2 = _interopRequireDefault(_fuelux);
+
+	var _moment2 = _interopRequireDefault(_moment);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
+	function _asyncToGenerator(fn) {
+		return function () {
+			var gen = fn.apply(this, arguments);
+			return new Promise(function (resolve, reject) {
+				function step(key, arg) {
+					try {
+						var info = gen[key](arg);
+						var value = info.value;
+					} catch (error) {
+						reject(error);
+						return;
+					}
+
+					if (info.done) {
+						resolve(value);
+					} else {
+						return Promise.resolve(value).then(function (value) {
+							step("next", value);
+						}, function (err) {
+							step("throw", err);
+						});
+					}
+				}
+
+				return step("next");
+			});
+		};
+	}
+
+	function _classCallCheck(instance, Constructor) {
+		if (!(instance instanceof Constructor)) {
+			throw new TypeError("Cannot call a class as a function");
+		}
+	}
+
+	var _dec, _class;
+
+	var CreateRequestTech = exports.CreateRequestTech = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig, _validation2.default, _people.People, _commonDialogs.CommonDialogs, _dataTable.DataTable, _utils.Utils, _sessions.Sessions, _products.Products, _clientRequests.ClientRequests, _siteInfo.SiteInfo, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+		function CreateRequestTech(router, config, validation, people, dialog, datatable, utils, sessions, products, requests, siteInfo, ea) {
+			_classCallCheck(this, CreateRequestTech);
+
+			this.sessionSelected = false;
+			this.spinnerHTML = "";
+
+			this.router = router;
+			this.config = config;
+			this.validation = validation;
+			this.validation.initialize(this);
+			this.people = people;
+			this.dataTable = datatable;
+			this.dataTable.initialize(this);
+			this.utils = utils;
+			this.sessions = sessions;
+			this.products = products;
+			this.requests = requests;
+			this.siteInfo = siteInfo;
+			this.dialog = dialog;
+			this.ea = ea;
+
+			this.userObj = JSON.parse(sessionStorage.getItem('user'));;
+		}
+
+		CreateRequestTech.prototype.activate = function () {
+			var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var responses;
+				return regeneratorRuntime.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								_context.next = 2;
+								return Promise.all([this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate', true), this.products.getProductsArray('?filter=active|eq|true&order=name', true), this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name'), this.siteInfo.getMessageArray('?filter=category|eq|CLIENT_REQUESTS', true), this.config.getConfig()]);
+
+							case 2:
+								responses = _context.sent;
+
+
+								this.requests.selectRequest();
+								this.filterList();
+								this._setUpValidation();
+
+								if (!this.config.SANDBOX_USED) {
+									this.typeSelected = true;
+									this.regularClient = true;
+									this.requestType = "regularCourse";
+								}
+
+							case 7:
+							case 'end':
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
+
+			function activate() {
+				return _ref.apply(this, arguments);
+			}
+
+			return activate;
+		}();
+
+		CreateRequestTech.prototype.changeBeginDate = function changeBeginDate(evt) {
+			if (evt.detail && evt.detail.value.date !== "") {
+				this.minEndDate = (0, _moment2.default)(evt.detail.value.date).format("MM/DD/YYYY");
+				this.requests.selectedRequest.endDate = _moment2.default.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
+			}
+		};
+
+		CreateRequestTech.prototype.selectProduct = function selectProduct(el) {
+			if (this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage) {
+				if (this.alreadyOnList(el.target.id)) {
+					this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.');
+				} else {
+					$("#requestProductsLabel").html("Requested Products");
+					var newObj = this.requests.emptyRequestDetail();
+					newObj.productId = el.target.id;
+					newObj.sessionId = this.sessionId;
+					newObj.courseId = this.courseId;
+					this.requests.selectedRequest.requestDetails.push(newObj);
+					this.products.selectedProductFromId(newObj.productId);
+					this.requests.selectedRequest.requestDetails[this.requests.selectedRequest.requestDetails.length - 1].productName = this.products.selectedProduct.name;
+				}
+			}
+
+			this.validation.makeValid($("#productList"));
+		};
+
+		CreateRequestTech.prototype.alreadyOnList = function alreadyOnList(id) {
+			for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
+				if (this.requests.selectedRequest.requestDetails[i].productId === id) return true;
+			}
+			return false;
+		};
+
+		CreateRequestTech.prototype.removeProduct = function removeProduct(el) {
+			var _this = this;
+
+			if (!this.showLockMessage) {
+				for (var i = 0; i < this.requests.selectedRequest.requestDetails.length; i++) {
+					if (el.target.id === this.requests.selectedRequest.requestDetails[i].productId) {
+						if (this.requests.selectedRequest.requestDetails[i]._id) {
+							if (this.requests.selectedRequest.requestDetails[i].requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
+								return this.dialog.showMessage("That request has already been assigned and cannot be deleted?", "Cannot Delete Request", ['Ok']).then(function (response) {});
+							} else {
+								return this.dialog.showMessage("Are you sure you want to delete that request?", "Delete Request", ['Yes', 'No']).then(function (response) {
+									if (!response.wasCancelled) {
+										_this.requests.selectedRequest.requestDetails[i].delete = true;
+									}
+								});
+							}
+							break;
+						} else {
+							this.requests.selectedRequest.requestDetails.splice(i, 1);
+							for (var j = 0; j < this.productInfo.length; j++) {
+								if (el.target.id == this.productInfo[j].productId) {
+									this.productInfo.splice(j, 1);
+									break;
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		};
+
+		CreateRequestTech.prototype._buildRequest = function _buildRequest() {
+			var _this2 = this;
+
+			if (this.requests.selectedRequest._id) {
+				this.requests.selectedRequest.requestDetailsToSave = this.requests.selectedRequest.requestDetails;
+				this.requests.selectedRequest.requestDetailsToSave.forEach(function (item, index) {
+					if (item.requestStatus != _this2.config.ASSIGNED_REQUEST_CODE) item.requestStatus = _this2.config.UPDATED_REQUEST_CODE;
+				});
+				this.requests.selectedRequest.requestStatus = this.config.UPDATED_REQUEST_CODE;
+			} else {
+				this.requests.selectedRequest.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
+			}
+
+			this.requests.selectedRequest.audit[0].personId = this.userObj._id;
+			this.requests.selectedRequest.institutionId = this.selectedInstitution;
+			this.requests.selectedRequest.sessionId = this.sessionId;
+			this.requests.selectedRequest.courseId = this.courseId;
+			this.requests.selectedRequest.personId = this.selectedPerson;
+		};
+
+		CreateRequestTech.prototype.save = function () {
+			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var email, serverResponse;
+				return regeneratorRuntime.wrap(function _callee2$(_context2) {
+					while (1) {
+						switch (_context2.prev = _context2.next) {
+							case 0:
+								if (!this.validation.validate(1)) {
+									_context2.next = 8;
+									break;
+								}
+
+								this._buildRequest();
+								email = this._buildEmailObject();
+								_context2.next = 5;
+								return this.requests.saveRequest(email);
+
+							case 5:
+								serverResponse = _context2.sent;
+
+								if (!serverResponse.status) {
+									this.utils.showNotification("The product request was updated");
+									this.systemSelected = false;
+								}
+								this._cleanUp();
+
+							case 8:
+							case 'end':
+								return _context2.stop();
+						}
+					}
+				}, _callee2, this);
+			}));
+
+			function save() {
+				return _ref2.apply(this, arguments);
+			}
+
+			return save;
+		}();
+
+		CreateRequestTech.prototype._buildEmailObject = function _buildEmailObject() {
+			var _this3 = this;
+
+			var mailObject = new Object();
+			mailObject.products = new Array();
+			this.requests.selectedRequest.requestDetails.forEach(function (detail, index) {
+				_this3.products.selectedProductFromId(detail.productId);
+				var date = new Date(detail.requiredDate);
+				var day = date.getDate();
+				var month = date.getMonth();
+				var year = date.getFullYear();
+				mailObject.products.push({ id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: _this3.products.selectedProduct.name });
+			});
+
+			mailObject.comments = this.requests.selectedRequest.comments;
+			mailObject.name = this.userObj.fullName;
+			mailObject.numStudents = parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+			mailObject.email = this.people.selectedPerson.email;
+			mailObject.reason = 1;
+			mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
+
+			return mailObject;
+		};
+
+		CreateRequestTech.prototype._cleanUp = function _cleanUp() {
+			this.requests.selectRequest();
+			this.productInfo = new Array();
+			this.sessionSelected = false;
+			this.institutionSelected = false;
+			this.personSelected = false;
+			this.typeSelected = false;
+			this.courseSelected = false;
+			this.regularClient = false;
+			this.sandBoxClient = false;
+			$("#existingRequestInfo").hide();
+			this.courseId = "-1";
+			this.sessionId = "";
+			this.requestType = -1;
+		};
+
+		CreateRequestTech.prototype.changeSession = function () {
+			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(el) {
+				return regeneratorRuntime.wrap(function _callee3$(_context3) {
+					while (1) {
+						switch (_context3.prev = _context3.next) {
+							case 0:
+								if (this.sessionId == "") {
+									this.sessionSelected = false;
+									this.courseSelected = false;
+									this.sandBoxClient = false;
+								} else {
+									this.sessionSelected = true;
+
+									this.sessions.selectSession(el.target.selectedIndex - 1);
+									this.setDates();
+								}
+
+							case 1:
+							case 'end':
+								return _context3.stop();
+						}
+					}
+				}, _callee3, this);
+			}));
+
+			function changeSession(_x) {
+				return _ref3.apply(this, arguments);
+			}
+
+			return changeSession;
+		}();
+
+		CreateRequestTech.prototype.changeInstitution = function changeInstitution(el) {
+			console.log(this.selectedInstitution);
+			this.institutionSelected = true;
+			this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.selectedInstitution + '&order=lastName', true);
+		};
+
+		CreateRequestTech.prototype.changePerson = function changePerson(el) {
+			this.personSelected = true;
+			this.people.selectedPersonFromId(this.selectedPerson, 'i');
+		};
+
+		CreateRequestTech.prototype.changeRequestType = function changeRequestType(el) {
+			switch (this.requestType) {
+				case -1:
+					this.regularClient = false;
+					break;
+				case "regularCourse":
+					this.regularClient = true;
+					this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedPerson + '&order=number', true);
+					break;
+				case "sandboxCourse":
+					this.courseId = this.config.SANDBOX_ID;
+					this.sandBoxClient = true;
+					break;
+			}
+		};
+
+		CreateRequestTech.prototype.openEditCourseForm = function () {
+			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+				return regeneratorRuntime.wrap(function _callee4$(_context4) {
+					while (1) {
+						switch (_context4.prev = _context4.next) {
+							case 0:
+								if (this.showCourses) {
+									_context4.next = 3;
+									break;
+								}
+
+								_context4.next = 3;
+								return this.refreshCourses();
+
+							case 3:
+								this.showCourses = !this.showCourses;
+
+							case 4:
+							case 'end':
+								return _context4.stop();
+						}
+					}
+				}, _callee4, this);
+			}));
+
+			function openEditCourseForm() {
+				return _ref4.apply(this, arguments);
+			}
+
+			return openEditCourseForm;
+		}();
+
+		CreateRequestTech.prototype.refreshCourses = function () {
+			var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+				return regeneratorRuntime.wrap(function _callee5$(_context5) {
+					while (1) {
+						switch (_context5.prev = _context5.next) {
+							case 0:
+								_context5.next = 2;
+								return this.people.getCoursesArray(true, '?filter=personId|eq|' + this.selectedPerson + '&order=number', true);
+
+							case 2:
+							case 'end':
+								return _context5.stop();
+						}
+					}
+				}, _callee5, this);
+			}));
+
+			function refreshCourses() {
+				return _ref5.apply(this, arguments);
+			}
+
+			return refreshCourses;
+		}();
+
+		CreateRequestTech.prototype.editACourse = function editACourse() {
+			if (this.courseId != -1) {
+				this.editCourse = true;
+				$("#number").focus();
+			}
+		};
+
+		CreateRequestTech.prototype.newCourse = function newCourse() {
+			this.editCourseIndex = -1;
+			this.people.selectCourse();
+			$("#number").focus();
+			this.editCourse = true;
+		};
+
+		CreateRequestTech.prototype.saveCourse = function () {
+			var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+				var serverResponse;
+				return regeneratorRuntime.wrap(function _callee6$(_context6) {
+					while (1) {
+						switch (_context6.prev = _context6.next) {
+							case 0:
+								if (!this.validation.validate(5)) {
+									_context6.next = 9;
+									break;
+								}
+
+								if (!this.userObj._id) {
+									_context6.next = 9;
+									break;
+								}
+
+								if (this.people.selectedCourse._id) this.editCourseIndex = this.baseArray.length;
+								this.people.selectedCourse.personId = this.userObj._id;
+								_context6.next = 6;
+								return this.people.saveCourse();
+
+							case 6:
+								serverResponse = _context6.sent;
+
+								if (!serverResponse.status) {
+									this.utils.showNotification("The course was updated");
+								}
+								this.editCourse = false;
+
+							case 9:
+							case 'end':
+								return _context6.stop();
+						}
+					}
+				}, _callee6, this);
+			}));
+
+			function saveCourse() {
+				return _ref6.apply(this, arguments);
+			}
+
+			return saveCourse;
+		}();
+
+		CreateRequestTech.prototype.cancelEditCourse = function cancelEditCourse() {
+			this.editCourse = false;
+		};
+
+		CreateRequestTech.prototype.selectCourse = function () {
+			var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(index, el) {
+				return regeneratorRuntime.wrap(function _callee7$(_context7) {
+					while (1) {
+						switch (_context7.prev = _context7.next) {
+							case 0:
+								this.editCourseIndex = index;
+								this.people.selectCourse(this.editCourseIndex);
+								this.courseSelected = true;
+								this.courseId = this.people.selectedCourse._id;
+								_context7.next = 6;
+								return this.getRequests();
+
+							case 6:
+
+								if (this.selectedCourseRow) this.selectedCourseRow.children().removeClass('info');
+								this.selectedCourseRow = $(el.target).closest('tr');
+								this.selectedCourseRow.children().addClass('info');
+
+							case 9:
+							case 'end':
+								return _context7.stop();
+						}
+					}
+				}, _callee7, this);
+			}));
+
+			function selectCourse(_x2, _x3) {
+				return _ref7.apply(this, arguments);
+			}
+
+			return selectCourse;
+		}();
+
+		CreateRequestTech.prototype.getRequests = function () {
+			var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+				var dateFoo, existingMsg;
+				return regeneratorRuntime.wrap(function _callee8$(_context8) {
+					while (1) {
+						switch (_context8.prev = _context8.next) {
+							case 0:
+								if (!(this.sessionId != -1 && this.courseId != -1)) {
+									_context8.next = 8;
+									break;
+								}
+
+								this.ILockedIt = false;
+								this.existingRequest = false;
+								_context8.next = 5;
+								return this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
+
+							case 5:
+								if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
+									this.requests.selectRequest(0);
+									this.setDates(false);
+
+									this.ILockedIt = true;
+									this.existingRequest = true;
+									if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
+										dateFoo = (0, _moment2.default)(new Date(this.requests.selectedRequest.requestDetails[0].createdDate)).format(this.config.DATE_FORMAT_TABLE);
+										existingMsg = this.siteInfo.selectMessageByKey('EXISTING_REQUEST_MESSAGE').content.replace('DATECREATED', dateFoo);
+
+										$("#existingRequestInfo").html('').append(existingMsg).fadeIn();
+									} else {
+										$("#existingRequestInfo").empty().hide();
+									}
+								} else {
+									$("#existingRequestInfo").empty().hide();
+									this.setDates(true);
+									this.existingRequest = false;
+									this.requests.selectRequest();
+									this.requests.selectedRequest.sessionId = this.sessionId;
+								}
+
+								_context8.next = 9;
+								break;
+
+							case 8:
+								this.existingRequest = false;
+
+							case 9:
+							case 'end':
+								return _context8.stop();
+						}
+					}
+				}, _callee8, this);
+			}));
+
+			function getRequests() {
+				return _ref8.apply(this, arguments);
+			}
+
+			return getRequests;
+		}();
+
+		CreateRequestTech.prototype.filterList = function filterList() {
+			if (this.filter) {
+				var thisFilter = this.filter;
+				this.filteredProductsArray = this.products.productsArray.filter(function (item) {
+					return item.name.toUpperCase().indexOf(thisFilter.toUpperCase()) != -1;
+				});
+			} else {
+				this.filteredProductsArray = this.products.productsArray;
+			}
+		};
+
+		CreateRequestTech.prototype.setDates = function setDates(session) {
+			if (session) {
+				$("#input-startDate").val("");
+				$("#input-endDate").val("");
+			}
+			this.minStartDate = this.sessions.selectedSession.startDate;
+			this.maxStartDate = this.sessions.selectedSession.endDate;
+			this.minEndDate = this.sessions.selectedSession.startDate;
+			this.maxEndDate = this.sessions.selectedSession.endDate;
+
+			var nowPlusLeeway = (0, _moment2.default)(new Date()).add(this.config.REQUEST_LEEWAY, 'days');
+			this.minRequiredDate = _moment2.default.max(nowPlusLeeway, (0, _moment2.default)(this.sessions.selectedSession.startDate));
+			this.minRequiredDate = (0, _moment2.default)(this.minRequiredDate._d).format('YYYY-MM-DD');
+			this.maxRequiredDate = this.sessions.selectedSession.endDate;
+		};
+
+		CreateRequestTech.prototype.changeCourse = function () {
+			var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(el) {
+				var courseId;
+				return regeneratorRuntime.wrap(function _callee9$(_context9) {
+					while (1) {
+						switch (_context9.prev = _context9.next) {
+							case 0:
+								courseId = el.target.options[el.target.selectedIndex].value;
+
+								this.selectedCourseIndex = el.target.selectedIndex;
+
+								if (!(courseId === "")) {
+									_context9.next = 6;
+									break;
+								}
+
+								this.courseSelected = false;
+								_context9.next = 11;
+								break;
+
+							case 6:
+								this.courseSelected = true;
+								this.courseName = this.courses[el.target.selectedIndex - 1].number + " - " + this.courses[el.target.selectedIndex - 1].name;
+								this.validation.makeValid($(el.target));
+								_context9.next = 11;
+								return this.getRequests();
+
+							case 11:
+							case 'end':
+								return _context9.stop();
+						}
+					}
+				}, _callee9, this);
+			}));
+
+			function changeCourse(_x4) {
+				return _ref9.apply(this, arguments);
+			}
+
+			return changeCourse;
+		}();
+
+		CreateRequestTech.prototype._setUpValidation = function _setUpValidation() {
+			this.validation.addRule(1, "session", [{ "rule": "custom", "message": "Select a session",
+				"valFunction": function valFunction(context) {
+					return !(context.sessionId == -1);
+				} }]);
+			this.validation.addRule(1, "institution", [{ "rule": "custom", "message": "Select an institution",
+				"valFunction": function valFunction(context) {
+					return !(context.selectedInstitution == "");
+				} }]);
+			this.validation.addRule(1, "faculty", [{ "rule": "custom", "message": "Select a person",
+				"valFunction": function valFunction(context) {
+					return !(context.selectedPerson == "");
+				} }]);
+			this.validation.addRule(1, "course", [{ "rule": "custom", "message": "Select a course",
+				"valFunction": function valFunction(context) {
+					return context.courseId != undefined && !(context.courseId == "-1");
+				}
+			}]);
+			this.validation.addRule(1, "startDateError", [{ "rule": "required", "message": "Select a date",
+				"value": "requests.selectedRequest.startDate" }]);
+			this.validation.addRule(1, "endDateError", [{ "rule": "required", "message": "Select a date",
+				"value": "requests.selectedRequest.endDate" }]);
+
+			this.validation.addRule(1, "requestType", [{ "rule": "custom", "message": "Select a request type",
+				"valFunction": function valFunction(context) {
+					return !(context.requestType == -1);
+				} }]);
+			this.validation.addRule(1, "numberOfStudentsError", [{ "rule": "custom", "message": "Enter either the number of undergradate or graduate students",
+				"valFunction": function valFunction(context) {
+					if (context.requestType === "sandboxCourse") {
+						return true;
+					} else if (context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}]);
+			this.validation.addRule(1, "productList", [{ "rule": "custom", "message": "Select at least one product",
+				"valFunction": function valFunction(context) {
+					if (context.requests.selectedRequest.requestDetails.length === 0) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}]);
+			this.validation.addRule(1, "productListTable", [{ "rule": "custom", "message": "Enter all required dates",
+				"valFunction": function valFunction(context) {
+					for (var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++) {
+						if (!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === "") {
+							return false;
+						}
+					}
+					return true;
+				}
+			}]);
+			this.validation.addRule(5, "number", [{ "rule": "required", "message": "Enter the course number", "value": "people.selectedCourse.number" }, { "rule": "required", "message": "Enter the course name", "value": "people.selectedCourse.name" }]);
+		};
+
+		return CreateRequestTech;
+	}()) || _class);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"resources/css/styles.css\"></require>\n  <require from=\"humane-js/themes/flatty.css\"></require>\n  <require from=\"bootstrap-select/css/bootstrap-select.css\"></require>\n  <require from=\"toastr/build/toastr.css\"></require>\n  <nav-bar></nav-bar>\n\n <div class=\"page-host\">\n    <loading-indicator progress.bind=\"data.progress\" loading.bind=\"router.isNavigating || data.isRequesting\"></loading-indicator>\n    <router-view></router-view>\n  </div>\n   \n</template>"; });
 define('text!resources/css/bootstrap-datetimepicker.min.css', ['module'], function(module) { module.exports = "/*!\n * Datetimepicker for Bootstrap 3\n * version : 4.17.43\n * https://github.com/Eonasdan/bootstrap-datetimepicker/\n */.bootstrap-datetimepicker-widget{list-style:none}.bootstrap-datetimepicker-widget.dropdown-menu{margin:2px 0;padding:4px;width:19em}@media (min-width:768px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:992px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}@media (min-width:1200px){.bootstrap-datetimepicker-widget.dropdown-menu.timepicker-sbs{width:38em}}.bootstrap-datetimepicker-widget.dropdown-menu:before,.bootstrap-datetimepicker-widget.dropdown-menu:after{content:'';display:inline-block;position:absolute}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:before{border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #ccc;border-bottom-color:rgba(0,0,0,0.2);top:-7px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.bottom:after{border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid white;top:-6px;left:8px}.bootstrap-datetimepicker-widget.dropdown-menu.top:before{border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ccc;border-top-color:rgba(0,0,0,0.2);bottom:-7px;left:6px}.bootstrap-datetimepicker-widget.dropdown-menu.top:after{border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid white;bottom:-6px;left:7px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before{left:auto;right:6px}.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after{left:auto;right:7px}.bootstrap-datetimepicker-widget .list-unstyled{margin:0}.bootstrap-datetimepicker-widget a[data-action]{padding:6px 0}.bootstrap-datetimepicker-widget a[data-action]:active{box-shadow:none}.bootstrap-datetimepicker-widget .timepicker-hour,.bootstrap-datetimepicker-widget .timepicker-minute,.bootstrap-datetimepicker-widget .timepicker-second{width:54px;font-weight:bold;font-size:1.2em;margin:0}.bootstrap-datetimepicker-widget button[data-action]{padding:6px}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"incrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Increment Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"decrementMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Decrement Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showHours\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Hours\"}.bootstrap-datetimepicker-widget .btn[data-action=\"showMinutes\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Show Minutes\"}.bootstrap-datetimepicker-widget .btn[data-action=\"togglePeriod\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle AM/PM\"}.bootstrap-datetimepicker-widget .btn[data-action=\"clear\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Clear the picker\"}.bootstrap-datetimepicker-widget .btn[data-action=\"today\"]::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Set the date to today\"}.bootstrap-datetimepicker-widget .picker-switch{text-align:center}.bootstrap-datetimepicker-widget .picker-switch::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Toggle Date and Time Screens\"}.bootstrap-datetimepicker-widget .picker-switch td{padding:0;margin:0;height:auto;width:auto;line-height:inherit}.bootstrap-datetimepicker-widget .picker-switch td span{line-height:2.5;height:2.5em;width:100%}.bootstrap-datetimepicker-widget table{width:100%;margin:0}.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{text-align:center;border-radius:4px}.bootstrap-datetimepicker-widget table th{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table th.picker-switch{width:145px}.bootstrap-datetimepicker-widget table th.disabled,.bootstrap-datetimepicker-widget table th.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table th.prev::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Previous Month\"}.bootstrap-datetimepicker-widget table th.next::after{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0;content:\"Next Month\"}.bootstrap-datetimepicker-widget table thead tr:first-child th{cursor:pointer}.bootstrap-datetimepicker-widget table thead tr:first-child th:hover{background:#eee}.bootstrap-datetimepicker-widget table td{height:54px;line-height:54px;width:54px}.bootstrap-datetimepicker-widget table td.cw{font-size:.8em;height:20px;line-height:20px;color:#777}.bootstrap-datetimepicker-widget table td.day{height:20px;line-height:20px;width:20px}.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table td.hour:hover,.bootstrap-datetimepicker-widget table td.minute:hover,.bootstrap-datetimepicker-widget table td.second:hover{background:#eee;cursor:pointer}.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:#777}.bootstrap-datetimepicker-widget table td.today{position:relative}.bootstrap-datetimepicker-widget table td.today:before{content:'';display:inline-block;border:solid transparent;border-width:0 0 7px 7px;border-bottom-color:#337ab7;border-top-color:rgba(0,0,0,0.2);position:absolute;bottom:4px;right:4px}.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td.active.today:before{border-bottom-color:#fff}.bootstrap-datetimepicker-widget table td.disabled,.bootstrap-datetimepicker-widget table td.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget table td span{display:inline-block;width:54px;height:54px;line-height:54px;margin:2px 1.5px;cursor:pointer;border-radius:4px}.bootstrap-datetimepicker-widget table td span:hover{background:#eee}.bootstrap-datetimepicker-widget table td span.active{background-color:#337ab7;color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,0.25)}.bootstrap-datetimepicker-widget table td span.old{color:#777}.bootstrap-datetimepicker-widget table td span.disabled,.bootstrap-datetimepicker-widget table td span.disabled:hover{background:none;color:#777;cursor:not-allowed}.bootstrap-datetimepicker-widget.usetwentyfour td.hour{height:27px;line-height:27px}.bootstrap-datetimepicker-widget.wider{width:21em}.bootstrap-datetimepicker-widget .datepicker-decades .decade{line-height:1.8em !important}.input-group.date .input-group-addon{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}"; });
 define('text!modules/analytics/analytics.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Analytics</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n\n        </nav>\n    </div>\n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
@@ -37749,12 +38531,12 @@ define('text!resources/elements/tiny-mce.html', ['module'], function(module) { m
 define('text!resources/elements/tree-node.html', ['module'], function(module) { module.exports = "<template>\n\t<require from=\"./tree-node.css\"></require>\n\t<li if.bind=\"visible\" class=\"list-group-item treeview ${selectedNode == data?'active':''}\" click.delegate=\"clickMe(data)\">\n\t\t<span class=\"indent\" repeat.for=\"i of level\"></span>\n\t\t<span if.bind=\"data.children\" class=\"icon glyphicon ${childrenVisible?'glyphicon-triangle-bottom':'glyphicon-triangle-right'}\" click.delegate=\"toggleExpand()\"></span>\n\t\t<span if.bind=\"!data.children\" class=\"icon glyphicon\"></span>\n\t\t ${data.name}<span if.bind=\"!childrenVisible && itemCount != 0\" class=\"badge\" click.delegate=\"toggleExpand()\">${itemCount}</span>\n\t\t <span if.bind=\"!data.children\" class=\"icon glyphicon glyphicon-trash pull-right\" click.delegate=\"callback(data)\"></span>\n\t</li>\n\t<tree-node if.bind=\"visible\"  callback.call=\"deleteFile2(node)\" selected-file.bind=\"selectedFile\" repeat.for=\"node of data.children\" data.bind=\"node\" level.bind=\"level + 1\" visible.bind=\"childrenVisible\" max-level.bind=\"maxLevel\" selected-node.bind=\"selectedNode\"></tree-node>\n</template>"; });
 define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"event.personId | gravatarUrlId:people:100:1\"></div>\n\t<div class=\"smart-timeline-time\">\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \n\t</div>\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\n\t\t<div class=\"form-group\">\n\t\t\t<p>${event.personId | person:people:'fullName'}</p>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"well well-sm topMargin\">\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li>\n            <div class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId | gravatarUrlId:people:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <div class=\"form-group\">\n                  <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>\n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                      <span id=\"container\"></span>\n                      <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                      <h4 show.bind=\"showRequestDetails\" class=\"col-sm-11 col-sm-offset-1 \">Client: ${systems.selectedClient.client}</h4>\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n                   \n                      <div class=\"form-group topMargin\">\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                              target=\"_blank\"\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n                          </div>\n                      </div>\n                     </div>\n                    <div class=\"col-lg-7\">\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\n                        <hr/>\n                        <h4 >Steps to reproduce the problem</h4>\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\n                      </div>\n                    </div>\n                </div>\n              </div>\n            </div>\n          </li>\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\n            <compose view=\"./response.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n</template>"; });
+define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Documents</a>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n\t\t<compose view=\"./components/selectionForm.html\"></compose>\n\t\t<compose view=\"./components/emailTable.html\"></compose>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Customers</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
 define('text!modules/admin/customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n             <div show.bind=\"!personSelected && bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/bulkEmail.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/customers/test.html', ['module'], function(module) { module.exports = "<template>Test</template>"; });
-define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"subMenu-container\">\r\n        <nav class=\"navbar navbar-inverse subMenu\">\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\">Documents</a>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"\r\n                                    />\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Inventory</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/notes/notes.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Notes</a>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"noteSelected === 'No'\">\n                <compose view=\"./components/notesTable.html\"></compose>\n            </div> \n            <div show.bind=\"noteSelected === 'Yes'\" >\n                <compose view=\"./components/notesForm.html\"></compose>\n            </div>\n             <div show.bind=\"noteSelected === 'helpTicket'\" >\n                <compose view=\"./components/helpTicket.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>"; });
 define('text!modules/admin/site/admin.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"fluid-container\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-2\">\n\t\t\t\t<select  change.delegate=\"typeSelected()\" class=\"form-control\" value.bind=\"screenToShow\">\n\t\t\t\t\t<option value=\"\">Select an option</option>\n\t\t\t\t\t<option value=\"auth\">Authorization Log</option>\n\t\t\t\t\t<option value=\"log\">Transaction Log</option>\n\t\t\t\t\t<option value=\"files\">Files</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-lg-2 topMargin\">\n\t\t\t\t<div show.bind=\"fileList.length\" class=\"panel panel-default\">\n\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t<div class=\"input-group\">\n\t\t\t\t\t\t\t\t\t<span click.delegate=\"deleteFiles()\" class=\"smallMarginRight input-group-addon\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete oldest files\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span>\n\t\t\t\t\t\t\t\t\t<input value.bind=\"filesToDelete\" id=\"filesToDelete\" class=\"form-control\"  type=\"number\" ria-describedby=\"basic-addon1\"/>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<label>Files</label>\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\n                            <ul show.bind=\"screenToShow !== 'files'\" class=\"list-group\">\n                                <button click.trigger=\"fileSelected($index)\" type=\"button\" repeat.for=\"file of fileList\" id=\"${type.code}\" class=\"list-group-item\">${file}</button>\n                            </ul>\n\t\t\t\t\t\t\t <ul show.bind=\"screenToShow === 'files'\" class=\"list-group\">\n                                <button click.trigger=\"uploadedFileSelected(file)\" type=\"button\" repeat.for=\"file of fileList\" id=\"${$index}\" class=\"list-group-item\">${file.folder}</button>\n                            </ul>\n                        </div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div show.bind=\"fileContents.length && screenToShow !== 'files'\" class=\"col-lg-9 topMargin\">\n\t\t\t\t<compose view='./components/logFileTable.html'></compose>\n\t\t\t</div>\n\t\t\t<div show.bind=\"showFileList && screenToShow === 'files'\" class=\"col-lg-9 topMargin\">\n\t\t\t\t<compose view='./components/uploadedFilesTable.html'></compose>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
@@ -37792,11 +38574,11 @@ define('text!modules/social/components/blogPageUCC.html', ['module'], function(m
 define('text!modules/social/components/forumList.html', ['module'], function(module) { module.exports = "<template>\n\t<div>\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"newForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div show.bind=\"openNewForumForm\">\n\t\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t\t<span click.delegate=\"saveForum()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"title\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t<textarea value.bind=\"text\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<ul>\n\t\t<li show.bind=\"forum.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumArray\">\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${forum.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${forum.text}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${forum.topics}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${forum.posts}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
 define('text!modules/social/components/forumPage.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"container\">\n\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"list-group-item\" style=\"margin-top:5px;\">\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<h4>${social.selectedForum.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t<span>${social.selectedForum.text}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${social.selectedForum.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Topics: ${social.selectedForum.topics}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Posts: ${social.selectedForum.posts}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"bottomMargin topMargin list-group-item\">\n\t\t\t<span click.delegate=\"newForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\ttitle=\"\" data-original-title=\"New Forum Topic\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div show.bind=\"openNewTopicForm\">\n\t\t\t<div class=\"bottomMargin list-group-item\">\n\t\t\t\t<span click.delegate=\"saveForumTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span click.delegate=\"cancelFormTopic()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTitle\" class=\"control-label hideOnPhone\">Title</label>\n\t\t\t\t\t\t<input value.bind=\"FormTopicTitle\" id=\"editTitle\" class=\"form-control \" placeholder=\"Title\" type=\"text\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-12 col-lg-12\">\n\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t<label for=\"editTeaser\" class=\"control-label hideOnPhone\">Description</label>\n\t\t\t\t\t\t<textarea value.bind=\"ForumTopicText\" id=\"editTeaser\" rows=\"5\" class=\"form-control\" placeholder=\"Description\" type=\"text\" ></textarea>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div>\n\t\t<ul>\n\t\t\t<li class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"forum of social.forumMessageArray\">\n\t\t\t\t<div class=\"media-body\">\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t\t<h4>${forum.title}</h4>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div click.trigger=\"selectForum($index)\" class=\"col-lg-12\">\n\t\t\t\t\t\t<span>${forum.text}</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t\t<span>${forum.dateCreated | dateFormat}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</li>\n\t\t</ul>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/social/components/writeBlogList.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"New\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t</div>\n\t<ul>\n\t\t<li show.bind=\"blog.active\" class=\"list-group-item\" style=\"margin-top:5px;\" repeat.for=\"blog of social.blogArray\">\n\t\t\t<div class=\"media-left\" innerhtml='${blog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<h4>${blog.title}</h4>\n\t\t\t\t</div>\n\t\t\t\t<div click.trigger=\"selectBlog($index)\" class=\"col-lg-12\">\n\t\t\t\t\t<span>${blog.teaser}</span>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-lg-12 smallFont topMargin\">\n\t\t\t\t\t<span>${blog.dateCreated | dateFormat}</span>\n\t\t\t\t\t<span class=\"leftMargin\">Likes: ${blog.likes}</span>\n\t\t\t\t\t<span show.bind=\"blog.views > 0\" class=\"leftMargin\">Views: ${blog.views}</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</template>"; });
+define('text!modules/tech/requests/assignments.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"requestSelected == 'table'\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected == 'form'\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n            <div show.bind=\"requestSelected == 'edit'\" >\n                <compose view=\"./components/editRequestsForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>\n"; });
 define('text!modules/tech/support/archiveHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/searchHTForm.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTSearchResults.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body --> \n</template>"; });
 define('text!modules/tech/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <compose view='./components/helpTicketType.html'></compose>\n            <compose view='./components/Requests.html' show.bind=\"showRequests\"></compose>\n        </div>\n        <div class=\"col-lg-8\">\n            <compose show.bind=\"showAdditionalInfo\" view='./components/helpTicketDetails.html'></compose>\n        </div>\n      </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/support.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Tech Help Tickets</a>\n            </div>\n            <div class=\"collapse navbar-collapse col-lg-8\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        \n            <div class=\"pull-right\">\n                <h5 class=\"rightMargin\" style=\"color:white;\">${userObj.fullName}</h5>\n            </div>\n        </nav>\n    </div>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/tech/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> \n           \n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> \n           \n        </div> \n      </div> \n    \n</template>"; });
-define('text!modules/tech/requests/assignments.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Tech Client Requests</a>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"requestSelected == 'table'\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected == 'form'\" >\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n            <div show.bind=\"requestSelected == 'edit'\" >\n                <compose view=\"./components/editRequestsForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>\n"; });
 define('text!modules/user/components/banner.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"subMenu-container\">\n\t\t<div class=\"textContainer banner subMenu\">\n\t\t\t<span show.bind=\"temp\" class=\"leftMargin\">\n\t\t\t\t<h4>${userObj.city} weather: ${temp} </h4>\n\t\t\t\t<img src=\"${weatherIcon}\" class=\"weatherIcon smallLeftMargin\">\n\t\t\t</span> \n\t\t\t<span show.bind=\"ucctemp\" class=\"leftMargin\">\n\t\t\t\t<h4>UCC weather: ${ucctemp} </h4>\n\t\t\t\t<img src=\"${uccweatherIcon}\" class=\"weatherIcon smallLeftMargin\">\n\t\t\t</span> \n\t\t\t<div class=\"pull-right\">\n\t\t\t\t<span show.bind=\"userObj.userRole < config.UCC_ROLE\">\n\t\t\t\t\t<a href=\"#/clientRequests\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>            \n\t\t\t\t\t<a href=\"#/support\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\n\t\t\t\t</span>\n\t\t\t\t<span show.bind=\"userObj.userRole >= config.UCC_ROLE\">\n\t\t\t\t\t<a href=\"#/techRq\" class=\"rightMargin\" if.bind=\"showRequests > 0\" style=\"text-decoration: none;\">Requests <span class=\"badge\">${showRequests}</span></a>            \n\t\t\t\t\t<a href=\"#/techHt\" class=\"rightMargin\" if.bind=\"showHelpTickets > 0\" style=\"text-decoration: none;\">Help Tickets <span class=\"badge\">${showHelpTickets}</span></a>\n\t\t\t\t</span>\n\t\t\t\t<span show.bind=\"alertIndex > -1\" click.delegate=\"openAlert(siteinfo.siteArray[alertIndex])\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\t\t\ttitle=\"\" data-original-title=\"Alerts\"><i class=\"fa fa-bell-o fa-border\" aria-hidden=\"true\"></i></span>\n\t\t\t\t<span class=\"rightMargin\"><h4>Welcome ${userObj.fullName}</h4></span>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/user/components/carousel.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"showCarousel\" id=\"carousel-example-generic\" class=\"carousel slide bigTopMargin carouselSize\" data-ride=\"carousel\">\n    <!-- Indicators -->\n    <ol class=\"carousel-indicators\">\n      <li data-target=\"#carousel-example-generic\" data-slide-to=\"${$index}\" class=\"$firts ? 'active' : '''\" repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\"></li>\n    </ol>\n\n    <!-- Wrapper for slides -->\n    <div class=\"carousel-inner\" role=\"listbox\">\n      <div repeat.for=\"item of siteinfo.siteArray | infoFilter:'CARO'\" class=\"${$first ? 'item active' : 'item'}\">\n        <img src=\"${item.url}\" class=\"img-responsive\"  alt=\"${item.title}\">\n        <div class=\"carousel-caption\">\n          <h3>${item.title}</h3>\n        </div>\n      </div>\n    </div>\n\n    <!-- Controls -->\n    <a class=\"left carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"prev\">\n      <span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Previous</span>\n    </a>\n    <a class=\"right carousel-control\" href=\"#carousel-example-generic\" role=\"button\" data-slide=\"next\">\n      <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>\n      <span class=\"sr-only\">Next</span>\n    </a>\n  </div>\n  <div  class=\"carouselSize\" show.bind=\"!showCarousel\">\n    <img src=\"${config.IMG_DOWNLOAD_URL}${config.DEFAULT_HOME_IMAGE}\" class=\"img-responsive\">\n  </div>"; });
 define('text!modules/user/components/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <!--\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Unassigned</h4> <h2 style=\"margin-left:80px;\">${requests.unassignedRequests}</h2>\n    </div>\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Updated</h4> <h2 style=\"margin-left:80px;\">${requests.updatedRequests}</h2>\n    </div>\n    <div class=\"alert alert-success col-md-3 rightMargin\">\n        <h4>Customer Action</h4> <h2 style=\"margin-left:110px;\">${requests.customerActionRequests}</h2>\n    </div>\n-->\n\n    <div class=\"detail-container\">\n        <div>\n          <h4>Client Requests</h4>\n           <div class=\"bigMarginTop\">\n    \t\t\t<doughnut-chart>\n    \t\t\t\t<chart-data data.bind=\"clientRequestsArray\"></chart-data>\n    \t\t\t</doughnut-chart>\n    \t\t</div>\n    \t</div>\n</template>"; });
@@ -37816,6 +38598,8 @@ define('text!modules/user/support/support.html', ['module'], function(module) { 
 define('text!modules/user/support/tutorials.html', ['module'], function(module) { module.exports = "<template>\n    <h1>Tutorials Damn It!</h1>\n</template>"; });
 define('text!modules/user/support/usefulInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"row\">\n      <div repeat.for=\"category of linkArray\" class=\"col-lg-3\">\n        <h2>${category.category}</h2>\n        <div>\n          <a repeat.for=\"link of category.links\" href=\"${link.url}\" class=\"list-group-item\" target=\"_blank\">\n            <h4 class=\"list-group-item-heading\">${link.title}</h4>\n            <p class=\"list-group-item-text\">${link.content}</p>\n          </a>\n        </div>\n      </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/viewHelpTickets.html', ['module'], function(module) { module.exports = "<template>\n   \n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTTable.html\"></compose>\n            </div> \n           \n            <div show.bind=\"helpTicketSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewHTForm.html\"></compose>\n            </div> \n           \n        </div> \n      </div> \n    \n</template>"; });
+define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"panel-body\">\r\n                    <form class=\"form-horizontal topMargin\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <div class=\"checkbox\">\r\n                                            <label class=\"pull-left\">\r\n                                                            <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                                        </label>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\r\n                                            type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-lg-2 col-lg-offset-2\">\r\n                                <label class=\"btn btn-primary\">\r\n                                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"col-lg-6\">\r\n                                <ul show.bind=\"!uploading\" >\r\n                                    <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                                </ul>\r\n                                <div show.bind=\"uploading\" class=\"progress progress-striped active\">\r\n                                    <div id=\"progressBar\" class=\"progress-bar\" style=\"width: 0%\"></div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-6 col-lg-offset-2\">\r\n                            <div id=\"editFiles\"></div>\r\n                        </div>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n            <div class=\"row topMargin\">\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <th>Name</th>\r\n                                <th>Version</th>\r\n                                <th>Date Uploaded</th>\r\n                                <th>Uploaded By</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                                <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.code}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                                <td data-title=\"Version\">${item.version}</td>\r\n                                <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                                <td data-title=\"Person\">${item.personId | person:people.peopleArray:\"fullName\"}</td>\r\n                                <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                                <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n    </div>\r\n\r\n</template>"; });
+define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                    title=\"\" data-original-title=\"New Document\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Address.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"topMargin\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"copyInstAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Copy Instituion Address\"><i class=\"fa fa-files-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div>\n        <div class=\"topMargin\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editAddress1\" class=\"col-sm-3 control-label hideOnPhone\">Address 1</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.address1\" id=\"editAddress1\" class=\"form-control \" placeholder=\"Address 1\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editAddress2\" class=\"col-sm-3 control-label hideOnPhone\">Address 2</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.address2\" id=\"editAddress2\" class=\"form-control \" placeholder=\"Address2\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editCity\" class=\"col-sm-3 control-label hideOnPhone\">City</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.city\" id=\"editCity\" class=\"form-control \" placeholder=\"City\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editRegion\" class=\"col-sm-3 control-label hideOnPhone\">Region</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.region\" id=\"editRegion\" class=\"form-control \" placeholder=\"Region\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editPostalCode\" class=\"col-sm-3 control-label hideOnPhone\">Postal Code</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.postalCode\" id=\"editPostalCode\" class=\"form-control \" placeholder=\"Postal Code\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"editCountry\" class=\"col-sm-3 control-label hideOnPhone\">Country</label>\n                    <div class=\"col-sm-8\">\n                        <input value.bind=\"people.selectedPerson.country\" id=\"editCountry\" class=\"form-control \" placeholder=\"Country\" type=\"text\" />\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/customers/components/Audit.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"topMargin\">\n        <table id=\"auditTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <th style=\"width:20rem;\">Property </th>\n                    <th style=\"width:30rem;\">Date</th>\n                    <th style=\"width:15rem;\">Old Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">New Value</th>\n\t\t\t\t\t<th style=\"width:15rem;\">Person</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr repeat.for=\"change of people.selectedPerson.audit\">\n                    <td>${change.property} </td>\n                    <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n                    <td>${change.oldValue}</td>\n\t\t\t\t\t<td>${change.newValue}</td>\n\t\t\t\t\t<td>${change.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n                </tr>\n            </tbody>\n        </table>\n\t</div>\n</template>"; });
 define('text!modules/admin/customers/components/bulkEmail.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n\t\t<compose view=\"./selectionForm.html\"></compose>\n\t\t<compose view=\"./emailTable.html\"></compose>\n        </div> \n      </div> \n</template>"; });
@@ -37833,8 +38617,6 @@ define('text!modules/admin/customers/components/peopleForm.html', ['module'], fu
 define('text!modules/admin/customers/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12 col-sm-12\">\r\n        <div class='row'>\r\n            <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr colspan='7'>\r\n                                 <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                 </tr>\r\n                            <tr>                            \r\n                            <tr>\r\n                                <td colspan='7'>\r\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"new()\"  class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                                    <span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\r\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th style=\"width:20rem;\">Name <span click.trigger=\"dataTable.sortArray('lastName')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('nickName')\"><i class=\"fa fa-sort\"></i></span></th>                                \r\n                                <th style=\"width:30rem;\">Institution <span click.trigger=\"dataTable.sortArray('institutionId.name')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th style=\"width:15rem;\">Phone</th>\r\n                                <th style=\"width:20rem;\">eMail <span click.trigger=\"dataTable.sortArray('email')\"><i class=\"fa fa-sort\"></i></span></th>\r\n                                <th>Role</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr>\r\n                                <th>\r\n                                    <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterListExV(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'fullName', displayProperty: 'fullName', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"nickNameFilterValue\" input.delegate=\"dataTable.filterListExV(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'nickName', displayProperty: 'nickName', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th>\r\n                                    <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterListExV(institutionFilterValue, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" />\r\n                                </th>\r\n                                <th></th>\r\n                                <th></th>\r\n                                <th>\r\n                                    <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterListExp($event, { type: 'array',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array'} )\"  class=\"form-control\" />\r\n\r\n                                </th>\r\n                                <th>\r\n                                    <select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\r\n                                    <option value=\"\"></option>\r\n                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                                </select>\r\n                                </th>\r\n                            </tr>\r\n                            <tr repeat.for=\"person of dataTable.displayArray\">\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Name\">${person.firstName} ${person.lastName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Nickname\">${person.nickName}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Insitution\">${person.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</d> \r\n                                <!-- | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td> -->\r\n                                <td click.trigger=\"edit($index, $event)\" data-tile=\"Phone\">${person.phone | phoneNumber}</td>\r\n                                <td class=\"dropbtn\" data-title=\"Email\" click.delegate=\"sendAnEmail(person._id)\">${person.email}</td>\r\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Role\">${person.roles}</td>\r\n                                <td class=\"dropbtn\" click.trigger=\"toggleStatus(person._id, person.personStatus)\" data-title=\"Status\">${person.personStatus | lookupDescription:is4ua.personStatusArray}</td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/customers/components/Roles.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n         <form>\n      <div class=\"col-md-5 topMargin\">\n        <label>Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectRole($event, role)\" type=\"button\" repeat.for=\"role of filteredArray\" id=\"${role.role}\"\n                      class=\"list-group-item\">${role.label}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Roles</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeRole($index, role)\" type=\"button\" repeat.for=\"role of people.selectedPerson.roles\" id=\"${role}\"\n                    class=\"list-group-item\">${role | lookupValue:config.ROLES:'role':'label'}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n        <!--\n        <div class=\"col-sm-12 col-lg-12\">\n            <label class=\"control-label col-sm-1\">Roles</label>\n        </div>\n        <div class=\"col-sm-12 col-lg-6 col-sm-offset-3\">\n            <label class=\"checkbox\" repeat.for=\"role of config.ROLES\">\n                <input type=\"checkbox\" \n                    value.one-way=\"role.role\" id=\"editRoles\"\n                    checked.bind=\"hasRole(role.role)\">${role.label}\n            </label>\n        </div>\n    </div>  -->\n</template"; });
 define('text!modules/admin/customers/components/selectionForm.html', ['module'], function(module) { module.exports = "<template>\n <div class=\"col-lg-12\">\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"_clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t \ttitle=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"composeEmail()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n\t\t\ttitle=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t</div>\n\n\t<div show.bind=\"composeEmailPanel\" class=\"panel panel-info leftMargin rightMargin topMargin bottomMargin\">\n      <div class=\"panel-body\">\n\t   <div class=\"list-group-item col-md-12 topMargin\">\n\t\t\t<span click.delegate=\"send()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n\t\t\t<span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t</div>\n\t\t<div class=\"col-lg-10 col-lg-offset-1 topMargin\">\n\t\t\t<input value.bind=\"email.subject\" class=\"form-control\" placeholder=\"Subject\"/>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<editor value.bind=\"email.emailMessage\" height=\"250\" toolbar.bind=\"toolbar\" ></editor>\n\t\t\t</div>\n\t\t</div>\n\t  </div>\n\t</div>\n\n\t<div class=\"panel panel-info leftMargin rightMargin\">\n      <div class=\"panel-body\">\n\t  \t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-labelhideOnPhone\">Status</label>\n\t\t\t<select value.bind=\"activeFilterValue\" change.delegate=\"filterActive()\" class=\"form-control \" id=\"personStatus\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.personStatusArray' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Institution Type</label>\n\t\t\t<select value.bind=\"institutionTypeFilterValue\" input.delegate=\"filter($event, { type: 'value',  filter: 'institutionTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'institutionType', collectionProperty: 'institutionId.institutionType', displayProperty: 'institutionId.name', matchProperty:'institutionType', compare:'lookup'} )\" class=\"form-control \" ref=\"institutionTypeFilter\" id=\"institutionType\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.institutionTypes' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Member Type</label>\n\t\t\t<select value.bind=\"memberTypeFilterValue\" input.delegate=\"filter($event, { type: 'value',  filter: 'memberTypesFilter', lookupArray: people.institutionsArray, lookupProperty: 'memberType', collectionProperty: 'institutionId.memberType', displayProperty: 'institutionId.name', matchProperty:'memberType', compare:'lookup'} )\" class=\"form-control \" ref=\"memberTypeFilter\">\n\t\t\t\t<option value=\"\"></option>\n\t\t\t\t<option repeat.for='item of is4ua.memberTypes' value='${item.code}'>${item.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<label class=\"control-label hideOnPhone\">Institution</label>\n\t\t\t<input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterListExV(institutionFilterValue, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"institutionFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">Region</label>\n\t\t\t<input value.bind=\"regionFilterValue\" input.delegate=\"dataTable.filterListExV(regionFilterValue, { type: 'text',  filter: 'regionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.region', matchProperty:'region', compare:'lookup'} )\"   class=\"form-control\" ref=\"regionFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">City</label>\n\t\t\t<input value.bind=\"cityFilterValue\" input.delegate=\"dataTable.filterListExV(cityFilterValue, { type: 'text',  filter: 'cityFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.city', matchProperty:'city', compare:'lookup'} )\"   class=\"form-control\" ref=\"cityFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label class=\"control-label hideOnPhone\">Country</label>\n\t\t\t<input value.bind=\"countryFilterValue\" input.delegate=\"dataTable.filterListExV(countryFilterValue, { type: 'text',  filter: 'countryFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.country', matchProperty:'country', compare:'lookup'} )\"   class=\"form-control\" ref=\"countryFilter\"/>\n\t\t</div>\n\t\t<div class=\"col-lg-3 topMargin\">\n\t\t\t<label>Roles</label><br/>\n\t\t\t<select value.bind=\"roleFilterValue\" ref=\"select\" class=\"form-control\" \n\t\t\t\tinput.delegate=\"filter($event, { type: 'array',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array'} )\">\n\t\t\t\t<option repeat.for=\"option of config.ROLES\" value.bind=\"option.role\">${option.label}</option>\n\t\t\t</select>\n\t\t</div>\n\t  </div>\n\t</div>\n\n</div>\n</template>\n"; });
-define('text!modules/admin/documents/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div class=\"bottomMargin list-group-item\">\r\n                <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n                    data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                    title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            </div>\r\n\r\n            <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                <div class=\"panel-body\">\r\n                    <form class=\"form-horizontal topMargin\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"activeDoc\" class=\"control-label col-sm-2 hideOnPhone\">Status</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <div class=\"checkbox\">\r\n                                            <label class=\"pull-left\">\r\n                                                            <input id=\"activeDoc\" checked.bind=\"documents.selectedDocument.active\" type=\"checkbox\"> Active\r\n                                                        </label>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editName\" class=\"col-sm-2 control-label hideOnPhone\">Name</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.name\" id=\"editName\" class=\"form-control\" placeholder=\"Name\" type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-sm-12 col-lg-12\">\r\n                                <div class=\"form-group\">\r\n                                    <label for=\"editDescription\" class=\"col-sm-2 control-label hideOnPhone\">Description</label>\r\n                                    <div class=\"col-sm-8\">\r\n                                        <input value.bind=\"documents.selectedDocument.description\" id=\"editDescription\" class=\"form-control \" placeholder=\"Description\"\r\n                                            type=\"text\" />\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"row\">\r\n                            <div class=\"col-lg-2 col-lg-offset-2\">\r\n                                <label class=\"btn btn-primary\">\r\n                                            Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\" files.bind=\"files\">\r\n                                </label>\r\n                            </div>\r\n                            <div class=\"col-lg-6\">\r\n                                <ul show.bind=\"!uploading\" >\r\n                                    <li repeat.for=\"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\r\n                                </ul>\r\n                                <div show.bind=\"uploading\" class=\"progress progress-striped active\">\r\n                                    <div id=\"progressBar\" class=\"progress-bar\" style=\"width: 0%\"></div>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"col-lg-6 col-lg-offset-2\">\r\n                            <div id=\"editFiles\"></div>\r\n                        </div>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n            <div class=\"row topMargin\">\r\n                <div id=\"no-more-tables\">\r\n                    <table class=\"table table-striped table-hover cf\">\r\n                        <thead class=\"cf\">\r\n                            <tr>\r\n                                <th>Name</th>\r\n                                <th>Version</th>\r\n                                <th>Date Uploaded</th>\r\n                                <th>Uploaded By</th>\r\n                                <th>Status</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                                <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedCat.code}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                                <td data-title=\"Version\">${item.version}</td>\r\n                                <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                                <td data-title=\"Person\">${item.personId | person:people.peopleArray:\"fullName\"}</td>\r\n                                <td data-title=\"Active\" click.trigger=\"toggleFileActive($index)\" innerhtml.bind='item.active | checkBox'></td>\r\n                                <td data-title=\"Delete\" click.trigger=\"deleteFile($index)\"><i class=\"fa fa-trash\"></i></td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n    </div>\r\n\r\n</template>"; });
-define('text!modules/admin/documents/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <td colspan='6'>\r\n                                <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                    title=\"\" data-original-title=\"New Document\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\r\n                            </td>\r\n                        </tr>\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"editDocument($index, $event)\" repeat.for=\"item of dataTable.displayArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
 define('text!modules/admin/inventory/components/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
@@ -37879,6 +38661,12 @@ define('text!modules/admin/system/components/sessionTable.html', ['module'], fun
 define('text!modules/admin/system/components/systemForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"col-lg-12\">\r\n\r\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n            <span show.bind=\"!newSystem\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n            <span click.delegate=\"editClientsButton()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Client List\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n        </div>  \r\n\r\n            <!-- Edit Form -->\r\n            <div class=\" col-lg-6 topMargin\">\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group topMargin\">\r\n                        <label for=\"editSid\" class=\"col-sm-3 form-control-label\">SID</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.sid | toUppercase\" id=\"editSid\" class=\"form-control\" placeholder=\"SID\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label class=\"col-sm-3 form-control-label hideOnPhone\">Status</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <div class=\"checkbox\">\r\n                                <label class=\"pull-left\">\r\n                                    <input checked.bind=\"systems.selectedSystem.active\" id=\"activeCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Active\r\n                                </label>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDesc\" class=\"col-sm-3 form-control-label\">Description</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.description\" id=\"editDesc\" class=\"form-control input-md\" placeholder=\"Description\"\r\n                            type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editServer\" class=\"col-sm-3 form-control-label topMargin\">Server</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.server | toUppercase\" id=\"editServer\" class=\"topMargin form-control input-md\" placeholder=\"Server\"\r\n                            type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editInst\" class=\"col-sm-3 form-control-label topMargin\">Instance</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.instance\" id=\"editInst\" class=\"topMargin form-control input-md\" placeholder=\"Instance\"\r\n                            type=\"text\" maxLength=\"2\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editIpAddress\" class=\"col-sm-3 form-control-label topMargin\">IP Address</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.ipAddress\" id=\"editIpAddress\" class=\"topMargin form-control input-md\" placeholder=\"IP Address\"\r\n                            type=\"text\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                 <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editOs\" class=\"col-sm-3 form-control-label topMargin\">OS</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.os\" id=\"editOs\" class=\"topMargin form-control input-md\" placeholder=\"Operating System\"\r\n                            type=\"text\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                 <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editOsVersion\" class=\"col-sm-3 form-control-label topMargin\">OS Version</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.osVersion\" id=\"editOsVersion\" class=\"topMargin form-control input-md\" placeholder=\"OS Version\"\r\n                            type=\"text\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                 <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDB\" class=\"col-sm-3 form-control-label topMargin\">Database</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.dbType\" id=\"editDB\" class=\"topMargin form-control input-md\" placeholder=\"Database\"\r\n                            type=\"text\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editDBVersion\" class=\"col-sm-3 form-control-label topMargin\">Dataabase Version</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.dbVersion\" id=\"editDBVersion\" class=\"topMargin form-control input-md\" placeholder=\"Database Version\"\r\n                            type=\"text\"/>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editIts\" class=\"col-sm-3 form-control-label topMargin\">ITS</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.its\" id=\"editIts\" class=\"topMargin form-control input-md\" placeholder=\"ITS\"\r\n                            type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12\">\r\n                    <div class=\"form-group\">\r\n                        \r\n                        <label for=\"editTerms\" class=\"col-sm-3 form-control-label topMargin\">Sessions</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <select multiple value.bind=\"systems.selectedSystem.sessions\" class=\"form-control topMargin\">\r\n                                <option value=\"${session.session}\"  repeat.for=\"session of config.SESSION_PARAMS\">${session.session}</option>\r\n                            </select>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12 bottomMargin\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editIdsAvailable\" class=\"col-sm-3 form-control-label topMargin\">IDS Available</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <input value.bind=\"systems.selectedSystem.idsAvailable\" id=\"editIdsAvailable\" class=\"topMargin form-control input-md\"\r\n                            placeholder=\"IDS Available\" type=\"text\" />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"col-sm-12 col-lg-12 bottomMargin\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editProduct\" class=\"col-sm-3 form-control-label topMargin\">Products</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <ul class=\"list-group\">\r\n                                <li class=\"list-group-item\" repeat.for=\"product of systems.selectedSystem.productId\">${product | productName:products.productsArray}</li>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                 <div class=\"col-sm-12 col-lg-12 bottomMargin\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"editNotes\" class=\"col-sm-3 form-control-label topMargin\">Notes</label>\r\n                        <div class=\"col-sm-8\">\r\n                            <textarea value.bind=\"systems.selectedSystem.notes\" id=\"editNotes\" rows=\"8\" class=\"topMargin form-control input-md\"></textarea>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n             <div class=\" col-lg-6 topMargin\">\r\n                <div class=\"row\">\r\n                    <div show.bind=\"editClients\" class=\"panel panel-default editPanel topMargin col-sm-9\" >\r\n                        <div class=\"panel-body\">\r\n                            <div class=\"topMargin leftmargin\">\r\n                                <div class=\"row\">\r\n                                    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n                                        <span click.delegate=\"generateClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Add Clients\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"refreshClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh Clients\"><i class=\"fa fa-refresh fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"deleteClients()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Clients\"><i class=\"fa fa-trash-o fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"editClientsButton()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                    </div>  \r\n                                </div>\r\n                        \r\n                                <div class=\"row topMargin bottomMargin\">\r\n                                    <div class=\"form-group col-sm-2 \">\r\n                                        <input value.bind=\"editFirstClient\" style=\"width:75px;margin-right:10px;\" id=\"editFirstClient\" placeholder=\"Start\" class=\"form-control input-sm\"\r\n                                        type=\"number\" />\r\n                                    </div>\r\n                                    <div class=\"form-group col-sm-2 \">\r\n                                        <input value.bind=\"editLastClient\" style=\"width:75px;margin-right:10px;\" id=\"editLastClient\" placeholder=\"End\" class=\"form-control input-sm\"\r\n                                        type=\"number\" />\r\n                                    </div>\r\n                                    <div class=\"form-group col-sm-2 \">\r\n                                        <input value.bind=\"systems.selectedSystem.idsAvailable\" style=\"width:75px;margin-right:10px;\" id=\"editClientIdsAvailable\"\r\n                                        placeholder=\"IDS Available\" class=\"form-control input-sm\" type=\"number\" />\r\n                                    </div>\r\n                                    <div class=\"fom-group col-sm-3 \">\r\n                                        <select value.bind=\"editClientStatus\" class=\"form-control\" data-title=\"Single Select\" data-style=\"btn-default btn-block\"\r\n                                        data-menu-style=\"dropdown-blue\">\r\n                                            <option repeat.for=\"status of config.CLIENT_STATUSES\" value=\"${status.code}\">${status.description}\r\n                                                <option>\r\n                                        </select>\r\n                                    </div>\r\n                                    <h6 class=\"col-lg-12\">Client interval: ${config.CLIENT_INTERVAL}</h6>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n               \r\n                <div show.bind=\"systems.selectedSystem.clients.length > 0 && !clientSelected\" class=\"col-sm-9\">\r\n                    <div class=\"panel panel-default topMargin\" >\r\n                        <div class=\"panel-body\">\r\n                            <ul>\r\n                                <li class=\"list-group-item\" repeat.for=\"client of systems.selectedSystem.clients | sortArray:'client':'ASC'\">\r\n                                    <div class=\"row\">\r\n                                        <span class=\"col-sm-8\">\r\n                                            <h5>Client ${client.client} <span class=\"leftMargin\">IDs: ${client.idsAvailable}</span></h5>\r\n                                            <h6>Status: ${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</h6>\r\n                                            <h7>Assignments: ${client.assignments.length}</h7>\r\n                                        </span>\r\n                                        <span class=\"col-sm-4\">\r\n                                            <span click.delegate=\"refreshClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh Client\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                                            <span click.delegate=\"toggleSandBox($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Toggle Sandbox\"><i class=\"fa fa-users\" aria-hidden=\"true\"></i></span>\r\n                                            <span click.delegate=\"deleteClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Client\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span>\r\n                                            <span click.trigger=\"selectClient(client, $index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Client\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>                                            \r\n                                        </span>\r\n                                    </div>\r\n                                </li>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div show.bind=\"clientSelected\">\r\n                    <compose view=\"./edit-client-form.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>\r\n"; });
 define('text!modules/admin/system/components/Systems.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-12\">\n        <add-systems systemstring.two-way=\"editSystemsString\" systemchanges.two-way=\"systemChanges\" systemsarray.bind=\"systems.systemsArray\"  filteredsystemsarray.bind=\"systems.systemsArray\" selectedproduct.two-way=\"products.selectedProduct\"></add-systems>\n    </div>\n</template>"; });
 define('text!modules/admin/system/components/systemTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class='col-lg-10 col-lg-offset-1'>\n            <div id=\"no-more-tables\">\n        <table id=\"systemsTable\" class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n                <tr colspan='5'>\n                    <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                </tr>\n                <tr>                    \n                <tr>\n                    <td colspan='5'>\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"new()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"_cleanUpFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:100px;\">SID <span click.trigger=\"dataTable.sortArray('sid')\"><i class=\"fa fa-sort\"></i></span></th>\n                    <th>Description <span click.trigger=\"dataTable.sortArray('description')\"><i class=\"fa fa-sort\"></i></span></th>\n                    <th class=\"hidden-xs hidden-sm\">Server <span click.trigger=\"dataTable.sortArray('server')\"><i class=\"fa fa-sort\"></i></span></th>\n                    <th class=\"hidden-xs hidden-sm\">Instance</th>\n                    <th class=\"hidden-xs hidden-sm\">Status</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <th>\n                        <input value.bind=\"sidFilterValue\" input.delegate=\"dataTable.filterListExV(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\n                    </th>\n                    <th>\n                        <input value.bind=\"descriptionFilterValue\" input.delegate=\"dataTable.filterListExV(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\n                    </th>\n                    <th class=\"hidden-xs hidden-sm\">\n                        <input value.bind=\"serverFilterValue\" input.delegate=\"dataTable.filterListExV(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )\"  class=\"form-control\" />\n                    </th>\n                    <th class=\"hidden-xs hidden-sm\"></th>\n                    <th class=\"hidden-xs hidden-sm\">\n                        <select value.bind=\"activeFilter\" input.delegate=\"filter($event, { type: 'boolean',  filter: 'activeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )\" class=\"form-control\">\n                            <option value=\"\"></option>\n                            <option value=true>Active</option>\n                            <option value=false>Inactive</option>\n                        </select>\n                    </th>\n                </tr>\n                <tr click.trigger=\"edit($index, $event)\" repeat.for=\"system of dataTable.displayArray\">\n                    <td data-title=\"Session\">${system.sid}</td>\n                    <td data-title=\"StartDate\">${system.description}</td>\n                    <td  class=\"hidden-xs hidden-sm\" data-title=\"EndDate\">${system.server}</td>\n                    <td  class=\"hidden-xs hidden-sm\" data-title=\"RequestsOpen\">${system.instance}</td>\n                    <td  class=\"hidden-xs hidden-sm\" data-title=\"createdDate\">${system.active | translateStatus}</td>\n                </tr>\n            </tbody>\n        </table>\n        </div>\n    </div>    \n</template>"; });
+define('text!modules/tech/requests/components/editRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${people.selectedPerson.nickName}</h5>\n        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>\n        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>\n        <h5>Email: ${people.selectedPerson.email}</h5>\n      </div>\n  </div>\n<div class=\"fluid-container\">\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t<span click.delegate=\"backEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"saveEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t</div>\n\n\t<div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n\t<div show.bind=\"!showAudit\" class=\"col-lg-10 col-lg-offset-1\">\n\t\t<h4>Request No. ${requests.selectedRequestDetail.requestNo}</h4>\n\t\t<h5 class=\"dropbtn\" click.delegate=\"showProfile(requests.selectedRequestDetail, $event)\">Faculty: ${requests.selectedRequestDetail.requestId.personId | lookupValue:people.peopleArray:\"_id\":\"fullName\"} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\n\t\t<h5>Institution: ${requests.selectedRequestDetail.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n\t\n\t<div class=\"col-lg-5\" >\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Status</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestStatus\">\n\t\t\t\t<option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\n\t\t\t<input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\" class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.undergradIds\"/>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label for=\"graduates\" class=\"control-label\">Graduates</label>\n\t\t\t<input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\" class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.graduateIds\"/>\n\t\t</div>\n\t\t <div class=\"row col-lg-offset-3\">\n\t\t\t<span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Product</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.productId\">\n\t\t\t\t<option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n\t\t\t</select>\n\t\t</div>\n  </div>\n\n\t<div class=\"col-lg-5\" >\n\t\t<div  show.bind=\"config.SANDBOX_USED\" class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Request Type</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.courseId\">\n\t\t\t\t<option value=\"${config.SANDBOX_ID}\">${config.SANDBOX_NAME}</option>\n\t\t\t\t<option repeat.for=\"course of personCourses\" value=\"${course._id}\">${course.number} ${course.name}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Start Date</label>\n\t\t\t<flat-picker controlid=\"startDate\" config.bind=\"dateConfig\"  \n\t\t\t\t\tvalue.bind=\"requests.selectedRequestDetail.requestId.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\n\t\t\t<span id='startDateError'></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">End Date</label>\n\t\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"dateConfig\" value.bind=\"requests.selectedRequestDetail.requestId.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n\t\t\t\t<span id='endDateError'></span>\n\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Required Date</label>\n\t\t\t\t<flat-picker controlid=\"requiredDate\" config.bind=\"dateConfig\" value.bind=\"requests.selectedRequestDetail.requiredDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n\t\t\t\t<span id='requiredDateError'></span>\n\t\t</div>\n\t</div>\n\n\n\t <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\"></div>\n\t \n</div>\n</template>"; });
+define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/tech/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div  class=\"panel panel-default topMargin\">\n            <div class=\"panel-body leftJustify\">\n              <div class=\"bottomMargin\">\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"save()\">Save</button>\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"cancel()\">Cancel</button>\n              </div>\n              <div class=\"form-group\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>\n                  </div>\n                </div>\n                 \n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddUnder\" class=\"control-label\">Add Undergraduates</label>\n                            <input value.bind=\"requests.selectedRequest.addUndergraduates\" id=\"editAddUnder\" class=\"form-control input-sm\" placeholder=\"Addiiontal undergraduates\" type=\"number\" />\n                        </div>\n                    </div>\n                              \n                    <div class=\"col-lg-4 col-lg-offset-2\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddGrad\" class=\"control-label\">Add Graduate</label>\n                             <input value.bind=\"requests.selectedRequest.addGraduates\" type=\"number\" id=\"editAddGrad\" class=\"form-control input-sm\" placeholder=\"Addiiontal Graduates\"/>\n                        </div>\n                    </div>\n                  </div>\n                \n                \n                 <label show.bind=\"request.addUndergraduates > 0\">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>\n                 <label show.bind=\"request.addGraduates > 0\">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>\n              </div>\n              <div class=\"leftJustify\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"beginDate\" class=\"leftJustify\">Date the course begins</label>\n                          <input change.trigger=\"changeBeginDate()\" type=\"date\" value.bind=\"requests.selectedRequest.startDate\"\n                                class=\"form-control\" id=\"beginDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"endDate\" class=\"leftJustify\">Date the course ends</label>\n                          <input change.trigger=\"changeEndDate()\" type=\"date\" value.bind=\"requests.selectedRequest.endDate\"\n                                class=\"form-control\" id=\"endDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                \n              </div>\n               <textarea  placeholder=\"Additional Comments\" class=\"topMargin col-lg-12\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n              \n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n</template>\n    "; });
+define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n   <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${people.selectedPerson.nickName}</h5>\n        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>\n        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>\n        <h5>Email: ${people.selectedPerson.email}</h5>\n      </div>\n  </div>\n  <div class=\"col-lg-12 letMargin rightMargin\">\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='7'>\n                <div class=\"checkbox\">\n                    <label>\n                        <input checked.bind=\"isChecked\" change.trigger=\"filterInAssigned()\" type=\"checkbox\"> Show assigned requests\n                    </label>\n                </div>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <span click.delegate=\"refresh()\"class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n            </td>\n            <td></td>\n          </tr>\n          <tr>\n            <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('requiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th show.bind=\"config.SANDBOX_USED\" class=\"col-lg-1\">Type</th>\n            <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-sm-1\">IDS Requestd</th>\n            <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Institution <span click.trigger=\"dataTable.sortArray('requestId.institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th style=\"width:20px;\"></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th></th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th  show.bind=\"config.SANDBOX_USED\" >\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestId.courseId\" compare=\"obj\" ref=\"courseFilter\">\n                <option value=\"\"></option>\n                <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\n                <option  value=\"NOT${config.SANDBOX_ID}\">Regular</option>\n              </select>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\" ref=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n            </th>\n            <th></th>\n            <th>\n              <input value.bind=\"productFilterValue\" input.delegate=\"filterTable($event, { type: 'text',  filter: 'productFilter', lookupArray: products.productsArray, lookupProperty: '_id', collectionProperty: 'productId', displayProperty: 'name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"productFilter\"/>\n            </th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"requestId.personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n            </th>\n            <th>\n            <input value.bind=\"institutionFilterValue\" input.delegate=\"filterTable($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"institutionFilter\"/>\n            </th>\n            <th></th>\n          </tr>\n          <tr repeat.for=\"request of dataTable.displayArray\" class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requestNo\">${request.requestNo}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td   show.bind=\"config.SANDBOX_USED\" click.trigger=\"selectRequest($index, $event, request)\" data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID:config.SANDBOX_NAME}</td>\n            <td  mouseover.delegate=\"showComment(request, $event)\" mouseout.delegate=\"hideComment()\"  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"ids-requested\">${request.requestId | idsRequested}\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"product\">${request.productId | productName:products.productsArray}</td>\n            <td  class=\"dropbtn\" click.delegate=\"showProfile(request, $event)\" data-title=\"Name\">${request.requestId.personId | lookupValue:people.peopleArray:\"_id\":\"fullName\"}</td>\n            <td  data-title=\"Name\">${request.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n            <td><span click.delegate=\"editRequest($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</template>"; });
+define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"col-lg-12\">\n        <h4>Request No: ${requests.selectedRequestDetail.requestNo}</h4>\n      </div>\n\n      <div class=\"col-lg-12\">\n        <div class=\"col-lg-2\">\n          <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n        </div>\n        <div class=\"col-lg-3\">\n            <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n        </div>\n\n        <div class=\"col-lg-2\">\n            <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n        </div>\n      </div>\n\n        <!-- Faculty Detail Form -->\n        <div class=\"col-lg-12\">\n          <span show.bind=\"facultyDetails\">\n              <div class=\"col-lg-2\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Phone: ${people.selectedPerson.phone | phoneNumber}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Mobile: ${people.selectedPerson.mobile | phoneNumber}</h5>\n              </div>\n          </span>\n        </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <!--\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        -->\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12 editPanel\">\n                    <div class=\"panel-body\">\n                      <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Template\"><i class=\"fa fa-floppy-o fa-lg\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg\" aria-hidden=\"true\"></i></span>\n                      </div>\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control\"/>\n                        </div>\n                    </div>\n\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n             <editor value.bind=\"requests.selectedRequestDetail.techComments\" height=\"250\"></editor>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly && products.selectedProduct.clientRelevant\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\" show.bind=\"products.selectedProduct.clientRelevant\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
+define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/tech/support/components/additiontalInfo.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12 topMargin\">\n        <!-- Help Panel -->\n        <compose  repeat.for=\"helpTicket of config.HELP_TICKET_TYPES\" \n            show.bind=\"helpTicket.show\"     \n            view=\"./help-ticket-${helpTicket.code}.html\"></compose>\n            \n        <!-- Additional Information Panel -->\n        <div show.bind=\"showAdditionalInfo\" class=\"col-md-12\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <textarea id=\"descriptionID\" value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" class=\"form-control\" rows=\"12\"></textarea>\n            </div>\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                    <th>Status</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                    <td data-title=\"Active\"  innerhtml.bind='item.active | checkBox'></td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!modules/tech/support/components/Documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-4\">\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:400px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-8\" style='padding:15px;'>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</template>"; });
@@ -37892,15 +38680,9 @@ define('text!modules/tech/support/components/viewHelpTicketTableFilters.html', [
 define('text!modules/tech/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\">\n      <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"row\">\n      <div class=\"bottomMargin list-group-item leftMargin rightMargin\" id=\"toolbar\">\n          <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"ownHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span show.bind=\"showLockMessage\" click.delegate=\"_unlock()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Unlock\"><i class=\"fa fa-unlock-alt fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          <span class=\"pull-right\">${lockMessage}</span>\n      </div> \n    </div>\n    \n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n        <!-- Enter Response -->\n        <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin \">\n\n          <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\n            <div class=\"panel-body\">\n              <div class=\"list-group-item col-md-12 topMargin\">\n                <span  click.delegate=\"saveResponse(helpTickets.selectedHelpTicket.helpTicketStatus)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n                <span  click.delegate=\"saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Customer Action\"><i class=\"fa fa-users fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"saveResponse(config.CLOSED_HELPTICKET_STATUS)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save and Close\"><i class=\"fa fa-window-close-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                <span  click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n              </div>\n              <div class=\"row\">\n                  <div class=\"col-lg-1 topMargin\">\n                      <div class=\"checkbox \">\n                        <label>\n                          <input change.delegate=\"confidentialChecked()\" checked.bind=\"helpTickets.selectedHelpTicketContent.confidential\" id=\"confidentialCheckBox\" type=\"checkbox\"> Tech Staff\n                        </label>\n                      </div>\n                    </div>\n                    <div class=\"col-lg-2 topMargin\">\n                      <div class=\"checkbox\">\n                        <label>\n                          <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                        </label>\n                      </div>\n                    </div>\n                </div>\n               \n                <div class=\"leftMargin rightMargin\">\n                      <editor value.bind=\"responseMessage\" height=\"250\"></editor>\n                      <p>&nbsp;</p>\n\n                      <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                          <div class=\"col-lg-3\">\n                              <label class=\"btn btn-primary\">\n                                  Browse for files <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                              </label>\n                          </div>\n                        </div>\n                        <div class=\"col-lg-6\">\n                          <button click.delegate=\"insertDocument()\" class=\"btn btn-primary\">Insert Document</button>\n                        </div>\n                        <div class=\"col-lg-6 topMargin\">\n                          <div class=\"col-lg-10\">\n                              <ul>\n                                  <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                              </ul>\n                          </div>\n                        </div>\n                        <div class='col-lg-6 topMargin'>\n                          <div class=\"col-lg-10\">\n                            <ul>\n                                <li repeat.for = \"file of helpTickets.selectedHelpTicketContent.documents\" class=\"list-group-item\">${file.fileName}<span click.delegate=\"removeDocument($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                            </ul>\n                          </div>\n                      </div>\n                </div>\n            </div>\n          </div>\n          </div>\n        </div>\n\n        <!-- widget content -->\n        <div class=\"row\">\n          <div class=\"panel panel-default  leftMargin rightMargin\">        \n            <div class=\"panel-body\">\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Customer: ${helpTickets.selectedHelpTicket.personId| person:people.peopleArray:\"fullName\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Institution: ${helpTickets.selectedHelpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>\n                  </div>\n                </div>\n                 <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>\n                  </div>\n                </div>\n                <div class=\"col-md-3\">\n                  <div class=\"form-group\">\n                    <h5 class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</h5>\n                  </div>\n                </div>\n              </div>\n              <div class=\"row\">\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\" col-md-offset-1\">Type:</label>\n                      <select value.bind=\"helpTickets.selectedHelpTicket.helpTicketType\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control col-md-offset-1\" id=\"helpTicketType\">\n                          <option repeat.for=\"type of helpTickets.helpTicketTypesArray | helpTicketSubtypes\" model.bind=\"type.type\">${type.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Status</label>\n                      <select id=\"helpTicketStatus\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\" model.bind=\"status.code\">${status.description}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Priority</label>\n                      <select id=\"priority\" value.bind=\"helpTickets.selectedHelpTicket.priority\" class=\"form-control col-md-offset-1\">\n                        <option repeat.for=\"priority of config.HELP_TICKET_PRIORITIES\" model.bind=\"$index\">${priority.priority}</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div class=\"form-group col-lg-3\">\n                    <div class=\"input-group col-lg-11\">\n                      <label class=\"col-md-offset-1\">Keywords</label>\n                      <input type=\"text\" value.bind=\"helpTickets.selectedHelpTicket.keyWords\" class=\"form-control col-md-offset-1\">\n                    </div>\n                  </div>\n                </div>\n            </div>\n          </div>\n        </div>\n\n        <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n  \n    </div>\n</template>"; });
 define('text!modules/tech/support/components/viewHTSearchResults.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"!searchResults\">\n    <div class=\"row\">\n        <div class=\"bottomMargin list-group-item\">\n            <span click.delegate=\"backToSearch()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div> \n    </div>\n\t<div class='row'>\n      <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n              <td colspan='13'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n              </td>\n            </tr>\n            <tr>\n              <td colspan='13'>\n                <span click.delegate=\"refresh()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketType\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"type of config.HELP_TICKET_TYPES\"\n                                value.bind=\"type.code\">${type.description}</option>\n                      </select>\n              </th>\n              <th>\n                <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"owner.[0].personId\" compare=\"obj\" ref=\"ownerFilter\">\n                  <option value=\"\"></option>\n                  <option repeat.for=\"person of people.peopleArray | uccStaff\"\n                          value.bind=\"person._id\">${person.fullName}</option>\n                </select>\n              </th>\n              <th></th>\n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"personId-nickName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nickNameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, people.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n            </tr>\n            <tr>\n              <th>\n                Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th>\n                Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th></th>\n              <th class=\"col-lg-1\">\n                Status <span click.trigger=\"dataTable.sortArray('status')\"><i class=\"fa fa-sort\"></i></span><br>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">\n                Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n              </th>\n              <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th class=\"col-lg-1\">Nickname <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'nickName')\"><i class=\"fa fa-sort\"></i></span></th>\n               <th>Institution</th>\n              <th>Email</th>\n              <th>Phone</th>\n              <th>Mobile</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" click.delegate=\"selectHelpTicket(helpTicket, $event)\">\n              <td style=\"width:6rem;\" data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td style=\"width:15rem;\" mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" \n                data-title=\"type\">${helpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}\n                <td style=\"width:15rem;\" data-title=\"Owner\" >${helpTicket.owner[0].personId | person:people.peopleArray:'fullName'}</td>\n                <td style=\"width:5rem;\" data-title=\"Update\" click.trigger=\"ownHelpTicket(helpTicket)\"><span bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span></td>\n                <td data-title=\"Status\" >${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>\n                <td data-title=\"Created Date\" >${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Modified Date\" >${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>\n                <td data-title=\"Customer\" >${helpTicket.personId | person:people.peopleArray:\"fullName\"}</td>\n                <td data-title=\"Nickname\" >${helpTicket.personId | person:people.peopleArray:\"nickName\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Email\" >${helpTicket.personId | person:people.peopleArray:\"email\"}</td>\n                <td style=\"width:10rem;\" data-title=\"Phone\" >${helpTicket.personId | person:people.peopleArray:\"phone\" | formatPhone}</td>\n                 <td style=\"width:10rem;\" data-title=\"Phone\">${helpTicket.personId | person:people.peopleArray:\"mobile\" | formatPhone}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n\t</div>\n  </div>\n  <div class=\"row\" show.bind=\"searchResults\">\n    <compose view=\"./viewHTForm.html\"></compose>\n  </div>\n\t\n</template>"; });
 define('text!modules/tech/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n        <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n        <span  click.delegate=\"sendAnEmail(profileHelpTicket.personId)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n        <hr/>\n        <div class=\"col-md-4\">\n          <div style=\"height:100px;width:100px;\" innerhtml.bind=\"profileHelpTicket.personId | person:peopleArray:'email' | gravatarUrl:100:6\"></div>\n        </div>\n        <div class=\"col-md-8\">\n          <h5>Nickname: ${profileHelpTicket.personId | person:peopleArray:\"nickName\"}</h5>\n          <h5>Phone: ${profileHelpTicket.personId | person:peopleArray:\"phone\" | formatPhone}</h5>\n          <h5>Mobile: ${profileHelpTicket.personId | person:peopleArray:\"mobile\" | formatPhone}</h5>\n        </div>\n    </div>\n\n    <div class='row'>\n      <div class='bottomMargin'>\n        <table id=\"helpTicketTable\" class=\"table table-striped table-hover\">\n          <thead>\n            <tr>\n                <td colspan='colSpan'>\n                  <div class=\"checkbox\">\n                    <label>\n                      <input disabled.bind=\"sendMailDisable\" checked.bind=\"sendEmail\" type=\"checkbox\"> Send Email\n                    </label>\n                  </div>\n                </td>\n            </tr>\n            <tr>\n              <td colspan.bind='colSpan'><compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose></td>\n            </tr>\n            <tr>\n              <td colspan='colSpan'>\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                <span click.delegate=\"_cleanUpFilters()\" class=\"mousePointer\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter fa-ban\" aria-hidden=\"true\"></i></span>\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n              </td>\n            </tr>\n            <tr>\n              <th></th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, helpTicketTypeLookupArray)\" id=\"helpTicketType-description\" type=\"text\" compare=\"lookup-array\" class=\"form-control\" ref=\"typeFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray)\" id=\"owner-fullName-0-personId\" type=\"text\" compare=\"lookup-array-item\" class=\"form-control\" ref=\"ownerFilter\"/>\n              </th>\n           \n              <th>\n                <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of helpTicketTypes\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n              </th>\n              <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n               <th>\n                <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" compare=\"after\" placeholder=\"Filter Date\" class=\"form-control datepicker\" data-dateformat=\"yy/mm/dd\">\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray)\" id=\"personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n              </th>\n              <th>\n                <input input.delegate=\"dataTable.filterList($event, peopleArray.institutionsArray)\" id=\"institutionId-name\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"institutionFilter\"/>\n              </th>\n              <th></th>\n            </tr>\n            <tr>\n              <th>No <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:15em\">Owner <span click.trigger=\"dataTable.sortArray('owner[0].personId', 'id', peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th></th>\n              <th style=\"width:10em;\">Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br></th>\n              <th style=\"width:8em\">Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:8em\">Date Updated <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:15em\">Faculty <span click.trigger=\"dataTable.sortArray('personId', 'id', peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th style=\"width:20em\">Institution <span click.trigger=\"dataTable.sortArray('institutionId', 'id', peopleArray.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n              <th>Email</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr repeat.for=\"helpTicket of dataTable.displayArray\" class=\"${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}\">\n              <td  data-title=\"referenceNo\">${helpTicket.helpTicketNo}</td>\n              <td  mouseover.delegate=\"showComment(helpTicket, $event)\" mouseout.delegate=\"hideComment()\" click.delegate=\"selectHelpTicket($event, $index)\"\n                data-title=\"type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}\n              </td>\n              <td data-title=\"Owner\">\n                <span show.bind=\"helpTicket.owner[0].personId === 'b1b1b1b1b1b1b1b1b1b1b1b1'\" click.trigger=\"ownHelpTicket(helpTicket)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Take Ownership\"><i class=\"fa fa-child fa-lg\" aria-hidden=\"true\"></i></span>\n                <span class=\"dropbtn\" click.trigger=\"ownHelpTicket(helpTicket)\" show.bind=\"helpTicket.owner[0].personId !== 'b1b1b1b1b1b1b1b1b1b1b1b1'\"> ${helpTicket.owner[0].personId | person:peopleArray:'fullName'}</span>\n              </td>\n              <td class=\"dropbtn\" data-title=\"Status\">\n                <div class=\"dropdown\">\n                  <span class=\"dropbtn\"> ${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}\n                    <div show.bind=\"helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS\" class=\"dropdown-content\">\n                      <a href=\"#\" click.trigger=\"changeStatus(helpTicket, status.code, status.description)\" repeat.for=\"status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus\">${status.description}</a>\n                    </div>\n                  </span>\n                </div>\n              </td>\n              <td  data-title=\"Created Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td  data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              <td class=\"dropbtn\" style=\"width:10rem;\" data-title=\"Customer\" click.delegate=\"showProfile(helpTicket, $event)\"  >${helpTicket.personId | person:peopleArray:\"fullName\"}</td>\n              <td  data-title=\"Insitution\">${helpTicket.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n              <td class=\"dropbtn\"  click.delegate=\"sendAnEmail(helpTicket.personId)\" data-title=\"Email\" >${helpTicket.personId | person:peopleArray:\"email\"}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
-define('text!modules/tech/requests/components/editRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${people.selectedPerson.nickName}</h5>\n        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>\n        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>\n        <h5>Email: ${people.selectedPerson.email}</h5>\n      </div>\n  </div>\n<div class=\"fluid-container\">\n\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n\t\t<span click.delegate=\"backEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"saveEdit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n\t\t<span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t</div>\n\n\t<div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n\t<div show.bind=\"!showAudit\" class=\"col-lg-10 col-lg-offset-1\">\n\t\t<h4>Request No. ${requests.selectedRequestDetail.requestNo}</h4>\n\t\t<h5 class=\"dropbtn\" click.delegate=\"showProfile(requests.selectedRequestDetail, $event)\">Faculty: ${requests.selectedRequestDetail.requestId.personId | lookupValue:people.peopleArray:\"_id\":\"fullName\"} <i class=\"fa fa-info\" aria-hidden=\"true\"></i></h5>\n\t\t<h5>Institution: ${requests.selectedRequestDetail.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</h5>\n\t\n\t<div class=\"col-lg-5\" >\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Status</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestStatus\">\n\t\t\t\t<option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\n\t\t\t<input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\" class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.undergradIds\"/>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label for=\"graduates\" class=\"control-label\">Graduates</label>\n\t\t\t<input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\" class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.graduateIds\"/>\n\t\t</div>\n\t\t <div class=\"row col-lg-offset-3\">\n\t\t\t<span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Product</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.productId\">\n\t\t\t\t<option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\n\t\t\t</select>\n\t\t</div>\n  </div>\n\n\t<div class=\"col-lg-5\" >\n\t\t<div  show.bind=\"config.SANDBOX_USED\" class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Request Type</label>\n\t\t\t<select class=\"form-control\" value.bind=\"requests.selectedRequestDetail.requestId.courseId\">\n\t\t\t\t<option value=\"${config.SANDBOX_ID}\">${config.SANDBOX_NAME}</option>\n\t\t\t\t<option repeat.for=\"course of personCourses\" value=\"${course._id}\">${course.number} ${course.name}</option>\n\t\t\t</select>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Start Date</label>\n\t\t\t<flat-picker controlid=\"startDate\" config.bind=\"dateConfig\"  \n\t\t\t\t\tvalue.bind=\"requests.selectedRequestDetail.requestId.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\n\t\t\t<span id='startDateError'></span>\n\t\t</div>\n\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">End Date</label>\n\t\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"dateConfig\" value.bind=\"requests.selectedRequestDetail.requestId.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n\t\t\t\t<span id='endDateError'></span>\n\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t<label class=\"form-control-label \">Required Date</label>\n\t\t\t\t<flat-picker controlid=\"requiredDate\" config.bind=\"dateConfig\" value.bind=\"requests.selectedRequestDetail.requiredDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n\t\t\t\t<span id='requiredDateError'></span>\n\t\t</div>\n\t</div>\n\n\n\t <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\"></div>\n\t \n</div>\n</template>"; });
-define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | productName:products.productsArray}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupDescription:config.REQUEST_STATUS}</h5>\n        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupSid:systems.systemsArray}</h5>\n        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupSid:systems.systemsArray}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/tech/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div  class=\"panel panel-default topMargin\">\n            <div class=\"panel-body leftJustify\">\n              <div class=\"bottomMargin\">\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"save()\">Save</button>\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"cancel()\">Cancel</button>\n              </div>\n              <div class=\"form-group\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>\n                  </div>\n                </div>\n                 \n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddUnder\" class=\"control-label\">Add Undergraduates</label>\n                            <input value.bind=\"requests.selectedRequest.addUndergraduates\" id=\"editAddUnder\" class=\"form-control input-sm\" placeholder=\"Addiiontal undergraduates\" type=\"number\" />\n                        </div>\n                    </div>\n                              \n                    <div class=\"col-lg-4 col-lg-offset-2\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddGrad\" class=\"control-label\">Add Graduate</label>\n                             <input value.bind=\"requests.selectedRequest.addGraduates\" type=\"number\" id=\"editAddGrad\" class=\"form-control input-sm\" placeholder=\"Addiiontal Graduates\"/>\n                        </div>\n                    </div>\n                  </div>\n                \n                \n                 <label show.bind=\"request.addUndergraduates > 0\">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>\n                 <label show.bind=\"request.addGraduates > 0\">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>\n              </div>\n              <div class=\"leftJustify\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"beginDate\" class=\"leftJustify\">Date the course begins</label>\n                          <input change.trigger=\"changeBeginDate()\" type=\"date\" value.bind=\"requests.selectedRequest.startDate\"\n                                class=\"form-control\" id=\"beginDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"endDate\" class=\"leftJustify\">Date the course ends</label>\n                          <input change.trigger=\"changeEndDate()\" type=\"date\" value.bind=\"requests.selectedRequest.endDate\"\n                                class=\"form-control\" id=\"endDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                \n              </div>\n               <textarea  placeholder=\"Additional Comments\" class=\"topMargin col-lg-12\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n              \n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n</template>\n    "; });
-define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n   <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n        <div style=\"height:100px;width:100px;\" innerhtml.bind=\"people.selectedPerson.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${people.selectedPerson.nickName}</h5>\n        <h5>Phone: ${people.selectedPerson.phone | formatPhone}</h5>\n        <h5>Mobile: ${people.selectedPerson.mobile | formatPhone}</h5>\n        <h5>Email: ${people.selectedPerson.email}</h5>\n      </div>\n  </div>\n  <div class=\"col-lg-12 letMargin rightMargin\">\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='7'>\n                <div class=\"checkbox\">\n                    <label>\n                        <input checked.bind=\"isChecked\" change.trigger=\"filterInAssigned()\" type=\"checkbox\"> Show assigned requests\n                    </label>\n                </div>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <span click.delegate=\"refresh()\"class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n            </td>\n            <td></td>\n          </tr>\n          <tr>\n            <th class=\"col-xs-1\">No <span click.trigger=\"dataTable.sortArray('requestNo')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Due <span click.trigger=\"dataTable.sortArray('requiredDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Requested <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th show.bind=\"config.SANDBOX_USED\" class=\"col-lg-1\">Type</th>\n            <th class=\"col-lg-1\">Status <span click.trigger=\"dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-sm-1\">IDS Requestd</th>\n            <th class=\"col-lg-2\">Product <span click.trigger=\"dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Faculty <span click.trigger=\"dataTable.sortArray('requestId.personId', 'id', people.peopleArray, '_id', 'fullName')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\">Institution <span click.trigger=\"dataTable.sortArray('requestId.institutionId', 'id', people.institutionsArray, '_id', 'name')\"><i class=\"fa fa-sort\"></i></span></th>\n            <th style=\"width:20px;\"></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th></th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"requiredDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th>\n              <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" compare=\"after\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\n            </th>\n            <th  show.bind=\"config.SANDBOX_USED\" >\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestId.courseId\" compare=\"obj\" ref=\"courseFilter\">\n                <option value=\"\"></option>\n                <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\n                <option  value=\"NOT${config.SANDBOX_ID}\">Regular</option>\n              </select>\n            </th>\n            <th>\n              <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"requestStatus\" ref=\"requestStatus\">\n                   <option value=\"\"></option>\n                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n                 </select>\n            </th>\n            <th></th>\n            <th>\n              <input value.bind=\"productFilterValue\" input.delegate=\"filterTable($event, { type: 'text',  filter: 'productFilter', lookupArray: products.productsArray, lookupProperty: '_id', collectionProperty: 'productId', displayProperty: 'name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"productFilter\"/>\n            </th>\n            <th>\n              <input input.delegate=\"dataTable.filterList($event, people.peopleArray)\" id=\"requestId.personId-fullName\" type=\"text\" compare=\"lookup\" class=\"form-control\" ref=\"nameFilter\"/>\n            </th>\n            <th>\n            <input value.bind=\"institutionFilterValue\" input.delegate=\"filterTable($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )\"  class=\"form-control\" ref=\"institutionFilter\"/>\n            </th>\n            <th></th>\n          </tr>\n          <tr repeat.for=\"request of dataTable.displayArray\" class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requestNo\">${request.requestNo}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td   show.bind=\"config.SANDBOX_USED\" click.trigger=\"selectRequest($index, $event, request)\" data-title=\"courseId\">${request.requestId.courseId | sandbox:config.SANDBOX_ID:config.SANDBOX_NAME}</td>\n            <td  mouseover.delegate=\"showComment(request, $event)\" mouseout.delegate=\"hideComment()\"  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"status\">${request.requestStatus | lookupDescription:config.REQUEST_STATUS}</td>\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"ids-requested\">${request.requestId | idsRequested}\n            <td  click.trigger=\"selectRequest($index, $event, request)\" data-title=\"product\">${request.productId | productName:products.productsArray}</td>\n            <td  class=\"dropbtn\" click.delegate=\"showProfile(request, $event)\" data-title=\"Name\">${request.requestId.personId | personProperty:people.peopleArray:\"fullName\"}</td>\n            <td  data-title=\"Name\">${request.requestId.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</td>\n            <td><span click.delegate=\"editRequest($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Faculty Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div class=\"well col-lg-12\">\n      <div class=\"col-lg-12\">\n        <h4>Request No: ${requests.selectedRequestDetail.requestNo}</h4>\n      </div>\n\n      <div class=\"col-lg-12\">\n        <div class=\"col-lg-2\">\n          <h5>Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n        </div>\n        <div class=\"col-lg-3\">\n            <h5>Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n        </div>\n\n        <div class=\"col-lg-2\">\n            <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n        </div>\n          <div class=\"col-lg-2\">\n            <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n        </div>\n      </div>\n\n        <!-- Faculty Detail Form -->\n        <div class=\"col-lg-12\">\n          <span show.bind=\"facultyDetails\">\n              <div class=\"col-lg-2\">\n                <h5>Faculty: ${people.selectedPerson.fullName}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Email: ${people.selectedPerson.email}</h5>\n              </div>\n              <div class=\"col-lg-3\">\n                <h5>Institution: ${people.selectedPerson.institutionId | lookupValue:people.institutionsArray:'_id':'name'}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Phone: ${people.selectedPerson.phone | phoneNumber}</h5>\n              </div>\n              <div class=\"col-lg-2\">\n                <h5>Mobile: ${people.selectedPerson.mobile | phoneNumber}</h5>\n              </div>\n          </span>\n        </div>\n    </div>\n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of requests.selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId  | person:people.peopleArray:\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupSid:systems.systemsArray}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n        <!--\n        <div show.bind=\"customerMessage\" class=\"row\">\n          <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Customer Message\n                <span class=\"smallLeftMargin\" click.delegate=\"sendCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send\"><i class=\"fa fa-paper-plane\" aria-hidden=\"true\"></i></span>\n                <span class=\"smallLeftMargin\" click.delegate=\"cancelCustomerAction()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i></span>\n              </label>\n              <textarea class=\"form-control\" id=\"customerMessage\" placeholder=\"Customer Message\" innerhtml.bind=\"message.customerMessage\" rows=\"8\"></textarea>\n            </div>\n          </fieldset>\n        </div>\n        -->\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n        <!-- Add Student ID Template -->\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12 editPanel\">\n                    <div class=\"panel-body\">\n                      <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Template\"><i class=\"fa fa-floppy-o fa-lg\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg\" aria-hidden=\"true\"></i></span>\n                      </div>\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control\"/>\n                        </div>\n                    </div>\n\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n            <!--\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"roundTo10\" id=\"roundTo10CheckBox\" type=\"checkbox\" change.trigger=\"changeRoundTo10()\" data-toggle=\"checkbox\"> Round to 10\n                        </label>\n                    </div>\n                </div>\n            </div>\n             -->\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\"\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n             <editor value.bind=\"requests.selectedRequestDetail.techComments\" height=\"250\"></editor>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${requests.selectedRequestDetail.productId | productName:products.productsArray}</h5>\n          <h5 class=\"topMargin\">Required Date: ${requests.selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${requests.selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${requests.selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${requests.selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"requests.selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${requests.selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${requests.selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${requests.selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"requests.selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"requests.selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n    <!-- Systems and Clients -->\n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly && products.selectedProduct.clientRelevant\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\" show.bind=\"products.selectedProduct.clientRelevant\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.trigger=\"systemSelected()\" id=\"systemSelect\" value.bind=\"selectedSystem\" class=\"form-control\">\n                <option value=\"\">-- Select a System --</option>\n                <option repeat.for='system of products.selectedProduct.systems' value=\"${system.systemId}\">${system.sid}</option>\n            </select>\n        </div>\n        <div show.bind=\"systems.selectedSystem.clients.length > 0\" class=\"topMargin\">\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th class=\"col-sm-1\">Client</th>\n                <th class=\"col-sm-1\">Status</th>\n                <th class=\"col-sm-1\">IDs Available</th>\n                <th class=\"col-sm-9\">Assignments</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant\">\n                <td>${client.client}</td>\n                <td>${client.clientStatus | lookupDescription:config.CLIENT_STATUSES}</td>\n                <td>${client.idsAvailable}</td>\n                <td>\n                  <table class=\"col-sm-12\">\n                    <tr repeat.for=\"assignment of client.assignments\">\n                      <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | requestNumber:requests.requestsDetailsArray}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:\"_id\":\"name\"}</p></div></td>\n                    </tr>\n                  </table>\n                </td>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
-define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option value=\"\">Select a session</option>\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <!-- Request Table -->\n            <compose view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n\n  <compose view=\"./requestDetailDetails.html\"></compose>\n\n</template>\n"; });
 define('text!modules/user/requests/components/assignmentDetails.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"requests.selectedRequestDetail.assignments.length > 0\">\n      <div show.bind=\"requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE\" class=\"panel panel-primary topMargin\">\n        <div class=\"panel-body\">  \n\n          <table class=\"table table-striped table-hover\">\n            <thead>\n              <tr>\n                <th>System</th>\n                <th>Client</th>\n                <th>Student IDs</th>\n                <th>Student Password</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr repeat.for=\"assign of requests.selectedRequestDetail.assignments\" click.trigger=\"selectAssignment(assign, $index)\">\n                <td>${assign.systemId | lookupSid:systems.systemsArray}</td>\n                <td>${assign.client}</td>\n                <td>${assign.studentUserIds}</td>\n                <td>${assign.studentPassword}</td>\n              </tr>\n            </tbody>\n          </table>\n         \n          <h4 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"topMargin\"><strong>Faculty IDs</strong></h4>\n          <div class=\"form-group\">\n            <h5 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\" class=\"panel-title\">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>\n          </div>\n       \n          <h4 class=\"topMargin\"><strong>System Details</strong></h4>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">SID: ${systems.selectedSystem.sid}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">Server: ${systems.selectedSystem.server}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">System Number: ${systems.selectedSystem.instance}</h3>\n          </div>\n          <div class=\"form-group\">\n            <h5 class=\"panel-title\">ITS: ${systems.selectedSystem.its}</h3>\n          </div>\n          <div class=\"col-lg-12 topMargin\" innerhtml.bind=\"requests.selectedRequestDetail.techComments\"></div>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step1.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Term Select -->\n  <div class=\"row\">\n    <div class=\"col-sm-12\">\n      <div class=\"form-group leftJustify\">\n        <select value.bind=\"sessionId\" class=\"form-control\" change.delegate=\"changeSession($event)\" id=\"session\">\n          <option value=\"-1\">Select a session</option>\n          <option repeat.for=\"session of sessions.sessionsArray\"\n                  value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n        </select>\n      </div>\n    </div>\n  </div>\n  \n  <div class=\"row\">\n    <div show.bind=\"sessionSelected && useSandbox\" class=\"col-sm-12\">\n      <div class=\"form-group\">\n        <select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\n          <option value=\"-1\">Choose the Type of The Request</option>\n           <option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\n           <option value=\"regularCourse\">Regular Course</option>\n        </select>\n      </div>\n    </div>\n  </div>\n\n  <compose show.bind=\"regularClient && sessionSelected && typeSelected\" view='./Courses.html'></compose>\n\n  <!-- Number of students -->\n  <div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected\">\n    <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"REGULAR_NUMBER_OF_STUDENTS.content\"></div>\n    <div class=\"topMargin col-lg-5\">\n      <div class=\"form-group\">\n        <label for=\"undergraduates\" class=\"col-sm-3 control-label\">Undergraduates</label>\n        <div class=\"col-sm-8\">\n          <input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\n                  class=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\"/>\n        </div>\n      </div>\n    </div>\n    <div class=\"topMargin col-lg-5\">\n      <div class=\"form-group\">\n            <label for=\"graduates\" class=\"col-sm-3 control-label\">Graduates</label>\n            <div class=\"col-sm-8\">\n              <input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\n                    class=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\"/>\n            </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"row col-lg-offset-3\" show.bind=\"courseSelected\">\n      <span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\n  </div>\n\n  <!-- Begin and End Date -->\n  <div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\n    <div class=\"topMargin col-lg-10 leftMargin rightMargin\" innerhtml.bind=\"START_END_DATES.content\"></div>\n      <div class=\"col-lg-5\">\n        <div class=\"form-group topMargin\">\n           <label class=\"col-sm-3 form-control-label \">Start Date</label>\n           <div class=\"col-sm-8\">\n            <flat-picker disabled.bind=\"showLockMessage\" controlid=\"startDate\" config.bind=\"config\" change.delegate=\"changeBeginDate($event)\"  \n                value.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\n           <span id='startDateError'></span>\n           </div>\n        </div>\n      </div>\n      <div class=\"col-lg-5\">\n        <div class=\"form-group topMargin\">\n          <label class=\"col-sm-3 form-control-label \">End Date</label>\n          <div class=\"col-sm-8\">\n            <flat-picker disabled.bind=\"showLockMessage\" controlid=\"endDate\" config.bind=\"config\" value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n           <span id='endDateError'></span>\n          </div>\n        </div>\n      </div>\n       \n    </div>\n\n  <div show.bind=\"sessionId == -1 && requestType == -1\" innerhtml.bind=\"CLIENT_REQUEST_START.content\"></div>\n  <div show.bind=\"sessionId != -1 && requestType == -1 && useSandbox\" innerhtml.bind=\"SESSION_SELECTED.content\"></div>\n  \n  <div show.bind=\"showInfoBox\" class=\"topMargin leftMargin\" style=\"display: none;\" id=\"infoBox\"></div>\n</template>\n"; });
-define('text!modules/user/requests/components/client-request-step2.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\"  >\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\" innerhtml.bind =\"siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content.replace('REQUEST_LIMIT', config.REQUEST_LIMIT)\"></div>\n    </div>\n    \n    <div class=\"col-md-12\" >\n      <div class=\"col-md-5 topMargin\">\n        <label id=\"productList\">Available Products</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <a click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    mouseover.delegate=\"showCurriculum(product, $event)\" mouseout.delegate=\"hideCurriculum()\"\n                    class=\"list-group-item\">${product.name}</a>\n          </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 col-md-offset-1 topMargin\">\n        <label id=\"requestProductsLabel\">Requested Products</label>\n        <div class=\"well well2 overflow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <a  show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                    class=\"list-group-item\">${product.productId | productName:products.productsArray}</a>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
+define('text!modules/user/requests/components/client-request-step2.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\"  >\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\" innerhtml.bind =\"siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content.replace('REQUEST_LIMIT', config.REQUEST_LIMIT)\"></div>\n    </div>\n    \n    <div class=\"col-md-12\" >\n      <div class=\"col-md-5 topMargin\">\n        <label id=\"productList\">Available Products</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <a  click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    mouseover.delegate=\"showCurriculum(product, $event)\" mouseout.delegate=\"hideCurriculum()\"\n                    class=\"list-group-item dropbtn\">${product.name}</a>\n          </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 col-md-offset-1 topMargin\">\n        <label id=\"requestProductsLabel\">Requested Products</label>\n        <div class=\"well well2 overflow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <a show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n                    class=\"list-group-item dropbtn\">${product.productId | productName:products.productsArray}</a>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/client-request-step3.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div  class=\"well well-sm col-md-10 col-sm-offset-1\">${siteInfo.selectMessageByKey('CLIENT_REQUESTS_COMMENTS').content}</div>\n    </div>\n    <div class=\"form-group col-md-12\">\n      <editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/requests/components/client-request-step4.html', ['module'], function(module) { module.exports = "<template>\n\n  <div class=\"col-md-12\" >\n    <div  class=\"well well-sm col-md-10 col-sm-offset-1\" innerhtml.bind=\"siteInfo.selectMessageByKey('CLIENT_REQUESTS_SUMMARY').content\"></div>\n  </div>\n  <div class=\"form-group col-md-12\">\n    <div class=\"row\">\n      <h4 show.bind=\"requestType != 'sandboxCourse'\" class=\"col-md-5 topMargin\">Course: <b>${courseId | courseName:people.coursesArray}</b></h4>\n      <h4 show.bind=\"requestType == 'sandboxCourse'\" class=\"col-md-5 topMargin\">Course: <b>Sandbox</b></h4>\n    </div>\n    <div class=\"row\">\n      <h4 class=\"col-md-5 topMargin\" show.bind=\"requestType != 'sandboxCourse'\">Undergraduates: <b>${requests.selectedRequest.undergradIds}</b></h4>\n      <h4 class=\"col-md-5 topMargin\" show.bind=\"requestType != 'sandboxCourse'\">Graduates: <b>${requests.selectedRequest.graduateIds}</b> </h4>\n    </div>\n    <div class=\"row\">\n      <h4 class=\"col-md-5 topMargin\">Course Begins: <b>${requests.selectedRequest.startDate | dateFormat:'YYYY-MM-DD'}</b></h4>\n      <h4 class=\"col-md-5 topMargin\">Course Ends: <b>${requests.selectedRequest.endDate | dateFormat:'YYYY-MM-DD'}</b></h4>\n    </div>\n    <div class=\"col-md-12\"></div>\n    <div class=\"row\" id=\"productListTable\">\n      <table class=\"table table-striped table-bordered col-md-10 topMargin\">\n        <thead>\n        <tr>\n          <th>Requested Product</th>\n          <th>Date Required</th>\n        </tr>\n        <tbody id=\"requiredProductsTable\">\n        <tr repeat.for=\"request of requests.selectedRequest.requestDetails\">\n          <td>${request.productId | productName:products.productsArray}</td>\n          <td>\n            <div class=\"form-group  col-md-8\">\n              <!--  || request._id -->\n               <flat-picker controlid=\"requiredDate-${$index}\" config.bind=\"config\" value.bind=\"request.requiredDate\" startdate.bind=\"minRequiredDate\" enddate.bind=\"maxRequiredDate\"></flat-picker>\n           <!--   <date-picker disabled.bind=\"showLockMessage\" value.two-way=\"request.requiredDate\"  startdate.bind=\"minRequiredDate\" enddate.bind=\"maxRequiredDate\" controlid=\"requiredDate-${$index}\"></date-picker> -->\n            </div>\n          </td>\n        </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <div class=\"form-group\" show.bind=\"comments !== ''\">\n          <label >Comments:</label>\n          <div class=\"topMargin\" rows=\"12\" innerhtml.bind=\"requests.selectedRequest.comments\"></div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</template>\n"; });
 define('text!modules/user/requests/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <H4>Choose a Course</h4>\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span style=\"margin-left:5px;\"  class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\" click.delegate=\"editACourse()\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"nummber\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"editCourse\">\n            <div class=\"panel panel-default col-md-10 col-md-offset-1\" style=\"background-color:ghostwhite;\">\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin topMargin\">\n                    <span click.trigger=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Course\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.trigger=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                </div>\n                <div class=\"panel-body\">\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <span id=\"course\"></span>\n</template>\n"; });
@@ -37916,4 +38698,7 @@ define('text!modules/user/support/components/Requests.html', ['module'], functio
 define('text!modules/user/support/components/selectProduct.html', ['module'], function(module) { module.exports = "<template>\n     <compose view='./Courses.html' show.bind=\"config.HELP_TICKET_TYPES[helpTickets.selectedHelpTicket.helpTicketType - 1].clientRequired\"></compose>\n\n      <!-- Product Select -->\n      <div show.bind=\"helpTickets.selectedHelpTicket.courseId !== '' && clientRequestsArray.length > 0\">\n        <table id=\"clientTable\" class=\"table table-bordered table-responsive\" style=\"background:white;\">\n          <thead>\n          <tr class=\"header\">\n            <th>Product</th>\n            <th>System</th>\n            <th>Client Number</th>\n            <th>Status</th>\n          </tr>\n          </thead>\n          <tbody>\n          <tr id=\"${product.id}\" productId=\"${product.productId}\" \n              repeat.for=\"product of clientRequestsArray[0].requestDetails\">\n            <td >${product.productId}</td>\n            <td>${product.sid | lookupSid:systems}</td>\n            <td>${product.client}</td>\n            <td>${product.status | lookupDescription:config.REQUEST_STATUS}</td>\n          </tr>\n          </tbody>\n        </table>\n        <span id=\"client\"></span>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/user/support/components/viewHTForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"fluid-container\">\n    <div class=\"row\">\n        <span class=\"leftMargin largeFont\">${viewHelpTicketsHeading}</span>\n      </div>\n\n    <!-- Buttons -->\n    <div class=\"bottomMargin list-group-item\">\n      <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n      <span show.bind=\"helpTickets.selectedHelpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS\" click.delegate=\"respond()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n        title=\"\" data-original-title=\"Respond\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n      <span>${responseMessage}</span>\n    </div>\n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n      <!-- Enter Response -->\n      <div show.bind=\"enterResponse\" class=\"topMargin bottomMargin\">\n\n        <div class=\"panel panel-default leftMargin rightMargin\" style=\"background-color:ghostwhite;\">\n          <div class=\"panel-body\">\n    \n \n            <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n              <span click.delegate=\"saveResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Send Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n              <span click.delegate=\"cancelResponse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            </div>\n\n            <div class=\"row leftMargin rightMargin\">\n              <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n      \n              <p>&nbsp;</p>\n              <div class=\"row\">\n                <h4>Upload screenshots or other files that will help us solve you problem</h4>\n                  <div class=\"col-lg-2\">\n                      <label class=\"btn btn-primary\">\n                          Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n                      </label>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <ul>\n                          <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n                      </ul>\n                  </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"row\">\n        <div class=\"list-group-item leftMargin rightMargin\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h4 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\n                    | dateFormat:'h:mm A'}</h4>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h4>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupDescription:config.HELP_TICKET_TYPES}</h4>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h4 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h4>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h4>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</h4>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  person:people:'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n        </div>\n      </div>\n    </div>\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n</div>\n</template>"; });
 define('text!modules/user/support/components/viewHTTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n    <div class='row'>\n      <div class='bottomMargin'>\n        <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n        <div id=\"no-more-tables\">\n          <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n              <tr>\n                <td colspan='7'>\n                    <div class=\"checkbox\">\n                        <label>\n                            <input checked.bind=\"isChecked\" change.trigger=\"filterOutClosed()\" type=\"checkbox\"> Hide closed help tickets\n                        </label>\n                    </div>\n                </td>\n              </tr>\n              <tr>\n                <td colspan='7'>\n                  <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                    title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                  <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                </td>\n              </tr>\n              <tr>\n                <th></th>\n                <th>\n                  <input input.delegate=\"dataTable.filterList($event, helpTicketTypeLookupArray)\" id=\"helpTicketType-description\" type=\"text\" compare=\"lookup-array\" class=\"form-control\" ref=\"typeFilter\"/>\n\n                </th>\n                <th></th>\n                <th></th>\n                <th>\n                  <select value.bind=\"selectedStatus\" change.delegate=\"dataTable.filterList($event)\" class=\"form-control\" id=\"helpTicketStatus\">\n                        <option value=\"\"></option>\n                        <option repeat.for=\"status of config.HELP_TICKET_STATUSES\"\n                                value.bind=\"status.code\">${status.description}</option>\n                      </select>\n                </th>\n                <th>\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"createdDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n                 <th>\n                  <input change.delegate=\"dataTable.filterList($event)\" id=\"modifiedDate\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control datepicker\"\n                    data-dateformat=\"yy/mm/dd\">\n                </th>\n              </tr>\n              <tr>\n                <th>\n                  Number <span click.trigger=\"dataTable.sortArray('helpTicketNo')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Type <span click.trigger=\"dataTable.sortArray('helpTicketType')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                 <th>Owner</th>\n                <th></th>\n                <th>\n                  Status <span click.trigger=\"dataTable.sortArray('helpTicketStatus')\"><i class=\"fa fa-sort\"></i></span><br>\n                </th>\n                <th>\n                  Date Created <span click.trigger=\"dataTable.sortArray('createdDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n                <th>\n                  Date Modified <span click.trigger=\"dataTable.sortArray('modifiedDate')\"><i class=\"fa fa-sort\"></i></span>\n                </th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr repeat.for=\"helpTicket of dataTable.displayArray\">\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Reference\">${helpTicket.helpTicketNo}</td>\n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Type\">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}</td>\n                <td style=\"width:12rem;\">${helpTicket.owner[0].personId | person:people:'fullName'}</td> \n                <td style=\"width:2rem;\" data-title=\"Update\">\n                  <span click.trigger=\"closeHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus != config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close Help Ticket\"><i class=\"fa fa-window-close-o fa-lg\" aria-hidden=\"true\"></i></span>\n                  <!--\n                  <span click.trigger=\"openHelpTicket(helpTicket)\" show.bind=\"helpTicket.helpTicketStatus == config.CLOSED_HELPTICKET_STATUS\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Reopen Help Ticket\"><i class=\"fa fa-folder-open fa-lg\" aria-hidden=\"true\"></i></span>\n                  -->\n                </td>  \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Status\">${helpTicket.helpTicketStatus | lookupDescription:config.HELP_TICKET_STATUSES}</td>             \n                <td click.delegate=\"selectHelpTicket($event, $index)\" data-title=\"Created Date\">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n                <td data-title=\"Modified Date\" click.delegate=\"selectHelpTicket($event, $index)\">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>"; });
+define('text!modules/tech/requests/techRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">Tech Client Requests</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
+define('text!modules/tech/requests/createRequest.html', ['module'], function(module) { module.exports = "<template>\n\n\t<div class=\"fluid-container\">\n\t<div class=\"bottomMargin list-group-item\">\n\t\t\t<span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\" ></i></span>\n\t\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-4\">\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<select id=\"session\" value.bind=\"sessionId\" class=\"form-control\" change.delegate=\"changeSession($event)\" id=\"session\">\n\t\t\t\t\t<option value=\"-1\">Select a session</option>\n\t\t\t\t\t<option repeat.for=\"session of sessions.sessionsArray\"\n\t\t\t\t\t\tvalue.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div show.bind=\"sessionSelected\" class=\"topMargin\">\n\t\t\t\t<select id=\"institution\" value.bind=\"selectedInstitution\" change.delegate=\"changeInstitution($event)\" class=\"form-control\">\n\t\t\t\t\t<option value=\"\">Choose the Institution</option>\n\t\t\t\t\t<option repeat.for=\"item of people.institutionsArray\" value=\"${item._id}\">${item.name}</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\n\t\t\t<div show.bind=\"institutionSelected\" class=\"topMargin\">\n\t\t\t\t<select id=\"faculty\" value.bind=\"selectedPerson\" change.delegate=\"changePerson($event)\" class=\"form-control\">\n\t\t\t\t\t<option value=\"\">Choose the Faculty</option>\n\t\t\t\t\t<option repeat.for=\"item of people.instutionPeopleArray\" value=\"${item._id}\">${item.fullName}</option>\n\t\t\t\t</select>\n\t\t\t</div>\n  \n\t\t\t<div id=\"course\" show.bind=\"personSelected && config.SANDBOX_USED\" class=\"topMargin\">\n\t\t\t\t<select value.bind=\"requestType\" change.delegate=\"changeRequestType($event)\" id=\"requestType\" class=\"form-control\">\n\t\t\t\t\t<option value=\"-1\">Choose the Type of The Request</option>\n\t\t\t\t\t<option value=\"sandboxCourse\">${config.SANDBOX_NAME}</option>\n\t\t\t\t\t<option value=\"regularCourse\">Regular Course</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t\t\t\n\t\t\t<compose show.bind=\"regularClient\" view='./components/Courses.html'></compose>\n\n\t\t\t<div id=\"existingRequestInfo\"></div>\n\n\t\t\t<div class=\"row\"  id=\"numStudents\" show.bind=\"courseSelected && regularClient\">\n\t\t\t\t<div class=\"topMargin col-lg-5\">\n\t\t\t\t\t<label for=\"undergraduates\" class=\"control-label\">Undergraduates</label>\n\t\t\t\t\t<input  id=\"undergraduates\"  type=\"number\" placeholder=\"Number of Undergraduates\"\n\t\t\t\t\tclass=\"form-control\" value.bind=\"requests.selectedRequest.undergradIds\"/>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"topMargin col-lg-5\">\n\t\t\t\t\t<label for=\"graduates\" class=\"control-label\">Graduates</label>\n\t\t\t\t\t<input id=\"graduates\" type=\"number\" placeholder=\"Number of Graduates\"\n\t\t\t\t\t\tclass=\"form-control\" value.bind=\"requests.selectedRequest.graduateIds\"/>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row col-lg-offset-3\" show.bind=\"courseSelected\">\n\t\t\t\t<span class=\"col-lg-8 \" id=\"numberOfStudentsError\"></span>\n\t\t\t</div>\n\n\t\t\t<!-- Begin and End Date -->\n\t\t\t<div class=\"row\" show.bind=\"sandBoxClient || courseSelected\">\n      \t\t\t<div class=\"col-lg-5 topMargin\">\n\t\t\t\t\t<label class=\"form-control-label \">Start Date</label>\n\t\t\t\t\t<flat-picker disabled.bind=\"showLockMessage\" controlid=\"startDate\" config.bind=\"config\" change.delegate=\"changeBeginDate($event)\"  \n\t\t\t\t\t\tvalue.bind=\"requests.selectedRequest.startDate\" startdate.bind=\"minStartDate\" enddate.bind=\"maxStartDate\"></flat-picker>\n\t\t\t\t\t<span id='startDateError'></span>\n           \t\t</div>\n\t\t\t\t<div class=\"col-lg-5 topMargin\">\n\t\t\t\t\t<label class=\"form-control-label \">End Date</label>\n\t\t\t\t\t<flat-picker disabled.bind=\"showLockMessage\" controlid=\"endDate\" config.bind=\"config\" value.bind=\"requests.selectedRequest.endDate\" startdate.bind=\"minEndDate\" enddate.bind=\"maxEndDate\"></flat-picker>\n\t\t\t\t\t<span id='endDateError'></span>\n\t\t\t\t</div>\n      \t\t</div>\n\t\t\t\n\t\t</div>\n\t\t<div show.bind=\"sandBoxClient || courseSelected\" class=\"col-lg-8\">\n\t\t<div class=\"row\">\t\n\t\t\t<div class=\"col-md-5 topMargin\">\n\t\t\t\t<label id=\"productList\">Available Products</label>\n\t\t\t\t<div class=\"well well2 overFlow\" style=\"height:400px;\">\n\t\t\t\t\t<input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t<a click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\" class=\"list-group-item dropbtn\">${product.name}</a>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"col-md-5 col-md-offset-1 topMargin\">\n\t\t\t\t<label id=\"requestProductsLabel\">Requested Products</label>\n\t\t\t\t<div class=\"well well2 overflow\" style=\"height:400px;\">\n\t\t\t\t\t<ul class=\"list-group\">\n\t\t\t\t\t\t<a  show.bind=\"!product.delete\" click.trigger=\"removeProduct($event)\" type=\"button\" repeat.for=\"product of requests.selectedRequest.requestDetails\" id=\"${product.productId}\"\n\t\t\t\t\t\t\t\tclass=\"list-group-item dropbtn\">${product.productId | productName:products.productsArray}</a>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\" id=\"productListTable\">\n\t\t\t\t<div show.bind=\"requests.selectedRequest.requestDetails.length > 0\">\n\t\t\t\t\t<table class=\"table table-striped table-bordered col-md-10 topMargin\">\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t<th>Requested Product</th>\n\t\t\t\t\t\t<th>Date Required</th>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tbody id=\"requiredProductsTable\">\n\t\t\t\t\t\t<tr repeat.for=\"request of requests.selectedRequest.requestDetails\">\n\t\t\t\t\t\t<td>${request.productId | productName:products.productsArray}</td>\n\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t<div class=\"form-group  col-md-8\">\n\t\t\t\t\t\t\t<flat-picker controlid=\"requiredDate-${$index}\" config.bind=\"config\" value.bind=\"request.requiredDate\" startdate.bind=\"minRequiredDate\" enddate.bind=\"maxRequiredDate\"></flat-picker>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t</table>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row\">\n\n\t\t\t\t<div class=\"topMargin\" show.bind=\"sandBoxClient || courseSelected\">\n\t\t\t\t\t<editor value.bind=\"requests.selectedRequest.comments\" height=\"250\"></editor>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n</template>"; });
+define('text!modules/tech/requests/components/Courses.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"topMargin\">\n        <H4>Choose a Course</h4>\n        <table id=\"coursesTable\" class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"refreshCourses()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"newCourse()\" class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span style=\"margin-left:5px;\"  class=\"smallMarginRight\"  bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\" click.delegate=\"editACourse()\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">Number </th>\n                    <th style=\"width:30rem;\">Name</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"selectCourse($index, $event)\"  repeat.for=\"course of people.coursesArray\">\n                    <td data-title=\"nummber\">${course.number} </td>\n                    <td data-title=\"name\">${course.name}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"editCourse\">\n            <div class=\"panel panel-default col-md-10 col-md-offset-1\" style=\"background-color:ghostwhite;\">\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin topMargin\">\n                    <span click.trigger=\"saveCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Course\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.trigger=\"cancelEditCourse()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                </div>\n                <div class=\"panel-body\">\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"people.selectedCourse.number\" type=\"text\" placeholder=\"Course Number\"\n                            class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"people.selectedCourse.name\" type=\"text\" placeholder=\"Course Name\"\n                            class=\"form-control\"/>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <span id=\"course\"></span>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

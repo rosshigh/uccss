@@ -190,11 +190,11 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.cc = cc;
       mailObject.body = RequestCreatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Created'; 
@@ -204,20 +204,15 @@ if(env === 'development'){
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    // return new Promise(function(resolve, reject) {
+    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.body = RequestUpdatedTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = 'Product Request Updated'; 
        sendGrid(mailObject)
-          // .then(result => {
-          //     if (result.statusCode === 202) {     
-          //       resolve(result);
-          //     } else {
-          //       reject(Error(result));
-          //     }
-          // })
-
-      // });
   }
 
   customerAction = function(mailObject){
@@ -434,16 +429,16 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
             from: emailConfig.emailAddress,
-            to: mailObject.email,
+            to: toEmail,
             subject: 'Product Request Created',
             template: 'client-request-created',
-            cc: mailObject.cc,
             context: mailObject.context
         };
 
@@ -452,24 +447,20 @@ if(env === 'development'){
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-    // return new Promise(function(resolve, reject) {
+      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+      mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
           from: emailConfig.emailAddress,
-          to: mailObject.email,
+          to: toEmail,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
           context: mailObject.context
       };
 
-      nodeMailerSendMail(mail)
-    //         .then(result => {      
-    //               if (result.rejected.length === 0) {     
-    //                 resolve(result);
-    //               } else {
-    //                 reject(Error(result));
-    //               }
-    //           })
-    // });   
+      nodeMailerSendMail(mail)   
   }
 
   customerAction = function(mailObject){
