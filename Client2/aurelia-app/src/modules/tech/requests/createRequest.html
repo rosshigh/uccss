@@ -37,7 +37,7 @@
 				</select>
 			</div>
 				
-			<compose show.bind="regularClient" view='./components/Courses.html'></compose>
+			<compose show.bind="regularClient && personSelected" view='./components/Courses.html'></compose>
 
 			<div id="existingRequestInfo"></div>
 
