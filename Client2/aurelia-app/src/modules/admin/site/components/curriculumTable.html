@@ -23,22 +23,19 @@
                         <tbody>
                             <tr>
 								<th>
-									<select change.delegate="dataTable.filterList($event)" class="form-control" id="category" compare="id">
-										<option value=""></option>
-										<option repeat.for="category of curriculum.curriculumCatArray" value="${category.name}">${category.name}</option>
-									</select>
+                                    <select value.bind="categoryFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'categoryFilter',  collectionProperty: 'category', displayProperty: 'category', matchProperty:'', compare:'match'} )" class="form-control">
+                                        <option value=""></option>
+                                       <option repeat.for="category of curriculum.curriculumCatArray" value="${category.name}">${category.name}</option>
+                                    </select>
 								</th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="title" type="text" placeholder="Filter Title" class="form-control"
-                                    />
+                                    <input value.bind="titleFilterValue" input.delegate="dataTable.filterList(titleFilterValue, { type: 'text',  filter: 'titleFilter', collectionProperty: 'title', displayProperty: 'title',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="dateCreated" type="date" placeholder="Filter Date" class="form-control"
-                                    />
+                                    <input value.bind="dateCreatedFilterValue" input.delegate="dataTable.filterList(dateCreatedFilterValue, {type: 'date', filter: 'dateCreated',  collectionProperty: 'dateCreated', compare: 'after'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                     <input input.delegate="dataTable.filterList($event)" id="dateModified" type="date" placeholder="Filter Date" class="form-control"
-                                    />
+                                   <input value.bind="dateModifiedFilterValue" input.delegate="dataTable.filterList(dateModifiedFilterValue, {type: 'date', filter: 'dateModified',  collectionProperty: 'dateModified', compare: 'after'} )"  class="form-control" />
                                 </th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">

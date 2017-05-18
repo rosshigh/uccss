@@ -137,9 +137,7 @@ export class EditSessions {
 
     filterOutClosed() {
         if (this.isChecked) {
-            var filterValues = new Array();
-            filterValues.push({ property: "sessionStatus", value: "Closed", type: 'text', compare: 'not' });
-            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+            this.dataTable.filterList("Closed", {type: 'value', filter: "closedFilter",  collectionProperty: 'sessionStatus', compare: 'not-match'});
         } else {
             this.dataTable.updateArray(this.sessions.sessionsArray,'startDate',-1);
         }

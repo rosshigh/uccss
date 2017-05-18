@@ -21,17 +21,17 @@
                         <tbody>
                             <tr>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="category" compare="id">
-                                    <option value=""></option>
-                                    <option value="${type.type}" repeat.for="type of config.MESSAGE_TYPES">${type.description}</option>
-                                </select>
+                                    <input value.bind="keyFilterValue" input.delegate="dataTable.filterList(keyFilterValue, { type: 'text',  filter: 'keyFilter', collectionProperty: 'key', displayProperty: 'key',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="key" type="text" placeholder="Key" class="form-control" />
+                                    <select value.bind="categoryFilter" input.delegate="dataTable.filterList($event, { type:
+                                    'value',  filter: 'categoryFilter',  collectionProperty: 'category', displayProperty: 'category', matchProperty:'', compare:'match'} )" class="form-control">
+                                        <option value=""></option>
+                                        <option value="${type}" repeat.for="type of config.MESSAGE_TYPES">${type}</option>
+                                    </select>
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="description" type="text" placeholder="Description" class="form-control"
-                                    />
+                                    <input value.bind="descriptionFilterValue" input.delegate="dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilter', collectionProperty: 'description', displayProperty: 'description',  compare:'match'} )"  class="form-control" />
                                 </th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">

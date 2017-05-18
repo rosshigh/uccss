@@ -103,7 +103,49 @@ export class BulkEmails {
         this.people.sendBuikEmail(email);
     }
 
-    filter(el, options){
-        this.dataTable.filterListExV(el.target.value, options);
+    institutionCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    regionCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].region.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    cityCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].city.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    countryCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId._id == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].country.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    roleCustomFilter(value, item, context){
+		var keep = false;
+		if(item.roles && item.roles.length > 0){
+			for(let i = 0; i < item.roles.length; i++){
+				if(item.roles[i].toUpperCase().indexOf(value.toUpperCase()) > -1) keep = true;
+			}
+		}
+        return keep;
     }
 }

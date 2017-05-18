@@ -149,29 +149,37 @@ export class DataTable{
     this.pageOne();
     this.buildDisplayArray();
   }
- 
-  filterList(el, array){ 
-    el.preventDefault();
-    array = array || new Array();
+
+   filterList(value, options){
+    options.lookupArray = options.lookupArray || new Array();
     //If the property is already in filterValues, filter it out
     this.filterValues = this.filterValues.filter(function (obj) {
-      return obj.property !== el.target.id;
+      return obj.options.filter !== options.filter;
     });
 
-    //If the filter value is not set to empty, add it to filterValues
-    if(el.target.value !== ""){
-      switch(el.target.type){
-        case 'select-one':
-          this.filterValues.push({property:el.target.id,value:el.target.options[el.target.selectedIndex].value, type:el.target.type, compare:$(el.target).attr("compare")});
-          break;
-        default:
-          this.filterValues.push({property:el.target.id,value:el.target.value, type:el.target.type, compare:$(el.target).attr("compare")});
+    //Parse collection property
+    if(options.type.indexOf('obj') == -1 && options.type != 'custom'){
+      var properties = options.collectionProperty.split('.');
+      var condition = "item"
+      for(var j = 0; j<properties.length; j++){
+        if(properties[j].indexOf('[') > -1 ) {
+          condition += properties[j];
+        } else {
+          condition += "['" + properties[j] + "']";
+        }
       }
+      options.collectionProperty = condition;
+    }
+
+    //If the filter value is not set to empty, add it to filterValues 
+    if(typeof value == 'object' && !(value instanceof Date)) value = value.target.value;
+    if(value !== ""){
+      this.filterValues.push({options: options, value: value});
     }
 
     //If there are no filters in filterValues, reset the displayArray to the original list
     if(this.filterValues.length > 0){
-      this.baseArray = this.filter(this.filterValues,  array);
+      this.baseArray = this.filter(this.filterValues);
     } else {
       this.baseArray = this.sourceArray;
     }
@@ -182,6 +190,100 @@ export class DataTable{
 
     this.pageOne();
   }
+
+
+  filter(filters){
+    var keep;
+    var index = 0;
+    var that = this;
+    return this.sourceArray.filter(item => {
+      keep = false;
+      for(let i = 0; i < filters.length; i++) {
+        let filterItem = filters[i];
+        var matchValue = undefined;
+        if (filterItem.options.compare.indexOf('custom') > -1) {
+          matchValue = true;
+        } else  {
+          matchValue = eval(filterItem.options.collectionProperty);
+        }
+
+        if(matchValue != undefined) {
+          switch(filterItem.options.type){
+            case 'custom':
+              keep = filterItem.options.filter(filterItem.value, item, that.context);
+              break;
+            case 'text':
+              if(filterItem.options.compare.indexOf('not') > -1){
+                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
+              } else {
+                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+              }
+              break;
+            case 'value':
+              if(filterItem.options.compare.indexOf('not') > -1){
+                  keep = matchValue != filterItem.value;
+                } else {
+                   keep = matchValue == filterItem.value;
+                }
+              break;  
+            case "boolean":
+                keep = matchValue === eval(filterItem.value);
+                break;
+            case "date":
+              switch(filterItem.options.compare){
+                case 'after':
+                  if(matchValue){
+                    var dt = moment(matchValue).format('YYYY-MM-DD');
+                    keep = moment(dt).isAfter(filters[i].value);
+                  }
+                  break;
+                default:
+                  if(matchValue){
+                    var dt = moment(matchValue).format('YYYY-MM-DD');
+                    keep = moment(dt).isSame(filters[i].value);
+                  }
+              }
+          }
+        }
+
+       if(!keep) break;
+      }
+      return keep;
+      })
+  }
+ 
+  // filterList(el, array){ 
+  //   el.preventDefault();
+  //   array = array || new Array();
+  //   //If the property is already in filterValues, filter it out
+  //   this.filterValues = this.filterValues.filter(function (obj) {
+  //     return obj.property !== el.target.id;
+  //   });
+
+  //   //If the filter value is not set to empty, add it to filterValues
+  //   if(el.target.value !== ""){
+  //     switch(el.target.type){
+  //       case 'select-one':
+  //         this.filterValues.push({property:el.target.id,value:el.target.options[el.target.selectedIndex].value, type:el.target.type, compare:$(el.target).attr("compare")});
+  //         break;
+  //       default:
+  //         this.filterValues.push({property:el.target.id,value:el.target.value, type:el.target.type, compare:$(el.target).attr("compare")});
+  //     }
+  //   }
+
+  //   //If there are no filters in filterValues, reset the displayArray to the original list
+  //   if(this.filterValues.length > 0){
+  //     this.baseArray = this.filter(this.filterValues,  array);
+  //   } else {
+  //     this.baseArray = this.sourceArray;
+  //   }
+  //   this.startRecord = this.DEFAULT_START;
+  //   this.firstVisible = 1;
+  //   this.buildDisplayArray();
+  //   this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+
+  //   this.pageOne();
+  // }
 
   // filterListExp(el, options){
   //   el.preventDefault();
@@ -222,329 +324,335 @@ export class DataTable{
   //   this.pageOne();
   // }
 
-   filterListExV(value, options){
-    options.lookupArray = options.lookupArray || new Array();
-    //If the property is already in filterValues, filter it out
-    this.filterValues = this.filterValues.filter(function (obj) {
-      return obj.options.filter !== options.filter;
-    });
+  //  filterListExV(value, options){
+  //   options.lookupArray = options.lookupArray || new Array();
+  //   //If the property is already in filterValues, filter it out
+  //   this.filterValues = this.filterValues.filter(function (obj) {
+  //     return obj.options.filter !== options.filter;
+  //   });
 
-    //Parse collection property
-    if(options.type.indexOf('obj') == -1){
-      var properties = options.collectionProperty.split('.');
-      var condition = "item"
-      for(var j = 0; j<properties.length; j++){
-        if(properties[j].indexOf('[') > -1 ) {
-          condition += properties[j];
-        } else {
-          condition += "['" + properties[j] + "']";
-        }
-      }
-      options.collectionProperty = condition;
-    }
+  //   //Parse collection property
+  //   if(options.type.indexOf('obj') == -1){
+  //     var properties = options.collectionProperty.split('.');
+  //     var condition = "item"
+  //     for(var j = 0; j<properties.length; j++){
+  //       if(properties[j].indexOf('[') > -1 ) {
+  //         condition += properties[j];
+  //       } else {
+  //         condition += "['" + properties[j] + "']";
+  //       }
+  //     }
+  //     options.collectionProperty = condition;
+  //   }
 
-    //If the filter value is not set to empty, add it to filterValues
-    if(value !== ""){
-      this.filterValues.push({options: options, value: value});
-    }
+  //   //If the filter value is not set to empty, add it to filterValues
+  //   if(value !== ""){
+  //     this.filterValues.push({options: options, value: value});
+  //   }
 
-    //If there are no filters in filterValues, reset the displayArray to the original list
-    if(this.filterValues.length > 0){
-      this.baseArray = this.filter2(this.filterValues);
-    } else {
-      this.baseArray = this.sourceArray;
-    }
-    this.startRecord = this.DEFAULT_START;
-    this.firstVisible = 1;
-    this.buildDisplayArray();
-    this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+  //   //If there are no filters in filterValues, reset the displayArray to the original list
+  //   if(this.filterValues.length > 0){
+  //     this.baseArray = this.filter2(this.filterValues);
+  //   } else {
+  //     this.baseArray = this.sourceArray;
+  //   }
+  //   this.startRecord = this.DEFAULT_START;
+  //   this.firstVisible = 1;
+  //   this.buildDisplayArray();
+  //   this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
 
-    this.pageOne();
-  }
+  //   this.pageOne();
+  // }
 
-  externalFilter(filters){
-      if(filters.length > 0){
-        this.baseArray = this.filter(filters);
-      } else {
-        this.baseArray = this.sourceArray;
-      }
-      this.startRecord = this.DEFAULT_START;
-      this.firstVisible = 1;
-      this.buildDisplayArray();
-      this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
+  // externalFilter(filters){
+  //     if(filters.length > 0){
+  //       this.baseArray = this.filter(filters);
+  //     } else {
+  //       this.baseArray = this.sourceArray;
+  //     }
+  //     this.startRecord = this.DEFAULT_START;
+  //     this.firstVisible = 1;
+  //     this.buildDisplayArray();
+  //     this.lastVisible = parseInt(this.take) < this.displayLength ? parseInt(this.take) : this.displayLength;
 
-      this.pageOne();
-  }
+  //     this.pageOne();
+  // }
 
-  filter2(filters){
-    var keep;
-    var index = 0;
-    return this.sourceArray.filter(item => {
-      keep = false;
-      for(let i = 0; i < filters.length; i++) {
-        let filterItem = filters[i];
-        var matchValue = undefined;
-        if(filterItem.options.compare.indexOf('lookup') > -1){
-          matchValue = this.lookup2(filterItem, item);
-        } else if (filterItem.options.compare.indexOf('array') > -1) {
-          matchValue = true;
-        } else  {
-          matchValue = eval(filterItem.options.collectionProperty);
-        }
+  // filter2(filters){
+  //   var keep;
+  //   var index = 0;
+  //    var that = this;
+  //   return this.sourceArray.filter(item => {
+  //     keep = false;
+  //     for(let i = 0; i < filters.length; i++) {
+  //       let filterItem = filters[i];
+  //       var matchValue = undefined;
+  //       if(filterItem.options.compare.indexOf('lookup') > -1){
+  //         matchValue = this.lookup2(filterItem, item);
+  //       } else if (filterItem.options.compare.indexOf('array') > -1) {
+  //         matchValue = true;
+  //       } else if (filterItem.options.compare.indexOf('custom') > -1) {
+  //         matchValue = true;
+  //       } else {
+  //         matchValue = eval(filterItem.options.collectionProperty);
+  //       } 
 
-        if(matchValue != undefined) {
-          switch(filterItem.options.type){
-            case 'text':
-              if(filterItem.options.compare.indexOf('not') > -1){
-                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
-              } else {
-                keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
-              }
-              break;
-            case 'value':
-              if(filterItem.options.compare.indexOf('not') > -1){
-                  keep = matchValue != filterItem.value;
-                } else {
-                   keep = matchValue == filterItem.value;
-                }
-              break;  
-            case 'array':
-              var propArray = eval(filterItem.options.collectionProperty);
-              for(let j = 0; j < propArray.length; j++){
-                 if(propArray[j].toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1) {
-                   keep = true;  
-                   break;
-                 }
-              }
-              break;
-            case "boolean":
-                keep = matchValue === eval(filterItem.value);
-                break;
-            case "array-obj":
-              var properties = filterItem.options.collectionProperty.split('.')
-              var propArray = eval("item." + properties[0]);
-              if(propArray){
-                for(let l = 0;  l < propArray.length; l++){
-                  if(propArray[l][properties[1]].indexOf(filterItem.value.toUpperCase()) > -1){
-                    keep = true;
-                    break;
-                  }
-                }
-              }
-              break;
-          }
-        }
+  //       if(matchValue != undefined) {
+  //         switch(filterItem.options.type){  
+  //           case 'custom':
+  //             keep = filterItem.options.filter(filterItem.value, item, that.context);
+  //             break;
+  //           case 'text':
+  //             if(filterItem.options.compare.indexOf('not') > -1){
+  //               keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
+  //             } else {
+  //               keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1;
+  //             }
+  //             break;
+  //           case 'value':
+  //             if(filterItem.options.compare.indexOf('not') > -1){
+  //                 keep = matchValue != filterItem.value;
+  //               } else {
+  //                  keep = matchValue == filterItem.value;
+  //               }
+  //             break;  
+  //           case 'array':
+  //             var propArray = eval(filterItem.options.collectionProperty);
+  //             for(let j = 0; j < propArray.length; j++){
+  //                if(propArray[j].toUpperCase().indexOf(filterItem.value.toUpperCase()) > -1) {
+  //                  keep = true;  
+  //                  break;
+  //                }
+  //             }
+  //             break;
+  //           case "boolean":
+  //               keep = matchValue === eval(filterItem.value);
+  //               break;
+  //           case "array-obj":
+  //             var properties = filterItem.options.collectionProperty.split('.')
+  //             var propArray = eval("item." + properties[0]);
+  //             if(propArray){
+  //               for(let l = 0;  l < propArray.length; l++){
+  //                 if(propArray[l][properties[1]].indexOf(filterItem.value.toUpperCase()) > -1){
+  //                   keep = true;
+  //                   break;
+  //                 }
+  //               }
+  //             }
+  //             break;
+  //         }
+  //       }
 
-       if(!keep) break;
-      }
-      return keep;
-      })
-  }
+  //      if(!keep) break;
+  //     }
+  //     return keep;
+  //     })
+  // }
 
-  lookup2(filterItem, item){
-     for(var i = 0, x=filterItem.options.lookupArray.length; i < x; i++){
-        if(filterItem.options.lookupArray[i][filterItem.options.lookupProperty] == eval(filterItem.options.collectionProperty) ) {
-         return filterItem.options.lookupArray[i][filterItem.options.matchProperty];
-        }
-      }
-      return undefined;
-  }
+  // lookup2(filterItem, item){
+  //    for(var i = 0, x=filterItem.options.lookupArray.length; i < x; i++){
+  //       if(filterItem.options.lookupArray[i][filterItem.options.lookupProperty] == eval(filterItem.options.collectionProperty) ) {
+  //        return filterItem.options.lookupArray[i][filterItem.options.matchProperty];
+  //       }
+  //     }
+  //     return undefined;
+  // }
 
-  filter(filters, lookupArray){
-    var keep;
-    var index = 0;
-    return this.sourceArray.filter((item) => {
-      //Assume the item should be 
-      keep = false;
-      //For each filter in filterValues
-      for(var i = 0, x =  filters.length; i < x; i++){
-        switch(filters[i].type){
-          //Filter control is a drop down\
-          //compare is used to define the type of comparison to make
-          case 'select-one':
-            switch(filters[i].compare){
-              case 'active':
-                keep = filters[i].value == 'true' ? item[filters[i].property] : !item[filters[i].property];
-                break;
-              case 'id':
-                keep = filters[i].value == item[filters[i].property];
-                break;
-              case 'obj':
-                var properties = filters[i].property.split('.')
-                var condition = "item"
-                for(var j = 0; j<properties.length; j++){
-                  if(properties[j].indexOf('[') > -1 ) {
-                    condition += properties[j];
-                  } else {
-                    condition += "['" + properties[j] + "']";
-                  }
-                }
-                if(filters[i].value.indexOf('NOT') === -1){
-                  keep = eval(condition) === filters[i].value;
-                } else {
-                  let thisValue = filters[i].value.substring(3);
-                  keep = eval(condition) !== thisValue;
-                }
-                break
-              case "boolean":
-                keep = eval(filters[i].value) === eval(item[filters[i].property]);
-                break;
-              case "not":
-                break;
-              default:
-                // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId"  ref="ownerFilter">
-                // if( isNaN(filters[i].value)){
-                //   keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
-                // } else {
-                  keep = filters[i].value == item[filters[i].property];
-                // }
+  // filter(filters, lookupArray){
+  //   var keep;
+  //   var index = 0;
+  //   return this.sourceArray.filter((item) => {
+  //     //Assume the item should be 
+  //     keep = false;
+  //     //For each filter in filterValues
+  //     for(var i = 0, x =  filters.length; i < x; i++){
+  //       switch(filters[i].type){
+  //         //Filter control is a drop down\
+  //         //compare is used to define the type of comparison to make
+  //         case 'select-one':
+  //           switch(filters[i].compare){
+  //             case 'active':
+  //               keep = filters[i].value == 'true' ? item[filters[i].property] : !item[filters[i].property];
+  //               break;
+  //             case 'id':
+  //               keep = filters[i].value == item[filters[i].property];
+  //               break;
+  //             case 'obj':
+  //               var properties = filters[i].property.split('.')
+  //               var condition = "item"
+  //               for(var j = 0; j<properties.length; j++){
+  //                 if(properties[j].indexOf('[') > -1 ) {
+  //                   condition += properties[j];
+  //                 } else {
+  //                   condition += "['" + properties[j] + "']";
+  //                 }
+  //               }
+  //               if(filters[i].value.indexOf('NOT') === -1){
+  //                 keep = eval(condition) === filters[i].value;
+  //               } else {
+  //                 let thisValue = filters[i].value.substring(3);
+  //                 keep = eval(condition) !== thisValue;
+  //               }
+  //               break
+  //             case "boolean":
+  //               keep = eval(filters[i].value) === eval(item[filters[i].property]);
+  //               break;
+  //             case "not":
+  //               break;
+  //             default:
+  //               // <select change.delegate="dataTable.filterList($event)" class="form-control" id="owner[0].personId"  ref="ownerFilter">
+  //               // if( isNaN(filters[i].value)){
+  //               //   keep = parseInt(filters[i].value) === parseInt(item[filters[i].property]);
+  //               // } else {
+  //                 keep = filters[i].value == item[filters[i].property];
+  //               // }
                 
-            }
-            break;
-          case 'text':
-            switch (filters[i].compare){
-              case 'array':
-                var array = eval("item." + filters[i].property);
-                  keep = false;
-                  if(array){
-                    for(var l = 0; l<array.length; l++){
-                      if(array[l].indexOf(filters[i].value.toUpperCase()) > -1){
-                        keep = true;
-                        break;
-                      }
-                    }
-                  }
-                break;
-              case 'obj-array':
-                if(filters[i].property.indexOf('.') > -1){
-                  var properties = filters[i].property.split('.')
-                  var array = eval("item." + properties[0]);
-                  keep = false;
-                  if(array){
-                    for(var l = 0; l<array.length; l++){
-                      if(array[l][properties[1]].indexOf(filters[i].value.toUpperCase()) > -1){
-                        keep = true;
-                        break;
-                      }
-                    }
-                  }
-                }
-                break;
-              case 'lookup':
-                // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
-                // Match personId with _id in people.peopleArray and then compare the filter value with the found item's fullName
-                var arrayToLookup = filters[i].property.split('-');
-                var properties = arrayToLookup[0].split('.');
-                var condition = "item"
-                for(var j = 0; j<properties.length; j++){
-                  if(properties[j].indexOf('[') > -1 ) {
-                    condition += properties[j];
-                  } else {
-                    condition += "['" + properties[j] + "']";
-                  }
-                }
-                let value = this.lookup(eval(condition), arrayToLookup[1], lookupArray);
-                if(value){
-                   keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
-                }
-                break;
-              // case 'lookup-deep':
-              //   // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
-              //   //Used when the property to lookup is in an object of the item
-              //   var arrayToLookup = filters[i].property.split('-');
-              //   var depth = arrayToLookup[0].split('.');
-              //   let deepValue = this.lookup(item[depth[0]][depth[1]], arrayToLookup[1], lookupArray);
-              //   if(deepValue){
-              //     keep = deepValue.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
-              //   }
-              //   break;
-              case 'lookup-array-item':
-                //<input input.delegate="dataTable.filterList($event, people.peopleArray)" id="owner-fullName-0-personId" type="text" compare="lookup-array-item" class="form-control" ref="ownerFilter"/>
-                var array = filters[i].property.split('-');
-                var value = this.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
-                if(value){
-                   keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
-                }
-                break;
-              case 'lookup-array':
-                //<input input.delegate="dataTable.filterList($event, helpTicketTypeLookupArray)" id="helpTicketType-description" type="text" compare="lookup-array" class="form-control" ref="typeFilter"/>
-                let arrayLookup = filters[i].property.split('-');
-                for(var index = 0; index < lookupArray.length; index++){
-                  if(lookupArray[index][arrayLookup[0]] === item[arrayLookup[0]]){
-                    keep = lookupArray[index][arrayLookup[1]].toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
-                    break;
-                  }
-                }
-                break;
-              case 'not':
-                let propValue = isNaN(item[filters[i].property]) ? item[filters[i].property] : item[filters[i].property].toString();
-                let filterValue = isNaN(filters[i].value) ? filters[i].value : filters[i].value.toString();
-                if(filters[i].property.indexOf('.') > -1){
-                    var properties = filters[i].property.split('.')
-                    var condition = "item"
-                    for(var j = 0; j<properties.length; j++){
-                      condition += "['" + properties[j] + "']"
-                    }
-                    keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
-                    //  keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
-                  } else {
-                     keep = propValue.toUpperCase().indexOf(filterValue.toUpperCase()) === -1;
-                    // keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
-                  }
-                 break;
-              case 'not-number':
-                 if(filters[i].property.indexOf('.') > -1){
-                    var properties = filters[i].property.split('.')
-                    var condition = "item"
-                    for(var j = 0; j<properties.length; j++){
-                      condition += "['" + properties[j] + "']"
-                    }
-                    keep = eval(condition) !== filters[i].value
-                  } else {
-                    keep = item[filters[i].property] !== filters[i].value;
-                  }
-                 break;
-              default:
-                if(filters[i].property.indexOf('.') > -1){
-                  var properties = filters[i].property.split('.')
-                  var condition = "item"
-                  for(var j = 0; j<properties.length; j++){
-                    condition += "['" + properties[j] + "']"
-                  }
-                  keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1
-                } else {
-                  keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
-                }
-                break;
-            }
-            break;
-          case 'date':
-            switch(filters[i].compare){
-              case 'after':
-                if(item[filters[i].property]){
-                  var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-                  keep = moment(dt).isAfter(filters[i].value);
-                }
-                break;
-              default:
-                if(item[filters[i].property]){
-                  var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
-                  keep = moment(dt).isSame(filters[i].value);
-                }
-            }
-        }
-        if(!keep) break;
-      }
-      return keep;
-    })
-  }
+  //           }
+  //           break;
+  //         case 'text':
+  //           switch (filters[i].compare){
+  //             case 'array':
+  //               var array = eval("item." + filters[i].property);
+  //                 keep = false;
+  //                 if(array){
+  //                   for(var l = 0; l<array.length; l++){
+  //                     if(array[l].indexOf(filters[i].value.toUpperCase()) > -1){
+  //                       keep = true;
+  //                       break;
+  //                     }
+  //                   }
+  //                 }
+  //               break;
+  //             case 'obj-array':
+  //               if(filters[i].property.indexOf('.') > -1){
+  //                 var properties = filters[i].property.split('.')
+  //                 var array = eval("item." + properties[0]);
+  //                 keep = false;
+  //                 if(array){
+  //                   for(var l = 0; l<array.length; l++){
+  //                     if(array[l][properties[1]].indexOf(filters[i].value.toUpperCase()) > -1){
+  //                       keep = true;
+  //                       break;
+  //                     }
+  //                   }
+  //                 }
+  //               }
+  //               break;
+  //             case 'lookup':
+  //               // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+  //               // Match personId with _id in people.peopleArray and then compare the filter value with the found item's fullName
+  //               var arrayToLookup = filters[i].property.split('-');
+  //               var properties = arrayToLookup[0].split('.');
+  //               var condition = "item"
+  //               for(var j = 0; j<properties.length; j++){
+  //                 if(properties[j].indexOf('[') > -1 ) {
+  //                   condition += properties[j];
+  //                 } else {
+  //                   condition += "['" + properties[j] + "']";
+  //                 }
+  //               }
+  //               let value = this.lookup(eval(condition), arrayToLookup[1], lookupArray);
+  //               if(value){
+  //                  keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+  //               }
+  //               break;
+  //             // case 'lookup-deep':
+  //             //   // <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+  //             //   //Used when the property to lookup is in an object of the item
+  //             //   var arrayToLookup = filters[i].property.split('-');
+  //             //   var depth = arrayToLookup[0].split('.');
+  //             //   let deepValue = this.lookup(item[depth[0]][depth[1]], arrayToLookup[1], lookupArray);
+  //             //   if(deepValue){
+  //             //     keep = deepValue.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+  //             //   }
+  //             //   break;
+  //             case 'lookup-array-item':
+  //               //<input input.delegate="dataTable.filterList($event, people.peopleArray)" id="owner-fullName-0-personId" type="text" compare="lookup-array-item" class="form-control" ref="ownerFilter"/>
+  //               var array = filters[i].property.split('-');
+  //               var value = this.lookup(item[array[0]][array[2]][array[3]], array[1], lookupArray);
+  //               if(value){
+  //                  keep = value.toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+  //               }
+  //               break;
+  //             case 'lookup-array':
+  //               //<input input.delegate="dataTable.filterList($event, helpTicketTypeLookupArray)" id="helpTicketType-description" type="text" compare="lookup-array" class="form-control" ref="typeFilter"/>
+  //               let arrayLookup = filters[i].property.split('-');
+  //               for(var index = 0; index < lookupArray.length; index++){
+  //                 if(lookupArray[index][arrayLookup[0]] === item[arrayLookup[0]]){
+  //                   keep = lookupArray[index][arrayLookup[1]].toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+  //                   break;
+  //                 }
+  //               }
+  //               break;
+  //             case 'not':
+  //               let propValue = isNaN(item[filters[i].property]) ? item[filters[i].property] : item[filters[i].property].toString();
+  //               let filterValue = isNaN(filters[i].value) ? filters[i].value : filters[i].value.toString();
+  //               if(filters[i].property.indexOf('.') > -1){
+  //                   var properties = filters[i].property.split('.')
+  //                   var condition = "item"
+  //                   for(var j = 0; j<properties.length; j++){
+  //                     condition += "['" + properties[j] + "']"
+  //                   }
+  //                   keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
+  //                   //  keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1
+  //                 } else {
+  //                    keep = propValue.toUpperCase().indexOf(filterValue.toUpperCase()) === -1;
+  //                   // keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) === -1;
+  //                 }
+  //                break;
+  //             case 'not-number':
+  //                if(filters[i].property.indexOf('.') > -1){
+  //                   var properties = filters[i].property.split('.')
+  //                   var condition = "item"
+  //                   for(var j = 0; j<properties.length; j++){
+  //                     condition += "['" + properties[j] + "']"
+  //                   }
+  //                   keep = eval(condition) !== filters[i].value
+  //                 } else {
+  //                   keep = item[filters[i].property] !== filters[i].value;
+  //                 }
+  //                break;
+  //             default:
+  //               if(filters[i].property.indexOf('.') > -1){
+  //                 var properties = filters[i].property.split('.')
+  //                 var condition = "item"
+  //                 for(var j = 0; j<properties.length; j++){
+  //                   condition += "['" + properties[j] + "']"
+  //                 }
+  //                 keep = eval(condition).toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1
+  //               } else {
+  //                 keep = item[filters[i].property].toUpperCase().indexOf(filters[i].value.toUpperCase()) > -1;
+  //               }
+  //               break;
+  //           }
+  //           break;
+  //         case 'date':
+  //           switch(filters[i].compare){
+  //             case 'after':
+  //               if(item[filters[i].property]){
+  //                 var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+  //                 keep = moment(dt).isAfter(filters[i].value);
+  //               }
+  //               break;
+  //             default:
+  //               if(item[filters[i].property]){
+  //                 var dt = moment(item[filters[i].property]).format('YYYY-MM-DD');
+  //                 keep = moment(dt).isSame(filters[i].value);
+  //               }
+  //           }
+  //       }
+  //       if(!keep) break;
+  //     }
+  //     return keep;
+  //   })
+  // }
 
-  lookup(lookupValue, lookupProperty, lookupArray){
-    for(var i = 0, x=lookupArray.length; i < x; i++){
-      if(lookupArray[i]._id == lookupValue ) return lookupArray[i][lookupProperty];
-    }
-    return "";
-  }
+  // lookup(lookupValue, lookupProperty, lookupArray){
+  //   for(var i = 0, x=lookupArray.length; i < x; i++){
+  //     if(lookupArray[i]._id == lookupValue ) return lookupArray[i][lookupProperty];
+  //   }
+  //   return "";
+  // }
 
   /***************************************************************
    * propertyName - property to sort on unless a surrogate is provided 

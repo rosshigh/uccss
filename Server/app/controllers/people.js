@@ -141,10 +141,10 @@ module.exports = function (app, config) {
       if(err){
         return next(err);
       } else {     
-            
-        if(people) var facCoord = people[0];
-        if(facCoord){
-          var facCoordName = facCoord.fullName;
+console.log(people)            
+
+        if(people.length > 0){
+          var facCoordName = people[0].fullName;
         }  else {
           var facCoordName = "";
         }
@@ -154,17 +154,24 @@ module.exports = function (app, config) {
           context: context
         }    
 
-        welcome(mailObj)
+       welcome(mailObj)
 
-        if(facCoord){
+        var facCoordEmail;
+        people.forEach(item => {
+          facCoordEmail += item.email + ',';
+        });
+
+        if(people.length > 0){
             var context = {name: req.body.fullName, institution: req.body.institution};            
             var mailObj = {
-              email: facCoord.email,
+              email: facCoordEmail,
               institution: req.body.institution,
               cc: req.body.cc,
               context: context
-            }                                                    
-            newCustomer(mailObj);
+            }    
+console.log("llkdsjfl;jas")
+console.log(mailObj)                                                            
+           newCustomer(mailObj);
         }
 
       }

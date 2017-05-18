@@ -32,28 +32,25 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="title" type="text" placeholder="Filter Title" class="form-control"
-                                    />
-                                </th>
-                                <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="createdDate" type="date" placeholder="Filter Date" class="form-control"
-                                    />
-                                </th>
-                                <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="expiredDate" type="date" placeholder="Filter Date" class="form-control"
-                                    />
-                                </th>
-                                <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control " id="itemType" compare="id" ref="itemTypes">
-                                        <option value=""></option>
-                                        <option value="${type.type}" repeat.for="type of config.SITE_INFO_TYPES">${type.description}</optionp>
-                                    </select>
-                                </th>
-                                <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="url" type="text" placeholder="Filter URL" class="form-control" />
-                                </th>
-                            </tr>
+							<th>
+								 <input value.bind="titleFilterValue" input.delegate="dataTable.filterList(titleFilterValue, { type: 'text',  filter: 'titleFilter', collectionProperty: 'title', displayProperty: 'title',  compare:'match'} )"  class="form-control" />
+							</th>
+							<th>
+							 	<input value.bind="createdDateFilterValue" input.delegate="dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )"  class="form-control" />
+							</th>
+							<th>
+								<input value.bind="expiredDateFilterValue" input.delegate="dataTable.filterList(expiredDateFilterValue, {type: 'date', filter: 'expiredDate',  collectionProperty: 'expiredDate', compare: 'after'} )"  class="form-control" />
+							</th>
+							<th>
+								<select value.bind="itemTypeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'itemTypeFilter',  collectionProperty: 'itemType', displayProperty: 'itemType', matchProperty:'', compare:'match'} )" class="form-control">
+									<option value=""></option>
+									<option value="${type.type}" repeat.for="type of config.SITE_INFO_TYPES">${type.description}</optionp>
+								</select>
+							</th>
+							<th>
+								<input value.bind="urlFilterValue" input.delegate="dataTable.filterList(urlFilterValue, { type: 'text',  filter: 'urlFilter', collectionProperty: 'url', displayProperty: 'url',  compare:'match'} )"  class="form-control" />
+							</th>
+						</tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">
                                 <td data-title="Title">${item.title}</td>
                                 <td data-title="Date Created" style="width: 75px">

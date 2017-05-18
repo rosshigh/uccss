@@ -27,7 +27,7 @@
                         <tbody>
                             <tr>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="parameter" type="text" placeholder="Filter Parameter" class="form-control"/>
+                                    <input value.bind="parameterFilterValue" input.delegate="dataTable.filterList(parameterFilterValue, { type: 'text',  filter: 'parameterFilter', collectionProperty: 'parameter', displayProperty: 'parameter',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th></th>
                                 <th></th>

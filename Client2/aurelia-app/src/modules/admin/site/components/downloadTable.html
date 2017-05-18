@@ -27,30 +27,30 @@
                         <tbody>
                             <tr>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="name" type="text" placeholder="Filter Name" class="form-control"/>
+                                    <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'name', displayProperty: 'name',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <input input.delegate="dataTable.filterList($event)" id="file.originalFilename" type="text" placeholder="Filter File" class="form-control"/>
+                                    <input value.bind="fileNameFilterValue" input.delegate="dataTable.filterList(fileNameFilterValue, { type: 'text',  filter: 'fileNameFilter', collectionProperty: 'file.originalFilename', displayProperty: 'file.originalFilename',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control" id="downCatcode" compare="id">
-                                    <option value=""></option>
-                                    <option repeat.for="category of downloads.appCatsArray" value="${category.downCatcode}">${category.description}</option>
-                                </select>
+                                	<select value.bind="downCatcodeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'downCatcodeFilter',  collectionProperty: 'downCatcode', displayProperty: 'downCatcode', matchProperty:'', compare:'match'} )" class="form-control">
+                                        <option value=""></option>
+                                        <option repeat.for="category of downloads.appCatsArray" value="${category.downCatcode}">${category.description}</option>
+                                    </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)"  class="form-control" id="active" compare="boolean">
-                                    <option value=""></option>
-                                    <option value="true">Active</option>
-                                    <option value="false">Inactive</options>
-                                </select>
+                                    <select value.bind="activeFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter',  collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )" class="form-control">                                  
+                                        <option value=""></option>
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</options>
+                                    </select>
                                 </th>
                                 <th>
-                                    <select change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketRelevant" compare="boolean">
-                                    <option value=""></option>
-                                    <option value="true">True</option>
-                                    <option value="false">False</options>
-                                </select>
+                                    <select value.bind="helpTicketRelevantFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'helpTicketRelevantFilter',  collectionProperty: 'helpTicketRelevant', displayProperty: 'helpTicketRelevant', matchProperty:'', compare:'boolean'} )" class="form-control">
+                                        <option value=""></option>
+                                        <option value="true">True</option>
+                                        <option value="false">False</options>
+                                    </select>
                                 </th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="item of dataTable.displayArray">

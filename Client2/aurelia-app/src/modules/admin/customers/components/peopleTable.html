@@ -28,27 +28,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                           <tr>
                                 <th>
-                                    <input value.bind="nameFilterValue" input.delegate="dataTable.filterListExV(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'fullName', displayProperty: 'fullName', matchProperty:'', compare:'match'} )"  class="form-control" />
+                                    <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', displayProperty: 'fullName',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <input value.bind="nickNameFilterValue" input.delegate="dataTable.filterListExV(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'nickName', displayProperty: 'nickName', matchProperty:'', compare:'match'} )"  class="form-control" />
+                                    <input value.bind="nickNameFilterValue" input.delegate="dataTable.filterList(nickNameFilterValue, { type: 'text',  filter: 'nickNameFilter',  collectionProperty: 'nickName', displayProperty: 'nickName',  compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <input value.bind="institutionFilterValue" input.delegate="dataTable.filterListExV(institutionFilterValue, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )"  class="form-control" />
+                                    <input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
                                 </th>
                                 <th></th>
                                 <th></th>
                                 <th>
-                                    <input value.bind="roleFilter" input.delegate="dataTable.filterListExp($event, { type: 'array',  filter: 'roleFilter', lookupArray: config.ROLES, lookupProperty: 'role', collectionProperty: 'roles', displayProperty: 'roles', matchProperty:'code', compare:'array'} )"  class="form-control" />
+                                    <input value.bind="roleFilter" input.delegate="dataTable.filterList($event, { type: 'custom',  filter: customRoleFilter, compare:'custom'} )"  class="form-control" />
 
                                 </th>
                                 <th>
                                     <select value.bind="activeFilterValue" change.delegate="filterActive()" class="form-control " id="personStatus">
-                                    <option value=""></option>
-                                    <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>
-                                </select>
+                                        <option value=""></option>
+                                        <option repeat.for='status of is4ua.personStatusArray' model.bind='status.code'>${status.description}</option>
+                                    </select>
                                 </th>
                             </tr>
                             <tr repeat.for="person of dataTable.displayArray">

@@ -26,20 +26,20 @@
             <tbody>
                 <tr>
                     <th>
-                        <input value.bind="sidFilterValue" input.delegate="dataTable.filterListExV(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )"  class="form-control" />
+                        <input value.bind="sidFilterValue" input.delegate="dataTable.filterList(sidFilterValue, { type: 'text',  filter: 'sidFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'sid', displayProperty: 'sid', matchProperty:'', compare:'match'} )"  class="form-control" />
                     </th>
                     <th>
-                        <input value.bind="descriptionFilterValue" input.delegate="dataTable.filterListExV(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )"  class="form-control" />
+                        <input value.bind="descriptionFilterValue" input.delegate="dataTable.filterList(descriptionFilterValue, { type: 'text',  filter: 'descriptionFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'description', displayProperty: 'description', matchProperty:'', compare:'match'} )"  class="form-control" />
                     </th>
                     <th class="hidden-xs hidden-sm">
-                        <input value.bind="serverFilterValue" input.delegate="dataTable.filterListExV(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )"  class="form-control" />
+                        <input value.bind="serverFilterValue" input.delegate="dataTable.filterList(serverFilterValue, { type: 'text',  filter: 'serverFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'server', displayProperty: 'server', matchProperty:'', compare:'match'} )"  class="form-control" />
                     </th>
                     <th class="hidden-xs hidden-sm"></th>
                     <th class="hidden-xs hidden-sm">
-                        <select value.bind="activeFilter" input.delegate="filter($event, { type: 'boolean',  filter: 'activeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )" class="form-control">
+                        <select value.bind="activeFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter',  collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )" class="form-control">
                             <option value=""></option>
-                            <option value=true>Active</option>
-                            <option value=false>Inactive</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</options>
                         </select>
                     </th>
                 </tr>

@@ -29,23 +29,23 @@
                             <tr>
                                 <th></th>
                                 <th>
-                                    <input value.bind="nameFilterValue" input.delegate="dataTable.filterListExV(nameFilterValue, { type: 'text',  filter: 'nameFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'name', matchProperty:'', compare:'match'} )"  class="form-control" />
+                                    <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'name', matchProperty:'', compare:'match'} )"  class="form-control" />
                                 </th>
                                 <th>
-                                    <select value.bind="sapNameFilterValue" input.delegate="filter($event, { type: 'value',  filter: 'sapNameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'sapName', displayProperty: 'sapName', matchProperty:'', compare:'match'} )" class="form-control " >
+                                    <select value.bind="sapNameFilterValue" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'sapNameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'sapName', displayProperty: 'sapName', matchProperty:'', compare:'match'} )" class="form-control " >
                                         <option value=""></option>
                                         <option repeat.for="product of is4ua.sapProductsArray" value="${product.code}">${product.description}</option>
                                     </select>
                                 </th>
                                 <th>
-                                    <select value.bind="activeFilter" input.delegate="filter($event, { type: 'boolean',  filter: 'activeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )" class="form-control">
+                                    <select value.bind="activeFilter" input.delegate="dataTable.filterList($event, { type: 'boolean',  filter: 'activeFilter',  collectionProperty: 'active', displayProperty: 'active', matchProperty:'', compare:'boolean'} )" class="form-control">
                                         <option value=""></option>
                                         <option value="true">Active</option>
                                         <option value="false">Inactive</option>
                                     </select>
                                 </th>
                                 <th>
-                                    <input value.bind="systemFilterValue" input.delegate="dataTable.filterListExV(systemFilterValue, { type: 'array-obj',  filter: 'systemFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'systems.sid', displayProperty: 'systems.sid', matchProperty:'', compare:'array'} )"  class="form-control" />
+                                    <input value.bind="systemFilterValue" input.delegate="dataTable.filterList(systemFilterValue, { type: 'array-obj',  filter: 'systemFilterValue', lookupArray: '', lookupProperty: '', collectionProperty: 'systems.sid', displayProperty: 'systems.sid', matchProperty:'', compare:'array'} )"  class="form-control" />
                                 </th>
                             </tr>
                             <tr click.trigger="edit($index, $event)" repeat.for="system of dataTable.displayArray">

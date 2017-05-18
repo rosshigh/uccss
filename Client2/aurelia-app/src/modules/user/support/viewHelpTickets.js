@@ -93,8 +93,6 @@ export class ViewHelpTickets {
       })
     })
 
-    // this.filterValues.push({ property: "helpTicketStatus", value: this.config.NEW_HELPTICKET_STATUS, type: 'select-one' });
-    // if (this.dataTable.active) this.dataTable.filter(this.filterValues);
     this._setUpValidation();
   }
 
@@ -341,9 +339,7 @@ export class ViewHelpTickets {
 
   filterOutClosed() {
         if (this.isChecked) {
-            var filterValues = new Array();
-            filterValues.push({ property: "helpTicketStatus", value: this.config.CLOSED_HELPTICKET_STATUS, type: 'text', compare: 'not-number' });
-            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+            this.dataTable.filterList(this.config.CLOSED_HELPTICKET_STATUS, {type: 'value', filter: "expiredFilter",  collectionProperty: 'helpTicketStatus', compare: 'not-match'});
         } else {
             this.updateArray();
         }
@@ -400,6 +396,19 @@ export class ViewHelpTickets {
 
   toolTips(){
       $('[data-toggle="tooltip"]').tooltip();
+  }
+
+   institutionCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+  customHelpTicketTypeFilter(value, item, context){
+
   }
 
 }

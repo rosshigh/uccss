@@ -82,7 +82,7 @@ export class Documents {
         if(this.filter){
             var thisFilter = this.filter
             this.filteredDocumentArray = this.documents.docCatsArray.filter((item) => {
-            return item.description.substring(0, thisFilter.length).toUpperCase() === thisFilter.toUpperCase();
+                return item.description.toUpperCase().indexOf(thisFilter.toUpperCase()) > -1;
             });
         } else {
             this.filteredDocumentArray = this.documents.docCatsArray;

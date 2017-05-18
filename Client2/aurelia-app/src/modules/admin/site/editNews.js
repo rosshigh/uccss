@@ -182,9 +182,7 @@ export class EditNews {
     //TODO: Fix This
     filterOutExpired(){
         if (this.isChecked) {
-            var filterValues = new Array();
-            filterValues.push({ property: "expiredDate", value: new Date(), type: 'date', compare: 'after' });
-            if (this.dataTable.active) this.dataTable.externalFilter(filterValues);
+			this.dataTable.filterList(new Date(), {type: 'date', filter: "expiredFilter",  collectionProperty: 'expiredDate', compare: 'after'});
         } else {
             this.dataTable.updateArray(this.siteinfo.siteArray);
         }

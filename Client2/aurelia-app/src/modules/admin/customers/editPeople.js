@@ -61,9 +61,15 @@ export class EditPeople {
     }
 
     async filterActive(){
-        this._clearFilters()
-        await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
+        this._cleanUpFilters();
+        this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+        if(this.activeFilterValue == "") {
+             await this.people.getPeopleArray('?order=lastName', true);
+        } else {
+            await this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|' + this.activeFilterValue, true);
+        }
         this.dataTable.updateArray(this.people.peopleArray);
+        this.spinnerHTML = "";
     }
 
     attached() {
@@ -390,7 +396,6 @@ export class EditPeople {
         this.nameFilterValue = "";
         this.nickNameFilterValue = "";
         this.institutionFilterValue = "";
-        this.activeFilterValue = "";
     }
 
     cancelCustomerEmail(){
@@ -491,4 +496,22 @@ export class EditPeople {
         }
     }
 
+    institutionCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.institutionId == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    customRoleFilter(value, item, context){
+		var keep = false;
+		if(item.roles && item.roles.length > 0){
+			for(let i = 0; i < item.roles.length; i++){
+				if(item.roles[i].toUpperCase().indexOf(value.toUpperCase()) > -1) keep = true;
+			}
+		}
+        return keep;
+	}
 }
