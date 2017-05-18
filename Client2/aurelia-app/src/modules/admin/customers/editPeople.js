@@ -334,14 +334,18 @@ export class EditPeople {
          {"rule":"custom", "message":"A person with that name at that institution already exists",
             "valFunction":function(context){
                 var found = false;
-                for(var i = 0; i < context.people.peopleArray.length; i++){
-                    if( context.people.peopleArray[i].firstName.toUpperCase() === context.people.selectedPerson.firstName.toUpperCase()
-                        && context.people.peopleArray[i].lastName.toUpperCase() === context.people.selectedPerson.lastName.toUpperCase()
-                        && context.people.peopleArray[i].institutionId === context.people.selectedPerson.institutionId){
-                        if(context.people.selectedPerson._id && context.people.selectedPerson._id != context.people.peopleArray[i]._id){
-                            found = true;
-                        } else if (!context.people.selectedPerson._id){
-                            found = true;
+                if(context.people.selectedPerson._id) {
+                    return true;
+                } else {
+                    for(var i = 0; i < context.people.peopleArray.length; i++){
+                        if( context.people.peopleArray[i].firstName.toUpperCase() === context.people.selectedPerson.firstName.toUpperCase()
+                            && context.people.peopleArray[i].lastName.toUpperCase() === context.people.selectedPerson.lastName.toUpperCase()
+                            && context.people.peopleArray[i].institutionId === context.people.selectedPerson.institutionId){
+                            if(context.people.selectedPerson._id && context.people.selectedPerson._id != context.people.peopleArray[i]._id){
+                                found = true;
+                            } else if (!context.people.selectedPerson._id){
+                                found = true;
+                            }
                         }
                     }
                 }

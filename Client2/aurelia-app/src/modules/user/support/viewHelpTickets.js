@@ -398,17 +398,16 @@ export class ViewHelpTickets {
       $('[data-toggle="tooltip"]').tooltip();
   }
 
-   institutionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
-    }
-
   customHelpTicketTypeFilter(value, item, context){
-
+    var foo = value.toUpperCase();
+    for(let i = 0; i < context.helpTickets.helpTicketTypesArray.length; i++){
+      for(let j = 0; j < context.helpTickets.helpTicketTypesArray[i].subtypes.length; j++){
+        if(context.helpTickets.helpTicketTypesArray[i].subtypes[j].type == item.helpTicketType) {
+          return  context.helpTickets.helpTicketTypesArray[i].subtypes[j].description.toUpperCase().indexOf(foo) > -1;
+        }
+      }
+    }
+    return false
   }
 
 }

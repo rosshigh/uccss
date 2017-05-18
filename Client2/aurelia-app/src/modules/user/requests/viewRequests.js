@@ -58,7 +58,6 @@ export class ViewRequests {
     ]);
     this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: "Sandbox"});
     await this.getRequests();
-    // this._setUpValidation();
   }
 
   deactivate(){
@@ -151,16 +150,6 @@ export class ViewRequests {
   }
 
   _buildRequest(){
-    //Update the table array
-    // this.requests.requestsArray.forEach(item => {
-    //   if(item._id == this.requests.selectedRequest._id) {
-    //     item.requestStatus = this.config.REPLIED_REQUEST_CODE;
-    //     item.requestDetails.forEach(item2 => {
-    //       item2.requesStatus = this.config.REPLIED_REQUEST_CODE;
-    //     })
-    //   }
-    // })
-
     //Update the selected request to update
     this.requests.selectedRequest.requestDetails.forEach(item => {
       if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.REPLIED_REQUEST_CODE;

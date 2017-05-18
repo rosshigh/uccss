@@ -1129,12 +1129,45 @@ export class Assignments {
         this.maxRequiredDate = this.sessions.selectedSession.endDate;
     }
 
-     changeBeginDate(evt){
+    changeBeginDate(evt){
         if(evt.detail && evt.detail.value.date !== ""){
         this.minEndDate = moment(evt.detail.value.date).format("MM/DD/YYYY");
         this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
     }
     
   }
+
+  customCourseFilter(value, item, context){
+    if(item.requestId.courseId == context.config.SANDBOX_ID && value == context.config.SANDBOX_ID) return true;
+    if(item.requestId.courseId != context.config.SANDBOX_ID && value != context.config.SANDBOX_ID) return true;    
+    return false;
+  }
+
+  customNameFilter(value, item, context){
+    var foo = value.toUpperCase();
+    for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
+      if(context.people.peopleArray[i]._id == item.requestId.personId) {
+        return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
+      }
+    }
+  }
+
+   institutionCustomFilter(value, item, context){
+        for(let i = 0; i < context.people.institutionsArray.length; i++){
+            if(item.requestId.institutionId == context.people.institutionsArray[i]._id) {
+                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
+
+    customProductNameFilter(value, item, context){
+        for(let i = 0; i < context.products.productsArray.length; i++){
+            if(item.productId == context.products.productsArray[i]._id) {
+                return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
 
 }

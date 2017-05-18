@@ -56,33 +56,33 @@
           <tr>
             <th></th>
             <th>
-              <input change.delegate="dataTable.filterList($event)" id="requiredDate" type="date" compare="after" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              <input type="date" value.bind="requiredDateFilterValue" input.delegate="dataTable.filterList(requiredDateFilterValue, {type: 'date', filter: 'requiredDate',  collectionProperty: 'requiredDate', compare: 'after'} )"  class="form-control" />
             </th>
             <th>
-              <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" compare="after" class="form-control datepicker" data-dateformat=config.DATE_FORMAT_TABLE>
+              <input type="date" value.bind="createdDateFilterValue" input.delegate="dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )"  class="form-control" />
             </th>
             <th  show.bind="config.SANDBOX_USED" >
-              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestId.courseId" compare="obj" ref="courseFilter">
+              <select value.bind="courseFilter" input.delegate="dataTable.filterList($event, { type: 'custom',  filter: customCourseFilter, compare:'custom'} )" class="form-control">
                 <option value=""></option>
-                <option  value="${config.SANDBOX_ID}">Sandbox</option>
+                <option  value="${config.SANDBOX_ID}">${config.SANDBOX_NAME}</option>
                 <option  value="NOT${config.SANDBOX_ID}">Regular</option>
               </select>
             </th>
             <th>
-              <select change.delegate="dataTable.filterList($event)" class="form-control " id="requestStatus" ref="requestStatus">
-                   <option value=""></option>
-                   <option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
-                 </select>
+              <select value.bind="requestStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )" class="form-control">
+                <option value=""></option>
+                <option repeat.for="status of config.REQUEST_STATUS" value="${status.code}">${status.description}</option>
+              </select>
             </th>
             <th></th>
             <th>
-              <input value.bind="productFilterValue" input.delegate="filterTable($event, { type: 'text',  filter: 'productFilter', lookupArray: products.productsArray, lookupProperty: '_id', collectionProperty: 'productId', displayProperty: 'name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="productFilter"/>
+              <input value.bind="productFilterValue" input.delegate="dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )"  class="form-control" />
             </th>
             <th>
-              <input input.delegate="dataTable.filterList($event, people.peopleArray)" id="requestId.personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+              <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )"  class="form-control" />
             </th>
             <th>
-            <input value.bind="institutionFilterValue" input.delegate="filterTable($event, { type: 'text',  filter: 'institutionFilter', lookupArray: people.institutionsArray, lookupProperty: '_id', collectionProperty: 'institutionId._id', displayProperty: 'institutionId.name', matchProperty:'name', compare:'lookup'} )"  class="form-control" ref="institutionFilter"/>
+              <input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
             </th>
             <th></th>
           </tr>

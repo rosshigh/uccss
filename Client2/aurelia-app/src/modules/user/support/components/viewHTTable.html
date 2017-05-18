@@ -44,11 +44,11 @@
                <tr>
                 <th></th>
                 <th>
-                  <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: 'customHelpTicketTypeFilter', collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
+                  <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
                 </th>
                 <th></th>
                 <th></th>
-                <th>
+                <th> 
                   <select value.bind="helpTicketStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" class="form-control">
                         <option value=""></option>
                         <option repeat.for="status of config.HELP_TICKET_STATUSES" value.bind="status.code">${status.description}</option>

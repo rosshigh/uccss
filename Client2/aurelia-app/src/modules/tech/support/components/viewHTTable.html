@@ -41,30 +41,29 @@
             <tr>
               <th></th>
               <th>
-                <input input.delegate="dataTable.filterList($event, helpTicketTypeLookupArray)" id="helpTicketType-description" type="text" compare="lookup-array" class="form-control" ref="typeFilter"/>
+                <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
               </th>
               <th>
-                <input input.delegate="dataTable.filterList($event, peopleArray)" id="owner-fullName-0-personId" type="text" compare="lookup-array-item" class="form-control" ref="ownerFilter"/>
-              </th>
-           
-              <th>
-                <select value.bind="selectedStatus" change.delegate="dataTable.filterList($event)" class="form-control" id="helpTicketStatus">
-                        <option value=""></option>
-                        <option repeat.for="status of helpTicketTypes"
-                                value.bind="status.code">${status.description}</option>
-                      </select>
+                <input value.bind="ownerFilterValue" input.delegate="dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
               </th>
               <th>
-                <input change.delegate="dataTable.filterList($event)" id="createdDate" type="date" compare="after" placeholder="Filter Date" class="form-control datepicker" data-dateformat="yy/mm/dd">
+                <select value.bind="helpTicketStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" class="form-control">
+                  <option value=""></option>
+                  <option repeat.for="status of helpTicketTypes"
+                          value.bind="status.code">${status.description}</option>
+                </select>
+              </th>
+              <th>
+                <input type="date" value.bind="createdDateFilterValue" input.delegate="dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )"  class="form-control" />
               </th>
                <th>
-                <input change.delegate="dataTable.filterList($event)" id="modifiedDate" type="date" compare="after" placeholder="Filter Date" class="form-control datepicker" data-dateformat="yy/mm/dd">
+                <input type="date" value.bind="modifiedDateFilterValue" input.delegate="dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )"  class="form-control" />
               </th>
               <th>
-                <input input.delegate="dataTable.filterList($event, peopleArray)" id="personId-fullName" type="text" compare="lookup" class="form-control" ref="nameFilter"/>
+                <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )"  class="form-control" />
               </th>
               <th>
-                <input input.delegate="dataTable.filterList($event, peopleArray.institutionsArray)" id="institutionId-name" type="text" compare="lookup" class="form-control" ref="institutionFilter"/>
+                <input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
               </th>
               <th></th>
             </tr>
