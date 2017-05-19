@@ -1079,16 +1079,7 @@ export class Assignments {
 
     filterInAssigned() {
         if (!this.isChecked) {
-            
-            var options = { type: 'value',  
-                        filter: 'statusFilter', 
-                        lookupArray: this.config.REQUEST_STATUS, 
-                        lookupProperty: 'code', 
-                        collectionProperty: 'requestStatus', 
-                        displayProperty: 'description', 
-                        matchProperty:'code', 
-                        compare:'not-lookup'}
-            this.dataTable.filterListExV(this.config.ASSIGNED_REQUEST_CODE.toString(), options);
+            this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
         } else {
              this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
         }
@@ -1152,7 +1143,12 @@ export class Assignments {
     }
   }
 
-   institutionCustomFilter(value, item, context){
+  statusCustomFilter(value, item, context){
+        if(item.requestStatus == value) return false;
+        return true;
+    }
+
+ institutionCustomFilter(value, item, context){
         for(let i = 0; i < context.people.institutionsArray.length; i++){
             if(item.requestId.institutionId == context.people.institutionsArray[i]._id) {
                 return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;

@@ -21,6 +21,8 @@
                                 <th style="width:30rem;">Institution Type</th>
                                 <th style="width:15rem;">Member Type</th>
                                 <th style="width:20rem;">Member Since</th>
+                                <th style="width:7rem;">Region <span click.trigger="dataTable.sortArray('region')"><i class="fa fa-sort"></i></span></th>
+                                <th style="width:9rem;">Country <span click.trigger="dataTable.sortArray('country')"><i class="fa fa-sort"></i></span></th>
                                 <th>Highest Degree</th>
                                 <th>Status</th>
                             </tr>
@@ -28,7 +30,7 @@
                         <tbody>
                              <tr>
                             <th>
-                            <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'name', displayProperty: 'fullnameName', matchProperty:'', compare:'match'} )"  class="form-control" />
+                                <input value.bind="nameFilterValue" input.delegate="dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter',  collectionProperty: 'name', displayProperty: 'fullnameName', compare:'match'} )"  class="form-control" />
                             </th>
                             <th>
                                 <select value.bind="institutionTypeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'institutionTypeFilter',  collectionProperty: 'institutionType', displayProperty: 'institutionType', compare:'match'} )" class="form-control">
@@ -37,20 +39,26 @@
                                 </select>
                             </th>
                             <th>
-                                <select value.bind="memberTypeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'memberTypeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'memberType', displayProperty: 'memberType', matchProperty:'', compare:'match'} )" class="form-control">
+                                <select value.bind="memberTypeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'memberTypeFilter',  collectionProperty: 'memberType', displayProperty: 'memberType', compare:'match'} )" class="form-control">
                                     <option value=""></option>
                                     <option repeat.for="institution of is4ua.memberTypes" value="${institution.code}">${institution.description}</option>
                                 </select>
                             </th>
                             <th></th>
                             <th>
-                            <select value.bind="highestDegreeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'highestDegreeFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'highestDegree', displayProperty: 'highestDegree', matchProperty:'', compare:'match'} )" class="form-control">
+                                <input value.bind="regionFilterValue" input.delegate="dataTable.filterList(regionFilterValue, { type: 'text',  filter: 'regionFilter',  collectionProperty: 'region', displayProperty: 'region', compare:'match'} )"  class="form-control" />
+                            </th>
+                             <th>
+                                <input value.bind="countryFilterValue" input.delegate="dataTable.filterList(countryFilterValue, { type: 'text',  filter: 'countryFilter',  collectionProperty: 'country', displayProperty: 'country', compare:'match'} )"  class="form-control" />
+                            </th>
+                            <th>
+                            <select value.bind="highestDegreeFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'highestDegreeFilter',  collectionProperty: 'highestDegree', displayProperty: 'highestDegree', compare:'match'} )" class="form-control">
                                     <option value=""></option>
                                     <option repeat.for="institution of is4ua.highestDegrees" value="${institution.code}">${institution.description}</option>
                                 </select>
                             </th>
                             <th>
-                                <select value.bind="institutionStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter', lookupArray: '', lookupProperty: '', collectionProperty: 'institutionStatus', displayProperty: 'institutionStatus', matchProperty:'', compare:'match'} )" class="form-control">
+                                <select value.bind="institutionStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'institutionStatusFilter',  collectionProperty: 'institutionStatus', displayProperty: 'institutionStatus', compare:'match'} )" class="form-control">
                                     <option value=""></option>
                                     <option repeat.for='status of is4ua.institutonStatusArray' value="${status.code}">${status.description}</option>
                                 </select>
@@ -61,6 +69,8 @@
                                 <td data-title="Type">${inst.institutionType | lookupDescription:is4ua.institutionTypes}</td>
                                 <td data-tile="Phone">${inst.memberType | lookupDescription:is4ua.memberTypes}</td>
                                 <td data-title="Email">${inst.joinDate | dateFormat:config.DATE_FORMAT_TABLE:true}</td>
+                                <td data-title="Region">${inst.region}</td>
+                                <td data-title="Region">${inst.country}</td>
                                 <td data-title="Role">${inst.highestDegree | lookupDescription:is4ua.highestDegrees}</td>
                                 <td data-title="Status">${inst.institutionStatus | lookupDescription:is4ua.institutonStatusArray}</td>
                             </tr>
