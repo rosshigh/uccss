@@ -1,0 +1,46 @@
+<template>
+  <div class="well well-sm topMargin">
+      <div class="smart-timeline">
+        <ul class="smart-timeline-list">
+          <li>
+            <div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="helpTickets.selectedHelpTicket.personId | gravatarUrlId:people:100:1"></div>
+              <div class="smart-timeline-time">
+                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
+              </div>
+              <div class="smart-timeline-content borderTop leftJustify">
+                <div class="form-group">
+                  <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <span id="container"></span>
+                      <h4 show.bind="showRequestDetails" class="col-sm-11 col-sm-offset-1 topMargin">System: ${systems.selectedSystem.sid}</h4>
+                      <h4 show.bind="showRequestDetails" class="col-sm-11 col-sm-offset-1 ">Client: ${systems.selectedClient.client}</h4>
+                      <h4 show.bind="!showRequestDetails && clientRequired" class="col-sm-11 col-sm-offset-1 topMargin">Client not assigned</h4>
+                   
+                      <div class="form-group topMargin">
+                          <div class="hover_img" repeat.for="file of helpTickets.selectedHelpTicket.content[0].files">
+                            <a href="${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}"
+                              target="_blank"
+                              innerhtml.bind="file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename"></a>
+                          </div>
+                      </div>
+                     </div>
+                    <div class="col-lg-7">
+                      <div class="topMargin bottomMargin"  innerhtml.bind="helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' "></div>
+                      <div show.bind="helpTickets.selectedHelpTicket.content[0].content.steps">
+                        <hr/>
+                        <h4 >Steps to reproduce the problem</h4>
+                        <div class="topMargin bottomMargin"  innerhtml.bind="helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' "></div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li repeat.for="event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true">
+            <compose view="./response.html"></compose>
+          </li>
+        </ul>
+      </div>
+    </div>
+</template>

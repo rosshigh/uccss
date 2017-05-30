@@ -146,7 +146,7 @@ module.exports = function (app, config) {
       if(err){
          return next(err);
       } else {
-        var path = config.uploads + "/documents/" + document.name + '/' + document.files[req.params.index].fileName;     
+        var path = config.uploads + "/documents/" + document.categoryCode + "/" + document.name + '/' + document.files[req.params.index].fileName;     
          document.files.splice(req.params.index, 1);
          document.save(function(err, document){
             if(err){
@@ -178,8 +178,10 @@ module.exports = function (app, config) {
       });
     },
     filename: function (req, file, cb) {
+console.log(file)      
       let fileName = file.originalname.split('.');
-      cb(null, fileName[0] + " (" + req.params.version + ")." + fileName[1]);
+console.log(fileName)      
+      cb(null, fileName[0] + " (" + req.params.version + ")." + fileName[fileName.length - 1]);
     }
   });
 

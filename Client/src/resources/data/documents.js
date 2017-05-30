@@ -7,6 +7,11 @@ import moment from 'moment';
 @inject(DataServices, Utils, AppConfig)
 export class DocumentsServices {
 
+    DOCUMENTS_SERVICE = "documents";
+    DOCUMENTS_CATEGORY_SERVICE = "documentCategory"; 
+
+    
+
     constructor(data, utils, config) {
         this.data = data;
         this.utils = utils;
@@ -16,7 +21,7 @@ export class DocumentsServices {
     //Documents
     async getDocumentsArray(refresh, options) {
         if (!this.documentsArray || refresh) {
-            var url = this.data.DOCUMENTS_SERVICE;
+            var url = this.DOCUMENTS_SERVICE;
             url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -66,7 +71,7 @@ export class DocumentsServices {
         }
 
         if (!this.selectedDocument._id) {
-            let serverResponse = await this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "post");
+            let serverResponse = await this.data.saveObject(this.selectedDocument, this.DOCUMENTS_SERVICE, "post");
             if (!serverResponse.status) {
                 this.selectedDocument = serverResponse;
                 this.documentsArray.push(this.selectedDocument);
@@ -74,7 +79,7 @@ export class DocumentsServices {
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedDocument, this.data.DOCUMENTS_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedDocument, this.DOCUMENTS_SERVICE, "put");
             if (!serverResponse.status) {
                 this.documentsArray[this.editDocumentIndex] = this.utils.copyObject(this.selectedDocument, this.documentsArray[this.editDocumentIndex]);
             }
@@ -101,7 +106,7 @@ export class DocumentsServices {
     }
 
     async deleteDocument(){
-         let serverResponse = await this.data.deleteObject(this.data.DOCUMENTS_SERVICE + '/' + this.selectedDocument._id);
+         let serverResponse = await this.data.deleteObject(this.DOCUMENTS_SERVICE + '/' + this.selectedDocument._id);
             if (serverResponse.status === 204) {
                 this.documentsArray.splice(this.editDocumentIndex, 1);
                 this.editDownloadIndex = - 1;
@@ -123,7 +128,7 @@ export class DocumentsServices {
     //Categories
     async getDocumentsCategoriesArray(refresh, options) {
         if (!this.docCatsArray || refresh) {
-            var url = this.data.DOCUMENTS_CATEGORY_SERVICE;
+            var url = this.DOCUMENTS_CATEGORY_SERVICE;
             url += options ? options : "";;
             try {
                 let serverResponse = await this.data.get(url);
@@ -190,14 +195,14 @@ export class DocumentsServices {
         }
 
         if (!this.selectedCat._id) {
-            let serverResponse = await this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "post");
+            let serverResponse = await this.data.saveObject(this.selectedCat, this.DOCUMENTS_CATEGORY_SERVICE, "post");
             if (!serverResponse.status) {
                 this.docCatsArray.push(serverResponse);
                 this.editCatIndex = this.docCatsArray.length - 1;
             }
             return serverResponse;
         } else {
-            var serverResponse = await this.data.saveObject(this.selectedCat, this.data.DOCUMENTS_CATEGORY_SERVICE, "put");
+            var serverResponse = await this.data.saveObject(this.selectedCat, this.DOCUMENTS_CATEGORY_SERVICE, "put");
             if (!serverResponse.status) {
                 this.docCatsArray[this.editCatIndex] = this.utils.copyObject(this.selectedCat, this.docCatsArray[this.editCatIndex]);
             }
@@ -208,7 +213,7 @@ export class DocumentsServices {
 
     async deleteCat(){
         if (this.selectedCat._id) {
-            let serverResponse = await this.data.deleteObject(this.data.DOCUMENTS_CATEGORY_SERVICE + '/' + this.selectedCat._id);
+            let serverResponse = await this.data.deleteObject(this.DOCUMENTS_CATEGORY_SERVICE + '/' + this.selectedCat._id);
             if (serverResponse.status === 204) {
                 this.docCatsArray.splice(this.editCatIndex, 1);
                 this.editCatIndex = - 1;

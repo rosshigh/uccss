@@ -22,6 +22,10 @@ export function configure(config) {
     './value-converters/to-uppercase',
     './value-converters/sort-array',
     './value-converters/system-list',
-     './value-converters/check-box'
+    './value-converters/check-box',
+    './value-converters/activate-button',
+    './value-converters/help-ticket-type',
+    './value-converters/help-ticket-subtypes',
+    './value-converters/session'
   ]);
 }

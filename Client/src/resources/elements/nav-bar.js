@@ -8,7 +8,7 @@ import {AppConfig} from "../../config/appConfig";
 import { CommonDialogs } from '../dialogs/common-dialogs';
 import moment from 'moment';
 import * as toastr from "toastr";
-
+import $ from "jquery";
 
 @inject(Router, EventAggregator, BindingEngine, Auth, Utils, People, AppConfig, CommonDialogs)
 export class NavBar {
