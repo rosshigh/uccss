@@ -21,24 +21,14 @@
                   <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
                 </td>
               </tr>
-              <tr>
-                <th>
-                  Number <span click.trigger="dataTable.sortArray('helpTicketNo')"><i class="fa fa-sort"></i></span>
-                </th>
-                <th>
-                  Type <span click.trigger="dataTable.sortArray('helpTicketType')"><i class="fa fa-sort"></i></span><br>
-                </th>
+              <tr> 
+                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketNo'})">Number </span><i class="fa fa-sort"></i></th>
+                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketType'})">Type </span><i class="fa fa-sort"></i></th>
                  <th>Owner</th>
                 <th></th>
-                <th>
-                  Status <span click.trigger="dataTable.sortArray('helpTicketStatus')"><i class="fa fa-sort"></i></span><br>
-                </th>
-                <th>
-                  Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span>
-                </th>
-                <th>
-                  Date Modified <span click.trigger="dataTable.sortArray('modifiedDate')"><i class="fa fa-sort"></i></span>
-                </th>
+                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})">Status </span><i class="fa fa-sort"></i></th>
+                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Date Created </span><i class="fa fa-sort"></i></th>
+                <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Date Modified </span><i class="fa fa-sort"></i></th>
               </tr>
                <tr>
                 <th></th>

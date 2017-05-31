@@ -9,7 +9,7 @@
               </div>
               <div class="smart-timeline-content borderTop leftJustify">
                 <div class="form-group">
-                  <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>
+                  <p>${helpTickets.selectedHelpTicket.personId | lookupValue:people:'_idfullName'}</p>
                   <div class="row">
                     <div class="col-lg-4">
                       <span id="container"></span>

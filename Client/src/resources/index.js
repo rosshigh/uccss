@@ -26,6 +26,7 @@ export function configure(config) {
     './value-converters/activate-button',
     './value-converters/help-ticket-type',
     './value-converters/help-ticket-subtypes',
-    './value-converters/session'
+    './value-converters/session',
+    './value-converters/sort-date-time'
   ]);
 }

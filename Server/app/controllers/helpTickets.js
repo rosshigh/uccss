@@ -248,7 +248,7 @@ module.exports = function (app, config) {
 
   router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){
     writeLog.log("Send email to " + req.body.email, 'verbose');
-
+console.log(req.body.reason)
     if(req.body){
        switch(req.body.reason){
          case 1: //help ticket created
@@ -264,7 +264,7 @@ module.exports = function (app, config) {
         case 2:
         case 3:
         case 4:
-        case 5:
+        case 5: 
           var context = {helpTicketNo: req.body.helpTicketNo, name: req.body.fullName, message: req.body.message};            
           var mailObj = {
             email: req.body.email,

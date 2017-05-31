@@ -1,3 +1,5 @@
+'use strict'
+
 var express = require('express'),
   debug = require('debug')('uccss'),
   fs = require('fs'),
