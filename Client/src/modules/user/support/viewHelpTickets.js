@@ -173,8 +173,8 @@ export class ViewHelpTickets {
   }
 
   getName(){
-    for(var i = 0; i < this.people.peopleArray.length; i++){
-      if(this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
+    for(var i = 0; i < this.people.uccPeople.length; i++){
+      if(this.people.uccPeople[i]._id == this.lockObject.personId) return this.people.uccPeople[i].fullName;
     }
     return "someone";
   }

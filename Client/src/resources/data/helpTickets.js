@@ -37,20 +37,169 @@ export class HelpTickets {
     }
 
     async getCurrentCount(options){
-    var url = this.HELP_TICKET_SERVICES +'/current/count';
-      url += options ? "/" + options : "";
-      var response = await this.data.get(url);
-      if (!response.status) {
-          this.newHelpTickets = this.utils.countItems(this.config.NEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
-          this.underReviewHelpTickets = this.utils.countItems(this.config.UNDER_REVIEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
-          this.customerActionHelpTickets = this.utils.countItems(this.config.CUSTOMER_ACTION_HELPTICKET_STATUS, 'helpTicketStatus', response);
-          return response.count;
-      } else {
-          return null;
-      }
-  }
+        var url = this.HELP_TICKET_SERVICES +'/current/count';
+        url += options ? "/" + options : "";
+        var response = await this.data.get(url);
+        if (!response.status) {
+            this.newHelpTickets = this.utils.countItems(this.config.NEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
+            this.underReviewHelpTickets = this.utils.countItems(this.config.UNDER_REVIEW_HELPTICKET_STATUS, 'helpTicketStatus', response);
+            this.customerActionHelpTickets = this.utils.countItems(this.config.CUSTOMER_ACTION_HELPTICKET_STATUS, 'helpTicketStatus', response);
+            return response.count;
+        } else {
+            return null;
+        }
+    }
 
-   async getHelpTicketTypes(options, refresh){
+    selectHelpTicket(index) {
+        if (!index && index != 0) {
+            this.emptyHelpTicket();
+        } else {
+            try {
+                this.selectedHelpTicket = this.utils.copyObject(this.helpTicketsArray[index]);
+                this.newHelpTicket = false;
+                this.editIndex = index;
+            } catch (error) {
+                this.selectedHelpTicket = this.emptyHelpTicket();
+            }
+
+        }
+    }
+
+    selectHelpTicketByID(id){
+        this.helpTicketsArray.forEach((item, index) => {
+          if(item._id === id){
+            this.selectedHelpTicket = this.utils.copyObject(item);
+            this.editIndex = index;
+            return;
+          }
+        });
+        return null;
+    }
+
+    selectHelpTicketContent(index){
+        if (!index && index != 0) {
+            this.emptyHelpTicketContent();
+        } else {
+            try {
+            } catch (error) {
+                console.log(error);
+                this.emptyHelpTicketContent();
+            }
+        }
+    }
+
+    emptyHelpTicketContent(){
+        var newHelpTicketContent = new Object();
+        newHelpTicketContent.type = 0;
+        newHelpTicketContent.createdDate = new Date();
+        newHelpTicketContent.helpTicketId = "";
+        newHelpTicketContent.files = new Array();
+        newHelpTicketContent.confidential = false;
+        newHelpTicketContent.personId = ""; 
+        newHelpTicketContent.content = {};
+        newHelpTicketContent.content.comments = "";
+        this.selectedHelpTicketContent = newHelpTicketContent;
+
+    }
+
+    async updateStatus(email){
+         if(!this.selectedHelpTicket){
+            return;
+        }
+
+         var response = await this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/status/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
+            if(email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+            this.helpTicketsArray[this.editIndex].helpTicketStatus = response.helpTicketStatus;
+        } else {
+                this.data.processError(response, "There was an error updating the help ticket.");
+            }
+        return response;
+    }
+    
+    async updateKeywords(){
+        if(!this.selectedHelpTicket){
+            return;
+        }
+
+         var response = await this.data.saveObject(this.selectedHelpTicket, this.HELP_TICKET_SERVICES + "/keywords/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
+            this.helpTicketsArray[this.editIndex].keyWords = response.keyWords;
+        } else {
+                this.data.processError(response, "There was an error updating the help ticket.");
+            }
+        return response;
+    }
+
+    async saveHelpTicket(email){
+        if(!this.selectedHelpTicket){
+            return;
+        }
+        var url = this.HELP_TICKET_SERVICES;
+        if(!this.selectedHelpTicket._id){
+            var response = await this.data.saveObject(this.selectedHelpTicket, url, "post");
+            if (!response.error) {
+                if(email.email){
+                    email.helpTicketNo = response.helpTicketNo;
+                    this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                }
+                this.selectedHelpTicket = this.utils.copyObject(response);
+                if(this.helpTicketsArray) this.helpTicketsArray.push(this.selectedHelpTicket);
+            } else {
+                     this.data.processError(response, "There was an error creating the help ticket.");
+                }
+            return response;
+        } else {
+            var response = await this.data.saveObject(this.selectedHelpTicket, url, "put");
+            if (!response.error) {
+                if(email.email){
+                    this.selectedHelpTicket = this.utils.copyObject(response);
+                }
+                this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+            } else {
+                 this.data.processError(response, "There was an error updating the help ticket.");
+                }
+            return response;
+        }
+    }
+
+    async saveHelpTicketResponse(email){
+        if(this.selectedHelpTicket._id) {
+            var url = this.HELP_TICKET_CONTENT_SERVICES.replace("HELPTICKETID", this.selectedHelpTicket._id).replace("STATUS", this.selectedHelpTicket.helpTicketStatus);
+            var response = await this.data.saveObject(this.selectedHelpTicketContent, url, "put");
+                if (!response.error) {
+                    if(!this.selectedHelpTicketContent.confidential && email.email) this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+                    this.selectedHelpTicket.content.push(response);
+                    this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+                } else {
+                     this.data.processError(response, "There was an error updating the help ticket.");
+                }
+            return response;
+        }
+    }
+
+    isHelpTicketDirty(){
+      if(this.selectedHelpTicket){
+            if(this.selectedHelpTicket._id){
+                var obj = this.helpTicketsArray[this.editIndex];
+            } else {
+                var obj = this.emptyHelpTicket();
+            }
+            return this.utils.objectsEqual(this.selectedHelpTicket, obj);
+        }
+        return new Array();
+    }
+
+    async uploadFile(files,content){
+        let response = await this.data.uploadFiles(files,  this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+        if(!response.error){
+            this.selectedHelpTicket = this.utils.copyObject(response);
+            this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+        }
+    }
+
+    async getHelpTicketTypes(options, refresh){
          if (!this.helpTicketTypesArray || refresh) {
            var url = this.HELP_TICKET_TYPES;
             url += options ? options : "";
@@ -109,5 +258,24 @@ export class HelpTickets {
                 }
             return response;
         }
+    }  
+
+    lockHelpTicket(obj){
+        if(obj.helpTicketId) {
+            var response = this.data.saveObject(obj, this.HELP_TICKET_LOCK_SERVICES, "post");
+        }
+    }
+
+    async getHelpTicketLock(id){
+        var response = await this.data.get(this.HELP_TICKET_LOCK_SERVICES + "/" + id);
+        if (!response.error) {
+                return response;
+        } else {
+                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+        }
+    }
+
+    removeHelpTicketLock(id){
+        var response = this.data.deleteObject(this.HELP_TICKET_LOCK_SERVICES + "/" + id);
     }
 }
