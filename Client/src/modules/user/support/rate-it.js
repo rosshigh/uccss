@@ -10,7 +10,6 @@ export class RateIt{
 
 	constructor(element) {
         this.element = element;
-		
 	
 	}
 

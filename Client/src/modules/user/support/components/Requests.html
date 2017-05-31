@@ -1,0 +1,32 @@
+<template>
+      <div>
+        <h5 show.bind="clientRequestsArray.length === 0">You have no product requests that apply to this type of help ticket.</h5>
+        <table id="clientTable" show.bind="clientRequestsArray.length > 0" class="table table-bordered table-responsive" style="background:white;">
+          <thead>
+          <tr class="header">
+            <th>Course</th>
+            <th>Session</th>
+            <th>Product</th>
+            <th>System</th>
+            <th>Client</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr id="${product.id}" productId="${product.productId}" 
+                repeat.for="product of clientRequestsArray"
+                click.trigger="requestChosen($event, $index)">
+              <td>${product.courseId | lookupValue:people.coursesArray:"_id":"name"}</td>
+              <td>${product.sessionId | sessionName:sessions.sessionsArray}</td>
+              <td>${product.productId | lookupValue:products.productsArray,"_id":"name"}</td>
+              <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+              <td>${product.client}</td>
+              <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
+            </tr>
+          </tbody>
+        </table>
+        <span id="client"></span>
+      </div>
+    </div>
+  </div>
+</template>

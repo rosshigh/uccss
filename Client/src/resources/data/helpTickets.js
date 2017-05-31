@@ -76,6 +76,31 @@ export class HelpTickets {
         return null;
     }
 
+    emptyHelpTicket() {
+        var newHelpTicketObj = new Object();
+
+        newHelpTicketObj.sessionId = "";
+        newHelpTicketObj.type = "";
+        newHelpTicketObj.courseId = "";
+        newHelpTicketObj.personId = "";
+        newHelpTicketObj.helpTicketType = "";
+        newHelpTicketObj.helpTicketStatus = this.config.NEW_HELPTICKET_STATUS;
+        newHelpTicketObj.priority = 0;
+        newHelpTicketObj.content = new Array();
+        newHelpTicketObj.owner = new Array();
+        newHelpTicketObj.createdDate = new Date();
+        newHelpTicketObj.modifiedDate = new Date();
+        newHelpTicketObj.audit = new Array();
+        newHelpTicketObj.audit.push({
+            event: 'Created',
+            eventDate: new Date()
+        })
+
+       this.selectedHelpTicket =  newHelpTicketObj;
+
+       this.emptyHelpTicketContent();
+    }
+
     selectHelpTicketContent(index){
         if (!index && index != 0) {
             this.emptyHelpTicketContent();

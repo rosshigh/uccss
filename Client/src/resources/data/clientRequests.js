@@ -34,6 +34,24 @@ export class ClientRequests {
         }
     }
 
+    async getActiveClientRequestsArray(personId, sessions){
+        var url = this.CLIENT_REQUESTS_SERVICES;
+        url += "/" + personId + "/" + sessions
+        try {
+            let serverResponse = await this.data.get(url);
+            if (!serverResponse.error) {
+                this.requestsArray = serverResponse;
+            } else {
+                return undefined;
+            }
+        } catch (error) {
+            console.log(error);
+            return undefined;
+        }
+        return this.requestsArray;
+
+    }
+
     async getCurrentCount(options){
        var url = this.CLIENT_REQUESTS_SERVICES +'/current/count';
        url += options ? options : "";
@@ -46,9 +64,9 @@ export class ClientRequests {
        } else {
            return null;
        }
-   }
+    }
 
-   async getClientRequestsDetailsArray(options, refresh){
+    async getClientRequestsDetailsArray(options, refresh){
         if (!this.requestsArray || refresh) {
           var url = this.CLIENT_REQUEST_DETAILS;
           url += options ? options : "";

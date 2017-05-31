@@ -30,7 +30,6 @@ export class Support {
                 name: 'viewHelpTickets',
                 title: 'View Help Tickets'
             },
-            /*
             {
                 route: 'createHelpTickets',
                 moduleId: './createHelpTickets',
@@ -46,7 +45,7 @@ export class Support {
                 nav: true,
                 name: 'downloads',
                 title: 'Downloads'
-            },
+            },           
             {
                 route: 'curriculum',
                 moduleId: './curriculum',
@@ -63,7 +62,6 @@ export class Support {
                 name: 'links',
                 title: 'Useful Information'
             }
-            */
         ]);
 
         this.router = router;

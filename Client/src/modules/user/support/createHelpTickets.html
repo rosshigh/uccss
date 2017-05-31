@@ -1,2 +1,15 @@
 <template>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="col-lg-4">
+            <compose view='./components/helpTicketType.html'></compose>
+
+            <compose show.bind="helpTicketType != 'NULL'" view='./components/Requests.html' show.bind="requestsRequired"></compose>
+           
+        </div>
+        <div class="col-lg-8">
+            <compose show.bind="showAdditionalInfo && helpTicketType != 'NULL'" view='./components/helpTicketDetails.html'></compose>
+        </div>
+      </div>
+    </div> <!-- Panel Body -->
 </template>
