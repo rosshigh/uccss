@@ -42,7 +42,6 @@ export class Download {
     typeChanged(el) {
         if (el.target.id != "") {
             this.typeSelected = el.target.id;
-            this.filterList();
         }
     }
 
