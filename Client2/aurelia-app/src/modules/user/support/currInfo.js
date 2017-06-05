@@ -106,7 +106,7 @@ export class CurrInfo{
 	rateCurriculum(el){
 		this.curriculum.selectCurriculumById(el.detail.id);
 		this.curriculum.selectedCurriculum.rating = el.detail.rating;
-		this.curriculum.selectedCurriculum.raters = el.detail.raters;
+		this.curriculum.selectedCurriculum.raters = this.curriculum.selectedCurriculum.raters ? this.curriculum.selectedCurriculum.raters + 1 : 0;
 		let serverResponse = this.curriculum.save();
 	}
 }

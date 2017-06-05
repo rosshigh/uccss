@@ -5,8 +5,7 @@ export function configure(config) {
     './elements/loading-indicator',
     './elements/table-navigation-bar',
     './elements/flat-picker',
-    './elements/add-systems',
-    './elements/rate-it',
+     './elements/add-systems',
     './value-converters/info-filter',
     './value-converters/session-type',
     './value-converters/date-format',
@@ -28,8 +27,6 @@ export function configure(config) {
     './value-converters/help-ticket-type',
     './value-converters/help-ticket-subtypes',
     './value-converters/session',
-    './value-converters/sort-date-time',
-    './value-converters/session-name',
-    './value-converters/format-digits'
+    './value-converters/sort-date-time'
   ]);
 }

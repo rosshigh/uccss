@@ -34,17 +34,16 @@ export class RateIt{
 	rateIt(value, index){
 		if(!this.ratedIt){
 			this.ratedIt = true;
-			let foo = this.rating * (this.raters > 0 ? this.raters : 1);
 			this.raters += 1;
-			this.rating = (foo + Number(value)) / (this.raters);
+			this.rating = (this.rating + Number(value)) / (this.raters);
 			document.getElementById(this.rates[index].id).checked="true";
+			// this.ratecurriculum(this.rating, this.id);
 			let changeEvent;
 
                 if (window.CustomEvent) {
                     changeEvent = new CustomEvent('change', {
                         detail: {
                             rating: this.rating,
-							raters: this.raters,
 							id: this.id
                         },
                         bubbles: true
@@ -54,7 +53,6 @@ export class RateIt{
                     changeEvent.initCustomEvent('change', true, true, {
                         detail: {
                             rating: this.rating,
-							raters: this.raters,
 							id: this.id
                         }
                     });
