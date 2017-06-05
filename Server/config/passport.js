@@ -14,8 +14,6 @@ var localOptions = {
 };
 
 var localLogin = new localStrategy(localOptions, function(email, password, next){
-  console.log(email)
-  console.log(password)
   User.findOne({email: {$regex: new RegExp('^' + email.toLowerCase(), 'i')}}, function(err,user){
     if(err){
       return next(err);

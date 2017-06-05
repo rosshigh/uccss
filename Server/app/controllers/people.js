@@ -140,9 +140,7 @@ module.exports = function (app, config) {
     Model.find({institutionId: req.body.institutionId, roles: "PRIM"}, function(err, people){
       if(err){
         return next(err);
-      } else {     
-console.log(people)            
-
+      } else {            
         if(people.length > 0){
           var facCoordName = people[0].fullName;
         }  else {
@@ -168,9 +166,7 @@ console.log(people)
               institution: req.body.institution,
               cc: req.body.cc,
               context: context
-            }    
-console.log("llkdsjfl;jas")
-console.log(mailObj)                                                            
+            }                                                                
            newCustomer(mailObj);
         }
 
@@ -336,11 +332,9 @@ console.log(mailObj)
         var str = '';
         response.on('data', function(d) {
             str = JSON.parse(d);
-            console.log(str);
         });
         response.on('end', function() {
             // Data reception is done, do whatever with it!
-            console.log("ENDING")
             res.status(200).json(str);
         });
 
@@ -396,7 +390,6 @@ console.log(mailObj)
 
   router.route('/api/users/logout').post(function(req, res, next){
     logAuth.log('logoff-' + req.body.email, 'info');
-    console.log(req.body.email);
     res.status(201).json({message: "logout successful"});
   })
 
