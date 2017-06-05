@@ -4,7 +4,7 @@ import {HttpClient} from 'aurelia-http-client';
 @inject(HttpClient)
 export class AppConfig {
 
-    HOST = location.origin;
+    HOST = location.origin; 
 
     // BASE_URL = "http://localhost:5000/api/"; 
     // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
