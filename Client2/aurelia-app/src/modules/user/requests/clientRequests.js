@@ -28,10 +28,18 @@ export class ClientRequests{
         {
             route: 'createRequests',
             moduleId: './createRequests',
-             settings: { auth: true, roles: [] },
+            settings: { auth: true, roles: [] },
             nav: true,
             name: 'createRequests',
             title: 'Create Request'
+        },
+        {
+            route: 'viewProducts',
+            moduleId: './viewProducts',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'viewProducts',
+            title: 'Product List'
         }
         ]);
 

@@ -50,7 +50,7 @@ export class AppConfig {
 
     //Help Tickets
     NEW_HELPTICKET_STATUS = 1; 
-    UNDER_REVIEW_HELPTICKET_STATUS = 2;
+    UNDER_REVIEW_HELPTICKET_STATUS = 2; 
     CUSTOMER_ACTION_HELPTICKET_STATUS = 3;
 
     //Client requests
