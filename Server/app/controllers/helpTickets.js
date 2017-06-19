@@ -248,7 +248,6 @@ module.exports = function (app, config) {
 
   router.post('/api/helpTickets/sendMail', requireAuth, function(req, res, next){
     writeLog.log("Send email to " + req.body.email, 'verbose');
-console.log(req.body.reason)
     if(req.body){
        switch(req.body.reason){
          case 1: //help ticket created
@@ -312,7 +311,7 @@ console.log(req.body.reason)
       Model.findById(req.params.id, function(err, helpticket){   
         if(err){
           return next(err);
-        } else {
+        } else {         
           if(req.params.contentId){
             var id = req.params.contentId;
           
@@ -323,7 +322,7 @@ console.log(req.body.reason)
                   originalFilename: req.files[i].originalname,
                   fileName: req.files[i].filename,
                   dateUploaded: new Date()
-                };
+                };             
                 content.files.push(file);
               }
               helpticket.save(function(err, helpticket) {

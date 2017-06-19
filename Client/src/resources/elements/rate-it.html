@@ -1,0 +1,8 @@
+<template>
+    <fieldset class="rating">
+		<span repeat.for="rate of rates" >
+			<input  type="radio" name="${rate.name}" id="${rate.id}" title="${rate.title}" />
+			<label click.delegate="rateIt(rate.value, $index)" class="${rate.class}" for="${rate.title}" title="${rate.title}"></label>
+		</span>
+    </fieldset>
+</template>

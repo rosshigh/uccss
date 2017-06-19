@@ -6,13 +6,11 @@ import {Downloads} from '../../../resources/data/downloads';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import $ from 'jquery';
 
 @inject(DataTable, Downloads, Utils, CommonDialogs, Validation, AppConfig, EventAggregator)
 export class EditProducts {
     downloadItemSelected = false;
     editCat = false;
-    navControl = "downloadsNavButtons";
     spinnerHTML = "";
     selectedFile = "";
     removedFiles = new Array();
@@ -278,6 +276,29 @@ export class EditProducts {
         $("#active").val("");
         $("#helpTicketRelevant").val("");
         this.dataTable.updateArray(this.downloads.appDownloadsArray);
+    }
+
+    customFileNameSorter(sortProperty, sortDirection, sortArray, context){
+      return sortArray.sort((a, b) => {
+          var result = (a["file"]["originalFilename"] < b["file"]["originalFilename"]) ? -1 : (a["file"]["originalFilename"] > b["file"]["originalFilename"]) ? 1 : 0;
+            return result * sortDirection;
+      });
+    }
+
+    customCatSorter(sortProperty, sortDirection, sortArray, context){
+      return sortArray.sort((a, b) => {
+         let aDescription = context.lookupCategory(a["downCatcode"]);
+         let bDesription = context.lookupCategory(b["downCatcode"]);
+         var result = (aDescription < bDesription) ? -1 : (aDescription > bDesription) ? 1 : 0;
+         return result * sortDirection;
+      })
+    }
+
+    lookupCategory(value){
+        for(let i = 0; i < this.downloads.appCatsArray.length; i++){
+            if(this.downloads.appCatsArray[i].downCatcode === value) return this.downloads.appCatsArray[i].description;
+        }
+        return "";
     }
 
 }

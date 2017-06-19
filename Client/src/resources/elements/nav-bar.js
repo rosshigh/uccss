@@ -69,8 +69,6 @@ export class NavBar {
                     ).then(response => {
                           this.logout();
                     });
-                    // this.utils.showNotification("You must have an active account to access the web site");
-                    //  this.logout();
                 } else {
                     if (!this.userObj.userRole)  this.logout();
                     sessionStorage.setItem('role',this.userObj.userRole)
@@ -87,7 +85,7 @@ export class NavBar {
     async requestPasswordReset(){
         if(this.email){
             let response = await this.people.requestPasswordReset({email: this.email});
-            if(!response.error){
+            if(response && !response.error){
                 this.utils.showNotification("An email has been sent to the provided email address with a link you can use to reset your password");
             } else if(response.status = 404){
                 this.utils.showNotification("There is no registered user with that email address");
@@ -141,7 +139,7 @@ export class NavBar {
     async reminders(){
 
         let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
-        if(!response.error && this.people){
+        if(response && !response.error && this.people){
             toastr.options.closeButton = true;
             toastr.options.closeMethod = 'fadeOut';
             toastr.options.closeDuration = 300;

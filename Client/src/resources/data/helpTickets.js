@@ -76,6 +76,31 @@ export class HelpTickets {
         return null;
     }
 
+    emptyHelpTicket() {
+        var newHelpTicketObj = new Object();
+
+        newHelpTicketObj.sessionId = "";
+        newHelpTicketObj.type = "";
+        newHelpTicketObj.courseId = "";
+        newHelpTicketObj.personId = "";
+        newHelpTicketObj.helpTicketType = "";
+        newHelpTicketObj.helpTicketStatus = this.config.NEW_HELPTICKET_STATUS;
+        newHelpTicketObj.priority = 0;
+        newHelpTicketObj.content = new Array();
+        newHelpTicketObj.owner = new Array();
+        newHelpTicketObj.createdDate = new Date();
+        newHelpTicketObj.modifiedDate = new Date();
+        newHelpTicketObj.audit = new Array();
+        newHelpTicketObj.audit.push({
+            event: 'Created',
+            eventDate: new Date()
+        })
+
+       this.selectedHelpTicket =  newHelpTicketObj;
+
+       this.emptyHelpTicketContent();
+    }
+
     selectHelpTicketContent(index){
         if (!index && index != 0) {
             this.emptyHelpTicketContent();
@@ -191,12 +216,8 @@ export class HelpTickets {
         return new Array();
     }
 
-    async uploadFile(files,content){
-        let response = await this.data.uploadFiles(files,  this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
-        if(!response.error){
-            this.selectedHelpTicket = this.utils.copyObject(response);
-            this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
-        }
+    async uploadFile(files,content, helpTicket){
+        let response = await this.data.uploadFiles(files,  this.HELP_TICKET_SERVICES + "/upload/" + helpTicket._id + '/' + helpTicket.helpTicketNo + '/' + content);
     }
 
     async getHelpTicketTypes(options, refresh){

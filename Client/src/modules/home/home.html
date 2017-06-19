@@ -4,16 +4,19 @@
   </div>
 
   <div class="parallax1">
-    <div class="caption">
-        <span class="border">${config.HOME_WELCOME}</span>
-   </div>
-</div>
+    <div if.bind="config.HOME_WELCOME.length === 0" class="pull-right topMargin rightMargin">
+        <img src="/img/UCC_LOGO_UCCSS.jpg" width="300px">
+    </div>
+     <div if.bind="config.HOME_WELCOME.length > 0" class="caption">
+      <span class="border">${config.HOME_WELCOME}</span> 
+    </div>
+ </div>
 
 <div class="row center-text" style="color: #777;background-color:white;text-align:center;padding:25px 80px;text-align: justify;">
        <compose view="./components/uccInformation.html"></compose>
 </div>
 
- <div class="parallax2"></div>
+ <div class="parallax1"></div>
 
  <div class="row bigMarginTop" style="color: #777;background-color:white;text-align:center;padding:50px 80px;text-align: justify;">
         <div class="col-lg-3 bigMarginTop">

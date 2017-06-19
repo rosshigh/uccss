@@ -1,0 +1,176 @@
+<template>
+	<div class="bottomMargin list-group-item leftMargin rightMargin">
+		<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+			data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+		<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+			title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+	</div>
+	<div class="fluid-container">
+		<div class="row leftMargin rightMargin">
+			<div class="form-group topMargin col-lg-5">
+				<select value.bind="selectedCategory" change.delegate="selectCategory()" id="category" class="form-control">
+				<option value="-1">Select a Category</option>
+				<option repeat.for="type of helpTickets.helpTicketTypesArray"
+						value.bind="$index">${type.description}</option>
+				</select>
+				 <a class="btn btn-link" click.trigger="newCategory()" aria-hidden="true">(Add a Category)</a>
+			<!--	<span click.delegate="newCategory()" class="topMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Category"><i class="fa fa-plus" aria-hidden="true"></i></span> -->
+			</div>
+			<div show.bind="selectedCategory > -1" class="form-group topMargin col-lg-5">
+				<select value.bind="selectedSubtype" change.delegate="typeSelected()" id="course"
+						class="form-control">
+				<option value="-1">Select a Subtype</option>
+				<option repeat.for="subtype of helpTickets.selectedHelpTicketType.subtypes"
+						value.bind="$index">${subtype.description}</option>
+				</select>
+				 <a class="btn btn-link" click.trigger="newCategory()" aria-hidden="true">(Add a Subtype)</a>
+			<!--	<span click.delegate="newSubtype()" class="topMargin" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="New Subtype"><i class="fa fa-plus" aria-hidden="true"></i></span> -->
+			</div>
+		</div>
+
+		<div show.bind="selectedCategory > -1">
+			<h4>Category</h4>
+			<div class="bottomMargin panel panel-default leftMargin rightMargin">
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="form-group">
+								<label for="editDescription" class="col-sm-2 control-label hideOnPhone">Description</label>
+								<input value.bind="helpTickets.selectedHelpTicketType.description" id="editDescription" class="form-control " placeholder="Description"
+									type="text" />
+							</div>
+						</div>
+						<div class="col-lg-8">
+							<div class="col-lg-2 topMargin">
+								<div class="checkbox ">
+									<label>
+									<input checked.bind="helpTickets.selectedHelpTicketType.showSubtypes" id="subtypesCheckBox" type="checkbox"> Show subtypes
+								</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div show.bind="selectedSubtype > -1">
+				<h4>Subtype</h4>
+				<div class="bottomMargin panel panel-default leftMargin rightMargin">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-lg-2 topMargin">
+								<div class="checkbox ">
+									<label>
+									<input checked.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].active" id="activeSubtypesCheckBox" type="checkbox"> Active
+								</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label for="editKey" class="col-sm-2 control-label hideOnPhone">Key</label>
+									<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].type" id="editKey" class="form-control " placeholder="Key"
+										type="text" />
+								</div>
+							</div>
+							<div class="col-lg-2 topMargin">
+								<div class="checkbox ">
+									<label>
+									<input checked.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].public" id="publicSubtypesCheckBox" type="checkbox"> Public
+								</label>
+								</div>
+							</div>
+							<div class="col-lg-2 topMargin">
+								<div class="checkbox ">
+									<label>
+									<input checked.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].appsRequired" id="appsSubtypesCheckBox" type="checkbox"> Applications Required
+								</label>
+								</div>
+							</div>
+							<div class="col-lg-2 topMargin">
+								<div class="checkbox ">
+									<label>
+									<input checked.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].clientRequried" id="clientSubtypesCheckBox" type="checkbox"> Client Required
+								</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label for="editDescription" class="col-sm-2 control-label hideOnPhone">Description</label>
+									<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].description" id="editSubtypeDescription" class="form-control " placeholder="Description"
+										type="text" />
+								</div>
+							</div>
+						</div>
+						<hr/>
+						<div class="row">	
+							<div class="col-lg-6">
+								<div class="form-group">
+									<label for="editInputForm" class="col-sm-4 control-label hideOnPhone">Input Form</label>
+									<textarea readonly value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].inputForm" id="editInputForm" class="form-control " placeholder="Input Form" rows="20" ></textarea>
+								</div>
+							</div>
+							<div class="bottomMargin panel panel-default col-lg-5">
+								<div class="panel-body">
+									<label class="col-sm-12 control-label hideOnPhone">Preview</label>
+									<div innerhtml.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].inputForm"></div>
+								</div>
+							</div>
+						</div>
+						<div class="row">	
+							<div class="col-lg-6">
+								<div class="form-group">
+									<label for="editOutputForm" class="col-sm-4 control-label hideOnPhone">Output Form</label>
+									<textarea readonly value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].outputForm" id="editOutputForm" class="form-control " placeholder="Input Form" rows="20" ></textarea>
+								</div>
+							</div>
+							<div class="bottomMargin panel panel-default col-lg-5">
+								<div class="panel-body">
+									<label class="col-sm-12 control-label hideOnPhone">Preview</label>
+									<div innerhtml.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].outputForm"></div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group topMargin col-lg-5">
+								<select value.bind="selectedValidationRules" change.delegate="selectCategory()" id="validation" class="form-control">
+								<option value="-1">Select a Rule</option>
+								<option repeat.for="type of helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation"
+										value.bind="$index">${type.rule} - ${type.value}</option>
+								</select>
+							</div>
+							<div show.bind="selectedValidationRules > -1" class="col-lg-6">
+								<div class="col-lg-10">
+									<div class="form-group">
+										<label for="editRule" class="col-sm-2 control-label hideOnPhone">Rule</label>
+										<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].rule" id="editRule" class="form-control" placeholder="Rule"
+											type="text" />
+									</div>
+									<div class="form-group">
+										<label for="editRule" class="col-sm-2 control-label hideOnPhone">Value</label>
+										<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].value" id="editRule" class="form-control" placeholder="Value"
+											type="text" />
+									</div>
+									<div class="form-group">
+										<label for="editRule" class="col-sm-2 control-label hideOnPhone">Message</label>
+										<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].message" id="editRule" class="form-control" placeholder="Message"
+											type="text" />
+									</div>
+									<div class="form-group">
+										<label for="editRule" class="col-sm-2 control-label hideOnPhone">Control</label>
+										<input value.bind="helpTickets.selectedHelpTicketType.subtypes[selectedSubtype].validation[selectedValidationRules].control" id="editRule" class="form-control" placeholder="Control"
+											type="text" />
+									</div>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+			<compose view="./document.html"></compose>
+		</div>
+      </div>
+	
+    </div>
+</template>

@@ -1,0 +1,26 @@
+<template>
+
+   <!-- Category Select -->
+  <div class="form-group">
+    <select value.bind="helpTickets.selectedHelpTicket.helpTicketCategory" change.delegate="categoryChanged()" id="helpTicketCategory" class="form-control">
+          <option value="-1">Select the help ticket category</option>
+          <option repeat.for="types of helpTickets.helpTicketTypesArray" 
+                  model.bind="types.category">${types.description}</option>
+        </select>
+  </div>
+
+   <!-- Type Select -->
+  <div class="form-group">
+    <select show.bind="showTypes" value.bind="helpTicketType" change.delegate="typeChanged($event)" id="helpTicketPurpose"
+      class="form-control">
+          <option value="NULL">Select the help ticket type</option>
+          <option repeat.for="types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes"
+                  model.bind="types.type">${types.description}</option>
+        </select>
+  </div>
+
+  <div show.bind="helpTicketTypeMessage">
+    <div class="well well-sm" innerhtml.bind="helpTicketTypeMessage"></div>
+  </div>
+  
+</template>

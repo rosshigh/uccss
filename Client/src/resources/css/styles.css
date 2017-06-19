@@ -226,3 +226,47 @@ span i {
 .smart-timeline-time{float:left;width:70px;text-align:right}
 .smart-timeline-time>small{font-style:italic}
 .smart-timeline-content{margin-left:123px}
+
+
+/****** Style Star Rating Widget *****/
+
+.rating { 
+  border: none;
+  float: left;
+}
+
+.rating > span > input { display: none; } 
+.rating > span > label:before { 
+  margin: 5px;
+  font-size: 1.25em;
+  font-family: FontAwesome;
+  display: inline-block;
+  content: "\f005";
+}
+
+.rating > span > .half:before { 
+  content: "\f089";
+  position: absolute;
+}
+
+.rating > span > label { 
+    color: #ddd; 
+    float: right; 
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.rating > span > input:checked ~ label, /* show gold star when clicked */
+.rating:not(:checked) > span > label:hover, /* hover current star */
+.rating:not(:checked) > span > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+.rating > span > input:checked + label:hover, /* hover current star when changing rating */
+.rating > span >  input:checked ~ label:hover,
+.rating > span > label:hover ~ input:checked ~ label, /* lighten current selection */
+.rating > span > input:checked ~ label:hover ~ label { color: #FFED85;  }
+
+.link-shadow {
+    -webkit-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+    -moz-box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+    box-shadow: 3px 4px 11px 0px rgba(105,97,105,1);
+}

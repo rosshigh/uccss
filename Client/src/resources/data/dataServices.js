@@ -230,8 +230,8 @@ export class DataServices {
     // PASSWORD_RESET = 'passwordReset';
     // NOTES_SERVICE = "notes";
 
-    CURRICULUM_SERVICE = 'curriculum';
-    CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
+    // CURRICULUM_SERVICE = 'curriculum';
+    // CURRICULUM_CATEGORY_SERVICE = 'curriculumcategory';
 
     // //IS4UA Services
     IS4UA = 'is4ua';

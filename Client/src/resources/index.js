@@ -2,6 +2,7 @@ export function configure(config) {
   config.globalResources([
     './editor/editor',
     './elements/nav-bar',
+    './elements/rate-it',
     './elements/loading-indicator',
     './elements/table-navigation-bar',
     './elements/flat-picker',
@@ -14,7 +15,7 @@ export function configure(config) {
     './value-converters/ucc-title',
     './value-converters/phone-number',
     './value-converters/lookup-value',
-     './value-converters/sandbox',
+    './value-converters/sandbox',
     './value-converters/idsRequested',
     './value-converters/person-status-button',
     './value-converters/session-status-button',
@@ -27,6 +28,9 @@ export function configure(config) {
     './value-converters/help-ticket-type',
     './value-converters/help-ticket-subtypes',
     './value-converters/session',
-    './value-converters/sort-date-time'
+    './value-converters/sort-date-time',
+    './value-converters/file-type',
+    './value-converters/format-digits',
+    './value-converters/onoff-switch'
   ]);
 }
