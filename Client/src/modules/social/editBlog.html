@@ -1,0 +1,12 @@
+<template>
+	<div class="panel panel-info">  
+      <div class="panel-body">
+        <div class="row">
+			<div show.bind="!blogSelected" class="container">
+				<compose view="./components/blogListUCC.html"></compose>
+			</div>
+            <div show.bind="blogSelected" class="col-lg-12">
+                <compose view="./components/blogPageUCC.html"></compose>
+            </div> 
+      </div> 
+</template>

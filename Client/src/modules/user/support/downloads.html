@@ -32,7 +32,7 @@
                             <tr repeat.for="item of dataTable.displayArray">
                                 <td data-title="name" class="col-md-2">${item.name}</td>
                                 <td data-title="originalFilename" class="col-md-2">
-                                    <a href="${config.DOWNLOAD_FILE_DOWNLOAD_URL}/${typeSelected}/${item.file.originalFilename}" target="_blank">${item.file.originalFilename}</a>
+                                    <a href="${config.DOWNLOAD_URL}/downloads/${typeSelected}/${item.file.originalFilename}" target="_blank">${item.file.originalFilename}</a>
                                 </td>
                                 <td data-title="description" class="col-md-8">
                                     <div>${item.description}</div>

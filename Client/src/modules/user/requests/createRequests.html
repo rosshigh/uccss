@@ -1,0 +1,84 @@
+<template>
+<require from="fuelux/css/fuelux.min.css"></require>
+<require from="flatpickr/flatpickr.css"></require>
+<div class="row">
+ <span  show.bind="showLockMessage" class="leftMargin bottomMargin" >Request is currently locked by ${lockObject.personId | lookupValue:people.peopleArray:"_id":'fullName'}</span>
+ 
+</div>
+  <div class="fuelux col-lg-7 blackText" style="height:1000px;">
+    <div class="wizard" data-initialize="wizard" id="myWizard">
+      <div class="steps-container">
+        <ul class="steps">
+          <li data-step="1"  data-target="#step1" class="active">
+            <span class="badge badge-info">1</span>Step 1<span class="chevron"></span>
+          </li>
+          <li data-step="2" data-target="#step2">
+            <span class="badge">2</span>Step 2<span class="chevron"></span>
+          </li>
+          <li data-step="3" data-target="#step3">
+            <span class="badge">3</span>Step 3<span class="chevron"></span>
+          </li>
+          <li data-step="4" data-target="#step4">
+            <span class="badge">4</span>Step 4<span class="chevron"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-default btn-prev btn-md">
+           <span><i class="fa fa-chevron-left" aria-hidden="true"></i></span>Prev</button>
+        <button type="button" class="btn btn-primary btn-next btn-md" data-last="Complete">Next
+          <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span>
+        </button>
+      </div>
+      <div class="step-content">
+
+        <div class="step-pane active" id="step1" data-step="1">
+          <h3><strong>Step 1 </strong> - Course Information</h3>
+          <compose view="./components/client-request-step1.html"></compose>
+        </div>
+
+        <div class="step-pane" id="step2"  data-step="2">
+          <h3><strong>Step 2 </strong> - Products</h3>
+
+          <compose view="./components/client-request-step2.html"></compose>
+
+        </div>
+
+        <div class="step-pane" id="step3"  data-step="3">
+          <h3><strong>Step 3 </strong> - Additional Comments</h3>
+          <compose view="./components/client-request-step3.html"></compose>
+        </div>
+
+        <div class="step-pane" id="step4"  data-step="4">
+          <h3><strong>Step 4 </strong> - Requested Dates</h3>
+          <compose view="./components/client-request-step4.html"></compose>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 leftMargin" id="SessionInfo">
+			<h2 class="underline">Current Sessions</h2>
+			<div class="list-group">
+				<a class="list-group-item" repeat.for="session of sessions.sessionsArray">
+					<h4 class="list-group-item-heading">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>
+					<p class="list-group-item-text">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+					<p class="list-group-item-text">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
+				</a>
+    </div>
+  </div>
+  <div show.bind="sessionSelected" class="topMargin col-lg-4 leftMargin"><h4>Session: ${sessions.selectedSession.session} - ${sessions.selectedSession.year}</h4></div> 
+  <div show.bind="sandBoxClient" class="topMargin col-lg-4 leftMargin"><h4>Course: ${config.SANDBOX_NAME}</h4></div> 
+  <div show.bind="courseSelected" class="topMargin col-lg-4 leftMargin"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> 
+  <div class="topMargin col-lg-4 leftMargin" style="display: none;" id="existingRequestInfo"></div>
+
+  <div id="curriculumInfo" class="topMargin col-lg-4 leftMargin" >
+    <div class="panel panel-default" >
+      <div class="panel-heading">${productInfoObject.header}</div>
+      <div class="panel-body" innerhtml.bind="productInfoObject.info"></div>
+    </div>
+  </div>
+</div>
+  
+</template>

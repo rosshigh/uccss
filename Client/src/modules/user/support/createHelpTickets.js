@@ -277,7 +277,7 @@ export class CreateHelpTickets{
         } else {
             this.helpTickets.selectedHelpTicket.requestId = this.SelectedClientRequest._id;
             this.helpTickets.selectedHelpTicket.systemId = this.SelectedClientRequest.systemId;
-            this.helpTickets.selectedHelpTicket.clientId = this.SelectedClientRequest.clientId;
+            this.helpTickets.selectedHelpTicket.client = this.SelectedClientRequest.client;
             this.helpTickets.selectedHelpTicket.productId = this.SelectedClientRequest.productId;
             this.helpTickets.selectedHelpTicket.courseId = this.SelectedClientRequest.courseId;
         }

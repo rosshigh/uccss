@@ -160,16 +160,16 @@ export class ViewHelpTickets {
   async getDetails(){
     this.showRequestDetails = false;
     if(this.helpTickets.selectedHelpTicket.requestId){
-      if(this.helpTickets.selectedHelpTicket.systemId){
-        this.showRequestDetails = true;
-        for(var i = 0; i < this.systems.systemsArray.length; i++){
-          if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
-            this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
-            break;
-          }
-        }
+      if(this.helpTickets.selectedHelpTicket.requestId.assignments && this.helpTickets.selectedHelpTicket.requestId.assignments.length > 0) this.showRequestDetails = true;
+      this.showCourse = false;
+      this.course = "";
+      this.showCourse = true;
+      if(this.helpTickets.selectedHelpTicket.courseId) {
+        this.course = this.helpTickets.selectedHelpTicket.courseId.number + " - " + this.helpTickets.selectedHelpTicket.courseId.name;
+      } else {
+        this.course = this.config.SANDBOX_NAME
       }
-    }
+    } 
   }
 
   getName(){

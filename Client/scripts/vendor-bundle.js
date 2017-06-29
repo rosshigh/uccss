@@ -13423,6 +13423,159 @@ define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], 
     return protocol + '//' + hostname + (port ? ':' + port : '');
   }
 });
+define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  
+
+  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
+    
+
+    this.src = src;
+    this.name = name;
+  };
+
+  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
+    function TemplateRegistryEntry(address) {
+      
+
+      this.templateIsLoaded = false;
+      this.factoryIsReady = false;
+      this.resources = null;
+      this.dependencies = null;
+
+      this.address = address;
+      this.onReady = null;
+      this._template = null;
+      this._factory = null;
+    }
+
+    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
+      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
+
+      this.dependencies.push(new TemplateDependency(finalSrc, name));
+    };
+
+    _createClass(TemplateRegistryEntry, [{
+      key: 'template',
+      get: function get() {
+        return this._template;
+      },
+      set: function set(value) {
+        var address = this.address;
+        var requires = void 0;
+        var current = void 0;
+        var src = void 0;
+        var dependencies = void 0;
+
+        this._template = value;
+        this.templateIsLoaded = true;
+
+        requires = value.content.querySelectorAll('require');
+        dependencies = this.dependencies = new Array(requires.length);
+
+        for (var i = 0, ii = requires.length; i < ii; ++i) {
+          current = requires[i];
+          src = current.getAttribute('from');
+
+          if (!src) {
+            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
+          }
+
+          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
+
+          if (current.parentNode) {
+            current.parentNode.removeChild(current);
+          }
+        }
+      }
+    }, {
+      key: 'factory',
+      get: function get() {
+        return this._factory;
+      },
+      set: function set(value) {
+        this._factory = value;
+        this.factoryIsReady = true;
+      }
+    }]);
+
+    return TemplateRegistryEntry;
+  }();
+
+  var Loader = exports.Loader = function () {
+    function Loader() {
+      
+
+      this.templateRegistry = {};
+    }
+
+    Loader.prototype.map = function map(id, source) {
+      throw new Error('Loaders must implement map(id, source).');
+    };
+
+    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
+    };
+
+    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
+      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
+    };
+
+    Loader.prototype.loadModule = function loadModule(id) {
+      throw new Error('Loaders must implement loadModule(id).');
+    };
+
+    Loader.prototype.loadAllModules = function loadAllModules(ids) {
+      throw new Error('Loader must implement loadAllModules(ids).');
+    };
+
+    Loader.prototype.loadTemplate = function loadTemplate(url) {
+      throw new Error('Loader must implement loadTemplate(url).');
+    };
+
+    Loader.prototype.loadText = function loadText(url) {
+      throw new Error('Loader must implement loadText(url).');
+    };
+
+    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
+      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
+    };
+
+    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
+      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
+    };
+
+    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
+      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
+    };
+
+    return Loader;
+  }();
+});
 define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'aurelia-metadata'], function (exports, _aureliaLoader, _aureliaPal, _aureliaMetadata) {
   'use strict';
 
@@ -13706,159 +13859,6 @@ define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'au
       }));
     };
   }
-});
-define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Loader = exports.TemplateRegistryEntry = exports.TemplateDependency = undefined;
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  
-
-  var TemplateDependency = exports.TemplateDependency = function TemplateDependency(src, name) {
-    
-
-    this.src = src;
-    this.name = name;
-  };
-
-  var TemplateRegistryEntry = exports.TemplateRegistryEntry = function () {
-    function TemplateRegistryEntry(address) {
-      
-
-      this.templateIsLoaded = false;
-      this.factoryIsReady = false;
-      this.resources = null;
-      this.dependencies = null;
-
-      this.address = address;
-      this.onReady = null;
-      this._template = null;
-      this._factory = null;
-    }
-
-    TemplateRegistryEntry.prototype.addDependency = function addDependency(src, name) {
-      var finalSrc = typeof src === 'string' ? (0, _aureliaPath.relativeToFile)(src, this.address) : _aureliaMetadata.Origin.get(src).moduleId;
-
-      this.dependencies.push(new TemplateDependency(finalSrc, name));
-    };
-
-    _createClass(TemplateRegistryEntry, [{
-      key: 'template',
-      get: function get() {
-        return this._template;
-      },
-      set: function set(value) {
-        var address = this.address;
-        var requires = void 0;
-        var current = void 0;
-        var src = void 0;
-        var dependencies = void 0;
-
-        this._template = value;
-        this.templateIsLoaded = true;
-
-        requires = value.content.querySelectorAll('require');
-        dependencies = this.dependencies = new Array(requires.length);
-
-        for (var i = 0, ii = requires.length; i < ii; ++i) {
-          current = requires[i];
-          src = current.getAttribute('from');
-
-          if (!src) {
-            throw new Error('<require> element in ' + address + ' has no "from" attribute.');
-          }
-
-          dependencies[i] = new TemplateDependency((0, _aureliaPath.relativeToFile)(src, address), current.getAttribute('as'));
-
-          if (current.parentNode) {
-            current.parentNode.removeChild(current);
-          }
-        }
-      }
-    }, {
-      key: 'factory',
-      get: function get() {
-        return this._factory;
-      },
-      set: function set(value) {
-        this._factory = value;
-        this.factoryIsReady = true;
-      }
-    }]);
-
-    return TemplateRegistryEntry;
-  }();
-
-  var Loader = exports.Loader = function () {
-    function Loader() {
-      
-
-      this.templateRegistry = {};
-    }
-
-    Loader.prototype.map = function map(id, source) {
-      throw new Error('Loaders must implement map(id, source).');
-    };
-
-    Loader.prototype.normalizeSync = function normalizeSync(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalizeSync(moduleId, relativeTo).');
-    };
-
-    Loader.prototype.normalize = function normalize(moduleId, relativeTo) {
-      throw new Error('Loaders must implement normalize(moduleId: string, relativeTo: string): Promise<string>.');
-    };
-
-    Loader.prototype.loadModule = function loadModule(id) {
-      throw new Error('Loaders must implement loadModule(id).');
-    };
-
-    Loader.prototype.loadAllModules = function loadAllModules(ids) {
-      throw new Error('Loader must implement loadAllModules(ids).');
-    };
-
-    Loader.prototype.loadTemplate = function loadTemplate(url) {
-      throw new Error('Loader must implement loadTemplate(url).');
-    };
-
-    Loader.prototype.loadText = function loadText(url) {
-      throw new Error('Loader must implement loadText(url).');
-    };
-
-    Loader.prototype.applyPluginToUrl = function applyPluginToUrl(url, pluginName) {
-      throw new Error('Loader must implement applyPluginToUrl(url, pluginName).');
-    };
-
-    Loader.prototype.addPlugin = function addPlugin(pluginName, implementation) {
-      throw new Error('Loader must implement addPlugin(pluginName, implementation).');
-    };
-
-    Loader.prototype.getOrCreateTemplateRegistryEntry = function getOrCreateTemplateRegistryEntry(address) {
-      return this.templateRegistry[address] || (this.templateRegistry[address] = new TemplateRegistryEntry(address));
-    };
-
-    return Loader;
-  }();
 });
 define('aurelia-logging',['exports'], function (exports) {
   'use strict';
@@ -24114,6 +24114,7 @@ define('aurelia-templating-binding',['exports', 'aurelia-logging', 'aurelia-bind
     config.container.registerAlias(_aureliaTemplating.BindingLanguage, TemplatingBindingLanguage);
   }
 });
+define('text',{});
 define('aurelia-templating-resources/aurelia-templating-resources',['exports', 'aurelia-pal', './compose', './if', './with', './repeat', './show', './hide', './sanitize-html', './replaceable', './focus', 'aurelia-templating', './css-resource', './html-sanitizer', './attr-binding-behavior', './binding-mode-behaviors', './throttle-binding-behavior', './debounce-binding-behavior', './self-binding-behavior', './signal-binding-behavior', './binding-signaler', './update-trigger-binding-behavior', './abstract-repeater', './repeat-strategy-locator', './html-resource-plugin', './null-repeat-strategy', './array-repeat-strategy', './map-repeat-strategy', './set-repeat-strategy', './number-repeat-strategy', './repeat-utilities', './analyze-view-factory', './aurelia-hide-style'], function (exports, _aureliaPal, _compose, _if, _with, _repeat, _show, _hide, _sanitizeHtml, _replaceable, _focus, _aureliaTemplating, _cssResource, _htmlSanitizer, _attrBindingBehavior, _bindingModeBehaviors, _throttleBindingBehavior, _debounceBindingBehavior, _selfBindingBehavior, _signalBindingBehavior, _bindingSignaler, _updateTriggerBindingBehavior, _abstractRepeater, _repeatStrategyLocator, _htmlResourcePlugin, _nullRepeatStrategy, _arrayRepeatStrategy, _mapRepeatStrategy, _setRepeatStrategy, _numberRepeatStrategy, _repeatUtilities, _analyzeViewFactory, _aureliaHideStyle) {
   'use strict';
 
@@ -26428,6 +26429,479 @@ var use = exports.use = _i18next2.default.use.bind(_i18next2.default);
 });
 ;define('i18next', ['i18next/index'], function (main) { return main; });
 
+define('regenerator-runtime/runtime-module',['require','exports','module','./runtime'],function (require, exports, module) {// This method of obtaining a reference to the global object needs to be
+// kept identical to the way it is obtained in runtime.js
+var g =
+  typeof global === "object" ? global :
+  typeof window === "object" ? window :
+  typeof self === "object" ? self : this;
+
+// Use `getOwnPropertyNames` because not all browsers support calling
+// `hasOwnProperty` on the global `self` object in a worker. See #183.
+var hadRuntime = g.regeneratorRuntime &&
+  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+// Save the old regeneratorRuntime in case it needs to be restored later.
+var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+// Force reevalutation of runtime.js.
+g.regeneratorRuntime = undefined;
+
+module.exports = require("./runtime");
+
+if (hadRuntime) {
+  // Restore the original runtime.
+  g.regeneratorRuntime = oldRuntime;
+} else {
+  // Remove the global property added by runtime.js.
+  try {
+    delete g.regeneratorRuntime;
+  } catch(e) {
+    g.regeneratorRuntime = undefined;
+  }
+}
+
+});
+;define('regenerator-runtime', ['regenerator-runtime/runtime-module'], function (main) { return main; });
+
+/*
+ * Toastr
+ * Copyright 2012-2015
+ * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
+ * All Rights Reserved.
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and
+ * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
+ *
+ * ARIA Support: Greta Krafsig
+ *
+ * Project: https://github.com/CodeSeven/toastr
+ */
+/* global define */
+; (function (define) {
+    define('toastr/toastr',['jquery'], function ($) {
+        return (function () {
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                error: 'error',
+                info: 'info',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.2',
+                warning: warning
+            };
+
+            var previousToast;
+
+            return toastr;
+
+            ////////////////
+
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
+            }
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function subscribe(callback) {
+                listener = callback;
+            }
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass)
+                    .attr('aria-live', 'polite')
+                    .attr('role', 'alert');
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true,
+                    toastClass: 'toast',
+                    containerId: 'toast-container',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut',
+                    hideDuration: 1000,
+                    hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false,
+                    closeDuration: false,
+                    closeEasing: false,
+
+                    extendedTimeOut: 1000,
+                    iconClasses: {
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+
+                displayToast();
+
+                handleEvents();
+
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null)
+                        source = "";
+
+                    return new String(source)
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setCloseButton();
+                    setProgressBar();
+                    setSequence();
+                }
+
+                function handleEvents() {
+                    $toastElement.hover(stickAround, delayedHideToast);
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        $titleElement.append(!options.escapeHtml ? map.title : escapeHtml(map.title)).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        $messageElement.append(!options.escapeHtml ? map.message : escapeHtml(map.message)).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass('toast-close-button').attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass('toast-progress');
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
+    });
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
+    if (typeof module !== 'undefined' && module.exports) { //Node
+        module.exports = factory(require('jquery'));
+    } else {
+        window.toastr = factory(window.jQuery);
+    }
+}));
+;define('toastr', ['toastr/toastr'], function (main) { return main; });
+
+define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #ffffff;\n}\n.toast-message a:hover {\n  color: #cccccc;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #ffffff;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > :hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51a351;\n}\n.toast-error {\n  background-color: #bd362f;\n}\n.toast-info {\n  background-color: #2f96b4;\n}\n.toast-warning {\n  background-color: #f89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n}\n"; });
 define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configuration", "./ux-dialog", "./ux-dialog-header", "./ux-dialog-body", "./ux-dialog-footer", "./attach-focus", "./dialog-settings", "./dialog-configuration", "./renderer", "./dialog-cancel-error", "./dialog-service", "./dialog-controller"], function (require, exports, dialog_configuration_1, ux_dialog_1, ux_dialog_header_1, ux_dialog_body_1, ux_dialog_footer_1, attach_focus_1, dialog_settings_1, dialog_configuration_2, renderer_1, dialog_cancel_error_1, dialog_service_1, dialog_controller_1) {
     "use strict";
     function __export(m) {
@@ -26460,6 +26934,485 @@ define('aurelia-dialog/aurelia-dialog',["require", "exports", "./dialog-configur
 });
 ;define('aurelia-dialog', ['aurelia-dialog/aurelia-dialog'], function (main) { return main; });
 
+/* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
+ * @license MIT */
+
+;(function(root, factory) {
+
+  if (typeof define === 'function' && define.amd) {
+    define('nprogress/nprogress',factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory();
+  } else {
+    root.NProgress = factory();
+  }
+
+})(this, function() {
+  var NProgress = {};
+
+  NProgress.version = '0.2.0';
+
+  var Settings = NProgress.settings = {
+    minimum: 0.08,
+    easing: 'ease',
+    positionUsing: '',
+    speed: 200,
+    trickle: true,
+    trickleRate: 0.02,
+    trickleSpeed: 800,
+    showSpinner: true,
+    barSelector: '[role="bar"]',
+    spinnerSelector: '[role="spinner"]',
+    parent: 'body',
+    template: '<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
+  };
+
+  /**
+   * Updates configuration.
+   *
+   *     NProgress.configure({
+   *       minimum: 0.1
+   *     });
+   */
+  NProgress.configure = function(options) {
+    var key, value;
+    for (key in options) {
+      value = options[key];
+      if (value !== undefined && options.hasOwnProperty(key)) Settings[key] = value;
+    }
+
+    return this;
+  };
+
+  /**
+   * Last number.
+   */
+
+  NProgress.status = null;
+
+  /**
+   * Sets the progress bar status, where `n` is a number from `0.0` to `1.0`.
+   *
+   *     NProgress.set(0.4);
+   *     NProgress.set(1.0);
+   */
+
+  NProgress.set = function(n) {
+    var started = NProgress.isStarted();
+
+    n = clamp(n, Settings.minimum, 1);
+    NProgress.status = (n === 1 ? null : n);
+
+    var progress = NProgress.render(!started),
+        bar      = progress.querySelector(Settings.barSelector),
+        speed    = Settings.speed,
+        ease     = Settings.easing;
+
+    progress.offsetWidth; /* Repaint */
+
+    queue(function(next) {
+      // Set positionUsing if it hasn't already been set
+      if (Settings.positionUsing === '') Settings.positionUsing = NProgress.getPositioningCSS();
+
+      // Add transition
+      css(bar, barPositionCSS(n, speed, ease));
+
+      if (n === 1) {
+        // Fade out
+        css(progress, { 
+          transition: 'none', 
+          opacity: 1 
+        });
+        progress.offsetWidth; /* Repaint */
+
+        setTimeout(function() {
+          css(progress, { 
+            transition: 'all ' + speed + 'ms linear', 
+            opacity: 0 
+          });
+          setTimeout(function() {
+            NProgress.remove();
+            next();
+          }, speed);
+        }, speed);
+      } else {
+        setTimeout(next, speed);
+      }
+    });
+
+    return this;
+  };
+
+  NProgress.isStarted = function() {
+    return typeof NProgress.status === 'number';
+  };
+
+  /**
+   * Shows the progress bar.
+   * This is the same as setting the status to 0%, except that it doesn't go backwards.
+   *
+   *     NProgress.start();
+   *
+   */
+  NProgress.start = function() {
+    if (!NProgress.status) NProgress.set(0);
+
+    var work = function() {
+      setTimeout(function() {
+        if (!NProgress.status) return;
+        NProgress.trickle();
+        work();
+      }, Settings.trickleSpeed);
+    };
+
+    if (Settings.trickle) work();
+
+    return this;
+  };
+
+  /**
+   * Hides the progress bar.
+   * This is the *sort of* the same as setting the status to 100%, with the
+   * difference being `done()` makes some placebo effect of some realistic motion.
+   *
+   *     NProgress.done();
+   *
+   * If `true` is passed, it will show the progress bar even if its hidden.
+   *
+   *     NProgress.done(true);
+   */
+
+  NProgress.done = function(force) {
+    if (!force && !NProgress.status) return this;
+
+    return NProgress.inc(0.3 + 0.5 * Math.random()).set(1);
+  };
+
+  /**
+   * Increments by a random amount.
+   */
+
+  NProgress.inc = function(amount) {
+    var n = NProgress.status;
+
+    if (!n) {
+      return NProgress.start();
+    } else {
+      if (typeof amount !== 'number') {
+        amount = (1 - n) * clamp(Math.random() * n, 0.1, 0.95);
+      }
+
+      n = clamp(n + amount, 0, 0.994);
+      return NProgress.set(n);
+    }
+  };
+
+  NProgress.trickle = function() {
+    return NProgress.inc(Math.random() * Settings.trickleRate);
+  };
+
+  /**
+   * Waits for all supplied jQuery promises and
+   * increases the progress as the promises resolve.
+   *
+   * @param $promise jQUery Promise
+   */
+  (function() {
+    var initial = 0, current = 0;
+
+    NProgress.promise = function($promise) {
+      if (!$promise || $promise.state() === "resolved") {
+        return this;
+      }
+
+      if (current === 0) {
+        NProgress.start();
+      }
+
+      initial++;
+      current++;
+
+      $promise.always(function() {
+        current--;
+        if (current === 0) {
+            initial = 0;
+            NProgress.done();
+        } else {
+            NProgress.set((initial - current) / initial);
+        }
+      });
+
+      return this;
+    };
+
+  })();
+
+  /**
+   * (Internal) renders the progress bar markup based on the `template`
+   * setting.
+   */
+
+  NProgress.render = function(fromStart) {
+    if (NProgress.isRendered()) return document.getElementById('nprogress');
+
+    addClass(document.documentElement, 'nprogress-busy');
+    
+    var progress = document.createElement('div');
+    progress.id = 'nprogress';
+    progress.innerHTML = Settings.template;
+
+    var bar      = progress.querySelector(Settings.barSelector),
+        perc     = fromStart ? '-100' : toBarPerc(NProgress.status || 0),
+        parent   = document.querySelector(Settings.parent),
+        spinner;
+    
+    css(bar, {
+      transition: 'all 0 linear',
+      transform: 'translate3d(' + perc + '%,0,0)'
+    });
+
+    if (!Settings.showSpinner) {
+      spinner = progress.querySelector(Settings.spinnerSelector);
+      spinner && removeElement(spinner);
+    }
+
+    if (parent != document.body) {
+      addClass(parent, 'nprogress-custom-parent');
+    }
+
+    parent.appendChild(progress);
+    return progress;
+  };
+
+  /**
+   * Removes the element. Opposite of render().
+   */
+
+  NProgress.remove = function() {
+    removeClass(document.documentElement, 'nprogress-busy');
+    removeClass(document.querySelector(Settings.parent), 'nprogress-custom-parent');
+    var progress = document.getElementById('nprogress');
+    progress && removeElement(progress);
+  };
+
+  /**
+   * Checks if the progress bar is rendered.
+   */
+
+  NProgress.isRendered = function() {
+    return !!document.getElementById('nprogress');
+  };
+
+  /**
+   * Determine which positioning CSS rule to use.
+   */
+
+  NProgress.getPositioningCSS = function() {
+    // Sniff on document.body.style
+    var bodyStyle = document.body.style;
+
+    // Sniff prefixes
+    var vendorPrefix = ('WebkitTransform' in bodyStyle) ? 'Webkit' :
+                       ('MozTransform' in bodyStyle) ? 'Moz' :
+                       ('msTransform' in bodyStyle) ? 'ms' :
+                       ('OTransform' in bodyStyle) ? 'O' : '';
+
+    if (vendorPrefix + 'Perspective' in bodyStyle) {
+      // Modern browsers with 3D support, e.g. Webkit, IE10
+      return 'translate3d';
+    } else if (vendorPrefix + 'Transform' in bodyStyle) {
+      // Browsers without 3D support, e.g. IE9
+      return 'translate';
+    } else {
+      // Browsers without translate() support, e.g. IE7-8
+      return 'margin';
+    }
+  };
+
+  /**
+   * Helpers
+   */
+
+  function clamp(n, min, max) {
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
+  }
+
+  /**
+   * (Internal) converts a percentage (`0..1`) to a bar translateX
+   * percentage (`-100%..0%`).
+   */
+
+  function toBarPerc(n) {
+    return (-1 + n) * 100;
+  }
+
+
+  /**
+   * (Internal) returns the correct CSS for changing the bar's
+   * position given an n percentage, and speed and ease from Settings
+   */
+
+  function barPositionCSS(n, speed, ease) {
+    var barCSS;
+
+    if (Settings.positionUsing === 'translate3d') {
+      barCSS = { transform: 'translate3d('+toBarPerc(n)+'%,0,0)' };
+    } else if (Settings.positionUsing === 'translate') {
+      barCSS = { transform: 'translate('+toBarPerc(n)+'%,0)' };
+    } else {
+      barCSS = { 'margin-left': toBarPerc(n)+'%' };
+    }
+
+    barCSS.transition = 'all '+speed+'ms '+ease;
+
+    return barCSS;
+  }
+
+  /**
+   * (Internal) Queues a function to be executed.
+   */
+
+  var queue = (function() {
+    var pending = [];
+    
+    function next() {
+      var fn = pending.shift();
+      if (fn) {
+        fn(next);
+      }
+    }
+
+    return function(fn) {
+      pending.push(fn);
+      if (pending.length == 1) next();
+    };
+  })();
+
+  /**
+   * (Internal) Applies css properties to an element, similar to the jQuery 
+   * css method.
+   *
+   * While this helper does assist with vendor prefixed property names, it 
+   * does not perform any manipulation of values prior to setting styles.
+   */
+
+  var css = (function() {
+    var cssPrefixes = [ 'Webkit', 'O', 'Moz', 'ms' ],
+        cssProps    = {};
+
+    function camelCase(string) {
+      return string.replace(/^-ms-/, 'ms-').replace(/-([\da-z])/gi, function(match, letter) {
+        return letter.toUpperCase();
+      });
+    }
+
+    function getVendorProp(name) {
+      var style = document.body.style;
+      if (name in style) return name;
+
+      var i = cssPrefixes.length,
+          capName = name.charAt(0).toUpperCase() + name.slice(1),
+          vendorName;
+      while (i--) {
+        vendorName = cssPrefixes[i] + capName;
+        if (vendorName in style) return vendorName;
+      }
+
+      return name;
+    }
+
+    function getStyleProp(name) {
+      name = camelCase(name);
+      return cssProps[name] || (cssProps[name] = getVendorProp(name));
+    }
+
+    function applyCss(element, prop, value) {
+      prop = getStyleProp(prop);
+      element.style[prop] = value;
+    }
+
+    return function(element, properties) {
+      var args = arguments,
+          prop, 
+          value;
+
+      if (args.length == 2) {
+        for (prop in properties) {
+          value = properties[prop];
+          if (value !== undefined && properties.hasOwnProperty(prop)) applyCss(element, prop, value);
+        }
+      } else {
+        applyCss(element, args[1], args[2]);
+      }
+    }
+  })();
+
+  /**
+   * (Internal) Determines if an element or space separated list of class names contains a class name.
+   */
+
+  function hasClass(element, name) {
+    var list = typeof element == 'string' ? element : classList(element);
+    return list.indexOf(' ' + name + ' ') >= 0;
+  }
+
+  /**
+   * (Internal) Adds a class to an element.
+   */
+
+  function addClass(element, name) {
+    var oldList = classList(element),
+        newList = oldList + name;
+
+    if (hasClass(oldList, name)) return; 
+
+    // Trim the opening space.
+    element.className = newList.substring(1);
+  }
+
+  /**
+   * (Internal) Removes a class from an element.
+   */
+
+  function removeClass(element, name) {
+    var oldList = classList(element),
+        newList;
+
+    if (!hasClass(element, name)) return;
+
+    // Replace the class name.
+    newList = oldList.replace(' ' + name + ' ', ' ');
+
+    // Trim the opening and closing spaces.
+    element.className = newList.substring(1, newList.length - 1);
+  }
+
+  /**
+   * (Internal) Gets a space separated list of the class names on the element. 
+   * The list is wrapped with a single space on each end to facilitate finding 
+   * matches within the list.
+   */
+
+  function classList(element) {
+    return (' ' + (element.className || '') + ' ').replace(/\s+/gi, ' ');
+  }
+
+  /**
+   * (Internal) Removes an element from the DOM.
+   */
+
+  function removeElement(element) {
+    element && element.parentNode && element.parentNode.removeChild(element);
+  }
+
+  return NProgress;
+});
+
+;define('nprogress', ['nprogress/nprogress'], function (main) { return main; });
+
+define('text!nprogress/nprogress.css', ['module'], function(module) { module.exports = "/* Make clicks pass-through */\n#nprogress {\n  pointer-events: none;\n}\n\n#nprogress .bar {\n  background: #29d;\n\n  position: fixed;\n  z-index: 1031;\n  top: 0;\n  left: 0;\n\n  width: 100%;\n  height: 2px;\n}\n\n/* Fancy blur effect */\n#nprogress .peg {\n  display: block;\n  position: absolute;\n  right: 0px;\n  width: 100px;\n  height: 100%;\n  box-shadow: 0 0 10px #29d, 0 0 5px #29d;\n  opacity: 1.0;\n\n  -webkit-transform: rotate(3deg) translate(0px, -4px);\n      -ms-transform: rotate(3deg) translate(0px, -4px);\n          transform: rotate(3deg) translate(0px, -4px);\n}\n\n/* Remove these to get rid of the spinner */\n#nprogress .spinner {\n  display: block;\n  position: fixed;\n  z-index: 1031;\n  top: 15px;\n  right: 15px;\n}\n\n#nprogress .spinner-icon {\n  width: 18px;\n  height: 18px;\n  box-sizing: border-box;\n\n  border: solid 2px transparent;\n  border-top-color: #29d;\n  border-left-color: #29d;\n  border-radius: 50%;\n\n  -webkit-animation: nprogress-spinner 400ms linear infinite;\n          animation: nprogress-spinner 400ms linear infinite;\n}\n\n.nprogress-custom-parent {\n  overflow: hidden;\n  position: relative;\n}\n\n.nprogress-custom-parent #nprogress .spinner,\n.nprogress-custom-parent #nprogress .bar {\n  position: absolute;\n}\n\n@-webkit-keyframes nprogress-spinner {\n  0%   { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n@keyframes nprogress-spinner {\n  0%   { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n"; });
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -37558,41 +38511,6 @@ exports.isNumeric = isNumeric;
 //# sourceMappingURL=masker.js.map
 });
 
-define('regenerator-runtime/runtime-module',['require','exports','module','./runtime'],function (require, exports, module) {// This method of obtaining a reference to the global object needs to be
-// kept identical to the way it is obtained in runtime.js
-var g =
-  typeof global === "object" ? global :
-  typeof window === "object" ? window :
-  typeof self === "object" ? self : this;
-
-// Use `getOwnPropertyNames` because not all browsers support calling
-// `hasOwnProperty` on the global `self` object in a worker. See #183.
-var hadRuntime = g.regeneratorRuntime &&
-  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
-
-// Save the old regeneratorRuntime in case it needs to be restored later.
-var oldRuntime = hadRuntime && g.regeneratorRuntime;
-
-// Force reevalutation of runtime.js.
-g.regeneratorRuntime = undefined;
-
-module.exports = require("./runtime");
-
-if (hadRuntime) {
-  // Restore the original runtime.
-  g.regeneratorRuntime = oldRuntime;
-} else {
-  // Remove the global property added by runtime.js.
-  try {
-    delete g.regeneratorRuntime;
-  } catch(e) {
-    g.regeneratorRuntime = undefined;
-  }
-}
-
-});
-;define('regenerator-runtime', ['regenerator-runtime/runtime-module'], function (main) { return main; });
-
 define('flatpickr/flatpickr',['require','exports','module'],function (require, exports, module) {var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -39876,5477 +40794,6 @@ if (typeof module !== "undefined") module.exports = Flatpickr;
 define('text!flatpickr/flatpickr.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  overflow: hidden;\n  max-height: 0;\n  opacity: 0;\n  visibility: hidden;\n  text-align: center;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 315px;\n  box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: #fff;\n  box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  visibility: visible;\n  overflow: visible;\n  max-height: 640px;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.hasWeeks {\n  width: auto;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #e6e6e6;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #e6e6e6;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #fff;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-month {\n  background: transparent;\n  color: rgba(0,0,0,0.9);\n  fill: rgba(0,0,0,0.9);\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n}\n.flatpickr-prev-month,\n.flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px calc(3.57% - 1.5px);\n  z-index: 3;\n}\n.flatpickr-prev-month i,\n.flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-next-month.flatpickr-prev-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  left: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-next-month.flatpickr-next-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  right: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month:hover,\n.flatpickr-next-month:hover {\n  color: #959ea9;\n}\n.flatpickr-prev-month:hover svg,\n.flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-prev-month svg,\n.flatpickr-next-month svg {\n  width: 14px;\n}\n.flatpickr-prev-month svg path,\n.flatpickr-next-month svg path {\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(57,57,57,0.05);\n  box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n  top: 33%;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(57,57,57,0.6);\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(57,57,57,0.6);\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(0,0,0,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month.slideLeft {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideLeftNew {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRight {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRightNew {\n  -webkit-transform: translate3d(0, 0, 0px);\n          transform: translate3d(0, 0, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(0,0,0,0.9);\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  box-sizing: border-box;\n  color: inherit;\n  cursor: default;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: initial;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(0,0,0,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 315px;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  width: 315px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 315px;\n  min-width: 315px;\n  max-width: 315px;\n  box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft,\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideRight {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideRightNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  box-sizing: border-box;\n  color: #393939;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 40px;\n  height: 40px;\n  line-height: 40px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e6e6e6;\n  border-color: #e6e6e6;\n}\n.flatpickr-day.today {\n  border-color: #959ea9;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #959ea9;\n  background: #959ea9;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #569ff7;\n  box-shadow: none;\n  color: #fff;\n  border-color: #569ff7;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange,\n.flatpickr-day.startRange.startRange + .endRange,\n.flatpickr-day.endRange.startRange + .endRange {\n  box-shadow: -10px 0 0 #569ff7;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  box-shadow: -5px 0 0 #e6e6e6, 5px 0 0 #e6e6e6;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  pointer-events: none;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(57,57,57,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  box-shadow: -5px 0 0 #569ff7, 5px 0 0 #569ff7;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  box-shadow: 1px 0 0 #e6e6e6;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day {\n  display: block;\n  width: 100%;\n  max-width: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #393939;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #393939;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  cursor: pointer;\n  color: #393939;\n  font-size: 14px;\n  position: relative;\n  box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #393939;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n              -ms-grid-row-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #f0f0f0;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@-webkit-keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@-webkit-keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n@keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"; });
 define('text!flatpickr/themes/dark.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  overflow: hidden;\n  max-height: 0;\n  opacity: 0;\n  visibility: hidden;\n  text-align: center;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 315px;\n  box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  background: rgba(63,68,88,0.95);\n  box-shadow: 1px 0 0 #3f4458, -1px 0 0 #3f4458, 0 1px 0 #3f4458, 0 -1px 0 #3f4458, 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  visibility: visible;\n  overflow: visible;\n  max-height: 640px;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.hasWeeks {\n  width: auto;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid #3f4458;\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: #3f4458;\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: rgba(63,68,88,0.95);\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: #3f4458;\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: rgba(63,68,88,0.95);\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-month {\n  background: transparent;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n}\n.flatpickr-prev-month,\n.flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px calc(3.57% - 1.5px);\n  z-index: 3;\n}\n.flatpickr-prev-month i,\n.flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-next-month.flatpickr-prev-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  left: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-next-month.flatpickr-next-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  right: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month:hover,\n.flatpickr-next-month:hover {\n  color: #eee;\n}\n.flatpickr-prev-month:hover svg,\n.flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-prev-month svg,\n.flatpickr-next-month svg {\n  width: 14px;\n}\n.flatpickr-prev-month svg path,\n.flatpickr-next-month svg path {\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(255,255,255,0.05);\n  box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(192,187,167,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(192,187,167,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n  top: 33%;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(255,255,255,0.6);\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(255,255,255,0.6);\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(192,187,167,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month.slideLeft {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideLeftNew {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRight {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRightNew {\n  -webkit-transform: translate3d(0, 0, 0px);\n          transform: translate3d(0, 0, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(192,187,167,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  box-sizing: border-box;\n  color: inherit;\n  cursor: default;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: initial;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: transparent;\n  text-align: center;\n  overflow: hidden;\n  width: 315px;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: transparent;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  width: 315px;\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 315px;\n  min-width: 315px;\n  max-width: 315px;\n  box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft,\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideRight {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideRightNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  box-sizing: border-box;\n  color: rgba(255,255,255,0.95);\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 40px;\n  height: 40px;\n  line-height: 40px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: rgba(100,108,140,0.95);\n  border-color: rgba(100,108,140,0.95);\n}\n.flatpickr-day.today {\n  border-color: #eee;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #eee;\n  background: #eee;\n  color: #3f4458;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #80cbc4;\n  box-shadow: none;\n  color: #fff;\n  border-color: #80cbc4;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange,\n.flatpickr-day.startRange.startRange + .endRange,\n.flatpickr-day.endRange.startRange + .endRange {\n  box-shadow: -10px 0 0 #80cbc4;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  box-shadow: -5px 0 0 rgba(100,108,140,0.95), 5px 0 0 rgba(100,108,140,0.95);\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  pointer-events: none;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(255,255,255,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  box-shadow: -5px 0 0 #80cbc4, 5px 0 0 #80cbc4;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  box-shadow: 1px 0 0 #3f4458;\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day {\n  display: block;\n  width: 100%;\n  max-width: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: rgba(255,255,255,0.95);\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  cursor: pointer;\n  color: rgba(255,255,255,0.95);\n  font-size: 14px;\n  position: relative;\n  box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: rgba(255,255,255,0.95);\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n              -ms-grid-row-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: rgba(109,118,151,0.95);\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@-webkit-keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@-webkit-keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n@keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"; });
 define('text!flatpickr/themes/material_blue.css', ['module'], function(module) { module.exports = ".flatpickr-calendar {\n  background: transparent;\n  overflow: hidden;\n  max-height: 0;\n  opacity: 0;\n  visibility: hidden;\n  text-align: center;\n  padding: 0;\n  -webkit-animation: none;\n          animation: none;\n  direction: ltr;\n  border: 0;\n  font-size: 14px;\n  line-height: 24px;\n  border-radius: 5px;\n  position: absolute;\n  width: 315px;\n  box-sizing: border-box;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  box-shadow: 0 3px 13px rgba(0,0,0,0.08);\n}\n.flatpickr-calendar.open,\n.flatpickr-calendar.inline {\n  opacity: 1;\n  visibility: visible;\n  overflow: visible;\n  max-height: 640px;\n}\n.flatpickr-calendar.open {\n  display: inline-block;\n  z-index: 99999;\n}\n.flatpickr-calendar.animate.open {\n  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.inline {\n  display: block;\n  position: relative;\n  top: 2px;\n}\n.flatpickr-calendar.static {\n  position: absolute;\n  top: calc(100% + 2px);\n}\n.flatpickr-calendar.static.open {\n  z-index: 999;\n  display: block;\n}\n.flatpickr-calendar.hasWeeks {\n  width: auto;\n}\n.flatpickr-calendar .hasWeeks .dayContainer,\n.flatpickr-calendar .hasTime .dayContainer {\n  border-bottom: 0;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.flatpickr-calendar .hasWeeks .dayContainer {\n  border-left: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  height: 40px;\n  border-top: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-innerContainer {\n  border-bottom: 0;\n}\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\n  border: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.noCalendar.hasTime .flatpickr-time {\n  height: auto;\n}\n.flatpickr-calendar:before,\n.flatpickr-calendar:after {\n  position: absolute;\n  display: block;\n  pointer-events: none;\n  border: solid transparent;\n  content: '';\n  height: 0;\n  width: 0;\n  left: 22px;\n}\n.flatpickr-calendar.rightMost:before,\n.flatpickr-calendar.rightMost:after {\n  left: auto;\n  right: 22px;\n}\n.flatpickr-calendar:before {\n  border-width: 5px;\n  margin: 0 -5px;\n}\n.flatpickr-calendar:after {\n  border-width: 4px;\n  margin: 0 -4px;\n}\n.flatpickr-calendar.arrowTop:before,\n.flatpickr-calendar.arrowTop:after {\n  bottom: 100%;\n}\n.flatpickr-calendar.arrowTop:before {\n  border-bottom-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #42a5f5;\n}\n.flatpickr-calendar.arrowBottom:before,\n.flatpickr-calendar.arrowBottom:after {\n  top: 100%;\n}\n.flatpickr-calendar.arrowBottom:before {\n  border-top-color: rgba(72,72,72,0.2);\n}\n.flatpickr-calendar.arrowBottom:after {\n  border-top-color: #42a5f5;\n}\n.flatpickr-calendar:focus {\n  outline: 0;\n}\n.flatpickr-wrapper {\n  position: relative;\n  display: inline-block;\n}\n.flatpickr-month {\n  border-radius: 5px 5px 0 0;\n  background: #42a5f5;\n  color: #fff;\n  fill: #fff;\n  height: 28px;\n  line-height: 1;\n  text-align: center;\n  position: relative;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  overflow: hidden;\n}\n.flatpickr-prev-month,\n.flatpickr-next-month {\n  text-decoration: none;\n  cursor: pointer;\n  position: absolute;\n  top: 0px;\n  line-height: 16px;\n  height: 28px;\n  padding: 10px calc(3.57% - 1.5px);\n  z-index: 3;\n}\n.flatpickr-prev-month i,\n.flatpickr-next-month i {\n  position: relative;\n}\n.flatpickr-prev-month.flatpickr-prev-month,\n.flatpickr-next-month.flatpickr-prev-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  left: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month.flatpickr-next-month,\n.flatpickr-next-month.flatpickr-next-month {\n/*\n        /*rtl:begin:ignore*/\n/*\n        */\n  right: 0;\n/*\n        /*rtl:end:ignore*/\n/*\n        */\n}\n/*\n        /*rtl:begin:ignore*/\n/*\n        /*rtl:end:ignore*/\n.flatpickr-prev-month:hover,\n.flatpickr-next-month:hover {\n  color: #bbb;\n}\n.flatpickr-prev-month:hover svg,\n.flatpickr-next-month:hover svg {\n  fill: #f64747;\n}\n.flatpickr-prev-month svg,\n.flatpickr-next-month svg {\n  width: 14px;\n}\n.flatpickr-prev-month svg path,\n.flatpickr-next-month svg path {\n  transition: fill 0.1s;\n  fill: inherit;\n}\n.numInputWrapper {\n  position: relative;\n  height: auto;\n}\n.numInputWrapper input,\n.numInputWrapper span {\n  display: inline-block;\n}\n.numInputWrapper input {\n  width: 100%;\n}\n.numInputWrapper span {\n  position: absolute;\n  right: 0;\n  width: 14px;\n  padding: 0 4px 0 2px;\n  height: 50%;\n  line-height: 50%;\n  opacity: 0;\n  cursor: pointer;\n  border: 1px solid rgba(72,72,72,0.05);\n  box-sizing: border-box;\n}\n.numInputWrapper span:hover {\n  background: rgba(0,0,0,0.1);\n}\n.numInputWrapper span:active {\n  background: rgba(0,0,0,0.2);\n}\n.numInputWrapper span:after {\n  display: block;\n  content: \"\";\n  position: absolute;\n  top: 33%;\n}\n.numInputWrapper span.arrowUp {\n  top: 0;\n  border-bottom: 0;\n}\n.numInputWrapper span.arrowUp:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-bottom: 4px solid rgba(72,72,72,0.6);\n}\n.numInputWrapper span.arrowDown {\n  top: 50%;\n}\n.numInputWrapper span.arrowDown:after {\n  border-left: 4px solid transparent;\n  border-right: 4px solid transparent;\n  border-top: 4px solid rgba(72,72,72,0.6);\n}\n.numInputWrapper span svg {\n  width: inherit;\n  height: auto;\n}\n.numInputWrapper span svg path {\n  fill: rgba(255,255,255,0.5);\n}\n.numInputWrapper:hover {\n  background: rgba(0,0,0,0.05);\n}\n.numInputWrapper:hover span {\n  opacity: 1;\n}\n.flatpickr-current-month {\n  font-size: 135%;\n  line-height: inherit;\n  font-weight: 300;\n  color: inherit;\n  position: absolute;\n  width: 75%;\n  left: 12.5%;\n  padding: 6.16px 0 0 0;\n  line-height: 1;\n  height: 28px;\n  display: inline-block;\n  text-align: center;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n}\n.flatpickr-current-month.slideLeft {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideLeftNew {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideLeftNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRight {\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n  -webkit-animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms ease, fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month.slideRightNew {\n  -webkit-transform: translate3d(0, 0, 0px);\n          transform: translate3d(0, 0, 0px);\n  -webkit-animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms ease, fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-current-month span.cur-month {\n  font-family: inherit;\n  font-weight: 700;\n  color: inherit;\n  display: inline-block;\n  margin-left: 0.5ch;\n  padding: 0;\n}\n.flatpickr-current-month span.cur-month:hover {\n  background: rgba(0,0,0,0.05);\n}\n.flatpickr-current-month .numInputWrapper {\n  width: 6ch;\n  width: 7ch\\0;\n  display: inline-block;\n}\n.flatpickr-current-month .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #fff;\n}\n.flatpickr-current-month .numInputWrapper span.arrowDown:after {\n  border-top-color: #fff;\n}\n.flatpickr-current-month input.cur-year {\n  background: transparent;\n  box-sizing: border-box;\n  color: inherit;\n  cursor: default;\n  padding: 0 0 0 0.5ch;\n  margin: 0;\n  display: inline-block;\n  font-size: inherit;\n  font-family: inherit;\n  font-weight: 300;\n  line-height: inherit;\n  height: initial;\n  border: 0;\n  border-radius: 0;\n  vertical-align: initial;\n}\n.flatpickr-current-month input.cur-year:focus {\n  outline: 0;\n}\n.flatpickr-current-month input.cur-year[disabled],\n.flatpickr-current-month input.cur-year[disabled]:hover {\n  font-size: 100%;\n  color: rgba(255,255,255,0.5);\n  background: transparent;\n  pointer-events: none;\n}\n.flatpickr-weekdays {\n  background: #42a5f5;\n  text-align: center;\n  overflow: hidden;\n  width: 315px;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  height: 28px;\n}\nspan.flatpickr-weekday {\n  cursor: default;\n  font-size: 90%;\n  background: #42a5f5;\n  color: rgba(0,0,0,0.54);\n  line-height: 1;\n  margin: 0;\n  text-align: center;\n  display: block;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  font-weight: bolder;\n}\n.dayContainer,\n.flatpickr-weeks {\n  padding: 1px 0 0 0;\n}\n.flatpickr-days {\n  position: relative;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  width: 315px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n  border-right: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-days:focus {\n  outline: 0;\n}\n.dayContainer {\n  padding: 0;\n  outline: 0;\n  text-align: left;\n  width: 315px;\n  min-width: 315px;\n  max-width: 315px;\n  box-sizing: border-box;\n  display: inline-block;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n          flex-wrap: wrap;\n  -ms-flex-wrap: wrap;\n  -ms-flex-pack: justify;\n  -webkit-justify-content: space-around;\n          justify-content: space-around;\n  -webkit-transform: translate3d(0px, 0px, 0px);\n          transform: translate3d(0px, 0px, 0px);\n  opacity: 1;\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeft,\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-transform: translate3d(-100%, 0px, 0px);\n          transform: translate3d(-100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideLeftNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideLeft 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-calendar.animate .dayContainer.slideRight {\n  -webkit-animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeOut 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRight 400ms cubic-bezier(0.23, 1, 0.32, 1);\n  -webkit-transform: translate3d(100%, 0px, 0px);\n          transform: translate3d(100%, 0px, 0px);\n}\n.flatpickr-calendar.animate .dayContainer.slideRightNew {\n  -webkit-animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n          animation: fpFadeIn 400ms cubic-bezier(0.23, 1, 0.32, 1), fpSlideRightNew 400ms cubic-bezier(0.23, 1, 0.32, 1);\n}\n.flatpickr-day {\n  background: none;\n  border: 1px solid transparent;\n  border-radius: 150px;\n  box-sizing: border-box;\n  color: #484848;\n  cursor: pointer;\n  font-weight: 400;\n  width: 14.2857143%;\n  -webkit-flex-basis: 14.2857143%;\n      -ms-flex-preferred-size: 14.2857143%;\n          flex-basis: 14.2857143%;\n  max-width: 40px;\n  height: 40px;\n  line-height: 40px;\n  margin: 0;\n  display: inline-block;\n  position: relative;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  text-align: center;\n}\n.flatpickr-day.inRange,\n.flatpickr-day.prevMonthDay.inRange,\n.flatpickr-day.nextMonthDay.inRange,\n.flatpickr-day.today.inRange,\n.flatpickr-day.prevMonthDay.today.inRange,\n.flatpickr-day.nextMonthDay.today.inRange,\n.flatpickr-day:hover,\n.flatpickr-day.prevMonthDay:hover,\n.flatpickr-day.nextMonthDay:hover,\n.flatpickr-day:focus,\n.flatpickr-day.prevMonthDay:focus,\n.flatpickr-day.nextMonthDay:focus {\n  cursor: pointer;\n  outline: 0;\n  background: #e2e2e2;\n  border-color: #e2e2e2;\n}\n.flatpickr-day.today {\n  border-color: #bbb;\n}\n.flatpickr-day.today:hover,\n.flatpickr-day.today:focus {\n  border-color: #bbb;\n  background: #bbb;\n  color: #fff;\n}\n.flatpickr-day.selected,\n.flatpickr-day.startRange,\n.flatpickr-day.endRange,\n.flatpickr-day.selected.inRange,\n.flatpickr-day.startRange.inRange,\n.flatpickr-day.endRange.inRange,\n.flatpickr-day.selected:focus,\n.flatpickr-day.startRange:focus,\n.flatpickr-day.endRange:focus,\n.flatpickr-day.selected:hover,\n.flatpickr-day.startRange:hover,\n.flatpickr-day.endRange:hover,\n.flatpickr-day.selected.prevMonthDay,\n.flatpickr-day.startRange.prevMonthDay,\n.flatpickr-day.endRange.prevMonthDay,\n.flatpickr-day.selected.nextMonthDay,\n.flatpickr-day.startRange.nextMonthDay,\n.flatpickr-day.endRange.nextMonthDay {\n  background: #42a5f5;\n  box-shadow: none;\n  color: #fff;\n  border-color: #42a5f5;\n}\n.flatpickr-day.selected.startRange,\n.flatpickr-day.startRange.startRange,\n.flatpickr-day.endRange.startRange {\n  border-radius: 50px 0 0 50px;\n}\n.flatpickr-day.selected.endRange,\n.flatpickr-day.startRange.endRange,\n.flatpickr-day.endRange.endRange {\n  border-radius: 0 50px 50px 0;\n}\n.flatpickr-day.selected.startRange + .endRange,\n.flatpickr-day.startRange.startRange + .endRange,\n.flatpickr-day.endRange.startRange + .endRange {\n  box-shadow: -10px 0 0 #42a5f5;\n}\n.flatpickr-day.selected.startRange.endRange,\n.flatpickr-day.startRange.startRange.endRange,\n.flatpickr-day.endRange.startRange.endRange {\n  border-radius: 50px;\n}\n.flatpickr-day.inRange {\n  border-radius: 0;\n  box-shadow: -5px 0 0 #e2e2e2, 5px 0 0 #e2e2e2;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover {\n  pointer-events: none;\n}\n.flatpickr-day.disabled,\n.flatpickr-day.disabled:hover,\n.flatpickr-day.prevMonthDay,\n.flatpickr-day.nextMonthDay,\n.flatpickr-day.notAllowed,\n.flatpickr-day.notAllowed.prevMonthDay,\n.flatpickr-day.notAllowed.nextMonthDay {\n  color: rgba(72,72,72,0.3);\n  background: transparent;\n  border-color: transparent;\n  cursor: default;\n}\n.flatpickr-day.week.selected {\n  border-radius: 0;\n  box-shadow: -5px 0 0 #42a5f5, 5px 0 0 #42a5f5;\n}\n.rangeMode .flatpickr-day {\n  margin-top: 1px;\n}\n.flatpickr-weekwrapper {\n  display: inline-block;\n  float: left;\n}\n.flatpickr-weekwrapper .flatpickr-weeks {\n  padding: 0 12px;\n  border-left: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-weekwrapper .flatpickr-weekday {\n  float: none;\n  width: 100%;\n  line-height: 28px;\n}\n.flatpickr-weekwrapper span.flatpickr-day {\n  display: block;\n  width: 100%;\n  max-width: none;\n}\n.flatpickr-innerContainer {\n  display: block;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border-bottom: 1px solid rgba(72,72,72,0.2);\n}\n.flatpickr-rContainer {\n  display: inline-block;\n  padding: 0;\n  box-sizing: border-box;\n}\n.flatpickr-time {\n  text-align: center;\n  outline: 0;\n  display: block;\n  height: 0;\n  line-height: 40px;\n  max-height: 40px;\n  box-sizing: border-box;\n  overflow: hidden;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.flatpickr-time:after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n.flatpickr-time .numInputWrapper {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  width: 40%;\n  height: 40px;\n  float: left;\n}\n.flatpickr-time .numInputWrapper span.arrowUp:after {\n  border-bottom-color: #484848;\n}\n.flatpickr-time .numInputWrapper span.arrowDown:after {\n  border-top-color: #484848;\n}\n.flatpickr-time.hasSeconds .numInputWrapper {\n  width: 26%;\n}\n.flatpickr-time.time24hr .numInputWrapper {\n  width: 49%;\n}\n.flatpickr-time input {\n  background: transparent;\n  box-shadow: none;\n  border: 0;\n  border-radius: 0;\n  text-align: center;\n  margin: 0;\n  padding: 0;\n  height: inherit;\n  line-height: inherit;\n  cursor: pointer;\n  color: #484848;\n  font-size: 14px;\n  position: relative;\n  box-sizing: border-box;\n}\n.flatpickr-time input.flatpickr-hour {\n  font-weight: bold;\n}\n.flatpickr-time input.flatpickr-minute,\n.flatpickr-time input.flatpickr-second {\n  font-weight: 400;\n}\n.flatpickr-time input:focus {\n  outline: 0;\n  border: 0;\n}\n.flatpickr-time .flatpickr-time-separator,\n.flatpickr-time .flatpickr-am-pm {\n  height: inherit;\n  display: inline-block;\n  float: left;\n  line-height: inherit;\n  color: #484848;\n  font-weight: bold;\n  width: 2%;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n              -ms-grid-row-align: center;\n          align-self: center;\n}\n.flatpickr-time .flatpickr-am-pm {\n  outline: 0;\n  width: 18%;\n  cursor: pointer;\n  text-align: center;\n  font-weight: 400;\n}\n.flatpickr-time .flatpickr-am-pm:hover,\n.flatpickr-time .flatpickr-am-pm:focus {\n  background: #ececec;\n}\n.flatpickr-input[readonly] {\n  cursor: pointer;\n}\n@-webkit-keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@keyframes fpFadeInDown {\n  from {\n    opacity: 0;\n    -webkit-transform: translate3d(0, -20px, 0);\n            transform: translate3d(0, -20px, 0);\n  }\n  to {\n    opacity: 1;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n@-webkit-keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeft {\n  from {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@keyframes fpSlideLeftNew {\n  from {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@keyframes fpSlideRight {\n  from {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px);\n  }\n}\n@-webkit-keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@keyframes fpSlideRightNew {\n  from {\n    -webkit-transform: translate3d(-100%, 0, 0px);\n            transform: translate3d(-100%, 0, 0px);\n  }\n  to {\n    -webkit-transform: translate3d(0, 0, 0px);\n            transform: translate3d(0, 0, 0px);\n  }\n}\n@-webkit-keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@keyframes fpFadeOut {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n@-webkit-keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n@keyframes fpFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"; });
-define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) { /**/ }
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone;
-	var target = arguments[0];
-	var i = 1;
-	var length = arguments.length;
-	var deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	}
-	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
-});
-
-//! moment.js
-//! version : 2.18.1
-//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
-//! license : MIT
-//! momentjs.com
-
-;(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('moment',factory) :
-    global.moment = factory()
-}(this, (function () { 'use strict';
-
-var hookCallback;
-
-function hooks () {
-    return hookCallback.apply(null, arguments);
-}
-
-// This is done to register the method called with moment()
-// without creating circular dependencies.
-function setHookCallback (callback) {
-    hookCallback = callback;
-}
-
-function isArray(input) {
-    return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
-}
-
-function isObject(input) {
-    // IE8 will treat undefined and null as object if it wasn't for
-    // input != null
-    return input != null && Object.prototype.toString.call(input) === '[object Object]';
-}
-
-function isObjectEmpty(obj) {
-    var k;
-    for (k in obj) {
-        // even if its not own property I'd still call it non-empty
-        return false;
-    }
-    return true;
-}
-
-function isUndefined(input) {
-    return input === void 0;
-}
-
-function isNumber(input) {
-    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
-}
-
-function isDate(input) {
-    return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
-}
-
-function map(arr, fn) {
-    var res = [], i;
-    for (i = 0; i < arr.length; ++i) {
-        res.push(fn(arr[i], i));
-    }
-    return res;
-}
-
-function hasOwnProp(a, b) {
-    return Object.prototype.hasOwnProperty.call(a, b);
-}
-
-function extend(a, b) {
-    for (var i in b) {
-        if (hasOwnProp(b, i)) {
-            a[i] = b[i];
-        }
-    }
-
-    if (hasOwnProp(b, 'toString')) {
-        a.toString = b.toString;
-    }
-
-    if (hasOwnProp(b, 'valueOf')) {
-        a.valueOf = b.valueOf;
-    }
-
-    return a;
-}
-
-function createUTC (input, format, locale, strict) {
-    return createLocalOrUTC(input, format, locale, strict, true).utc();
-}
-
-function defaultParsingFlags() {
-    // We need to deep clone this object.
-    return {
-        empty           : false,
-        unusedTokens    : [],
-        unusedInput     : [],
-        overflow        : -2,
-        charsLeftOver   : 0,
-        nullInput       : false,
-        invalidMonth    : null,
-        invalidFormat   : false,
-        userInvalidated : false,
-        iso             : false,
-        parsedDateParts : [],
-        meridiem        : null,
-        rfc2822         : false,
-        weekdayMismatch : false
-    };
-}
-
-function getParsingFlags(m) {
-    if (m._pf == null) {
-        m._pf = defaultParsingFlags();
-    }
-    return m._pf;
-}
-
-var some;
-if (Array.prototype.some) {
-    some = Array.prototype.some;
-} else {
-    some = function (fun) {
-        var t = Object(this);
-        var len = t.length >>> 0;
-
-        for (var i = 0; i < len; i++) {
-            if (i in t && fun.call(this, t[i], i, t)) {
-                return true;
-            }
-        }
-
-        return false;
-    };
-}
-
-var some$1 = some;
-
-function isValid(m) {
-    if (m._isValid == null) {
-        var flags = getParsingFlags(m);
-        var parsedParts = some$1.call(flags.parsedDateParts, function (i) {
-            return i != null;
-        });
-        var isNowValid = !isNaN(m._d.getTime()) &&
-            flags.overflow < 0 &&
-            !flags.empty &&
-            !flags.invalidMonth &&
-            !flags.invalidWeekday &&
-            !flags.nullInput &&
-            !flags.invalidFormat &&
-            !flags.userInvalidated &&
-            (!flags.meridiem || (flags.meridiem && parsedParts));
-
-        if (m._strict) {
-            isNowValid = isNowValid &&
-                flags.charsLeftOver === 0 &&
-                flags.unusedTokens.length === 0 &&
-                flags.bigHour === undefined;
-        }
-
-        if (Object.isFrozen == null || !Object.isFrozen(m)) {
-            m._isValid = isNowValid;
-        }
-        else {
-            return isNowValid;
-        }
-    }
-    return m._isValid;
-}
-
-function createInvalid (flags) {
-    var m = createUTC(NaN);
-    if (flags != null) {
-        extend(getParsingFlags(m), flags);
-    }
-    else {
-        getParsingFlags(m).userInvalidated = true;
-    }
-
-    return m;
-}
-
-// Plugins that add properties should also add the key here (null value),
-// so we can properly clone ourselves.
-var momentProperties = hooks.momentProperties = [];
-
-function copyConfig(to, from) {
-    var i, prop, val;
-
-    if (!isUndefined(from._isAMomentObject)) {
-        to._isAMomentObject = from._isAMomentObject;
-    }
-    if (!isUndefined(from._i)) {
-        to._i = from._i;
-    }
-    if (!isUndefined(from._f)) {
-        to._f = from._f;
-    }
-    if (!isUndefined(from._l)) {
-        to._l = from._l;
-    }
-    if (!isUndefined(from._strict)) {
-        to._strict = from._strict;
-    }
-    if (!isUndefined(from._tzm)) {
-        to._tzm = from._tzm;
-    }
-    if (!isUndefined(from._isUTC)) {
-        to._isUTC = from._isUTC;
-    }
-    if (!isUndefined(from._offset)) {
-        to._offset = from._offset;
-    }
-    if (!isUndefined(from._pf)) {
-        to._pf = getParsingFlags(from);
-    }
-    if (!isUndefined(from._locale)) {
-        to._locale = from._locale;
-    }
-
-    if (momentProperties.length > 0) {
-        for (i = 0; i < momentProperties.length; i++) {
-            prop = momentProperties[i];
-            val = from[prop];
-            if (!isUndefined(val)) {
-                to[prop] = val;
-            }
-        }
-    }
-
-    return to;
-}
-
-var updateInProgress = false;
-
-// Moment prototype object
-function Moment(config) {
-    copyConfig(this, config);
-    this._d = new Date(config._d != null ? config._d.getTime() : NaN);
-    if (!this.isValid()) {
-        this._d = new Date(NaN);
-    }
-    // Prevent infinite loop in case updateOffset creates new moment
-    // objects.
-    if (updateInProgress === false) {
-        updateInProgress = true;
-        hooks.updateOffset(this);
-        updateInProgress = false;
-    }
-}
-
-function isMoment (obj) {
-    return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
-}
-
-function absFloor (number) {
-    if (number < 0) {
-        // -0 -> 0
-        return Math.ceil(number) || 0;
-    } else {
-        return Math.floor(number);
-    }
-}
-
-function toInt(argumentForCoercion) {
-    var coercedNumber = +argumentForCoercion,
-        value = 0;
-
-    if (coercedNumber !== 0 && isFinite(coercedNumber)) {
-        value = absFloor(coercedNumber);
-    }
-
-    return value;
-}
-
-// compare two arrays, return the number of differences
-function compareArrays(array1, array2, dontConvert) {
-    var len = Math.min(array1.length, array2.length),
-        lengthDiff = Math.abs(array1.length - array2.length),
-        diffs = 0,
-        i;
-    for (i = 0; i < len; i++) {
-        if ((dontConvert && array1[i] !== array2[i]) ||
-            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
-            diffs++;
-        }
-    }
-    return diffs + lengthDiff;
-}
-
-function warn(msg) {
-    if (hooks.suppressDeprecationWarnings === false &&
-            (typeof console !==  'undefined') && console.warn) {
-        console.warn('Deprecation warning: ' + msg);
-    }
-}
-
-function deprecate(msg, fn) {
-    var firstTime = true;
-
-    return extend(function () {
-        if (hooks.deprecationHandler != null) {
-            hooks.deprecationHandler(null, msg);
-        }
-        if (firstTime) {
-            var args = [];
-            var arg;
-            for (var i = 0; i < arguments.length; i++) {
-                arg = '';
-                if (typeof arguments[i] === 'object') {
-                    arg += '\n[' + i + '] ';
-                    for (var key in arguments[0]) {
-                        arg += key + ': ' + arguments[0][key] + ', ';
-                    }
-                    arg = arg.slice(0, -2); // Remove trailing comma and space
-                } else {
-                    arg = arguments[i];
-                }
-                args.push(arg);
-            }
-            warn(msg + '\nArguments: ' + Array.prototype.slice.call(args).join('') + '\n' + (new Error()).stack);
-            firstTime = false;
-        }
-        return fn.apply(this, arguments);
-    }, fn);
-}
-
-var deprecations = {};
-
-function deprecateSimple(name, msg) {
-    if (hooks.deprecationHandler != null) {
-        hooks.deprecationHandler(name, msg);
-    }
-    if (!deprecations[name]) {
-        warn(msg);
-        deprecations[name] = true;
-    }
-}
-
-hooks.suppressDeprecationWarnings = false;
-hooks.deprecationHandler = null;
-
-function isFunction(input) {
-    return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
-}
-
-function set (config) {
-    var prop, i;
-    for (i in config) {
-        prop = config[i];
-        if (isFunction(prop)) {
-            this[i] = prop;
-        } else {
-            this['_' + i] = prop;
-        }
-    }
-    this._config = config;
-    // Lenient ordinal parsing accepts just a number in addition to
-    // number + (possibly) stuff coming from _dayOfMonthOrdinalParse.
-    // TODO: Remove "ordinalParse" fallback in next major release.
-    this._dayOfMonthOrdinalParseLenient = new RegExp(
-        (this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) +
-            '|' + (/\d{1,2}/).source);
-}
-
-function mergeConfigs(parentConfig, childConfig) {
-    var res = extend({}, parentConfig), prop;
-    for (prop in childConfig) {
-        if (hasOwnProp(childConfig, prop)) {
-            if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
-                res[prop] = {};
-                extend(res[prop], parentConfig[prop]);
-                extend(res[prop], childConfig[prop]);
-            } else if (childConfig[prop] != null) {
-                res[prop] = childConfig[prop];
-            } else {
-                delete res[prop];
-            }
-        }
-    }
-    for (prop in parentConfig) {
-        if (hasOwnProp(parentConfig, prop) &&
-                !hasOwnProp(childConfig, prop) &&
-                isObject(parentConfig[prop])) {
-            // make sure changes to properties don't modify parent config
-            res[prop] = extend({}, res[prop]);
-        }
-    }
-    return res;
-}
-
-function Locale(config) {
-    if (config != null) {
-        this.set(config);
-    }
-}
-
-var keys;
-
-if (Object.keys) {
-    keys = Object.keys;
-} else {
-    keys = function (obj) {
-        var i, res = [];
-        for (i in obj) {
-            if (hasOwnProp(obj, i)) {
-                res.push(i);
-            }
-        }
-        return res;
-    };
-}
-
-var keys$1 = keys;
-
-var defaultCalendar = {
-    sameDay : '[Today at] LT',
-    nextDay : '[Tomorrow at] LT',
-    nextWeek : 'dddd [at] LT',
-    lastDay : '[Yesterday at] LT',
-    lastWeek : '[Last] dddd [at] LT',
-    sameElse : 'L'
-};
-
-function calendar (key, mom, now) {
-    var output = this._calendar[key] || this._calendar['sameElse'];
-    return isFunction(output) ? output.call(mom, now) : output;
-}
-
-var defaultLongDateFormat = {
-    LTS  : 'h:mm:ss A',
-    LT   : 'h:mm A',
-    L    : 'MM/DD/YYYY',
-    LL   : 'MMMM D, YYYY',
-    LLL  : 'MMMM D, YYYY h:mm A',
-    LLLL : 'dddd, MMMM D, YYYY h:mm A'
-};
-
-function longDateFormat (key) {
-    var format = this._longDateFormat[key],
-        formatUpper = this._longDateFormat[key.toUpperCase()];
-
-    if (format || !formatUpper) {
-        return format;
-    }
-
-    this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
-        return val.slice(1);
-    });
-
-    return this._longDateFormat[key];
-}
-
-var defaultInvalidDate = 'Invalid date';
-
-function invalidDate () {
-    return this._invalidDate;
-}
-
-var defaultOrdinal = '%d';
-var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
-
-function ordinal (number) {
-    return this._ordinal.replace('%d', number);
-}
-
-var defaultRelativeTime = {
-    future : 'in %s',
-    past   : '%s ago',
-    s  : 'a few seconds',
-    ss : '%d seconds',
-    m  : 'a minute',
-    mm : '%d minutes',
-    h  : 'an hour',
-    hh : '%d hours',
-    d  : 'a day',
-    dd : '%d days',
-    M  : 'a month',
-    MM : '%d months',
-    y  : 'a year',
-    yy : '%d years'
-};
-
-function relativeTime (number, withoutSuffix, string, isFuture) {
-    var output = this._relativeTime[string];
-    return (isFunction(output)) ?
-        output(number, withoutSuffix, string, isFuture) :
-        output.replace(/%d/i, number);
-}
-
-function pastFuture (diff, output) {
-    var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
-    return isFunction(format) ? format(output) : format.replace(/%s/i, output);
-}
-
-var aliases = {};
-
-function addUnitAlias (unit, shorthand) {
-    var lowerCase = unit.toLowerCase();
-    aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
-}
-
-function normalizeUnits(units) {
-    return typeof units === 'string' ? aliases[units] || aliases[units.toLowerCase()] : undefined;
-}
-
-function normalizeObjectUnits(inputObject) {
-    var normalizedInput = {},
-        normalizedProp,
-        prop;
-
-    for (prop in inputObject) {
-        if (hasOwnProp(inputObject, prop)) {
-            normalizedProp = normalizeUnits(prop);
-            if (normalizedProp) {
-                normalizedInput[normalizedProp] = inputObject[prop];
-            }
-        }
-    }
-
-    return normalizedInput;
-}
-
-var priorities = {};
-
-function addUnitPriority(unit, priority) {
-    priorities[unit] = priority;
-}
-
-function getPrioritizedUnits(unitsObj) {
-    var units = [];
-    for (var u in unitsObj) {
-        units.push({unit: u, priority: priorities[u]});
-    }
-    units.sort(function (a, b) {
-        return a.priority - b.priority;
-    });
-    return units;
-}
-
-function makeGetSet (unit, keepTime) {
-    return function (value) {
-        if (value != null) {
-            set$1(this, unit, value);
-            hooks.updateOffset(this, keepTime);
-            return this;
-        } else {
-            return get(this, unit);
-        }
-    };
-}
-
-function get (mom, unit) {
-    return mom.isValid() ?
-        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
-}
-
-function set$1 (mom, unit, value) {
-    if (mom.isValid()) {
-        mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
-    }
-}
-
-// MOMENTS
-
-function stringGet (units) {
-    units = normalizeUnits(units);
-    if (isFunction(this[units])) {
-        return this[units]();
-    }
-    return this;
-}
-
-
-function stringSet (units, value) {
-    if (typeof units === 'object') {
-        units = normalizeObjectUnits(units);
-        var prioritized = getPrioritizedUnits(units);
-        for (var i = 0; i < prioritized.length; i++) {
-            this[prioritized[i].unit](units[prioritized[i].unit]);
-        }
-    } else {
-        units = normalizeUnits(units);
-        if (isFunction(this[units])) {
-            return this[units](value);
-        }
-    }
-    return this;
-}
-
-function zeroFill(number, targetLength, forceSign) {
-    var absNumber = '' + Math.abs(number),
-        zerosToFill = targetLength - absNumber.length,
-        sign = number >= 0;
-    return (sign ? (forceSign ? '+' : '') : '-') +
-        Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
-}
-
-var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
-
-var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
-
-var formatFunctions = {};
-
-var formatTokenFunctions = {};
-
-// token:    'M'
-// padded:   ['MM', 2]
-// ordinal:  'Mo'
-// callback: function () { this.month() + 1 }
-function addFormatToken (token, padded, ordinal, callback) {
-    var func = callback;
-    if (typeof callback === 'string') {
-        func = function () {
-            return this[callback]();
-        };
-    }
-    if (token) {
-        formatTokenFunctions[token] = func;
-    }
-    if (padded) {
-        formatTokenFunctions[padded[0]] = function () {
-            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
-        };
-    }
-    if (ordinal) {
-        formatTokenFunctions[ordinal] = function () {
-            return this.localeData().ordinal(func.apply(this, arguments), token);
-        };
-    }
-}
-
-function removeFormattingTokens(input) {
-    if (input.match(/\[[\s\S]/)) {
-        return input.replace(/^\[|\]$/g, '');
-    }
-    return input.replace(/\\/g, '');
-}
-
-function makeFormatFunction(format) {
-    var array = format.match(formattingTokens), i, length;
-
-    for (i = 0, length = array.length; i < length; i++) {
-        if (formatTokenFunctions[array[i]]) {
-            array[i] = formatTokenFunctions[array[i]];
-        } else {
-            array[i] = removeFormattingTokens(array[i]);
-        }
-    }
-
-    return function (mom) {
-        var output = '', i;
-        for (i = 0; i < length; i++) {
-            output += isFunction(array[i]) ? array[i].call(mom, format) : array[i];
-        }
-        return output;
-    };
-}
-
-// format date using native date object
-function formatMoment(m, format) {
-    if (!m.isValid()) {
-        return m.localeData().invalidDate();
-    }
-
-    format = expandFormat(format, m.localeData());
-    formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
-
-    return formatFunctions[format](m);
-}
-
-function expandFormat(format, locale) {
-    var i = 5;
-
-    function replaceLongDateFormatTokens(input) {
-        return locale.longDateFormat(input) || input;
-    }
-
-    localFormattingTokens.lastIndex = 0;
-    while (i >= 0 && localFormattingTokens.test(format)) {
-        format = format.replace(localFormattingTokens, replaceLongDateFormatTokens);
-        localFormattingTokens.lastIndex = 0;
-        i -= 1;
-    }
-
-    return format;
-}
-
-var match1         = /\d/;            //       0 - 9
-var match2         = /\d\d/;          //      00 - 99
-var match3         = /\d{3}/;         //     000 - 999
-var match4         = /\d{4}/;         //    0000 - 9999
-var match6         = /[+-]?\d{6}/;    // -999999 - 999999
-var match1to2      = /\d\d?/;         //       0 - 99
-var match3to4      = /\d\d\d\d?/;     //     999 - 9999
-var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
-var match1to3      = /\d{1,3}/;       //       0 - 999
-var match1to4      = /\d{1,4}/;       //       0 - 9999
-var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
-
-var matchUnsigned  = /\d+/;           //       0 - inf
-var matchSigned    = /[+-]?\d+/;      //    -inf - inf
-
-var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
-var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
-
-var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
-
-// any word (or two) characters or numbers including two/three word month in arabic.
-// includes scottish gaelic two word and hyphenated months
-var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
-
-
-var regexes = {};
-
-function addRegexToken (token, regex, strictRegex) {
-    regexes[token] = isFunction(regex) ? regex : function (isStrict, localeData) {
-        return (isStrict && strictRegex) ? strictRegex : regex;
-    };
-}
-
-function getParseRegexForToken (token, config) {
-    if (!hasOwnProp(regexes, token)) {
-        return new RegExp(unescapeFormat(token));
-    }
-
-    return regexes[token](config._strict, config._locale);
-}
-
-// Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
-function unescapeFormat(s) {
-    return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
-        return p1 || p2 || p3 || p4;
-    }));
-}
-
-function regexEscape(s) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-
-var tokens = {};
-
-function addParseToken (token, callback) {
-    var i, func = callback;
-    if (typeof token === 'string') {
-        token = [token];
-    }
-    if (isNumber(callback)) {
-        func = function (input, array) {
-            array[callback] = toInt(input);
-        };
-    }
-    for (i = 0; i < token.length; i++) {
-        tokens[token[i]] = func;
-    }
-}
-
-function addWeekParseToken (token, callback) {
-    addParseToken(token, function (input, array, config, token) {
-        config._w = config._w || {};
-        callback(input, config._w, config, token);
-    });
-}
-
-function addTimeToArrayFromToken(token, input, config) {
-    if (input != null && hasOwnProp(tokens, token)) {
-        tokens[token](input, config._a, config, token);
-    }
-}
-
-var YEAR = 0;
-var MONTH = 1;
-var DATE = 2;
-var HOUR = 3;
-var MINUTE = 4;
-var SECOND = 5;
-var MILLISECOND = 6;
-var WEEK = 7;
-var WEEKDAY = 8;
-
-var indexOf;
-
-if (Array.prototype.indexOf) {
-    indexOf = Array.prototype.indexOf;
-} else {
-    indexOf = function (o) {
-        // I know
-        var i;
-        for (i = 0; i < this.length; ++i) {
-            if (this[i] === o) {
-                return i;
-            }
-        }
-        return -1;
-    };
-}
-
-var indexOf$1 = indexOf;
-
-function daysInMonth(year, month) {
-    return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-}
-
-// FORMATTING
-
-addFormatToken('M', ['MM', 2], 'Mo', function () {
-    return this.month() + 1;
-});
-
-addFormatToken('MMM', 0, 0, function (format) {
-    return this.localeData().monthsShort(this, format);
-});
-
-addFormatToken('MMMM', 0, 0, function (format) {
-    return this.localeData().months(this, format);
-});
-
-// ALIASES
-
-addUnitAlias('month', 'M');
-
-// PRIORITY
-
-addUnitPriority('month', 8);
-
-// PARSING
-
-addRegexToken('M',    match1to2);
-addRegexToken('MM',   match1to2, match2);
-addRegexToken('MMM',  function (isStrict, locale) {
-    return locale.monthsShortRegex(isStrict);
-});
-addRegexToken('MMMM', function (isStrict, locale) {
-    return locale.monthsRegex(isStrict);
-});
-
-addParseToken(['M', 'MM'], function (input, array) {
-    array[MONTH] = toInt(input) - 1;
-});
-
-addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
-    var month = config._locale.monthsParse(input, token, config._strict);
-    // if we didn't find a month name, mark the date as invalid.
-    if (month != null) {
-        array[MONTH] = month;
-    } else {
-        getParsingFlags(config).invalidMonth = input;
-    }
-});
-
-// LOCALES
-
-var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
-var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
-function localeMonths (m, format) {
-    if (!m) {
-        return isArray(this._months) ? this._months :
-            this._months['standalone'];
-    }
-    return isArray(this._months) ? this._months[m.month()] :
-        this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format) ? 'format' : 'standalone'][m.month()];
-}
-
-var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
-function localeMonthsShort (m, format) {
-    if (!m) {
-        return isArray(this._monthsShort) ? this._monthsShort :
-            this._monthsShort['standalone'];
-    }
-    return isArray(this._monthsShort) ? this._monthsShort[m.month()] :
-        this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
-}
-
-function handleStrictParse(monthName, format, strict) {
-    var i, ii, mom, llc = monthName.toLocaleLowerCase();
-    if (!this._monthsParse) {
-        // this is not used
-        this._monthsParse = [];
-        this._longMonthsParse = [];
-        this._shortMonthsParse = [];
-        for (i = 0; i < 12; ++i) {
-            mom = createUTC([2000, i]);
-            this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
-            this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
-        }
-    }
-
-    if (strict) {
-        if (format === 'MMM') {
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
-            return ii !== -1 ? ii : null;
-        } else {
-            ii = indexOf$1.call(this._longMonthsParse, llc);
-            return ii !== -1 ? ii : null;
-        }
-    } else {
-        if (format === 'MMM') {
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._longMonthsParse, llc);
-            return ii !== -1 ? ii : null;
-        } else {
-            ii = indexOf$1.call(this._longMonthsParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
-            return ii !== -1 ? ii : null;
-        }
-    }
-}
-
-function localeMonthsParse (monthName, format, strict) {
-    var i, mom, regex;
-
-    if (this._monthsParseExact) {
-        return handleStrictParse.call(this, monthName, format, strict);
-    }
-
-    if (!this._monthsParse) {
-        this._monthsParse = [];
-        this._longMonthsParse = [];
-        this._shortMonthsParse = [];
-    }
-
-    // TODO: add sorting
-    // Sorting makes sure if one month (or abbr) is a prefix of another
-    // see sorting in computeMonthsParse
-    for (i = 0; i < 12; i++) {
-        // make the regex if we don't have it already
-        mom = createUTC([2000, i]);
-        if (strict && !this._longMonthsParse[i]) {
-            this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');
-            this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');
-        }
-        if (!strict && !this._monthsParse[i]) {
-            regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
-            this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
-        }
-        // test the regex
-        if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {
-            return i;
-        } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {
-            return i;
-        } else if (!strict && this._monthsParse[i].test(monthName)) {
-            return i;
-        }
-    }
-}
-
-// MOMENTS
-
-function setMonth (mom, value) {
-    var dayOfMonth;
-
-    if (!mom.isValid()) {
-        // No op
-        return mom;
-    }
-
-    if (typeof value === 'string') {
-        if (/^\d+$/.test(value)) {
-            value = toInt(value);
-        } else {
-            value = mom.localeData().monthsParse(value);
-            // TODO: Another silent failure?
-            if (!isNumber(value)) {
-                return mom;
-            }
-        }
-    }
-
-    dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
-    mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
-    return mom;
-}
-
-function getSetMonth (value) {
-    if (value != null) {
-        setMonth(this, value);
-        hooks.updateOffset(this, true);
-        return this;
-    } else {
-        return get(this, 'Month');
-    }
-}
-
-function getDaysInMonth () {
-    return daysInMonth(this.year(), this.month());
-}
-
-var defaultMonthsShortRegex = matchWord;
-function monthsShortRegex (isStrict) {
-    if (this._monthsParseExact) {
-        if (!hasOwnProp(this, '_monthsRegex')) {
-            computeMonthsParse.call(this);
-        }
-        if (isStrict) {
-            return this._monthsShortStrictRegex;
-        } else {
-            return this._monthsShortRegex;
-        }
-    } else {
-        if (!hasOwnProp(this, '_monthsShortRegex')) {
-            this._monthsShortRegex = defaultMonthsShortRegex;
-        }
-        return this._monthsShortStrictRegex && isStrict ?
-            this._monthsShortStrictRegex : this._monthsShortRegex;
-    }
-}
-
-var defaultMonthsRegex = matchWord;
-function monthsRegex (isStrict) {
-    if (this._monthsParseExact) {
-        if (!hasOwnProp(this, '_monthsRegex')) {
-            computeMonthsParse.call(this);
-        }
-        if (isStrict) {
-            return this._monthsStrictRegex;
-        } else {
-            return this._monthsRegex;
-        }
-    } else {
-        if (!hasOwnProp(this, '_monthsRegex')) {
-            this._monthsRegex = defaultMonthsRegex;
-        }
-        return this._monthsStrictRegex && isStrict ?
-            this._monthsStrictRegex : this._monthsRegex;
-    }
-}
-
-function computeMonthsParse () {
-    function cmpLenRev(a, b) {
-        return b.length - a.length;
-    }
-
-    var shortPieces = [], longPieces = [], mixedPieces = [],
-        i, mom;
-    for (i = 0; i < 12; i++) {
-        // make the regex if we don't have it already
-        mom = createUTC([2000, i]);
-        shortPieces.push(this.monthsShort(mom, ''));
-        longPieces.push(this.months(mom, ''));
-        mixedPieces.push(this.months(mom, ''));
-        mixedPieces.push(this.monthsShort(mom, ''));
-    }
-    // Sorting makes sure if one month (or abbr) is a prefix of another it
-    // will match the longer piece.
-    shortPieces.sort(cmpLenRev);
-    longPieces.sort(cmpLenRev);
-    mixedPieces.sort(cmpLenRev);
-    for (i = 0; i < 12; i++) {
-        shortPieces[i] = regexEscape(shortPieces[i]);
-        longPieces[i] = regexEscape(longPieces[i]);
-    }
-    for (i = 0; i < 24; i++) {
-        mixedPieces[i] = regexEscape(mixedPieces[i]);
-    }
-
-    this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
-    this._monthsShortRegex = this._monthsRegex;
-    this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
-    this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
-}
-
-// FORMATTING
-
-addFormatToken('Y', 0, 0, function () {
-    var y = this.year();
-    return y <= 9999 ? '' + y : '+' + y;
-});
-
-addFormatToken(0, ['YY', 2], 0, function () {
-    return this.year() % 100;
-});
-
-addFormatToken(0, ['YYYY',   4],       0, 'year');
-addFormatToken(0, ['YYYYY',  5],       0, 'year');
-addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
-
-// ALIASES
-
-addUnitAlias('year', 'y');
-
-// PRIORITIES
-
-addUnitPriority('year', 1);
-
-// PARSING
-
-addRegexToken('Y',      matchSigned);
-addRegexToken('YY',     match1to2, match2);
-addRegexToken('YYYY',   match1to4, match4);
-addRegexToken('YYYYY',  match1to6, match6);
-addRegexToken('YYYYYY', match1to6, match6);
-
-addParseToken(['YYYYY', 'YYYYYY'], YEAR);
-addParseToken('YYYY', function (input, array) {
-    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
-});
-addParseToken('YY', function (input, array) {
-    array[YEAR] = hooks.parseTwoDigitYear(input);
-});
-addParseToken('Y', function (input, array) {
-    array[YEAR] = parseInt(input, 10);
-});
-
-// HELPERS
-
-function daysInYear(year) {
-    return isLeapYear(year) ? 366 : 365;
-}
-
-function isLeapYear(year) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-}
-
-// HOOKS
-
-hooks.parseTwoDigitYear = function (input) {
-    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
-};
-
-// MOMENTS
-
-var getSetYear = makeGetSet('FullYear', true);
-
-function getIsLeapYear () {
-    return isLeapYear(this.year());
-}
-
-function createDate (y, m, d, h, M, s, ms) {
-    // can't just apply() to create a date:
-    // https://stackoverflow.com/q/181348
-    var date = new Date(y, m, d, h, M, s, ms);
-
-    // the date constructor remaps years 0-99 to 1900-1999
-    if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
-        date.setFullYear(y);
-    }
-    return date;
-}
-
-function createUTCDate (y) {
-    var date = new Date(Date.UTC.apply(null, arguments));
-
-    // the Date.UTC function remaps years 0-99 to 1900-1999
-    if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
-        date.setUTCFullYear(y);
-    }
-    return date;
-}
-
-// start-of-first-week - start-of-year
-function firstWeekOffset(year, dow, doy) {
-    var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
-        fwd = 7 + dow - doy,
-        // first-week day local weekday -- which local weekday is fwd
-        fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
-
-    return -fwdlw + fwd - 1;
-}
-
-// https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
-function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
-    var localWeekday = (7 + weekday - dow) % 7,
-        weekOffset = firstWeekOffset(year, dow, doy),
-        dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
-        resYear, resDayOfYear;
-
-    if (dayOfYear <= 0) {
-        resYear = year - 1;
-        resDayOfYear = daysInYear(resYear) + dayOfYear;
-    } else if (dayOfYear > daysInYear(year)) {
-        resYear = year + 1;
-        resDayOfYear = dayOfYear - daysInYear(year);
-    } else {
-        resYear = year;
-        resDayOfYear = dayOfYear;
-    }
-
-    return {
-        year: resYear,
-        dayOfYear: resDayOfYear
-    };
-}
-
-function weekOfYear(mom, dow, doy) {
-    var weekOffset = firstWeekOffset(mom.year(), dow, doy),
-        week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
-        resWeek, resYear;
-
-    if (week < 1) {
-        resYear = mom.year() - 1;
-        resWeek = week + weeksInYear(resYear, dow, doy);
-    } else if (week > weeksInYear(mom.year(), dow, doy)) {
-        resWeek = week - weeksInYear(mom.year(), dow, doy);
-        resYear = mom.year() + 1;
-    } else {
-        resYear = mom.year();
-        resWeek = week;
-    }
-
-    return {
-        week: resWeek,
-        year: resYear
-    };
-}
-
-function weeksInYear(year, dow, doy) {
-    var weekOffset = firstWeekOffset(year, dow, doy),
-        weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
-    return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
-}
-
-// FORMATTING
-
-addFormatToken('w', ['ww', 2], 'wo', 'week');
-addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
-
-// ALIASES
-
-addUnitAlias('week', 'w');
-addUnitAlias('isoWeek', 'W');
-
-// PRIORITIES
-
-addUnitPriority('week', 5);
-addUnitPriority('isoWeek', 5);
-
-// PARSING
-
-addRegexToken('w',  match1to2);
-addRegexToken('ww', match1to2, match2);
-addRegexToken('W',  match1to2);
-addRegexToken('WW', match1to2, match2);
-
-addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
-    week[token.substr(0, 1)] = toInt(input);
-});
-
-// HELPERS
-
-// LOCALES
-
-function localeWeek (mom) {
-    return weekOfYear(mom, this._week.dow, this._week.doy).week;
-}
-
-var defaultLocaleWeek = {
-    dow : 0, // Sunday is the first day of the week.
-    doy : 6  // The week that contains Jan 1st is the first week of the year.
-};
-
-function localeFirstDayOfWeek () {
-    return this._week.dow;
-}
-
-function localeFirstDayOfYear () {
-    return this._week.doy;
-}
-
-// MOMENTS
-
-function getSetWeek (input) {
-    var week = this.localeData().week(this);
-    return input == null ? week : this.add((input - week) * 7, 'd');
-}
-
-function getSetISOWeek (input) {
-    var week = weekOfYear(this, 1, 4).week;
-    return input == null ? week : this.add((input - week) * 7, 'd');
-}
-
-// FORMATTING
-
-addFormatToken('d', 0, 'do', 'day');
-
-addFormatToken('dd', 0, 0, function (format) {
-    return this.localeData().weekdaysMin(this, format);
-});
-
-addFormatToken('ddd', 0, 0, function (format) {
-    return this.localeData().weekdaysShort(this, format);
-});
-
-addFormatToken('dddd', 0, 0, function (format) {
-    return this.localeData().weekdays(this, format);
-});
-
-addFormatToken('e', 0, 0, 'weekday');
-addFormatToken('E', 0, 0, 'isoWeekday');
-
-// ALIASES
-
-addUnitAlias('day', 'd');
-addUnitAlias('weekday', 'e');
-addUnitAlias('isoWeekday', 'E');
-
-// PRIORITY
-addUnitPriority('day', 11);
-addUnitPriority('weekday', 11);
-addUnitPriority('isoWeekday', 11);
-
-// PARSING
-
-addRegexToken('d',    match1to2);
-addRegexToken('e',    match1to2);
-addRegexToken('E',    match1to2);
-addRegexToken('dd',   function (isStrict, locale) {
-    return locale.weekdaysMinRegex(isStrict);
-});
-addRegexToken('ddd',   function (isStrict, locale) {
-    return locale.weekdaysShortRegex(isStrict);
-});
-addRegexToken('dddd',   function (isStrict, locale) {
-    return locale.weekdaysRegex(isStrict);
-});
-
-addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
-    var weekday = config._locale.weekdaysParse(input, token, config._strict);
-    // if we didn't get a weekday name, mark the date as invalid
-    if (weekday != null) {
-        week.d = weekday;
-    } else {
-        getParsingFlags(config).invalidWeekday = input;
-    }
-});
-
-addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
-    week[token] = toInt(input);
-});
-
-// HELPERS
-
-function parseWeekday(input, locale) {
-    if (typeof input !== 'string') {
-        return input;
-    }
-
-    if (!isNaN(input)) {
-        return parseInt(input, 10);
-    }
-
-    input = locale.weekdaysParse(input);
-    if (typeof input === 'number') {
-        return input;
-    }
-
-    return null;
-}
-
-function parseIsoWeekday(input, locale) {
-    if (typeof input === 'string') {
-        return locale.weekdaysParse(input) % 7 || 7;
-    }
-    return isNaN(input) ? null : input;
-}
-
-// LOCALES
-
-var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
-function localeWeekdays (m, format) {
-    if (!m) {
-        return isArray(this._weekdays) ? this._weekdays :
-            this._weekdays['standalone'];
-    }
-    return isArray(this._weekdays) ? this._weekdays[m.day()] :
-        this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
-}
-
-var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
-function localeWeekdaysShort (m) {
-    return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
-}
-
-var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
-function localeWeekdaysMin (m) {
-    return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
-}
-
-function handleStrictParse$1(weekdayName, format, strict) {
-    var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
-    if (!this._weekdaysParse) {
-        this._weekdaysParse = [];
-        this._shortWeekdaysParse = [];
-        this._minWeekdaysParse = [];
-
-        for (i = 0; i < 7; ++i) {
-            mom = createUTC([2000, 1]).day(i);
-            this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
-            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
-            this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
-        }
-    }
-
-    if (strict) {
-        if (format === 'dddd') {
-            ii = indexOf$1.call(this._weekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        } else if (format === 'ddd') {
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        } else {
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        }
-    } else {
-        if (format === 'dddd') {
-            ii = indexOf$1.call(this._weekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        } else if (format === 'ddd') {
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._weekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        } else {
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._weekdaysParse, llc);
-            if (ii !== -1) {
-                return ii;
-            }
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
-            return ii !== -1 ? ii : null;
-        }
-    }
-}
-
-function localeWeekdaysParse (weekdayName, format, strict) {
-    var i, mom, regex;
-
-    if (this._weekdaysParseExact) {
-        return handleStrictParse$1.call(this, weekdayName, format, strict);
-    }
-
-    if (!this._weekdaysParse) {
-        this._weekdaysParse = [];
-        this._minWeekdaysParse = [];
-        this._shortWeekdaysParse = [];
-        this._fullWeekdaysParse = [];
-    }
-
-    for (i = 0; i < 7; i++) {
-        // make the regex if we don't have it already
-
-        mom = createUTC([2000, 1]).day(i);
-        if (strict && !this._fullWeekdaysParse[i]) {
-            this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
-            this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
-            this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
-        }
-        if (!this._weekdaysParse[i]) {
-            regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
-            this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
-        }
-        // test the regex
-        if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
-            return i;
-        } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
-            return i;
-        } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
-            return i;
-        } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
-            return i;
-        }
-    }
-}
-
-// MOMENTS
-
-function getSetDayOfWeek (input) {
-    if (!this.isValid()) {
-        return input != null ? this : NaN;
-    }
-    var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
-    if (input != null) {
-        input = parseWeekday(input, this.localeData());
-        return this.add(input - day, 'd');
-    } else {
-        return day;
-    }
-}
-
-function getSetLocaleDayOfWeek (input) {
-    if (!this.isValid()) {
-        return input != null ? this : NaN;
-    }
-    var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
-    return input == null ? weekday : this.add(input - weekday, 'd');
-}
-
-function getSetISODayOfWeek (input) {
-    if (!this.isValid()) {
-        return input != null ? this : NaN;
-    }
-
-    // behaves the same as moment#day except
-    // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
-    // as a setter, sunday should belong to the previous week.
-
-    if (input != null) {
-        var weekday = parseIsoWeekday(input, this.localeData());
-        return this.day(this.day() % 7 ? weekday : weekday - 7);
-    } else {
-        return this.day() || 7;
-    }
-}
-
-var defaultWeekdaysRegex = matchWord;
-function weekdaysRegex (isStrict) {
-    if (this._weekdaysParseExact) {
-        if (!hasOwnProp(this, '_weekdaysRegex')) {
-            computeWeekdaysParse.call(this);
-        }
-        if (isStrict) {
-            return this._weekdaysStrictRegex;
-        } else {
-            return this._weekdaysRegex;
-        }
-    } else {
-        if (!hasOwnProp(this, '_weekdaysRegex')) {
-            this._weekdaysRegex = defaultWeekdaysRegex;
-        }
-        return this._weekdaysStrictRegex && isStrict ?
-            this._weekdaysStrictRegex : this._weekdaysRegex;
-    }
-}
-
-var defaultWeekdaysShortRegex = matchWord;
-function weekdaysShortRegex (isStrict) {
-    if (this._weekdaysParseExact) {
-        if (!hasOwnProp(this, '_weekdaysRegex')) {
-            computeWeekdaysParse.call(this);
-        }
-        if (isStrict) {
-            return this._weekdaysShortStrictRegex;
-        } else {
-            return this._weekdaysShortRegex;
-        }
-    } else {
-        if (!hasOwnProp(this, '_weekdaysShortRegex')) {
-            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
-        }
-        return this._weekdaysShortStrictRegex && isStrict ?
-            this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
-    }
-}
-
-var defaultWeekdaysMinRegex = matchWord;
-function weekdaysMinRegex (isStrict) {
-    if (this._weekdaysParseExact) {
-        if (!hasOwnProp(this, '_weekdaysRegex')) {
-            computeWeekdaysParse.call(this);
-        }
-        if (isStrict) {
-            return this._weekdaysMinStrictRegex;
-        } else {
-            return this._weekdaysMinRegex;
-        }
-    } else {
-        if (!hasOwnProp(this, '_weekdaysMinRegex')) {
-            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
-        }
-        return this._weekdaysMinStrictRegex && isStrict ?
-            this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
-    }
-}
-
-
-function computeWeekdaysParse () {
-    function cmpLenRev(a, b) {
-        return b.length - a.length;
-    }
-
-    var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
-        i, mom, minp, shortp, longp;
-    for (i = 0; i < 7; i++) {
-        // make the regex if we don't have it already
-        mom = createUTC([2000, 1]).day(i);
-        minp = this.weekdaysMin(mom, '');
-        shortp = this.weekdaysShort(mom, '');
-        longp = this.weekdays(mom, '');
-        minPieces.push(minp);
-        shortPieces.push(shortp);
-        longPieces.push(longp);
-        mixedPieces.push(minp);
-        mixedPieces.push(shortp);
-        mixedPieces.push(longp);
-    }
-    // Sorting makes sure if one weekday (or abbr) is a prefix of another it
-    // will match the longer piece.
-    minPieces.sort(cmpLenRev);
-    shortPieces.sort(cmpLenRev);
-    longPieces.sort(cmpLenRev);
-    mixedPieces.sort(cmpLenRev);
-    for (i = 0; i < 7; i++) {
-        shortPieces[i] = regexEscape(shortPieces[i]);
-        longPieces[i] = regexEscape(longPieces[i]);
-        mixedPieces[i] = regexEscape(mixedPieces[i]);
-    }
-
-    this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
-    this._weekdaysShortRegex = this._weekdaysRegex;
-    this._weekdaysMinRegex = this._weekdaysRegex;
-
-    this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
-    this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
-    this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
-}
-
-// FORMATTING
-
-function hFormat() {
-    return this.hours() % 12 || 12;
-}
-
-function kFormat() {
-    return this.hours() || 24;
-}
-
-addFormatToken('H', ['HH', 2], 0, 'hour');
-addFormatToken('h', ['hh', 2], 0, hFormat);
-addFormatToken('k', ['kk', 2], 0, kFormat);
-
-addFormatToken('hmm', 0, 0, function () {
-    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
-});
-
-addFormatToken('hmmss', 0, 0, function () {
-    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
-        zeroFill(this.seconds(), 2);
-});
-
-addFormatToken('Hmm', 0, 0, function () {
-    return '' + this.hours() + zeroFill(this.minutes(), 2);
-});
-
-addFormatToken('Hmmss', 0, 0, function () {
-    return '' + this.hours() + zeroFill(this.minutes(), 2) +
-        zeroFill(this.seconds(), 2);
-});
-
-function meridiem (token, lowercase) {
-    addFormatToken(token, 0, 0, function () {
-        return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
-    });
-}
-
-meridiem('a', true);
-meridiem('A', false);
-
-// ALIASES
-
-addUnitAlias('hour', 'h');
-
-// PRIORITY
-addUnitPriority('hour', 13);
-
-// PARSING
-
-function matchMeridiem (isStrict, locale) {
-    return locale._meridiemParse;
-}
-
-addRegexToken('a',  matchMeridiem);
-addRegexToken('A',  matchMeridiem);
-addRegexToken('H',  match1to2);
-addRegexToken('h',  match1to2);
-addRegexToken('k',  match1to2);
-addRegexToken('HH', match1to2, match2);
-addRegexToken('hh', match1to2, match2);
-addRegexToken('kk', match1to2, match2);
-
-addRegexToken('hmm', match3to4);
-addRegexToken('hmmss', match5to6);
-addRegexToken('Hmm', match3to4);
-addRegexToken('Hmmss', match5to6);
-
-addParseToken(['H', 'HH'], HOUR);
-addParseToken(['k', 'kk'], function (input, array, config) {
-    var kInput = toInt(input);
-    array[HOUR] = kInput === 24 ? 0 : kInput;
-});
-addParseToken(['a', 'A'], function (input, array, config) {
-    config._isPm = config._locale.isPM(input);
-    config._meridiem = input;
-});
-addParseToken(['h', 'hh'], function (input, array, config) {
-    array[HOUR] = toInt(input);
-    getParsingFlags(config).bigHour = true;
-});
-addParseToken('hmm', function (input, array, config) {
-    var pos = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos));
-    array[MINUTE] = toInt(input.substr(pos));
-    getParsingFlags(config).bigHour = true;
-});
-addParseToken('hmmss', function (input, array, config) {
-    var pos1 = input.length - 4;
-    var pos2 = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos1));
-    array[MINUTE] = toInt(input.substr(pos1, 2));
-    array[SECOND] = toInt(input.substr(pos2));
-    getParsingFlags(config).bigHour = true;
-});
-addParseToken('Hmm', function (input, array, config) {
-    var pos = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos));
-    array[MINUTE] = toInt(input.substr(pos));
-});
-addParseToken('Hmmss', function (input, array, config) {
-    var pos1 = input.length - 4;
-    var pos2 = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos1));
-    array[MINUTE] = toInt(input.substr(pos1, 2));
-    array[SECOND] = toInt(input.substr(pos2));
-});
-
-// LOCALES
-
-function localeIsPM (input) {
-    // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
-    // Using charAt should be more compatible.
-    return ((input + '').toLowerCase().charAt(0) === 'p');
-}
-
-var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
-function localeMeridiem (hours, minutes, isLower) {
-    if (hours > 11) {
-        return isLower ? 'pm' : 'PM';
-    } else {
-        return isLower ? 'am' : 'AM';
-    }
-}
-
-
-// MOMENTS
-
-// Setting the hour should keep the time, because the user explicitly
-// specified which hour he wants. So trying to maintain the same hour (in
-// a new timezone) makes sense. Adding/subtracting hours does not follow
-// this rule.
-var getSetHour = makeGetSet('Hours', true);
-
-// months
-// week
-// weekdays
-// meridiem
-var baseConfig = {
-    calendar: defaultCalendar,
-    longDateFormat: defaultLongDateFormat,
-    invalidDate: defaultInvalidDate,
-    ordinal: defaultOrdinal,
-    dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
-    relativeTime: defaultRelativeTime,
-
-    months: defaultLocaleMonths,
-    monthsShort: defaultLocaleMonthsShort,
-
-    week: defaultLocaleWeek,
-
-    weekdays: defaultLocaleWeekdays,
-    weekdaysMin: defaultLocaleWeekdaysMin,
-    weekdaysShort: defaultLocaleWeekdaysShort,
-
-    meridiemParse: defaultLocaleMeridiemParse
-};
-
-// internal storage for locale config files
-var locales = {};
-var localeFamilies = {};
-var globalLocale;
-
-function normalizeLocale(key) {
-    return key ? key.toLowerCase().replace('_', '-') : key;
-}
-
-// pick the locale from the array
-// try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
-// substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
-function chooseLocale(names) {
-    var i = 0, j, next, locale, split;
-
-    while (i < names.length) {
-        split = normalizeLocale(names[i]).split('-');
-        j = split.length;
-        next = normalizeLocale(names[i + 1]);
-        next = next ? next.split('-') : null;
-        while (j > 0) {
-            locale = loadLocale(split.slice(0, j).join('-'));
-            if (locale) {
-                return locale;
-            }
-            if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
-                //the next array item is better than a shallower substring of this one
-                break;
-            }
-            j--;
-        }
-        i++;
-    }
-    return null;
-}
-
-function loadLocale(name) {
-    var oldLocale = null;
-    // TODO: Find a better way to register and load all the locales in Node
-    if (!locales[name] && (typeof module !== 'undefined') &&
-            module && module.exports) {
-        try {
-            oldLocale = globalLocale._abbr;
-            require('./locale/' + name);
-            // because defineLocale currently also sets the global locale, we
-            // want to undo that for lazy loaded locales
-            getSetGlobalLocale(oldLocale);
-        } catch (e) { }
-    }
-    return locales[name];
-}
-
-// This function will load locale and then set the global locale.  If
-// no arguments are passed in, it will simply return the current global
-// locale key.
-function getSetGlobalLocale (key, values) {
-    var data;
-    if (key) {
-        if (isUndefined(values)) {
-            data = getLocale(key);
-        }
-        else {
-            data = defineLocale(key, values);
-        }
-
-        if (data) {
-            // moment.duration._locale = moment._locale = data;
-            globalLocale = data;
-        }
-    }
-
-    return globalLocale._abbr;
-}
-
-function defineLocale (name, config) {
-    if (config !== null) {
-        var parentConfig = baseConfig;
-        config.abbr = name;
-        if (locales[name] != null) {
-            deprecateSimple('defineLocaleOverride',
-                    'use moment.updateLocale(localeName, config) to change ' +
-                    'an existing locale. moment.defineLocale(localeName, ' +
-                    'config) should only be used for creating a new locale ' +
-                    'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
-            parentConfig = locales[name]._config;
-        } else if (config.parentLocale != null) {
-            if (locales[config.parentLocale] != null) {
-                parentConfig = locales[config.parentLocale]._config;
-            } else {
-                if (!localeFamilies[config.parentLocale]) {
-                    localeFamilies[config.parentLocale] = [];
-                }
-                localeFamilies[config.parentLocale].push({
-                    name: name,
-                    config: config
-                });
-                return null;
-            }
-        }
-        locales[name] = new Locale(mergeConfigs(parentConfig, config));
-
-        if (localeFamilies[name]) {
-            localeFamilies[name].forEach(function (x) {
-                defineLocale(x.name, x.config);
-            });
-        }
-
-        // backwards compat for now: also set the locale
-        // make sure we set the locale AFTER all child locales have been
-        // created, so we won't end up with the child locale set.
-        getSetGlobalLocale(name);
-
-
-        return locales[name];
-    } else {
-        // useful for testing
-        delete locales[name];
-        return null;
-    }
-}
-
-function updateLocale(name, config) {
-    if (config != null) {
-        var locale, parentConfig = baseConfig;
-        // MERGE
-        if (locales[name] != null) {
-            parentConfig = locales[name]._config;
-        }
-        config = mergeConfigs(parentConfig, config);
-        locale = new Locale(config);
-        locale.parentLocale = locales[name];
-        locales[name] = locale;
-
-        // backwards compat for now: also set the locale
-        getSetGlobalLocale(name);
-    } else {
-        // pass null for config to unupdate, useful for tests
-        if (locales[name] != null) {
-            if (locales[name].parentLocale != null) {
-                locales[name] = locales[name].parentLocale;
-            } else if (locales[name] != null) {
-                delete locales[name];
-            }
-        }
-    }
-    return locales[name];
-}
-
-// returns locale data
-function getLocale (key) {
-    var locale;
-
-    if (key && key._locale && key._locale._abbr) {
-        key = key._locale._abbr;
-    }
-
-    if (!key) {
-        return globalLocale;
-    }
-
-    if (!isArray(key)) {
-        //short-circuit everything else
-        locale = loadLocale(key);
-        if (locale) {
-            return locale;
-        }
-        key = [key];
-    }
-
-    return chooseLocale(key);
-}
-
-function listLocales() {
-    return keys$1(locales);
-}
-
-function checkOverflow (m) {
-    var overflow;
-    var a = m._a;
-
-    if (a && getParsingFlags(m).overflow === -2) {
-        overflow =
-            a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
-            a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
-            a[HOUR]        < 0 || a[HOUR]        > 24 || (a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0)) ? HOUR :
-            a[MINUTE]      < 0 || a[MINUTE]      > 59  ? MINUTE :
-            a[SECOND]      < 0 || a[SECOND]      > 59  ? SECOND :
-            a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
-            -1;
-
-        if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
-            overflow = DATE;
-        }
-        if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
-            overflow = WEEK;
-        }
-        if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
-            overflow = WEEKDAY;
-        }
-
-        getParsingFlags(m).overflow = overflow;
-    }
-
-    return m;
-}
-
-// iso 8601 regex
-// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
-var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-
-var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
-
-var isoDates = [
-    ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
-    ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
-    ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
-    ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
-    ['YYYY-DDD', /\d{4}-\d{3}/],
-    ['YYYY-MM', /\d{4}-\d\d/, false],
-    ['YYYYYYMMDD', /[+-]\d{10}/],
-    ['YYYYMMDD', /\d{8}/],
-    // YYYYMM is NOT allowed by the standard
-    ['GGGG[W]WWE', /\d{4}W\d{3}/],
-    ['GGGG[W]WW', /\d{4}W\d{2}/, false],
-    ['YYYYDDD', /\d{7}/]
-];
-
-// iso time formats and regexes
-var isoTimes = [
-    ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
-    ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
-    ['HH:mm:ss', /\d\d:\d\d:\d\d/],
-    ['HH:mm', /\d\d:\d\d/],
-    ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
-    ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
-    ['HHmmss', /\d\d\d\d\d\d/],
-    ['HHmm', /\d\d\d\d/],
-    ['HH', /\d\d/]
-];
-
-var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
-
-// date from iso format
-function configFromISO(config) {
-    var i, l,
-        string = config._i,
-        match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
-        allowTime, dateFormat, timeFormat, tzFormat;
-
-    if (match) {
-        getParsingFlags(config).iso = true;
-
-        for (i = 0, l = isoDates.length; i < l; i++) {
-            if (isoDates[i][1].exec(match[1])) {
-                dateFormat = isoDates[i][0];
-                allowTime = isoDates[i][2] !== false;
-                break;
-            }
-        }
-        if (dateFormat == null) {
-            config._isValid = false;
-            return;
-        }
-        if (match[3]) {
-            for (i = 0, l = isoTimes.length; i < l; i++) {
-                if (isoTimes[i][1].exec(match[3])) {
-                    // match[2] should be 'T' or space
-                    timeFormat = (match[2] || ' ') + isoTimes[i][0];
-                    break;
-                }
-            }
-            if (timeFormat == null) {
-                config._isValid = false;
-                return;
-            }
-        }
-        if (!allowTime && timeFormat != null) {
-            config._isValid = false;
-            return;
-        }
-        if (match[4]) {
-            if (tzRegex.exec(match[4])) {
-                tzFormat = 'Z';
-            } else {
-                config._isValid = false;
-                return;
-            }
-        }
-        config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
-        configFromStringAndFormat(config);
-    } else {
-        config._isValid = false;
-    }
-}
-
-// RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
-var basicRfcRegex = /^((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d?\d\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(?:\d\d)?\d\d\s)(\d\d:\d\d)(\:\d\d)?(\s(?:UT|GMT|[ECMP][SD]T|[A-IK-Za-ik-z]|[+-]\d{4}))$/;
-
-// date and time from ref 2822 format
-function configFromRFC2822(config) {
-    var string, match, dayFormat,
-        dateFormat, timeFormat, tzFormat;
-    var timezones = {
-        ' GMT': ' +0000',
-        ' EDT': ' -0400',
-        ' EST': ' -0500',
-        ' CDT': ' -0500',
-        ' CST': ' -0600',
-        ' MDT': ' -0600',
-        ' MST': ' -0700',
-        ' PDT': ' -0700',
-        ' PST': ' -0800'
-    };
-    var military = 'YXWVUTSRQPONZABCDEFGHIKLM';
-    var timezone, timezoneIndex;
-
-    string = config._i
-        .replace(/\([^\)]*\)|[\n\t]/g, ' ') // Remove comments and folding whitespace
-        .replace(/(\s\s+)/g, ' ') // Replace multiple-spaces with a single space
-        .replace(/^\s|\s$/g, ''); // Remove leading and trailing spaces
-    match = basicRfcRegex.exec(string);
-
-    if (match) {
-        dayFormat = match[1] ? 'ddd' + ((match[1].length === 5) ? ', ' : ' ') : '';
-        dateFormat = 'D MMM ' + ((match[2].length > 10) ? 'YYYY ' : 'YY ');
-        timeFormat = 'HH:mm' + (match[4] ? ':ss' : '');
-
-        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
-        if (match[1]) { // day of week given
-            var momentDate = new Date(match[2]);
-            var momentDay = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][momentDate.getDay()];
-
-            if (match[1].substr(0,3) !== momentDay) {
-                getParsingFlags(config).weekdayMismatch = true;
-                config._isValid = false;
-                return;
-            }
-        }
-
-        switch (match[5].length) {
-            case 2: // military
-                if (timezoneIndex === 0) {
-                    timezone = ' +0000';
-                } else {
-                    timezoneIndex = military.indexOf(match[5][1].toUpperCase()) - 12;
-                    timezone = ((timezoneIndex < 0) ? ' -' : ' +') +
-                        (('' + timezoneIndex).replace(/^-?/, '0')).match(/..$/)[0] + '00';
-                }
-                break;
-            case 4: // Zone
-                timezone = timezones[match[5]];
-                break;
-            default: // UT or +/-9999
-                timezone = timezones[' GMT'];
-        }
-        match[5] = timezone;
-        config._i = match.splice(1).join('');
-        tzFormat = ' ZZ';
-        config._f = dayFormat + dateFormat + timeFormat + tzFormat;
-        configFromStringAndFormat(config);
-        getParsingFlags(config).rfc2822 = true;
-    } else {
-        config._isValid = false;
-    }
-}
-
-// date from iso format or fallback
-function configFromString(config) {
-    var matched = aspNetJsonRegex.exec(config._i);
-
-    if (matched !== null) {
-        config._d = new Date(+matched[1]);
-        return;
-    }
-
-    configFromISO(config);
-    if (config._isValid === false) {
-        delete config._isValid;
-    } else {
-        return;
-    }
-
-    configFromRFC2822(config);
-    if (config._isValid === false) {
-        delete config._isValid;
-    } else {
-        return;
-    }
-
-    // Final attempt, use Input Fallback
-    hooks.createFromInputFallback(config);
-}
-
-hooks.createFromInputFallback = deprecate(
-    'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
-    'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
-    'discouraged and will be removed in an upcoming major release. Please refer to ' +
-    'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
-    function (config) {
-        config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
-    }
-);
-
-// Pick the first defined of two or three arguments.
-function defaults(a, b, c) {
-    if (a != null) {
-        return a;
-    }
-    if (b != null) {
-        return b;
-    }
-    return c;
-}
-
-function currentDateArray(config) {
-    // hooks is actually the exported moment object
-    var nowValue = new Date(hooks.now());
-    if (config._useUTC) {
-        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
-    }
-    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
-}
-
-// convert an array to a date.
-// the array should mirror the parameters below
-// note: all values past the year are optional and will default to the lowest possible value.
-// [year, month, day , hour, minute, second, millisecond]
-function configFromArray (config) {
-    var i, date, input = [], currentDate, yearToUse;
-
-    if (config._d) {
-        return;
-    }
-
-    currentDate = currentDateArray(config);
-
-    //compute day of the year from weeks and weekdays
-    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
-        dayOfYearFromWeekInfo(config);
-    }
-
-    //if the day of the year is set, figure out what it is
-    if (config._dayOfYear != null) {
-        yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
-
-        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
-            getParsingFlags(config)._overflowDayOfYear = true;
-        }
-
-        date = createUTCDate(yearToUse, 0, config._dayOfYear);
-        config._a[MONTH] = date.getUTCMonth();
-        config._a[DATE] = date.getUTCDate();
-    }
-
-    // Default to current date.
-    // * if no year, month, day of month are given, default to today
-    // * if day of month is given, default month and year
-    // * if month is given, default only year
-    // * if year is given, don't default anything
-    for (i = 0; i < 3 && config._a[i] == null; ++i) {
-        config._a[i] = input[i] = currentDate[i];
-    }
-
-    // Zero out whatever was not defaulted, including time
-    for (; i < 7; i++) {
-        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
-    }
-
-    // Check for 24:00:00.000
-    if (config._a[HOUR] === 24 &&
-            config._a[MINUTE] === 0 &&
-            config._a[SECOND] === 0 &&
-            config._a[MILLISECOND] === 0) {
-        config._nextDay = true;
-        config._a[HOUR] = 0;
-    }
-
-    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
-    // Apply timezone offset from input. The actual utcOffset can be changed
-    // with parseZone.
-    if (config._tzm != null) {
-        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
-    }
-
-    if (config._nextDay) {
-        config._a[HOUR] = 24;
-    }
-}
-
-function dayOfYearFromWeekInfo(config) {
-    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
-
-    w = config._w;
-    if (w.GG != null || w.W != null || w.E != null) {
-        dow = 1;
-        doy = 4;
-
-        // TODO: We need to take the current isoWeekYear, but that depends on
-        // how we interpret now (local, utc, fixed offset). So create
-        // a now version of current config (take local/utc/offset flags, and
-        // create now).
-        weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
-        week = defaults(w.W, 1);
-        weekday = defaults(w.E, 1);
-        if (weekday < 1 || weekday > 7) {
-            weekdayOverflow = true;
-        }
-    } else {
-        dow = config._locale._week.dow;
-        doy = config._locale._week.doy;
-
-        var curWeek = weekOfYear(createLocal(), dow, doy);
-
-        weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
-
-        // Default to current week.
-        week = defaults(w.w, curWeek.week);
-
-        if (w.d != null) {
-            // weekday -- low day numbers are considered next week
-            weekday = w.d;
-            if (weekday < 0 || weekday > 6) {
-                weekdayOverflow = true;
-            }
-        } else if (w.e != null) {
-            // local weekday -- counting starts from begining of week
-            weekday = w.e + dow;
-            if (w.e < 0 || w.e > 6) {
-                weekdayOverflow = true;
-            }
-        } else {
-            // default to begining of week
-            weekday = dow;
-        }
-    }
-    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
-        getParsingFlags(config)._overflowWeeks = true;
-    } else if (weekdayOverflow != null) {
-        getParsingFlags(config)._overflowWeekday = true;
-    } else {
-        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
-        config._a[YEAR] = temp.year;
-        config._dayOfYear = temp.dayOfYear;
-    }
-}
-
-// constant that refers to the ISO standard
-hooks.ISO_8601 = function () {};
-
-// constant that refers to the RFC 2822 form
-hooks.RFC_2822 = function () {};
-
-// date from string and format string
-function configFromStringAndFormat(config) {
-    // TODO: Move this to another part of the creation flow to prevent circular deps
-    if (config._f === hooks.ISO_8601) {
-        configFromISO(config);
-        return;
-    }
-    if (config._f === hooks.RFC_2822) {
-        configFromRFC2822(config);
-        return;
-    }
-    config._a = [];
-    getParsingFlags(config).empty = true;
-
-    // This array is used to make a Date, either with `new Date` or `Date.UTC`
-    var string = '' + config._i,
-        i, parsedInput, tokens, token, skipped,
-        stringLength = string.length,
-        totalParsedInputLength = 0;
-
-    tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
-
-    for (i = 0; i < tokens.length; i++) {
-        token = tokens[i];
-        parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
-        // console.log('token', token, 'parsedInput', parsedInput,
-        //         'regex', getParseRegexForToken(token, config));
-        if (parsedInput) {
-            skipped = string.substr(0, string.indexOf(parsedInput));
-            if (skipped.length > 0) {
-                getParsingFlags(config).unusedInput.push(skipped);
-            }
-            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
-            totalParsedInputLength += parsedInput.length;
-        }
-        // don't parse if it's not a known token
-        if (formatTokenFunctions[token]) {
-            if (parsedInput) {
-                getParsingFlags(config).empty = false;
-            }
-            else {
-                getParsingFlags(config).unusedTokens.push(token);
-            }
-            addTimeToArrayFromToken(token, parsedInput, config);
-        }
-        else if (config._strict && !parsedInput) {
-            getParsingFlags(config).unusedTokens.push(token);
-        }
-    }
-
-    // add remaining unparsed input length to the string
-    getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
-    if (string.length > 0) {
-        getParsingFlags(config).unusedInput.push(string);
-    }
-
-    // clear _12h flag if hour is <= 12
-    if (config._a[HOUR] <= 12 &&
-        getParsingFlags(config).bigHour === true &&
-        config._a[HOUR] > 0) {
-        getParsingFlags(config).bigHour = undefined;
-    }
-
-    getParsingFlags(config).parsedDateParts = config._a.slice(0);
-    getParsingFlags(config).meridiem = config._meridiem;
-    // handle meridiem
-    config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
-
-    configFromArray(config);
-    checkOverflow(config);
-}
-
-
-function meridiemFixWrap (locale, hour, meridiem) {
-    var isPm;
-
-    if (meridiem == null) {
-        // nothing to do
-        return hour;
-    }
-    if (locale.meridiemHour != null) {
-        return locale.meridiemHour(hour, meridiem);
-    } else if (locale.isPM != null) {
-        // Fallback
-        isPm = locale.isPM(meridiem);
-        if (isPm && hour < 12) {
-            hour += 12;
-        }
-        if (!isPm && hour === 12) {
-            hour = 0;
-        }
-        return hour;
-    } else {
-        // this is not supposed to happen
-        return hour;
-    }
-}
-
-// date from string and array of format strings
-function configFromStringAndArray(config) {
-    var tempConfig,
-        bestMoment,
-
-        scoreToBeat,
-        i,
-        currentScore;
-
-    if (config._f.length === 0) {
-        getParsingFlags(config).invalidFormat = true;
-        config._d = new Date(NaN);
-        return;
-    }
-
-    for (i = 0; i < config._f.length; i++) {
-        currentScore = 0;
-        tempConfig = copyConfig({}, config);
-        if (config._useUTC != null) {
-            tempConfig._useUTC = config._useUTC;
-        }
-        tempConfig._f = config._f[i];
-        configFromStringAndFormat(tempConfig);
-
-        if (!isValid(tempConfig)) {
-            continue;
-        }
-
-        // if there is any input that was not parsed add a penalty for that format
-        currentScore += getParsingFlags(tempConfig).charsLeftOver;
-
-        //or tokens
-        currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
-
-        getParsingFlags(tempConfig).score = currentScore;
-
-        if (scoreToBeat == null || currentScore < scoreToBeat) {
-            scoreToBeat = currentScore;
-            bestMoment = tempConfig;
-        }
-    }
-
-    extend(config, bestMoment || tempConfig);
-}
-
-function configFromObject(config) {
-    if (config._d) {
-        return;
-    }
-
-    var i = normalizeObjectUnits(config._i);
-    config._a = map([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
-        return obj && parseInt(obj, 10);
-    });
-
-    configFromArray(config);
-}
-
-function createFromConfig (config) {
-    var res = new Moment(checkOverflow(prepareConfig(config)));
-    if (res._nextDay) {
-        // Adding is smart enough around DST
-        res.add(1, 'd');
-        res._nextDay = undefined;
-    }
-
-    return res;
-}
-
-function prepareConfig (config) {
-    var input = config._i,
-        format = config._f;
-
-    config._locale = config._locale || getLocale(config._l);
-
-    if (input === null || (format === undefined && input === '')) {
-        return createInvalid({nullInput: true});
-    }
-
-    if (typeof input === 'string') {
-        config._i = input = config._locale.preparse(input);
-    }
-
-    if (isMoment(input)) {
-        return new Moment(checkOverflow(input));
-    } else if (isDate(input)) {
-        config._d = input;
-    } else if (isArray(format)) {
-        configFromStringAndArray(config);
-    } else if (format) {
-        configFromStringAndFormat(config);
-    }  else {
-        configFromInput(config);
-    }
-
-    if (!isValid(config)) {
-        config._d = null;
-    }
-
-    return config;
-}
-
-function configFromInput(config) {
-    var input = config._i;
-    if (isUndefined(input)) {
-        config._d = new Date(hooks.now());
-    } else if (isDate(input)) {
-        config._d = new Date(input.valueOf());
-    } else if (typeof input === 'string') {
-        configFromString(config);
-    } else if (isArray(input)) {
-        config._a = map(input.slice(0), function (obj) {
-            return parseInt(obj, 10);
-        });
-        configFromArray(config);
-    } else if (isObject(input)) {
-        configFromObject(config);
-    } else if (isNumber(input)) {
-        // from milliseconds
-        config._d = new Date(input);
-    } else {
-        hooks.createFromInputFallback(config);
-    }
-}
-
-function createLocalOrUTC (input, format, locale, strict, isUTC) {
-    var c = {};
-
-    if (locale === true || locale === false) {
-        strict = locale;
-        locale = undefined;
-    }
-
-    if ((isObject(input) && isObjectEmpty(input)) ||
-            (isArray(input) && input.length === 0)) {
-        input = undefined;
-    }
-    // object construction must be done this way.
-    // https://github.com/moment/moment/issues/1423
-    c._isAMomentObject = true;
-    c._useUTC = c._isUTC = isUTC;
-    c._l = locale;
-    c._i = input;
-    c._f = format;
-    c._strict = strict;
-
-    return createFromConfig(c);
-}
-
-function createLocal (input, format, locale, strict) {
-    return createLocalOrUTC(input, format, locale, strict, false);
-}
-
-var prototypeMin = deprecate(
-    'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
-    function () {
-        var other = createLocal.apply(null, arguments);
-        if (this.isValid() && other.isValid()) {
-            return other < this ? this : other;
-        } else {
-            return createInvalid();
-        }
-    }
-);
-
-var prototypeMax = deprecate(
-    'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
-    function () {
-        var other = createLocal.apply(null, arguments);
-        if (this.isValid() && other.isValid()) {
-            return other > this ? this : other;
-        } else {
-            return createInvalid();
-        }
-    }
-);
-
-// Pick a moment m from moments so that m[fn](other) is true for all
-// other. This relies on the function fn to be transitive.
-//
-// moments should either be an array of moment objects or an array, whose
-// first element is an array of moment objects.
-function pickBy(fn, moments) {
-    var res, i;
-    if (moments.length === 1 && isArray(moments[0])) {
-        moments = moments[0];
-    }
-    if (!moments.length) {
-        return createLocal();
-    }
-    res = moments[0];
-    for (i = 1; i < moments.length; ++i) {
-        if (!moments[i].isValid() || moments[i][fn](res)) {
-            res = moments[i];
-        }
-    }
-    return res;
-}
-
-// TODO: Use [].sort instead?
-function min () {
-    var args = [].slice.call(arguments, 0);
-
-    return pickBy('isBefore', args);
-}
-
-function max () {
-    var args = [].slice.call(arguments, 0);
-
-    return pickBy('isAfter', args);
-}
-
-var now = function () {
-    return Date.now ? Date.now() : +(new Date());
-};
-
-var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'second', 'millisecond'];
-
-function isDurationValid(m) {
-    for (var key in m) {
-        if (!(ordering.indexOf(key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
-            return false;
-        }
-    }
-
-    var unitHasDecimal = false;
-    for (var i = 0; i < ordering.length; ++i) {
-        if (m[ordering[i]]) {
-            if (unitHasDecimal) {
-                return false; // only allow non-integers for smallest unit
-            }
-            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
-                unitHasDecimal = true;
-            }
-        }
-    }
-
-    return true;
-}
-
-function isValid$1() {
-    return this._isValid;
-}
-
-function createInvalid$1() {
-    return createDuration(NaN);
-}
-
-function Duration (duration) {
-    var normalizedInput = normalizeObjectUnits(duration),
-        years = normalizedInput.year || 0,
-        quarters = normalizedInput.quarter || 0,
-        months = normalizedInput.month || 0,
-        weeks = normalizedInput.week || 0,
-        days = normalizedInput.day || 0,
-        hours = normalizedInput.hour || 0,
-        minutes = normalizedInput.minute || 0,
-        seconds = normalizedInput.second || 0,
-        milliseconds = normalizedInput.millisecond || 0;
-
-    this._isValid = isDurationValid(normalizedInput);
-
-    // representation for dateAddRemove
-    this._milliseconds = +milliseconds +
-        seconds * 1e3 + // 1000
-        minutes * 6e4 + // 1000 * 60
-        hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
-    // Because of dateAddRemove treats 24 hours as different from a
-    // day when working around DST, we need to store them separately
-    this._days = +days +
-        weeks * 7;
-    // It is impossible translate months into days without knowing
-    // which months you are are talking about, so we have to store
-    // it separately.
-    this._months = +months +
-        quarters * 3 +
-        years * 12;
-
-    this._data = {};
-
-    this._locale = getLocale();
-
-    this._bubble();
-}
-
-function isDuration (obj) {
-    return obj instanceof Duration;
-}
-
-function absRound (number) {
-    if (number < 0) {
-        return Math.round(-1 * number) * -1;
-    } else {
-        return Math.round(number);
-    }
-}
-
-// FORMATTING
-
-function offset (token, separator) {
-    addFormatToken(token, 0, 0, function () {
-        var offset = this.utcOffset();
-        var sign = '+';
-        if (offset < 0) {
-            offset = -offset;
-            sign = '-';
-        }
-        return sign + zeroFill(~~(offset / 60), 2) + separator + zeroFill(~~(offset) % 60, 2);
-    });
-}
-
-offset('Z', ':');
-offset('ZZ', '');
-
-// PARSING
-
-addRegexToken('Z',  matchShortOffset);
-addRegexToken('ZZ', matchShortOffset);
-addParseToken(['Z', 'ZZ'], function (input, array, config) {
-    config._useUTC = true;
-    config._tzm = offsetFromString(matchShortOffset, input);
-});
-
-// HELPERS
-
-// timezone chunker
-// '+10:00' > ['10',  '00']
-// '-1530'  > ['-15', '30']
-var chunkOffset = /([\+\-]|\d\d)/gi;
-
-function offsetFromString(matcher, string) {
-    var matches = (string || '').match(matcher);
-
-    if (matches === null) {
-        return null;
-    }
-
-    var chunk   = matches[matches.length - 1] || [];
-    var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
-    var minutes = +(parts[1] * 60) + toInt(parts[2]);
-
-    return minutes === 0 ?
-      0 :
-      parts[0] === '+' ? minutes : -minutes;
-}
-
-// Return a moment from input, that is local/utc/zone equivalent to model.
-function cloneWithOffset(input, model) {
-    var res, diff;
-    if (model._isUTC) {
-        res = model.clone();
-        diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
-        // Use low-level api, because this fn is low-level api.
-        res._d.setTime(res._d.valueOf() + diff);
-        hooks.updateOffset(res, false);
-        return res;
-    } else {
-        return createLocal(input).local();
-    }
-}
-
-function getDateOffset (m) {
-    // On Firefox.24 Date#getTimezoneOffset returns a floating point.
-    // https://github.com/moment/moment/pull/1871
-    return -Math.round(m._d.getTimezoneOffset() / 15) * 15;
-}
-
-// HOOKS
-
-// This function will be called whenever a moment is mutated.
-// It is intended to keep the offset in sync with the timezone.
-hooks.updateOffset = function () {};
-
-// MOMENTS
-
-// keepLocalTime = true means only change the timezone, without
-// affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
-// 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
-// +0200, so we adjust the time as needed, to be valid.
-//
-// Keeping the time actually adds/subtracts (one hour)
-// from the actual represented time. That is why we call updateOffset
-// a second time. In case it wants us to change the offset again
-// _changeInProgress == true case, then we have to adjust, because
-// there is no such time in the given timezone.
-function getSetOffset (input, keepLocalTime, keepMinutes) {
-    var offset = this._offset || 0,
-        localAdjust;
-    if (!this.isValid()) {
-        return input != null ? this : NaN;
-    }
-    if (input != null) {
-        if (typeof input === 'string') {
-            input = offsetFromString(matchShortOffset, input);
-            if (input === null) {
-                return this;
-            }
-        } else if (Math.abs(input) < 16 && !keepMinutes) {
-            input = input * 60;
-        }
-        if (!this._isUTC && keepLocalTime) {
-            localAdjust = getDateOffset(this);
-        }
-        this._offset = input;
-        this._isUTC = true;
-        if (localAdjust != null) {
-            this.add(localAdjust, 'm');
-        }
-        if (offset !== input) {
-            if (!keepLocalTime || this._changeInProgress) {
-                addSubtract(this, createDuration(input - offset, 'm'), 1, false);
-            } else if (!this._changeInProgress) {
-                this._changeInProgress = true;
-                hooks.updateOffset(this, true);
-                this._changeInProgress = null;
-            }
-        }
-        return this;
-    } else {
-        return this._isUTC ? offset : getDateOffset(this);
-    }
-}
-
-function getSetZone (input, keepLocalTime) {
-    if (input != null) {
-        if (typeof input !== 'string') {
-            input = -input;
-        }
-
-        this.utcOffset(input, keepLocalTime);
-
-        return this;
-    } else {
-        return -this.utcOffset();
-    }
-}
-
-function setOffsetToUTC (keepLocalTime) {
-    return this.utcOffset(0, keepLocalTime);
-}
-
-function setOffsetToLocal (keepLocalTime) {
-    if (this._isUTC) {
-        this.utcOffset(0, keepLocalTime);
-        this._isUTC = false;
-
-        if (keepLocalTime) {
-            this.subtract(getDateOffset(this), 'm');
-        }
-    }
-    return this;
-}
-
-function setOffsetToParsedOffset () {
-    if (this._tzm != null) {
-        this.utcOffset(this._tzm, false, true);
-    } else if (typeof this._i === 'string') {
-        var tZone = offsetFromString(matchOffset, this._i);
-        if (tZone != null) {
-            this.utcOffset(tZone);
-        }
-        else {
-            this.utcOffset(0, true);
-        }
-    }
-    return this;
-}
-
-function hasAlignedHourOffset (input) {
-    if (!this.isValid()) {
-        return false;
-    }
-    input = input ? createLocal(input).utcOffset() : 0;
-
-    return (this.utcOffset() - input) % 60 === 0;
-}
-
-function isDaylightSavingTime () {
-    return (
-        this.utcOffset() > this.clone().month(0).utcOffset() ||
-        this.utcOffset() > this.clone().month(5).utcOffset()
-    );
-}
-
-function isDaylightSavingTimeShifted () {
-    if (!isUndefined(this._isDSTShifted)) {
-        return this._isDSTShifted;
-    }
-
-    var c = {};
-
-    copyConfig(c, this);
-    c = prepareConfig(c);
-
-    if (c._a) {
-        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
-        this._isDSTShifted = this.isValid() &&
-            compareArrays(c._a, other.toArray()) > 0;
-    } else {
-        this._isDSTShifted = false;
-    }
-
-    return this._isDSTShifted;
-}
-
-function isLocal () {
-    return this.isValid() ? !this._isUTC : false;
-}
-
-function isUtcOffset () {
-    return this.isValid() ? this._isUTC : false;
-}
-
-function isUtc () {
-    return this.isValid() ? this._isUTC && this._offset === 0 : false;
-}
-
-// ASP.NET json date format regex
-var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
-
-// from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
-// somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
-// and further modified to allow for strings containing both week and day
-var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
-
-function createDuration (input, key) {
-    var duration = input,
-        // matching against regexp is expensive, do it on demand
-        match = null,
-        sign,
-        ret,
-        diffRes;
-
-    if (isDuration(input)) {
-        duration = {
-            ms : input._milliseconds,
-            d  : input._days,
-            M  : input._months
-        };
-    } else if (isNumber(input)) {
-        duration = {};
-        if (key) {
-            duration[key] = input;
-        } else {
-            duration.milliseconds = input;
-        }
-    } else if (!!(match = aspNetRegex.exec(input))) {
-        sign = (match[1] === '-') ? -1 : 1;
-        duration = {
-            y  : 0,
-            d  : toInt(match[DATE])                         * sign,
-            h  : toInt(match[HOUR])                         * sign,
-            m  : toInt(match[MINUTE])                       * sign,
-            s  : toInt(match[SECOND])                       * sign,
-            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
-        };
-    } else if (!!(match = isoRegex.exec(input))) {
-        sign = (match[1] === '-') ? -1 : 1;
-        duration = {
-            y : parseIso(match[2], sign),
-            M : parseIso(match[3], sign),
-            w : parseIso(match[4], sign),
-            d : parseIso(match[5], sign),
-            h : parseIso(match[6], sign),
-            m : parseIso(match[7], sign),
-            s : parseIso(match[8], sign)
-        };
-    } else if (duration == null) {// checks for null or undefined
-        duration = {};
-    } else if (typeof duration === 'object' && ('from' in duration || 'to' in duration)) {
-        diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
-
-        duration = {};
-        duration.ms = diffRes.milliseconds;
-        duration.M = diffRes.months;
-    }
-
-    ret = new Duration(duration);
-
-    if (isDuration(input) && hasOwnProp(input, '_locale')) {
-        ret._locale = input._locale;
-    }
-
-    return ret;
-}
-
-createDuration.fn = Duration.prototype;
-createDuration.invalid = createInvalid$1;
-
-function parseIso (inp, sign) {
-    // We'd normally use ~~inp for this, but unfortunately it also
-    // converts floats to ints.
-    // inp may be undefined, so careful calling replace on it.
-    var res = inp && parseFloat(inp.replace(',', '.'));
-    // apply sign while we're at it
-    return (isNaN(res) ? 0 : res) * sign;
-}
-
-function positiveMomentsDifference(base, other) {
-    var res = {milliseconds: 0, months: 0};
-
-    res.months = other.month() - base.month() +
-        (other.year() - base.year()) * 12;
-    if (base.clone().add(res.months, 'M').isAfter(other)) {
-        --res.months;
-    }
-
-    res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
-
-    return res;
-}
-
-function momentsDifference(base, other) {
-    var res;
-    if (!(base.isValid() && other.isValid())) {
-        return {milliseconds: 0, months: 0};
-    }
-
-    other = cloneWithOffset(other, base);
-    if (base.isBefore(other)) {
-        res = positiveMomentsDifference(base, other);
-    } else {
-        res = positiveMomentsDifference(other, base);
-        res.milliseconds = -res.milliseconds;
-        res.months = -res.months;
-    }
-
-    return res;
-}
-
-// TODO: remove 'name' arg after deprecation is removed
-function createAdder(direction, name) {
-    return function (val, period) {
-        var dur, tmp;
-        //invert the arguments, but complain about it
-        if (period !== null && !isNaN(+period)) {
-            deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period). ' +
-            'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.');
-            tmp = val; val = period; period = tmp;
-        }
-
-        val = typeof val === 'string' ? +val : val;
-        dur = createDuration(val, period);
-        addSubtract(this, dur, direction);
-        return this;
-    };
-}
-
-function addSubtract (mom, duration, isAdding, updateOffset) {
-    var milliseconds = duration._milliseconds,
-        days = absRound(duration._days),
-        months = absRound(duration._months);
-
-    if (!mom.isValid()) {
-        // No op
-        return;
-    }
-
-    updateOffset = updateOffset == null ? true : updateOffset;
-
-    if (milliseconds) {
-        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
-    }
-    if (days) {
-        set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
-    }
-    if (months) {
-        setMonth(mom, get(mom, 'Month') + months * isAdding);
-    }
-    if (updateOffset) {
-        hooks.updateOffset(mom, days || months);
-    }
-}
-
-var add      = createAdder(1, 'add');
-var subtract = createAdder(-1, 'subtract');
-
-function getCalendarFormat(myMoment, now) {
-    var diff = myMoment.diff(now, 'days', true);
-    return diff < -6 ? 'sameElse' :
-            diff < -1 ? 'lastWeek' :
-            diff < 0 ? 'lastDay' :
-            diff < 1 ? 'sameDay' :
-            diff < 2 ? 'nextDay' :
-            diff < 7 ? 'nextWeek' : 'sameElse';
-}
-
-function calendar$1 (time, formats) {
-    // We want to compare the start of today, vs this.
-    // Getting start-of-today depends on whether we're local/utc/offset or not.
-    var now = time || createLocal(),
-        sod = cloneWithOffset(now, this).startOf('day'),
-        format = hooks.calendarFormat(this, sod) || 'sameElse';
-
-    var output = formats && (isFunction(formats[format]) ? formats[format].call(this, now) : formats[format]);
-
-    return this.format(output || this.localeData().calendar(format, this, createLocal(now)));
-}
-
-function clone () {
-    return new Moment(this);
-}
-
-function isAfter (input, units) {
-    var localInput = isMoment(input) ? input : createLocal(input);
-    if (!(this.isValid() && localInput.isValid())) {
-        return false;
-    }
-    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
-    if (units === 'millisecond') {
-        return this.valueOf() > localInput.valueOf();
-    } else {
-        return localInput.valueOf() < this.clone().startOf(units).valueOf();
-    }
-}
-
-function isBefore (input, units) {
-    var localInput = isMoment(input) ? input : createLocal(input);
-    if (!(this.isValid() && localInput.isValid())) {
-        return false;
-    }
-    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
-    if (units === 'millisecond') {
-        return this.valueOf() < localInput.valueOf();
-    } else {
-        return this.clone().endOf(units).valueOf() < localInput.valueOf();
-    }
-}
-
-function isBetween (from, to, units, inclusivity) {
-    inclusivity = inclusivity || '()';
-    return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
-        (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
-}
-
-function isSame (input, units) {
-    var localInput = isMoment(input) ? input : createLocal(input),
-        inputMs;
-    if (!(this.isValid() && localInput.isValid())) {
-        return false;
-    }
-    units = normalizeUnits(units || 'millisecond');
-    if (units === 'millisecond') {
-        return this.valueOf() === localInput.valueOf();
-    } else {
-        inputMs = localInput.valueOf();
-        return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
-    }
-}
-
-function isSameOrAfter (input, units) {
-    return this.isSame(input, units) || this.isAfter(input,units);
-}
-
-function isSameOrBefore (input, units) {
-    return this.isSame(input, units) || this.isBefore(input,units);
-}
-
-function diff (input, units, asFloat) {
-    var that,
-        zoneDelta,
-        delta, output;
-
-    if (!this.isValid()) {
-        return NaN;
-    }
-
-    that = cloneWithOffset(input, this);
-
-    if (!that.isValid()) {
-        return NaN;
-    }
-
-    zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
-
-    units = normalizeUnits(units);
-
-    if (units === 'year' || units === 'month' || units === 'quarter') {
-        output = monthDiff(this, that);
-        if (units === 'quarter') {
-            output = output / 3;
-        } else if (units === 'year') {
-            output = output / 12;
-        }
-    } else {
-        delta = this - that;
-        output = units === 'second' ? delta / 1e3 : // 1000
-            units === 'minute' ? delta / 6e4 : // 1000 * 60
-            units === 'hour' ? delta / 36e5 : // 1000 * 60 * 60
-            units === 'day' ? (delta - zoneDelta) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
-            units === 'week' ? (delta - zoneDelta) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
-            delta;
-    }
-    return asFloat ? output : absFloor(output);
-}
-
-function monthDiff (a, b) {
-    // difference in months
-    var wholeMonthDiff = ((b.year() - a.year()) * 12) + (b.month() - a.month()),
-        // b is in (anchor - 1 month, anchor + 1 month)
-        anchor = a.clone().add(wholeMonthDiff, 'months'),
-        anchor2, adjust;
-
-    if (b - anchor < 0) {
-        anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
-        // linear across the month
-        adjust = (b - anchor) / (anchor - anchor2);
-    } else {
-        anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
-        // linear across the month
-        adjust = (b - anchor) / (anchor2 - anchor);
-    }
-
-    //check for negative zero, return zero if negative zero
-    return -(wholeMonthDiff + adjust) || 0;
-}
-
-hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
-hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
-
-function toString () {
-    return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-}
-
-function toISOString() {
-    if (!this.isValid()) {
-        return null;
-    }
-    var m = this.clone().utc();
-    if (m.year() < 0 || m.year() > 9999) {
-        return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-    }
-    if (isFunction(Date.prototype.toISOString)) {
-        // native implementation is ~50x faster, use it when we can
-        return this.toDate().toISOString();
-    }
-    return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-}
-
-/**
- * Return a human readable representation of a moment that can
- * also be evaluated to get a new moment which is the same
- *
- * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
- */
-function inspect () {
-    if (!this.isValid()) {
-        return 'moment.invalid(/* ' + this._i + ' */)';
-    }
-    var func = 'moment';
-    var zone = '';
-    if (!this.isLocal()) {
-        func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
-        zone = 'Z';
-    }
-    var prefix = '[' + func + '("]';
-    var year = (0 <= this.year() && this.year() <= 9999) ? 'YYYY' : 'YYYYYY';
-    var datetime = '-MM-DD[T]HH:mm:ss.SSS';
-    var suffix = zone + '[")]';
-
-    return this.format(prefix + year + datetime + suffix);
-}
-
-function format (inputString) {
-    if (!inputString) {
-        inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
-    }
-    var output = formatMoment(this, inputString);
-    return this.localeData().postformat(output);
-}
-
-function from (time, withoutSuffix) {
-    if (this.isValid() &&
-            ((isMoment(time) && time.isValid()) ||
-             createLocal(time).isValid())) {
-        return createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
-    } else {
-        return this.localeData().invalidDate();
-    }
-}
-
-function fromNow (withoutSuffix) {
-    return this.from(createLocal(), withoutSuffix);
-}
-
-function to (time, withoutSuffix) {
-    if (this.isValid() &&
-            ((isMoment(time) && time.isValid()) ||
-             createLocal(time).isValid())) {
-        return createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
-    } else {
-        return this.localeData().invalidDate();
-    }
-}
-
-function toNow (withoutSuffix) {
-    return this.to(createLocal(), withoutSuffix);
-}
-
-// If passed a locale key, it will set the locale for this
-// instance.  Otherwise, it will return the locale configuration
-// variables for this instance.
-function locale (key) {
-    var newLocaleData;
-
-    if (key === undefined) {
-        return this._locale._abbr;
-    } else {
-        newLocaleData = getLocale(key);
-        if (newLocaleData != null) {
-            this._locale = newLocaleData;
-        }
-        return this;
-    }
-}
-
-var lang = deprecate(
-    'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
-    function (key) {
-        if (key === undefined) {
-            return this.localeData();
-        } else {
-            return this.locale(key);
-        }
-    }
-);
-
-function localeData () {
-    return this._locale;
-}
-
-function startOf (units) {
-    units = normalizeUnits(units);
-    // the following switch intentionally omits break keywords
-    // to utilize falling through the cases.
-    switch (units) {
-        case 'year':
-            this.month(0);
-            /* falls through */
-        case 'quarter':
-        case 'month':
-            this.date(1);
-            /* falls through */
-        case 'week':
-        case 'isoWeek':
-        case 'day':
-        case 'date':
-            this.hours(0);
-            /* falls through */
-        case 'hour':
-            this.minutes(0);
-            /* falls through */
-        case 'minute':
-            this.seconds(0);
-            /* falls through */
-        case 'second':
-            this.milliseconds(0);
-    }
-
-    // weeks are a special case
-    if (units === 'week') {
-        this.weekday(0);
-    }
-    if (units === 'isoWeek') {
-        this.isoWeekday(1);
-    }
-
-    // quarters are also special
-    if (units === 'quarter') {
-        this.month(Math.floor(this.month() / 3) * 3);
-    }
-
-    return this;
-}
-
-function endOf (units) {
-    units = normalizeUnits(units);
-    if (units === undefined || units === 'millisecond') {
-        return this;
-    }
-
-    // 'date' is an alias for 'day', so it should be considered as such.
-    if (units === 'date') {
-        units = 'day';
-    }
-
-    return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
-}
-
-function valueOf () {
-    return this._d.valueOf() - ((this._offset || 0) * 60000);
-}
-
-function unix () {
-    return Math.floor(this.valueOf() / 1000);
-}
-
-function toDate () {
-    return new Date(this.valueOf());
-}
-
-function toArray () {
-    var m = this;
-    return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
-}
-
-function toObject () {
-    var m = this;
-    return {
-        years: m.year(),
-        months: m.month(),
-        date: m.date(),
-        hours: m.hours(),
-        minutes: m.minutes(),
-        seconds: m.seconds(),
-        milliseconds: m.milliseconds()
-    };
-}
-
-function toJSON () {
-    // new Date(NaN).toJSON() === null
-    return this.isValid() ? this.toISOString() : null;
-}
-
-function isValid$2 () {
-    return isValid(this);
-}
-
-function parsingFlags () {
-    return extend({}, getParsingFlags(this));
-}
-
-function invalidAt () {
-    return getParsingFlags(this).overflow;
-}
-
-function creationData() {
-    return {
-        input: this._i,
-        format: this._f,
-        locale: this._locale,
-        isUTC: this._isUTC,
-        strict: this._strict
-    };
-}
-
-// FORMATTING
-
-addFormatToken(0, ['gg', 2], 0, function () {
-    return this.weekYear() % 100;
-});
-
-addFormatToken(0, ['GG', 2], 0, function () {
-    return this.isoWeekYear() % 100;
-});
-
-function addWeekYearFormatToken (token, getter) {
-    addFormatToken(0, [token, token.length], 0, getter);
-}
-
-addWeekYearFormatToken('gggg',     'weekYear');
-addWeekYearFormatToken('ggggg',    'weekYear');
-addWeekYearFormatToken('GGGG',  'isoWeekYear');
-addWeekYearFormatToken('GGGGG', 'isoWeekYear');
-
-// ALIASES
-
-addUnitAlias('weekYear', 'gg');
-addUnitAlias('isoWeekYear', 'GG');
-
-// PRIORITY
-
-addUnitPriority('weekYear', 1);
-addUnitPriority('isoWeekYear', 1);
-
-
-// PARSING
-
-addRegexToken('G',      matchSigned);
-addRegexToken('g',      matchSigned);
-addRegexToken('GG',     match1to2, match2);
-addRegexToken('gg',     match1to2, match2);
-addRegexToken('GGGG',   match1to4, match4);
-addRegexToken('gggg',   match1to4, match4);
-addRegexToken('GGGGG',  match1to6, match6);
-addRegexToken('ggggg',  match1to6, match6);
-
-addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
-    week[token.substr(0, 2)] = toInt(input);
-});
-
-addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
-    week[token] = hooks.parseTwoDigitYear(input);
-});
-
-// MOMENTS
-
-function getSetWeekYear (input) {
-    return getSetWeekYearHelper.call(this,
-            input,
-            this.week(),
-            this.weekday(),
-            this.localeData()._week.dow,
-            this.localeData()._week.doy);
-}
-
-function getSetISOWeekYear (input) {
-    return getSetWeekYearHelper.call(this,
-            input, this.isoWeek(), this.isoWeekday(), 1, 4);
-}
-
-function getISOWeeksInYear () {
-    return weeksInYear(this.year(), 1, 4);
-}
-
-function getWeeksInYear () {
-    var weekInfo = this.localeData()._week;
-    return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
-}
-
-function getSetWeekYearHelper(input, week, weekday, dow, doy) {
-    var weeksTarget;
-    if (input == null) {
-        return weekOfYear(this, dow, doy).year;
-    } else {
-        weeksTarget = weeksInYear(input, dow, doy);
-        if (week > weeksTarget) {
-            week = weeksTarget;
-        }
-        return setWeekAll.call(this, input, week, weekday, dow, doy);
-    }
-}
-
-function setWeekAll(weekYear, week, weekday, dow, doy) {
-    var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
-        date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
-
-    this.year(date.getUTCFullYear());
-    this.month(date.getUTCMonth());
-    this.date(date.getUTCDate());
-    return this;
-}
-
-// FORMATTING
-
-addFormatToken('Q', 0, 'Qo', 'quarter');
-
-// ALIASES
-
-addUnitAlias('quarter', 'Q');
-
-// PRIORITY
-
-addUnitPriority('quarter', 7);
-
-// PARSING
-
-addRegexToken('Q', match1);
-addParseToken('Q', function (input, array) {
-    array[MONTH] = (toInt(input) - 1) * 3;
-});
-
-// MOMENTS
-
-function getSetQuarter (input) {
-    return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
-}
-
-// FORMATTING
-
-addFormatToken('D', ['DD', 2], 'Do', 'date');
-
-// ALIASES
-
-addUnitAlias('date', 'D');
-
-// PRIOROITY
-addUnitPriority('date', 9);
-
-// PARSING
-
-addRegexToken('D',  match1to2);
-addRegexToken('DD', match1to2, match2);
-addRegexToken('Do', function (isStrict, locale) {
-    // TODO: Remove "ordinalParse" fallback in next major release.
-    return isStrict ?
-      (locale._dayOfMonthOrdinalParse || locale._ordinalParse) :
-      locale._dayOfMonthOrdinalParseLenient;
-});
-
-addParseToken(['D', 'DD'], DATE);
-addParseToken('Do', function (input, array) {
-    array[DATE] = toInt(input.match(match1to2)[0], 10);
-});
-
-// MOMENTS
-
-var getSetDayOfMonth = makeGetSet('Date', true);
-
-// FORMATTING
-
-addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
-
-// ALIASES
-
-addUnitAlias('dayOfYear', 'DDD');
-
-// PRIORITY
-addUnitPriority('dayOfYear', 4);
-
-// PARSING
-
-addRegexToken('DDD',  match1to3);
-addRegexToken('DDDD', match3);
-addParseToken(['DDD', 'DDDD'], function (input, array, config) {
-    config._dayOfYear = toInt(input);
-});
-
-// HELPERS
-
-// MOMENTS
-
-function getSetDayOfYear (input) {
-    var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
-    return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
-}
-
-// FORMATTING
-
-addFormatToken('m', ['mm', 2], 0, 'minute');
-
-// ALIASES
-
-addUnitAlias('minute', 'm');
-
-// PRIORITY
-
-addUnitPriority('minute', 14);
-
-// PARSING
-
-addRegexToken('m',  match1to2);
-addRegexToken('mm', match1to2, match2);
-addParseToken(['m', 'mm'], MINUTE);
-
-// MOMENTS
-
-var getSetMinute = makeGetSet('Minutes', false);
-
-// FORMATTING
-
-addFormatToken('s', ['ss', 2], 0, 'second');
-
-// ALIASES
-
-addUnitAlias('second', 's');
-
-// PRIORITY
-
-addUnitPriority('second', 15);
-
-// PARSING
-
-addRegexToken('s',  match1to2);
-addRegexToken('ss', match1to2, match2);
-addParseToken(['s', 'ss'], SECOND);
-
-// MOMENTS
-
-var getSetSecond = makeGetSet('Seconds', false);
-
-// FORMATTING
-
-addFormatToken('S', 0, 0, function () {
-    return ~~(this.millisecond() / 100);
-});
-
-addFormatToken(0, ['SS', 2], 0, function () {
-    return ~~(this.millisecond() / 10);
-});
-
-addFormatToken(0, ['SSS', 3], 0, 'millisecond');
-addFormatToken(0, ['SSSS', 4], 0, function () {
-    return this.millisecond() * 10;
-});
-addFormatToken(0, ['SSSSS', 5], 0, function () {
-    return this.millisecond() * 100;
-});
-addFormatToken(0, ['SSSSSS', 6], 0, function () {
-    return this.millisecond() * 1000;
-});
-addFormatToken(0, ['SSSSSSS', 7], 0, function () {
-    return this.millisecond() * 10000;
-});
-addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
-    return this.millisecond() * 100000;
-});
-addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
-    return this.millisecond() * 1000000;
-});
-
-
-// ALIASES
-
-addUnitAlias('millisecond', 'ms');
-
-// PRIORITY
-
-addUnitPriority('millisecond', 16);
-
-// PARSING
-
-addRegexToken('S',    match1to3, match1);
-addRegexToken('SS',   match1to3, match2);
-addRegexToken('SSS',  match1to3, match3);
-
-var token;
-for (token = 'SSSS'; token.length <= 9; token += 'S') {
-    addRegexToken(token, matchUnsigned);
-}
-
-function parseMs(input, array) {
-    array[MILLISECOND] = toInt(('0.' + input) * 1000);
-}
-
-for (token = 'S'; token.length <= 9; token += 'S') {
-    addParseToken(token, parseMs);
-}
-// MOMENTS
-
-var getSetMillisecond = makeGetSet('Milliseconds', false);
-
-// FORMATTING
-
-addFormatToken('z',  0, 0, 'zoneAbbr');
-addFormatToken('zz', 0, 0, 'zoneName');
-
-// MOMENTS
-
-function getZoneAbbr () {
-    return this._isUTC ? 'UTC' : '';
-}
-
-function getZoneName () {
-    return this._isUTC ? 'Coordinated Universal Time' : '';
-}
-
-var proto = Moment.prototype;
-
-proto.add               = add;
-proto.calendar          = calendar$1;
-proto.clone             = clone;
-proto.diff              = diff;
-proto.endOf             = endOf;
-proto.format            = format;
-proto.from              = from;
-proto.fromNow           = fromNow;
-proto.to                = to;
-proto.toNow             = toNow;
-proto.get               = stringGet;
-proto.invalidAt         = invalidAt;
-proto.isAfter           = isAfter;
-proto.isBefore          = isBefore;
-proto.isBetween         = isBetween;
-proto.isSame            = isSame;
-proto.isSameOrAfter     = isSameOrAfter;
-proto.isSameOrBefore    = isSameOrBefore;
-proto.isValid           = isValid$2;
-proto.lang              = lang;
-proto.locale            = locale;
-proto.localeData        = localeData;
-proto.max               = prototypeMax;
-proto.min               = prototypeMin;
-proto.parsingFlags      = parsingFlags;
-proto.set               = stringSet;
-proto.startOf           = startOf;
-proto.subtract          = subtract;
-proto.toArray           = toArray;
-proto.toObject          = toObject;
-proto.toDate            = toDate;
-proto.toISOString       = toISOString;
-proto.inspect           = inspect;
-proto.toJSON            = toJSON;
-proto.toString          = toString;
-proto.unix              = unix;
-proto.valueOf           = valueOf;
-proto.creationData      = creationData;
-
-// Year
-proto.year       = getSetYear;
-proto.isLeapYear = getIsLeapYear;
-
-// Week Year
-proto.weekYear    = getSetWeekYear;
-proto.isoWeekYear = getSetISOWeekYear;
-
-// Quarter
-proto.quarter = proto.quarters = getSetQuarter;
-
-// Month
-proto.month       = getSetMonth;
-proto.daysInMonth = getDaysInMonth;
-
-// Week
-proto.week           = proto.weeks        = getSetWeek;
-proto.isoWeek        = proto.isoWeeks     = getSetISOWeek;
-proto.weeksInYear    = getWeeksInYear;
-proto.isoWeeksInYear = getISOWeeksInYear;
-
-// Day
-proto.date       = getSetDayOfMonth;
-proto.day        = proto.days             = getSetDayOfWeek;
-proto.weekday    = getSetLocaleDayOfWeek;
-proto.isoWeekday = getSetISODayOfWeek;
-proto.dayOfYear  = getSetDayOfYear;
-
-// Hour
-proto.hour = proto.hours = getSetHour;
-
-// Minute
-proto.minute = proto.minutes = getSetMinute;
-
-// Second
-proto.second = proto.seconds = getSetSecond;
-
-// Millisecond
-proto.millisecond = proto.milliseconds = getSetMillisecond;
-
-// Offset
-proto.utcOffset            = getSetOffset;
-proto.utc                  = setOffsetToUTC;
-proto.local                = setOffsetToLocal;
-proto.parseZone            = setOffsetToParsedOffset;
-proto.hasAlignedHourOffset = hasAlignedHourOffset;
-proto.isDST                = isDaylightSavingTime;
-proto.isLocal              = isLocal;
-proto.isUtcOffset          = isUtcOffset;
-proto.isUtc                = isUtc;
-proto.isUTC                = isUtc;
-
-// Timezone
-proto.zoneAbbr = getZoneAbbr;
-proto.zoneName = getZoneName;
-
-// Deprecations
-proto.dates  = deprecate('dates accessor is deprecated. Use date instead.', getSetDayOfMonth);
-proto.months = deprecate('months accessor is deprecated. Use month instead', getSetMonth);
-proto.years  = deprecate('years accessor is deprecated. Use year instead', getSetYear);
-proto.zone   = deprecate('moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/', getSetZone);
-proto.isDSTShifted = deprecate('isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information', isDaylightSavingTimeShifted);
-
-function createUnix (input) {
-    return createLocal(input * 1000);
-}
-
-function createInZone () {
-    return createLocal.apply(null, arguments).parseZone();
-}
-
-function preParsePostFormat (string) {
-    return string;
-}
-
-var proto$1 = Locale.prototype;
-
-proto$1.calendar        = calendar;
-proto$1.longDateFormat  = longDateFormat;
-proto$1.invalidDate     = invalidDate;
-proto$1.ordinal         = ordinal;
-proto$1.preparse        = preParsePostFormat;
-proto$1.postformat      = preParsePostFormat;
-proto$1.relativeTime    = relativeTime;
-proto$1.pastFuture      = pastFuture;
-proto$1.set             = set;
-
-// Month
-proto$1.months            =        localeMonths;
-proto$1.monthsShort       =        localeMonthsShort;
-proto$1.monthsParse       =        localeMonthsParse;
-proto$1.monthsRegex       = monthsRegex;
-proto$1.monthsShortRegex  = monthsShortRegex;
-
-// Week
-proto$1.week = localeWeek;
-proto$1.firstDayOfYear = localeFirstDayOfYear;
-proto$1.firstDayOfWeek = localeFirstDayOfWeek;
-
-// Day of Week
-proto$1.weekdays       =        localeWeekdays;
-proto$1.weekdaysMin    =        localeWeekdaysMin;
-proto$1.weekdaysShort  =        localeWeekdaysShort;
-proto$1.weekdaysParse  =        localeWeekdaysParse;
-
-proto$1.weekdaysRegex       =        weekdaysRegex;
-proto$1.weekdaysShortRegex  =        weekdaysShortRegex;
-proto$1.weekdaysMinRegex    =        weekdaysMinRegex;
-
-// Hours
-proto$1.isPM = localeIsPM;
-proto$1.meridiem = localeMeridiem;
-
-function get$1 (format, index, field, setter) {
-    var locale = getLocale();
-    var utc = createUTC().set(setter, index);
-    return locale[field](utc, format);
-}
-
-function listMonthsImpl (format, index, field) {
-    if (isNumber(format)) {
-        index = format;
-        format = undefined;
-    }
-
-    format = format || '';
-
-    if (index != null) {
-        return get$1(format, index, field, 'month');
-    }
-
-    var i;
-    var out = [];
-    for (i = 0; i < 12; i++) {
-        out[i] = get$1(format, i, field, 'month');
-    }
-    return out;
-}
-
-// ()
-// (5)
-// (fmt, 5)
-// (fmt)
-// (true)
-// (true, 5)
-// (true, fmt, 5)
-// (true, fmt)
-function listWeekdaysImpl (localeSorted, format, index, field) {
-    if (typeof localeSorted === 'boolean') {
-        if (isNumber(format)) {
-            index = format;
-            format = undefined;
-        }
-
-        format = format || '';
-    } else {
-        format = localeSorted;
-        index = format;
-        localeSorted = false;
-
-        if (isNumber(format)) {
-            index = format;
-            format = undefined;
-        }
-
-        format = format || '';
-    }
-
-    var locale = getLocale(),
-        shift = localeSorted ? locale._week.dow : 0;
-
-    if (index != null) {
-        return get$1(format, (index + shift) % 7, field, 'day');
-    }
-
-    var i;
-    var out = [];
-    for (i = 0; i < 7; i++) {
-        out[i] = get$1(format, (i + shift) % 7, field, 'day');
-    }
-    return out;
-}
-
-function listMonths (format, index) {
-    return listMonthsImpl(format, index, 'months');
-}
-
-function listMonthsShort (format, index) {
-    return listMonthsImpl(format, index, 'monthsShort');
-}
-
-function listWeekdays (localeSorted, format, index) {
-    return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
-}
-
-function listWeekdaysShort (localeSorted, format, index) {
-    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
-}
-
-function listWeekdaysMin (localeSorted, format, index) {
-    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
-}
-
-getSetGlobalLocale('en', {
-    dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
-    ordinal : function (number) {
-        var b = number % 10,
-            output = (toInt(number % 100 / 10) === 1) ? 'th' :
-            (b === 1) ? 'st' :
-            (b === 2) ? 'nd' :
-            (b === 3) ? 'rd' : 'th';
-        return number + output;
-    }
-});
-
-// Side effect imports
-hooks.lang = deprecate('moment.lang is deprecated. Use moment.locale instead.', getSetGlobalLocale);
-hooks.langData = deprecate('moment.langData is deprecated. Use moment.localeData instead.', getLocale);
-
-var mathAbs = Math.abs;
-
-function abs () {
-    var data           = this._data;
-
-    this._milliseconds = mathAbs(this._milliseconds);
-    this._days         = mathAbs(this._days);
-    this._months       = mathAbs(this._months);
-
-    data.milliseconds  = mathAbs(data.milliseconds);
-    data.seconds       = mathAbs(data.seconds);
-    data.minutes       = mathAbs(data.minutes);
-    data.hours         = mathAbs(data.hours);
-    data.months        = mathAbs(data.months);
-    data.years         = mathAbs(data.years);
-
-    return this;
-}
-
-function addSubtract$1 (duration, input, value, direction) {
-    var other = createDuration(input, value);
-
-    duration._milliseconds += direction * other._milliseconds;
-    duration._days         += direction * other._days;
-    duration._months       += direction * other._months;
-
-    return duration._bubble();
-}
-
-// supports only 2.0-style add(1, 's') or add(duration)
-function add$1 (input, value) {
-    return addSubtract$1(this, input, value, 1);
-}
-
-// supports only 2.0-style subtract(1, 's') or subtract(duration)
-function subtract$1 (input, value) {
-    return addSubtract$1(this, input, value, -1);
-}
-
-function absCeil (number) {
-    if (number < 0) {
-        return Math.floor(number);
-    } else {
-        return Math.ceil(number);
-    }
-}
-
-function bubble () {
-    var milliseconds = this._milliseconds;
-    var days         = this._days;
-    var months       = this._months;
-    var data         = this._data;
-    var seconds, minutes, hours, years, monthsFromDays;
-
-    // if we have a mix of positive and negative values, bubble down first
-    // check: https://github.com/moment/moment/issues/2166
-    if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
-            (milliseconds <= 0 && days <= 0 && months <= 0))) {
-        milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
-        days = 0;
-        months = 0;
-    }
-
-    // The following code bubbles up values, see the tests for
-    // examples of what that means.
-    data.milliseconds = milliseconds % 1000;
-
-    seconds           = absFloor(milliseconds / 1000);
-    data.seconds      = seconds % 60;
-
-    minutes           = absFloor(seconds / 60);
-    data.minutes      = minutes % 60;
-
-    hours             = absFloor(minutes / 60);
-    data.hours        = hours % 24;
-
-    days += absFloor(hours / 24);
-
-    // convert days to months
-    monthsFromDays = absFloor(daysToMonths(days));
-    months += monthsFromDays;
-    days -= absCeil(monthsToDays(monthsFromDays));
-
-    // 12 months -> 1 year
-    years = absFloor(months / 12);
-    months %= 12;
-
-    data.days   = days;
-    data.months = months;
-    data.years  = years;
-
-    return this;
-}
-
-function daysToMonths (days) {
-    // 400 years have 146097 days (taking into account leap year rules)
-    // 400 years have 12 months === 4800
-    return days * 4800 / 146097;
-}
-
-function monthsToDays (months) {
-    // the reverse of daysToMonths
-    return months * 146097 / 4800;
-}
-
-function as (units) {
-    if (!this.isValid()) {
-        return NaN;
-    }
-    var days;
-    var months;
-    var milliseconds = this._milliseconds;
-
-    units = normalizeUnits(units);
-
-    if (units === 'month' || units === 'year') {
-        days   = this._days   + milliseconds / 864e5;
-        months = this._months + daysToMonths(days);
-        return units === 'month' ? months : months / 12;
-    } else {
-        // handle milliseconds separately because of floating point math errors (issue #1867)
-        days = this._days + Math.round(monthsToDays(this._months));
-        switch (units) {
-            case 'week'   : return days / 7     + milliseconds / 6048e5;
-            case 'day'    : return days         + milliseconds / 864e5;
-            case 'hour'   : return days * 24    + milliseconds / 36e5;
-            case 'minute' : return days * 1440  + milliseconds / 6e4;
-            case 'second' : return days * 86400 + milliseconds / 1000;
-            // Math.floor prevents floating point math errors here
-            case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
-            default: throw new Error('Unknown unit ' + units);
-        }
-    }
-}
-
-// TODO: Use this.as('ms')?
-function valueOf$1 () {
-    if (!this.isValid()) {
-        return NaN;
-    }
-    return (
-        this._milliseconds +
-        this._days * 864e5 +
-        (this._months % 12) * 2592e6 +
-        toInt(this._months / 12) * 31536e6
-    );
-}
-
-function makeAs (alias) {
-    return function () {
-        return this.as(alias);
-    };
-}
-
-var asMilliseconds = makeAs('ms');
-var asSeconds      = makeAs('s');
-var asMinutes      = makeAs('m');
-var asHours        = makeAs('h');
-var asDays         = makeAs('d');
-var asWeeks        = makeAs('w');
-var asMonths       = makeAs('M');
-var asYears        = makeAs('y');
-
-function get$2 (units) {
-    units = normalizeUnits(units);
-    return this.isValid() ? this[units + 's']() : NaN;
-}
-
-function makeGetter(name) {
-    return function () {
-        return this.isValid() ? this._data[name] : NaN;
-    };
-}
-
-var milliseconds = makeGetter('milliseconds');
-var seconds      = makeGetter('seconds');
-var minutes      = makeGetter('minutes');
-var hours        = makeGetter('hours');
-var days         = makeGetter('days');
-var months       = makeGetter('months');
-var years        = makeGetter('years');
-
-function weeks () {
-    return absFloor(this.days() / 7);
-}
-
-var round = Math.round;
-var thresholds = {
-    ss: 44,         // a few seconds to seconds
-    s : 45,         // seconds to minute
-    m : 45,         // minutes to hour
-    h : 22,         // hours to day
-    d : 26,         // days to month
-    M : 11          // months to year
-};
-
-// helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
-function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
-    return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
-}
-
-function relativeTime$1 (posNegDuration, withoutSuffix, locale) {
-    var duration = createDuration(posNegDuration).abs();
-    var seconds  = round(duration.as('s'));
-    var minutes  = round(duration.as('m'));
-    var hours    = round(duration.as('h'));
-    var days     = round(duration.as('d'));
-    var months   = round(duration.as('M'));
-    var years    = round(duration.as('y'));
-
-    var a = seconds <= thresholds.ss && ['s', seconds]  ||
-            seconds < thresholds.s   && ['ss', seconds] ||
-            minutes <= 1             && ['m']           ||
-            minutes < thresholds.m   && ['mm', minutes] ||
-            hours   <= 1             && ['h']           ||
-            hours   < thresholds.h   && ['hh', hours]   ||
-            days    <= 1             && ['d']           ||
-            days    < thresholds.d   && ['dd', days]    ||
-            months  <= 1             && ['M']           ||
-            months  < thresholds.M   && ['MM', months]  ||
-            years   <= 1             && ['y']           || ['yy', years];
-
-    a[2] = withoutSuffix;
-    a[3] = +posNegDuration > 0;
-    a[4] = locale;
-    return substituteTimeAgo.apply(null, a);
-}
-
-// This function allows you to set the rounding function for relative time strings
-function getSetRelativeTimeRounding (roundingFunction) {
-    if (roundingFunction === undefined) {
-        return round;
-    }
-    if (typeof(roundingFunction) === 'function') {
-        round = roundingFunction;
-        return true;
-    }
-    return false;
-}
-
-// This function allows you to set a threshold for relative time strings
-function getSetRelativeTimeThreshold (threshold, limit) {
-    if (thresholds[threshold] === undefined) {
-        return false;
-    }
-    if (limit === undefined) {
-        return thresholds[threshold];
-    }
-    thresholds[threshold] = limit;
-    if (threshold === 's') {
-        thresholds.ss = limit - 1;
-    }
-    return true;
-}
-
-function humanize (withSuffix) {
-    if (!this.isValid()) {
-        return this.localeData().invalidDate();
-    }
-
-    var locale = this.localeData();
-    var output = relativeTime$1(this, !withSuffix, locale);
-
-    if (withSuffix) {
-        output = locale.pastFuture(+this, output);
-    }
-
-    return locale.postformat(output);
-}
-
-var abs$1 = Math.abs;
-
-function toISOString$1() {
-    // for ISO strings we do not use the normal bubbling rules:
-    //  * milliseconds bubble up until they become hours
-    //  * days do not bubble at all
-    //  * months bubble up until they become years
-    // This is because there is no context-free conversion between hours and days
-    // (think of clock changes)
-    // and also not between days and months (28-31 days per month)
-    if (!this.isValid()) {
-        return this.localeData().invalidDate();
-    }
-
-    var seconds = abs$1(this._milliseconds) / 1000;
-    var days         = abs$1(this._days);
-    var months       = abs$1(this._months);
-    var minutes, hours, years;
-
-    // 3600 seconds -> 60 minutes -> 1 hour
-    minutes           = absFloor(seconds / 60);
-    hours             = absFloor(minutes / 60);
-    seconds %= 60;
-    minutes %= 60;
-
-    // 12 months -> 1 year
-    years  = absFloor(months / 12);
-    months %= 12;
-
-
-    // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
-    var Y = years;
-    var M = months;
-    var D = days;
-    var h = hours;
-    var m = minutes;
-    var s = seconds;
-    var total = this.asSeconds();
-
-    if (!total) {
-        // this is the same as C#'s (Noda) and python (isodate)...
-        // but not other JS (goog.date)
-        return 'P0D';
-    }
-
-    return (total < 0 ? '-' : '') +
-        'P' +
-        (Y ? Y + 'Y' : '') +
-        (M ? M + 'M' : '') +
-        (D ? D + 'D' : '') +
-        ((h || m || s) ? 'T' : '') +
-        (h ? h + 'H' : '') +
-        (m ? m + 'M' : '') +
-        (s ? s + 'S' : '');
-}
-
-var proto$2 = Duration.prototype;
-
-proto$2.isValid        = isValid$1;
-proto$2.abs            = abs;
-proto$2.add            = add$1;
-proto$2.subtract       = subtract$1;
-proto$2.as             = as;
-proto$2.asMilliseconds = asMilliseconds;
-proto$2.asSeconds      = asSeconds;
-proto$2.asMinutes      = asMinutes;
-proto$2.asHours        = asHours;
-proto$2.asDays         = asDays;
-proto$2.asWeeks        = asWeeks;
-proto$2.asMonths       = asMonths;
-proto$2.asYears        = asYears;
-proto$2.valueOf        = valueOf$1;
-proto$2._bubble        = bubble;
-proto$2.get            = get$2;
-proto$2.milliseconds   = milliseconds;
-proto$2.seconds        = seconds;
-proto$2.minutes        = minutes;
-proto$2.hours          = hours;
-proto$2.days           = days;
-proto$2.weeks          = weeks;
-proto$2.months         = months;
-proto$2.years          = years;
-proto$2.humanize       = humanize;
-proto$2.toISOString    = toISOString$1;
-proto$2.toString       = toISOString$1;
-proto$2.toJSON         = toISOString$1;
-proto$2.locale         = locale;
-proto$2.localeData     = localeData;
-
-// Deprecations
-proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)', toISOString$1);
-proto$2.lang = lang;
-
-// Side effect imports
-
-// FORMATTING
-
-addFormatToken('X', 0, 0, 'unix');
-addFormatToken('x', 0, 0, 'valueOf');
-
-// PARSING
-
-addRegexToken('x', matchSigned);
-addRegexToken('X', matchTimestamp);
-addParseToken('X', function (input, array, config) {
-    config._d = new Date(parseFloat(input, 10) * 1000);
-});
-addParseToken('x', function (input, array, config) {
-    config._d = new Date(toInt(input));
-});
-
-// Side effect imports
-
-
-hooks.version = '2.18.1';
-
-setHookCallback(createLocal);
-
-hooks.fn                    = proto;
-hooks.min                   = min;
-hooks.max                   = max;
-hooks.now                   = now;
-hooks.utc                   = createUTC;
-hooks.unix                  = createUnix;
-hooks.months                = listMonths;
-hooks.isDate                = isDate;
-hooks.locale                = getSetGlobalLocale;
-hooks.invalid               = createInvalid;
-hooks.duration              = createDuration;
-hooks.isMoment              = isMoment;
-hooks.weekdays              = listWeekdays;
-hooks.parseZone             = createInZone;
-hooks.localeData            = getLocale;
-hooks.isDuration            = isDuration;
-hooks.monthsShort           = listMonthsShort;
-hooks.weekdaysMin           = listWeekdaysMin;
-hooks.defineLocale          = defineLocale;
-hooks.updateLocale          = updateLocale;
-hooks.locales               = listLocales;
-hooks.weekdaysShort         = listWeekdaysShort;
-hooks.normalizeUnits        = normalizeUnits;
-hooks.relativeTimeRounding = getSetRelativeTimeRounding;
-hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
-hooks.calendarFormat        = getCalendarFormat;
-hooks.prototype             = proto;
-
-return hooks;
-
-})));
-
-define('text',{});
-/* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
- * @license MIT */
-
-;(function(root, factory) {
-
-  if (typeof define === 'function' && define.amd) {
-    define('nprogress/nprogress',factory);
-  } else if (typeof exports === 'object') {
-    module.exports = factory();
-  } else {
-    root.NProgress = factory();
-  }
-
-})(this, function() {
-  var NProgress = {};
-
-  NProgress.version = '0.2.0';
-
-  var Settings = NProgress.settings = {
-    minimum: 0.08,
-    easing: 'ease',
-    positionUsing: '',
-    speed: 200,
-    trickle: true,
-    trickleRate: 0.02,
-    trickleSpeed: 800,
-    showSpinner: true,
-    barSelector: '[role="bar"]',
-    spinnerSelector: '[role="spinner"]',
-    parent: 'body',
-    template: '<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
-  };
-
-  /**
-   * Updates configuration.
-   *
-   *     NProgress.configure({
-   *       minimum: 0.1
-   *     });
-   */
-  NProgress.configure = function(options) {
-    var key, value;
-    for (key in options) {
-      value = options[key];
-      if (value !== undefined && options.hasOwnProperty(key)) Settings[key] = value;
-    }
-
-    return this;
-  };
-
-  /**
-   * Last number.
-   */
-
-  NProgress.status = null;
-
-  /**
-   * Sets the progress bar status, where `n` is a number from `0.0` to `1.0`.
-   *
-   *     NProgress.set(0.4);
-   *     NProgress.set(1.0);
-   */
-
-  NProgress.set = function(n) {
-    var started = NProgress.isStarted();
-
-    n = clamp(n, Settings.minimum, 1);
-    NProgress.status = (n === 1 ? null : n);
-
-    var progress = NProgress.render(!started),
-        bar      = progress.querySelector(Settings.barSelector),
-        speed    = Settings.speed,
-        ease     = Settings.easing;
-
-    progress.offsetWidth; /* Repaint */
-
-    queue(function(next) {
-      // Set positionUsing if it hasn't already been set
-      if (Settings.positionUsing === '') Settings.positionUsing = NProgress.getPositioningCSS();
-
-      // Add transition
-      css(bar, barPositionCSS(n, speed, ease));
-
-      if (n === 1) {
-        // Fade out
-        css(progress, { 
-          transition: 'none', 
-          opacity: 1 
-        });
-        progress.offsetWidth; /* Repaint */
-
-        setTimeout(function() {
-          css(progress, { 
-            transition: 'all ' + speed + 'ms linear', 
-            opacity: 0 
-          });
-          setTimeout(function() {
-            NProgress.remove();
-            next();
-          }, speed);
-        }, speed);
-      } else {
-        setTimeout(next, speed);
-      }
-    });
-
-    return this;
-  };
-
-  NProgress.isStarted = function() {
-    return typeof NProgress.status === 'number';
-  };
-
-  /**
-   * Shows the progress bar.
-   * This is the same as setting the status to 0%, except that it doesn't go backwards.
-   *
-   *     NProgress.start();
-   *
-   */
-  NProgress.start = function() {
-    if (!NProgress.status) NProgress.set(0);
-
-    var work = function() {
-      setTimeout(function() {
-        if (!NProgress.status) return;
-        NProgress.trickle();
-        work();
-      }, Settings.trickleSpeed);
-    };
-
-    if (Settings.trickle) work();
-
-    return this;
-  };
-
-  /**
-   * Hides the progress bar.
-   * This is the *sort of* the same as setting the status to 100%, with the
-   * difference being `done()` makes some placebo effect of some realistic motion.
-   *
-   *     NProgress.done();
-   *
-   * If `true` is passed, it will show the progress bar even if its hidden.
-   *
-   *     NProgress.done(true);
-   */
-
-  NProgress.done = function(force) {
-    if (!force && !NProgress.status) return this;
-
-    return NProgress.inc(0.3 + 0.5 * Math.random()).set(1);
-  };
-
-  /**
-   * Increments by a random amount.
-   */
-
-  NProgress.inc = function(amount) {
-    var n = NProgress.status;
-
-    if (!n) {
-      return NProgress.start();
-    } else {
-      if (typeof amount !== 'number') {
-        amount = (1 - n) * clamp(Math.random() * n, 0.1, 0.95);
-      }
-
-      n = clamp(n + amount, 0, 0.994);
-      return NProgress.set(n);
-    }
-  };
-
-  NProgress.trickle = function() {
-    return NProgress.inc(Math.random() * Settings.trickleRate);
-  };
-
-  /**
-   * Waits for all supplied jQuery promises and
-   * increases the progress as the promises resolve.
-   *
-   * @param $promise jQUery Promise
-   */
-  (function() {
-    var initial = 0, current = 0;
-
-    NProgress.promise = function($promise) {
-      if (!$promise || $promise.state() === "resolved") {
-        return this;
-      }
-
-      if (current === 0) {
-        NProgress.start();
-      }
-
-      initial++;
-      current++;
-
-      $promise.always(function() {
-        current--;
-        if (current === 0) {
-            initial = 0;
-            NProgress.done();
-        } else {
-            NProgress.set((initial - current) / initial);
-        }
-      });
-
-      return this;
-    };
-
-  })();
-
-  /**
-   * (Internal) renders the progress bar markup based on the `template`
-   * setting.
-   */
-
-  NProgress.render = function(fromStart) {
-    if (NProgress.isRendered()) return document.getElementById('nprogress');
-
-    addClass(document.documentElement, 'nprogress-busy');
-    
-    var progress = document.createElement('div');
-    progress.id = 'nprogress';
-    progress.innerHTML = Settings.template;
-
-    var bar      = progress.querySelector(Settings.barSelector),
-        perc     = fromStart ? '-100' : toBarPerc(NProgress.status || 0),
-        parent   = document.querySelector(Settings.parent),
-        spinner;
-    
-    css(bar, {
-      transition: 'all 0 linear',
-      transform: 'translate3d(' + perc + '%,0,0)'
-    });
-
-    if (!Settings.showSpinner) {
-      spinner = progress.querySelector(Settings.spinnerSelector);
-      spinner && removeElement(spinner);
-    }
-
-    if (parent != document.body) {
-      addClass(parent, 'nprogress-custom-parent');
-    }
-
-    parent.appendChild(progress);
-    return progress;
-  };
-
-  /**
-   * Removes the element. Opposite of render().
-   */
-
-  NProgress.remove = function() {
-    removeClass(document.documentElement, 'nprogress-busy');
-    removeClass(document.querySelector(Settings.parent), 'nprogress-custom-parent');
-    var progress = document.getElementById('nprogress');
-    progress && removeElement(progress);
-  };
-
-  /**
-   * Checks if the progress bar is rendered.
-   */
-
-  NProgress.isRendered = function() {
-    return !!document.getElementById('nprogress');
-  };
-
-  /**
-   * Determine which positioning CSS rule to use.
-   */
-
-  NProgress.getPositioningCSS = function() {
-    // Sniff on document.body.style
-    var bodyStyle = document.body.style;
-
-    // Sniff prefixes
-    var vendorPrefix = ('WebkitTransform' in bodyStyle) ? 'Webkit' :
-                       ('MozTransform' in bodyStyle) ? 'Moz' :
-                       ('msTransform' in bodyStyle) ? 'ms' :
-                       ('OTransform' in bodyStyle) ? 'O' : '';
-
-    if (vendorPrefix + 'Perspective' in bodyStyle) {
-      // Modern browsers with 3D support, e.g. Webkit, IE10
-      return 'translate3d';
-    } else if (vendorPrefix + 'Transform' in bodyStyle) {
-      // Browsers without 3D support, e.g. IE9
-      return 'translate';
-    } else {
-      // Browsers without translate() support, e.g. IE7-8
-      return 'margin';
-    }
-  };
-
-  /**
-   * Helpers
-   */
-
-  function clamp(n, min, max) {
-    if (n < min) return min;
-    if (n > max) return max;
-    return n;
-  }
-
-  /**
-   * (Internal) converts a percentage (`0..1`) to a bar translateX
-   * percentage (`-100%..0%`).
-   */
-
-  function toBarPerc(n) {
-    return (-1 + n) * 100;
-  }
-
-
-  /**
-   * (Internal) returns the correct CSS for changing the bar's
-   * position given an n percentage, and speed and ease from Settings
-   */
-
-  function barPositionCSS(n, speed, ease) {
-    var barCSS;
-
-    if (Settings.positionUsing === 'translate3d') {
-      barCSS = { transform: 'translate3d('+toBarPerc(n)+'%,0,0)' };
-    } else if (Settings.positionUsing === 'translate') {
-      barCSS = { transform: 'translate('+toBarPerc(n)+'%,0)' };
-    } else {
-      barCSS = { 'margin-left': toBarPerc(n)+'%' };
-    }
-
-    barCSS.transition = 'all '+speed+'ms '+ease;
-
-    return barCSS;
-  }
-
-  /**
-   * (Internal) Queues a function to be executed.
-   */
-
-  var queue = (function() {
-    var pending = [];
-    
-    function next() {
-      var fn = pending.shift();
-      if (fn) {
-        fn(next);
-      }
-    }
-
-    return function(fn) {
-      pending.push(fn);
-      if (pending.length == 1) next();
-    };
-  })();
-
-  /**
-   * (Internal) Applies css properties to an element, similar to the jQuery 
-   * css method.
-   *
-   * While this helper does assist with vendor prefixed property names, it 
-   * does not perform any manipulation of values prior to setting styles.
-   */
-
-  var css = (function() {
-    var cssPrefixes = [ 'Webkit', 'O', 'Moz', 'ms' ],
-        cssProps    = {};
-
-    function camelCase(string) {
-      return string.replace(/^-ms-/, 'ms-').replace(/-([\da-z])/gi, function(match, letter) {
-        return letter.toUpperCase();
-      });
-    }
-
-    function getVendorProp(name) {
-      var style = document.body.style;
-      if (name in style) return name;
-
-      var i = cssPrefixes.length,
-          capName = name.charAt(0).toUpperCase() + name.slice(1),
-          vendorName;
-      while (i--) {
-        vendorName = cssPrefixes[i] + capName;
-        if (vendorName in style) return vendorName;
-      }
-
-      return name;
-    }
-
-    function getStyleProp(name) {
-      name = camelCase(name);
-      return cssProps[name] || (cssProps[name] = getVendorProp(name));
-    }
-
-    function applyCss(element, prop, value) {
-      prop = getStyleProp(prop);
-      element.style[prop] = value;
-    }
-
-    return function(element, properties) {
-      var args = arguments,
-          prop, 
-          value;
-
-      if (args.length == 2) {
-        for (prop in properties) {
-          value = properties[prop];
-          if (value !== undefined && properties.hasOwnProperty(prop)) applyCss(element, prop, value);
-        }
-      } else {
-        applyCss(element, args[1], args[2]);
-      }
-    }
-  })();
-
-  /**
-   * (Internal) Determines if an element or space separated list of class names contains a class name.
-   */
-
-  function hasClass(element, name) {
-    var list = typeof element == 'string' ? element : classList(element);
-    return list.indexOf(' ' + name + ' ') >= 0;
-  }
-
-  /**
-   * (Internal) Adds a class to an element.
-   */
-
-  function addClass(element, name) {
-    var oldList = classList(element),
-        newList = oldList + name;
-
-    if (hasClass(oldList, name)) return; 
-
-    // Trim the opening space.
-    element.className = newList.substring(1);
-  }
-
-  /**
-   * (Internal) Removes a class from an element.
-   */
-
-  function removeClass(element, name) {
-    var oldList = classList(element),
-        newList;
-
-    if (!hasClass(element, name)) return;
-
-    // Replace the class name.
-    newList = oldList.replace(' ' + name + ' ', ' ');
-
-    // Trim the opening and closing spaces.
-    element.className = newList.substring(1, newList.length - 1);
-  }
-
-  /**
-   * (Internal) Gets a space separated list of the class names on the element. 
-   * The list is wrapped with a single space on each end to facilitate finding 
-   * matches within the list.
-   */
-
-  function classList(element) {
-    return (' ' + (element.className || '') + ' ').replace(/\s+/gi, ' ');
-  }
-
-  /**
-   * (Internal) Removes an element from the DOM.
-   */
-
-  function removeElement(element) {
-    element && element.parentNode && element.parentNode.removeChild(element);
-  }
-
-  return NProgress;
-});
-
-;define('nprogress', ['nprogress/nprogress'], function (main) { return main; });
-
-define('text!nprogress/nprogress.css', ['module'], function(module) { module.exports = "/* Make clicks pass-through */\n#nprogress {\n  pointer-events: none;\n}\n\n#nprogress .bar {\n  background: #29d;\n\n  position: fixed;\n  z-index: 1031;\n  top: 0;\n  left: 0;\n\n  width: 100%;\n  height: 2px;\n}\n\n/* Fancy blur effect */\n#nprogress .peg {\n  display: block;\n  position: absolute;\n  right: 0px;\n  width: 100px;\n  height: 100%;\n  box-shadow: 0 0 10px #29d, 0 0 5px #29d;\n  opacity: 1.0;\n\n  -webkit-transform: rotate(3deg) translate(0px, -4px);\n      -ms-transform: rotate(3deg) translate(0px, -4px);\n          transform: rotate(3deg) translate(0px, -4px);\n}\n\n/* Remove these to get rid of the spinner */\n#nprogress .spinner {\n  display: block;\n  position: fixed;\n  z-index: 1031;\n  top: 15px;\n  right: 15px;\n}\n\n#nprogress .spinner-icon {\n  width: 18px;\n  height: 18px;\n  box-sizing: border-box;\n\n  border: solid 2px transparent;\n  border-top-color: #29d;\n  border-left-color: #29d;\n  border-radius: 50%;\n\n  -webkit-animation: nprogress-spinner 400ms linear infinite;\n          animation: nprogress-spinner 400ms linear infinite;\n}\n\n.nprogress-custom-parent {\n  overflow: hidden;\n  position: relative;\n}\n\n.nprogress-custom-parent #nprogress .spinner,\n.nprogress-custom-parent #nprogress .bar {\n  position: absolute;\n}\n\n@-webkit-keyframes nprogress-spinner {\n  0%   { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n@keyframes nprogress-spinner {\n  0%   { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n"; });
-/*
- * Toastr
- * Copyright 2012-2015
- * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
- * All Rights Reserved.
- * Use, reproduction, distribution, and modification of this code is subject to the terms and
- * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
- *
- * ARIA Support: Greta Krafsig
- *
- * Project: https://github.com/CodeSeven/toastr
- */
-/* global define */
-; (function (define) {
-    define('toastr/toastr',['jquery'], function ($) {
-        return (function () {
-            var $container;
-            var listener;
-            var toastId = 0;
-            var toastType = {
-                error: 'error',
-                info: 'info',
-                success: 'success',
-                warning: 'warning'
-            };
-
-            var toastr = {
-                clear: clear,
-                remove: remove,
-                error: error,
-                getContainer: getContainer,
-                info: info,
-                options: {},
-                subscribe: subscribe,
-                success: success,
-                version: '2.1.2',
-                warning: warning
-            };
-
-            var previousToast;
-
-            return toastr;
-
-            ////////////////
-
-            function error(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.error,
-                    iconClass: getOptions().iconClasses.error,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function getContainer(options, create) {
-                if (!options) { options = getOptions(); }
-                $container = $('#' + options.containerId);
-                if ($container.length) {
-                    return $container;
-                }
-                if (create) {
-                    $container = createContainer(options);
-                }
-                return $container;
-            }
-
-            function info(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.info,
-                    iconClass: getOptions().iconClasses.info,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function subscribe(callback) {
-                listener = callback;
-            }
-
-            function success(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.success,
-                    iconClass: getOptions().iconClasses.success,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function warning(message, title, optionsOverride) {
-                return notify({
-                    type: toastType.warning,
-                    iconClass: getOptions().iconClasses.warning,
-                    message: message,
-                    optionsOverride: optionsOverride,
-                    title: title
-                });
-            }
-
-            function clear($toastElement, clearOptions) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if (!clearToast($toastElement, options, clearOptions)) {
-                    clearContainer(options);
-                }
-            }
-
-            function remove($toastElement) {
-                var options = getOptions();
-                if (!$container) { getContainer(options); }
-                if ($toastElement && $(':focus', $toastElement).length === 0) {
-                    removeToast($toastElement);
-                    return;
-                }
-                if ($container.children().length) {
-                    $container.remove();
-                }
-            }
-
-            // internal functions
-
-            function clearContainer (options) {
-                var toastsToClear = $container.children();
-                for (var i = toastsToClear.length - 1; i >= 0; i--) {
-                    clearToast($(toastsToClear[i]), options);
-                }
-            }
-
-            function clearToast ($toastElement, options, clearOptions) {
-                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
-                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
-                    $toastElement[options.hideMethod]({
-                        duration: options.hideDuration,
-                        easing: options.hideEasing,
-                        complete: function () { removeToast($toastElement); }
-                    });
-                    return true;
-                }
-                return false;
-            }
-
-            function createContainer(options) {
-                $container = $('<div/>')
-                    .attr('id', options.containerId)
-                    .addClass(options.positionClass)
-                    .attr('aria-live', 'polite')
-                    .attr('role', 'alert');
-
-                $container.appendTo($(options.target));
-                return $container;
-            }
-
-            function getDefaults() {
-                return {
-                    tapToDismiss: true,
-                    toastClass: 'toast',
-                    containerId: 'toast-container',
-                    debug: false,
-
-                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
-                    showDuration: 300,
-                    showEasing: 'swing', //swing and linear are built into jQuery
-                    onShown: undefined,
-                    hideMethod: 'fadeOut',
-                    hideDuration: 1000,
-                    hideEasing: 'swing',
-                    onHidden: undefined,
-                    closeMethod: false,
-                    closeDuration: false,
-                    closeEasing: false,
-
-                    extendedTimeOut: 1000,
-                    iconClasses: {
-                        error: 'toast-error',
-                        info: 'toast-info',
-                        success: 'toast-success',
-                        warning: 'toast-warning'
-                    },
-                    iconClass: 'toast-info',
-                    positionClass: 'toast-top-right',
-                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
-                    titleClass: 'toast-title',
-                    messageClass: 'toast-message',
-                    escapeHtml: false,
-                    target: 'body',
-                    closeHtml: '<button type="button">&times;</button>',
-                    newestOnTop: true,
-                    preventDuplicates: false,
-                    progressBar: false
-                };
-            }
-
-            function publish(args) {
-                if (!listener) { return; }
-                listener(args);
-            }
-
-            function notify(map) {
-                var options = getOptions();
-                var iconClass = map.iconClass || options.iconClass;
-
-                if (typeof (map.optionsOverride) !== 'undefined') {
-                    options = $.extend(options, map.optionsOverride);
-                    iconClass = map.optionsOverride.iconClass || iconClass;
-                }
-
-                if (shouldExit(options, map)) { return; }
-
-                toastId++;
-
-                $container = getContainer(options, true);
-
-                var intervalId = null;
-                var $toastElement = $('<div/>');
-                var $titleElement = $('<div/>');
-                var $messageElement = $('<div/>');
-                var $progressElement = $('<div/>');
-                var $closeElement = $(options.closeHtml);
-                var progressBar = {
-                    intervalId: null,
-                    hideEta: null,
-                    maxHideTime: null
-                };
-                var response = {
-                    toastId: toastId,
-                    state: 'visible',
-                    startTime: new Date(),
-                    options: options,
-                    map: map
-                };
-
-                personalizeToast();
-
-                displayToast();
-
-                handleEvents();
-
-                publish(response);
-
-                if (options.debug && console) {
-                    console.log(response);
-                }
-
-                return $toastElement;
-
-                function escapeHtml(source) {
-                    if (source == null)
-                        source = "";
-
-                    return new String(source)
-                        .replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-                }
-
-                function personalizeToast() {
-                    setIcon();
-                    setTitle();
-                    setMessage();
-                    setCloseButton();
-                    setProgressBar();
-                    setSequence();
-                }
-
-                function handleEvents() {
-                    $toastElement.hover(stickAround, delayedHideToast);
-                    if (!options.onclick && options.tapToDismiss) {
-                        $toastElement.click(hideToast);
-                    }
-
-                    if (options.closeButton && $closeElement) {
-                        $closeElement.click(function (event) {
-                            if (event.stopPropagation) {
-                                event.stopPropagation();
-                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
-                                event.cancelBubble = true;
-                            }
-                            hideToast(true);
-                        });
-                    }
-
-                    if (options.onclick) {
-                        $toastElement.click(function (event) {
-                            options.onclick(event);
-                            hideToast();
-                        });
-                    }
-                }
-
-                function displayToast() {
-                    $toastElement.hide();
-
-                    $toastElement[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
-                    );
-
-                    if (options.timeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.timeOut);
-                        progressBar.maxHideTime = parseFloat(options.timeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                        if (options.progressBar) {
-                            progressBar.intervalId = setInterval(updateProgress, 10);
-                        }
-                    }
-                }
-
-                function setIcon() {
-                    if (map.iconClass) {
-                        $toastElement.addClass(options.toastClass).addClass(iconClass);
-                    }
-                }
-
-                function setSequence() {
-                    if (options.newestOnTop) {
-                        $container.prepend($toastElement);
-                    } else {
-                        $container.append($toastElement);
-                    }
-                }
-
-                function setTitle() {
-                    if (map.title) {
-                        $titleElement.append(!options.escapeHtml ? map.title : escapeHtml(map.title)).addClass(options.titleClass);
-                        $toastElement.append($titleElement);
-                    }
-                }
-
-                function setMessage() {
-                    if (map.message) {
-                        $messageElement.append(!options.escapeHtml ? map.message : escapeHtml(map.message)).addClass(options.messageClass);
-                        $toastElement.append($messageElement);
-                    }
-                }
-
-                function setCloseButton() {
-                    if (options.closeButton) {
-                        $closeElement.addClass('toast-close-button').attr('role', 'button');
-                        $toastElement.prepend($closeElement);
-                    }
-                }
-
-                function setProgressBar() {
-                    if (options.progressBar) {
-                        $progressElement.addClass('toast-progress');
-                        $toastElement.prepend($progressElement);
-                    }
-                }
-
-                function shouldExit(options, map) {
-                    if (options.preventDuplicates) {
-                        if (map.message === previousToast) {
-                            return true;
-                        } else {
-                            previousToast = map.message;
-                        }
-                    }
-                    return false;
-                }
-
-                function hideToast(override) {
-                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
-                    var duration = override && options.closeDuration !== false ?
-                        options.closeDuration : options.hideDuration;
-                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
-                    if ($(':focus', $toastElement).length && !override) {
-                        return;
-                    }
-                    clearTimeout(progressBar.intervalId);
-                    return $toastElement[method]({
-                        duration: duration,
-                        easing: easing,
-                        complete: function () {
-                            removeToast($toastElement);
-                            if (options.onHidden && response.state !== 'hidden') {
-                                options.onHidden();
-                            }
-                            response.state = 'hidden';
-                            response.endTime = new Date();
-                            publish(response);
-                        }
-                    });
-                }
-
-                function delayedHideToast() {
-                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
-                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
-                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
-                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
-                    }
-                }
-
-                function stickAround() {
-                    clearTimeout(intervalId);
-                    progressBar.hideEta = 0;
-                    $toastElement.stop(true, true)[options.showMethod](
-                        {duration: options.showDuration, easing: options.showEasing}
-                    );
-                }
-
-                function updateProgress() {
-                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
-                    $progressElement.width(percentage + '%');
-                }
-            }
-
-            function getOptions() {
-                return $.extend({}, getDefaults(), toastr.options);
-            }
-
-            function removeToast($toastElement) {
-                if (!$container) { $container = getContainer(); }
-                if ($toastElement.is(':visible')) {
-                    return;
-                }
-                $toastElement.remove();
-                $toastElement = null;
-                if ($container.children().length === 0) {
-                    $container.remove();
-                    previousToast = undefined;
-                }
-            }
-
-        })();
-    });
-}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
-    if (typeof module !== 'undefined' && module.exports) { //Node
-        module.exports = factory(require('jquery'));
-    } else {
-        window.toastr = factory(window.jQuery);
-    }
-}));
-;define('toastr', ['toastr/toastr'], function (main) { return main; });
-
-define('text!toastr/build/toastr.css', ['module'], function(module) { module.exports = ".toast-title {\n  font-weight: bold;\n}\n.toast-message {\n  -ms-word-wrap: break-word;\n  word-wrap: break-word;\n}\n.toast-message a,\n.toast-message label {\n  color: #ffffff;\n}\n.toast-message a:hover {\n  color: #cccccc;\n  text-decoration: none;\n}\n.toast-close-button {\n  position: relative;\n  right: -0.3em;\n  top: -0.3em;\n  float: right;\n  font-size: 20px;\n  font-weight: bold;\n  color: #ffffff;\n  -webkit-text-shadow: 0 1px 0 #ffffff;\n  text-shadow: 0 1px 0 #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n.toast-close-button:hover,\n.toast-close-button:focus {\n  color: #000000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Additional properties for button version\n iOS requires the button element instead of an anchor tag.\n If you want the anchor version, it requires `href=\"#\"`.*/\nbutton.toast-close-button {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n.toast-top-center {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-center {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-full-width {\n  top: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-bottom-full-width {\n  bottom: 0;\n  right: 0;\n  width: 100%;\n}\n.toast-top-left {\n  top: 12px;\n  left: 12px;\n}\n.toast-top-right {\n  top: 12px;\n  right: 12px;\n}\n.toast-bottom-right {\n  right: 12px;\n  bottom: 12px;\n}\n.toast-bottom-left {\n  bottom: 12px;\n  left: 12px;\n}\n#toast-container {\n  position: fixed;\n  z-index: 999999;\n  pointer-events: none;\n  /*overrides*/\n}\n#toast-container * {\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#toast-container > div {\n  position: relative;\n  pointer-events: auto;\n  overflow: hidden;\n  margin: 0 0 6px;\n  padding: 15px 15px 15px 50px;\n  width: 300px;\n  -moz-border-radius: 3px 3px 3px 3px;\n  -webkit-border-radius: 3px 3px 3px 3px;\n  border-radius: 3px 3px 3px 3px;\n  background-position: 15px center;\n  background-repeat: no-repeat;\n  -moz-box-shadow: 0 0 12px #999999;\n  -webkit-box-shadow: 0 0 12px #999999;\n  box-shadow: 0 0 12px #999999;\n  color: #ffffff;\n  opacity: 0.8;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);\n  filter: alpha(opacity=80);\n}\n#toast-container > :hover {\n  -moz-box-shadow: 0 0 12px #000000;\n  -webkit-box-shadow: 0 0 12px #000000;\n  box-shadow: 0 0 12px #000000;\n  opacity: 1;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);\n  filter: alpha(opacity=100);\n  cursor: pointer;\n}\n#toast-container > .toast-info {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-error {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=\") !important;\n}\n#toast-container > .toast-success {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==\") !important;\n}\n#toast-container > .toast-warning {\n  background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=\") !important;\n}\n#toast-container.toast-top-center > div,\n#toast-container.toast-bottom-center > div {\n  width: 300px;\n  margin-left: auto;\n  margin-right: auto;\n}\n#toast-container.toast-top-full-width > div,\n#toast-container.toast-bottom-full-width > div {\n  width: 96%;\n  margin-left: auto;\n  margin-right: auto;\n}\n.toast {\n  background-color: #030303;\n}\n.toast-success {\n  background-color: #51a351;\n}\n.toast-error {\n  background-color: #bd362f;\n}\n.toast-info {\n  background-color: #2f96b4;\n}\n.toast-warning {\n  background-color: #f89406;\n}\n.toast-progress {\n  position: absolute;\n  left: 0;\n  bottom: 0;\n  height: 4px;\n  background-color: #000000;\n  opacity: 0.4;\n  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);\n  filter: alpha(opacity=40);\n}\n/*Responsive Design*/\n@media all and (max-width: 240px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 11em;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n}\n@media all and (min-width: 241px) and (max-width: 480px) {\n  #toast-container > div {\n    padding: 8px 8px 8px 50px;\n    width: 18em;\n  }\n  #toast-container .toast-close-button {\n    right: -0.2em;\n    top: -0.2em;\n  }\n}\n@media all and (min-width: 481px) and (max-width: 768px) {\n  #toast-container > div {\n    padding: 15px 15px 15px 50px;\n    width: 25em;\n  }\n}\n"; });
 /**
  * Super simple wysiwyg editor v0.8.3
  * http://summernote.org/
@@ -52398,4 +47845,4569 @@ define('text!toastr/build/toastr.css', ['module'], function(module) { module.exp
 }));
 ;define('summernote', ['summernote/summernote'], function (main) { return main; });
 
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","text":"../node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min.js"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/facco/editPeople","modules/facco/facco","modules/facco/viewRequests","modules/user/profile","modules/user/resetPassword","modules/user/user","modules/home/contact","modules/home/home","modules/home/register","resources/data/admin","resources/data/auth","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessions","resources/data/siteInfo","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/table-navigation-bar","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/check-box","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/format-digits","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/sandbox","resources/value-converters/session-status-button","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","regenerator-runtime/runtime","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","resources/css/styles","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewRequestsTable","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/system/components/Assignments","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}
+/*!
+ * Fuel UX v3.16.0 
+ * Copyright 2012-2017 ExactTarget
+ * Licensed under the BSD-3-Clause license (https://github.com/ExactTarget/fuelux/blob/master/LICENSE)
+ */
+!function(a){"function"==typeof define&&define.amd?define('fuelux/js/fuelux.min',["jquery","bootstrap"],a):a(jQuery)}(function(a){if(void 0===a)throw new Error("Fuel UX's JavaScript requires jQuery");if(void 0===a.fn.dropdown||void 0===a.fn.collapse)throw new Error("Fuel UX's JavaScript requires Bootstrap");!function(a){var b=a.fn.checkbox,c=function(b,c){if(this.options=a.extend({},a.fn.checkbox.defaults,c),"label"===b.tagName.toLowerCase()){this.$label=a(b),this.$chk=this.$label.find('input[type="checkbox"]'),this.$container=a(b).parent(".checkbox");var d=this.$chk.attr("data-toggle");this.$toggleContainer=a(d),this.$chk.on("change",a.proxy(this.itemchecked,this)),this.setInitialState()}};c.prototype={constructor:c,setInitialState:function(){var a=this.$chk,b=(this.$label,a.prop("checked")),c=a.prop("disabled");this.setCheckedState(a,b),this.setDisabledState(a,c)},setCheckedState:function(a,b){var c=a,d=this.$label,e=(this.$container,this.$toggleContainer);b?(c.prop("checked",!0),d.addClass("checked"),e.removeClass("hide hidden"),d.trigger("checked.fu.checkbox")):(c.prop("checked",!1),d.removeClass("checked"),e.addClass("hidden"),d.trigger("unchecked.fu.checkbox")),d.trigger("changed.fu.checkbox",b)},setDisabledState:function(a,b){var c=this.$label;b?(this.$chk.prop("disabled",!0),c.addClass("disabled"),c.trigger("disabled.fu.checkbox")):(this.$chk.prop("disabled",!1),c.removeClass("disabled"),c.trigger("enabled.fu.checkbox"))},itemchecked:function(b){var c=a(b.target),d=c.prop("checked");this.setCheckedState(c,d)},toggle:function(){this.isChecked()?this.uncheck():this.check()},check:function(){this.setCheckedState(this.$chk,!0)},uncheck:function(){this.setCheckedState(this.$chk,!1)},isChecked:function(){return this.$chk.prop("checked")},enable:function(){this.setDisabledState(this.$chk,!1)},disable:function(){this.setDisabledState(this.$chk,!0)},destroy:function(){return this.$label.remove(),this.$label[0].outerHTML}},c.prototype.getValue=c.prototype.isChecked,a.fn.checkbox=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.checkbox"),h="object"==typeof b&&b;g||f.data("fu.checkbox",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.checkbox.defaults={},a.fn.checkbox.Constructor=c,a.fn.checkbox.noConflict=function(){return a.fn.checkbox=b,this},a(document).on("mouseover.fu.checkbox.data-api","[data-initialize=checkbox]",function(b){var c=a(b.target);c.data("fu.checkbox")||c.checkbox(c.data())}),a(function(){a("[data-initialize=checkbox]").each(function(){var b=a(this);b.data("fu.checkbox")||b.checkbox(b.data())})})}(a),function(a){var b=a.fn.combobox,c=function(b,c){this.$element=a(b),this.options=a.extend({},a.fn.combobox.defaults,c),this.$dropMenu=this.$element.find(".dropdown-menu"),this.$input=this.$element.find("input"),this.$button=this.$element.find(".btn"),this.$inputGroupBtn=this.$element.find(".input-group-btn"),this.$element.on("click.fu.combobox","a",a.proxy(this.itemclicked,this)),this.$element.on("change.fu.combobox","input",a.proxy(this.inputchanged,this)),this.$element.on("shown.bs.dropdown",a.proxy(this.menuShown,this)),this.$input.on("keyup.fu.combobox",a.proxy(this.keypress,this)),this.setDefaultSelection(),0===this.$dropMenu.children("li").length&&this.$button.addClass("disabled"),this.options.filterOnKeypress&&this.options.filter(this.$dropMenu.find("li"),this.$input.val(),this)};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$element[0].outerHTML},doSelect:function(a){void 0!==a[0]?(this.$element.find("li.selected:first").removeClass("selected"),this.$selectedItem=a,this.$selectedItem.addClass("selected"),this.$input.val(this.$selectedItem.text().trim())):(this.$selectedItem=null,this.$element.find("li.selected:first").removeClass("selected"))},clearSelection:function(){this.$selectedItem=null,this.$input.val(""),this.$dropMenu.find("li").removeClass("selected")},menuShown:function(){this.options.autoResizeMenu&&this.resizeMenu()},resizeMenu:function(){var a=this.$element.outerWidth();this.$dropMenu.outerWidth(a)},selectedItem:function(){var b=this.$selectedItem,c={};if(b){var d=this.$selectedItem.text().trim();c=a.extend({text:d},this.$selectedItem.data())}else c={text:this.$input.val().trim(),notFound:!0};return c},selectByText:function(b){var c=a([]);this.$element.find("li").each(function(){if((this.textContent||this.innerText||a(this).text()||"").trim().toLowerCase()===(b||"").trim().toLowerCase())return c=a(this),!1}),this.doSelect(c)},selectByValue:function(a){var b='li[data-value="'+a+'"]';this.selectBySelector(b)},selectByIndex:function(a){var b="li:eq("+a+")";this.selectBySelector(b)},selectBySelector:function(a){var b=this.$element.find(a);this.doSelect(b)},setDefaultSelection:function(){var a="li[data-selected=true]:first",b=this.$element.find(a);b.length>0&&(this.selectBySelector(a),b.removeData("selected"),b.removeAttr("data-selected"))},enable:function(){this.$element.removeClass("disabled"),this.$input.removeAttr("disabled"),this.$button.removeClass("disabled")},disable:function(){this.$element.addClass("disabled"),this.$input.attr("disabled",!0),this.$button.addClass("disabled")},itemclicked:function(b){this.$selectedItem=a(b.target).parent(),this.$input.val(this.$selectedItem.text().trim()).trigger("change",{synthetic:!0});var c=this.selectedItem();this.$element.trigger("changed.fu.combobox",c),b.preventDefault(),this.$element.find(".dropdown-toggle").focus()},keypress:function(a){var b=38===a.which||40===a.which||37===a.which||39===a.which;if(this.options.showOptionsOnKeypress&&!this.$inputGroupBtn.hasClass("open")&&(this.$button.dropdown("toggle"),this.$input.focus()),13===a.which){a.preventDefault();var c=this.$dropMenu.find("li.selected").text().trim();c.length>0?this.selectByText(c):this.selectByText(this.$input.val()),this.$inputGroupBtn.removeClass("open")}else if(27===a.which)a.preventDefault(),this.clearSelection(),this.$inputGroupBtn.removeClass("open");else if(this.options.showOptionsOnKeypress&&(40===a.which||38===a.which)){a.preventDefault();var d=this.$dropMenu.find("li.selected");d.length>0&&(d=40===a.which?d.next(":not(.hidden)"):d.prev(":not(.hidden)")),0===d.length&&(d=40===a.which?this.$dropMenu.find("li:not(.hidden):first"):this.$dropMenu.find("li:not(.hidden):last")),this.doSelect(d)}this.options.filterOnKeypress&&!b&&this.options.filter(this.$dropMenu.find("li"),this.$input.val(),this),this.previousKeyPress=a.which},inputchanged:function(b,c){var d=a(b.target).val();if(c&&c.synthetic)return void this.selectByText(d);this.selectByText(d);var e=this.selectedItem();0===e.text.length&&(e={text:d}),this.$element.trigger("changed.fu.combobox",e)}},c.prototype.getValue=c.prototype.selectedItem,a.fn.combobox=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.combobox"),h="object"==typeof b&&b;g||f.data("fu.combobox",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.combobox.defaults={autoResizeMenu:!0,filterOnKeypress:!1,showOptionsOnKeypress:!1,filter:function(b,c,d){var e=0;d.$dropMenu.find(".empty-indicator").remove(),b.each(function(b){var d=a(this),f=a(this).text().trim();d.removeClass(),f===c?(d.addClass("text-success"),e++):f.substr(0,c.length)===c?(d.addClass("text-info"),e++):d.addClass("hidden")}),0===e&&d.$dropMenu.append('<li class="empty-indicator text-muted"><em>No Matches</em></li>')}},a.fn.combobox.Constructor=c,a.fn.combobox.noConflict=function(){return a.fn.combobox=b,this},a(document).on("mousedown.fu.combobox.data-api","[data-initialize=combobox]",function(b){var c=a(b.target).closest(".combobox");c.data("fu.combobox")||c.combobox(c.data())}),a(function(){a("[data-initialize=combobox]").each(function(){var b=a(this);b.data("fu.combobox")||b.combobox(b.data())})})}(a),function(a){var b="moment.js is not available so you cannot use this function",c=[],d=!1,e=a.fn.datepicker,f=!1,g=function(){var a,b;for(f=!0,a=0,b=c.length;a<b;a++)c[a].init.call(c[a].scope);c=[]};"function"==typeof define&&define.amd?require(["moment"],function(a){d=a,g()},function(a){"moment"===(a.requireModules&&a.requireModules[0])&&g()}):g();var h=function(b,e){this.$element=a(b),this.options=a.extend(!0,{},a.fn.datepicker.defaults,e),this.$calendar=this.$element.find(".datepicker-calendar"),this.$days=this.$calendar.find(".datepicker-calendar-days"),this.$header=this.$calendar.find(".datepicker-calendar-header"),this.$headerTitle=this.$header.find(".title"),this.$input=this.$element.find("input"),this.$inputGroupBtn=this.$element.find(".input-group-btn"),this.$wheels=this.$element.find(".datepicker-wheels"),this.$wheelsMonth=this.$element.find(".datepicker-wheels-month"),this.$wheelsYear=this.$element.find(".datepicker-wheels-year"),this.artificialScrolling=!1,this.formatDate=this.options.formatDate||this.formatDate,this.inputValue=null,this.moment=!1,this.momentFormat=null,this.parseDate=this.options.parseDate||this.parseDate,this.preventBlurHide=!1,this.restricted=this.options.restricted||[],this.restrictedParsed=[],this.restrictedText=this.options.restrictedText,this.sameYearOnly=this.options.sameYearOnly,this.selectedDate=null,this.yearRestriction=null,this.$calendar.find(".datepicker-today").on("click.fu.datepicker",a.proxy(this.todayClicked,this)),this.$days.on("click.fu.datepicker","tr td button",a.proxy(this.dateClicked,this)),this.$header.find(".next").on("click.fu.datepicker",a.proxy(this.next,this)),this.$header.find(".prev").on("click.fu.datepicker",a.proxy(this.prev,this)),this.$headerTitle.on("click.fu.datepicker",a.proxy(this.titleClicked,this)),this.$input.on("change.fu.datepicker",a.proxy(this.inputChanged,this)),this.$input.on("mousedown.fu.datepicker",a.proxy(this.showDropdown,this)),this.$inputGroupBtn.on("hidden.bs.dropdown",a.proxy(this.hide,this)),this.$inputGroupBtn.on("shown.bs.dropdown",a.proxy(this.show,this)),this.$wheels.find(".datepicker-wheels-back").on("click.fu.datepicker",a.proxy(this.backClicked,this)),this.$wheels.find(".datepicker-wheels-select").on("click.fu.datepicker",a.proxy(this.selectClicked,this)),this.$wheelsMonth.on("click.fu.datepicker","ul button",a.proxy(this.monthClicked,this)),this.$wheelsYear.on("click.fu.datepicker","ul button",a.proxy(this.yearClicked,this)),this.$wheelsYear.find("ul").on("scroll.fu.datepicker",a.proxy(this.onYearScroll,this));var g=function(){this.checkForMomentJS()&&(d=d||window.moment,this.moment=!0,this.momentFormat=this.options.momentConfig.format,this.setCulture(this.options.momentConfig.culture),d.locale=d.locale||d.lang),this.setRestrictedDates(this.restricted),this.setDate(this.options.date)||(this.$input.val(""),this.inputValue=this.$input.val()),this.sameYearOnly&&(this.yearRestriction=this.selectedDate?this.selectedDate.getFullYear():(new Date).getFullYear())};f?g.call(this):c.push({init:g,scope:this})};h.prototype={constructor:h,backClicked:function(){this.changeView("calendar")},changeView:function(a,b){"wheels"===a?(this.$calendar.hide().attr("aria-hidden","true"),this.$wheels.show().removeAttr("aria-hidden",""),b&&this.renderWheel(b)):(this.$wheels.hide().attr("aria-hidden","true"),this.$calendar.show().removeAttr("aria-hidden",""),b&&this.renderMonth(b))},checkForMomentJS:function(){return!(!(a.isFunction(window.moment)||void 0!==d&&a.isFunction(d))||!a.isPlainObject(this.options.momentConfig)||"string"!=typeof this.options.momentConfig.culture||"string"!=typeof this.options.momentConfig.format)},dateClicked:function(b){var c,d=a(b.currentTarget).parents("td:first");d.hasClass("restricted")||(this.$days.find("td.selected").removeClass("selected"),d.addClass("selected"),c=new Date(d.attr("data-year"),d.attr("data-month"),d.attr("data-date")),this.selectedDate=c,this.$input.val(this.formatDate(c)),this.inputValue=this.$input.val(),this.hide(),this.$input.focus(),this.$element.trigger("dateClicked.fu.datepicker",c))},destroy:function(){return this.$element.remove(),this.$days.find("tbody").empty(),this.$wheelsYear.find("ul").empty(),this.$element[0].outerHTML},disable:function(){this.$element.addClass("disabled"),this.$element.find("input, button").attr("disabled","disabled"),this.$inputGroupBtn.removeClass("open")},enable:function(){this.$element.removeClass("disabled"),this.$element.find("input, button").removeAttr("disabled")},formatDate:function(a){var b=function(a){var b="0"+a;return b.substr(b.length-2)};return this.moment?d(a).format(this.momentFormat):b(a.getMonth()+1)+"/"+b(a.getDate())+"/"+a.getFullYear()},getCulture:function(){if(this.moment)return d.locale();throw b},getDate:function(){return this.selectedDate?this.selectedDate:new Date(NaN)},getFormat:function(){if(this.moment)return this.momentFormat;throw b},getFormattedDate:function(){return this.selectedDate?this.formatDate(this.selectedDate):"Invalid Date"},getRestrictedDates:function(){return this.restricted},inputChanged:function(){var a,b=this.$input.val();b!==this.inputValue&&(a=this.setDate(b),null===a?this.$element.trigger("inputParsingFailed.fu.datepicker",b):!1===a?this.$element.trigger("inputRestrictedDate.fu.datepicker",a):this.$element.trigger("changed.fu.datepicker",a))},show:function(){var a=this.selectedDate?this.selectedDate:new Date;this.changeView("calendar",a),this.$inputGroupBtn.addClass("open"),this.$element.trigger("shown.fu.datepicker")},showDropdown:function(a){this.$input.is(":focus")||this.$inputGroupBtn.hasClass("open")||this.show()},hide:function(){this.$inputGroupBtn.removeClass("open"),this.$element.trigger("hidden.fu.datepicker")},hideDropdown:function(){this.hide()},isInvalidDate:function(a){var b=a.toString();return"Invalid Date"===b||"NaN"===b},isRestricted:function(a,b,c){var d,e,f,g,h=this.restrictedParsed;if(this.sameYearOnly&&null!==this.yearRestriction&&c!==this.yearRestriction)return!0;for(d=0,f=h.length;d<f;d++)if(e=h[d].from,g=h[d].to,(c>e.year||c===e.year&&b>e.month||c===e.year&&b===e.month&&a>=e.date)&&(c<g.year||c===g.year&&b<g.month||c===g.year&&b===g.month&&a<=g.date))return!0;return!1},monthClicked:function(b){this.$wheelsMonth.find(".selected").removeClass("selected"),a(b.currentTarget).parent().addClass("selected")},next:function(){var a=this.$headerTitle.attr("data-month"),b=this.$headerTitle.attr("data-year");if(++a>11){if(this.sameYearOnly)return;a=0,b++}this.renderMonth(new Date(b,a,1))},onYearScroll:function(b){if(!this.artificialScrolling){var c,d,e=a(b.currentTarget),f="border-box"===e.css("box-sizing")?e.outerHeight():e.height(),g=e.get(0).scrollHeight,h=e.scrollTop(),i=f/(g-h)*100,j=h/g*100;if(j<5){for(d=parseInt(e.find("li:first").attr("data-year"),10),c=d-1;c>d-11;c--)e.prepend('<li data-year="'+c+'"><button type="button">'+c+"</button></li>");this.artificialScrolling=!0,e.scrollTop(e.get(0).scrollHeight-g+h),this.artificialScrolling=!1}else if(i>90)for(d=parseInt(e.find("li:last").attr("data-year"),10),c=d+1;c<d+11;c++)e.append('<li data-year="'+c+'"><button type="button">'+c+"</button></li>")}},parseDate:function(a){var b,c,e,f,g,h,i,j=this,k=new Date(NaN);if(a){if(this.moment)return f=function(a){var b=d(a,j.momentFormat);return!0===b.isValid()?b.toDate():k},e=function(a){var b=d(new Date(a));return!0===b.isValid()?b.toDate():k},g=function(a,b,c){var d=b(a);return j.isInvalidDate(d)?(d=c(a),j.isInvalidDate(d)?k:d):d},"string"==typeof a?g(a,f,e):g(a,e,f);if("string"==typeof a){if(b=new Date(Date.parse(a)),!this.isInvalidDate(b))return b;if(a=a.split("T")[0],c=/^\s*(\d{4})-(\d\d)-(\d\d)\s*$/,(i=c.exec(a))&&(h=parseInt(i[2],10),b=new Date(i[1],h-1,i[3]),h===b.getMonth()+1))return b}else if(b=new Date(a),!this.isInvalidDate(b))return b}return new Date(NaN)},prev:function(){var a=this.$headerTitle.attr("data-month"),b=this.$headerTitle.attr("data-year");if(--a<0){if(this.sameYearOnly)return;a=11,b--}this.renderMonth(new Date(b,a,1))},renderMonth:function(b){b=b||new Date;var c,d,e,f,g,h,i,j,k,l,m,n=new Date(b.getFullYear(),b.getMonth(),1).getDay(),o=new Date(b.getFullYear(),b.getMonth()+1,0).getDate(),p=new Date(b.getFullYear(),b.getMonth(),0).getDate(),q=this.$headerTitle.find(".month"),r=b.getMonth(),s=new Date,t=s.getDate(),u=s.getMonth(),v=s.getFullYear(),w=this.selectedDate,x=this.$days.find("tbody"),y=b.getFullYear();for(w&&(w={date:w.getDate(),month:w.getMonth(),year:w.getFullYear()}),q.find(".current").removeClass("current"),q.find('span[data-month="'+r+'"]').addClass("current"),this.$headerTitle.find(".year").text(y),this.$headerTitle.attr({"data-month":r,"data-year":y}),x.empty(),0!==n?(c=p-n+1,i=-1):(c=1,i=0),h=o<=35-n?5:6,f=0;f<h;f++){for(m=a("<tr></tr>"),g=0;g<7;g++)l=a("<td></td>"),-1===i?(l.addClass("last-month"),j!==i&&l.addClass("first")):1===i&&(l.addClass("next-month"),j!==i&&l.addClass("first")),d=r+i,e=y,d<0?(d=11,e--):d>11&&(d=0,e++),l.attr({"data-date":c,"data-month":d,"data-year":e}),e===v&&d===u&&c===t?l.addClass("current-day"):(e<v||e===v&&d<u||e===v&&d===u&&c<t)&&(l.addClass("past"),this.options.allowPastDates||l.addClass("restricted").attr("title",this.restrictedText)),this.isRestricted(c,d,e)&&l.addClass("restricted").attr("title",this.restrictedText),w&&e===w.year&&d===w.month&&c===w.date&&l.addClass("selected"),l.hasClass("restricted")?l.html('<span><b class="datepicker-date">'+c+"</b></span>"):l.html('<span><button type="button" class="datepicker-date">'+c+"</button></span>"),c++,k=j,j=i,-1===i&&c>p?(c=1,i=0,k!==i&&l.addClass("last")):0===i&&c>o&&(c=1,i=1,k!==i&&l.addClass("last")),f===h-1&&6===g&&l.addClass("last"),m.append(l);x.append(m)}},renderWheel:function(a){var b,c,d,e=a.getMonth(),f=this.$wheelsMonth.find("ul"),g=a.getFullYear(),h=this.$wheelsYear.find("ul");for(this.sameYearOnly?(this.$wheelsMonth.addClass("full"),this.$wheelsYear.addClass("hidden")):(this.$wheelsMonth.removeClass("full"),this.$wheelsYear.removeClass("hide hidden")),f.find(".selected").removeClass("selected"),c=f.find('li[data-month="'+e+'"]'),c.addClass("selected"),f.scrollTop(f.scrollTop()+(c.position().top-f.outerHeight()/2-c.outerHeight(!0)/2)),h.empty(),b=g-10;b<g+11;b++)h.append('<li data-year="'+b+'"><button type="button">'+b+"</button></li>");d=h.find('li[data-year="'+g+'"]'),d.addClass("selected"),this.artificialScrolling=!0,h.scrollTop(h.scrollTop()+(d.position().top-h.outerHeight()/2-d.outerHeight(!0)/2)),this.artificialScrolling=!1,c.find("button").focus()},selectClicked:function(){var a=this.$wheelsMonth.find(".selected").attr("data-month"),b=this.$wheelsYear.find(".selected").attr("data-year");this.changeView("calendar",new Date(b,a,1))},setCulture:function(a){if(!a)return!1;if(!this.moment)throw b;d.locale(a)},setDate:function(a){var b=this.parseDate(a);return this.isInvalidDate(b)?(this.selectedDate=null,this.renderMonth()):this.isRestricted(b.getDate(),b.getMonth(),b.getFullYear())?(this.selectedDate=!1,this.renderMonth()):(this.selectedDate=b,this.renderMonth(b),this.$input.val(this.formatDate(b))),this.inputValue=this.$input.val(),this.selectedDate},setFormat:function(a){if(!a)return!1;if(!this.moment)throw b;this.momentFormat=a},setRestrictedDates:function(a){var b,c,d=[],e=this,f=function(a){return a===-1/0?{date:-1/0,month:-1/0,year:-1/0}:a===1/0?{date:1/0,month:1/0,year:1/0}:(a=e.parseDate(a),{date:a.getDate(),month:a.getMonth(),year:a.getFullYear()})};for(this.restricted=a,b=0,c=a.length;b<c;b++)d.push({from:f(a[b].from),to:f(a[b].to)});this.restrictedParsed=d},titleClicked:function(a){this.changeView("wheels",new Date(this.$headerTitle.attr("data-year"),this.$headerTitle.attr("data-month"),1))},todayClicked:function(a){var b=new Date;b.getMonth()+""===this.$headerTitle.attr("data-month")&&b.getFullYear()+""===this.$headerTitle.attr("data-year")||this.renderMonth(b)},yearClicked:function(b){this.$wheelsYear.find(".selected").removeClass("selected"),a(b.currentTarget).parent().addClass("selected")}},h.prototype.getValue=h.prototype.getDate,a.fn.datepicker=function(b){var c,d=Array.prototype.slice.call(arguments,1),e=this.each(function(){var e=a(this),f=e.data("fu.datepicker"),g="object"==typeof b&&b;f||e.data("fu.datepicker",f=new h(this,g)),"string"==typeof b&&(c=f[b].apply(f,d))});return void 0===c?e:c},a.fn.datepicker.defaults={allowPastDates:!1,date:new Date,formatDate:null,momentConfig:{culture:"en",format:"L"},parseDate:null,restricted:[],restrictedText:"Restricted",sameYearOnly:!1},a.fn.datepicker.Constructor=h,a.fn.datepicker.noConflict=function(){return a.fn.datepicker=e,this},a(document).on("mousedown.fu.datepicker.data-api","[data-initialize=datepicker]",function(b){var c=a(b.target).closest(".datepicker");c.data("datepicker")||c.datepicker(c.data())}),a(document).on("click.fu.datepicker.data-api",".datepicker .dropdown-menu",function(b){var c=a(b.target);c.is(".datepicker-date")&&!c.closest(".restricted").length||b.stopPropagation()}),a(document).on("click.fu.datepicker.data-api",".datepicker input",function(a){a.stopPropagation()}),a(function(){a("[data-initialize=datepicker]").each(function(){var b=a(this);b.data("datepicker")||b.datepicker(b.data())})})}(a),function(a){function b(b){a(b).css({visibility:"hidden"}),c(b)?b.parent().addClass("dropup"):b.parent().removeClass("dropup"),a(b).css({visibility:"visible"})}function c(a){var b=d(a),c={};return c.parentHeight=a.parent().outerHeight(),c.parentOffsetTop=a.parent().offset().top,c.dropdownHeight=a.outerHeight(),c.containerHeight=b.overflowElement.outerHeight(),c.containerOffsetTop=b.isWindow?b.overflowElement.scrollTop():b.overflowElement.offset().top,c.fromTop=c.parentOffsetTop-c.containerOffsetTop,c.fromBottom=c.containerHeight-c.parentHeight-(c.parentOffsetTop-c.containerOffsetTop),!(c.dropdownHeight<c.fromBottom)&&(c.dropdownHeight<c.fromTop||(c.dropdownHeight>=c.fromTop&&c.dropdownHeight>=c.fromBottom?c.fromTop>=c.fromBottom:void 0))}function d(b){var c,d=b.attr("data-target"),e=!0;return d?"window"!==d&&(c=a(d),e=!1):a.each(b.parents(),function(b,d){if("visible"!==a(d).css("overflow"))return c=d,e=!1,!1}),e&&(c=window),{overflowElement:a(c),isWindow:e}}a(document).on("click.fu.dropdown-autoflip","[data-toggle=dropdown][data-flip]",function(c){"auto"===a(this).data().flip&&b(a(this).next(".dropdown-menu"))}),a(document).on("suggested.fu.pillbox",function(c,d){b(a(d)),a(d).parent().addClass("open")}),a.fn.dropdownautoflip=function(){}}(a),function(a){var b=a.fn.loader,c=function(b,c){this.$element=a(b),this.options=a.extend({},a.fn.loader.defaults,c)};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element[0].outerHTML},ieRepaint:function(){},msieVersion:function(){},next:function(){},pause:function(){},play:function(){},previous:function(){},reset:function(){}},a.fn.loader=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.loader"),h="object"==typeof b&&b;g||f.data("fu.loader",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.loader.defaults={},a.fn.loader.Constructor=c,a.fn.loader.noConflict=function(){return a.fn.loader=b,this},a(function(){a("[data-initialize=loader]").each(function(){var b=a(this);b.data("fu.loader")||b.loader(b.data())})})}(a),function(a){var b=a.fn.placard,c={accepted:"onAccept",cancelled:"onCancel"},d=function(b,c){var d=this;this.$element=a(b),this.options=a.extend({},a.fn.placard.defaults,c),"true"===this.$element.attr("data-ellipsis")&&(this.options.applyEllipsis=!0),this.$accept=this.$element.find(".placard-accept"),this.$cancel=this.$element.find(".placard-cancel"),this.$field=this.$element.find(".placard-field"),this.$footer=this.$element.find(".placard-footer"),this.$header=this.$element.find(".placard-header"),this.$popup=this.$element.find(".placard-popup"),this.actualValue=null,this.clickStamp="_",this.previousValue="",-1===this.options.revertOnCancel&&(this.options.revertOnCancel=this.$accept.length>0),this.isContentEditableDiv=this.$field.is("div"),this.isInput=this.$field.is("input"),this.divInTextareaMode=this.isContentEditableDiv&&"true"===this.$field.attr("data-textarea"),this.$field.on("focus.fu.placard",a.proxy(this.show,this)),this.$field.on("keydown.fu.placard",a.proxy(this.keyComplete,this)),this.$element.on("close.fu.placard",a.proxy(this.hide,this)),this.$accept.on("click.fu.placard",a.proxy(this.complete,this,"accepted")),this.$cancel.on("click.fu.placard",function(a){a.preventDefault(),d.complete("cancelled")}),this.applyEllipsis()},e=function(a){return a.$element.hasClass("showing")},f=function(){var b;if(b=a(document).find(".placard.showing"),b.length>0){if(b.data("fu.placard")&&b.data("fu.placard").options.explicit)return!1;b.placard("externalClickListener",{},!0)}return!0};d.prototype={constructor:d,complete:function(a){var b=this.options[c[a]],d={previousValue:this.previousValue,value:this.getValue()};b?(b(d),this.$element.trigger(a+".fu.placard",d)):("cancelled"===a&&this.options.revertOnCancel&&this.setValue(this.previousValue,!0),this.$element.trigger(a+".fu.placard",d),this.hide())},keyComplete:function(a){(this.isContentEditableDiv&&!this.divInTextareaMode||this.isInput)&&13===a.keyCode?(this.complete("accepted"),this.$field.blur()):27===a.keyCode&&(this.complete("cancelled"),this.$field.blur())},destroy:function(){return this.$element.remove(),a(document).off("click.fu.placard.externalClick."+this.clickStamp),this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$element[0].outerHTML},disable:function(){this.$element.addClass("disabled"),this.$field.attr("disabled","disabled"),this.isContentEditableDiv&&this.$field.removeAttr("contenteditable"),this.hide()},applyEllipsis:function(){var a,b,c;if(this.options.applyEllipsis)if(a=this.$field.get(0),this.isContentEditableDiv&&!this.divInTextareaMode||this.isInput)a.scrollLeft=0;else if(a.scrollTop=0,a.clientHeight<a.scrollHeight){for(this.actualValue=this.getValue(),this.setValue("",!0),c="",b=0;a.clientHeight>=a.scrollHeight;)c+=this.actualValue[b],this.setValue(c+"...",!0),b++;c=c.length>0?c.substring(0,c.length-1):"",this.setValue(c+"...",!0)}},enable:function(){this.$element.removeClass("disabled"),this.$field.removeAttr("disabled"),this.isContentEditableDiv&&this.$field.attr("contenteditable","true")},externalClickListener:function(a,b){(!0===b||this.isExternalClick(a))&&this.complete(this.options.externalClickAction)},getValue:function(){return null!==this.actualValue?this.actualValue:this.isContentEditableDiv?this.$field.html():this.$field.val()},hide:function(){this.$element.hasClass("showing")&&(this.$element.removeClass("showing"),this.applyEllipsis(),a(document).off("click.fu.placard.externalClick."+this.clickStamp),this.$element.trigger("hidden.fu.placard"))},isExternalClick:function(b){var c,d,e=this.$element.get(0),f=this.options.externalClickExceptions||[],g=a(b.target);if(b.target===e||g.parents(".placard:first").get(0)===e)return!1;for(c=0,d=f.length;c<d;c++)if(g.is(f[c])||g.parents(f[c]).length>0)return!1;return!0},setValue:function(a,b){return void 0===b&&(b=!this.options.applyEllipsis),this.isContentEditableDiv?this.$field.empty().append(a):this.$field.val(a),b||e(this)||this.applyEllipsis(),this.$field},show:function(){e(this)||f()&&(this.previousValue=this.isContentEditableDiv?this.$field.html():this.$field.val(),null!==this.actualValue&&(this.setValue(this.actualValue,!0),this.actualValue=null),this.showPlacard())},showPlacard:function(){this.$element.addClass("showing"),this.$header.length>0&&this.$popup.css("top","-"+this.$header.outerHeight(!0)+"px"),this.$footer.length>0&&this.$popup.css("bottom","-"+this.$footer.outerHeight(!0)+"px"),this.$element.trigger("shown.fu.placard"),this.clickStamp=(new Date).getTime()+(Math.floor(100*Math.random())+1),this.options.explicit||a(document).on("click.fu.placard.externalClick."+this.clickStamp,a.proxy(this.externalClickListener,this))}},a.fn.placard=function(b){var c,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.placard"),h="object"==typeof b&&b;g||f.data("fu.placard",g=new d(this,h)),"string"==typeof b&&(c=g[b].apply(g,e))});return void 0===c?f:c},a.fn.placard.defaults={onAccept:void 0,onCancel:void 0,externalClickAction:"cancelled",externalClickExceptions:[],explicit:!1,revertOnCancel:-1,applyEllipsis:!1},a.fn.placard.Constructor=d,a.fn.placard.noConflict=function(){return a.fn.placard=b,this},a(document).on("focus.fu.placard.data-api","[data-initialize=placard]",function(b){var c=a(b.target).closest(".placard");c.data("fu.placard")||c.placard(c.data())}),a(function(){a("[data-initialize=placard]").each(function(){var b=a(this);b.data("fu.placard")||b.placard(b.data())})})}(a),function(a){var b=a.fn.radio,c=function(b,c){if(this.options=a.extend({},a.fn.radio.defaults,c),"label"===b.tagName.toLowerCase()){this.$label=a(b),this.$radio=this.$label.find('input[type="radio"]'),this.groupName=this.$radio.attr("name");var d=this.$radio.attr("data-toggle");this.$toggleContainer=a(d),this.$radio.on("change",a.proxy(this.itemchecked,this)),this.setInitialState()}};c.prototype={constructor:c,setInitialState:function(){var a=this.$radio,b=(this.$label,a.prop("checked")),c=a.prop("disabled");this.setCheckedState(a,b),this.setDisabledState(a,c)},resetGroup:function(){a('input[name="'+this.groupName+'"]').each(function(b,c){var d=a(c),e=d.parent(),f=d.attr("data-toggle"),g=a(f);e.removeClass("checked"),g.addClass("hidden")})},setCheckedState:function(b,c){var d=b,e=d.parent(),f=d.attr("data-toggle"),g=a(f);c?(this.resetGroup(),d.prop("checked",!0),e.addClass("checked"),g.removeClass("hide hidden"),e.trigger("checked.fu.radio")):(d.prop("checked",!1),e.removeClass("checked"),g.addClass("hidden"),e.trigger("unchecked.fu.radio")),e.trigger("changed.fu.radio",c)},setDisabledState:function(a,b){var c=this.$label;b?(this.$radio.prop("disabled",!0),c.addClass("disabled"),c.trigger("disabled.fu.radio")):(this.$radio.prop("disabled",!1),c.removeClass("disabled"),c.trigger("enabled.fu.radio"))},itemchecked:function(b){var c=a(b.target);this.setCheckedState(c,!0)},check:function(){this.setCheckedState(this.$radio,!0)},uncheck:function(){this.setCheckedState(this.$radio,!1)},isChecked:function(){return this.$radio.prop("checked")},enable:function(){this.setDisabledState(this.$radio,!1)},disable:function(){this.setDisabledState(this.$radio,!0)},destroy:function(){return this.$label.remove(),this.$label[0].outerHTML}},c.prototype.getValue=c.prototype.isChecked,a.fn.radio=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.radio"),h="object"==typeof b&&b;g||f.data("fu.radio",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.radio.defaults={},a.fn.radio.Constructor=c,a.fn.radio.noConflict=function(){return a.fn.radio=b,this},a(document).on("mouseover.fu.radio.data-api","[data-initialize=radio]",function(b){var c=a(b.target);c.data("fu.radio")||c.radio(c.data())}),a(function(){a("[data-initialize=radio]").each(function(){var b=a(this);b.data("fu.radio")||b.radio(b.data())})})}(a),function(a){var b=a.fn.search,c=function(b,c){this.$element=a(b),this.$repeater=a(b).closest(".repeater"),this.options=a.extend({},a.fn.search.defaults,c),"true"===this.$element.attr("data-searchOnKeyPress")&&(this.options.searchOnKeyPress=!0),this.$button=this.$element.find("button"),this.$input=this.$element.find("input"),this.$icon=this.$element.find(".glyphicon, .fuelux-icon"),this.$button.on("click.fu.search",a.proxy(this.buttonclicked,this)),this.$input.on("keyup.fu.search",a.proxy(this.keypress,this)),this.$repeater.length>0&&this.$repeater.on("rendered.fu.repeater",a.proxy(this.clearPending,this)),this.activeSearch=""};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$element[0].outerHTML},search:function(a){
+this.$icon.hasClass("glyphicon")&&this.$icon.removeClass("glyphicon-search").addClass("glyphicon-remove"),this.$icon.hasClass("fuelux-icon")&&this.$icon.removeClass("fuelux-icon-search").addClass("fuelux-icon-remove"),this.activeSearch=a,this.$element.addClass("searched pending"),this.$element.trigger("searched.fu.search",a)},clear:function(){this.$icon.hasClass("glyphicon")&&this.$icon.removeClass("glyphicon-remove").addClass("glyphicon-search"),this.$icon.hasClass("fuelux-icon")&&this.$icon.removeClass("fuelux-icon-remove").addClass("fuelux-icon-search"),this.$element.hasClass("pending")&&this.$element.trigger("canceled.fu.search"),this.activeSearch="",this.$input.val(""),this.$element.trigger("cleared.fu.search"),this.$element.removeClass("searched pending")},clearPending:function(){this.$element.removeClass("pending")},action:function(){var a=this.$input.val();a&&a.length>0?this.search(a):this.clear()},buttonclicked:function(b){b.preventDefault(),a(b.currentTarget).is(".disabled, :disabled")||(this.$element.hasClass("pending")||this.$element.hasClass("searched")?this.clear():this.action())},keypress:function(a){13===a.which?(a.preventDefault(),this.action()):9===a.which?a.preventDefault():27===a.which?(a.preventDefault(),this.clear()):this.options.searchOnKeyPress&&this.action()},disable:function(){this.$element.addClass("disabled"),this.$input.attr("disabled","disabled"),this.options.allowCancel||this.$button.addClass("disabled")},enable:function(){this.$element.removeClass("disabled"),this.$input.removeAttr("disabled"),this.$button.removeClass("disabled")}},a.fn.search=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.search"),h="object"==typeof b&&b;g||f.data("fu.search",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.search.defaults={clearOnEmpty:!1,searchOnKeyPress:!1,allowCancel:!1},a.fn.search.Constructor=c,a.fn.search.noConflict=function(){return a.fn.search=b,this},a(document).on("mousedown.fu.search.data-api","[data-initialize=search]",function(b){var c=a(b.target).closest(".search");c.data("fu.search")||c.search(c.data())}),a(function(){a("[data-initialize=search]").each(function(){var b=a(this);b.data("fu.search")||b.search(b.data())})})}(a),function(a){var b=a.fn.selectlist,c=function(b,c){this.$element=a(b),this.options=a.extend({},a.fn.selectlist.defaults,c),this.$button=this.$element.find(".btn.dropdown-toggle"),this.$hiddenField=this.$element.find(".hidden-field"),this.$label=this.$element.find(".selected-label"),this.$dropdownMenu=this.$element.find(".dropdown-menu"),this.$element.on("click.fu.selectlist",".dropdown-menu a",a.proxy(this.itemClicked,this)),this.setDefaultSelection(),"auto"!==c.resize&&"auto"!==this.$element.attr("data-resize")||this.resize(),0===this.$dropdownMenu.children("li").length&&(this.disable(),this.doSelect(a(this.options.emptyLabelHTML))),this.$element.on("shown.bs.dropdown",function(){var b=a(this);a(document).on("keypress.fu.selectlist",function(c){var d=String.fromCharCode(c.which);b.find("li").each(function(b,c){if(a(c).text().charAt(0).toLowerCase()===d)return a(c).children("a").focus(),!1})})}),this.$element.on("hide.bs.dropdown",function(){a(document).off("keypress.fu.selectlist")})};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element[0].outerHTML},doSelect:function(b){var c;this.$selectedItem=c=b,this.$hiddenField.val(this.$selectedItem.attr("data-value")),this.$label.html(a(this.$selectedItem.children()[0]).html()),this.$element.find("li").each(function(){c.is(a(this))?a(this).attr("data-selected",!0):a(this).removeData("selected").removeAttr("data-selected")})},itemClicked:function(b){this.$element.trigger("clicked.fu.selectlist",this.$selectedItem),b.preventDefault(),a(b.currentTarget).parent("li").is(".disabled, :disabled")||(a(b.target).parent().is(this.$selectedItem)||this.itemChanged(b),this.$element.find(".dropdown-toggle").focus())},itemChanged:function(b){this.doSelect(a(b.target).closest("li"));var c=this.selectedItem();this.$element.trigger("changed.fu.selectlist",c)},resize:function(){var b=0,c=0,d=a("<div/>").addClass("selectlist-sizer");Boolean(a(document).find("html").hasClass("fuelux"))?a(document.body).append(d):a(".fuelux:first").append(d),d.append(this.$element.clone()),this.$element.find("a").each(function(){d.find(".selected-label").text(a(this).text()),c=d.find(".selectlist").outerWidth(),(c+=d.find(".sr-only").outerWidth())>b&&(b=c)}),b<=1||(this.$button.css("width",b),this.$dropdownMenu.css("width",b),d.remove())},selectedItem:function(){var b=this.$selectedItem.text();return a.extend({text:b},this.$selectedItem.data())},selectByText:function(b){var c=a([]);this.$element.find("li").each(function(){if((this.textContent||this.innerText||a(this).text()||"").toLowerCase()===(b||"").toLowerCase())return c=a(this),!1}),this.doSelect(c)},selectByValue:function(a){var b='li[data-value="'+a+'"]';this.selectBySelector(b)},selectByIndex:function(a){var b="li:eq("+a+")";this.selectBySelector(b)},selectBySelector:function(a){var b=this.$element.find(a);this.doSelect(b)},setDefaultSelection:function(){var a=this.$element.find("li[data-selected=true]").eq(0);0===a.length&&(a=this.$element.find("li").has("a").eq(0)),this.doSelect(a)},enable:function(){this.$element.removeClass("disabled"),this.$button.removeClass("disabled")},disable:function(){this.$element.addClass("disabled"),this.$button.addClass("disabled")}},c.prototype.getValue=c.prototype.selectedItem,a.fn.selectlist=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.selectlist"),h="object"==typeof b&&b;g||f.data("fu.selectlist",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.selectlist.defaults={emptyLabelHTML:'<li data-value=""><a href="#">No items</a></li>'},a.fn.selectlist.Constructor=c,a.fn.selectlist.noConflict=function(){return a.fn.selectlist=b,this},a(document).on("mousedown.fu.selectlist.data-api","[data-initialize=selectlist]",function(b){var c=a(b.target).closest(".selectlist");c.data("fu.selectlist")||c.selectlist(c.data())}),a(function(){a("[data-initialize=selectlist]").each(function(){var b=a(this);b.data("fu.selectlist")||b.selectlist(b.data())})})}(a),function(a){var b=a.fn.spinbox,c=function(b,c){this.$element=a(b),this.$element.find(".btn").on("click",function(a){a.preventDefault()}),this.options=a.extend({},a.fn.spinbox.defaults,c),this.options.step=this.$element.data("step")||this.options.step,this.options.value<this.options.min?this.options.value=this.options.min:this.options.max<this.options.value&&(this.options.value=this.options.max),this.$input=this.$element.find(".spinbox-input"),this.$input.on("focusout.fu.spinbox",this.$input,a.proxy(this.change,this)),this.$element.on("keydown.fu.spinbox",this.$input,a.proxy(this.keydown,this)),this.$element.on("keyup.fu.spinbox",this.$input,a.proxy(this.keyup,this)),this.options.hold?(this.$element.on("mousedown.fu.spinbox",".spinbox-up",a.proxy(function(){this.startSpin(!0)},this)),this.$element.on("mouseup.fu.spinbox",".spinbox-up, .spinbox-down",a.proxy(this.stopSpin,this)),this.$element.on("mouseout.fu.spinbox",".spinbox-up, .spinbox-down",a.proxy(this.stopSpin,this)),this.$element.on("mousedown.fu.spinbox",".spinbox-down",a.proxy(function(){this.startSpin(!1)},this))):(this.$element.on("click.fu.spinbox",".spinbox-up",a.proxy(function(){this.step(!0)},this)),this.$element.on("click.fu.spinbox",".spinbox-down",a.proxy(function(){this.step(!1)},this))),this.switches={count:1,enabled:!0},"medium"===this.options.speed?this.switches.speed=300:"fast"===this.options.speed?this.switches.speed=100:this.switches.speed=500,this.options.defaultUnit=e(this.options.defaultUnit,this.options.units)?this.options.defaultUnit:"",this.unit=this.options.defaultUnit,this.lastValue=this.options.value,this.render(),this.options.disabled&&this.disable()},d=function(a,b){return Math.round(a/b)*b},e=function(b,c){var d=!1,e=b.toLowerCase();return a.each(c,function(a,b){if(b=b.toLowerCase(),e===b)return d=!0,!1}),d},f=function(a){return isNaN(parseFloat(a))?a:(a>this.options.max?a=this.options.cycle?this.options.min:this.options.max:a<this.options.min&&(a=this.options.cycle?this.options.max:this.options.min),this.options.limitToStep&&this.options.step&&(a=d(a,this.options.step),a>this.options.max?a-=this.options.step:a<this.options.min&&(a+=this.options.step)),a)};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$element[0].outerHTML},render:function(){this._setValue(this.getDisplayValue())},change:function(){this._setValue(this.getDisplayValue()),this.triggerChangedEvent()},stopSpin:function(){void 0!==this.switches.timeout&&(clearTimeout(this.switches.timeout),this.switches.count=1,this.triggerChangedEvent())},triggerChangedEvent:function(){var a=this.getValue();a!==this.lastValue&&(this.lastValue=a,this.$element.trigger("changed.fu.spinbox",a))},startSpin:function(b){if(!this.options.disabled){var c=this.switches.count;1===c?(this.step(b),c=1):c=c<3?1.5:c<8?2.5:4,this.switches.timeout=setTimeout(a.proxy(function(){this.iterate(b)},this),this.switches.speed/c),this.switches.count++}},iterate:function(a){this.step(a),this.startSpin(a)},step:function(a){this._setValue(this.getDisplayValue());var b;b=a?this.options.value+this.options.step:this.options.value-this.options.step,b=b.toFixed(5),this._setValue(b+this.unit)},getDisplayValue:function(){var a=this.parseInput(this.$input.val());return a||this.options.value},setDisplayValue:function(a){this.$input.val(a)},getValue:function(){var a=this.options.value;return"."!==this.options.decimalMark&&(a=(a+"").split(".").join(this.options.decimalMark)),a+this.unit},setValue:function(a){return this._setValue(a,!0)},_setValue:function(a,b){if("."!==this.options.decimalMark&&(a=this.parseInput(a)),"number"!=typeof a){var c=a.replace(/[0-9.-]/g,"");this.unit=e(c,this.options.units)?c:this.options.defaultUnit}var d=this.getIntValue(a);return isNaN(d)&&!isFinite(d)?this._setValue(this.options.value,b):(d=f.call(this,d),this.options.value=d,a=d+this.unit,"."!==this.options.decimalMark&&(a=(a+"").split(".").join(this.options.decimalMark)),this.setDisplayValue(a),b&&(this.lastValue=a),this)},value:function(a){return a||0===a?this.setValue(a):this.getValue()},parseInput:function(a){return a=(a+"").split(this.options.decimalMark).join(".")},getIntValue:function(a){if(void 0!==(a=void 0===a?this.getValue():a))return"string"==typeof a&&(a=this.parseInput(a)),a=parseFloat(a,10)},disable:function(){this.options.disabled=!0,this.$element.addClass("disabled"),this.$input.attr("disabled",""),this.$element.find("button").addClass("disabled")},enable:function(){this.options.disabled=!1,this.$element.removeClass("disabled"),this.$input.removeAttr("disabled"),this.$element.find("button").removeClass("disabled")},keydown:function(a){var b=a.keyCode;38===b?this.step(!0):40===b?this.step(!1):13===b&&this.change()},keyup:function(a){var b=a.keyCode;38!==b&&40!==b||this.triggerChangedEvent()}},a.fn.spinbox=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.spinbox"),h="object"==typeof b&&b;g||f.data("fu.spinbox",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.spinbox.defaults={value:0,min:0,max:999,step:1,hold:!0,speed:"medium",disabled:!1,cycle:!1,units:[],decimalMark:".",defaultUnit:"",limitToStep:!1},a.fn.spinbox.Constructor=c,a.fn.spinbox.noConflict=function(){return a.fn.spinbox=b,this},a(document).on("mousedown.fu.spinbox.data-api","[data-initialize=spinbox]",function(b){var c=a(b.target).closest(".spinbox");c.data("fu.spinbox")||c.spinbox(c.data())}),a(function(){a("[data-initialize=spinbox]").each(function(){var b=a(this);b.data("fu.spinbox")||b.spinbox(b.data())})})}(a),function(a){function b(a,b){a.addClass("tree-selected"),"item"===a.data("type")&&b.hasClass("fueluxicon-bullet")&&b.removeClass("fueluxicon-bullet").addClass("glyphicon-ok")}function c(a,b){a.removeClass("tree-selected"),"item"===a.data("type")&&b.hasClass("glyphicon-ok")&&b.removeClass("glyphicon-ok").addClass("fueluxicon-bullet")}function d(d,e,f){a.each(f.$elements,function(b,c){var d=a(c);d[0]!==e.$element[0]&&f.dataForEvent.push(a(d).data())}),e.$element.hasClass("tree-selected")?(c(e.$element,e.$icon),f.eventType="deselected"):(b(e.$element,e.$icon),f.eventType="selected",f.dataForEvent.push(e.elementData))}function e(a,d,e){if(e.$elements[0]!==d.$element[0]){a.deselectAll(a.$element);b(d.$element,d.$icon),e.eventType="selected",e.dataForEvent=[d.elementData]}else c(d.$element,d.$icon),e.eventType="deselected",e.dataForEvent=[]}var f=a.fn.tree,g=function(b,c){this.$element=a(b),this.options=a.extend({},a.fn.tree.defaults,c),this.options.itemSelect&&this.$element.on("click.fu.tree",".tree-item",a.proxy(function(a){this.selectItem(a.currentTarget)},this)),this.$element.on("click.fu.tree",".tree-branch-name",a.proxy(function(a){this.toggleFolder(a.currentTarget)},this)),this.$element.on("click.fu.tree",".tree-overflow",a.proxy(function(b){this.populate(a(b.currentTarget))},this)),this.options.folderSelect&&(this.$element.addClass("tree-folder-select"),this.$element.off("click.fu.tree",".tree-branch-name"),this.$element.on("click.fu.tree",".icon-caret",a.proxy(function(b){this.toggleFolder(a(b.currentTarget).parent())},this)),this.$element.on("click.fu.tree",".tree-branch-name",a.proxy(function(b){this.selectFolder(a(b.currentTarget))},this))),this.render()};g.prototype={constructor:g,deselectAll:function(b){b=b||this.$element;var d=a(b).find(".tree-selected");return d.each(function(b,d){c(a(d),a(d).find(".glyphicon"))}),d},destroy:function(){return this.$element.find("li:not([data-template])").remove(),this.$element.remove(),this.$element[0].outerHTML},render:function(){this.populate(this.$element)},populate:function(b,c){var d=this,e=b.hasClass("tree-overflow"),f=b.hasClass("tree")?b:b.parent(),g=f.hasClass("tree");e&&!g&&(f=f.parent());var h=f.data();e&&(h.overflow=b.data()),c=c||!1,e&&(g?b.replaceWith(f.find("> .tree-loader").remove()):b.remove());var i=f.find(".tree-loader:last");!1===c&&i.removeClass("hide hidden"),this.options.dataSource(h||{},function(b){a.each(b.data,function(b,c){var e;"folder"===c.type?(e=d.$element.find("[data-template=treebranch]:eq(0)").clone().removeClass("hide hidden").removeData("template").removeAttr("data-template"),e.data(c),e.find(".tree-branch-name > .tree-label").html(c.text||c.name)):"item"===c.type?(e=d.$element.find("[data-template=treeitem]:eq(0)").clone().removeClass("hide hidden").removeData("template").removeAttr("data-template"),e.find(".tree-item-name > .tree-label").html(c.text||c.name),e.data(c)):"overflow"===c.type&&(e=d.$element.find("[data-template=treeoverflow]:eq(0)").clone().removeClass("hide hidden").removeData("template").removeAttr("data-template"),e.find(".tree-overflow-name > .tree-label").html(c.text||c.name),e.data(c));var h=c.attr||c.dataAttributes||[];a.each(h,function(a,b){switch(a){case"cssClass":case"class":case"className":e.addClass(b);break;case"data-icon":e.find(".icon-item").removeClass().addClass("icon-item "+b),e.attr(a,b);break;case"id":e.attr(a,b),e.attr("aria-labelledby",b+"-label"),e.find(".tree-branch-name > .tree-label").attr("id",b+"-label");break;default:e.attr(a,b)}}),g?f.append(e):f.find(".tree-branch-children:eq(0)").append(e)}),f.find(".tree-loader").addClass("hidden"),d.$element.trigger("loaded.fu.tree",f)})},selectTreeNode:function(b,c){var f={};f.$element=a(b);var g={};g.$elements=this.$element.find(".tree-selected"),g.dataForEvent=[],"folder"===c?(f.$element=f.$element.closest(".tree-branch"),f.$icon=f.$element.find(".icon-folder")):f.$icon=f.$element.find(".icon-item"),f.elementData=f.$element.data(),this.options.multiSelect?d(this,f,g):e(this,f,g),this.$element.trigger(g.eventType+".fu.tree",{target:f.elementData,selected:g.dataForEvent}),f.$element.trigger("updated.fu.tree",{selected:g.dataForEvent,item:f.$element,eventType:g.eventType})},discloseFolder:function(b){var c=a(b),d=c.closest(".tree-branch"),e=d.find(".tree-branch-children"),f=e.eq(0);d.addClass("tree-open"),d.attr("aria-expanded","true"),f.removeClass("hide hidden"),d.find("> .tree-branch-header .icon-folder").eq(0).removeClass("glyphicon-folder-close").addClass("glyphicon-folder-open"),e.children().length||this.populate(e),this.$element.trigger("disclosedFolder.fu.tree",d.data())},closeFolder:function(b){var c=a(b),d=c.closest(".tree-branch"),e=d.find(".tree-branch-children"),f=e.eq(0);d.removeClass("tree-open"),d.attr("aria-expanded","false"),f.addClass("hidden"),d.find("> .tree-branch-header .icon-folder").eq(0).removeClass("glyphicon-folder-open").addClass("glyphicon-folder-close"),this.options.cacheItems||f.empty(),this.$element.trigger("closed.fu.tree",d.data())},toggleFolder:function(b){var c=a(b);c.find(".glyphicon-folder-close").length?this.discloseFolder(b):c.find(".glyphicon-folder-open").length&&this.closeFolder(b)},selectFolder:function(a){this.options.folderSelect&&this.selectTreeNode(a,"folder")},selectItem:function(a){this.options.itemSelect&&this.selectTreeNode(a,"item")},selectedItems:function(){var b=this.$element.find(".tree-selected"),c=[];return a.each(b,function(b,d){c.push(a(d).data())}),c},collapse:function(){var a=this,b=[],c=function c(d,e){b.push(e),0===a.$element.find(".tree-branch.tree-open:not('.hidden, .hide')").length&&(a.$element.trigger("closedAll.fu.tree",{tree:a.$element,reportedClosed:b}),a.$element.off("loaded.fu.tree",a.$element,c))};a.$element.on("closed.fu.tree",c),a.$element.find(".tree-branch.tree-open:not('.hidden, .hide')").each(function(){a.closeFolder(this)})},discloseVisible:function(){var b=this,c=b.$element.find(".tree-branch:not('.tree-open, .hidden, .hide')"),d=[],e=function a(e,f){d.push(f),d.length===c.length&&(b.$element.trigger("disclosedVisible.fu.tree",{tree:b.$element,reportedOpened:d}),b.$element.off("loaded.fu.tree",b.$element,a))};b.$element.on("loaded.fu.tree",e),b.$element.find(".tree-branch:not('.tree-open, .hidden, .hide')").each(function(){b.discloseFolder(a(this).find(".tree-branch-header"))})},discloseAll:function(){var a=this;void 0===a.$element.data("disclosures")&&a.$element.data("disclosures",0);var b=a.options.disclosuresUpperLimit>=1&&a.$element.data("disclosures")>=a.options.disclosuresUpperLimit;if(0===a.$element.find(".tree-branch:not('.tree-open, .hidden, .hide')").length)a.$element.trigger("disclosedAll.fu.tree",{tree:a.$element,disclosures:a.$element.data("disclosures")}),a.options.cacheItems||a.$element.one("closeAll.fu.tree",function(){a.$element.data("disclosures",0)});else{if(b&&(a.$element.trigger("exceededDisclosuresLimit.fu.tree",{tree:a.$element,disclosures:a.$element.data("disclosures")}),!a.$element.data("ignore-disclosures-limit")))return;a.$element.data("disclosures",a.$element.data("disclosures")+1),a.$element.one("disclosedVisible.fu.tree",function(){a.discloseAll()}),a.discloseVisible()}},refreshFolder:function(a){var b=a.closest(".tree-branch"),c=b.find(".tree-branch-children");c.eq(0).empty(),b.hasClass("tree-open")?this.populate(c,!1):this.populate(c,!0),this.$element.trigger("refreshedFolder.fu.tree",b.data())}},g.prototype.closeAll=g.prototype.collapse,g.prototype.openFolder=g.prototype.discloseFolder,g.prototype.getValue=g.prototype.selectedItems,a.fn.tree=function(b){var c,d=Array.prototype.slice.call(arguments,1),e=this.each(function(){var e=a(this),f=e.data("fu.tree"),h="object"==typeof b&&b;f||e.data("fu.tree",f=new g(this,h)),"string"==typeof b&&(c=f[b].apply(f,d))});return void 0===c?e:c},a.fn.tree.defaults={dataSource:function(a,b){},multiSelect:!1,cacheItems:!0,folderSelect:!0,itemSelect:!0,disclosuresUpperLimit:0},a.fn.tree.Constructor=g,a.fn.tree.noConflict=function(){return a.fn.tree=f,this}}(a),function(a){var b={BACKSPACE_KEYCODE:8,COMMA_KEYCODE:188,DELETE_KEYCODE:46,DOWN_ARROW_KEYCODE:40,ENTER_KEYCODE:13,TAB_KEYCODE:9,UP_ARROW_KEYCODE:38},c=function(a){return!0===a.shiftKey},d=function(a){return function(b){return b.keyCode===a}},e=d(b.BACKSPACE_KEYCODE),f=d(b.DELETE_KEYCODE),g=d(b.TAB_KEYCODE),h=d(b.UP_ARROW_KEYCODE),i=d(b.DOWN_ARROW_KEYCODE),j=/<.*>/,k=function(b){var c=b;return j.test(c)&&(c=a("<i>").text(b).html()),c};a.fn.utilities={CONST:b,cleanInput:k,isBackspaceKey:e,isDeleteKey:f,isShiftHeld:c,isTabKey:g,isUpArrow:h,isDownArrow:i}}(a),function(a){var b=a.fn.wizard,c=function(b,c){this.$element=a(b),this.options=a.extend({},a.fn.wizard.defaults,c),this.options.disablePreviousStep="previous"===this.$element.attr("data-restrict")||this.options.disablePreviousStep,this.currentStep=this.options.selectedItem.step,this.numSteps=this.$element.find(".steps li").length,this.$prevBtn=this.$element.find("button.btn-prev"),this.$nextBtn=this.$element.find("button.btn-next");var d=this.$nextBtn.children().detach();this.nextText=a.trim(this.$nextBtn.text()),this.$nextBtn.append(d);var e=this.$element.children(".steps-container");0===e.length&&(e=this.$element,this.$element.addClass("no-steps-container"),window&&window.console&&window.console.warn&&window.console.warn('please update your wizard markup to include ".steps-container" as seen in http://getfuelux.com/javascript.html#wizard-usage-markup')),e=e.find(".steps"),this.$prevBtn.on("click.fu.wizard",a.proxy(this.previous,this)),this.$nextBtn.on("click.fu.wizard",a.proxy(this.next,this)),e.on("click.fu.wizard","li.complete",a.proxy(this.stepclicked,this)),this.selectedItem(this.options.selectedItem),this.options.disablePreviousStep&&(this.$prevBtn.attr("disabled",!0),this.$element.find(".steps").addClass("previous-disabled"))};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element[0].outerHTML},addSteps:function(b){var c,d,e,f,g,h,i=[].slice.call(arguments).slice(1),j=this.$element.find(".steps"),k=this.$element.find(".step-content");for(b=-1===b||b>this.numSteps+1?this.numSteps+1:b,i[0]instanceof Array&&(i=i[0]),g=j.find("li:nth-child("+b+")"),f=k.find(".step-pane:nth-child("+b+")"),g.length<1&&(g=null),c=0,d=i.length;c<d;c++)h=a('<li data-step="'+b+'"><span class="badge badge-info"></span></li>'),h.append(i[c].label||"").append('<span class="chevron"></span>'),h.find(".badge").append(i[c].badge||b),e=a('<div class="step-pane" data-step="'+b+'"></div>'),e.append(i[c].pane||""),g?(g.before(h),f.before(e)):(j.append(h),k.append(e)),b++;this.syncSteps(),this.numSteps=j.find("li").length,this.setState()},removeSteps:function(b,c){var d,e="nextAll",f=0,g=this.$element.find(".steps"),h=this.$element.find(".step-content");c=void 0!==c?c:1,b>g.find("li").length?d=g.find("li:last"):(d=g.find("li:nth-child("+b+")").prev(),d.length<1&&(e="children",d=g)),d[e]().each(function(){var b=a(this),d=b.attr("data-step");if(!(f<c))return!1;b.remove(),h.find('.step-pane[data-step="'+d+'"]:first').remove(),f++}),this.syncSteps(),this.numSteps=g.find("li").length,this.setState()},setState:function(){var b=this.currentStep>1,c=1===this.currentStep,d=this.currentStep===this.numSteps;this.options.disablePreviousStep||this.$prevBtn.attr("disabled",!0===c||!1===b);var e=this.$nextBtn.attr("data-last");if(e){this.lastText=e;var f=this.nextText;!0===d?(f=this.lastText,this.$element.addClass("complete")):this.$element.removeClass("complete");var g=this.$nextBtn.children().detach();this.$nextBtn.text(f).append(g)}var h=this.$element.find(".steps li");h.removeClass("active").removeClass("complete"),h.find("span.badge").removeClass("badge-info").removeClass("badge-success");var i=".steps li:lt("+(this.currentStep-1)+")",j=this.$element.find(i);j.addClass("complete"),j.find("span.badge").addClass("badge-success");var k=".steps li:eq("+(this.currentStep-1)+")",l=this.$element.find(k);l.addClass("active"),l.find("span.badge").addClass("badge-info");var m=this.$element.find(".step-content"),n=l.attr("data-step");m.find(".step-pane").removeClass("active"),m.find('.step-pane[data-step="'+n+'"]:first').addClass("active"),this.$element.find(".steps").first().attr("style","margin-left: 0");var o=0;this.$element.find(".steps > li").each(function(){o+=a(this).outerWidth()});var p=0;if(p=this.$element.find(".actions").length?this.$element.width()-this.$element.find(".actions").first().outerWidth():this.$element.width(),o>p){var q=o-p;this.$element.find(".steps").first().attr("style","margin-left: -"+q+"px"),this.$element.find("li.active").first().position().left<200&&(q+=this.$element.find("li.active").first().position().left-200,q<1?this.$element.find(".steps").first().attr("style","margin-left: 0"):this.$element.find(".steps").first().attr("style","margin-left: -"+q+"px"))}if(void 0!==this.initialized){var r=a.Event("changed.fu.wizard");this.$element.trigger(r,{step:this.currentStep})}this.initialized=!0},stepclicked:function(b){var c=a(b.currentTarget),d=this.$element.find(".steps li").index(c);if(!(d<this.currentStep&&this.options.disablePreviousStep)){var e=a.Event("stepclicked.fu.wizard");this.$element.trigger(e,{step:d+1}),e.isDefaultPrevented()||(this.currentStep=d+1,this.setState())}},syncSteps:function(){var b=1,c=this.$element.find(".steps"),d=this.$element.find(".step-content");c.children().each(function(){var c=a(this),e=c.find(".badge"),f=c.attr("data-step");isNaN(parseInt(e.html(),10))||e.html(b),c.attr("data-step",b),d.find('.step-pane[data-step="'+f+'"]:last').attr("data-step",b),b++})},previous:function(){if(!this.options.disablePreviousStep&&1!==this.currentStep){var b=a.Event("actionclicked.fu.wizard");if(this.$element.trigger(b,{step:this.currentStep,direction:"previous"}),!b.isDefaultPrevented()&&(this.currentStep-=1,this.setState(),this.$prevBtn.is(":focus"))){var c=this.$element.find(".active").find("input, select, textarea")[0];void 0!==c?a(c).focus():0===this.$element.find(".active input:first").length&&this.$prevBtn.is(":disabled")&&this.$nextBtn.focus()}}},next:function(){var b=a.Event("actionclicked.fu.wizard");if(this.$element.trigger(b,{step:this.currentStep,direction:"next"}),!b.isDefaultPrevented()&&(this.currentStep<this.numSteps?(this.currentStep+=1,this.setState()):this.$element.trigger("finished.fu.wizard"),this.$nextBtn.is(":focus"))){var c=this.$element.find(".active").find("input, select, textarea")[0];void 0!==c?a(c).focus():0===this.$element.find(".active input:first").length&&this.$nextBtn.is(":disabled")&&this.$prevBtn.focus()}},selectedItem:function(a){var b,c;return a?(c=a.step||-1,c=Number(this.$element.find('.steps li[data-name="'+c+'"]').first().attr("data-step"))||Number(c),1<=c&&c<=this.numSteps?(this.currentStep=c,this.setState()):(c=this.$element.find(".steps li.active:first").attr("data-step"),isNaN(c)||(this.currentStep=parseInt(c,10),this.setState())),b=this):(b={step:this.currentStep},this.$element.find(".steps li.active:first[data-name]").length&&(b.stepname=this.$element.find(".steps li.active:first").attr("data-name"))),b}},a.fn.wizard=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.wizard"),h="object"==typeof b&&b;g||f.data("fu.wizard",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.wizard.defaults={disablePreviousStep:!1,selectedItem:{step:-1}},a.fn.wizard.Constructor=c,a.fn.wizard.noConflict=function(){return a.fn.wizard=b,this},a(document).on("mouseover.fu.wizard.data-api","[data-initialize=wizard]",function(b){var c=a(b.target).closest(".wizard");c.data("fu.wizard")||c.wizard(c.data())}),a(function(){a("[data-initialize=wizard]").each(function(){var b=a(this);b.data("fu.wizard")||b.wizard(b.data())})})}(a),function(a){var b=a.fn.infinitescroll,c=function(b,c){this.$element=a(b),this.$element.addClass("infinitescroll"),this.options=a.extend({},a.fn.infinitescroll.defaults,c),this.curScrollTop=this.$element.scrollTop(),this.curPercentage=this.getPercentage(),this.fetchingData=!1,this.$element.on("scroll.fu.infinitescroll",a.proxy(this.onScroll,this)),this.onScroll()};c.prototype={constructor:c,destroy:function(){return this.$element.remove(),this.$element.empty(),this.$element[0].outerHTML},disable:function(){this.$element.off("scroll.fu.infinitescroll")},enable:function(){this.$element.on("scroll.fu.infinitescroll",a.proxy(this.onScroll,this))},end:function(b){var c=a('<div class="infinitescroll-end"></div>');b?c.append(b):c.append("---------"),this.$element.append(c),this.disable()},getPercentage:function(){var a="border-box"===this.$element.css("box-sizing")?this.$element.outerHeight():this.$element.height(),b=this.$element.get(0).scrollHeight;return b>a?a/(b-this.curScrollTop)*100:0},fetchData:function(b){var c,d=a('<div class="infinitescroll-load"></div>'),e=this,f=function(){var b={percentage:e.curPercentage,scrollTop:e.curScrollTop},c=a('<div class="loader"></div>');d.append(c),c.loader(),e.options.dataSource&&e.options.dataSource(b,function(a){var b;d.remove(),a.content&&e.$element.append(a.content),a.end&&(b=!0!==a.end?a.end:void 0,e.end(b)),e.fetchingData=!1})};this.fetchingData=!0,this.$element.append(d),this.options.hybrid&&!0!==b?(c=a('<button type="button" class="btn btn-primary"></button>'),"object"==typeof this.options.hybrid?c.append(this.options.hybrid.label):c.append('<span class="glyphicon glyphicon-repeat"></span>'),c.on("click.fu.infinitescroll",function(){c.remove(),f()}),d.append(c)):f()},onScroll:function(a){this.curScrollTop=this.$element.scrollTop(),this.curPercentage=this.getPercentage(),!this.fetchingData&&this.curPercentage>=this.options.percentage&&this.fetchData()}},a.fn.infinitescroll=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.infinitescroll"),h="object"==typeof b&&b;g||f.data("fu.infinitescroll",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.infinitescroll.defaults={dataSource:null,hybrid:!1,percentage:95},a.fn.infinitescroll.Constructor=c,a.fn.infinitescroll.noConflict=function(){return a.fn.infinitescroll=b,this}}(a),function(a){var b=a.fn.pillbox,c=a.fn.utilities,d=a.fn.utilities.CONST,e=d.COMMA_KEYCODE,f=d.ENTER_KEYCODE,g=c.isBackspaceKey,h=c.isDeleteKey,i=c.isTabKey,j=c.isUpArrow,k=c.isDownArrow,l=c.cleanInput,m=c.isShiftHeld,n=function(b,c){this.$element=a(b),this.$moreCount=this.$element.find(".pillbox-more-count"),this.$pillGroup=this.$element.find(".pill-group"),this.$addItem=this.$element.find(".pillbox-add-item"),this.$addItemWrap=this.$addItem.parent(),this.$suggest=this.$element.find(".suggest"),this.$pillHTML='<li class="btn btn-default pill">\t<span></span>\t<span class="glyphicon glyphicon-close">\t\t<span class="sr-only">Remove</span>\t</span></li>',this.options=a.extend({},a.fn.pillbox.defaults,c),-1===this.options.readonly?void 0!==this.$element.attr("data-readonly")&&this.readonly(!0):this.options.readonly&&this.readonly(!0),this.acceptKeyCodes=this._generateObject(this.options.acceptKeyCodes),this.$element.on("click.fu.pillbox",".pill-group > .pill",a.proxy(this.itemClicked,this)),this.$element.on("click.fu.pillbox",a.proxy(this.inputFocus,this)),this.$element.on("keydown.fu.pillbox",".pillbox-add-item",a.proxy(this.inputEvent,this)),this.options.onKeyDown&&this.$element.on("mousedown.fu.pillbox",".suggest > li",a.proxy(this.suggestionClick,this)),this.options.edit&&(this.$element.addClass("pills-editable"),this.$element.on("blur.fu.pillbox",".pillbox-add-item",a.proxy(this.cancelEdit,this))),this.$element.on("blur.fu.pillbox",".pillbox-add-item",a.proxy(this.inputEvent,this))};n.prototype={constructor:n,destroy:function(){return this.$element.remove(),this.$element[0].outerHTML},items:function(){var b=this;return this.$pillGroup.children(".pill").map(function(){return b.getItemData(a(this))}).get()},itemClicked:function(b){var c,d=a(b.target)
+;if(b.preventDefault(),b.stopPropagation(),this._closeSuggestions(),d.hasClass("pill"))c=d;else if(c=d.parent(),void 0===this.$element.attr("data-readonly")){if(d.hasClass("glyphicon-close"))return this.options.onRemove?this.options.onRemove(this.getItemData(c,{el:c}),a.proxy(this._removeElement,this)):this._removeElement(this.getItemData(c,{el:c})),!1;if(this.options.edit){if(c.find(".pillbox-list-edit").length)return!1;this.openEdit(c)}}return this.$element.trigger("clicked.fu.pillbox",this.getItemData(c)),!0},readonly:function(a){a?this.$element.attr("data-readonly","readonly"):this.$element.removeAttr("data-readonly"),this.options.truncate&&this.truncate(a)},suggestionClick:function(b){var c=a(b.currentTarget),d={text:c.html(),value:c.data("value")};b.preventDefault(),this.$addItem.val(""),c.data("attr")&&(d.attr=JSON.parse(c.data("attr"))),d.data=c.data("data"),this.addItems(d,!0),this._closeSuggestions()},itemCount:function(){return this.$pillGroup.children(".pill").length},addItems:function(){var b,c,d,e=this;!isFinite(String(arguments[0]))||arguments[0]instanceof Array?(b=[].slice.call(arguments).slice(0),d=b[1]&&!b[1].text):(b=[].slice.call(arguments).slice(1),c=arguments[0]),b[0]instanceof Array&&(b=b[0]),b.length&&(a.each(b,function(a,c){var d={text:c.text,value:c.value?c.value:c.text,el:e.$pillHTML};c.attr&&(d.attr=c.attr),c.data&&(d.data=c.data),b[a]=d}),this.options.edit&&this.currentEdit&&(b[0].el=this.currentEdit.wrap("<div></div>").parent().html()),d&&b.pop(1),e.options.onAdd&&d?this.options.edit&&this.currentEdit?e.options.onAdd(b[0],a.proxy(e.saveEdit,this)):e.options.onAdd(b[0],a.proxy(e.placeItems,this)):this.options.edit&&this.currentEdit?e.saveEdit(b):c?e.placeItems(c,b):e.placeItems(b,d))},removeItems:function(a,b){var c=this;if(a)for(var d=b||1,e=0;e<d;e++){var f=c.$pillGroup.find("> .pill:nth-child("+a+")");if(!f)break;f.remove()}else this.$pillGroup.find(".pill").remove(),this._removePillTrigger({method:"removeAll"})},placeItems:function(){var b,c,d,e;if(!isFinite(String(arguments[0]))||arguments[0]instanceof Array?(b=[].slice.call(arguments).slice(0),e=b[1]&&!b[1].text):(b=[].slice.call(arguments).slice(1),c=arguments[0]),b[0]instanceof Array&&(b=b[0]),b.length){var f=[];a.each(b,function(b,c){var d=a(c.el);d.attr("data-value",c.value),d.find("span:first").html(c.text),c.attr&&a.each(c.attr,function(a,b){"cssClass"===a||"class"===a?d.addClass(b):d.attr(a,b)}),c.data&&d.data("data",c.data),f.push(d)}),this.$pillGroup.children(".pill").length>0?c?(d=this.$pillGroup.find(".pill:nth-child("+c+")"),d.length?d.before(f):this.$pillGroup.children(".pill:last").after(f)):this.$pillGroup.children(".pill:last").after(f):this.$pillGroup.prepend(f),e&&this.$element.trigger("added.fu.pillbox",{text:b[0].text,value:b[0].value})}},inputEvent:function(a){var b=this,c=b.options.cleanInput(this.$addItem.val()),d="focusout"===a.type,e=d&&c.length>0;if(this.acceptKeyCodes[a.keyCode]&&!m(a)||e){var f,l;if(this.options.onKeyDown&&this._isSuggestionsOpen()){var n=this.$suggest.find(".pillbox-suggest-sel");n.length&&(c=b.options.cleanInput(n.html()),l=b.options.cleanInput(n.data("value")),f=n.data("attr"))}return(c.replace(/[ ]*\,[ ]*/,"").match(/\S/)||this.options.allowEmptyPills&&c.length)&&(this._closeSuggestions(),this.$addItem.hide().val(""),f?this.addItems({text:c,value:l,attr:JSON.parse(f)},!0):this.addItems({text:c,value:l},!0),setTimeout(function(){b.$addItem.show().attr({size:10}).focus()},0)),a.preventDefault(),!0}if(g(a)||h(a)){if(!c.length){if(a.preventDefault(),this.options.edit&&this.currentEdit)return this.cancelEdit(),!0;this._closeSuggestions();var o=this.$pillGroup.children(".pill:last");return o.hasClass("pillbox-highlight")?this._removeElement(this.getItemData(o,{el:o})):o.addClass("pillbox-highlight"),!0}}else c.length>10&&this.$addItem.width()<this.$pillGroup.width()-6&&this.$addItem.attr({size:c.length+3});if(this.$pillGroup.find(".pill").removeClass("pillbox-highlight"),this.options.onKeyDown&&!d){if(i(a)||j(a)||k(a))return this._isSuggestionsOpen()&&this._keySuggestions(a),!0;this.callbackId=a.timeStamp,this.options.onKeyDown({event:a,value:c},function(c){b._openSuggestions(a,c)})}return!0},openEdit:function(a){var b=a.index()+1,c=this.$addItemWrap.detach().hide();this.$pillGroup.find(".pill:nth-child("+b+")").before(c),this.currentEdit=a.detach(),c.addClass("editing"),this.$addItem.val(a.find("span:first").html()),c.show(),this.$addItem.focus().select()},cancelEdit:function(a){var b;return!!this.currentEdit&&(this._closeSuggestions(),a&&this.$addItemWrap.before(this.currentEdit),this.currentEdit=!1,b=this.$addItemWrap.detach(),b.removeClass("editing"),this.$addItem.val(""),this.$pillGroup.append(b),!0)},saveEdit:function(){var b=arguments[0][0]?arguments[0][0]:arguments[0];this.currentEdit=a(b.el),this.currentEdit.data("value",b.value),this.currentEdit.find("span:first").html(b.text),this.$addItemWrap.hide(),this.$addItemWrap.before(this.currentEdit),this.currentEdit=!1,this.$addItem.val(""),this.$addItemWrap.removeClass("editing"),this.$pillGroup.append(this.$addItemWrap.detach().show()),this.$element.trigger("edited.fu.pillbox",{value:b.value,text:b.text})},removeBySelector:function(){var b=[].slice.call(arguments).slice(0),c=this;a.each(b,function(a,b){c.$pillGroup.find(b).remove()}),this._removePillTrigger({method:"removeBySelector",removedSelectors:b})},removeByValue:function(){var b=[].slice.call(arguments).slice(0),c=this;a.each(b,function(a,b){c.$pillGroup.find('> .pill[data-value="'+b+'"]').remove()}),this._removePillTrigger({method:"removeByValue",removedValues:b})},removeByText:function(){var b=[].slice.call(arguments).slice(0),c=this;a.each(b,function(a,b){c.$pillGroup.find('> .pill:contains("'+b+'")').remove()}),this._removePillTrigger({method:"removeByText",removedText:b})},truncate:function(b){var c=this;if(this.$element.removeClass("truncate"),this.$addItemWrap.removeClass("truncated"),this.$pillGroup.find(".pill").removeClass("truncated"),b){this.$element.addClass("truncate");var d=this.$element.width(),e=!1,f=0,g=this.$pillGroup.find(".pill").length,h=0;this.$pillGroup.find(".pill").each(function(){var b=a(this);e?b.addClass("truncated"):(f++,c.$moreCount.text(g-f),h+b.outerWidth(!0)+c.$addItemWrap.outerWidth(!0)<=d?h+=b.outerWidth(!0):(c.$moreCount.text(g-f+1),b.addClass("truncated"),e=!0))}),f===g&&this.$addItemWrap.addClass("truncated")}},inputFocus:function(){this.$element.find(".pillbox-add-item").focus()},getItemData:function(b,c){return a.extend({text:b.find("span:first").html()},b.data(),c)},_removeElement:function(a){a.el.remove(),delete a.el,this.$element.trigger("removed.fu.pillbox",a)},_removePillTrigger:function(a){this.$element.trigger("removed.fu.pillbox",a)},_generateObject:function(b){var c={};return a.each(b,function(a,b){c[b]=!0}),c},_openSuggestions:function(b,c){var d=a("<ul>");return this.callbackId===b.timeStamp&&(c.data&&c.data.length&&(a.each(c.data,function(b,c){var e=c.value?c.value:c.text,f=a('<li data-value="'+e+'">'+c.text+"</li>");c.attr&&f.data("attr",JSON.stringify(c.attr)),c.data&&f.data("data",c.data),d.append(f)}),this.$suggest.html("").append(d.children()),a(document).trigger("suggested.fu.pillbox",this.$suggest)),!0)},_closeSuggestions:function(){this.$suggest.html("").parent().removeClass("open")},_isSuggestionsOpen:function(){return this.$suggest.parent().hasClass("open")},_keySuggestions:function(a){var b=this.$suggest.find("li.pillbox-suggest-sel"),c=j(a);if(a.preventDefault(),b.length){var d=c?b.prev():b.next();d.length||(d=c?this.$suggest.find("li:last"):this.$suggest.find("li:first")),d&&(d.addClass("pillbox-suggest-sel"),b.removeClass("pillbox-suggest-sel"))}else b=this.$suggest.find("li:first"),b.addClass("pillbox-suggest-sel")}},n.prototype.getValue=n.prototype.items,a.fn.pillbox=function(b){var c,d=Array.prototype.slice.call(arguments,1),e=this.each(function(){var e=a(this),f=e.data("fu.pillbox"),g="object"==typeof b&&b;f||e.data("fu.pillbox",f=new n(this,g)),"string"==typeof b&&(c=f[b].apply(f,d))});return void 0===c?e:c},a.fn.pillbox.defaults={edit:!1,readonly:-1,truncate:!1,acceptKeyCodes:[f,e],allowEmptyPills:!1,cleanInput:l},a.fn.pillbox.Constructor=n,a.fn.pillbox.noConflict=function(){return a.fn.pillbox=b,this},a(document).on("mousedown.fu.pillbox.data-api","[data-initialize=pillbox]",function(b){var c=a(b.target).closest(".pillbox");c.data("fu.pillbox")||c.pillbox(c.data())}),a(function(){a("[data-initialize=pillbox]").each(function(){var b=a(this);b.data("fu.pillbox")||b.pillbox(b.data())})})}(a),function(a){var b=a.fn.repeater,c=function(b,c){var d,e,f=this;this.$element=a(b),this.$canvas=this.$element.find(".repeater-canvas"),this.$count=this.$element.find(".repeater-count"),this.$end=this.$element.find(".repeater-end"),this.$filters=this.$element.find(".repeater-filters"),this.$loader=this.$element.find(".repeater-loader"),this.$pageSize=this.$element.find(".repeater-itemization .selectlist"),this.$nextBtn=this.$element.find(".repeater-next"),this.$pages=this.$element.find(".repeater-pages"),this.$prevBtn=this.$element.find(".repeater-prev"),this.$primaryPaging=this.$element.find(".repeater-primaryPaging"),this.$search=this.$element.find(".repeater-search").find(".search"),this.$secondaryPaging=this.$element.find(".repeater-secondaryPaging"),this.$start=this.$element.find(".repeater-start"),this.$viewport=this.$element.find(".repeater-viewport"),this.$views=this.$element.find(".repeater-views"),this.currentPage=0,this.currentView=null,this.isDisabled=!1,this.infiniteScrollingCallback=function(){},this.infiniteScrollingCont=null,this.infiniteScrollingEnabled=!1,this.infiniteScrollingEnd=null,this.infiniteScrollingOptions={},this.lastPageInput=0,this.options=a.extend({},a.fn.repeater.defaults,c),this.pageIncrement=0,this.resizeTimeout={},this.stamp=(new Date).getTime()+(Math.floor(100*Math.random())+1),this.storedDataSourceOpts=null,this.syncingViewButtonState=!1,this.viewOptions={},this.viewType=null,this.$filters.selectlist(),this.$pageSize.selectlist(),this.$primaryPaging.find(".combobox").combobox(),this.$search.search({searchOnKeyPress:this.options.searchOnKeyPress,allowCancel:this.options.allowCancel}),this.$filters.on("changed.fu.selectlist",function(a,b){f.$element.trigger("filtered.fu.repeater",b),f.render({clearInfinite:!0,pageIncrement:null})}),this.$nextBtn.on("click.fu.repeater",a.proxy(this.next,this)),this.$pageSize.on("changed.fu.selectlist",function(a,b){f.$element.trigger("pageSizeChanged.fu.repeater",b),f.render({pageIncrement:null})}),this.$prevBtn.on("click.fu.repeater",a.proxy(this.previous,this)),this.$primaryPaging.find(".combobox").on("changed.fu.combobox",function(a,b){f.pageInputChange(b.text,b)}),this.$search.on("searched.fu.search cleared.fu.search",function(a,b){f.$element.trigger("searchChanged.fu.repeater",b),f.render({clearInfinite:!0,pageIncrement:null})}),this.$search.on("canceled.fu.search",function(a,b){f.$element.trigger("canceled.fu.repeater",b),f.render({clearInfinite:!0,pageIncrement:null})}),this.$secondaryPaging.on("blur.fu.repeater",function(){f.pageInputChange(f.$secondaryPaging.val())}),this.$secondaryPaging.on("keyup",function(a){13===a.keyCode&&f.pageInputChange(f.$secondaryPaging.val())}),this.$views.find("input").on("change.fu.repeater",a.proxy(this.viewChanged,this)),a(window).on("resize.fu.repeater."+this.stamp,function(){clearTimeout(f.resizeTimeout),f.resizeTimeout=setTimeout(function(){f.resize(),f.$element.trigger("resized.fu.repeater")},75)}),this.$loader.loader(),this.$loader.loader("pause"),-1!==this.options.defaultView?e=this.options.defaultView:(d=this.$views.find("label.active input"),e=d.length>0?d.val():"list"),this.setViewOptions(e),this.initViewTypes(function(){f.resize(),f.$element.trigger("resized.fu.repeater"),f.render({changeView:e})})},d=function(a){window.console&&window.console.warn&&window.console.warn(a)},e=function b(c){var d=[];c.children().each(function(){var c=a(this),e=c.attr("data-preserve");"deep"===e?(c.detach(),d.push(c)):"shallow"===e&&(b(c),c.detach(),d.push(c))}),c.empty(),c.append(d)},f=function(b,c){var d;if(c&&"none"!==(d=c.action?c.action:"append")&&void 0!==c.item){(void 0!==c.container?a(c.container):b)[d](c.item)}},g=function(a,b,c){var d=a+1;d<b.length?h.call(this,d,b,c):c()},h=function(a,b,c){b[a].initialize?b[a].initialize.call(this,{},function(){g.call(this,a,b,c)}):g.call(this,a,b,c)},i=function(a){var b=a.data||{};this.infiniteScrollingEnabled&&((a.viewChanged||a.options.clearInfinite)&&this.initInfiniteScrolling(),this.infiniteScrollPaging(b,a.options)),this.$loader.hide().loader("pause"),this.enable(),this.$search.trigger("rendered.fu.repeater",{data:b,options:a.dataOptions,renderOptions:a.options}),this.$element.trigger("rendered.fu.repeater",{data:b,options:a.dataOptions,renderOptions:a.options}),this.$element.trigger("loaded.fu.repeater",a.dataOptions)},j=function(a){var b=a.data||{};this.infiniteScrollingEnabled?this.infiniteScrollingCallback({}):(this.itemization(b),this.pagination(b));var c=this;this.renderItems(a.viewTypeObj,b,function(b){a.data=b,i.call(c,a)})};c.prototype={constructor:c,clear:function(b){var c=b||{};c.preserve?this.infiniteScrollingEnabled&&!c.clearInfinite||e(this.$canvas):this.$canvas.empty();var d=void 0!==c.viewChanged&&c.viewChanged,f=a.fn.repeater.viewTypes[this.viewType]||{};!d&&f.cleared&&f.cleared.call(this,{options:c})},clearPreservedDataSourceOptions:function(){this.storedDataSourceOpts=null},destroy:function(){var b;return this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$canvas.empty(),b=this.$element[0].outerHTML,this.$element.find(".combobox").combobox("destroy"),this.$element.find(".selectlist").selectlist("destroy"),this.$element.find(".search").search("destroy"),this.infiniteScrollingEnabled&&a(this.infiniteScrollingCont).infinitescroll("destroy"),this.$element.remove(),a(window).off("resize.fu.repeater."+this.stamp),b},disable:function(){var b=a.fn.repeater.viewTypes[this.viewType]||{};this.$search.search("disable"),this.$filters.selectlist("disable"),this.$views.find("label, input").addClass("disabled").attr("disabled","disabled"),this.$pageSize.selectlist("disable"),this.$primaryPaging.find(".combobox").combobox("disable"),this.$secondaryPaging.attr("disabled","disabled"),this.$prevBtn.attr("disabled","disabled"),this.$nextBtn.attr("disabled","disabled"),b.enabled&&b.enabled.call(this,{status:!1}),this.isDisabled=!0,this.$element.addClass("disabled"),this.$element.trigger("disabled.fu.repeater")},enable:function(){var b=a.fn.repeater.viewTypes[this.viewType]||{};this.$search.search("enable"),this.$filters.selectlist("enable"),this.$views.find("label, input").removeClass("disabled").removeAttr("disabled"),this.$pageSize.selectlist("enable"),this.$primaryPaging.find(".combobox").combobox("enable"),this.$secondaryPaging.removeAttr("disabled"),this.$prevBtn.hasClass("page-end")||this.$prevBtn.removeAttr("disabled"),this.$nextBtn.hasClass("page-end")||this.$nextBtn.removeAttr("disabled"),this.$prevBtn.hasClass("page-end")&&this.$nextBtn.hasClass("page-end")&&this.$primaryPaging.combobox("disable"),0!==parseInt(this.$count.html(),10)?this.$pageSize.selectlist("enable"):this.$pageSize.selectlist("disable"),b.enabled&&b.enabled.call(this,{status:!0}),this.isDisabled=!1,this.$element.removeClass("disabled"),this.$element.trigger("enabled.fu.repeater")},getDataOptions:function(b){var c=b||{};void 0!==c.pageIncrement&&(null===c.pageIncrement?this.currentPage=0:this.currentPage+=c.pageIncrement);var d={};c.dataSourceOptions&&(d=c.dataSourceOptions,c.preserveDataSourceOptions&&(this.storedDataSourceOpts?this.storedDataSourceOpts=a.extend(this.storedDataSourceOpts,d):this.storedDataSourceOpts=d)),this.storedDataSourceOpts&&(d=a.extend(this.storedDataSourceOpts,d));var e={view:this.currentView,pageIndex:this.currentPage,filter:{text:"All",value:"all"}};this.$filters.length>0&&(e.filter=this.$filters.selectlist("selectedItem")),this.infiniteScrollingEnabled||(e.pageSize=25,this.$pageSize.length>0&&(e.pageSize=parseInt(this.$pageSize.selectlist("selectedItem").value,10)));var f=this.$search&&this.$search.find("input")&&this.$search.find("input").val();""!==f&&(e.search=f);var g=a.fn.repeater.viewTypes[this.viewType]||{},h=g.dataOptions;return h&&(e=h.call(this,e)),e=a.extend(e,d)},infiniteScrolling:function(a,b){var c=this.$element.find(".repeater-footer"),d=this.$element.find(".repeater-viewport"),e=b||{};if(a)this.infiniteScrollingEnabled=!0,this.infiniteScrollingEnd=e.end,delete e.dataSource,delete e.end,this.infiniteScrollingOptions=e,d.css({height:d.height()+c.outerHeight()}),c.hide();else{var f=this.infiniteScrollingCont;delete f.data().infinitescroll,f.off("scroll"),f.removeClass("infinitescroll"),this.infiniteScrollingCont=null,this.infiniteScrollingEnabled=!1,this.infiniteScrollingEnd=null,this.infiniteScrollingOptions={},d.css({height:d.height()-c.outerHeight()}),c.show()}},infiniteScrollPaging:function(a){var b=!0!==this.infiniteScrollingEnd?this.infiniteScrollingEnd:void 0,c=a.page,d=a.pages;this.currentPage=void 0!==c?c:NaN,(!0===a.end||this.currentPage+1>=d)&&this.infiniteScrollingCont.infinitescroll("end",b)},initInfiniteScrolling:function(){var b=this.$canvas.find('[data-infinite="true"]:first');if(b=b.length<1?this.$canvas:b,b.data("fu.infinitescroll"))b.infinitescroll("enable");else{var c=this,d=a.extend({},this.infiniteScrollingOptions);d.dataSource=function(a,b){c.infiniteScrollingCallback=b,c.render({pageIncrement:1})},b.infinitescroll(d),this.infiniteScrollingCont=b}},initViewTypes:function(b){var c=[];for(var d in a.fn.repeater.viewTypes)({}).hasOwnProperty.call(a.fn.repeater.viewTypes,d)&&c.push(a.fn.repeater.viewTypes[d]);c.length>0?h.call(this,0,c,b):b()},itemization:function(a){this.$count.html(void 0!==a.count?a.count:"?"),this.$end.html(void 0!==a.end?a.end:"?"),this.$start.html(void 0!==a.start?a.start:"?")},next:function(){this.$nextBtn.attr("disabled","disabled"),this.$prevBtn.attr("disabled","disabled"),this.pageIncrement=1,this.$element.trigger("nextClicked.fu.repeater"),this.render({pageIncrement:this.pageIncrement})},pageInputChange:function(a,b){var c;if(a!==this.lastPageInput){this.lastPageInput=a;var d=parseInt(a,10)-1;c=d-this.currentPage,this.$element.trigger("pageChanged.fu.repeater",[d,b]),this.render({pageIncrement:c})}},pagination:function(a){this.$primaryPaging.removeClass("active"),this.$secondaryPaging.removeClass("active");var b=a.pages;this.currentPage=void 0!==a.page?a.page:NaN;var c=0===b?0:this.currentPage+1;if(b<=this.viewOptions.dropPagingCap){this.$primaryPaging.addClass("active");var d=this.$primaryPaging.find(".dropdown-menu");d.empty();for(var e=0;e<b;e++){var f=e+1;d.append('<li data-value="'+f+'"><a href="#">'+f+"</a></li>")}this.$primaryPaging.find("input.form-control").val(c)}else this.$secondaryPaging.addClass("active"),this.$secondaryPaging.val(c);this.lastPageInput=this.currentPage+1+"",this.$pages.html(""+b),this.currentPage+1<b?(this.$nextBtn.removeAttr("disabled"),this.$nextBtn.removeClass("page-end")):(this.$nextBtn.attr("disabled","disabled"),this.$nextBtn.addClass("page-end")),this.currentPage-1>=0?(this.$prevBtn.removeAttr("disabled"),this.$prevBtn.removeClass("page-end")):(this.$prevBtn.attr("disabled","disabled"),this.$prevBtn.addClass("page-end")),0!==this.pageIncrement&&(this.pageIncrement>0?this.$nextBtn.is(":disabled")?this.$prevBtn.focus():this.$nextBtn.focus():this.$prevBtn.is(":disabled")?this.$nextBtn.focus():this.$prevBtn.focus())},previous:function(){this.$nextBtn.attr("disabled","disabled"),this.$prevBtn.attr("disabled","disabled"),this.pageIncrement=-1,this.$element.trigger("previousClicked.fu.repeater"),this.render({pageIncrement:this.pageIncrement})},render:function(b){this.disable();var c=!1,d=a.fn.repeater.viewTypes[this.viewType]||{},e=b||{};if(e.changeView&&this.currentView!==e.changeView){var f=this.currentView;this.currentView=e.changeView,this.viewType=this.currentView.split(".")[0],this.setViewOptions(this.currentView),this.$element.attr("data-currentview",this.currentView),this.$element.attr("data-viewtype",this.viewType),c=!0,e.viewChanged=c,this.$element.trigger("viewChanged.fu.repeater",this.currentView),this.infiniteScrollingEnabled&&this.infiniteScrolling(!1),d=a.fn.repeater.viewTypes[this.viewType]||{},d.selected&&d.selected.call(this,{prevView:f})}this.syncViewButtonState(),e.preserve=void 0!==e.preserve?e.preserve:!c,this.clear(e),(!this.infiniteScrollingEnabled||this.infiniteScrollingEnabled&&c)&&this.$loader.show().loader("play");var g=this.getDataOptions(e),h=this;(0,this.viewOptions.dataSource)(g,function(a){j.call(h,{data:a,dataOptions:g,options:e,viewChanged:c,viewTypeObj:d})})},resize:function(){for(var b,c,d,e=-1===this.viewOptions.staticHeight?this.$element.attr("data-staticheight"):this.viewOptions.staticHeight,f={},g=[],h=[],i=this.$element.parentsUntil(":visible").addBack(),j=0;j<i.length&&this.$element.is(":hidden");)d=i[j],a(d).is(":hidden")&&(h.push(d.style.display),d.style.display="block",g.push(d)),j++;if(this.viewType&&(f=a.fn.repeater.viewTypes[this.viewType]||{}),void 0!==e&&!1!==e&&"false"!==e){this.$canvas.addClass("scrolling"),c={bottom:this.$viewport.css("margin-bottom"),top:this.$viewport.css("margin-top")};b=("true"===e||!0===e?this.$element.height():parseInt(e,10))-this.$element.find(".repeater-header").outerHeight()-this.$element.find(".repeater-footer").outerHeight()-("auto"===c.bottom?0:parseInt(c.bottom,10))-("auto"===c.top?0:parseInt(c.top,10)),this.$viewport.outerHeight(b)}else this.$canvas.removeClass("scrolling");f.resize&&f.resize.call(this,{height:this.$element.outerHeight(),width:this.$element.outerWidth()}),g.forEach(function(a,b){a.style.display=h[b]})},renderItems:function(a,b,c){if(a.render)a.render.call(this,{container:this.$canvas,data:b},c);else{if(a.before){var e=a.before.call(this,{container:this.$canvas,data:b});f(this.$canvas,e)}var g=this.$canvas.find('[data-container="true"]:last'),h=g.length>0?g:this.$canvas;if(a.renderItem){var i,j=a.repeat||"data.items",k=j.split("."),l=k[0];if("data"===l||"this"===l){i="this"===l?this:b;for(var m=k.slice(1),n=0;n<m.length;n++){if(void 0===i[m[n]]){i=[],d("WARNING: Repeater unable to find property to iterate renderItem on.");break}i=i[m[n]]}for(var o=0;o<i.length;o++){var p=a.renderItem.call(this,{container:h,data:b,index:o,subset:i});f(h,p)}}else d('WARNING: Repeater plugin "repeat" value must start with either "data" or "this"')}if(a.after){var q=a.after.call(this,{container:this.$canvas,data:b});f(this.$canvas,q)}c(b)}},setViewOptions:function(b){var c={},d=b.split(".")[1];c=this.options.views?this.options.views[d]||this.options.views[b]||{}:{},this.viewOptions=a.extend({},this.options,c)},viewChanged:function(b){var c=a(b.target),d=c.val();this.syncingViewButtonState||(this.isDisabled||c.parents("label:first").hasClass("disabled")?this.syncViewButtonState():this.render({changeView:d,pageIncrement:null}))},syncViewButtonState:function(){var a=this.$views.find('input[value="'+this.currentView+'"]');this.syncingViewButtonState=!0,this.$views.find("input").prop("checked",!1),this.$views.find("label.active").removeClass("active"),a.length>0&&(a.prop("checked",!0),a.parents("label:first").addClass("active")),this.syncingViewButtonState=!1}},c.prototype.runRenderer=c.prototype.renderItems,a.fn.repeater=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.repeater"),h="object"==typeof b&&b;g||f.data("fu.repeater",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.repeater.defaults={dataSource:function(a,b){b({count:0,end:0,items:[],page:0,pages:1,start:0})},defaultView:-1,dropPagingCap:10,staticHeight:-1,views:null,searchOnKeyPress:!1,allowCancel:!0},a.fn.repeater.viewTypes={},a.fn.repeater.Constructor=c,a.fn.repeater.noConflict=function(){return a.fn.repeater=b,this}}(a),function(a){a.fn.repeater&&(a.fn.repeater.Constructor.prototype.list_clearSelectedItems=function(){this.$canvas.find(".repeater-list-check").remove(),this.$canvas.find(".repeater-list table tbody tr.selected").removeClass("selected")},a.fn.repeater.Constructor.prototype.list_highlightColumn=function(b,c){var d=this.$canvas.find(".repeater-list-wrapper > table tbody");(this.viewOptions.list_highlightSortedColumn||c)&&(d.find("td.sorted").removeClass("sorted"),d.find("tr").each(function(){a(this).find("td:nth-child("+(b+1)+")").filter(function(){return!a(this).parent().hasClass("empty")}).addClass("sorted")}))},a.fn.repeater.Constructor.prototype.list_getSelectedItems=function(){var b=[];return this.$canvas.find(".repeater-list .repeater-list-wrapper > table tbody tr.selected").each(function(){var c=a(this);b.push({data:c.data("item_data"),element:c})}),b},a.fn.repeater.Constructor.prototype.getValue=a.fn.repeater.Constructor.prototype.list_getSelectedItems,a.fn.repeater.Constructor.prototype.list_positionHeadings=function(){var b=this.$element.find(".repeater-list-wrapper"),c=b.offset().left;b.scrollLeft()>0?b.find(".repeater-list-heading").each(function(){var b=a(this),d=b.parents("th:first").offset().left-c+"px";b.addClass("shifted").css("left",d)}):b.find(".repeater-list-heading").each(function(){a(this).removeClass("shifted").css("left","")})},a.fn.repeater.Constructor.prototype.list_setSelectedItems=function(b,c){var d,e,f,g,h=this.viewOptions.list_selectable,i=this,j=b;a.isArray(j)||(j=[j]);var k=function(b){f=a(this),d=f.data("item_data")||{},d[j[e].property]===j[e].value&&l(f,j[e].selected,b)},l=function(a,b,d){var e;void 0===b||b?(c||"multi"===h||i.list_clearSelectedItems(),a.hasClass("selected")||(a.addClass("selected"),(i.viewOptions.list_frozenColumns||"multi"===i.viewOptions.list_selectable)&&(e=i.$element.find(".frozen-column-wrapper tr:nth-child("+(d+1)+")"),e.addClass("selected"),e.find(".repeater-select-checkbox").addClass("checked")),i.viewOptions.list_actions&&i.$element.find(".actions-column-wrapper tr:nth-child("+(d+1)+")").addClass("selected"),a.find("td:first").prepend('<div class="repeater-list-check"><span class="glyphicon glyphicon-ok"></span></div>'))):(i.viewOptions.list_frozenColumns&&(e=i.$element.find(".frozen-column-wrapper tr:nth-child("+(d+1)+")"),e.addClass("selected"),e.find(".repeater-select-checkbox").removeClass("checked")),i.viewOptions.list_actions&&i.$element.find(".actions-column-wrapper tr:nth-child("+(d+1)+")").removeClass("selected"),a.find(".repeater-list-check").remove(),a.removeClass("selected"))};for(g=!0===c||"multi"===h?j.length:h&&j.length>0?1:0,e=0;e<g;e++)void 0!==j[e].index?(f=this.$canvas.find(".repeater-list .repeater-list-wrapper > table tbody tr:nth-child("+(j[e].index+1)+")"),f.length>0&&l(f,j[e].selected,j[e].index)):void 0!==j[e].property&&void 0!==j[e].value&&this.$canvas.find(".repeater-list .repeater-list-wrapper > table tbody tr").each(k)},a.fn.repeater.Constructor.prototype.list_sizeHeadings=function(){this.$element.find(".repeater-list table").find("thead th").each(function(){var b=a(this),c=b.find(".repeater-list-heading");c.css({height:b.outerHeight()}),c.outerWidth(c.data("forced-width")||b.outerWidth())})},a.fn.repeater.Constructor.prototype.list_setFrozenColumns=function(){var b=this.$canvas.find(".table-frozen"),c=this.$element.find(".repeater-canvas"),d=this.$element.find(".repeater-list .repeater-list-wrapper > table"),e=this.$element.find(".repeater-list"),f=this.viewOptions.list_frozenColumns,g=this;if("multi"===this.viewOptions.list_selectable&&(f+=1,c.addClass("multi-select-enabled")),b.length<1){var h=a('<div class="frozen-column-wrapper"></div>').insertBefore(d),i=d.clone().addClass("table-frozen");i.find("th:not(:lt("+f+"))").remove(),i.find("td:not(:nth-child(n+0):nth-child(-n+"+f+"))").remove();var j=i.clone().removeClass("table-frozen");j.find("tbody").remove();var k=a('<div class="frozen-thead-wrapper"></div>').append(j),l=k.find("th label.checkbox-custom.checkbox-inline");l.attr("id",l.attr("id")+"_cloned"),h.append(i),e.append(k),this.$canvas.addClass("frozen-enabled")}this.list_sizeFrozenColumns(),a(".frozen-thead-wrapper .repeater-list-heading").on("click",function(){var b=a(this).parent("th").index();b+=1,g.$element.find(".repeater-list-wrapper > table thead th:nth-child("+b+") .repeater-list-heading")[0].click()})},a.fn.repeater.Constructor.prototype.list_positionColumns=function(){var a=this.$element.find(".repeater-canvas"),b=a.scrollTop(),c=a.scrollLeft(),d=this.viewOptions.list_frozenColumns||"multi"===this.viewOptions.list_selectable,e=this.viewOptions.list_actions,f=this.$element.find(".repeater-canvas").outerWidth(),g=this.$element.find(".repeater-list .repeater-list-wrapper > table").outerWidth(),h=this.$element.find(".table-actions")?this.$element.find(".table-actions").outerWidth():0,i=g-(f-h)>=c;b>0?a.find(".repeater-list-heading").css("top",b):a.find(".repeater-list-heading").css("top","0"),c>0?(d&&(a.find(".frozen-thead-wrapper").css("left",c),a.find(".frozen-column-wrapper").css("left",c)),e&&i&&(a.find(".actions-thead-wrapper").css("right",-c),a.find(".actions-column-wrapper").css("right",-c))):(d&&(a.find(".frozen-thead-wrapper").css("left","0"),a.find(".frozen-column-wrapper").css("left","0")),e&&(a.find(".actions-thead-wrapper").css("right","0"),a.find(".actions-column-wrapper").css("right","0")))},a.fn.repeater.Constructor.prototype.list_createItemActions=function(){var b,c,d="",e=this,f=this.$element.find(".repeater-list .repeater-list-wrapper > table"),g=this.$canvas.find(".table-actions");for(b=0,c=this.viewOptions.list_actions.items.length;b<c;b++){var h=this.viewOptions.list_actions.items[b],i=h.html;d+='<li><a href="#" data-action="'+h.name+'" class="action-item"> '+i+"</a></li>"}var j='<div class="btn-group"><button type="button" class="btn btn-xs btn-default dropdown-toggle repeater-actions-button" data-toggle="dropdown" data-flip="auto" aria-expanded="false"><span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right" role="menu">'+d+"</ul></div>";if(g.length<1){var k=a('<div class="actions-column-wrapper" style="width: '+this.list_actions_width+'px"></div>').insertBefore(f),l=f.clone().addClass("table-actions");if(l.find("th:not(:last-child)").remove(),l.find("tr td:not(:last-child)").remove(),"multi"===this.viewOptions.list_selectable||"action"===this.viewOptions.list_selectable)l.find("thead tr").html('<th><div class="repeater-list-heading">'+j+"</div></th>"),"action"!==this.viewOptions.list_selectable&&l.find("thead .btn").attr("disabled","disabled");else{var m=this.viewOptions.list_actions.label||'<span class="actions-hidden">a</span>';l.find("thead tr").addClass("empty-heading").html("<th>"+m+'<div class="repeater-list-heading">'+m+"</div></th>")}l.find("td").each(function(b){a(this).html(j),a(this).find("a").attr("data-row",b+1)}),k.append(l),this.$canvas.addClass("actions-enabled")}this.list_sizeActionsTable(),this.$element.find(".table-actions tbody .action-item").on("click",function(b){if(!e.isDisabled){var c=a(this).data("action"),d=a(this).data("row"),f={actionName:c,rows:[d]};e.list_getActionItems(f,b)}}),this.$element.find(".table-actions thead .action-item").on("click",function(b){if(!e.isDisabled){var c=a(this).data("action"),d={actionName:c,rows:[]},f=".repeater-list-wrapper > table .selected";"action"===e.viewOptions.list_selectable&&(f=".repeater-list-wrapper > table tr"),e.$element.find(f).each(function(a){d.rows.push(a+1)}),e.list_getActionItems(d,b)}})},a.fn.repeater.Constructor.prototype.list_getActionItems=function(b,c){for(var d=[],e=a.grep(this.viewOptions.list_actions.items,function(a){return a.name===b.actionName})[0],f=0,g=b.rows.length;f<g;f++){var h=this.$canvas.find(".repeater-list-wrapper > table tbody tr:nth-child("+b.rows[f]+")");d.push({item:h,rowData:h.data("item_data")})}if(1===d.length&&(d=d[0]),e.clickAction){var i=function(){};e.clickAction(d,i,c)}},
+a.fn.repeater.Constructor.prototype.list_sizeActionsTable=function(){var b=this.$element.find(".repeater-list table.table-actions"),c=b.find("thead tr th"),d=this.$element.find(".repeater-list-wrapper > table");c.outerHeight(d.find("thead tr th").outerHeight()),c.find(".repeater-list-heading").outerHeight(c.outerHeight()),b.find("tbody tr td:first-child").each(function(b){a(this).outerHeight(d.find("tbody tr:eq("+b+") td").outerHeight())})},a.fn.repeater.Constructor.prototype.list_sizeFrozenColumns=function(){var b=this.$element.find(".repeater-list .repeater-list-wrapper > table");this.$element.find(".repeater-list table.table-frozen tr").each(function(c){a(this).height(b.find("tr:eq("+c+")").height())});var c=b.find("td:eq(0)").outerWidth();this.$element.find(".frozen-column-wrapper, .frozen-thead-wrapper").width(c)},a.fn.repeater.Constructor.prototype.list_frozenOptionsInitialize=function(){function b(a){f.list_revertingCheckbox=!0,a.checkbox("toggle"),delete f.list_revertingCheckbox}var c=this.$element.find(".frozen-column-wrapper .checkbox-inline"),d=this.$element.find(".header-checkbox .checkbox-custom"),e=this.$element.find(".repeater-list table"),f=this;this.$element.find("tr.selectable").on("mouseover mouseleave",function(b){var c=a(this).index();c+=1,"mouseover"===b.type?e.find("tbody tr:nth-child("+c+")").addClass("hovered"):e.find("tbody tr:nth-child("+c+")").removeClass("hovered")}),d.checkbox(),c.checkbox();var g=this.$element.find(".table-frozen tbody .checkbox-inline"),h=this.$element.find(".frozen-thead-wrapper thead .checkbox-inline input");g.on("change",function(c){if(c.preventDefault(),!f.list_revertingCheckbox)if(f.isDisabled)b(a(c.currentTarget));else{var d=a(this).attr("data-row");d=parseInt(d,10)+1,f.$element.find(".repeater-list-wrapper > table tbody tr:nth-child("+d+")").click();var e=f.$element.find(".table-frozen tbody .checkbox-inline.checked").length;0===e?(h.prop("checked",!1),h.prop("indeterminate",!1)):e===g.length?(h.prop("checked",!0),h.prop("indeterminate",!1)):(h.prop("checked",!1),h.prop("indeterminate",!0))}}),h.on("change",function(d){f.list_revertingCheckbox||(f.isDisabled?b(a(d.currentTarget)):a(this).is(":checked")?(f.$element.find(".repeater-list-wrapper > table tbody tr:not(.selected)").click(),f.$element.trigger("selected.fu.repeaterList",c)):(f.$element.find(".repeater-list-wrapper > table tbody tr.selected").click(),f.$element.trigger("deselected.fu.repeaterList",c)))})},a.fn.repeater.defaults=a.extend({},a.fn.repeater.defaults,{list_columnRendered:null,list_columnSizing:!0,list_columnSyncing:!0,list_highlightSortedColumn:!0,list_infiniteScroll:!1,list_noItemsHTML:"no items found",list_selectable:!1,list_sortClearing:!1,list_rowRendered:null,list_frozenColumns:0,list_actions:!1}),a.fn.repeater.viewTypes.list={cleared:function(){this.viewOptions.list_columnSyncing&&this.list_sizeHeadings()},dataOptions:function(a){return this.list_sortDirection&&(a.sortDirection=this.list_sortDirection),this.list_sortProperty&&(a.sortProperty=this.list_sortProperty),a},enabled:function(a){this.viewOptions.list_actions&&(a.status?(this.$canvas.find(".repeater-actions-button").removeAttr("disabled"),k.call(this)):this.$canvas.find(".repeater-actions-button").attr("disabled","disabled"))},initialize:function(a,b){this.list_sortDirection=null,this.list_sortProperty=null,this.list_specialBrowserClass=j(),this.list_actions_width=void 0!==this.viewOptions.list_actions.width?this.viewOptions.list_actions.width:37,this.list_noItems=!1,b()},resize:function(){i.call(this,this.$element.find(".repeater-list-wrapper > table thead tr")),this.viewOptions.list_actions&&this.list_sizeActionsTable(),(this.viewOptions.list_frozenColumns||"multi"===this.viewOptions.list_selectable)&&this.list_sizeFrozenColumns(),this.viewOptions.list_columnSyncing&&this.list_sizeHeadings()},selected:function(){var a,b=this.viewOptions.list_infiniteScroll;this.list_firstRender=!0,this.$loader.addClass("noHeader"),b&&(a="object"==typeof b?b:{},this.infiniteScrolling(!0,a))},before:function(b){var c,d=b.container.find(".repeater-list"),e=this;return b.data.count>0?this.list_noItems=!1:this.list_noItems=!0,d.length<1&&(d=a('<div class="repeater-list '+this.list_specialBrowserClass+'" data-preserve="shallow"><div class="repeater-list-wrapper" data-infinite="true" data-preserve="shallow"><table aria-readonly="true" class="table" data-preserve="shallow" role="grid"></table></div></div>'),d.find(".repeater-list-wrapper").on("scroll.fu.repeaterList",function(){e.viewOptions.list_columnSyncing&&e.list_positionHeadings()}),(e.viewOptions.list_frozenColumns||e.viewOptions.list_actions||"multi"===e.viewOptions.list_selectable)&&b.container.on("scroll.fu.repeaterList",function(){e.list_positionColumns()}),b.container.append(d)),b.container.removeClass("actions-enabled actions-enabled multi-select-enabled"),c=d.find("table"),h.call(this,c,b.data),g.call(this,c,b.data),!1},renderItem:function(a){return f.call(this,a.container,a.subset,a.index),!1},after:function(){var a;return!this.viewOptions.list_frozenColumns&&"multi"!==this.viewOptions.list_selectable||this.list_noItems||this.list_setFrozenColumns(),this.viewOptions.list_actions&&!this.list_noItems&&(this.list_createItemActions(),this.list_sizeActionsTable()),!this.viewOptions.list_frozenColumns&&!this.viewOptions.list_actions&&"multi"!==this.viewOptions.list_selectable||this.list_noItems||(this.list_positionColumns(),this.list_frozenOptionsInitialize()),this.viewOptions.list_columnSyncing&&(this.list_sizeHeadings(),this.list_positionHeadings()),a=this.$canvas.find(".repeater-list-wrapper > table .repeater-list-heading.sorted"),a.length>0&&this.list_highlightColumn(a.data("fu_item_index")),!1}});var b=function(a,b){if(!b)return!1;if(!a||b.length!==a.length)return!0;for(var c=0,d=b.length;c<d;c++){if(!a[c])return!0;for(var e in b[c])if(b[c].hasOwnProperty(e)&&a[c][e]!==b[c][e])return!0}return!1},c=function(b,c,d,e,f){var g=e[f].className,h=c[d][e[f].property],i=a("<td></td>"),j=e[f]._auto_width,k=e[f].property;if(!1!==this.viewOptions.list_actions&&"@_ACTIONS_@"===k&&(h='<div class="repeater-list-actions-placeholder" style="width: '+this.list_actions_width+'px"></div>'),h=void 0!==h?h:"",i.addClass(void 0!==g?g:"").append(h),void 0!==j&&i.outerWidth(j),b.append(i),"multi"===this.viewOptions.list_selectable&&"@_CHECKBOX_@"===e[f].property){var l='<label data-row="'+d+'" class="checkbox-custom checkbox-inline body-checkbox repeater-select-checkbox"><input class="sr-only" type="checkbox"></label>';i.html(l)}return i},d=function(b,c,d){var e,f,g,h,i,j="glyphicon-chevron-down",k="glyphicon-chevron-up",l=a('<div class="repeater-list-heading"><span class="glyphicon rlc"></span></div>'),m=(this.$element.attr("id")+"_"||"")+"checkall",n='<div class="repeater-list-heading header-checkbox"><label id="'+m+'" class="checkbox-custom checkbox-inline"><input class="sr-only" type="checkbox" value=""><span class="checkbox-label">&nbsp;</span></label></div>',o=a("<th></th>"),p=this;if(l.data("fu_item_index",d),l.prepend(c[d].label),o.html(l.html()).find("[id]").removeAttr("id"),"@_CHECKBOX_@"!==c[d].property?o.append(l):o.append(n),e=o.add(l),h=l.find(".glyphicon.rlc:first"),i=h.add(o.find(".glyphicon.rlc:first")),this.viewOptions.list_actions&&"@_ACTIONS_@"===c[d].property){var q=this.list_actions_width;o.css("width",q),l.css("width",q)}f=c[d].className,void 0!==f&&e.addClass(f),g=c[d].sortable,g&&(e.addClass("sortable"),l.on("click.fu.repeaterList",function(){p.isDisabled||(p.list_sortProperty="string"==typeof g?g:c[d].property,l.hasClass("sorted")?h.hasClass(k)?(i.removeClass(k).addClass(j),p.list_sortDirection="desc"):p.viewOptions.list_sortClearing?(e.removeClass("sorted"),i.removeClass(j),p.list_sortDirection=null,p.list_sortProperty=null):(i.removeClass(j).addClass(k),p.list_sortDirection="asc"):(b.find("th, .repeater-list-heading").removeClass("sorted"),i.removeClass(j).addClass(k),p.list_sortDirection="asc",e.addClass("sorted")),p.render({clearInfinite:!0,pageIncrement:null}))})),"asc"!==c[d].sortDirection&&"desc"!==c[d].sortDirection||(b.find("th, .repeater-list-heading").removeClass("sorted"),e.addClass("sortable sorted"),"asc"===c[d].sortDirection?(i.addClass(k),this.list_sortDirection="asc"):(i.addClass(j),this.list_sortDirection="desc"),this.list_sortProperty="string"==typeof g?g:c[d].property),b.append(o)},e=function(b){var c="multi"===b.viewOptions.list_selectable,d=b.viewOptions.list_actions,e=b.$element;if(!b.isDisabled){var f=a(this),g=a(this).index()+1,h=e.find(".frozen-column-wrapper tr:nth-child("+g+")"),i=e.find(".actions-column-wrapper tr:nth-child("+g+")"),j=e.find(".frozen-column-wrapper tr:nth-child("+g+") .checkbox-inline");f.is(".selected")?(f.removeClass("selected"),c?(j.click(),h.removeClass("selected"),d&&i.removeClass("selected")):f.find(".repeater-list-check").remove(),e.trigger("deselected.fu.repeaterList",f)):(c?(j.click(),f.addClass("selected"),h.addClass("selected"),d&&i.addClass("selected")):(b.$canvas.find(".repeater-list-check").remove(),b.$canvas.find(".repeater-list tbody tr.selected").each(function(){a(this).removeClass("selected"),e.trigger("deselected.fu.repeaterList",a(this))}),f.find("td:first").prepend('<div class="repeater-list-check"><span class="glyphicon glyphicon-ok"></span></div>'),f.addClass("selected"),h.addClass("selected")),e.trigger("selected.fu.repeaterList",f)),k.call(b)}},f=function(b,d,f){var g=a("<tr></tr>");if(this.viewOptions.list_selectable&&(g.data("item_data",d[f]),"action"!==this.viewOptions.list_selectable)){g.addClass("selectable"),g.attr("tabindex",0);var h=this;g.on("click.fu.repeaterList",function(){e.call(this,h)}),g.keyup(function(a){13===a.keyCode&&g.trigger("click.fu.repeaterList")})}this.viewOptions.list_actions&&!this.viewOptions.list_selectable&&g.data("item_data",d[f]);for(var i=[],j=0,k=this.list_columns.length;j<k;j++)i.push(c.call(this,g,d,f,this.list_columns,j));if(b.append(g),this.viewOptions.list_columnRendered)for(var l=0,m=i.length;l<m;l++)"@_CHECKBOX_@"!==this.list_columns[l].property&&"@_ACTIONS_@"!==this.list_columns[l].property&&this.viewOptions.list_columnRendered({container:g,columnAttr:this.list_columns[l].property,item:i[l],rowData:d[f]},function(){});this.viewOptions.list_rowRendered&&this.viewOptions.list_rowRendered({container:b,item:g,rowData:d[f]},function(){})},g=function(b,c){var d,e=b.find("tbody");e.length<1&&(e=a('<tbody data-container="true"></tbody>'),b.append(e)),"string"==typeof c.error&&c.error.length>0?(d=a('<tr class="empty text-danger"><td colspan="'+this.list_columns.length+'"></td></tr>'),d.find("td").append(c.error),e.append(d)):c.items&&c.items.length<1&&(d=a('<tr class="empty"><td colspan="'+this.list_columns.length+'"></td></tr>'),d.find("td").append(this.viewOptions.list_noItemsHTML),e.append(d))},h=function(c,e){var f,g,h,j=e.columns||[],k=c.find("thead");if(this.list_firstRender||b(this.list_columns,j)||0===k.length){if(k.remove(),"multi"===this.viewOptions.list_selectable&&!this.list_noItems){var l={label:"c",property:"@_CHECKBOX_@",sortable:!1};j.splice(0,0,l)}if(this.list_columns=j,this.list_firstRender=!1,this.$loader.removeClass("noHeader"),this.viewOptions.list_actions){var m={label:this.viewOptions.list_actions.label||'<span class="actions-hidden">a</span>',property:"@_ACTIONS_@",sortable:!1,width:this.list_actions_width};j.push(m)}for(k=a('<thead data-preserve="deep"><tr></tr></thead>'),h=k.find("tr"),f=0,g=j.length;f<g;f++)d.call(this,h,j,f);if(c.prepend(k),"multi"===this.viewOptions.list_selectable&&!this.list_noItems){var n=this.$element.find(".repeater-list-wrapper .header-checkbox").outerWidth();a.grep(j,function(a){return"@_CHECKBOX_@"===a.property})[0].width=n}i.call(this,h)}},i=function(b){var c,d,e,f,g=[],h=this;if(this.viewOptions.list_columnSizing&&(c=0,f=0,b.find("th").each(function(){var b,d=a(this);if(void 0!==h.list_columns[c].width)b=h.list_columns[c].width,d.outerWidth(b),f+=d.outerWidth(),h.list_columns[c]._auto_width=b;else{var e=d.find(".repeater-list-heading").outerWidth();g.push({col:d,index:c,minWidth:e})}c++}),(d=g.length)>0)){var i=this.$canvas.find(".repeater-list-wrapper").outerWidth();for(e=Math.floor((i-f)/d),c=0;c<d;c++)g[c].minWidth>e&&(e=g[c].minWidth),g[c].col.outerWidth(e),this.list_columns[g[c].index]._auto_width=e}},j=function(){var a=window.navigator.userAgent,b=a.indexOf("MSIE "),c=a.indexOf("Firefox");return b>0?"ie-"+parseInt(a.substring(b+5,a.indexOf(".",b)),10):c>0?"firefox":""},k=function(){var a,b=".repeater-list-wrapper > table .selected",c=this.$element.find(".table-actions");"action"===this.viewOptions.list_selectable&&(b=".repeater-list-wrapper > table tr"),a=this.$canvas.find(b),a.length>0?c.find("thead .btn").removeAttr("disabled"):c.find("thead .btn").attr("disabled","disabled")}}(a),function(a){function b(b,c){for(var d=!1;!d&&c.search("{{")>=0;)!function(){var e,f,g;f=c.indexOf("{{"),e=c.indexOf("}}",f+2),f>-1&&e>-1?(g=a.trim(c.substring(f+2,e)),g=void 0!==b[g]?b[g]:"",c=c.substring(0,f)+g+c.substring(e+2)):d=!0}();return c}a.fn.repeater&&(a.fn.repeater.Constructor.prototype.thumbnail_clearSelectedItems=function(){this.$canvas.find(".repeater-thumbnail-cont .selectable.selected").removeClass("selected")},a.fn.repeater.Constructor.prototype.thumbnail_getSelectedItems=function(){var b=[];return this.$canvas.find(".repeater-thumbnail-cont .selectable.selected").each(function(){b.push(a(this))}),b},a.fn.repeater.Constructor.prototype.thumbnail_setSelectedItems=function(b,c){function d(){if(j===b[g].index)return h=a(this),!1;j++}function e(){h=a(this),h.is(b[g].selector)&&f(h,b[g].selected)}function f(a,b){b=void 0===b||b,b?(c||"multi"===k||l.thumbnail_clearSelectedItems(),a.addClass("selected")):a.removeClass("selected")}var g,h,i,j,k=this.viewOptions.thumbnail_selectable,l=this;for(a.isArray(b)||(b=[b]),i=!0===c||"multi"===k?b.length:k&&b.length>0?1:0,g=0;g<i;g++)void 0!==b[g].index?(h=a(),j=0,this.$canvas.find(".repeater-thumbnail-cont .selectable").each(d),h.length>0&&f(h,b[g].selected)):b[g].selector&&this.$canvas.find(".repeater-thumbnail-cont .selectable").each(e)},a.fn.repeater.defaults=a.extend({},a.fn.repeater.defaults,{thumbnail_alignment:"left",thumbnail_infiniteScroll:!1,thumbnail_itemRendered:null,thumbnail_noItemsHTML:"no items found",thumbnail_selectable:!1,thumbnail_template:'<div class="thumbnail repeater-thumbnail"><img height="75" src="{{src}}" width="65"><span>{{name}}</span></div>'}),a.fn.repeater.viewTypes.thumbnail={selected:function(){var a,b=this.viewOptions.thumbnail_infiniteScroll;b&&(a="object"==typeof b?b:{},this.infiniteScrolling(!0,a))},before:function(b){var c,d,e=this.viewOptions.thumbnail_alignment,f=this.$canvas.find(".repeater-thumbnail-cont"),g=b.data,h={};return f.length<1?(f=a('<div class="clearfix repeater-thumbnail-cont" data-container="true" data-infinite="true" data-preserve="shallow"></div>'),e&&"none"!==e?(d={center:1,justify:1,left:1,right:1},e=d[e]?e:"justify",f.addClass("align-"+e),this.thumbnail_injectSpacers=!0):this.thumbnail_injectSpacers=!1,h.item=f):h.action="none",g.items&&g.items.length<1?(c=a('<div class="empty"></div>'),c.append(this.viewOptions.thumbnail_noItemsHTML),f.append(c)):f.find(".empty:first").remove(),h},renderItem:function(c){var d=this.viewOptions.thumbnail_selectable,e=this,f=a(b(c.subset[c.index],this.viewOptions.thumbnail_template));return f.data("item_data",c.data.items[c.index]),d&&(f.addClass("selectable"),f.on("click",function(){e.isDisabled||(f.hasClass("selected")?(f.removeClass("selected"),e.$element.trigger("deselected.fu.repeaterThumbnail",f)):("multi"!==d&&e.$canvas.find(".repeater-thumbnail-cont .selectable.selected").each(function(){var b=a(this);b.removeClass("selected"),e.$element.trigger("deselected.fu.repeaterThumbnail",b)}),f.addClass("selected"),e.$element.trigger("selected.fu.repeaterThumbnail",f)))})),c.container.append(f),this.thumbnail_injectSpacers&&f.after('<span class="spacer">&nbsp;</span>'),this.viewOptions.thumbnail_itemRendered&&this.viewOptions.thumbnail_itemRendered({container:c.container,item:f,itemData:c.subset[c.index]},function(){}),!1}})}(a),function(a){var b=a.fn.scheduler,c=function(b,c){var d=this;this.$element=a(b),this.options=a.extend({},a.fn.scheduler.defaults,c),this.$startDate=this.$element.find(".start-datetime .start-date"),this.$startTime=this.$element.find(".start-datetime .start-time"),this.$timeZone=this.$element.find(".timezone-container .timezone"),this.$repeatIntervalPanel=this.$element.find(".repeat-every-panel"),this.$repeatIntervalSelect=this.$element.find(".repeat-options"),this.$repeatIntervalSpinbox=this.$element.find(".repeat-every"),this.$repeatIntervalTxt=this.$element.find(".repeat-every-text"),this.$end=this.$element.find(".repeat-end"),this.$endSelect=this.$end.find(".end-options"),this.$endAfter=this.$end.find(".end-after"),this.$endDate=this.$end.find(".end-on-date"),this.$recurrencePanels=this.$element.find(".repeat-panel"),this.$repeatIntervalSelect.selectlist(),this.$element.find(".selectlist").selectlist(),this.$startDate.datepicker(this.options.startDateOptions);var e="function"==typeof this.options.startDateChanged?this.options.startDateChanged:this._guessEndDate;this.$startDate.on("change changed.fu.datepicker dateClicked.fu.datepicker",a.proxy(e,this)),this.$startTime.combobox(),""===this.$startTime.find("input").val()&&this.$startTime.combobox("selectByIndex",0),"0"===this.$repeatIntervalSpinbox.find("input").val()?this.$repeatIntervalSpinbox.spinbox({value:1,min:1,limitToStep:!0}):this.$repeatIntervalSpinbox.spinbox({min:1,limitToStep:!0}),this.$endAfter.spinbox({value:1,min:1,limitToStep:!0}),this.$endDate.datepicker(this.options.endDateOptions),this.$element.find(".radio-custom").radio(),this.$repeatIntervalSelect.on("changed.fu.selectlist",a.proxy(this.repeatIntervalSelectChanged,this)),this.$endSelect.on("changed.fu.selectlist",a.proxy(this.endSelectChanged,this)),this.$element.find(".repeat-days-of-the-week .btn-group .btn").on("change.fu.scheduler",function(a,b){d.changed(a,b,!0)}),this.$element.find(".combobox").on("changed.fu.combobox",a.proxy(this.changed,this)),this.$element.find(".datepicker").on("changed.fu.datepicker",a.proxy(this.changed,this)),this.$element.find(".datepicker").on("dateClicked.fu.datepicker",a.proxy(this.changed,this)),this.$element.find(".selectlist").on("changed.fu.selectlist",a.proxy(this.changed,this)),this.$element.find(".spinbox").on("changed.fu.spinbox",a.proxy(this.changed,this)),this.$element.find(".repeat-monthly .radio-custom, .repeat-yearly .radio-custom").on("change.fu.scheduler",a.proxy(this.changed,this))},d=function(a,b){var c,d="";return d+=a.getFullYear(),d+=b,c=a.getMonth()+1,d+=c<10?"0"+c:c,d+=b,c=a.getDate(),d+=c<10?"0"+c:c},e={secondly:1e3,minutely:6e4,hourly:36e5,daily:864e5,weekly:6048e5,monthly:3024e6,yearly:314496e5},f=function(a,b,c,d){return new Date(a.getTime()+e[c]*d)};c.prototype={constructor:c,destroy:function(){var b;return this.$element.find("input").each(function(){a(this).attr("value",a(this).val())}),this.$element.find(".datepicker .calendar").empty(),b=this.$element[0].outerHTML,this.$element.find(".combobox").combobox("destroy"),this.$element.find(".datepicker").datepicker("destroy"),this.$element.find(".selectlist").selectlist("destroy"),this.$element.find(".spinbox").spinbox("destroy"),this.$element.find(".radio-custom").radio("destroy"),this.$element.remove(),b},changed:function(b,c,d){d||b.stopPropagation(),this.$element.trigger("changed.fu.scheduler",{data:void 0!==c?c:a(b.currentTarget).data(),originalEvent:b,value:this.getValue()})},disable:function(){this.toggleState("disable")},enable:function(){this.toggleState("enable")},setUtcTime:function(a,b,c){var d=a.split("-"),e=b.split(":"),f=new Date(Date.UTC(d[0],d[1]-1,d[2],e[0],e[1],e[2]?e[2]:0));if("Z"===c)f.setUTCHours(f.getUTCHours()+0);else{var g=[];g[0]="(.)",g[1]=".*?",g[2]="\\d",g[3]=".*?",g[4]="(\\d)";var h=new RegExp(g.join(""),["i"]),i=h.exec(c);if(null!==i){var j=i[1],k=i[2],l="+"===j?1:-1;f.setUTCHours(f.getUTCHours()+l*parseInt(k,10))}}var m=f.getTimezoneOffset();return f.setMinutes(m),f},endSelectChanged:function(a,b){var c,d;b?d=b.value:(c=this.$endSelect.selectlist("selectedItem"),d=c.value),this.$endAfter.parent().addClass("hidden"),this.$endAfter.parent().attr("aria-hidden","true"),this.$endDate.parent().addClass("hidden"),this.$endDate.parent().attr("aria-hidden","true"),"after"===d?(this.$endAfter.parent().removeClass("hide hidden"),this.$endAfter.parent().attr("aria-hidden","false")):"date"===d&&(this.$endDate.parent().removeClass("hide hidden"),this.$endDate.parent().attr("aria-hidden","false"))},_guessEndDate:function(){var a=this.$repeatIntervalSelect.selectlist("selectedItem").value,b=new Date(this.$endDate.datepicker("getDate")),c=new Date(this.$startDate.datepicker("getDate")),d=this.$repeatIntervalSpinbox.find("input").val();"none"!==a&&b<=c&&(this.$repeatIntervalSpinbox.is(":visible")||(d=1),"weekdays"===a&&(d=1,a="weekly"),b=f(c,0,a,d),this.$endDate.datepicker("setDate",b))},getValue:function(){var b,c=this.$repeatIntervalSpinbox.spinbox("value"),e="",f=this.$repeatIntervalSelect.selectlist("selectedItem").value;this.$startTime.combobox("selectedItem").value?(b=this.$startTime.combobox("selectedItem").value,b=b.toLowerCase()):b=this.$startTime.combobox("selectedItem").text.toLowerCase();var g,h,i,j,k,l,m,n,o=this.$timeZone.selectlist("selectedItem");m=""+d(this.$startDate.datepicker("getDate"),"-"),m+="T",i=b.search("am")>=0,j=b.search("pm")>=0,b=a.trim(b.replace(/am/g,"").replace(/pm/g,"")).split(":"),b[0]=parseInt(b[0],10),b[1]=parseInt(b[1],10),i&&b[0]>11?b[0]=0:j&&b[0]<12&&(b[0]+=12),m+=b[0]<10?"0"+b[0]:b[0],m+=":",m+=b[1]<10?"0"+b[1]:b[1],m+="+00:00"===o.offset?"Z":o.offset,"none"===f?e="FREQ=DAILY;INTERVAL=1;COUNT=1;":"secondly"===f?(e="FREQ=SECONDLY;",e+="INTERVAL="+c+";"):"minutely"===f?(e="FREQ=MINUTELY;",e+="INTERVAL="+c+";"):"hourly"===f?(e="FREQ=HOURLY;",e+="INTERVAL="+c+";"):"daily"===f?(e+="FREQ=DAILY;",e+="INTERVAL="+c+";"):"weekdays"===f?(e+="FREQ=WEEKLY;",e+="BYDAY=MO,TU,WE,TH,FR;",e+="INTERVAL=1;"):"weekly"===f?(h=[],this.$element.find(".repeat-days-of-the-week .btn-group input:checked").each(function(){h.push(a(this).data().value)}),e+="FREQ=WEEKLY;",e+="BYDAY="+h.join(",")+";",e+="INTERVAL="+c+";"):"monthly"===f?(e+="FREQ=MONTHLY;",e+="INTERVAL="+c+";",n=this.$element.find("input[name=repeat-monthly]:checked").val(),"bymonthday"===n?(g=parseInt(this.$element.find(".repeat-monthly-date .selectlist").selectlist("selectedItem").text,10),e+="BYMONTHDAY="+g+";"):"bysetpos"===n&&(h=this.$element.find(".repeat-monthly-day .month-days").selectlist("selectedItem").value,l=this.$element.find(".repeat-monthly-day .month-day-pos").selectlist("selectedItem").value,e+="BYDAY="+h+";",e+="BYSETPOS="+l+";")):"yearly"===f&&(e+="FREQ=YEARLY;",n=this.$element.find("input[name=repeat-yearly]:checked").val(),"bymonthday"===n?(k=this.$element.find(".repeat-yearly-date .year-month").selectlist("selectedItem").value,g=this.$element.find(".repeat-yearly-date .year-month-day").selectlist("selectedItem").text,e+="BYMONTH="+k+";",e+="BYMONTHDAY="+g+";"):"bysetpos"===n&&(h=this.$element.find(".repeat-yearly-day .year-month-days").selectlist("selectedItem").value,l=this.$element.find(".repeat-yearly-day .year-month-day-pos").selectlist("selectedItem").value,k=this.$element.find(".repeat-yearly-day .year-month").selectlist("selectedItem").value,e+="BYDAY="+h+";",e+="BYSETPOS="+l+";",e+="BYMONTH="+k+";"));var p=this.$endSelect.selectlist("selectedItem").value,q="";return"none"!==f&&("after"===p?q="COUNT="+this.$endAfter.spinbox("value")+";":"date"===p&&(q="UNTIL="+d(this.$endDate.datepicker("getDate"),"")+";")),e+=q,e=";"===e.substring(e.length-1)?e.substring(0,e.length-1):e,{startDateTime:m,timeZone:o,recurrencePattern:e}},repeatIntervalSelectChanged:function(a,b){var c,d,e;switch(b?(d=b.value,e=b.text):(c=this.$repeatIntervalSelect.selectlist("selectedItem"),d=c.value||"",e=c.text||""),this.$repeatIntervalTxt.text(e),d.toLowerCase()){case"hourly":case"daily":case"weekly":case"monthly":this.$repeatIntervalPanel.removeClass("hide hidden"),this.$repeatIntervalPanel.attr("aria-hidden","false");break;default:this.$repeatIntervalPanel.addClass("hidden"),this.$repeatIntervalPanel.attr("aria-hidden","true")}this.$recurrencePanels.addClass("hidden"),this.$recurrencePanels.attr("aria-hidden","true"),this.$element.find(".repeat-"+d).removeClass("hide hidden"),this.$element.find(".repeat-"+d).attr("aria-hidden","false"),"none"===d?(this.$end.addClass("hidden"),this.$end.attr("aria-hidden","true")):(this.$end.removeClass("hide hidden"),this.$end.attr("aria-hidden","false")),this._guessEndDate()},_parseAndSetRecurrencePattern:function(a,b){var c,d,e,f,g={},h=0,i="",j=a.toUpperCase().split(";");for(h=0;h<j.length;h++)""!==j[h]&&(i=j[h].split("="),g[i[0]]=i[1]);if("DAILY"===g.FREQ)i="MO,TU,WE,TH,FR"===g.BYDAY?"weekdays":"1"===g.INTERVAL&&"1"===g.COUNT?"none":"daily";else if("SECONDLY"===g.FREQ)i="secondly";else if("MINUTELY"===g.FREQ)i="minutely";else if("HOURLY"===g.FREQ)i="hourly";else if("WEEKLY"===g.FREQ){if(i="weekly",g.BYDAY)if("MO,TU,WE,TH,FR"===g.BYDAY)i="weekdays";else{var k=this.$element.find(".repeat-days-of-the-week .btn-group");for(k.find("label").removeClass("active"),c=g.BYDAY.split(","),h=0;h<c.length;h++)k.find('input[data-value="'+c[h]+'"]').prop("checked",!0).parent().addClass("active")}}else if("MONTHLY"===g.FREQ){if(this.$element.find(".repeat-monthly input").removeAttr("checked").removeClass("checked"),this.$element.find(".repeat-monthly label.radio-custom").removeClass("checked"),g.BYMONTHDAY)d=this.$element.find(".repeat-monthly-date"),d.find("input").addClass("checked").prop("checked",!0),d.find("label.radio-custom").addClass("checked"),d.find(".selectlist").selectlist("selectByValue",g.BYMONTHDAY);else if(g.BYDAY){var l=this.$element.find(".repeat-monthly-day");l.find("input").addClass("checked").prop("checked",!0),l.find("label.radio-custom").addClass("checked"),g.BYSETPOS&&l.find(".month-day-pos").selectlist("selectByValue",g.BYSETPOS),l.find(".month-days").selectlist("selectByValue",g.BYDAY)}i="monthly"}else"YEARLY"===g.FREQ?(this.$element.find(".repeat-yearly input").removeAttr("checked").removeClass("checked"),this.$element.find(".repeat-yearly label.radio-custom").removeClass("checked"),g.BYMONTHDAY?(e=this.$element.find(".repeat-yearly-date"),e.find("input").addClass("checked").prop("checked",!0),e.find("label.radio-custom").addClass("checked"),g.BYMONTH&&e.find(".year-month").selectlist("selectByValue",g.BYMONTH),e.find(".year-month-day").selectlist("selectByValue",g.BYMONTHDAY)):g.BYSETPOS&&(f=this.$element.find(".repeat-yearly-day"),f.find("input").addClass("checked").prop("checked",!0),f.find("label.radio-custom").addClass("checked"),f.find(".year-month-day-pos").selectlist("selectByValue",g.BYSETPOS),g.BYDAY&&f.find(".year-month-days").selectlist("selectByValue",g.BYDAY),g.BYMONTH&&f.find(".year-month").selectlist("selectByValue",g.BYMONTH)),i="yearly"):i="none";if(g.COUNT)this.$endAfter.spinbox("value",parseInt(g.COUNT,10)),this.$endSelect.selectlist("selectByValue","after");else if(g.UNTIL){var m,n;8===g.UNTIL.length&&(m=g.UNTIL.split(""),m.splice(4,0,"-"),m.splice(7,0,"-"),n=m.join(""));var o=this.$timeZone.selectlist("selectedItem"),p="+00:00"===o.offset?"Z":o.offset,q=this.setUtcTime(n,b.time24HourFormat,p);this.$endDate.datepicker("setDate",q),this.$endSelect.selectlist("selectByValue","date")}else this.$endSelect.selectlist("selectByValue","never");this.endSelectChanged(),g.INTERVAL&&this.$repeatIntervalSpinbox.spinbox("value",parseInt(g.INTERVAL,10)),this.$repeatIntervalSelect.selectlist("selectByValue",i),this.repeatIntervalSelectChanged()},_parseStartDateTime:function(b){var c,d,e,f={};return f.time24HourFormat=b.split("+")[0].split("-")[0],b.search(/\+/)>-1?f.timeZoneOffset="+"+a.trim(b.split("+")[1]):b.search(/\-/)>-1?f.timeZoneOffset="-"+a.trim(b.split("-")[1]):f.timeZoneOffset="+00:00",f.time24HourFormatSplit=f.time24HourFormat.split(":"),c=parseInt(f.time24HourFormatSplit[0],10),d=f.time24HourFormatSplit[1]?parseInt(f.time24HourFormatSplit[1].split("+")[0].split("-")[0].split("Z")[0],10):0,e=c<12?"AM":"PM",0===c?c=12:c>12&&(c-=12),d=d<10?"0"+d:d,f.time12HourFormat=c+":"+d,f.time12HourFormatWithPeriod=c+":"+d+" "+e,f},_parseTimeZone:function(b,c){return c.timeZoneQuerySelector="",b.timeZone?("string"==typeof b.timeZone?c.timeZoneQuerySelector+='li[data-name="'+b.timeZone+'"]':a.each(b.timeZone,function(a,b){c.timeZoneQuerySelector+="li[data-"+a+'="'+b+'"]'}),c.timeZoneOffset=b.timeZone.offset):b.startDateTime?(c.timeZoneOffset="+00:00"===c.timeZoneOffset?"Z":c.timeZoneOffset,c.timeZoneQuerySelector+='li[data-offset="'+c.timeZoneOffset+'"]'):c.timeZoneOffset="Z",c.timeZoneOffset},_setTimeUI:function(a){this.$startTime.find("input").val(a),this.$startTime.combobox("selectByText",a)},_setTimeZoneUI:function(a){this.$timeZone.selectlist("selectBySelector",a)},setValue:function(a){var b,c,d,e,f={};if(a.startDateTime)b=a.startDateTime.split("T"),c=b[0],d=b[1],d?(f=this._parseStartDateTime(d),this._setTimeUI(f.time12HourFormatWithPeriod)):(f.time12HourFormat="00:00",f.time24HourFormat="00:00");else{f.time12HourFormat="00:00",f.time24HourFormat="00:00";var g=this.$startDate.datepicker("getDate");c=g.getFullYear()+"-"+g.getMonth()+"-"+g.getDate()}this._parseTimeZone(a,f),f.timeZoneQuerySelector&&this._setTimeZoneUI(f.timeZoneQuerySelector),a.recurrencePattern&&this._parseAndSetRecurrencePattern(a.recurrencePattern,f),e=this.setUtcTime(c,f.time24HourFormat,f.timeZoneOffset),this.$startDate.datepicker("setDate",e)},toggleState:function(a){this.$element.find(".combobox").combobox(a),this.$element.find(".datepicker").datepicker(a),this.$element.find(".selectlist").selectlist(a),this.$element.find(".spinbox").spinbox(a),this.$element.find(".radio-custom").radio(a),a="disable"===a?"addClass":"removeClass",this.$element.find(".repeat-days-of-the-week .btn-group")[a]("disabled")},value:function(a){return a?this.setValue(a):this.getValue()}},a.fn.scheduler=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.scheduler"),h="object"==typeof b&&b;g||f.data("fu.scheduler",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.scheduler.defaults={},a.fn.scheduler.Constructor=c,a.fn.scheduler.noConflict=function(){return a.fn.scheduler=b,this},a(document).on("mousedown.fu.scheduler.data-api","[data-initialize=scheduler]",function(b){var c=a(b.target).closest(".scheduler");c.data("fu.scheduler")||c.scheduler(c.data())}),a(function(){a("[data-initialize=scheduler]").each(function(){var b=a(this);b.data("scheduler")||b.scheduler(b.data())})})}(a),function(a){var b=a.fn.picker,c=function(b,c){var d=this;this.$element=a(b),this.options=a.extend({},a.fn.picker.defaults,c),this.$accept=this.$element.find(".picker-accept"),this.$cancel=this.$element.find(".picker-cancel"),this.$trigger=this.$element.find(".picker-trigger"),this.$footer=this.$element.find(".picker-footer"),this.$header=this.$element.find(".picker-header"),this.$popup=this.$element.find(".picker-popup"),this.$body=this.$element.find(".picker-body"),this.clickStamp="_",this.isInput=this.$trigger.is("input"),this.$trigger.on("keydown.fu.picker",a.proxy(this.keyComplete,this)),this.$trigger.on("focus.fu.picker",a.proxy(function(b){(void 0===b||a(b.target).is("input[type=text]"))&&a.proxy(this.show(),this)},this)),this.$trigger.on("click.fu.picker",a.proxy(function(b){a(b.target).is("input[type=text]")?a.proxy(this.show(),this):a.proxy(this.toggle(),this)},this)),this.$accept.on("click.fu.picker",a.proxy(this.complete,this,"accepted")),this.$cancel.on("click.fu.picker",function(a){a.preventDefault(),d.complete("cancelled")})},d=function(b){
+var c=Math.max(document.documentElement.clientHeight,window.innerHeight||0),d=a(document).scrollTop(),e=b.$popup.offset();return e.top+b.$popup.outerHeight(!0)>c+d||e.top<d},e=function(a){a.$popup.css("visibility","hidden"),g(a),d(a)&&(f(a),d(a)&&g(a)),a.$popup.css("visibility","visible")},f=function(a){a.$popup.css("top",-a.$popup.outerHeight(!0)+"px")},g=function(a){a.$popup.css("top",a.$trigger.outerHeight(!0)+"px")};c.prototype={constructor:c,complete:function(a){var b={accepted:"onAccept",cancelled:"onCancel",exited:"onExit"},c=this.options[b[a]],d={contents:this.$body};c?(c(d),this.$element.trigger(a+".fu.picker",d)):(this.$element.trigger(a+".fu.picker",d),this.hide())},keyComplete:function(a){this.isInput&&13===a.keyCode?(this.complete("accepted"),this.$trigger.blur()):27===a.keyCode&&(this.complete("exited"),this.$trigger.blur())},destroy:function(){return this.$element.remove(),a(document).off("click.fu.picker.externalClick."+this.clickStamp),this.$element[0].outerHTML},disable:function(){this.$element.addClass("disabled"),this.$trigger.attr("disabled","disabled")},enable:function(){this.$element.removeClass("disabled"),this.$trigger.removeAttr("disabled")},toggle:function(){this.$element.hasClass("showing")?this.hide():this.show()},hide:function(){this.$element.hasClass("showing")&&(this.$element.removeClass("showing"),a(document).off("click.fu.picker.externalClick."+this.clickStamp),this.$element.trigger("hidden.fu.picker"))},externalClickListener:function(a,b){(!0===b||this.isExternalClick(a))&&this.complete("exited")},isExternalClick:function(b){var c,d,e=this.$element.get(0),f=this.options.externalClickExceptions||[],g=a(b.target);if(b.target===e||g.parents(".picker:first").get(0)===e)return!1;for(c=0,d=f.length;c<d;c++)if(g.is(f[c])||g.parents(f[c]).length>0)return!1;return!0},show:function(){var b;if(b=a(document).find(".picker.showing"),b.length>0){if(b.data("fu.picker")&&b.data("fu.picker").options.explicit)return;b.picker("externalClickListener",{},!0)}this.$element.addClass("showing"),e(this),this.$element.trigger("shown.fu.picker"),this.clickStamp=(new Date).getTime()+(Math.floor(100*Math.random())+1),this.options.explicit||a(document).on("click.fu.picker.externalClick."+this.clickStamp,a.proxy(this.externalClickListener,this))}},a.fn.picker=function(b){var d,e=Array.prototype.slice.call(arguments,1),f=this.each(function(){var f=a(this),g=f.data("fu.picker"),h="object"==typeof b&&b;g||f.data("fu.picker",g=new c(this,h)),"string"==typeof b&&(d=g[b].apply(g,e))});return void 0===d?f:d},a.fn.picker.defaults={onAccept:void 0,onCancel:void 0,onExit:void 0,externalClickExceptions:[],explicit:!1},a.fn.picker.Constructor=c,a.fn.picker.noConflict=function(){return a.fn.picker=b,this},a(document).on("focus.fu.picker.data-api","[data-initialize=picker]",function(b){var c=a(b.target).closest(".picker");c.data("fu.picker")||c.picker(c.data())}),a(function(){a("[data-initialize=picker]").each(function(){var b=a(this);b.data("fu.picker")||b.picker(b.data())})})}(a)});;define('fuelux', ['fuelux/js/fuelux.min'], function (main) { return main; });
+
+define('text!fuelux/css/fuelux.min.css', ['module'], function(module) { module.exports = "/*!\n * Fuel UX v3.16.0 \n * Copyright 2012-2017 ExactTarget\n * Licensed under the BSD-3-Clause license (https://github.com/ExactTarget/fuelux/blob/master/LICENSE)\n */\n\n@charset \"UTF-8\";.clearfix{*zoom:1}.clearfix:before,.clearfix:after{display:table;content:\"\";line-height:0}.clearfix:after{clear:both}@font-face{font-family:\"fuelux\";src:url(\"../fonts/fuelux.eot\");src:url(\"../fonts/fuelux.eot?#iefix\") format(\"embedded-opentype\"),url(data:font-woff;base64,d09GRk9UVE8AAAUUAAsAAAAABuAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABDRkYgAAABCAAAAegAAAIisWS2RkZGVE0AAALwAAAAGQAAABxvEtzhR0RFRgAAAwwAAAAdAAAAIAA4AARPUy8yAAADLAAAAEoAAABgL7lMbGNtYXAAAAN4AAAAPAAAAUrAGiK3aGVhZAAAA7QAAAAvAAAANgDSVuNoaGVhAAAD5AAAABwAAAAkBCkCA2htdHgAAAQAAAAAGgAAABoHmgL4bWF4cAAABBwAAAAGAAAABgALUABuYW1lAAAEJAAAAN0AAAF3kxoWmXBvc3QAAAUEAAAAEAAAACAAAwABeJw90M9rE0EUB/D30uzusLtuNTqiGIs/+gt6ifVHtgfRHqQHLTYumEsrpSSWRVNozNJc2t6S2K2bBATbS0tLe9jDUlJ6aS85hFT8H6SCFPwTZiCIbpnq6fMe8+Y7j0GIRgERlbdO9r1TBIwAwijvi/D+Ln4tuqqjq3e5erRHhetW7I/r/i90xfN4ndelOHztjgNcjMP3S3HQ41iIgX4WQ6AbrsJN6IUhGIYReApjMA6WM2c/SyQSgnuCYcF9wQPBQ8EjQVJgCkbEvudbA2AZK/gRV9DFVfyEHlaxBhpiJPlk7GX6TebdhxWDDfEb9JbaGezI9Laa74zTOyqTn9O7KosFtFdlg0ymfeE5e0X7VTZaogOqwXz+OOwM/pqbZz2vs+VwyGC/2YXwjsGWf4YBxrdfYZjhMT9M/veQwU7ZHD3MNianstmpyUb28KjROOox+OcrLnV1Nfysy0AQ6YD5Yjpf+jJxLB0Eza2WR0zFruSW5otEq7W2m3v7pJ2SFvKLubJNNPvAaVZa5ET27LXcxjzRkopVS29n9ki7Le0s+ItBmWjHE9KMnXasCjlRAs9f290gWskqpGczJNWWNnfW/WpAtB9Kq9Qs7M+SVErKb+bW7SrRgpmttGcRU64ES35xl2h/Ac9Ys4h4nGNgYGBkAILzccd+gelbXJ9hNABYswg7AAAAeJxjYGRgYOADYgkGEGBiYARCLiBmAfMYAAS4AD0AAAB4nGNgZmJgnMDAysDB6MOYxsDA4A6lvzJIMrQwMDAxsHIywIEAgskQkOaawuDwgOEBJ+OD/w8Y9Bj//v8LFGaEK1AAQkYALokNlwAAeJxjYGBgZoBgGQZGBhBwAfIYwXwWBg0gzQakGRmYGBgecP7/D1LwgAFEKzBC1QMBIxsDgjNCAQBlrAaweJxjYGRgYADiH2cX2sfz23xl4GZiAIHzt7g+w2lmBmbGv4x/gVwOBrA0AFSyC6wAeJxjYGRgYPzLwMCgx8QAAkA2IwMqYAIANwYCMQIAAAACAAADARUBhwGDAQ8AWAADAAMAXACnAAAAAFAAAAsAAHicbY49asNAEIU/2bJMsEmX1JsipYS0BAwuU/gAKdy7WAuDkPDagtzDkD5djpED5AQ5TZ7kKVJ4l9n59vHmB1jyQcJwEjLujSfMeTae8sTROJXn03jGgm/jTPdXziS9k7IcqwaeqOOD8ZRXcuNUnovxjEe+jDPpP+zpCTR632Hfh6ZXfpNUS2rYEfUNdd/sBBs6Ws5jjnIEHJ6CUnmt+N/sqnitsVJ4eSpe1KJrz5su1sH5onRrdx0p8Pkq92Uly82VtpIiJw7jCk7NhrFsQzwdutZVRXm78A9U7zY2AAAAeJxjYGZABowMaAAAAI4ABQ==) format(\"woff\"),url(\"../fonts/fuelux.ttf\") format(\"truetype\"),url(\"../fonts/fuelux.svg#fuelux\") format(\"svg\");font-weight:normal;font-style:normal}.fuelux [class^=\"fueluxicon-\"]:before,.fuelux [class*=\" fueluxicon-\"]:before{font-family:\"fuelux\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fuelux .fueluxicon-loader-full:before{content:\"\\e000\"}.fuelux .fueluxicon-loader-1:before{content:\"\\e001\"}.fuelux .fueluxicon-loader-2:before{content:\"\\e002\"}.fuelux .fueluxicon-loader-3:before{content:\"\\e003\"}.fuelux .fueluxicon-loader-4:before{content:\"\\e004\"}.fuelux .fueluxicon-loader-5:before{content:\"\\e005\"}.fuelux .fueluxicon-loader-6:before{content:\"\\e006\"}.fuelux .fueluxicon-loader-7:before{content:\"\\e007\"}.fuelux .fueluxicon-loader-8:before{content:\"\\e008\"}.fuelux .fueluxicon-bullet:before{content:\"\\e009\"}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline.highlight,.fuelux .checkbox-inline.highlight{left:-8px}.fuelux .radio-inline label,.fuelux .checkbox-inline label{margin-bottom:0}label.fuelux .radio:hover:before,label.fuelux .checkbox:hover:before,label.fuelux .radio-inline:hover:before,label.fuelux .checkbox-inline:hover:before,.input-label.fuelux .radio:hover:before,.input-label.fuelux .checkbox:hover:before,.input-label.fuelux .radio-inline:hover:before,.input-label.fuelux .checkbox-inline:hover:before,.fuelux .radio label:hover:before,.fuelux .checkbox label:hover:before,.fuelux .radio-inline label:hover:before,.fuelux .checkbox-inline label:hover:before,.fuelux .radio .input-label:hover:before,.fuelux .checkbox .input-label:hover:before,.fuelux .radio-inline .input-label:hover:before,.fuelux .checkbox-inline .input-label:hover:before{box-shadow:inset 0 0 2px 1px rgba(91,157,217,0.7),0 0 5px 0 rgba(91,157,217,0.7)}.fuelux .radio label,.fuelux .checkbox label,.fuelux .radio-inline label,.fuelux .checkbox-inline label,.fuelux .radio .input-label,.fuelux .checkbox .input-label,.fuelux .radio-inline .input-label,.fuelux .checkbox-inline .input-label,label.fuelux .radio,label.fuelux .checkbox,label.fuelux .radio-inline,label.fuelux .checkbox-inline{cursor:pointer;font-weight:normal}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only)~label{padding:4px;border-radius:4px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"checkbox\"]:not(.sr-only):checked~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .radio-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label,.fuelux .checkbox-inline.highlight input[type=\"radio\"]:not(.sr-only):checked~label{background-color:#e6e6e6;opacity:1;z-index:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only),.fuelux .radio input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox input[type=\"radio\"]:not(.sr-only),.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only),.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label{padding-left:0}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)~label:before{font-family:\"Glyphicons Halflings\";font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;speak:none;border:1px solid #aaaaaa;color:#FFF;font-size:9px;width:14px;height:14px;padding:0;margin-top:0;margin-bottom:-2px;cursor:pointer;display:inline-block;text-align:left;z-index:2;content:\"\"}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label{color:#333333;color:#39b3d7;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9;outline:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:pointer}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled=\"disabled\"]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only)[disabled]~label:before,.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):disabled~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):disabled~label:before{color:#333333;opacity:.65;cursor:not-allowed !important;outline:none;box-shadow:none}.fuelux .radio input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio.highlight:before,.fuelux .checkbox.highlight:before,.fuelux .radio-inline.highlight:before,.fuelux .checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .radio.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label,.fuelux .radio.highlight input[type=\"radio\"]:not(.sr-only)~label,.fuelux .checkbox.highlight input[type=\"radio\"]:not(.sr-only)~label{left:-8px;position:relative}.fuelux .radio-inline,.fuelux .checkbox-inline{padding-left:0}.fuelux .radio-inline:before,.fuelux .checkbox-inline:before{left:0;top:3px}.fuelux .checkbox.multiline,.fuelux .radio.multiline{float:left;margin-left:15px}.fuelux .checkbox.multiline~.control-label,.fuelux .radio.multiline~.control-label{float:left;width:80%;margin-left:10px;text-align:left}.fuelux .checkbox.multiline~.control-label>label,.fuelux .radio.multiline~.control-label>label{font-weight:normal;cursor:pointer}.fuelux .form-group.required .control-label:before{content:'*';color:#a94442;margin-right:5px}.fuelux .checkbox.highlight+.checkbox.highlight{margin-top:-5px}.fuelux .checkbox.highlight label.checkbox-custom{padding:4px 4px 4px 24px}.fuelux .checkbox.highlight.checked label.checkbox-custom,.fuelux .checkbox.highlight label.checked.checkbox-custom{background:#e6e6e6;border-radius:4px}.fuelux .checkbox input[type=\"checkbox\"]:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:hover+.checkbox-label,.fuelux .checkbox .checkbox-label:hover{color:#999999}.fuelux .checkbox input[type=\"checkbox\"]:disabled:focus+.checkbox-label,.fuelux .checkbox input[type=\"checkbox\"]:disabled:hover+.checkbox-label,.fuelux .checkbox.disabled label:hover{color:inherit}.fuelux .form-horizontal .checkbox-inline{padding-top:0}.fuelux .input-group-addon.checkbox-custom{margin-bottom:0;cursor:pointer;padding-left:24px}.fuelux .input-group-addon.checkbox-custom input[type=checkbox]{position:absolute;margin-left:-24px}.fuelux .input-group-addon.checkbox-custom:before{left:11px;top:9px}.fuelux .checkbox-custom{position:relative}.fuelux .checkbox-custom:before{font-family:\"Glyphicons Halflings\" !important;font-style:normal !important;font-weight:normal !important;font-variant:normal !important;text-transform:none !important;line-height:1;speak:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;border:1px solid #aaaaaa;border-radius:4px;color:#FFF;content:\" \";font-size:9px;height:14px;left:0;padding:1px 0 0 1px;position:absolute;top:3px;width:14px}.fuelux .checkbox-custom:active:before,.fuelux .checkbox-custom:focus:before{color:#5B9DD9;cursor:pointer;box-shadow:inset 0 0 2px 1px #5B9DD9,0 0 5px 0 #5B9DD9}.fuelux .checkbox-custom.highlight:before{left:4px;top:6px}.fuelux .checkbox-custom.checked:before{background:#39b3d7;border-color:#39b3d7;content:\"\\e013\"}.fuelux .checkbox-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .checkbox-custom.checkbox-inline:before{left:0;top:3px}.fuelux .checkbox-custom.checkbox-inline.highlight{padding:4px 4px 4px 24px;left:-4px}.fuelux .checkbox-custom.checkbox-inline.highlight:before{left:4px;top:7px}.fuelux .checkbox-custom.checkbox-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .checkbox-custom input[type=\"checkbox\"]:focus+.checkbox-label{color:#999999}.fuelux .checkbox-custom input[type=\"checkbox\"]+.checkbox-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.checkbox-custom.checkbox-inline{padding-left:20px}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only)~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only)~label:before{border-radius:4px;z-index:1}.fuelux .checkbox input[type=\"checkbox\"]:not(.sr-only):checked~label:before,.fuelux .checkbox-inline input[type=\"checkbox\"]:not(.sr-only):checked~label:before{color:white;content:\"\\e013\";line-height:1em;padding-left:1px;font-size:8px;padding-top:2px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight{margin-left:-14px}.fuelux .checkbox.hightlight+.checkbox-inline.highlight.checkbox-custom,.fuelux .checkbox-inline.hightlight+.checkbox-inline.highlight.checkbox-custom{margin-left:0}.fuelux .checkbox.highlight input[type=\"checkbox\"]:not(.sr-only)~label{left:-4px}.fuelux .radio.highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio.highlight+.radio.highlight{margin-top:-9px}.fuelux .radio.highlight label.radio-custom{left:-8px;padding:4px 4px 4px 24px;border-radius:4px}.fuelux .radio.highlight label.radio-custom:before{left:5px;top:7px}.fuelux .radio.highlight label.radio-custom:after{left:9px;top:11px}.fuelux .radio.highlight.checked label.radio-custom,.fuelux .radio.highlight label.radio-custom.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio input[type=\"radio\"]:focus+.radio-label,.fuelux .radio input[type=\"radio\"]:hover+.radio-label,.fuelux .radio .radio-label:hover{color:#999999}.fuelux .form-horizontal .radio-inline{padding-top:0}.fuelux .input-group-addon.radio-custom.radio-inline:before{left:11px;top:9px}.fuelux .input-group-addon.radio-custom.radio-inline:after{left:15px;top:13px}.fuelux .radio-custom{position:relative}.fuelux .radio-custom .highlight{padding:4px;margin:0 0 5px 0}.fuelux .radio-custom .highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom:after{background:transparent;border-radius:6px;content:\" \";height:6px;left:4px;position:absolute;top:7px;width:6px}.fuelux .radio-custom:before{border:1px solid #aaaaaa;border-radius:14px;content:\" \";height:14px;left:0;position:absolute;top:3px;width:14px}.fuelux .radio-custom.checked:after{background:#FFF}.fuelux .radio-custom.checked:before{background:#39b3d7;border-color:#39b3d7}.fuelux .radio-custom.disabled{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.disabled:after{cursor:not-allowed}.fuelux .radio-custom.disabled:before{cursor:not-allowed;opacity:.65}.fuelux .radio-custom.radio-inline:after{left:4px;top:7px}.fuelux .radio-custom.radio-inline:before{left:0;top:3px}.fuelux .radio-custom.radio-inline.highlight{left:-3px;padding:4px 4px 4px 24px}.fuelux .radio-custom.radio-inline.highlight:after{left:8px;top:11px}.fuelux .radio-custom.radio-inline.highlight:before{left:4px;top:7px}.fuelux .radio-custom.radio-inline.highlight.checked{background:#e6e6e6;border-radius:4px}.fuelux .radio-custom input[type=\"radio\"]:focus+.radio-label{color:#999999}.fuelux .radio-custom input[type=\"radio\"]+.radio-label.truncate{display:inherit;line-height:14px;margin-top:3px;margin-bottom:-3px}.fuelux label.radio-custom.radio-inline{padding-left:20px}.fuelux .radio input[type=\"radio\"]:not(.sr-only)~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only)~label:before{border-radius:8px;z-index:1}.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked~label:before{background:#39b3d7;background:-moz-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-webkit-gradient(radial, center center, 0, center center, 100%, color-stop(0, #FFF), color-stop(40%, #FFF), color-stop(41%, #39b3d7), color-stop(100%, #39b3d7));background:-webkit-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-o-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:-ms-radial-gradient(center, ellipse cover, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);background:radial-gradient(ellipse at center, #FFF 0, #FFF 40%, #39b3d7 41%, #39b3d7 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFF', endColorstr='#39b3d7', GradientType=1)}.fuelux .radio input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus~label:before{box-shadow:inset 0 0 2px 1px #5b9dd9,0 0 5px 0 #5b9dd9}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:before,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:before,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:before{outline-color:none;outline-offset:0;outline-style:none;outline-width:0;cursor:default}.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label,.fuelux .radio input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):active:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):focus:hover~label:hover,.fuelux .radio input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover,.fuelux .radio-inline input[type=\"radio\"]:not(.sr-only):checked:hover~label:hover{color:#333333;cursor:default}.fuelux .combobox.disabled .input-group-btn{cursor:not-allowed}.fuelux .combobox input::-ms-clear{display:none}.fuelux .combobox .dropdown-menu>li.selected>a{color:#262626;text-decoration:none;background-color:#f5f5f5}.fuelux .combobox .dropdown-menu>li>em{display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.42857143;color:#333;white-space:nowrap}.fuelux .datepicker-calendar{padding:16px 16px 0;min-height:262px}.fuelux .datepicker-calendar button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-days{height:182px;margin:10px 0 12px;width:100%}.fuelux .datepicker-calendar-days thead{border-bottom:1px solid #cccccc}.fuelux .datepicker-calendar-days tbody:before{color:transparent;content:\"\\200C\";display:block;line-height:3px;visibility:hidden}.fuelux .datepicker-calendar-days td,.fuelux .datepicker-calendar-days th{font-size:14px;height:32px;text-align:center;vertical-align:middle;width:14.29%}.fuelux .datepicker-calendar-days td b,.fuelux .datepicker-calendar-days td button{color:#333333;display:inline-block;font-weight:normal;height:30px;text-decoration:none;width:30px}.fuelux .datepicker-calendar-days td b{line-height:30px}.fuelux .datepicker-calendar-days td span{display:block;border-radius:4px}.fuelux .datepicker-calendar-days td span:hover{background:#f5f5f5;text-decoration:none}.fuelux .datepicker-calendar-days td.current-day span{border:1px solid #333333}.fuelux .datepicker-calendar-days td.last-month,.fuelux .datepicker-calendar-days td.next-month{background:#d5d5d5}.fuelux .datepicker-calendar-days td.last-month.first,.fuelux .datepicker-calendar-days td.next-month.first{border-top-left-radius:4px;border-bottom-left-radius:4px;padding-left:1px}.fuelux .datepicker-calendar-days td.last-month.last,.fuelux .datepicker-calendar-days td.next-month.last{border-top-right-radius:4px;border-bottom-right-radius:4px;padding-right:1px}.fuelux .datepicker-calendar-days td.past b,.fuelux .datepicker-calendar-days td.past button{color:#999999}.fuelux .datepicker-calendar-days td.restricted b,.fuelux .datepicker-calendar-days td.restricted button{cursor:no-drop;position:relative}.fuelux .datepicker-calendar-days td.restricted b:before,.fuelux .datepicker-calendar-days td.restricted button:before{border-top:1px solid #e9322d;bottom:0;content:\" \";display:block;left:5px;position:absolute;right:5px;top:50%}.fuelux .datepicker-calendar-days td.restricted b:hover,.fuelux .datepicker-calendar-days td.restricted button:hover{background:none}.fuelux .datepicker-calendar-days td.selected span{background:#eeeeee}.fuelux .datepicker-calendar-days td.selected span:hover{background:#dddddd}.fuelux .datepicker-calendar-days td.selected b,.fuelux .datepicker-calendar-days td.selected button{color:#878787}.fuelux .datepicker-calendar-days td.selected.current-day{box-shadow:0 0 0 1px #FFF offset}.fuelux .datepicker-calendar-days td.selected.current-day b,.fuelux .datepicker-calendar-days td.selected.current-day button{color:#222222}.fuelux .datepicker-calendar-days td.selected.current-day span:hover b,.fuelux .datepicker-calendar-days td.selected.current-day span:hover button{border-color:#0f5f9f}.fuelux .datepicker-calendar-days th{font-weight:bold;height:22px;vertical-align:top}.fuelux .datepicker-calendar-header{*zoom:1}.fuelux .datepicker-calendar-header:before,.fuelux .datepicker-calendar-header:after{display:table;content:\"\";line-height:0}.fuelux .datepicker-calendar-header:after{clear:both}.fuelux .datepicker-calendar-header button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-calendar-header .title{margin:0 auto;text-align:center;display:block;width:174px;color:#222222;font-size:20px;line-height:30px;text-decoration:underline;vertical-align:middle}.fuelux .datepicker-calendar-header .title:hover{color:#0f5f9f;text-decoration:underline}.fuelux .datepicker-calendar-header .title.disabled{cursor:default;pointer-events:none;text-decoration:none}.fuelux .datepicker-calendar-header .title .month{display:inline;margin:0;padding:0}.fuelux .datepicker-calendar-header .title .month span{display:none}.fuelux .datepicker-calendar-header .title .month span.current{display:inline}.fuelux .datepicker-calendar-header .next,.fuelux .datepicker-calendar-header .prev{background:#666666;background-clip:padding-box;border-radius:30px;cursor:pointer;float:left;height:30px;text-align:center;width:30px}.fuelux .datepicker-calendar-header .next span.glyphicon,.fuelux .datepicker-calendar-header .prev span.glyphicon{color:#FFF;font-size:16px;line-height:30px}.fuelux .datepicker-calendar-header .next:hover,.fuelux .datepicker-calendar-header .prev:hover{background:#0f5f9f}.fuelux .datepicker-calendar-header .next{float:right}.fuelux .datepicker-calendar-header .next span.glyphicon{line-height:28px}.fuelux .datepicker-calendar-footer{background:#e6e6e6;background-clip:padding-box;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;height:30px;margin:0 -16px;padding:4px 14px}.fuelux .datepicker-calendar-footer .datepicker-today{color:#333333;font-size:14px;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today:hover{color:#1b75bb;text-decoration:underline}.fuelux .datepicker-calendar-footer .datepicker-today.disabled{color:#878787;cursor:default;pointer-events:none}.fuelux .datepicker-calendar-footer .datepicker-today.disabled:hover{color:#878787}.fuelux .datepicker-calendar-wrapper{border:1px solid #757575;min-height:20px;padding:0;width:300px}.fuelux .datepicker-wheels{display:none}.fuelux .datepicker-wheels ul button{border:0;padding:0;background-color:transparent}.fuelux .datepicker-wheels-footer{background:#e6e6e6;border-radius:0 0 4px 4px;border-top:1px solid #cccccc;clear:both}.fuelux .datepicker-wheels-footer .datepicker-wheels-back{display:block;color:#222222;float:left;line-height:22px;border:0;background-color:transparent}.fuelux .datepicker-wheels-footer .datepicker-wheels-back:hover{color:#1b75bb}.fuelux .datepicker-wheels-footer .datepicker-wheels-select{float:right;background-color:transparent;color:#5B9DD9}.fuelux .datepicker-wheels-footer .datepicker-wheels-select:hover{color:#1b75bb}.fuelux .datepicker-wheels-month,.fuelux .datepicker-wheels-year{float:left;width:50%}.fuelux .datepicker-wheels-month ul,.fuelux .datepicker-wheels-year ul{height:217px;list-style-type:none;margin:0;overflow:auto;padding:0;text-align:center}.fuelux .datepicker-wheels-month ul li,.fuelux .datepicker-wheels-year ul li{margin:4px 0}.fuelux .datepicker-wheels-month ul li button,.fuelux .datepicker-wheels-year ul li button{width:100%;text-align:center;color:#454545;display:block;font-size:16px;line-height:24px;text-decoration:none}.fuelux .datepicker-wheels-month ul li button:hover,.fuelux .datepicker-wheels-year ul li button:hover{background:#d9edf7;text-decoration:none}.fuelux .datepicker-wheels-month ul li.selected button,.fuelux .datepicker-wheels-year ul li.selected button{background:#1b75bb;color:#FFF}.fuelux .datepicker-wheels-month ul li.selected button:hover,.fuelux .datepicker-wheels-year ul li.selected button:hover{background:#0f5f9f}.fuelux .datepicker-wheels-month .header,.fuelux .datepicker-wheels-year .header{background:#e6e6e6;background-clip:padding-box;border-bottom:1px solid #cccccc;border-radius:4px 0 0 0;color:#222222;font-size:20px;font-weight:bold;line-height:30px;margin-top:0;margin-bottom:0;text-align:center}.fuelux .datepicker-wheels-month.full,.fuelux .datepicker-wheels-year.full{border-left:0;width:100%}.fuelux .datepicker-wheels-month.full .header,.fuelux .datepicker-wheels-year.full .header{border-radius:4px 4px 0 0}.fuelux .datepicker-wheels-year{border-left:1px solid #cccccc;float:right}.fuelux .datepicker-wheels-year .header{border-radius:0 4px 0 0}.fuelux .datepicker input::-ms-clear{display:none}.fuelux .infinitescroll{overflow-y:auto}.fuelux .infinitescroll .infinitescroll-end{clear:both;font-style:italic;padding:6px;text-align:center}.fuelux .infinitescroll .infinitescroll-load{clear:both;padding:6px}.fuelux .infinitescroll .infinitescroll-load button{padding:5px 12px;width:100%}.fuelux .infinitescroll .infinitescroll-load .loader{font-size:32px;height:32px;margin:0 auto;width:32px}.fuelux .dropUp,.fuelux .dropup{-webkit-box-shadow:0 0 10px rgba(0,0,0,0.2);-moz-box-shadow:0 0 10px rgba(0,0,0,0.2);box-shadow:0 0 10px rgba(0,0,0,0.2)}.fuelux .loader{height:64px;font-size:64px;position:relative;width:64px;background-image:url(\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSIwIDAgNjQgNjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PGcgd2lkdGg9IjU0cHgiIGhlaWdodD0iNTRweCIgdmlld0JveD0iNSA1IDU0IDU0IiBpZD0ibG9hZGVyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4wMDAwMDAsIDUuMDAwMDAwKSIgZmlsbD0iIzE1ODllZSI+PGcgaWQ9InNwaW5uZXItbWVkaXVtIj48ZyBpZD0iT3ZhbC0zNSI+PGNpcmNsZSBpZD0iVG9wIiBjeD0iMjciIGN5PSI2IiByPSI1Ij48L2NpcmNsZT48Y2lyY2xlIGlkPSJUb3BSaWdodCIgY3g9IjQ4IiBjeT0iMTciIHI9IjUiPjwvY2lyY2xlPjxjaXJjbGUgaWQ9IkJvdHRvbVJpZ2h0IiBjeD0iNDgiIGN5PSIzNiIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iQm90dG9tIiBjeD0iMjciIGN5PSI0OCIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iQm90dG9tTGVmdCIgY3g9IjYiIGN5PSIzNiIgcj0iNSI+PC9jaXJjbGU+PGNpcmNsZSBpZD0iVG9wTGVmdCIgY3g9IjYiIGN5PSIxNyIgcj0iNSI+PC9jaXJjbGU+PC9nPjwvZz48L2c+PGFuaW1hdGVNb3Rpb24geGxpbms6aHJlZj0iI1RvcCIgcGF0aD0iTSAwIDAgViAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSIwczsgVG9wTGVmdEFuaW0uZW5kIiBpZD0iVG9wQW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjVG9wUmlnaHQiIHBhdGg9Ik0gMCAwIEwgNSAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSJUb3BBbmltLmVuZCIgaWQ9IlRvcFJpZ2h0QW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjQm90dG9tUmlnaHQiIHBhdGg9Ik0gMCAwIEwgNSA1IFoiIGR1cj0iLjI1cyIgYmVnaW49IlRvcFJpZ2h0QW5pbS5lbmQiIGlkPSJCb3R0b21SaWdodEFuaW0iIC8+PGFuaW1hdGVNb3Rpb24geGxpbms6aHJlZj0iI0JvdHRvbSIgcGF0aD0iTSAwIDAgViA1IFoiIGR1cj0iLjI1cyIgYmVnaW49IkJvdHRvbVJpZ2h0QW5pbS5lbmQiIGlkPSJCb3R0b21BbmltIiAvPjxhbmltYXRlTW90aW9uIHhsaW5rOmhyZWY9IiNCb3R0b21MZWZ0IiBwYXRoPSJNIDAgMCBMIC01IDUgWiIgZHVyPSIuMjVzIiBiZWdpbj0iQm90dG9tQW5pbS5lbmQiIGlkPSJCb3R0b21MZWZ0QW5pbSIgLz48YW5pbWF0ZU1vdGlvbiB4bGluazpocmVmPSIjVG9wTGVmdCIgcGF0aD0iTSAwIDAgTCAtNSAtNSBaIiBkdXI9Ii4yNXMiIGJlZ2luPSJCb3R0b21MZWZ0QW5pbS5lbmQiIGlkPSJUb3BMZWZ0QW5pbSIgLz48L3N2Zz4=\");background-size:contain}.fuelux .pillbox{border:1px solid #bbbbbb;border-radius:4px;cursor:text;padding:3px}.fuelux .pillbox[data-readonly]{border:1px solid transparent}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap{display:inline-block}.fuelux .pillbox[data-readonly].truncate .pillbox-input-wrap.truncated{display:none}.fuelux .pillbox[data-readonly].truncate .pillbox-more{display:inline}.fuelux .pillbox[data-readonly] .pill span.glyphicon-close{display:none}.fuelux .pillbox[data-readonly] .pillbox-add-item{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap{display:none}.fuelux .pillbox[data-readonly] .pillbox-input-wrap button.dropdown-toggle{display:none}.fuelux .pillbox.pills-editable .pill-group .pill span{cursor:text}.fuelux .pillbox.pills-editable .pill-group .pill span.glyphicon-close{cursor:pointer}.fuelux .pillbox>.pill-group{margin:0;padding:0;width:100%}.fuelux .pillbox>.pill-group>.pill{margin:2px;cursor:default;float:left;word-break:break-all}.fuelux .pillbox>.pill-group>.pill.pillbox-highlight{outline:1px dotted #999999}.fuelux .pillbox>.pill-group>.pill.truncated{display:none}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit{border:none;color:#333333;font-weight:normal;border-radius:2px}.fuelux .pillbox>.pill-group>.pill .pillbox-list-edit:focus{outline:none;border:none}.fuelux .pillbox>.pill-group>.pill .glyphicon-close{cursor:pointer;top:-1px;left:2px}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:before{content:\" \\00d7\"}.fuelux .pillbox>.pill-group>.pill .glyphicon-close:hover{opacity:.4}.fuelux .pillbox .pillbox-input-wrap{position:relative;margin:4px 0 3px 3px;float:left}.fuelux .pillbox .pillbox-input-wrap.editing{border:1px solid #cccccc;border-radius:4px;margin:2px 0 3px 3px}.fuelux .pillbox .pillbox-input-wrap.editing input.pillbox-add-item{border-radius:4px;color:#333333;height:32px}.fuelux .pillbox .pillbox-add-item{border:none;box-shadow:none}.fuelux .pillbox .pillbox-add-item:focus{outline:none;border:none}.fuelux .pillbox .pillbox-more{cursor:pointer;display:none;line-height:30px}.fuelux .pillbox .suggest{max-height:166px;overflow-y:auto}.fuelux .pillbox .suggest>li{white-space:nowrap;cursor:pointer;padding:3px 20px}.fuelux .pillbox .suggest>li.pillbox-suggest-sel{background-color:#eeeeee}.fuelux .pillbox .suggest>li:hover{background-color:#eeeeee}.fuelux .pillbox input::-ms-clear{display:none}.fuelux .placard{display:inline-block;position:relative}.fuelux .placard[data-ellipsis=\"true\"].showing div.placard-field,.fuelux .placard[data-ellipsis=\"true\"].showing input.placard-field{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field::-ms-clear,.fuelux .placard[data-ellipsis=\"true\"] input.placard-field::-ms-clear{display:none}.fuelux .placard[data-ellipsis=\"true\"] div.placard-field[data-textarea]{overflow:auto;text-overflow:clip;white-space:normal}.fuelux .placard[data-ellipsis=\"true\"] textarea.placard-field[readonly]{overflow:hidden}.fuelux .placard.showing .placard-footer,.fuelux .placard.showing .placard-header,.fuelux .placard.showing .placard-popup{display:block;z-index:1}.fuelux .placard.showing div.placard-field,.fuelux .placard.showing input.placard-field,.fuelux .placard.showing textarea.placard-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .placard div.placard-field,.fuelux .placard input.placard-field,.fuelux .placard textarea.placard-field{resize:none}.fuelux .placard div.placard-field[readonly],.fuelux .placard input.placard-field[readonly],.fuelux .placard textarea.placard-field[readonly]{background:#FFF;cursor:auto}.fuelux .placard div.placard-field[readonly].glass,.fuelux .placard input.placard-field[readonly].glass,.fuelux .placard textarea.placard-field[readonly].glass{background:none}.fuelux .placard div.placard-field[readonly].glass:hover,.fuelux .placard input.placard-field[readonly].glass:hover,.fuelux .placard textarea.placard-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .placard div.placard-field:focus,.fuelux .placard input.placard-field:focus,.fuelux .placard textarea.placard-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .placard div.placard-field{width:168px;overflow:auto}.fuelux .placard div.placard-field[data-textarea]{height:54px}.fuelux .placard-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .placard-footer,.fuelux .placard-header{display:none;left:0;line-height:1;position:absolute;right:0}.fuelux .placard-footer{padding:4px 0 8px 0;text-align:right;top:100%}.fuelux .placard-header{bottom:100%;padding:8px 0 4px 0}.fuelux .placard-header h1,.fuelux .placard-header h2,.fuelux .placard-header h3,.fuelux .placard-header h4,.fuelux .placard-header h5,.fuelux .placard-header h6{margin:0}.fuelux .placard-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;bottom:-8px;box-shadow:0 0 0 1px #FFF inset;display:none;left:-8px;position:absolute;right:-8px;top:-8px}.fuelux .placard .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .placard .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .placard .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .placard .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .placard .glass[disabled]{cursor:not-allowed}.fuelux .repeater{border:1px solid #dddddd;border-radius:4px}.fuelux .repeater-canvas.scrolling{bottom:0;left:0;overflow-y:auto;position:absolute;right:0;top:0}.fuelux .repeater-header,.fuelux .repeater-footer{background:#fafafa;min-height:50px;padding:8px;*zoom:1}.fuelux .repeater-header:before,.fuelux .repeater-footer:before,.fuelux .repeater-header:after,.fuelux .repeater-footer:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header:after,.fuelux .repeater-footer:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{float:left}.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:right}@media (max-width:625px){.fuelux .repeater-header-left,.fuelux .repeater-footer-left,.fuelux .repeater-header-right,.fuelux .repeater-footer-right{float:none;*zoom:1}.fuelux .repeater-header-left:before,.fuelux .repeater-footer-left:before,.fuelux .repeater-header-right:before,.fuelux .repeater-footer-right:before,.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{display:table;content:\"\";line-height:0}.fuelux .repeater-header-left:after,.fuelux .repeater-footer-left:after,.fuelux .repeater-header-right:after,.fuelux .repeater-footer-right:after{clear:both}.fuelux .repeater-header-left,.fuelux .repeater-footer-left{margin-bottom:8px}}.fuelux .repeater-header{border-bottom:1px solid #dddddd;border-top-right-radius:4px;border-top-left-radius:4px}.fuelux .repeater-footer{border-top:1px solid #dddddd;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.fuelux .repeater-loader{display:none;left:50%;position:absolute;margin:-32px 0 0 -32px;top:50%}.fuelux .repeater-viewport{min-height:80px;position:relative}.fuelux .repeater-pagination label{font-weight:normal}.fuelux .repeater-pagination .repeater-primaryPaging{display:none;vertical-align:middle;width:116px}.fuelux .repeater-pagination .repeater-primaryPaging.active{display:inline-block}.fuelux .repeater-pagination .repeater-primaryPaging ul.dropdown-menu{min-width:116px}.fuelux .repeater-pagination .repeater-secondaryPaging{display:none;width:82px}.fuelux .repeater-pagination .repeater-secondaryPaging.active{display:inline-block}.fuelux .repeater-search{float:left;width:200px}.fuelux .repeater-title{display:block;float:left;line-height:34px;margin-right:10px}.fuelux .repeater-itemization .selectlist,.fuelux .repeater-filters,.fuelux .repeater-secondaryPaging,.fuelux .repeater-primaryPaging,.fuelux .repeater-next,.fuelux .repeater-prev{margin:auto .3em}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#fff}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-select-checkbox{cursor:not-allowed}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th.sortable,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table thead tr th .repeater-list-heading.sortable{background:#fafafa;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover.selected td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered.selected td{background:#eee}.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"].disabled .repeater-canvas .repeater-list .repeater-list-wrapper table tbody tr.selectable.hovered td{background:#fff;cursor:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list{bottom:0;left:0;position:absolute;right:0;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.scrolling .repeater-list-wrapper{height:100%;overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list{position:relative}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table{margin-bottom:0;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td{border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.sorted{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody td.truncate{display:inherit}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr:focus{outline:1px dotted #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.empty td{border-bottom:none;font-size:14px;font-style:italic;padding:20px;text-align:center;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table tbody tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid transparent;border-top:none;color:rgba(0,0,0,0);line-height:1.42857;padding:8px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child{border-left:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox{width:37px;padding-left:12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th:first-child .header-checkbox .checkbox-inline:before{top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th.sorted span.glyphicon{display:block;visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list table thead>tr>th .actions-hidden{visibility:hidden}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check{display:inline-block;height:0;line-height:0;position:relative;vertical-align:top;width:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-check span.glyphicon{left:-22px;position:absolute;top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading{background:#fafafa;border-bottom:1px solid #dddddd;border-left:1px solid #dddddd;border-top:none;color:#333333;line-height:1.42857;margin-left:-9px;padding:8px;position:absolute;top:0;z-index:1;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:-1px}@media screen and (-webkit-min-device-pixel-ratio:0){.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.shifted{margin-left:0}}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable:hover,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted{background:#f5f5f5;cursor:pointer;background-color:#f2f2f2;background-image:-moz-linear-gradient(top, #fafafa, #e6e6e6);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#fafafa), to(#e6e6e6));background-image:-webkit-linear-gradient(top, #fafafa, #e6e6e6);background-image:-o-linear-gradient(top, #fafafa, #e6e6e6);background-image:linear-gradient(to bottom, #fafafa, #e6e6e6);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffe6e6e6', GradientType=0)}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading.sortable.sorted span.glyphicon{display:block;visibility:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas .repeater-list-heading span.glyphicon{display:none;float:right;margin-top:2px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-column-wrapper{position:absolute;z-index:2;left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper{position:absolute;top:0;left:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list .frozen-thead-wrapper table{border-right:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen{border-right:1px solid #dddddd;z-index:2;background:#FFF;border-collapse:collapse;table-layout:fixed;float:left}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen th{border-collapse:collapse;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading{background:#fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.frozen-enabled .repeater-list table.table-frozen .repeater-frozen-heading.shifted{left:-1px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled{overflow:auto}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list-wrapper{overflow:visible}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper{position:absolute;z-index:2;right:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions{border-left:1px solid #dddddd;z-index:2;border-collapse:collapse;table-layout:fixed;float:right}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading{background:transparent;border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.empty-heading th{background:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td{background:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable:hover td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable.hovered td{background:#f5f5f5;cursor:pointer}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selectable .checkbox-custom:before{margin-top:-4px;top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td{background:#eeeeee;color:#333333}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:30px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-collapse:collapse;word-wrap:break-word;padding-bottom:5px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group{width:100%;text-align:center}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr td .btn-group .btn,.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .btn-group .btn{float:none}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th{border-bottom:1px solid #dddddd;padding-bottom:7px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{padding:8px 0 7px;border-left:1px solid #fafafa;margin-left:-9px;width:100%}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading .glyphicon{display:inline-block;float:none;margin-top:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-column-wrapper table.table-actions .caret{margin-left:0}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list .actions-thead-wrapper{position:absolute;top:0;right:0;z-index:3}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table{table-layout:fixed;word-wrap:break-word}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list table thead tr th:last-child .repeater-list-heading{border-left:1px solid transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions{background-color:#FFF}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr{background-color:transparent}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr.empty-heading{border-left:1px solid #fafafa}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr th{padding-bottom:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.actions-enabled .repeater-list.ie-9 .actions-column-wrapper table.table-actions tr td{padding-bottom:6px;line-height:1.39}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox{width:37px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list thead tr:first-child .header-checkbox .checkbox{margin:0 4px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tbody tr .body-checkbox{left:4px;top:-3px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled .repeater-list tr.selected td:first-child{padding-left:8px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-canvas.multi-select-enabled.actions-enabled .repeater-list .actions-column-wrapper table.table-actions tr th .repeater-list-heading{border-left:1px solid #dddddd}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader{margin-top:-12px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-loader.noHeader{margin-top:-32px}.fuelux .repeater[data-viewtype=\"list\"] .repeater-viewport{overflow:hidden}.fuelux .repeater[data-viewtype=\"list\"] .actions-wrapper{z-index:10;text-align:right}.fuelux .repeater.disabled .repeater-thumbnail.selectable:hover{background:#fff;cursor:auto}.fuelux .repeater.disabled .repeater-thumbnail.selectable.selected:hover{background:#eeeeee}.fuelux .repeater-thumbnail{border:1px solid #dddddd;color:#666666;float:left;font-size:14px;min-height:110px;min-width:100px;margin:8px 7px;text-align:center}.fuelux .repeater-thumbnail img{display:block;margin-top:10px;margin-bottom:3px}.fuelux .repeater-thumbnail-cont{height:100%;overflow-y:auto;padding:6px;width:100%}.fuelux .repeater-thumbnail-cont.align-center,.fuelux .repeater-thumbnail-cont.align-justify,.fuelux .repeater-thumbnail-cont.align-left,.fuelux .repeater-thumbnail-cont.align-right{position:relative;font-size:.1px}.fuelux .repeater-thumbnail-cont.align-center:after,.fuelux .repeater-thumbnail-cont.align-justify:after,.fuelux .repeater-thumbnail-cont.align-left:after,.fuelux .repeater-thumbnail-cont.align-right:after{display:inline-block;width:100%;content:''}.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-end,.fuelux .repeater-thumbnail-cont.align-center .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-justify .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-left .infinitescroll-load,.fuelux .repeater-thumbnail-cont.align-right .infinitescroll-load{display:inline-block;width:100%}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail{display:inline-block;float:none;font-size:14px}.fuelux .repeater-thumbnail-cont.align-center .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-justify .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-left .repeater-thumbnail:after,.fuelux .repeater-thumbnail-cont.align-right .repeater-thumbnail:after{content:' '}.fuelux .repeater-thumbnail-cont.align-center{text-align:center}.fuelux .repeater-thumbnail-cont.align-justify{text-align:justify}.fuelux .repeater-thumbnail-cont.align-left{text-align:left}.fuelux .repeater-thumbnail-cont.align-right{text-align:right}.fuelux .repeater-thumbnail-cont div.empty{font-size:14px;font-style:italic;padding:14px 10px 20px;text-align:center}.fuelux .repeater-thumbnail-cont .selectable:hover{background:#f5f5f5;cursor:pointer}.fuelux .repeater-thumbnail-cont .selectable.selected{background:#eeeeee}.fuelux .repeater-thumbnail-cont .selectable.selected:hover{background:#dddddd}.fuelux .spinbox{display:inline-block;position:relative}.fuelux .spinbox.digits-3{width:60px}.fuelux .spinbox.disabled .spinbox-buttons{cursor:not-allowed}.fuelux .spinbox .spinbox-input{float:left;padding-bottom:3px;padding:0 25px 0 7px}.fuelux .spinbox .spinbox-input::-ms-clear{display:none}.fuelux .spinbox .btn{position:relative;width:20px;height:13px;padding-top:0;padding-right:9px;padding-left:9px;overflow-y:hidden}.fuelux .spinbox .btn.disabled{cursor:not-allowed}.fuelux .spinbox .spinbox-buttons{position:absolute;height:28px;width:20px;right:2px}.fuelux .spinbox .spinbox-up{padding:0 0 14px 1px;top:2px}.fuelux .spinbox .spinbox-up .glyphicon-chevron-up{position:relative;top:0}.fuelux .spinbox .btn-group>.btn.spinbox-up{border-top-right-radius:4px}.fuelux .spinbox .spinbox-down{padding:0 0 8px 1px;top:2px;height:15px;border-bottom-left-radius:4px}.fuelux .spinbox .spinbox-down .glyphicon-chevron-down{position:relative;left:0;top:0}.fuelux .spinbox input::-ms-clear{display:none}.fuelux .scheduler .row{margin-bottom:10px}.fuelux .scheduler .row.no-margin{margin-bottom:0}.fuelux .scheduler .control-label{min-width:7em}.fuelux .scheduler .inline-form-text{float:left;line-height:27px;margin-top:4px}.fuelux .scheduler .form-group{margin-bottom:0}.fuelux .scheduler .start-datetime .form-group{margin-left:0}.fuelux .scheduler .start-datetime .combobox{max-width:9em}.fuelux .scheduler .start-datetime .combobox .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .start-datetime .dropdown{float:left;margin:0 10px 0 0}.fuelux .scheduler .timezone-container .input-group{max-width:20em}.fuelux .scheduler .timezone-container .dropdown-label{height:18px;white-space:nowrap;max-width:20em;overflow:hidden;text-overflow:ellipsis}.fuelux .scheduler .timezone-container .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-panel{margin-left:0}.fuelux .scheduler .repeat-panel label{font-weight:normal}.fuelux .scheduler .repeat-panel .radio{margin-right:10px}.fuelux .scheduler .repeat-panel .form-group{margin-left:0}.fuelux .scheduler .repeat-interval{margin-left:0;*zoom:1}.fuelux .scheduler .repeat-interval:before,.fuelux .scheduler .repeat-interval:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-interval:after{clear:both}.fuelux .scheduler .repeat-interval .form-group{margin-left:0}.fuelux .scheduler .repeat-interval .dropdown-menu{max-height:200px;overflow:auto}.fuelux .scheduler .repeat-interval .repeat-every-panel{float:left}.fuelux .scheduler .repeat-interval .repeat-every-panel .repeat-every-pretext{padding:0 10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox{float:left;margin-right:10px}.fuelux .scheduler .repeat-interval .repeat-every-panel .spinbox input{margin-bottom:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-date:after{clear:both}.fuelux .scheduler .repeat-monthly .repeat-monthly-date .selectlist{margin-left:5px}.fuelux .scheduler .repeat-monthly .repeat-monthly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:before,.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-monthly .repeat-monthly-day:after{clear:both}.fuelux .scheduler .repeat-monthly .month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-date{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-date:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-date .year-month-day{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month-days{margin-left:10px}.fuelux .scheduler .repeat-yearly .year-month{margin-left:10px}.fuelux .scheduler .repeat-yearly .repeat-yearly-day{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:before,.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-yearly .repeat-yearly-day:after{clear:both}.fuelux .scheduler .repeat-yearly .repeat-yearly-day .repeat-yearly-day-text{margin-left:10px}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week{margin-top:10px;*zoom:1}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:before,.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{display:table;content:\"\";line-height:0}.fuelux .scheduler .repeat-weekly.repeat-days-of-the-week:after{clear:both}.fuelux .scheduler .repeat-weekly button:not(.active){background-color:#FFF}.fuelux .scheduler .repeat-weekly .btn-group.disabled{position:relative;opacity:.65}.fuelux .scheduler .repeat-weekly .btn-group.disabled:before{background:transparent;bottom:0;content:\"\";left:0;position:absolute;right:0;top:0;z-index:5}.fuelux .scheduler .selectlist{float:left}.fuelux .scheduler label.radio{float:left;line-height:27px}.fuelux .scheduler label.radio input{margin-top:8px}.fuelux .scheduler .repeat-end .end-after{float:left;display:inline-block;margin-right:10px}.fuelux .scheduler .repeat-end .form-group{margin-left:0}.fuelux .scheduler .repeat-end .end-option-panel{padding-left:10px}.fuelux .scheduler .repeat-end .selectlist{min-width:100%}.fuelux .scheduler .repeat-end .selectlist button,.fuelux .scheduler .repeat-end .selectlist ul{min-width:100%}.fuelux .scheduler input::-ms-clear{display:none}.fuelux .search.disabled .input-group-btn{cursor:not-allowed}.fuelux .search input::-ms-clear{display:none}.fuelux .selectlist.disabled{cursor:not-allowed}.fuelux .selectlist .selected-label{overflow:hidden;min-width:2em}.fuelux .selectlist .dropdown-menu{min-width:inherit;overflow-y:auto}.fuelux .selectlist .btn.dropdown-toggle{text-align:left;padding-right:28px}.fuelux .selectlist .btn.dropdown-toggle .caret{margin:auto;position:absolute;top:0;bottom:0;right:12px}.fuelux .button-sizer,.fuelux .selectlist-sizer{display:inline-block;position:absolute;visibility:hidden;top:0;float:left}.fuelux .button-sizer .selectlist,.fuelux .selectlist-sizer .selectlist{display:block !important}.fuelux .button-sizer .dropdown-menu,.fuelux .selectlist-sizer .dropdown-menu{display:block;min-width:inherit}.fuelux .button-sizer .selected-label,.fuelux .selectlist-sizer .selected-label{width:auto !important}.fuelux .picker{display:inline-block;position:relative}.fuelux .picker[data-ellipsis=\"true\"].showing input.picker-field{overflow:visible;text-overflow:clip;white-space:normal}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .picker[data-ellipsis=\"true\"] input.picker-field::-ms-clear{display:none}.fuelux .picker[data-ellipsis=\"true\"] textarea.picker-field[readonly]{overflow:hidden}.fuelux .picker.showing .picker-footer,.fuelux .picker.showing .picker-header,.fuelux .picker.showing .picker-popup{display:block;z-index:1}.fuelux .picker.showing input.picker-field,.fuelux .picker.showing textarea.picker-field{background:#FFF;border:1px solid #cccccc;box-shadow:none;position:relative;z-index:1}.fuelux .picker input.picker-field,.fuelux .picker textarea.picker-field{resize:none}.fuelux .picker input.picker-field[readonly],.fuelux .picker textarea.picker-field[readonly]{background:#FFF;cursor:auto}.fuelux .picker input.picker-field[readonly].glass,.fuelux .picker textarea.picker-field[readonly].glass{background:none}.fuelux .picker input.picker-field[readonly].glass:hover,.fuelux .picker textarea.picker-field[readonly].glass:hover{background:#d9edf7;cursor:pointer}.fuelux .picker input.picker-field:focus,.fuelux .picker textarea.picker-field:focus{border:1px solid #cccccc;box-shadow:none}.fuelux .picker-cancel{font-size:12px;margin-right:4px;vertical-align:middle}.fuelux .picker-footer,.fuelux .picker-header{display:none;left:0;line-height:1;right:0}.fuelux .picker-footer{padding:8px 10px 8px 0;text-align:right;bottom:0;position:absolute}.fuelux .picker-header{height:31px;padding:8px 0 0 10px}.fuelux .picker-header h1,.fuelux .picker-header h2,.fuelux .picker-header h3,.fuelux .picker-header h4,.fuelux .picker-header h5,.fuelux .picker-header h6{margin:0}.fuelux .picker-popup{background:#d9edf7;background-clip:padding-box;border:1px solid #cccccc;border-radius:4px;box-shadow:0 0 0 1px #FFF inset;display:none;position:absolute;padding-left:6px;padding-right:6px;height:234px;width:350px;margin:4px 0}.fuelux .picker .picker-body.well{background-color:#fff;overflow:scroll;padding:0;height:165px}.fuelux .picker .tree{border:none}.fuelux .picker .glass{background:transparent;border:1px solid #FFF;box-shadow:none}.fuelux .picker .glass:hover{background:#d9edf7;border-color:#5B9DD9;cursor:pointer}.fuelux .picker .glass:hover[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass:focus{background:#FFF;border-color:#5B9DD9;box-shadow:inset 0 1px 1px rgba(0,0,0,0.75),0 0 8px rgba(91,157,217,0.6);cursor:auto}.fuelux .picker .glass:focus[disabled]{background:transparent;border-color:#FFF;cursor:not-allowed}.fuelux .picker .glass[disabled]{cursor:not-allowed}.fuelux .tree{border:1px solid #999999;border-radius:4px 4px 4px 4px;padding:10px 15px 0 15px;overflow-x:auto;overflow-y:auto;position:relative;list-style:none}.fuelux .tree *:focus{outline:none}.fuelux .tree button:focus{color:#999999}.fuelux .tree ul{padding-left:0;margin-top:0;margin-bottom:0;list-style:none}.fuelux .tree li{margin:0;margin-top:5px;margin-bottom:5px}.fuelux .tree .tree-loader{margin-left:65px}.fuelux .tree>.tree-loader{margin-left:50px}.fuelux .tree .tree-open>.tree-branch-header .glyphicon-play{transform:rotate(90deg);-ms-transform:rotate(90deg);-webkit-transform:rotate(90deg);position:relative}.fuelux .tree [data-children=false]>.tree-branch-header .icon-caret:before{content:'\\00a0'}.fuelux .tree .tree-branch .tree-branch-header{position:relative;border-radius:6px;white-space:nowrap}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name:hover{color:#999999}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play{font-size:10px;padding-right:5px;padding-left:7px}.fuelux .tree .tree-branch .tree-branch-header .glyphicon-play:before{position:relative;top:-2px}.fuelux .tree .tree-branch .tree-branch-header .tree-branch-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-branch .tree-branch-header label{font-weight:normal;padding-left:3px;margin-bottom:0;cursor:pointer}.fuelux .tree .tree-branch .tree-branch-children{margin-left:14px}.fuelux .tree .tree-branch[haschildren='false'] .icon-caret,.fuelux .tree .tree-branch[data-has-children='false'] .icon-caret{visibility:hidden}.fuelux .tree .tree-item,.fuelux .tree .tree-overflow{white-space:nowrap;position:relative;cursor:pointer;border-radius:6px;margin-left:26px}.fuelux .tree .tree-item .tree-item-name,.fuelux .tree .tree-overflow .tree-item-name,.fuelux .tree .tree-item .tree-overflow-name,.fuelux .tree .tree-overflow .tree-overflow-name{white-space:nowrap;border-radius:6px;background-color:transparent;border:0}.fuelux .tree .tree-item .tree-overflow-name .tree-label,.fuelux .tree .tree-overflow .tree-overflow-name .tree-label{margin-left:15px;color:#0088cc}.fuelux .tree .tree-item .tree-item-name:hover,.fuelux .tree .tree-overflow .tree-item-name:hover,.fuelux .tree .tree-item .tree-overflow-name:hover,.fuelux .tree .tree-overflow .tree-overflow-name:hover{color:#999999}.fuelux .tree .tree-item.tree-selected .tree-item-name,.fuelux .tree .tree-overflow.tree-selected .tree-item-name{background-color:#eeeeee;color:#333333}.fuelux .tree .tree-item label,.fuelux .tree .tree-overflow label{font-weight:normal;padding-left:7px;margin-bottom:0;cursor:pointer}.fuelux .tree .icon-caret:hover+.tree-branch-name{color:#999999}.fuelux .tree.tree-folder-select .tree-branch .icon-caret{background-color:transparent;border:0}.fuelux .tree.tree-folder-select .tree-branch .icon-caret:hover{cursor:pointer;color:#999999}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name{padding:1px 5px 0 5px;border-radius:6px}.fuelux .tree.tree-folder-select .tree-branch>.tree-branch-name.tree-selected{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name{background-color:#eeeeee}.fuelux .tree.tree-folder-select .tree-branch.tree-selected>.tree-branch-header .tree-branch-name:hover{background-color:#eeeeee}.fuelux .truncate .tree .tree-branch-header .tree-branch-name,.fuelux .truncate .tree .tree-item .tree-item-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fuelux .wizard{*zoom:1;border:1px solid #d4d4d4;border-radius:4px;background-color:#fafafa;position:relative;min-height:48px}.fuelux .wizard:before,.fuelux .wizard:after{display:table;content:\"\";line-height:0}.fuelux .wizard:after{clear:both}.fuelux .wizard.no-steps-container{overflow:hidden}.fuelux .wizard .steps-container{border-radius:4px 4px 0 0;overflow:hidden}.fuelux .wizard>ul.steps,.fuelux .wizard>.steps-container>ul.steps{list-style:none outside none;padding:0;margin:0;width:999999px}.fuelux .wizard>ul.steps.previous-disabled li.complete,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete{cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover{background:#f5f5f5;color:#468847;cursor:default}.fuelux .wizard>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-left-color:#f5f5f5}.fuelux .wizard>ul.steps li,.fuelux .wizard>.steps-container>ul.steps li{float:left;margin:0;padding:0 20px 0 30px;height:46px;line-height:46px;position:relative;background:#eeeeee;color:#999999;font-size:16px;cursor:not-allowed}.fuelux .wizard>ul.steps li>.has-secondary-text,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text{display:inline}.fuelux .wizard>ul.steps li>.has-secondary-text>h4,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text>h4{display:inline;font-size:16px;font-weight:normal}.fuelux .wizard>ul.steps li>.has-secondary-text>small,.fuelux .wizard>.steps-container>ul.steps li>.has-secondary-text>small{display:none}.fuelux .wizard>ul.steps li .chevron,.fuelux .wizard>.steps-container>ul.steps li .chevron{border:24px solid transparent;border-left:14px solid #d4d4d4;border-right:0;display:block;position:absolute;right:-14px;top:0;z-index:1}.fuelux .wizard>ul.steps li .chevron:before,.fuelux .wizard>.steps-container>ul.steps li .chevron:before{border:24px solid transparent;border-left:14px solid #eeeeee;border-right:0;content:\"\";display:block;position:absolute;right:1px;top:-24px}.fuelux .wizard>ul.steps li.complete,.fuelux .wizard>.steps-container>ul.steps li.complete{background:#f5f5f5;color:#468847}.fuelux .wizard>ul.steps li.complete:hover,.fuelux .wizard>.steps-container>ul.steps li.complete:hover{background:#e2eaee;cursor:pointer}.fuelux .wizard>ul.steps li.complete:hover .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete:hover .chevron:before{border-left:14px solid #e2eaee}.fuelux .wizard>ul.steps li.complete .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.complete .chevron:before{border-left:14px solid #f5f5f5}.fuelux .wizard>ul.steps li.active,.fuelux .wizard>.steps-container>ul.steps li.active{background:#eef7fb;color:#3a87ad;cursor:default}.fuelux .wizard>ul.steps li.active .chevron:before,.fuelux .wizard>.steps-container>ul.steps li.active .chevron:before{border-left:14px solid #eef7fb}.fuelux .wizard>ul.steps li.active .badge,.fuelux .wizard>.steps-container>ul.steps li.active .badge{background-color:#3a87ad}.fuelux .wizard>ul.steps li .badge,.fuelux .wizard>.steps-container>ul.steps li .badge{margin-right:8px}.fuelux .wizard>ul.steps li .badge-success,.fuelux .wizard>.steps-container>ul.steps li .badge-success{background-color:#468847}.fuelux .wizard>ul.steps li:first-child,.fuelux .wizard>.steps-container>ul.steps li:first-child{border-radius:4px 0 0 0;padding-left:20px}.fuelux .wizard.rtl{direction:rtl}.fuelux .wizard.rtl>ul.steps,.fuelux .wizard.rtl>.steps-container>ul.steps{right:0;left:auto;float:right}.fuelux .wizard.rtl>ul.steps.previous-disabled li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps.previous-disabled li.complete:hover .chevron:before{border-right-color:#f5f5f5}.fuelux .wizard.rtl>ul.steps li,.fuelux .wizard.rtl>.steps-container>ul.steps li{float:right}.fuelux .wizard.rtl>ul.steps li .chevron,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron{right:auto;left:-14px;border-right:14px solid #cccccc;border-left:0}.fuelux .wizard.rtl>ul.steps li .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li .chevron:before{right:auto;left:1px;border-right:14px solid #eeeeee;border-left:0}.fuelux .wizard.rtl>ul.steps li.active .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.active .chevron:before{border-right:14px solid #eef7fb}.fuelux .wizard.rtl>ul.steps li.complete .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete .chevron:before{border-right:14px solid #f5f5f5}.fuelux .wizard.rtl>ul.steps li.complete:hover .chevron:before,.fuelux .wizard.rtl>.steps-container>ul.steps li.complete:hover .chevron:before{border-right:14px solid #e2eaee;border-left:none}.fuelux .wizard.rtl>ul.steps li .badge,.fuelux .wizard.rtl>.steps-container>ul.steps li .badge{margin-left:8px}.fuelux .wizard.rtl>.actions{right:auto;left:0;float:left;border-left:none;border-right:1px solid #d4d4d4;border-radius:4px 0 0 0}.fuelux .wizard.rtl>.actions .btn-prev span{margin-left:5px;margin-right:0}.fuelux .wizard.rtl>.actions .btn-next span{margin-left:0;margin-right:5px}.fuelux .wizard>.actions{z-index:1000;position:absolute;right:0;top:0;line-height:46px;float:right;padding-left:15px;padding-right:15px;vertical-align:middle;background-color:#e6e6e6;border-left:1px solid #d4d4d4;border-radius:0 4px 0 0}.fuelux .wizard>.actions a{line-height:45px;font-size:12px;margin-right:8px}.fuelux .wizard>.actions .btn-prev[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-prev span{margin-right:5px}.fuelux .wizard>.actions .btn-next[disabled]{cursor:not-allowed}.fuelux .wizard>.actions .btn-next span{margin-left:5px}.fuelux .wizard .step-content{border-top:1px solid #cccccc;padding:10px;float:left;width:100%}.fuelux .wizard .step-content .step-pane{display:none}.fuelux .wizard .step-content>.active{display:block}.fuelux .wizard .step-content>.active .btn-group .active{display:inline-block}.fuelux .wizard.complete>.actions .btn-next .glyphicon{display:none}.fuelux .serif{font-family:Georgia,\"Times New Roman\",Times,serif}.fuelux .monospace{font-family:Monaco,Menlo,Consolas,\"Courier New\",monospace}.fuelux .text-sm{font-size:11.9px}.fuelux .text-lg{font-size:17.5px}.fuelux .padding-xs{padding:5px}.fuelux .padding-xs-horizontal{padding:0 5px}.fuelux .padding-xs-vertical{padding:5px 0}.fuelux .padding-xs-top{padding-top:5px}.fuelux .padding-xs-bottom{padding-bottom:5px}.fuelux .padding-xs-left{padding-left:5px}.fuelux .padding-xs-right{padding-right:5px}.fuelux .padding-sm{padding:10px}.fuelux .padding-sm-horizontal{padding:0 10px}.fuelux .padding-sm-vertical{padding:10px 0}.fuelux .padding-sm-top{padding-top:10px}.fuelux .padding-sm-bottom{padding-bottom:10px}.fuelux .padding-sm-left{padding-left:10px}.fuelux .padding-sm-right{padding-right:10px}.fuelux .padding-md{padding:15px}.fuelux .padding-md-horizontal{padding:0 15px}.fuelux .padding-md-vertical{padding:15px 0}.fuelux .padding-md-top{padding-top:15px}.fuelux .padding-md-bottom{padding-bottom:15px}.fuelux .padding-md-left{padding-left:15px}.fuelux .padding-md-right{padding-right:15px}.fuelux .padding-lg{padding:20px}.fuelux .padding-lg-horizontal{padding:0 20px}.fuelux .padding-lg-vertical{padding:20px 0}.fuelux .padding-lg-top{padding-top:20px}.fuelux .padding-lg-bottom{padding-bottom:20px}.fuelux .padding-lg-left{padding-left:20px}.fuelux .padding-lg-right{padding-right:20px}.fuelux .margin-xs{margin:5px}.fuelux .margin-xs-horizontal{margin:0 5px}.fuelux .margin-xs-vertical{margin:5px 0}.fuelux .margin-xs-top{margin-top:5px}.fuelux .margin-xs-bottom{margin-bottom:5px}.fuelux .margin-xs-left{margin-left:5px}.fuelux .margin-xs-right{margin-right:5px}.fuelux .margin-sm{margin:10px}.fuelux .margin-sm-horizontal{margin:0 10px}.fuelux .margin-sm-vertical{margin:10px 0}.fuelux .margin-sm-top{margin-top:10px}.fuelux .margin-sm-bottom{margin-bottom:10px}.fuelux .margin-sm-left{margin-left:10px}.fuelux .margin-sm-right{margin-right:10px}.fuelux .margin-md{margin:15px}.fuelux .margin-md-horizontal{margin:0 15px}.fuelux .margin-md-vertical{margin:15px 0}.fuelux .margin-md-top{margin-top:15px}.fuelux .margin-md-bottom{margin-bottom:15px}.fuelux .margin-md-left{margin-left:15px}.fuelux .margin-md-right{margin-right:15px}.fuelux .margin-lg{margin:20px}.fuelux .margin-lg-horizontal{margin:0 20px}.fuelux .margin-lg-vertical{margin:20px 0}.fuelux .margin-lg-top{margin-top:20px}.fuelux .margin-lg-bottom{margin-bottom:20px}.fuelux .margin-lg-left{margin-left:20px}.fuelux .margin-lg-right{margin-right:20px}.fuelux .data-label{text-transform:uppercase;font-size:10px;margin-bottom:2px;text-shadow:0 1px #FFF;color:#666666}.fuelux .data-value{font-size:14px}.fuelux .section-heading{font-size:16px;color:#333333;margin:0 0 10px;padding:0;text-shadow:0 1px #FFF}.fuelux .truncate{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"; });
+define('extend',['require','exports','module'],function (require, exports, module) {'use strict';
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[name] = extend(deep, clone, copy);
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						target[name] = copy;
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+});
+
+//! moment.js
+//! version : 2.18.1
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! momentjs.com
+
+;(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define('moment',factory) :
+    global.moment = factory()
+}(this, (function () { 'use strict';
+
+var hookCallback;
+
+function hooks () {
+    return hookCallback.apply(null, arguments);
+}
+
+// This is done to register the method called with moment()
+// without creating circular dependencies.
+function setHookCallback (callback) {
+    hookCallback = callback;
+}
+
+function isArray(input) {
+    return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
+}
+
+function isObject(input) {
+    // IE8 will treat undefined and null as object if it wasn't for
+    // input != null
+    return input != null && Object.prototype.toString.call(input) === '[object Object]';
+}
+
+function isObjectEmpty(obj) {
+    var k;
+    for (k in obj) {
+        // even if its not own property I'd still call it non-empty
+        return false;
+    }
+    return true;
+}
+
+function isUndefined(input) {
+    return input === void 0;
+}
+
+function isNumber(input) {
+    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
+}
+
+function isDate(input) {
+    return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
+}
+
+function map(arr, fn) {
+    var res = [], i;
+    for (i = 0; i < arr.length; ++i) {
+        res.push(fn(arr[i], i));
+    }
+    return res;
+}
+
+function hasOwnProp(a, b) {
+    return Object.prototype.hasOwnProperty.call(a, b);
+}
+
+function extend(a, b) {
+    for (var i in b) {
+        if (hasOwnProp(b, i)) {
+            a[i] = b[i];
+        }
+    }
+
+    if (hasOwnProp(b, 'toString')) {
+        a.toString = b.toString;
+    }
+
+    if (hasOwnProp(b, 'valueOf')) {
+        a.valueOf = b.valueOf;
+    }
+
+    return a;
+}
+
+function createUTC (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, true).utc();
+}
+
+function defaultParsingFlags() {
+    // We need to deep clone this object.
+    return {
+        empty           : false,
+        unusedTokens    : [],
+        unusedInput     : [],
+        overflow        : -2,
+        charsLeftOver   : 0,
+        nullInput       : false,
+        invalidMonth    : null,
+        invalidFormat   : false,
+        userInvalidated : false,
+        iso             : false,
+        parsedDateParts : [],
+        meridiem        : null,
+        rfc2822         : false,
+        weekdayMismatch : false
+    };
+}
+
+function getParsingFlags(m) {
+    if (m._pf == null) {
+        m._pf = defaultParsingFlags();
+    }
+    return m._pf;
+}
+
+var some;
+if (Array.prototype.some) {
+    some = Array.prototype.some;
+} else {
+    some = function (fun) {
+        var t = Object(this);
+        var len = t.length >>> 0;
+
+        for (var i = 0; i < len; i++) {
+            if (i in t && fun.call(this, t[i], i, t)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+}
+
+var some$1 = some;
+
+function isValid(m) {
+    if (m._isValid == null) {
+        var flags = getParsingFlags(m);
+        var parsedParts = some$1.call(flags.parsedDateParts, function (i) {
+            return i != null;
+        });
+        var isNowValid = !isNaN(m._d.getTime()) &&
+            flags.overflow < 0 &&
+            !flags.empty &&
+            !flags.invalidMonth &&
+            !flags.invalidWeekday &&
+            !flags.nullInput &&
+            !flags.invalidFormat &&
+            !flags.userInvalidated &&
+            (!flags.meridiem || (flags.meridiem && parsedParts));
+
+        if (m._strict) {
+            isNowValid = isNowValid &&
+                flags.charsLeftOver === 0 &&
+                flags.unusedTokens.length === 0 &&
+                flags.bigHour === undefined;
+        }
+
+        if (Object.isFrozen == null || !Object.isFrozen(m)) {
+            m._isValid = isNowValid;
+        }
+        else {
+            return isNowValid;
+        }
+    }
+    return m._isValid;
+}
+
+function createInvalid (flags) {
+    var m = createUTC(NaN);
+    if (flags != null) {
+        extend(getParsingFlags(m), flags);
+    }
+    else {
+        getParsingFlags(m).userInvalidated = true;
+    }
+
+    return m;
+}
+
+// Plugins that add properties should also add the key here (null value),
+// so we can properly clone ourselves.
+var momentProperties = hooks.momentProperties = [];
+
+function copyConfig(to, from) {
+    var i, prop, val;
+
+    if (!isUndefined(from._isAMomentObject)) {
+        to._isAMomentObject = from._isAMomentObject;
+    }
+    if (!isUndefined(from._i)) {
+        to._i = from._i;
+    }
+    if (!isUndefined(from._f)) {
+        to._f = from._f;
+    }
+    if (!isUndefined(from._l)) {
+        to._l = from._l;
+    }
+    if (!isUndefined(from._strict)) {
+        to._strict = from._strict;
+    }
+    if (!isUndefined(from._tzm)) {
+        to._tzm = from._tzm;
+    }
+    if (!isUndefined(from._isUTC)) {
+        to._isUTC = from._isUTC;
+    }
+    if (!isUndefined(from._offset)) {
+        to._offset = from._offset;
+    }
+    if (!isUndefined(from._pf)) {
+        to._pf = getParsingFlags(from);
+    }
+    if (!isUndefined(from._locale)) {
+        to._locale = from._locale;
+    }
+
+    if (momentProperties.length > 0) {
+        for (i = 0; i < momentProperties.length; i++) {
+            prop = momentProperties[i];
+            val = from[prop];
+            if (!isUndefined(val)) {
+                to[prop] = val;
+            }
+        }
+    }
+
+    return to;
+}
+
+var updateInProgress = false;
+
+// Moment prototype object
+function Moment(config) {
+    copyConfig(this, config);
+    this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+    if (!this.isValid()) {
+        this._d = new Date(NaN);
+    }
+    // Prevent infinite loop in case updateOffset creates new moment
+    // objects.
+    if (updateInProgress === false) {
+        updateInProgress = true;
+        hooks.updateOffset(this);
+        updateInProgress = false;
+    }
+}
+
+function isMoment (obj) {
+    return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
+}
+
+function absFloor (number) {
+    if (number < 0) {
+        // -0 -> 0
+        return Math.ceil(number) || 0;
+    } else {
+        return Math.floor(number);
+    }
+}
+
+function toInt(argumentForCoercion) {
+    var coercedNumber = +argumentForCoercion,
+        value = 0;
+
+    if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+        value = absFloor(coercedNumber);
+    }
+
+    return value;
+}
+
+// compare two arrays, return the number of differences
+function compareArrays(array1, array2, dontConvert) {
+    var len = Math.min(array1.length, array2.length),
+        lengthDiff = Math.abs(array1.length - array2.length),
+        diffs = 0,
+        i;
+    for (i = 0; i < len; i++) {
+        if ((dontConvert && array1[i] !== array2[i]) ||
+            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
+            diffs++;
+        }
+    }
+    return diffs + lengthDiff;
+}
+
+function warn(msg) {
+    if (hooks.suppressDeprecationWarnings === false &&
+            (typeof console !==  'undefined') && console.warn) {
+        console.warn('Deprecation warning: ' + msg);
+    }
+}
+
+function deprecate(msg, fn) {
+    var firstTime = true;
+
+    return extend(function () {
+        if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(null, msg);
+        }
+        if (firstTime) {
+            var args = [];
+            var arg;
+            for (var i = 0; i < arguments.length; i++) {
+                arg = '';
+                if (typeof arguments[i] === 'object') {
+                    arg += '\n[' + i + '] ';
+                    for (var key in arguments[0]) {
+                        arg += key + ': ' + arguments[0][key] + ', ';
+                    }
+                    arg = arg.slice(0, -2); // Remove trailing comma and space
+                } else {
+                    arg = arguments[i];
+                }
+                args.push(arg);
+            }
+            warn(msg + '\nArguments: ' + Array.prototype.slice.call(args).join('') + '\n' + (new Error()).stack);
+            firstTime = false;
+        }
+        return fn.apply(this, arguments);
+    }, fn);
+}
+
+var deprecations = {};
+
+function deprecateSimple(name, msg) {
+    if (hooks.deprecationHandler != null) {
+        hooks.deprecationHandler(name, msg);
+    }
+    if (!deprecations[name]) {
+        warn(msg);
+        deprecations[name] = true;
+    }
+}
+
+hooks.suppressDeprecationWarnings = false;
+hooks.deprecationHandler = null;
+
+function isFunction(input) {
+    return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+}
+
+function set (config) {
+    var prop, i;
+    for (i in config) {
+        prop = config[i];
+        if (isFunction(prop)) {
+            this[i] = prop;
+        } else {
+            this['_' + i] = prop;
+        }
+    }
+    this._config = config;
+    // Lenient ordinal parsing accepts just a number in addition to
+    // number + (possibly) stuff coming from _dayOfMonthOrdinalParse.
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    this._dayOfMonthOrdinalParseLenient = new RegExp(
+        (this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) +
+            '|' + (/\d{1,2}/).source);
+}
+
+function mergeConfigs(parentConfig, childConfig) {
+    var res = extend({}, parentConfig), prop;
+    for (prop in childConfig) {
+        if (hasOwnProp(childConfig, prop)) {
+            if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+                res[prop] = {};
+                extend(res[prop], parentConfig[prop]);
+                extend(res[prop], childConfig[prop]);
+            } else if (childConfig[prop] != null) {
+                res[prop] = childConfig[prop];
+            } else {
+                delete res[prop];
+            }
+        }
+    }
+    for (prop in parentConfig) {
+        if (hasOwnProp(parentConfig, prop) &&
+                !hasOwnProp(childConfig, prop) &&
+                isObject(parentConfig[prop])) {
+            // make sure changes to properties don't modify parent config
+            res[prop] = extend({}, res[prop]);
+        }
+    }
+    return res;
+}
+
+function Locale(config) {
+    if (config != null) {
+        this.set(config);
+    }
+}
+
+var keys;
+
+if (Object.keys) {
+    keys = Object.keys;
+} else {
+    keys = function (obj) {
+        var i, res = [];
+        for (i in obj) {
+            if (hasOwnProp(obj, i)) {
+                res.push(i);
+            }
+        }
+        return res;
+    };
+}
+
+var keys$1 = keys;
+
+var defaultCalendar = {
+    sameDay : '[Today at] LT',
+    nextDay : '[Tomorrow at] LT',
+    nextWeek : 'dddd [at] LT',
+    lastDay : '[Yesterday at] LT',
+    lastWeek : '[Last] dddd [at] LT',
+    sameElse : 'L'
+};
+
+function calendar (key, mom, now) {
+    var output = this._calendar[key] || this._calendar['sameElse'];
+    return isFunction(output) ? output.call(mom, now) : output;
+}
+
+var defaultLongDateFormat = {
+    LTS  : 'h:mm:ss A',
+    LT   : 'h:mm A',
+    L    : 'MM/DD/YYYY',
+    LL   : 'MMMM D, YYYY',
+    LLL  : 'MMMM D, YYYY h:mm A',
+    LLLL : 'dddd, MMMM D, YYYY h:mm A'
+};
+
+function longDateFormat (key) {
+    var format = this._longDateFormat[key],
+        formatUpper = this._longDateFormat[key.toUpperCase()];
+
+    if (format || !formatUpper) {
+        return format;
+    }
+
+    this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
+        return val.slice(1);
+    });
+
+    return this._longDateFormat[key];
+}
+
+var defaultInvalidDate = 'Invalid date';
+
+function invalidDate () {
+    return this._invalidDate;
+}
+
+var defaultOrdinal = '%d';
+var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+
+function ordinal (number) {
+    return this._ordinal.replace('%d', number);
+}
+
+var defaultRelativeTime = {
+    future : 'in %s',
+    past   : '%s ago',
+    s  : 'a few seconds',
+    ss : '%d seconds',
+    m  : 'a minute',
+    mm : '%d minutes',
+    h  : 'an hour',
+    hh : '%d hours',
+    d  : 'a day',
+    dd : '%d days',
+    M  : 'a month',
+    MM : '%d months',
+    y  : 'a year',
+    yy : '%d years'
+};
+
+function relativeTime (number, withoutSuffix, string, isFuture) {
+    var output = this._relativeTime[string];
+    return (isFunction(output)) ?
+        output(number, withoutSuffix, string, isFuture) :
+        output.replace(/%d/i, number);
+}
+
+function pastFuture (diff, output) {
+    var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
+    return isFunction(format) ? format(output) : format.replace(/%s/i, output);
+}
+
+var aliases = {};
+
+function addUnitAlias (unit, shorthand) {
+    var lowerCase = unit.toLowerCase();
+    aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
+}
+
+function normalizeUnits(units) {
+    return typeof units === 'string' ? aliases[units] || aliases[units.toLowerCase()] : undefined;
+}
+
+function normalizeObjectUnits(inputObject) {
+    var normalizedInput = {},
+        normalizedProp,
+        prop;
+
+    for (prop in inputObject) {
+        if (hasOwnProp(inputObject, prop)) {
+            normalizedProp = normalizeUnits(prop);
+            if (normalizedProp) {
+                normalizedInput[normalizedProp] = inputObject[prop];
+            }
+        }
+    }
+
+    return normalizedInput;
+}
+
+var priorities = {};
+
+function addUnitPriority(unit, priority) {
+    priorities[unit] = priority;
+}
+
+function getPrioritizedUnits(unitsObj) {
+    var units = [];
+    for (var u in unitsObj) {
+        units.push({unit: u, priority: priorities[u]});
+    }
+    units.sort(function (a, b) {
+        return a.priority - b.priority;
+    });
+    return units;
+}
+
+function makeGetSet (unit, keepTime) {
+    return function (value) {
+        if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+        } else {
+            return get(this, unit);
+        }
+    };
+}
+
+function get (mom, unit) {
+    return mom.isValid() ?
+        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
+}
+
+function set$1 (mom, unit, value) {
+    if (mom.isValid()) {
+        mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+    }
+}
+
+// MOMENTS
+
+function stringGet (units) {
+    units = normalizeUnits(units);
+    if (isFunction(this[units])) {
+        return this[units]();
+    }
+    return this;
+}
+
+
+function stringSet (units, value) {
+    if (typeof units === 'object') {
+        units = normalizeObjectUnits(units);
+        var prioritized = getPrioritizedUnits(units);
+        for (var i = 0; i < prioritized.length; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+        }
+    } else {
+        units = normalizeUnits(units);
+        if (isFunction(this[units])) {
+            return this[units](value);
+        }
+    }
+    return this;
+}
+
+function zeroFill(number, targetLength, forceSign) {
+    var absNumber = '' + Math.abs(number),
+        zerosToFill = targetLength - absNumber.length,
+        sign = number >= 0;
+    return (sign ? (forceSign ? '+' : '') : '-') +
+        Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+}
+
+var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+
+var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
+
+var formatFunctions = {};
+
+var formatTokenFunctions = {};
+
+// token:    'M'
+// padded:   ['MM', 2]
+// ordinal:  'Mo'
+// callback: function () { this.month() + 1 }
+function addFormatToken (token, padded, ordinal, callback) {
+    var func = callback;
+    if (typeof callback === 'string') {
+        func = function () {
+            return this[callback]();
+        };
+    }
+    if (token) {
+        formatTokenFunctions[token] = func;
+    }
+    if (padded) {
+        formatTokenFunctions[padded[0]] = function () {
+            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+        };
+    }
+    if (ordinal) {
+        formatTokenFunctions[ordinal] = function () {
+            return this.localeData().ordinal(func.apply(this, arguments), token);
+        };
+    }
+}
+
+function removeFormattingTokens(input) {
+    if (input.match(/\[[\s\S]/)) {
+        return input.replace(/^\[|\]$/g, '');
+    }
+    return input.replace(/\\/g, '');
+}
+
+function makeFormatFunction(format) {
+    var array = format.match(formattingTokens), i, length;
+
+    for (i = 0, length = array.length; i < length; i++) {
+        if (formatTokenFunctions[array[i]]) {
+            array[i] = formatTokenFunctions[array[i]];
+        } else {
+            array[i] = removeFormattingTokens(array[i]);
+        }
+    }
+
+    return function (mom) {
+        var output = '', i;
+        for (i = 0; i < length; i++) {
+            output += isFunction(array[i]) ? array[i].call(mom, format) : array[i];
+        }
+        return output;
+    };
+}
+
+// format date using native date object
+function formatMoment(m, format) {
+    if (!m.isValid()) {
+        return m.localeData().invalidDate();
+    }
+
+    format = expandFormat(format, m.localeData());
+    formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
+
+    return formatFunctions[format](m);
+}
+
+function expandFormat(format, locale) {
+    var i = 5;
+
+    function replaceLongDateFormatTokens(input) {
+        return locale.longDateFormat(input) || input;
+    }
+
+    localFormattingTokens.lastIndex = 0;
+    while (i >= 0 && localFormattingTokens.test(format)) {
+        format = format.replace(localFormattingTokens, replaceLongDateFormatTokens);
+        localFormattingTokens.lastIndex = 0;
+        i -= 1;
+    }
+
+    return format;
+}
+
+var match1         = /\d/;            //       0 - 9
+var match2         = /\d\d/;          //      00 - 99
+var match3         = /\d{3}/;         //     000 - 999
+var match4         = /\d{4}/;         //    0000 - 9999
+var match6         = /[+-]?\d{6}/;    // -999999 - 999999
+var match1to2      = /\d\d?/;         //       0 - 99
+var match3to4      = /\d\d\d\d?/;     //     999 - 9999
+var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
+var match1to3      = /\d{1,3}/;       //       0 - 999
+var match1to4      = /\d{1,4}/;       //       0 - 9999
+var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
+
+var matchUnsigned  = /\d+/;           //       0 - inf
+var matchSigned    = /[+-]?\d+/;      //    -inf - inf
+
+var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
+var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
+
+var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
+
+// any word (or two) characters or numbers including two/three word month in arabic.
+// includes scottish gaelic two word and hyphenated months
+var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+
+
+var regexes = {};
+
+function addRegexToken (token, regex, strictRegex) {
+    regexes[token] = isFunction(regex) ? regex : function (isStrict, localeData) {
+        return (isStrict && strictRegex) ? strictRegex : regex;
+    };
+}
+
+function getParseRegexForToken (token, config) {
+    if (!hasOwnProp(regexes, token)) {
+        return new RegExp(unescapeFormat(token));
+    }
+
+    return regexes[token](config._strict, config._locale);
+}
+
+// Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+function unescapeFormat(s) {
+    return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return p1 || p2 || p3 || p4;
+    }));
+}
+
+function regexEscape(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var tokens = {};
+
+function addParseToken (token, callback) {
+    var i, func = callback;
+    if (typeof token === 'string') {
+        token = [token];
+    }
+    if (isNumber(callback)) {
+        func = function (input, array) {
+            array[callback] = toInt(input);
+        };
+    }
+    for (i = 0; i < token.length; i++) {
+        tokens[token[i]] = func;
+    }
+}
+
+function addWeekParseToken (token, callback) {
+    addParseToken(token, function (input, array, config, token) {
+        config._w = config._w || {};
+        callback(input, config._w, config, token);
+    });
+}
+
+function addTimeToArrayFromToken(token, input, config) {
+    if (input != null && hasOwnProp(tokens, token)) {
+        tokens[token](input, config._a, config, token);
+    }
+}
+
+var YEAR = 0;
+var MONTH = 1;
+var DATE = 2;
+var HOUR = 3;
+var MINUTE = 4;
+var SECOND = 5;
+var MILLISECOND = 6;
+var WEEK = 7;
+var WEEKDAY = 8;
+
+var indexOf;
+
+if (Array.prototype.indexOf) {
+    indexOf = Array.prototype.indexOf;
+} else {
+    indexOf = function (o) {
+        // I know
+        var i;
+        for (i = 0; i < this.length; ++i) {
+            if (this[i] === o) {
+                return i;
+            }
+        }
+        return -1;
+    };
+}
+
+var indexOf$1 = indexOf;
+
+function daysInMonth(year, month) {
+    return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+// FORMATTING
+
+addFormatToken('M', ['MM', 2], 'Mo', function () {
+    return this.month() + 1;
+});
+
+addFormatToken('MMM', 0, 0, function (format) {
+    return this.localeData().monthsShort(this, format);
+});
+
+addFormatToken('MMMM', 0, 0, function (format) {
+    return this.localeData().months(this, format);
+});
+
+// ALIASES
+
+addUnitAlias('month', 'M');
+
+// PRIORITY
+
+addUnitPriority('month', 8);
+
+// PARSING
+
+addRegexToken('M',    match1to2);
+addRegexToken('MM',   match1to2, match2);
+addRegexToken('MMM',  function (isStrict, locale) {
+    return locale.monthsShortRegex(isStrict);
+});
+addRegexToken('MMMM', function (isStrict, locale) {
+    return locale.monthsRegex(isStrict);
+});
+
+addParseToken(['M', 'MM'], function (input, array) {
+    array[MONTH] = toInt(input) - 1;
+});
+
+addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
+    var month = config._locale.monthsParse(input, token, config._strict);
+    // if we didn't find a month name, mark the date as invalid.
+    if (month != null) {
+        array[MONTH] = month;
+    } else {
+        getParsingFlags(config).invalidMonth = input;
+    }
+});
+
+// LOCALES
+
+var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
+var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
+function localeMonths (m, format) {
+    if (!m) {
+        return isArray(this._months) ? this._months :
+            this._months['standalone'];
+    }
+    return isArray(this._months) ? this._months[m.month()] :
+        this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
+function localeMonthsShort (m, format) {
+    if (!m) {
+        return isArray(this._monthsShort) ? this._monthsShort :
+            this._monthsShort['standalone'];
+    }
+    return isArray(this._monthsShort) ? this._monthsShort[m.month()] :
+        this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+function handleStrictParse(monthName, format, strict) {
+    var i, ii, mom, llc = monthName.toLocaleLowerCase();
+    if (!this._monthsParse) {
+        // this is not used
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+        for (i = 0; i < 12; ++i) {
+            mom = createUTC([2000, i]);
+            this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+            this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'MMM') {
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'MMM') {
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeMonthsParse (monthName, format, strict) {
+    var i, mom, regex;
+
+    if (this._monthsParseExact) {
+        return handleStrictParse.call(this, monthName, format, strict);
+    }
+
+    if (!this._monthsParse) {
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+    }
+
+    // TODO: add sorting
+    // Sorting makes sure if one month (or abbr) is a prefix of another
+    // see sorting in computeMonthsParse
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        if (strict && !this._longMonthsParse[i]) {
+            this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');
+            this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');
+        }
+        if (!strict && !this._monthsParse[i]) {
+            regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
+            this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (!strict && this._monthsParse[i].test(monthName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function setMonth (mom, value) {
+    var dayOfMonth;
+
+    if (!mom.isValid()) {
+        // No op
+        return mom;
+    }
+
+    if (typeof value === 'string') {
+        if (/^\d+$/.test(value)) {
+            value = toInt(value);
+        } else {
+            value = mom.localeData().monthsParse(value);
+            // TODO: Another silent failure?
+            if (!isNumber(value)) {
+                return mom;
+            }
+        }
+    }
+
+    dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+    mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
+    return mom;
+}
+
+function getSetMonth (value) {
+    if (value != null) {
+        setMonth(this, value);
+        hooks.updateOffset(this, true);
+        return this;
+    } else {
+        return get(this, 'Month');
+    }
+}
+
+function getDaysInMonth () {
+    return daysInMonth(this.year(), this.month());
+}
+
+var defaultMonthsShortRegex = matchWord;
+function monthsShortRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsShortStrictRegex;
+        } else {
+            return this._monthsShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsShortRegex')) {
+            this._monthsShortRegex = defaultMonthsShortRegex;
+        }
+        return this._monthsShortStrictRegex && isStrict ?
+            this._monthsShortStrictRegex : this._monthsShortRegex;
+    }
+}
+
+var defaultMonthsRegex = matchWord;
+function monthsRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsStrictRegex;
+        } else {
+            return this._monthsRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            this._monthsRegex = defaultMonthsRegex;
+        }
+        return this._monthsStrictRegex && isStrict ?
+            this._monthsStrictRegex : this._monthsRegex;
+    }
+}
+
+function computeMonthsParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom;
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        shortPieces.push(this.monthsShort(mom, ''));
+        longPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.monthsShort(mom, ''));
+    }
+    // Sorting makes sure if one month (or abbr) is a prefix of another it
+    // will match the longer piece.
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 12; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+    }
+    for (i = 0; i < 24; i++) {
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._monthsShortRegex = this._monthsRegex;
+    this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+addFormatToken('Y', 0, 0, function () {
+    var y = this.year();
+    return y <= 9999 ? '' + y : '+' + y;
+});
+
+addFormatToken(0, ['YY', 2], 0, function () {
+    return this.year() % 100;
+});
+
+addFormatToken(0, ['YYYY',   4],       0, 'year');
+addFormatToken(0, ['YYYYY',  5],       0, 'year');
+addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+// ALIASES
+
+addUnitAlias('year', 'y');
+
+// PRIORITIES
+
+addUnitPriority('year', 1);
+
+// PARSING
+
+addRegexToken('Y',      matchSigned);
+addRegexToken('YY',     match1to2, match2);
+addRegexToken('YYYY',   match1to4, match4);
+addRegexToken('YYYYY',  match1to6, match6);
+addRegexToken('YYYYYY', match1to6, match6);
+
+addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+addParseToken('YYYY', function (input, array) {
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+});
+addParseToken('YY', function (input, array) {
+    array[YEAR] = hooks.parseTwoDigitYear(input);
+});
+addParseToken('Y', function (input, array) {
+    array[YEAR] = parseInt(input, 10);
+});
+
+// HELPERS
+
+function daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365;
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+// HOOKS
+
+hooks.parseTwoDigitYear = function (input) {
+    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+};
+
+// MOMENTS
+
+var getSetYear = makeGetSet('FullYear', true);
+
+function getIsLeapYear () {
+    return isLeapYear(this.year());
+}
+
+function createDate (y, m, d, h, M, s, ms) {
+    // can't just apply() to create a date:
+    // https://stackoverflow.com/q/181348
+    var date = new Date(y, m, d, h, M, s, ms);
+
+    // the date constructor remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
+        date.setFullYear(y);
+    }
+    return date;
+}
+
+function createUTCDate (y) {
+    var date = new Date(Date.UTC.apply(null, arguments));
+
+    // the Date.UTC function remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
+        date.setUTCFullYear(y);
+    }
+    return date;
+}
+
+// start-of-first-week - start-of-year
+function firstWeekOffset(year, dow, doy) {
+    var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+        fwd = 7 + dow - doy,
+        // first-week day local weekday -- which local weekday is fwd
+        fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+
+    return -fwdlw + fwd - 1;
+}
+
+// https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
+function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+    var localWeekday = (7 + weekday - dow) % 7,
+        weekOffset = firstWeekOffset(year, dow, doy),
+        dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+        resYear, resDayOfYear;
+
+    if (dayOfYear <= 0) {
+        resYear = year - 1;
+        resDayOfYear = daysInYear(resYear) + dayOfYear;
+    } else if (dayOfYear > daysInYear(year)) {
+        resYear = year + 1;
+        resDayOfYear = dayOfYear - daysInYear(year);
+    } else {
+        resYear = year;
+        resDayOfYear = dayOfYear;
+    }
+
+    return {
+        year: resYear,
+        dayOfYear: resDayOfYear
+    };
+}
+
+function weekOfYear(mom, dow, doy) {
+    var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+        week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+        resWeek, resYear;
+
+    if (week < 1) {
+        resYear = mom.year() - 1;
+        resWeek = week + weeksInYear(resYear, dow, doy);
+    } else if (week > weeksInYear(mom.year(), dow, doy)) {
+        resWeek = week - weeksInYear(mom.year(), dow, doy);
+        resYear = mom.year() + 1;
+    } else {
+        resYear = mom.year();
+        resWeek = week;
+    }
+
+    return {
+        week: resWeek,
+        year: resYear
+    };
+}
+
+function weeksInYear(year, dow, doy) {
+    var weekOffset = firstWeekOffset(year, dow, doy),
+        weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+    return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+}
+
+// FORMATTING
+
+addFormatToken('w', ['ww', 2], 'wo', 'week');
+addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+// ALIASES
+
+addUnitAlias('week', 'w');
+addUnitAlias('isoWeek', 'W');
+
+// PRIORITIES
+
+addUnitPriority('week', 5);
+addUnitPriority('isoWeek', 5);
+
+// PARSING
+
+addRegexToken('w',  match1to2);
+addRegexToken('ww', match1to2, match2);
+addRegexToken('W',  match1to2);
+addRegexToken('WW', match1to2, match2);
+
+addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
+    week[token.substr(0, 1)] = toInt(input);
+});
+
+// HELPERS
+
+// LOCALES
+
+function localeWeek (mom) {
+    return weekOfYear(mom, this._week.dow, this._week.doy).week;
+}
+
+var defaultLocaleWeek = {
+    dow : 0, // Sunday is the first day of the week.
+    doy : 6  // The week that contains Jan 1st is the first week of the year.
+};
+
+function localeFirstDayOfWeek () {
+    return this._week.dow;
+}
+
+function localeFirstDayOfYear () {
+    return this._week.doy;
+}
+
+// MOMENTS
+
+function getSetWeek (input) {
+    var week = this.localeData().week(this);
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+function getSetISOWeek (input) {
+    var week = weekOfYear(this, 1, 4).week;
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+// FORMATTING
+
+addFormatToken('d', 0, 'do', 'day');
+
+addFormatToken('dd', 0, 0, function (format) {
+    return this.localeData().weekdaysMin(this, format);
+});
+
+addFormatToken('ddd', 0, 0, function (format) {
+    return this.localeData().weekdaysShort(this, format);
+});
+
+addFormatToken('dddd', 0, 0, function (format) {
+    return this.localeData().weekdays(this, format);
+});
+
+addFormatToken('e', 0, 0, 'weekday');
+addFormatToken('E', 0, 0, 'isoWeekday');
+
+// ALIASES
+
+addUnitAlias('day', 'd');
+addUnitAlias('weekday', 'e');
+addUnitAlias('isoWeekday', 'E');
+
+// PRIORITY
+addUnitPriority('day', 11);
+addUnitPriority('weekday', 11);
+addUnitPriority('isoWeekday', 11);
+
+// PARSING
+
+addRegexToken('d',    match1to2);
+addRegexToken('e',    match1to2);
+addRegexToken('E',    match1to2);
+addRegexToken('dd',   function (isStrict, locale) {
+    return locale.weekdaysMinRegex(isStrict);
+});
+addRegexToken('ddd',   function (isStrict, locale) {
+    return locale.weekdaysShortRegex(isStrict);
+});
+addRegexToken('dddd',   function (isStrict, locale) {
+    return locale.weekdaysRegex(isStrict);
+});
+
+addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+    var weekday = config._locale.weekdaysParse(input, token, config._strict);
+    // if we didn't get a weekday name, mark the date as invalid
+    if (weekday != null) {
+        week.d = weekday;
+    } else {
+        getParsingFlags(config).invalidWeekday = input;
+    }
+});
+
+addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
+    week[token] = toInt(input);
+});
+
+// HELPERS
+
+function parseWeekday(input, locale) {
+    if (typeof input !== 'string') {
+        return input;
+    }
+
+    if (!isNaN(input)) {
+        return parseInt(input, 10);
+    }
+
+    input = locale.weekdaysParse(input);
+    if (typeof input === 'number') {
+        return input;
+    }
+
+    return null;
+}
+
+function parseIsoWeekday(input, locale) {
+    if (typeof input === 'string') {
+        return locale.weekdaysParse(input) % 7 || 7;
+    }
+    return isNaN(input) ? null : input;
+}
+
+// LOCALES
+
+var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
+function localeWeekdays (m, format) {
+    if (!m) {
+        return isArray(this._weekdays) ? this._weekdays :
+            this._weekdays['standalone'];
+    }
+    return isArray(this._weekdays) ? this._weekdays[m.day()] :
+        this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+}
+
+var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
+function localeWeekdaysShort (m) {
+    return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+}
+
+var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
+function localeWeekdaysMin (m) {
+    return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+}
+
+function handleStrictParse$1(weekdayName, format, strict) {
+    var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._minWeekdaysParse = [];
+
+        for (i = 0; i < 7; ++i) {
+            mom = createUTC([2000, 1]).day(i);
+            this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+            this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'dddd') {
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'dddd') {
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeWeekdaysParse (weekdayName, format, strict) {
+    var i, mom, regex;
+
+    if (this._weekdaysParseExact) {
+        return handleStrictParse$1.call(this, weekdayName, format, strict);
+    }
+
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._minWeekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._fullWeekdaysParse = [];
+    }
+
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+
+        mom = createUTC([2000, 1]).day(i);
+        if (strict && !this._fullWeekdaysParse[i]) {
+            this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
+            this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
+            this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+        }
+        if (!this._weekdaysParse[i]) {
+            regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
+            this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function getSetDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+    if (input != null) {
+        input = parseWeekday(input, this.localeData());
+        return this.add(input - day, 'd');
+    } else {
+        return day;
+    }
+}
+
+function getSetLocaleDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+    return input == null ? weekday : this.add(input - weekday, 'd');
+}
+
+function getSetISODayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+
+    // behaves the same as moment#day except
+    // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
+    // as a setter, sunday should belong to the previous week.
+
+    if (input != null) {
+        var weekday = parseIsoWeekday(input, this.localeData());
+        return this.day(this.day() % 7 ? weekday : weekday - 7);
+    } else {
+        return this.day() || 7;
+    }
+}
+
+var defaultWeekdaysRegex = matchWord;
+function weekdaysRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysStrictRegex;
+        } else {
+            return this._weekdaysRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            this._weekdaysRegex = defaultWeekdaysRegex;
+        }
+        return this._weekdaysStrictRegex && isStrict ?
+            this._weekdaysStrictRegex : this._weekdaysRegex;
+    }
+}
+
+var defaultWeekdaysShortRegex = matchWord;
+function weekdaysShortRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysShortStrictRegex;
+        } else {
+            return this._weekdaysShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysShortRegex')) {
+            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+        }
+        return this._weekdaysShortStrictRegex && isStrict ?
+            this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+    }
+}
+
+var defaultWeekdaysMinRegex = matchWord;
+function weekdaysMinRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysMinStrictRegex;
+        } else {
+            return this._weekdaysMinRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysMinRegex')) {
+            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+        }
+        return this._weekdaysMinStrictRegex && isStrict ?
+            this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+    }
+}
+
+
+function computeWeekdaysParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom, minp, shortp, longp;
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, 1]).day(i);
+        minp = this.weekdaysMin(mom, '');
+        shortp = this.weekdaysShort(mom, '');
+        longp = this.weekdays(mom, '');
+        minPieces.push(minp);
+        shortPieces.push(shortp);
+        longPieces.push(longp);
+        mixedPieces.push(minp);
+        mixedPieces.push(shortp);
+        mixedPieces.push(longp);
+    }
+    // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+    // will match the longer piece.
+    minPieces.sort(cmpLenRev);
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 7; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._weekdaysShortRegex = this._weekdaysRegex;
+    this._weekdaysMinRegex = this._weekdaysRegex;
+
+    this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+    this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+function hFormat() {
+    return this.hours() % 12 || 12;
+}
+
+function kFormat() {
+    return this.hours() || 24;
+}
+
+addFormatToken('H', ['HH', 2], 0, 'hour');
+addFormatToken('h', ['hh', 2], 0, hFormat);
+addFormatToken('k', ['kk', 2], 0, kFormat);
+
+addFormatToken('hmm', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('hmmss', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+addFormatToken('Hmm', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('Hmmss', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+function meridiem (token, lowercase) {
+    addFormatToken(token, 0, 0, function () {
+        return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+    });
+}
+
+meridiem('a', true);
+meridiem('A', false);
+
+// ALIASES
+
+addUnitAlias('hour', 'h');
+
+// PRIORITY
+addUnitPriority('hour', 13);
+
+// PARSING
+
+function matchMeridiem (isStrict, locale) {
+    return locale._meridiemParse;
+}
+
+addRegexToken('a',  matchMeridiem);
+addRegexToken('A',  matchMeridiem);
+addRegexToken('H',  match1to2);
+addRegexToken('h',  match1to2);
+addRegexToken('k',  match1to2);
+addRegexToken('HH', match1to2, match2);
+addRegexToken('hh', match1to2, match2);
+addRegexToken('kk', match1to2, match2);
+
+addRegexToken('hmm', match3to4);
+addRegexToken('hmmss', match5to6);
+addRegexToken('Hmm', match3to4);
+addRegexToken('Hmmss', match5to6);
+
+addParseToken(['H', 'HH'], HOUR);
+addParseToken(['k', 'kk'], function (input, array, config) {
+    var kInput = toInt(input);
+    array[HOUR] = kInput === 24 ? 0 : kInput;
+});
+addParseToken(['a', 'A'], function (input, array, config) {
+    config._isPm = config._locale.isPM(input);
+    config._meridiem = input;
+});
+addParseToken(['h', 'hh'], function (input, array, config) {
+    array[HOUR] = toInt(input);
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('Hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+});
+addParseToken('Hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+});
+
+// LOCALES
+
+function localeIsPM (input) {
+    // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
+    // Using charAt should be more compatible.
+    return ((input + '').toLowerCase().charAt(0) === 'p');
+}
+
+var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+function localeMeridiem (hours, minutes, isLower) {
+    if (hours > 11) {
+        return isLower ? 'pm' : 'PM';
+    } else {
+        return isLower ? 'am' : 'AM';
+    }
+}
+
+
+// MOMENTS
+
+// Setting the hour should keep the time, because the user explicitly
+// specified which hour he wants. So trying to maintain the same hour (in
+// a new timezone) makes sense. Adding/subtracting hours does not follow
+// this rule.
+var getSetHour = makeGetSet('Hours', true);
+
+// months
+// week
+// weekdays
+// meridiem
+var baseConfig = {
+    calendar: defaultCalendar,
+    longDateFormat: defaultLongDateFormat,
+    invalidDate: defaultInvalidDate,
+    ordinal: defaultOrdinal,
+    dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+    relativeTime: defaultRelativeTime,
+
+    months: defaultLocaleMonths,
+    monthsShort: defaultLocaleMonthsShort,
+
+    week: defaultLocaleWeek,
+
+    weekdays: defaultLocaleWeekdays,
+    weekdaysMin: defaultLocaleWeekdaysMin,
+    weekdaysShort: defaultLocaleWeekdaysShort,
+
+    meridiemParse: defaultLocaleMeridiemParse
+};
+
+// internal storage for locale config files
+var locales = {};
+var localeFamilies = {};
+var globalLocale;
+
+function normalizeLocale(key) {
+    return key ? key.toLowerCase().replace('_', '-') : key;
+}
+
+// pick the locale from the array
+// try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+// substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+function chooseLocale(names) {
+    var i = 0, j, next, locale, split;
+
+    while (i < names.length) {
+        split = normalizeLocale(names[i]).split('-');
+        j = split.length;
+        next = normalizeLocale(names[i + 1]);
+        next = next ? next.split('-') : null;
+        while (j > 0) {
+            locale = loadLocale(split.slice(0, j).join('-'));
+            if (locale) {
+                return locale;
+            }
+            if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                //the next array item is better than a shallower substring of this one
+                break;
+            }
+            j--;
+        }
+        i++;
+    }
+    return null;
+}
+
+function loadLocale(name) {
+    var oldLocale = null;
+    // TODO: Find a better way to register and load all the locales in Node
+    if (!locales[name] && (typeof module !== 'undefined') &&
+            module && module.exports) {
+        try {
+            oldLocale = globalLocale._abbr;
+            require('./locale/' + name);
+            // because defineLocale currently also sets the global locale, we
+            // want to undo that for lazy loaded locales
+            getSetGlobalLocale(oldLocale);
+        } catch (e) { }
+    }
+    return locales[name];
+}
+
+// This function will load locale and then set the global locale.  If
+// no arguments are passed in, it will simply return the current global
+// locale key.
+function getSetGlobalLocale (key, values) {
+    var data;
+    if (key) {
+        if (isUndefined(values)) {
+            data = getLocale(key);
+        }
+        else {
+            data = defineLocale(key, values);
+        }
+
+        if (data) {
+            // moment.duration._locale = moment._locale = data;
+            globalLocale = data;
+        }
+    }
+
+    return globalLocale._abbr;
+}
+
+function defineLocale (name, config) {
+    if (config !== null) {
+        var parentConfig = baseConfig;
+        config.abbr = name;
+        if (locales[name] != null) {
+            deprecateSimple('defineLocaleOverride',
+                    'use moment.updateLocale(localeName, config) to change ' +
+                    'an existing locale. moment.defineLocale(localeName, ' +
+                    'config) should only be used for creating a new locale ' +
+                    'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
+            parentConfig = locales[name]._config;
+        } else if (config.parentLocale != null) {
+            if (locales[config.parentLocale] != null) {
+                parentConfig = locales[config.parentLocale]._config;
+            } else {
+                if (!localeFamilies[config.parentLocale]) {
+                    localeFamilies[config.parentLocale] = [];
+                }
+                localeFamilies[config.parentLocale].push({
+                    name: name,
+                    config: config
+                });
+                return null;
+            }
+        }
+        locales[name] = new Locale(mergeConfigs(parentConfig, config));
+
+        if (localeFamilies[name]) {
+            localeFamilies[name].forEach(function (x) {
+                defineLocale(x.name, x.config);
+            });
+        }
+
+        // backwards compat for now: also set the locale
+        // make sure we set the locale AFTER all child locales have been
+        // created, so we won't end up with the child locale set.
+        getSetGlobalLocale(name);
+
+
+        return locales[name];
+    } else {
+        // useful for testing
+        delete locales[name];
+        return null;
+    }
+}
+
+function updateLocale(name, config) {
+    if (config != null) {
+        var locale, parentConfig = baseConfig;
+        // MERGE
+        if (locales[name] != null) {
+            parentConfig = locales[name]._config;
+        }
+        config = mergeConfigs(parentConfig, config);
+        locale = new Locale(config);
+        locale.parentLocale = locales[name];
+        locales[name] = locale;
+
+        // backwards compat for now: also set the locale
+        getSetGlobalLocale(name);
+    } else {
+        // pass null for config to unupdate, useful for tests
+        if (locales[name] != null) {
+            if (locales[name].parentLocale != null) {
+                locales[name] = locales[name].parentLocale;
+            } else if (locales[name] != null) {
+                delete locales[name];
+            }
+        }
+    }
+    return locales[name];
+}
+
+// returns locale data
+function getLocale (key) {
+    var locale;
+
+    if (key && key._locale && key._locale._abbr) {
+        key = key._locale._abbr;
+    }
+
+    if (!key) {
+        return globalLocale;
+    }
+
+    if (!isArray(key)) {
+        //short-circuit everything else
+        locale = loadLocale(key);
+        if (locale) {
+            return locale;
+        }
+        key = [key];
+    }
+
+    return chooseLocale(key);
+}
+
+function listLocales() {
+    return keys$1(locales);
+}
+
+function checkOverflow (m) {
+    var overflow;
+    var a = m._a;
+
+    if (a && getParsingFlags(m).overflow === -2) {
+        overflow =
+            a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
+            a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
+            a[HOUR]        < 0 || a[HOUR]        > 24 || (a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0)) ? HOUR :
+            a[MINUTE]      < 0 || a[MINUTE]      > 59  ? MINUTE :
+            a[SECOND]      < 0 || a[SECOND]      > 59  ? SECOND :
+            a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
+            -1;
+
+        if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            overflow = DATE;
+        }
+        if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+            overflow = WEEK;
+        }
+        if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+            overflow = WEEKDAY;
+        }
+
+        getParsingFlags(m).overflow = overflow;
+    }
+
+    return m;
+}
+
+// iso 8601 regex
+// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+
+var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
+
+var isoDates = [
+    ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+    ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+    ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+    ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+    ['YYYY-DDD', /\d{4}-\d{3}/],
+    ['YYYY-MM', /\d{4}-\d\d/, false],
+    ['YYYYYYMMDD', /[+-]\d{10}/],
+    ['YYYYMMDD', /\d{8}/],
+    // YYYYMM is NOT allowed by the standard
+    ['GGGG[W]WWE', /\d{4}W\d{3}/],
+    ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+    ['YYYYDDD', /\d{7}/]
+];
+
+// iso time formats and regexes
+var isoTimes = [
+    ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+    ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+    ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+    ['HH:mm', /\d\d:\d\d/],
+    ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+    ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+    ['HHmmss', /\d\d\d\d\d\d/],
+    ['HHmm', /\d\d\d\d/],
+    ['HH', /\d\d/]
+];
+
+var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
+
+// date from iso format
+function configFromISO(config) {
+    var i, l,
+        string = config._i,
+        match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+        allowTime, dateFormat, timeFormat, tzFormat;
+
+    if (match) {
+        getParsingFlags(config).iso = true;
+
+        for (i = 0, l = isoDates.length; i < l; i++) {
+            if (isoDates[i][1].exec(match[1])) {
+                dateFormat = isoDates[i][0];
+                allowTime = isoDates[i][2] !== false;
+                break;
+            }
+        }
+        if (dateFormat == null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[3]) {
+            for (i = 0, l = isoTimes.length; i < l; i++) {
+                if (isoTimes[i][1].exec(match[3])) {
+                    // match[2] should be 'T' or space
+                    timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                    break;
+                }
+            }
+            if (timeFormat == null) {
+                config._isValid = false;
+                return;
+            }
+        }
+        if (!allowTime && timeFormat != null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[4]) {
+            if (tzRegex.exec(match[4])) {
+                tzFormat = 'Z';
+            } else {
+                config._isValid = false;
+                return;
+            }
+        }
+        config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
+        configFromStringAndFormat(config);
+    } else {
+        config._isValid = false;
+    }
+}
+
+// RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
+var basicRfcRegex = /^((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d?\d\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(?:\d\d)?\d\d\s)(\d\d:\d\d)(\:\d\d)?(\s(?:UT|GMT|[ECMP][SD]T|[A-IK-Za-ik-z]|[+-]\d{4}))$/;
+
+// date and time from ref 2822 format
+function configFromRFC2822(config) {
+    var string, match, dayFormat,
+        dateFormat, timeFormat, tzFormat;
+    var timezones = {
+        ' GMT': ' +0000',
+        ' EDT': ' -0400',
+        ' EST': ' -0500',
+        ' CDT': ' -0500',
+        ' CST': ' -0600',
+        ' MDT': ' -0600',
+        ' MST': ' -0700',
+        ' PDT': ' -0700',
+        ' PST': ' -0800'
+    };
+    var military = 'YXWVUTSRQPONZABCDEFGHIKLM';
+    var timezone, timezoneIndex;
+
+    string = config._i
+        .replace(/\([^\)]*\)|[\n\t]/g, ' ') // Remove comments and folding whitespace
+        .replace(/(\s\s+)/g, ' ') // Replace multiple-spaces with a single space
+        .replace(/^\s|\s$/g, ''); // Remove leading and trailing spaces
+    match = basicRfcRegex.exec(string);
+
+    if (match) {
+        dayFormat = match[1] ? 'ddd' + ((match[1].length === 5) ? ', ' : ' ') : '';
+        dateFormat = 'D MMM ' + ((match[2].length > 10) ? 'YYYY ' : 'YY ');
+        timeFormat = 'HH:mm' + (match[4] ? ':ss' : '');
+
+        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
+        if (match[1]) { // day of week given
+            var momentDate = new Date(match[2]);
+            var momentDay = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][momentDate.getDay()];
+
+            if (match[1].substr(0,3) !== momentDay) {
+                getParsingFlags(config).weekdayMismatch = true;
+                config._isValid = false;
+                return;
+            }
+        }
+
+        switch (match[5].length) {
+            case 2: // military
+                if (timezoneIndex === 0) {
+                    timezone = ' +0000';
+                } else {
+                    timezoneIndex = military.indexOf(match[5][1].toUpperCase()) - 12;
+                    timezone = ((timezoneIndex < 0) ? ' -' : ' +') +
+                        (('' + timezoneIndex).replace(/^-?/, '0')).match(/..$/)[0] + '00';
+                }
+                break;
+            case 4: // Zone
+                timezone = timezones[match[5]];
+                break;
+            default: // UT or +/-9999
+                timezone = timezones[' GMT'];
+        }
+        match[5] = timezone;
+        config._i = match.splice(1).join('');
+        tzFormat = ' ZZ';
+        config._f = dayFormat + dateFormat + timeFormat + tzFormat;
+        configFromStringAndFormat(config);
+        getParsingFlags(config).rfc2822 = true;
+    } else {
+        config._isValid = false;
+    }
+}
+
+// date from iso format or fallback
+function configFromString(config) {
+    var matched = aspNetJsonRegex.exec(config._i);
+
+    if (matched !== null) {
+        config._d = new Date(+matched[1]);
+        return;
+    }
+
+    configFromISO(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    configFromRFC2822(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    // Final attempt, use Input Fallback
+    hooks.createFromInputFallback(config);
+}
+
+hooks.createFromInputFallback = deprecate(
+    'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
+    'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
+    'discouraged and will be removed in an upcoming major release. Please refer to ' +
+    'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+    function (config) {
+        config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+    }
+);
+
+// Pick the first defined of two or three arguments.
+function defaults(a, b, c) {
+    if (a != null) {
+        return a;
+    }
+    if (b != null) {
+        return b;
+    }
+    return c;
+}
+
+function currentDateArray(config) {
+    // hooks is actually the exported moment object
+    var nowValue = new Date(hooks.now());
+    if (config._useUTC) {
+        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
+    }
+    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+}
+
+// convert an array to a date.
+// the array should mirror the parameters below
+// note: all values past the year are optional and will default to the lowest possible value.
+// [year, month, day , hour, minute, second, millisecond]
+function configFromArray (config) {
+    var i, date, input = [], currentDate, yearToUse;
+
+    if (config._d) {
+        return;
+    }
+
+    currentDate = currentDateArray(config);
+
+    //compute day of the year from weeks and weekdays
+    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+        dayOfYearFromWeekInfo(config);
+    }
+
+    //if the day of the year is set, figure out what it is
+    if (config._dayOfYear != null) {
+        yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+
+        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+        }
+
+        date = createUTCDate(yearToUse, 0, config._dayOfYear);
+        config._a[MONTH] = date.getUTCMonth();
+        config._a[DATE] = date.getUTCDate();
+    }
+
+    // Default to current date.
+    // * if no year, month, day of month are given, default to today
+    // * if day of month is given, default month and year
+    // * if month is given, default only year
+    // * if year is given, don't default anything
+    for (i = 0; i < 3 && config._a[i] == null; ++i) {
+        config._a[i] = input[i] = currentDate[i];
+    }
+
+    // Zero out whatever was not defaulted, including time
+    for (; i < 7; i++) {
+        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
+    }
+
+    // Check for 24:00:00.000
+    if (config._a[HOUR] === 24 &&
+            config._a[MINUTE] === 0 &&
+            config._a[SECOND] === 0 &&
+            config._a[MILLISECOND] === 0) {
+        config._nextDay = true;
+        config._a[HOUR] = 0;
+    }
+
+    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    // Apply timezone offset from input. The actual utcOffset can be changed
+    // with parseZone.
+    if (config._tzm != null) {
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+    }
+
+    if (config._nextDay) {
+        config._a[HOUR] = 24;
+    }
+}
+
+function dayOfYearFromWeekInfo(config) {
+    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+
+    w = config._w;
+    if (w.GG != null || w.W != null || w.E != null) {
+        dow = 1;
+        doy = 4;
+
+        // TODO: We need to take the current isoWeekYear, but that depends on
+        // how we interpret now (local, utc, fixed offset). So create
+        // a now version of current config (take local/utc/offset flags, and
+        // create now).
+        weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+        week = defaults(w.W, 1);
+        weekday = defaults(w.E, 1);
+        if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+        }
+    } else {
+        dow = config._locale._week.dow;
+        doy = config._locale._week.doy;
+
+        var curWeek = weekOfYear(createLocal(), dow, doy);
+
+        weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+
+        // Default to current week.
+        week = defaults(w.w, curWeek.week);
+
+        if (w.d != null) {
+            // weekday -- low day numbers are considered next week
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+            }
+        } else if (w.e != null) {
+            // local weekday -- counting starts from begining of week
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+            }
+        } else {
+            // default to begining of week
+            weekday = dow;
+        }
+    }
+    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+        getParsingFlags(config)._overflowWeeks = true;
+    } else if (weekdayOverflow != null) {
+        getParsingFlags(config)._overflowWeekday = true;
+    } else {
+        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+        config._a[YEAR] = temp.year;
+        config._dayOfYear = temp.dayOfYear;
+    }
+}
+
+// constant that refers to the ISO standard
+hooks.ISO_8601 = function () {};
+
+// constant that refers to the RFC 2822 form
+hooks.RFC_2822 = function () {};
+
+// date from string and format string
+function configFromStringAndFormat(config) {
+    // TODO: Move this to another part of the creation flow to prevent circular deps
+    if (config._f === hooks.ISO_8601) {
+        configFromISO(config);
+        return;
+    }
+    if (config._f === hooks.RFC_2822) {
+        configFromRFC2822(config);
+        return;
+    }
+    config._a = [];
+    getParsingFlags(config).empty = true;
+
+    // This array is used to make a Date, either with `new Date` or `Date.UTC`
+    var string = '' + config._i,
+        i, parsedInput, tokens, token, skipped,
+        stringLength = string.length,
+        totalParsedInputLength = 0;
+
+    tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+
+    for (i = 0; i < tokens.length; i++) {
+        token = tokens[i];
+        parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+        // console.log('token', token, 'parsedInput', parsedInput,
+        //         'regex', getParseRegexForToken(token, config));
+        if (parsedInput) {
+            skipped = string.substr(0, string.indexOf(parsedInput));
+            if (skipped.length > 0) {
+                getParsingFlags(config).unusedInput.push(skipped);
+            }
+            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+            totalParsedInputLength += parsedInput.length;
+        }
+        // don't parse if it's not a known token
+        if (formatTokenFunctions[token]) {
+            if (parsedInput) {
+                getParsingFlags(config).empty = false;
+            }
+            else {
+                getParsingFlags(config).unusedTokens.push(token);
+            }
+            addTimeToArrayFromToken(token, parsedInput, config);
+        }
+        else if (config._strict && !parsedInput) {
+            getParsingFlags(config).unusedTokens.push(token);
+        }
+    }
+
+    // add remaining unparsed input length to the string
+    getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+    if (string.length > 0) {
+        getParsingFlags(config).unusedInput.push(string);
+    }
+
+    // clear _12h flag if hour is <= 12
+    if (config._a[HOUR] <= 12 &&
+        getParsingFlags(config).bigHour === true &&
+        config._a[HOUR] > 0) {
+        getParsingFlags(config).bigHour = undefined;
+    }
+
+    getParsingFlags(config).parsedDateParts = config._a.slice(0);
+    getParsingFlags(config).meridiem = config._meridiem;
+    // handle meridiem
+    config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+
+    configFromArray(config);
+    checkOverflow(config);
+}
+
+
+function meridiemFixWrap (locale, hour, meridiem) {
+    var isPm;
+
+    if (meridiem == null) {
+        // nothing to do
+        return hour;
+    }
+    if (locale.meridiemHour != null) {
+        return locale.meridiemHour(hour, meridiem);
+    } else if (locale.isPM != null) {
+        // Fallback
+        isPm = locale.isPM(meridiem);
+        if (isPm && hour < 12) {
+            hour += 12;
+        }
+        if (!isPm && hour === 12) {
+            hour = 0;
+        }
+        return hour;
+    } else {
+        // this is not supposed to happen
+        return hour;
+    }
+}
+
+// date from string and array of format strings
+function configFromStringAndArray(config) {
+    var tempConfig,
+        bestMoment,
+
+        scoreToBeat,
+        i,
+        currentScore;
+
+    if (config._f.length === 0) {
+        getParsingFlags(config).invalidFormat = true;
+        config._d = new Date(NaN);
+        return;
+    }
+
+    for (i = 0; i < config._f.length; i++) {
+        currentScore = 0;
+        tempConfig = copyConfig({}, config);
+        if (config._useUTC != null) {
+            tempConfig._useUTC = config._useUTC;
+        }
+        tempConfig._f = config._f[i];
+        configFromStringAndFormat(tempConfig);
+
+        if (!isValid(tempConfig)) {
+            continue;
+        }
+
+        // if there is any input that was not parsed add a penalty for that format
+        currentScore += getParsingFlags(tempConfig).charsLeftOver;
+
+        //or tokens
+        currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+
+        getParsingFlags(tempConfig).score = currentScore;
+
+        if (scoreToBeat == null || currentScore < scoreToBeat) {
+            scoreToBeat = currentScore;
+            bestMoment = tempConfig;
+        }
+    }
+
+    extend(config, bestMoment || tempConfig);
+}
+
+function configFromObject(config) {
+    if (config._d) {
+        return;
+    }
+
+    var i = normalizeObjectUnits(config._i);
+    config._a = map([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
+        return obj && parseInt(obj, 10);
+    });
+
+    configFromArray(config);
+}
+
+function createFromConfig (config) {
+    var res = new Moment(checkOverflow(prepareConfig(config)));
+    if (res._nextDay) {
+        // Adding is smart enough around DST
+        res.add(1, 'd');
+        res._nextDay = undefined;
+    }
+
+    return res;
+}
+
+function prepareConfig (config) {
+    var input = config._i,
+        format = config._f;
+
+    config._locale = config._locale || getLocale(config._l);
+
+    if (input === null || (format === undefined && input === '')) {
+        return createInvalid({nullInput: true});
+    }
+
+    if (typeof input === 'string') {
+        config._i = input = config._locale.preparse(input);
+    }
+
+    if (isMoment(input)) {
+        return new Moment(checkOverflow(input));
+    } else if (isDate(input)) {
+        config._d = input;
+    } else if (isArray(format)) {
+        configFromStringAndArray(config);
+    } else if (format) {
+        configFromStringAndFormat(config);
+    }  else {
+        configFromInput(config);
+    }
+
+    if (!isValid(config)) {
+        config._d = null;
+    }
+
+    return config;
+}
+
+function configFromInput(config) {
+    var input = config._i;
+    if (isUndefined(input)) {
+        config._d = new Date(hooks.now());
+    } else if (isDate(input)) {
+        config._d = new Date(input.valueOf());
+    } else if (typeof input === 'string') {
+        configFromString(config);
+    } else if (isArray(input)) {
+        config._a = map(input.slice(0), function (obj) {
+            return parseInt(obj, 10);
+        });
+        configFromArray(config);
+    } else if (isObject(input)) {
+        configFromObject(config);
+    } else if (isNumber(input)) {
+        // from milliseconds
+        config._d = new Date(input);
+    } else {
+        hooks.createFromInputFallback(config);
+    }
+}
+
+function createLocalOrUTC (input, format, locale, strict, isUTC) {
+    var c = {};
+
+    if (locale === true || locale === false) {
+        strict = locale;
+        locale = undefined;
+    }
+
+    if ((isObject(input) && isObjectEmpty(input)) ||
+            (isArray(input) && input.length === 0)) {
+        input = undefined;
+    }
+    // object construction must be done this way.
+    // https://github.com/moment/moment/issues/1423
+    c._isAMomentObject = true;
+    c._useUTC = c._isUTC = isUTC;
+    c._l = locale;
+    c._i = input;
+    c._f = format;
+    c._strict = strict;
+
+    return createFromConfig(c);
+}
+
+function createLocal (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, false);
+}
+
+var prototypeMin = deprecate(
+    'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other < this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+var prototypeMax = deprecate(
+    'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other > this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+// Pick a moment m from moments so that m[fn](other) is true for all
+// other. This relies on the function fn to be transitive.
+//
+// moments should either be an array of moment objects or an array, whose
+// first element is an array of moment objects.
+function pickBy(fn, moments) {
+    var res, i;
+    if (moments.length === 1 && isArray(moments[0])) {
+        moments = moments[0];
+    }
+    if (!moments.length) {
+        return createLocal();
+    }
+    res = moments[0];
+    for (i = 1; i < moments.length; ++i) {
+        if (!moments[i].isValid() || moments[i][fn](res)) {
+            res = moments[i];
+        }
+    }
+    return res;
+}
+
+// TODO: Use [].sort instead?
+function min () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isBefore', args);
+}
+
+function max () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isAfter', args);
+}
+
+var now = function () {
+    return Date.now ? Date.now() : +(new Date());
+};
+
+var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'second', 'millisecond'];
+
+function isDurationValid(m) {
+    for (var key in m) {
+        if (!(ordering.indexOf(key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
+            return false;
+        }
+    }
+
+    var unitHasDecimal = false;
+    for (var i = 0; i < ordering.length; ++i) {
+        if (m[ordering[i]]) {
+            if (unitHasDecimal) {
+                return false; // only allow non-integers for smallest unit
+            }
+            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+                unitHasDecimal = true;
+            }
+        }
+    }
+
+    return true;
+}
+
+function isValid$1() {
+    return this._isValid;
+}
+
+function createInvalid$1() {
+    return createDuration(NaN);
+}
+
+function Duration (duration) {
+    var normalizedInput = normalizeObjectUnits(duration),
+        years = normalizedInput.year || 0,
+        quarters = normalizedInput.quarter || 0,
+        months = normalizedInput.month || 0,
+        weeks = normalizedInput.week || 0,
+        days = normalizedInput.day || 0,
+        hours = normalizedInput.hour || 0,
+        minutes = normalizedInput.minute || 0,
+        seconds = normalizedInput.second || 0,
+        milliseconds = normalizedInput.millisecond || 0;
+
+    this._isValid = isDurationValid(normalizedInput);
+
+    // representation for dateAddRemove
+    this._milliseconds = +milliseconds +
+        seconds * 1e3 + // 1000
+        minutes * 6e4 + // 1000 * 60
+        hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
+    // Because of dateAddRemove treats 24 hours as different from a
+    // day when working around DST, we need to store them separately
+    this._days = +days +
+        weeks * 7;
+    // It is impossible translate months into days without knowing
+    // which months you are are talking about, so we have to store
+    // it separately.
+    this._months = +months +
+        quarters * 3 +
+        years * 12;
+
+    this._data = {};
+
+    this._locale = getLocale();
+
+    this._bubble();
+}
+
+function isDuration (obj) {
+    return obj instanceof Duration;
+}
+
+function absRound (number) {
+    if (number < 0) {
+        return Math.round(-1 * number) * -1;
+    } else {
+        return Math.round(number);
+    }
+}
+
+// FORMATTING
+
+function offset (token, separator) {
+    addFormatToken(token, 0, 0, function () {
+        var offset = this.utcOffset();
+        var sign = '+';
+        if (offset < 0) {
+            offset = -offset;
+            sign = '-';
+        }
+        return sign + zeroFill(~~(offset / 60), 2) + separator + zeroFill(~~(offset) % 60, 2);
+    });
+}
+
+offset('Z', ':');
+offset('ZZ', '');
+
+// PARSING
+
+addRegexToken('Z',  matchShortOffset);
+addRegexToken('ZZ', matchShortOffset);
+addParseToken(['Z', 'ZZ'], function (input, array, config) {
+    config._useUTC = true;
+    config._tzm = offsetFromString(matchShortOffset, input);
+});
+
+// HELPERS
+
+// timezone chunker
+// '+10:00' > ['10',  '00']
+// '-1530'  > ['-15', '30']
+var chunkOffset = /([\+\-]|\d\d)/gi;
+
+function offsetFromString(matcher, string) {
+    var matches = (string || '').match(matcher);
+
+    if (matches === null) {
+        return null;
+    }
+
+    var chunk   = matches[matches.length - 1] || [];
+    var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
+    var minutes = +(parts[1] * 60) + toInt(parts[2]);
+
+    return minutes === 0 ?
+      0 :
+      parts[0] === '+' ? minutes : -minutes;
+}
+
+// Return a moment from input, that is local/utc/zone equivalent to model.
+function cloneWithOffset(input, model) {
+    var res, diff;
+    if (model._isUTC) {
+        res = model.clone();
+        diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+        // Use low-level api, because this fn is low-level api.
+        res._d.setTime(res._d.valueOf() + diff);
+        hooks.updateOffset(res, false);
+        return res;
+    } else {
+        return createLocal(input).local();
+    }
+}
+
+function getDateOffset (m) {
+    // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+    // https://github.com/moment/moment/pull/1871
+    return -Math.round(m._d.getTimezoneOffset() / 15) * 15;
+}
+
+// HOOKS
+
+// This function will be called whenever a moment is mutated.
+// It is intended to keep the offset in sync with the timezone.
+hooks.updateOffset = function () {};
+
+// MOMENTS
+
+// keepLocalTime = true means only change the timezone, without
+// affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
+// 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
+// +0200, so we adjust the time as needed, to be valid.
+//
+// Keeping the time actually adds/subtracts (one hour)
+// from the actual represented time. That is why we call updateOffset
+// a second time. In case it wants us to change the offset again
+// _changeInProgress == true case, then we have to adjust, because
+// there is no such time in the given timezone.
+function getSetOffset (input, keepLocalTime, keepMinutes) {
+    var offset = this._offset || 0,
+        localAdjust;
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    if (input != null) {
+        if (typeof input === 'string') {
+            input = offsetFromString(matchShortOffset, input);
+            if (input === null) {
+                return this;
+            }
+        } else if (Math.abs(input) < 16 && !keepMinutes) {
+            input = input * 60;
+        }
+        if (!this._isUTC && keepLocalTime) {
+            localAdjust = getDateOffset(this);
+        }
+        this._offset = input;
+        this._isUTC = true;
+        if (localAdjust != null) {
+            this.add(localAdjust, 'm');
+        }
+        if (offset !== input) {
+            if (!keepLocalTime || this._changeInProgress) {
+                addSubtract(this, createDuration(input - offset, 'm'), 1, false);
+            } else if (!this._changeInProgress) {
+                this._changeInProgress = true;
+                hooks.updateOffset(this, true);
+                this._changeInProgress = null;
+            }
+        }
+        return this;
+    } else {
+        return this._isUTC ? offset : getDateOffset(this);
+    }
+}
+
+function getSetZone (input, keepLocalTime) {
+    if (input != null) {
+        if (typeof input !== 'string') {
+            input = -input;
+        }
+
+        this.utcOffset(input, keepLocalTime);
+
+        return this;
+    } else {
+        return -this.utcOffset();
+    }
+}
+
+function setOffsetToUTC (keepLocalTime) {
+    return this.utcOffset(0, keepLocalTime);
+}
+
+function setOffsetToLocal (keepLocalTime) {
+    if (this._isUTC) {
+        this.utcOffset(0, keepLocalTime);
+        this._isUTC = false;
+
+        if (keepLocalTime) {
+            this.subtract(getDateOffset(this), 'm');
+        }
+    }
+    return this;
+}
+
+function setOffsetToParsedOffset () {
+    if (this._tzm != null) {
+        this.utcOffset(this._tzm, false, true);
+    } else if (typeof this._i === 'string') {
+        var tZone = offsetFromString(matchOffset, this._i);
+        if (tZone != null) {
+            this.utcOffset(tZone);
+        }
+        else {
+            this.utcOffset(0, true);
+        }
+    }
+    return this;
+}
+
+function hasAlignedHourOffset (input) {
+    if (!this.isValid()) {
+        return false;
+    }
+    input = input ? createLocal(input).utcOffset() : 0;
+
+    return (this.utcOffset() - input) % 60 === 0;
+}
+
+function isDaylightSavingTime () {
+    return (
+        this.utcOffset() > this.clone().month(0).utcOffset() ||
+        this.utcOffset() > this.clone().month(5).utcOffset()
+    );
+}
+
+function isDaylightSavingTimeShifted () {
+    if (!isUndefined(this._isDSTShifted)) {
+        return this._isDSTShifted;
+    }
+
+    var c = {};
+
+    copyConfig(c, this);
+    c = prepareConfig(c);
+
+    if (c._a) {
+        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+        this._isDSTShifted = this.isValid() &&
+            compareArrays(c._a, other.toArray()) > 0;
+    } else {
+        this._isDSTShifted = false;
+    }
+
+    return this._isDSTShifted;
+}
+
+function isLocal () {
+    return this.isValid() ? !this._isUTC : false;
+}
+
+function isUtcOffset () {
+    return this.isValid() ? this._isUTC : false;
+}
+
+function isUtc () {
+    return this.isValid() ? this._isUTC && this._offset === 0 : false;
+}
+
+// ASP.NET json date format regex
+var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+
+// from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+// somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+// and further modified to allow for strings containing both week and day
+var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
+
+function createDuration (input, key) {
+    var duration = input,
+        // matching against regexp is expensive, do it on demand
+        match = null,
+        sign,
+        ret,
+        diffRes;
+
+    if (isDuration(input)) {
+        duration = {
+            ms : input._milliseconds,
+            d  : input._days,
+            M  : input._months
+        };
+    } else if (isNumber(input)) {
+        duration = {};
+        if (key) {
+            duration[key] = input;
+        } else {
+            duration.milliseconds = input;
+        }
+    } else if (!!(match = aspNetRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y  : 0,
+            d  : toInt(match[DATE])                         * sign,
+            h  : toInt(match[HOUR])                         * sign,
+            m  : toInt(match[MINUTE])                       * sign,
+            s  : toInt(match[SECOND])                       * sign,
+            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
+        };
+    } else if (!!(match = isoRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y : parseIso(match[2], sign),
+            M : parseIso(match[3], sign),
+            w : parseIso(match[4], sign),
+            d : parseIso(match[5], sign),
+            h : parseIso(match[6], sign),
+            m : parseIso(match[7], sign),
+            s : parseIso(match[8], sign)
+        };
+    } else if (duration == null) {// checks for null or undefined
+        duration = {};
+    } else if (typeof duration === 'object' && ('from' in duration || 'to' in duration)) {
+        diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+
+        duration = {};
+        duration.ms = diffRes.milliseconds;
+        duration.M = diffRes.months;
+    }
+
+    ret = new Duration(duration);
+
+    if (isDuration(input) && hasOwnProp(input, '_locale')) {
+        ret._locale = input._locale;
+    }
+
+    return ret;
+}
+
+createDuration.fn = Duration.prototype;
+createDuration.invalid = createInvalid$1;
+
+function parseIso (inp, sign) {
+    // We'd normally use ~~inp for this, but unfortunately it also
+    // converts floats to ints.
+    // inp may be undefined, so careful calling replace on it.
+    var res = inp && parseFloat(inp.replace(',', '.'));
+    // apply sign while we're at it
+    return (isNaN(res) ? 0 : res) * sign;
+}
+
+function positiveMomentsDifference(base, other) {
+    var res = {milliseconds: 0, months: 0};
+
+    res.months = other.month() - base.month() +
+        (other.year() - base.year()) * 12;
+    if (base.clone().add(res.months, 'M').isAfter(other)) {
+        --res.months;
+    }
+
+    res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
+
+    return res;
+}
+
+function momentsDifference(base, other) {
+    var res;
+    if (!(base.isValid() && other.isValid())) {
+        return {milliseconds: 0, months: 0};
+    }
+
+    other = cloneWithOffset(other, base);
+    if (base.isBefore(other)) {
+        res = positiveMomentsDifference(base, other);
+    } else {
+        res = positiveMomentsDifference(other, base);
+        res.milliseconds = -res.milliseconds;
+        res.months = -res.months;
+    }
+
+    return res;
+}
+
+// TODO: remove 'name' arg after deprecation is removed
+function createAdder(direction, name) {
+    return function (val, period) {
+        var dur, tmp;
+        //invert the arguments, but complain about it
+        if (period !== null && !isNaN(+period)) {
+            deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period). ' +
+            'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.');
+            tmp = val; val = period; period = tmp;
+        }
+
+        val = typeof val === 'string' ? +val : val;
+        dur = createDuration(val, period);
+        addSubtract(this, dur, direction);
+        return this;
+    };
+}
+
+function addSubtract (mom, duration, isAdding, updateOffset) {
+    var milliseconds = duration._milliseconds,
+        days = absRound(duration._days),
+        months = absRound(duration._months);
+
+    if (!mom.isValid()) {
+        // No op
+        return;
+    }
+
+    updateOffset = updateOffset == null ? true : updateOffset;
+
+    if (milliseconds) {
+        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+    }
+    if (days) {
+        set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
+    }
+    if (months) {
+        setMonth(mom, get(mom, 'Month') + months * isAdding);
+    }
+    if (updateOffset) {
+        hooks.updateOffset(mom, days || months);
+    }
+}
+
+var add      = createAdder(1, 'add');
+var subtract = createAdder(-1, 'subtract');
+
+function getCalendarFormat(myMoment, now) {
+    var diff = myMoment.diff(now, 'days', true);
+    return diff < -6 ? 'sameElse' :
+            diff < -1 ? 'lastWeek' :
+            diff < 0 ? 'lastDay' :
+            diff < 1 ? 'sameDay' :
+            diff < 2 ? 'nextDay' :
+            diff < 7 ? 'nextWeek' : 'sameElse';
+}
+
+function calendar$1 (time, formats) {
+    // We want to compare the start of today, vs this.
+    // Getting start-of-today depends on whether we're local/utc/offset or not.
+    var now = time || createLocal(),
+        sod = cloneWithOffset(now, this).startOf('day'),
+        format = hooks.calendarFormat(this, sod) || 'sameElse';
+
+    var output = formats && (isFunction(formats[format]) ? formats[format].call(this, now) : formats[format]);
+
+    return this.format(output || this.localeData().calendar(format, this, createLocal(now)));
+}
+
+function clone () {
+    return new Moment(this);
+}
+
+function isAfter (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() > localInput.valueOf();
+    } else {
+        return localInput.valueOf() < this.clone().startOf(units).valueOf();
+    }
+}
+
+function isBefore (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() < localInput.valueOf();
+    } else {
+        return this.clone().endOf(units).valueOf() < localInput.valueOf();
+    }
+}
+
+function isBetween (from, to, units, inclusivity) {
+    inclusivity = inclusivity || '()';
+    return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+        (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+}
+
+function isSame (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input),
+        inputMs;
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(units || 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() === localInput.valueOf();
+    } else {
+        inputMs = localInput.valueOf();
+        return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
+    }
+}
+
+function isSameOrAfter (input, units) {
+    return this.isSame(input, units) || this.isAfter(input,units);
+}
+
+function isSameOrBefore (input, units) {
+    return this.isSame(input, units) || this.isBefore(input,units);
+}
+
+function diff (input, units, asFloat) {
+    var that,
+        zoneDelta,
+        delta, output;
+
+    if (!this.isValid()) {
+        return NaN;
+    }
+
+    that = cloneWithOffset(input, this);
+
+    if (!that.isValid()) {
+        return NaN;
+    }
+
+    zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+
+    units = normalizeUnits(units);
+
+    if (units === 'year' || units === 'month' || units === 'quarter') {
+        output = monthDiff(this, that);
+        if (units === 'quarter') {
+            output = output / 3;
+        } else if (units === 'year') {
+            output = output / 12;
+        }
+    } else {
+        delta = this - that;
+        output = units === 'second' ? delta / 1e3 : // 1000
+            units === 'minute' ? delta / 6e4 : // 1000 * 60
+            units === 'hour' ? delta / 36e5 : // 1000 * 60 * 60
+            units === 'day' ? (delta - zoneDelta) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
+            units === 'week' ? (delta - zoneDelta) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
+            delta;
+    }
+    return asFloat ? output : absFloor(output);
+}
+
+function monthDiff (a, b) {
+    // difference in months
+    var wholeMonthDiff = ((b.year() - a.year()) * 12) + (b.month() - a.month()),
+        // b is in (anchor - 1 month, anchor + 1 month)
+        anchor = a.clone().add(wholeMonthDiff, 'months'),
+        anchor2, adjust;
+
+    if (b - anchor < 0) {
+        anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor - anchor2);
+    } else {
+        anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor2 - anchor);
+    }
+
+    //check for negative zero, return zero if negative zero
+    return -(wholeMonthDiff + adjust) || 0;
+}
+
+hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+function toString () {
+    return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+}
+
+function toISOString() {
+    if (!this.isValid()) {
+        return null;
+    }
+    var m = this.clone().utc();
+    if (m.year() < 0 || m.year() > 9999) {
+        return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    }
+    if (isFunction(Date.prototype.toISOString)) {
+        // native implementation is ~50x faster, use it when we can
+        return this.toDate().toISOString();
+    }
+    return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+}
+
+/**
+ * Return a human readable representation of a moment that can
+ * also be evaluated to get a new moment which is the same
+ *
+ * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
+ */
+function inspect () {
+    if (!this.isValid()) {
+        return 'moment.invalid(/* ' + this._i + ' */)';
+    }
+    var func = 'moment';
+    var zone = '';
+    if (!this.isLocal()) {
+        func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
+        zone = 'Z';
+    }
+    var prefix = '[' + func + '("]';
+    var year = (0 <= this.year() && this.year() <= 9999) ? 'YYYY' : 'YYYYYY';
+    var datetime = '-MM-DD[T]HH:mm:ss.SSS';
+    var suffix = zone + '[")]';
+
+    return this.format(prefix + year + datetime + suffix);
+}
+
+function format (inputString) {
+    if (!inputString) {
+        inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+    }
+    var output = formatMoment(this, inputString);
+    return this.localeData().postformat(output);
+}
+
+function from (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function fromNow (withoutSuffix) {
+    return this.from(createLocal(), withoutSuffix);
+}
+
+function to (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function toNow (withoutSuffix) {
+    return this.to(createLocal(), withoutSuffix);
+}
+
+// If passed a locale key, it will set the locale for this
+// instance.  Otherwise, it will return the locale configuration
+// variables for this instance.
+function locale (key) {
+    var newLocaleData;
+
+    if (key === undefined) {
+        return this._locale._abbr;
+    } else {
+        newLocaleData = getLocale(key);
+        if (newLocaleData != null) {
+            this._locale = newLocaleData;
+        }
+        return this;
+    }
+}
+
+var lang = deprecate(
+    'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
+    function (key) {
+        if (key === undefined) {
+            return this.localeData();
+        } else {
+            return this.locale(key);
+        }
+    }
+);
+
+function localeData () {
+    return this._locale;
+}
+
+function startOf (units) {
+    units = normalizeUnits(units);
+    // the following switch intentionally omits break keywords
+    // to utilize falling through the cases.
+    switch (units) {
+        case 'year':
+            this.month(0);
+            /* falls through */
+        case 'quarter':
+        case 'month':
+            this.date(1);
+            /* falls through */
+        case 'week':
+        case 'isoWeek':
+        case 'day':
+        case 'date':
+            this.hours(0);
+            /* falls through */
+        case 'hour':
+            this.minutes(0);
+            /* falls through */
+        case 'minute':
+            this.seconds(0);
+            /* falls through */
+        case 'second':
+            this.milliseconds(0);
+    }
+
+    // weeks are a special case
+    if (units === 'week') {
+        this.weekday(0);
+    }
+    if (units === 'isoWeek') {
+        this.isoWeekday(1);
+    }
+
+    // quarters are also special
+    if (units === 'quarter') {
+        this.month(Math.floor(this.month() / 3) * 3);
+    }
+
+    return this;
+}
+
+function endOf (units) {
+    units = normalizeUnits(units);
+    if (units === undefined || units === 'millisecond') {
+        return this;
+    }
+
+    // 'date' is an alias for 'day', so it should be considered as such.
+    if (units === 'date') {
+        units = 'day';
+    }
+
+    return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+}
+
+function valueOf () {
+    return this._d.valueOf() - ((this._offset || 0) * 60000);
+}
+
+function unix () {
+    return Math.floor(this.valueOf() / 1000);
+}
+
+function toDate () {
+    return new Date(this.valueOf());
+}
+
+function toArray () {
+    var m = this;
+    return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
+}
+
+function toObject () {
+    var m = this;
+    return {
+        years: m.year(),
+        months: m.month(),
+        date: m.date(),
+        hours: m.hours(),
+        minutes: m.minutes(),
+        seconds: m.seconds(),
+        milliseconds: m.milliseconds()
+    };
+}
+
+function toJSON () {
+    // new Date(NaN).toJSON() === null
+    return this.isValid() ? this.toISOString() : null;
+}
+
+function isValid$2 () {
+    return isValid(this);
+}
+
+function parsingFlags () {
+    return extend({}, getParsingFlags(this));
+}
+
+function invalidAt () {
+    return getParsingFlags(this).overflow;
+}
+
+function creationData() {
+    return {
+        input: this._i,
+        format: this._f,
+        locale: this._locale,
+        isUTC: this._isUTC,
+        strict: this._strict
+    };
+}
+
+// FORMATTING
+
+addFormatToken(0, ['gg', 2], 0, function () {
+    return this.weekYear() % 100;
+});
+
+addFormatToken(0, ['GG', 2], 0, function () {
+    return this.isoWeekYear() % 100;
+});
+
+function addWeekYearFormatToken (token, getter) {
+    addFormatToken(0, [token, token.length], 0, getter);
+}
+
+addWeekYearFormatToken('gggg',     'weekYear');
+addWeekYearFormatToken('ggggg',    'weekYear');
+addWeekYearFormatToken('GGGG',  'isoWeekYear');
+addWeekYearFormatToken('GGGGG', 'isoWeekYear');
+
+// ALIASES
+
+addUnitAlias('weekYear', 'gg');
+addUnitAlias('isoWeekYear', 'GG');
+
+// PRIORITY
+
+addUnitPriority('weekYear', 1);
+addUnitPriority('isoWeekYear', 1);
+
+
+// PARSING
+
+addRegexToken('G',      matchSigned);
+addRegexToken('g',      matchSigned);
+addRegexToken('GG',     match1to2, match2);
+addRegexToken('gg',     match1to2, match2);
+addRegexToken('GGGG',   match1to4, match4);
+addRegexToken('gggg',   match1to4, match4);
+addRegexToken('GGGGG',  match1to6, match6);
+addRegexToken('ggggg',  match1to6, match6);
+
+addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
+    week[token.substr(0, 2)] = toInt(input);
+});
+
+addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
+    week[token] = hooks.parseTwoDigitYear(input);
+});
+
+// MOMENTS
+
+function getSetWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input,
+            this.week(),
+            this.weekday(),
+            this.localeData()._week.dow,
+            this.localeData()._week.doy);
+}
+
+function getSetISOWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input, this.isoWeek(), this.isoWeekday(), 1, 4);
+}
+
+function getISOWeeksInYear () {
+    return weeksInYear(this.year(), 1, 4);
+}
+
+function getWeeksInYear () {
+    var weekInfo = this.localeData()._week;
+    return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+}
+
+function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+    var weeksTarget;
+    if (input == null) {
+        return weekOfYear(this, dow, doy).year;
+    } else {
+        weeksTarget = weeksInYear(input, dow, doy);
+        if (week > weeksTarget) {
+            week = weeksTarget;
+        }
+        return setWeekAll.call(this, input, week, weekday, dow, doy);
+    }
+}
+
+function setWeekAll(weekYear, week, weekday, dow, doy) {
+    var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+        date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+    this.year(date.getUTCFullYear());
+    this.month(date.getUTCMonth());
+    this.date(date.getUTCDate());
+    return this;
+}
+
+// FORMATTING
+
+addFormatToken('Q', 0, 'Qo', 'quarter');
+
+// ALIASES
+
+addUnitAlias('quarter', 'Q');
+
+// PRIORITY
+
+addUnitPriority('quarter', 7);
+
+// PARSING
+
+addRegexToken('Q', match1);
+addParseToken('Q', function (input, array) {
+    array[MONTH] = (toInt(input) - 1) * 3;
+});
+
+// MOMENTS
+
+function getSetQuarter (input) {
+    return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+}
+
+// FORMATTING
+
+addFormatToken('D', ['DD', 2], 'Do', 'date');
+
+// ALIASES
+
+addUnitAlias('date', 'D');
+
+// PRIOROITY
+addUnitPriority('date', 9);
+
+// PARSING
+
+addRegexToken('D',  match1to2);
+addRegexToken('DD', match1to2, match2);
+addRegexToken('Do', function (isStrict, locale) {
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    return isStrict ?
+      (locale._dayOfMonthOrdinalParse || locale._ordinalParse) :
+      locale._dayOfMonthOrdinalParseLenient;
+});
+
+addParseToken(['D', 'DD'], DATE);
+addParseToken('Do', function (input, array) {
+    array[DATE] = toInt(input.match(match1to2)[0], 10);
+});
+
+// MOMENTS
+
+var getSetDayOfMonth = makeGetSet('Date', true);
+
+// FORMATTING
+
+addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+// ALIASES
+
+addUnitAlias('dayOfYear', 'DDD');
+
+// PRIORITY
+addUnitPriority('dayOfYear', 4);
+
+// PARSING
+
+addRegexToken('DDD',  match1to3);
+addRegexToken('DDDD', match3);
+addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+    config._dayOfYear = toInt(input);
+});
+
+// HELPERS
+
+// MOMENTS
+
+function getSetDayOfYear (input) {
+    var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
+    return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+}
+
+// FORMATTING
+
+addFormatToken('m', ['mm', 2], 0, 'minute');
+
+// ALIASES
+
+addUnitAlias('minute', 'm');
+
+// PRIORITY
+
+addUnitPriority('minute', 14);
+
+// PARSING
+
+addRegexToken('m',  match1to2);
+addRegexToken('mm', match1to2, match2);
+addParseToken(['m', 'mm'], MINUTE);
+
+// MOMENTS
+
+var getSetMinute = makeGetSet('Minutes', false);
+
+// FORMATTING
+
+addFormatToken('s', ['ss', 2], 0, 'second');
+
+// ALIASES
+
+addUnitAlias('second', 's');
+
+// PRIORITY
+
+addUnitPriority('second', 15);
+
+// PARSING
+
+addRegexToken('s',  match1to2);
+addRegexToken('ss', match1to2, match2);
+addParseToken(['s', 'ss'], SECOND);
+
+// MOMENTS
+
+var getSetSecond = makeGetSet('Seconds', false);
+
+// FORMATTING
+
+addFormatToken('S', 0, 0, function () {
+    return ~~(this.millisecond() / 100);
+});
+
+addFormatToken(0, ['SS', 2], 0, function () {
+    return ~~(this.millisecond() / 10);
+});
+
+addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+addFormatToken(0, ['SSSS', 4], 0, function () {
+    return this.millisecond() * 10;
+});
+addFormatToken(0, ['SSSSS', 5], 0, function () {
+    return this.millisecond() * 100;
+});
+addFormatToken(0, ['SSSSSS', 6], 0, function () {
+    return this.millisecond() * 1000;
+});
+addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+    return this.millisecond() * 10000;
+});
+addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+    return this.millisecond() * 100000;
+});
+addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+    return this.millisecond() * 1000000;
+});
+
+
+// ALIASES
+
+addUnitAlias('millisecond', 'ms');
+
+// PRIORITY
+
+addUnitPriority('millisecond', 16);
+
+// PARSING
+
+addRegexToken('S',    match1to3, match1);
+addRegexToken('SS',   match1to3, match2);
+addRegexToken('SSS',  match1to3, match3);
+
+var token;
+for (token = 'SSSS'; token.length <= 9; token += 'S') {
+    addRegexToken(token, matchUnsigned);
+}
+
+function parseMs(input, array) {
+    array[MILLISECOND] = toInt(('0.' + input) * 1000);
+}
+
+for (token = 'S'; token.length <= 9; token += 'S') {
+    addParseToken(token, parseMs);
+}
+// MOMENTS
+
+var getSetMillisecond = makeGetSet('Milliseconds', false);
+
+// FORMATTING
+
+addFormatToken('z',  0, 0, 'zoneAbbr');
+addFormatToken('zz', 0, 0, 'zoneName');
+
+// MOMENTS
+
+function getZoneAbbr () {
+    return this._isUTC ? 'UTC' : '';
+}
+
+function getZoneName () {
+    return this._isUTC ? 'Coordinated Universal Time' : '';
+}
+
+var proto = Moment.prototype;
+
+proto.add               = add;
+proto.calendar          = calendar$1;
+proto.clone             = clone;
+proto.diff              = diff;
+proto.endOf             = endOf;
+proto.format            = format;
+proto.from              = from;
+proto.fromNow           = fromNow;
+proto.to                = to;
+proto.toNow             = toNow;
+proto.get               = stringGet;
+proto.invalidAt         = invalidAt;
+proto.isAfter           = isAfter;
+proto.isBefore          = isBefore;
+proto.isBetween         = isBetween;
+proto.isSame            = isSame;
+proto.isSameOrAfter     = isSameOrAfter;
+proto.isSameOrBefore    = isSameOrBefore;
+proto.isValid           = isValid$2;
+proto.lang              = lang;
+proto.locale            = locale;
+proto.localeData        = localeData;
+proto.max               = prototypeMax;
+proto.min               = prototypeMin;
+proto.parsingFlags      = parsingFlags;
+proto.set               = stringSet;
+proto.startOf           = startOf;
+proto.subtract          = subtract;
+proto.toArray           = toArray;
+proto.toObject          = toObject;
+proto.toDate            = toDate;
+proto.toISOString       = toISOString;
+proto.inspect           = inspect;
+proto.toJSON            = toJSON;
+proto.toString          = toString;
+proto.unix              = unix;
+proto.valueOf           = valueOf;
+proto.creationData      = creationData;
+
+// Year
+proto.year       = getSetYear;
+proto.isLeapYear = getIsLeapYear;
+
+// Week Year
+proto.weekYear    = getSetWeekYear;
+proto.isoWeekYear = getSetISOWeekYear;
+
+// Quarter
+proto.quarter = proto.quarters = getSetQuarter;
+
+// Month
+proto.month       = getSetMonth;
+proto.daysInMonth = getDaysInMonth;
+
+// Week
+proto.week           = proto.weeks        = getSetWeek;
+proto.isoWeek        = proto.isoWeeks     = getSetISOWeek;
+proto.weeksInYear    = getWeeksInYear;
+proto.isoWeeksInYear = getISOWeeksInYear;
+
+// Day
+proto.date       = getSetDayOfMonth;
+proto.day        = proto.days             = getSetDayOfWeek;
+proto.weekday    = getSetLocaleDayOfWeek;
+proto.isoWeekday = getSetISODayOfWeek;
+proto.dayOfYear  = getSetDayOfYear;
+
+// Hour
+proto.hour = proto.hours = getSetHour;
+
+// Minute
+proto.minute = proto.minutes = getSetMinute;
+
+// Second
+proto.second = proto.seconds = getSetSecond;
+
+// Millisecond
+proto.millisecond = proto.milliseconds = getSetMillisecond;
+
+// Offset
+proto.utcOffset            = getSetOffset;
+proto.utc                  = setOffsetToUTC;
+proto.local                = setOffsetToLocal;
+proto.parseZone            = setOffsetToParsedOffset;
+proto.hasAlignedHourOffset = hasAlignedHourOffset;
+proto.isDST                = isDaylightSavingTime;
+proto.isLocal              = isLocal;
+proto.isUtcOffset          = isUtcOffset;
+proto.isUtc                = isUtc;
+proto.isUTC                = isUtc;
+
+// Timezone
+proto.zoneAbbr = getZoneAbbr;
+proto.zoneName = getZoneName;
+
+// Deprecations
+proto.dates  = deprecate('dates accessor is deprecated. Use date instead.', getSetDayOfMonth);
+proto.months = deprecate('months accessor is deprecated. Use month instead', getSetMonth);
+proto.years  = deprecate('years accessor is deprecated. Use year instead', getSetYear);
+proto.zone   = deprecate('moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/', getSetZone);
+proto.isDSTShifted = deprecate('isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information', isDaylightSavingTimeShifted);
+
+function createUnix (input) {
+    return createLocal(input * 1000);
+}
+
+function createInZone () {
+    return createLocal.apply(null, arguments).parseZone();
+}
+
+function preParsePostFormat (string) {
+    return string;
+}
+
+var proto$1 = Locale.prototype;
+
+proto$1.calendar        = calendar;
+proto$1.longDateFormat  = longDateFormat;
+proto$1.invalidDate     = invalidDate;
+proto$1.ordinal         = ordinal;
+proto$1.preparse        = preParsePostFormat;
+proto$1.postformat      = preParsePostFormat;
+proto$1.relativeTime    = relativeTime;
+proto$1.pastFuture      = pastFuture;
+proto$1.set             = set;
+
+// Month
+proto$1.months            =        localeMonths;
+proto$1.monthsShort       =        localeMonthsShort;
+proto$1.monthsParse       =        localeMonthsParse;
+proto$1.monthsRegex       = monthsRegex;
+proto$1.monthsShortRegex  = monthsShortRegex;
+
+// Week
+proto$1.week = localeWeek;
+proto$1.firstDayOfYear = localeFirstDayOfYear;
+proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+
+// Day of Week
+proto$1.weekdays       =        localeWeekdays;
+proto$1.weekdaysMin    =        localeWeekdaysMin;
+proto$1.weekdaysShort  =        localeWeekdaysShort;
+proto$1.weekdaysParse  =        localeWeekdaysParse;
+
+proto$1.weekdaysRegex       =        weekdaysRegex;
+proto$1.weekdaysShortRegex  =        weekdaysShortRegex;
+proto$1.weekdaysMinRegex    =        weekdaysMinRegex;
+
+// Hours
+proto$1.isPM = localeIsPM;
+proto$1.meridiem = localeMeridiem;
+
+function get$1 (format, index, field, setter) {
+    var locale = getLocale();
+    var utc = createUTC().set(setter, index);
+    return locale[field](utc, format);
+}
+
+function listMonthsImpl (format, index, field) {
+    if (isNumber(format)) {
+        index = format;
+        format = undefined;
+    }
+
+    format = format || '';
+
+    if (index != null) {
+        return get$1(format, index, field, 'month');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 12; i++) {
+        out[i] = get$1(format, i, field, 'month');
+    }
+    return out;
+}
+
+// ()
+// (5)
+// (fmt, 5)
+// (fmt)
+// (true)
+// (true, 5)
+// (true, fmt, 5)
+// (true, fmt)
+function listWeekdaysImpl (localeSorted, format, index, field) {
+    if (typeof localeSorted === 'boolean') {
+        if (isNumber(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    } else {
+        format = localeSorted;
+        index = format;
+        localeSorted = false;
+
+        if (isNumber(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    }
+
+    var locale = getLocale(),
+        shift = localeSorted ? locale._week.dow : 0;
+
+    if (index != null) {
+        return get$1(format, (index + shift) % 7, field, 'day');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 7; i++) {
+        out[i] = get$1(format, (i + shift) % 7, field, 'day');
+    }
+    return out;
+}
+
+function listMonths (format, index) {
+    return listMonthsImpl(format, index, 'months');
+}
+
+function listMonthsShort (format, index) {
+    return listMonthsImpl(format, index, 'monthsShort');
+}
+
+function listWeekdays (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
+}
+
+function listWeekdaysShort (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
+}
+
+function listWeekdaysMin (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
+}
+
+getSetGlobalLocale('en', {
+    dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+    ordinal : function (number) {
+        var b = number % 10,
+            output = (toInt(number % 100 / 10) === 1) ? 'th' :
+            (b === 1) ? 'st' :
+            (b === 2) ? 'nd' :
+            (b === 3) ? 'rd' : 'th';
+        return number + output;
+    }
+});
+
+// Side effect imports
+hooks.lang = deprecate('moment.lang is deprecated. Use moment.locale instead.', getSetGlobalLocale);
+hooks.langData = deprecate('moment.langData is deprecated. Use moment.localeData instead.', getLocale);
+
+var mathAbs = Math.abs;
+
+function abs () {
+    var data           = this._data;
+
+    this._milliseconds = mathAbs(this._milliseconds);
+    this._days         = mathAbs(this._days);
+    this._months       = mathAbs(this._months);
+
+    data.milliseconds  = mathAbs(data.milliseconds);
+    data.seconds       = mathAbs(data.seconds);
+    data.minutes       = mathAbs(data.minutes);
+    data.hours         = mathAbs(data.hours);
+    data.months        = mathAbs(data.months);
+    data.years         = mathAbs(data.years);
+
+    return this;
+}
+
+function addSubtract$1 (duration, input, value, direction) {
+    var other = createDuration(input, value);
+
+    duration._milliseconds += direction * other._milliseconds;
+    duration._days         += direction * other._days;
+    duration._months       += direction * other._months;
+
+    return duration._bubble();
+}
+
+// supports only 2.0-style add(1, 's') or add(duration)
+function add$1 (input, value) {
+    return addSubtract$1(this, input, value, 1);
+}
+
+// supports only 2.0-style subtract(1, 's') or subtract(duration)
+function subtract$1 (input, value) {
+    return addSubtract$1(this, input, value, -1);
+}
+
+function absCeil (number) {
+    if (number < 0) {
+        return Math.floor(number);
+    } else {
+        return Math.ceil(number);
+    }
+}
+
+function bubble () {
+    var milliseconds = this._milliseconds;
+    var days         = this._days;
+    var months       = this._months;
+    var data         = this._data;
+    var seconds, minutes, hours, years, monthsFromDays;
+
+    // if we have a mix of positive and negative values, bubble down first
+    // check: https://github.com/moment/moment/issues/2166
+    if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
+            (milliseconds <= 0 && days <= 0 && months <= 0))) {
+        milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+        days = 0;
+        months = 0;
+    }
+
+    // The following code bubbles up values, see the tests for
+    // examples of what that means.
+    data.milliseconds = milliseconds % 1000;
+
+    seconds           = absFloor(milliseconds / 1000);
+    data.seconds      = seconds % 60;
+
+    minutes           = absFloor(seconds / 60);
+    data.minutes      = minutes % 60;
+
+    hours             = absFloor(minutes / 60);
+    data.hours        = hours % 24;
+
+    days += absFloor(hours / 24);
+
+    // convert days to months
+    monthsFromDays = absFloor(daysToMonths(days));
+    months += monthsFromDays;
+    days -= absCeil(monthsToDays(monthsFromDays));
+
+    // 12 months -> 1 year
+    years = absFloor(months / 12);
+    months %= 12;
+
+    data.days   = days;
+    data.months = months;
+    data.years  = years;
+
+    return this;
+}
+
+function daysToMonths (days) {
+    // 400 years have 146097 days (taking into account leap year rules)
+    // 400 years have 12 months === 4800
+    return days * 4800 / 146097;
+}
+
+function monthsToDays (months) {
+    // the reverse of daysToMonths
+    return months * 146097 / 4800;
+}
+
+function as (units) {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    var days;
+    var months;
+    var milliseconds = this._milliseconds;
+
+    units = normalizeUnits(units);
+
+    if (units === 'month' || units === 'year') {
+        days   = this._days   + milliseconds / 864e5;
+        months = this._months + daysToMonths(days);
+        return units === 'month' ? months : months / 12;
+    } else {
+        // handle milliseconds separately because of floating point math errors (issue #1867)
+        days = this._days + Math.round(monthsToDays(this._months));
+        switch (units) {
+            case 'week'   : return days / 7     + milliseconds / 6048e5;
+            case 'day'    : return days         + milliseconds / 864e5;
+            case 'hour'   : return days * 24    + milliseconds / 36e5;
+            case 'minute' : return days * 1440  + milliseconds / 6e4;
+            case 'second' : return days * 86400 + milliseconds / 1000;
+            // Math.floor prevents floating point math errors here
+            case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
+            default: throw new Error('Unknown unit ' + units);
+        }
+    }
+}
+
+// TODO: Use this.as('ms')?
+function valueOf$1 () {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    return (
+        this._milliseconds +
+        this._days * 864e5 +
+        (this._months % 12) * 2592e6 +
+        toInt(this._months / 12) * 31536e6
+    );
+}
+
+function makeAs (alias) {
+    return function () {
+        return this.as(alias);
+    };
+}
+
+var asMilliseconds = makeAs('ms');
+var asSeconds      = makeAs('s');
+var asMinutes      = makeAs('m');
+var asHours        = makeAs('h');
+var asDays         = makeAs('d');
+var asWeeks        = makeAs('w');
+var asMonths       = makeAs('M');
+var asYears        = makeAs('y');
+
+function get$2 (units) {
+    units = normalizeUnits(units);
+    return this.isValid() ? this[units + 's']() : NaN;
+}
+
+function makeGetter(name) {
+    return function () {
+        return this.isValid() ? this._data[name] : NaN;
+    };
+}
+
+var milliseconds = makeGetter('milliseconds');
+var seconds      = makeGetter('seconds');
+var minutes      = makeGetter('minutes');
+var hours        = makeGetter('hours');
+var days         = makeGetter('days');
+var months       = makeGetter('months');
+var years        = makeGetter('years');
+
+function weeks () {
+    return absFloor(this.days() / 7);
+}
+
+var round = Math.round;
+var thresholds = {
+    ss: 44,         // a few seconds to seconds
+    s : 45,         // seconds to minute
+    m : 45,         // minutes to hour
+    h : 22,         // hours to day
+    d : 26,         // days to month
+    M : 11          // months to year
+};
+
+// helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
+function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+    return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+}
+
+function relativeTime$1 (posNegDuration, withoutSuffix, locale) {
+    var duration = createDuration(posNegDuration).abs();
+    var seconds  = round(duration.as('s'));
+    var minutes  = round(duration.as('m'));
+    var hours    = round(duration.as('h'));
+    var days     = round(duration.as('d'));
+    var months   = round(duration.as('M'));
+    var years    = round(duration.as('y'));
+
+    var a = seconds <= thresholds.ss && ['s', seconds]  ||
+            seconds < thresholds.s   && ['ss', seconds] ||
+            minutes <= 1             && ['m']           ||
+            minutes < thresholds.m   && ['mm', minutes] ||
+            hours   <= 1             && ['h']           ||
+            hours   < thresholds.h   && ['hh', hours]   ||
+            days    <= 1             && ['d']           ||
+            days    < thresholds.d   && ['dd', days]    ||
+            months  <= 1             && ['M']           ||
+            months  < thresholds.M   && ['MM', months]  ||
+            years   <= 1             && ['y']           || ['yy', years];
+
+    a[2] = withoutSuffix;
+    a[3] = +posNegDuration > 0;
+    a[4] = locale;
+    return substituteTimeAgo.apply(null, a);
+}
+
+// This function allows you to set the rounding function for relative time strings
+function getSetRelativeTimeRounding (roundingFunction) {
+    if (roundingFunction === undefined) {
+        return round;
+    }
+    if (typeof(roundingFunction) === 'function') {
+        round = roundingFunction;
+        return true;
+    }
+    return false;
+}
+
+// This function allows you to set a threshold for relative time strings
+function getSetRelativeTimeThreshold (threshold, limit) {
+    if (thresholds[threshold] === undefined) {
+        return false;
+    }
+    if (limit === undefined) {
+        return thresholds[threshold];
+    }
+    thresholds[threshold] = limit;
+    if (threshold === 's') {
+        thresholds.ss = limit - 1;
+    }
+    return true;
+}
+
+function humanize (withSuffix) {
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var locale = this.localeData();
+    var output = relativeTime$1(this, !withSuffix, locale);
+
+    if (withSuffix) {
+        output = locale.pastFuture(+this, output);
+    }
+
+    return locale.postformat(output);
+}
+
+var abs$1 = Math.abs;
+
+function toISOString$1() {
+    // for ISO strings we do not use the normal bubbling rules:
+    //  * milliseconds bubble up until they become hours
+    //  * days do not bubble at all
+    //  * months bubble up until they become years
+    // This is because there is no context-free conversion between hours and days
+    // (think of clock changes)
+    // and also not between days and months (28-31 days per month)
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var seconds = abs$1(this._milliseconds) / 1000;
+    var days         = abs$1(this._days);
+    var months       = abs$1(this._months);
+    var minutes, hours, years;
+
+    // 3600 seconds -> 60 minutes -> 1 hour
+    minutes           = absFloor(seconds / 60);
+    hours             = absFloor(minutes / 60);
+    seconds %= 60;
+    minutes %= 60;
+
+    // 12 months -> 1 year
+    years  = absFloor(months / 12);
+    months %= 12;
+
+
+    // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
+    var Y = years;
+    var M = months;
+    var D = days;
+    var h = hours;
+    var m = minutes;
+    var s = seconds;
+    var total = this.asSeconds();
+
+    if (!total) {
+        // this is the same as C#'s (Noda) and python (isodate)...
+        // but not other JS (goog.date)
+        return 'P0D';
+    }
+
+    return (total < 0 ? '-' : '') +
+        'P' +
+        (Y ? Y + 'Y' : '') +
+        (M ? M + 'M' : '') +
+        (D ? D + 'D' : '') +
+        ((h || m || s) ? 'T' : '') +
+        (h ? h + 'H' : '') +
+        (m ? m + 'M' : '') +
+        (s ? s + 'S' : '');
+}
+
+var proto$2 = Duration.prototype;
+
+proto$2.isValid        = isValid$1;
+proto$2.abs            = abs;
+proto$2.add            = add$1;
+proto$2.subtract       = subtract$1;
+proto$2.as             = as;
+proto$2.asMilliseconds = asMilliseconds;
+proto$2.asSeconds      = asSeconds;
+proto$2.asMinutes      = asMinutes;
+proto$2.asHours        = asHours;
+proto$2.asDays         = asDays;
+proto$2.asWeeks        = asWeeks;
+proto$2.asMonths       = asMonths;
+proto$2.asYears        = asYears;
+proto$2.valueOf        = valueOf$1;
+proto$2._bubble        = bubble;
+proto$2.get            = get$2;
+proto$2.milliseconds   = milliseconds;
+proto$2.seconds        = seconds;
+proto$2.minutes        = minutes;
+proto$2.hours          = hours;
+proto$2.days           = days;
+proto$2.weeks          = weeks;
+proto$2.months         = months;
+proto$2.years          = years;
+proto$2.humanize       = humanize;
+proto$2.toISOString    = toISOString$1;
+proto$2.toString       = toISOString$1;
+proto$2.toJSON         = toISOString$1;
+proto$2.locale         = locale;
+proto$2.localeData     = localeData;
+
+// Deprecations
+proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)', toISOString$1);
+proto$2.lang = lang;
+
+// Side effect imports
+
+// FORMATTING
+
+addFormatToken('X', 0, 0, 'unix');
+addFormatToken('x', 0, 0, 'valueOf');
+
+// PARSING
+
+addRegexToken('x', matchSigned);
+addRegexToken('X', matchTimestamp);
+addParseToken('X', function (input, array, config) {
+    config._d = new Date(parseFloat(input, 10) * 1000);
+});
+addParseToken('x', function (input, array, config) {
+    config._d = new Date(toInt(input));
+});
+
+// Side effect imports
+
+
+hooks.version = '2.18.1';
+
+setHookCallback(createLocal);
+
+hooks.fn                    = proto;
+hooks.min                   = min;
+hooks.max                   = max;
+hooks.now                   = now;
+hooks.utc                   = createUTC;
+hooks.unix                  = createUnix;
+hooks.months                = listMonths;
+hooks.isDate                = isDate;
+hooks.locale                = getSetGlobalLocale;
+hooks.invalid               = createInvalid;
+hooks.duration              = createDuration;
+hooks.isMoment              = isMoment;
+hooks.weekdays              = listWeekdays;
+hooks.parseZone             = createInZone;
+hooks.localeData            = getLocale;
+hooks.isDuration            = isDuration;
+hooks.monthsShort           = listMonthsShort;
+hooks.weekdaysMin           = listWeekdaysMin;
+hooks.defineLocale          = defineLocale;
+hooks.updateLocale          = updateLocale;
+hooks.locales               = listLocales;
+hooks.weekdaysShort         = listWeekdaysShort;
+hooks.normalizeUnits        = normalizeUnits;
+hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+hooks.calendarFormat        = getCalendarFormat;
+hooks.prototype             = proto;
+
+return hooks;
+
+})));
+
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"../node_modules\\text\\text","jquery":"../node_modules\\jquery\\dist\\jquery","extend":"../node_modules\\extend\\index","moment":"../node_modules\\moment\\moment","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-notification","location":"../node_modules/aurelia-notification/dist/amd","main":"aurelia-notification"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"humane-js","location":"../node_modules/humane-js","main":"humane"},{"name":"aurelia-i18n","location":"../node_modules/aurelia-i18n/dist/amd","main":"aurelia-i18n"},{"name":"i18next","location":"../node_modules/i18next/dist/commonjs","main":"index"},{"name":"regenerator-runtime","location":"../node_modules/regenerator-runtime","main":"runtime-module"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"aurelia-dialog","location":"../node_modules/aurelia-dialog/dist/amd","main":"aurelia-dialog"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min.js"},{"name":"aurelia-mask","location":"../node_modules/aurelia-mask/dist","main":"masked-input"},{"name":"flatpickr","location":"../node_modules/flatpickr/dist","main":"flatpickr"},{"name":"summernote","location":"../node_modules/summernote/dist/","main":"summernote"},{"name":"fuelux","location":"../node_modules/fuelux/dist","main":"js/fuelux.min"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","config/appConfig","config/routerConfig","resources/index","modules/facco/editPeople","modules/facco/facco","modules/facco/viewRequests","modules/home/contact","modules/home/home","modules/home/register","modules/social/editBlog","modules/social/social","modules/social/viewBlogs","modules/social/viewForums","modules/social/writeBlog","modules/user/profile","modules/user/resetPassword","modules/user/user","resources/data/admin","resources/data/auth","resources/data/clientRequests","resources/data/config","resources/data/curriculum","resources/data/dataServices","resources/data/documents","resources/data/downloads","resources/data/helpTickets","resources/data/inventory","resources/data/is4ua","resources/data/people","resources/data/products","resources/data/sessions","resources/data/siteInfo","resources/data/social","resources/data/systems","resources/dialogs/common-dialogs","resources/dialogs/confirm-dialog","resources/dialogs/document-dialog","resources/dialogs/email-dialog","resources/dialogs/message-dialog","resources/dialogs/note-dialog","resources/dialogs/password-dialog","resources/editor/editor","resources/editor/styles","resources/elements/add-systems","resources/elements/flat-picker","resources/elements/loading-indicator","resources/elements/nav-bar","resources/elements/rate-it","resources/elements/table-navigation-bar","resources/utils/dataTable","resources/utils/utils","resources/utils/validation","resources/value-converters/activate-button","resources/value-converters/check-box","resources/value-converters/course-name","resources/value-converters/date-format","resources/value-converters/file-type","resources/value-converters/format-digits","resources/value-converters/gravatar-url-id","resources/value-converters/gravatar-url","resources/value-converters/help-ticket-subtypes","resources/value-converters/help-ticket-type","resources/value-converters/idsRequested","resources/value-converters/info-filter","resources/value-converters/lookup-value","resources/value-converters/onoff-switch","resources/value-converters/person-status-button","resources/value-converters/phone-number","resources/value-converters/request-status-class","resources/value-converters/sandbox","resources/value-converters/session-name","resources/value-converters/session-status-button","resources/value-converters/session-type","resources/value-converters/session","resources/value-converters/sort-array","resources/value-converters/sort-date-time","resources/value-converters/system-list","resources/value-converters/to-uppercase","resources/value-converters/translate-status","resources/value-converters/ucc-title","modules/admin/Customers/bulkEmails","modules/admin/Customers/customers","modules/admin/Customers/editInstitutions","modules/admin/Customers/editPeople","modules/admin/documents/documents","modules/admin/inventory/editInventory","modules/admin/site/admin","modules/admin/site/editConfig","modules/admin/site/editCurriculum","modules/admin/site/editDownloads","modules/admin/site/editHelpTickets","modules/admin/site/editMessages","modules/admin/site/editNews","modules/admin/site/site","modules/admin/system/editProduct","modules/admin/system/editSession","modules/admin/system/editSystem","modules/admin/system/system","modules/user/support/createHelpTickets","modules/user/support/curriculum","modules/user/support/downloads","modules/user/support/links","modules/user/support/support","modules/user/support/viewHelpTickets","modules/user/requests/clientRequests","modules/user/requests/createRequests","modules/user/requests/viewProducts","modules/user/requests/viewRequests","aurelia-templating-resources/compose","aurelia-templating-resources/if","aurelia-templating-resources/with","aurelia-templating-resources/repeat","aurelia-templating-resources/repeat-strategy-locator","aurelia-templating-resources/null-repeat-strategy","aurelia-templating-resources/array-repeat-strategy","aurelia-templating-resources/repeat-utilities","aurelia-templating-resources/map-repeat-strategy","aurelia-templating-resources/set-repeat-strategy","aurelia-templating-resources/number-repeat-strategy","aurelia-templating-resources/analyze-view-factory","aurelia-templating-resources/abstract-repeater","aurelia-templating-resources/show","aurelia-templating-resources/aurelia-hide-style","aurelia-templating-resources/hide","aurelia-templating-resources/sanitize-html","aurelia-templating-resources/html-sanitizer","aurelia-templating-resources/replaceable","aurelia-templating-resources/focus","aurelia-templating-resources/css-resource","aurelia-templating-resources/attr-binding-behavior","aurelia-templating-resources/binding-mode-behaviors","aurelia-templating-resources/throttle-binding-behavior","aurelia-templating-resources/debounce-binding-behavior","aurelia-templating-resources/self-binding-behavior","aurelia-templating-resources/signal-binding-behavior","aurelia-templating-resources/binding-signaler","aurelia-templating-resources/update-trigger-binding-behavior","aurelia-templating-resources/html-resource-plugin","aurelia-templating-resources/dynamic-element","aurelia-i18n/i18n","i18next/i18next","i18next/logger","i18next/EventEmitter","i18next/ResourceStore","i18next/utils","i18next/Translator","i18next/postProcessor","i18next/compatibility/v1","i18next/LanguageUtils","i18next/PluralResolver","i18next/Interpolator","i18next/BackendConnector","i18next/CacheConnector","i18next/defaults","aurelia-i18n/relativeTime","aurelia-i18n/defaultTranslations/relative.time","aurelia-i18n/df","aurelia-i18n/utils","aurelia-i18n/nf","aurelia-i18n/rt","aurelia-i18n/t","aurelia-i18n/base-i18n","aurelia-i18n/aurelia-i18n-loader","regenerator-runtime/runtime","aurelia-dialog/dialog-configuration","aurelia-dialog/renderer","aurelia-dialog/dialog-settings","aurelia-dialog/dialog-renderer","aurelia-dialog/ux-dialog","aurelia-dialog/ux-dialog-header","aurelia-dialog/dialog-controller","aurelia-dialog/lifecycle","aurelia-dialog/dialog-cancel-error","aurelia-dialog/ux-dialog-body","aurelia-dialog/ux-dialog-footer","aurelia-dialog/attach-focus","aurelia-dialog/dialog-service","resources/css/styles","resources/editor/skins/moono-lisa/dialog","resources/editor/skins/moono-lisa/dialog_ie","resources/editor/skins/moono-lisa/dialog_ie8","resources/editor/skins/moono-lisa/dialog_iequirks","resources/editor/skins/moono-lisa/editor","resources/editor/skins/moono-lisa/editor_gecko","resources/editor/skins/moono-lisa/editor_ie","resources/editor/skins/moono-lisa/editor_ie8","resources/editor/skins/moono-lisa/editor_iequirks","resources/dialogs/documentForm","resources/dialogs/documentsTable","resources/htTimeline/response","resources/htTimeline/timeline","modules/admin/site/downloadForm","modules/admin/site/downloadTable","modules/facco/components/peopleTable","modules/facco/components/requestDetailDetails","modules/facco/components/requestsTable","modules/facco/components/viewRequestsTable","modules/home/components/homeContent","modules/home/components/homePageLinks","modules/home/components/newsItem","modules/home/components/uccInformation","modules/social/components/blogForm","modules/social/components/blogList","modules/social/components/blogListUCC","modules/social/components/blogPage","modules/social/components/blogPageUCC","modules/social/components/forumList","modules/social/components/forumPage","modules/social/components/writeBlogList","modules/user/components/banner","modules/user/components/carousel","modules/user/components/homePageLinks","modules/user/components/newsItem","modules/user/components/uccInformation","modules/admin/Customers/components/Address","modules/admin/Customers/components/Audit","modules/admin/Customers/components/Courses","modules/admin/Customers/components/Email","modules/admin/Customers/components/emailTable","modules/admin/Customers/components/instAddress","modules/admin/Customers/components/instIs4ua","modules/admin/Customers/components/institutionsForm","modules/admin/Customers/components/institutionsTable","modules/admin/Customers/components/instPeople","modules/admin/Customers/components/is4ua","modules/admin/Customers/components/Password","modules/admin/Customers/components/peopleForm","modules/admin/Customers/components/peopleTable","modules/admin/Customers/components/Roles","modules/admin/Customers/components/selectionForm","modules/admin/documents/components/documentForm","modules/admin/documents/components/documentsTable","modules/admin/inventory/components/documentForm","modules/admin/inventory/components/Documents","modules/admin/inventory/components/documentsTable","modules/admin/inventory/components/History","modules/admin/inventory/components/inventoryForm","modules/admin/inventory/components/inventoryTable","modules/admin/inventory/components/Maintenance","modules/admin/inventory/components/Purchase","modules/admin/inventory/components/Technical","modules/admin/site/components/configForm","modules/admin/site/components/configTable","modules/admin/site/components/curriculumForm","modules/admin/site/components/curriculumTable","modules/admin/site/components/document","modules/admin/site/components/documentForm","modules/admin/site/components/documentsTable","modules/admin/site/components/downloadForm","modules/admin/site/components/downloadTable","modules/admin/site/components/htTypeForm","modules/admin/site/components/htTypeTable","modules/admin/site/components/logFileTable","modules/admin/site/components/messageForm","modules/admin/site/components/messageTable","modules/admin/site/components/newsForm","modules/admin/site/components/newsTable","modules/admin/site/components/uploadedFilesTable","modules/admin/system/components/Assignments","modules/admin/system/components/documentForm","modules/admin/system/components/Documents","modules/admin/system/components/documentsTable","modules/admin/system/components/edit-client-form","modules/admin/system/components/is4ua","modules/admin/system/components/Notes","modules/admin/system/components/productForm","modules/admin/system/components/productTable","modules/admin/system/components/sessionConfigTable","modules/admin/system/components/sessionForm","modules/admin/system/components/sessionTable","modules/admin/system/components/systemForm","modules/admin/system/components/Systems","modules/admin/system/components/systemTable","modules/user/requests/components/assignmentDetails","modules/user/requests/components/client-request-step1","modules/user/requests/components/client-request-step2","modules/user/requests/components/client-request-step3","modules/user/requests/components/client-request-step4","modules/user/requests/components/Courses","modules/user/requests/components/requestDetails","modules/user/requests/components/viewRequestsForm","modules/user/requests/components/viewRequestsTable","modules/user/support/components/comment","modules/user/support/components/helpTicketDetails","modules/user/support/components/helpTicketType","modules/user/support/components/Requests","modules/user/support/components/viewHTForm","modules/user/support/components/viewHTTable"]}})}

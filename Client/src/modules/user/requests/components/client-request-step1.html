@@ -1,0 +1,84 @@
+<template>
+  <!-- Term Select -->
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group leftJustify">
+        <select value.bind="sessionId" class="form-control" change.delegate="changeSession($event)" id="session">
+          <option value="-1">Select a session</option>
+          <option repeat.for="session of sessions.sessionsArray"
+                  value.bind="session._id">Session ${session.session} - ${session.year}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div show.bind="sessionSelected && useSandbox" class="col-sm-12">
+      <div class="form-group">
+        <select value.bind="requestType" change.delegate="changeRequestType($event)" id="requestType" class="form-control">
+          <option value="-1">Choose the Type of The Request</option>
+           <option value="sandboxCourse">${config.SANDBOX_NAME}</option>
+           <option value="regularCourse">Regular Course</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <compose show.bind="regularClient && sessionSelected && typeSelected" view='./Courses.html'></compose>
+
+  <!-- Number of students -->
+  <div class="row"  id="numStudents" show.bind="courseSelected">
+    <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="REGULAR_NUMBER_OF_STUDENTS.content"></div>
+    <div class="topMargin col-lg-5">
+      <div class="form-group">
+        <label for="undergraduates" class="col-sm-3 control-label">Undergraduates</label>
+        <div class="col-sm-8">
+          <input  id="undergraduates"  type="number" placeholder="Number of Undergraduates"
+                  class="form-control" value.bind="requests.selectedRequest.undergradIds"/>
+        </div>
+      </div>
+    </div>
+    <div class="topMargin col-lg-5">
+      <div class="form-group">
+            <label for="graduates" class="col-sm-3 control-label">Graduates</label>
+            <div class="col-sm-8">
+              <input id="graduates" type="number" placeholder="Number of Graduates"
+                    class="form-control" value.bind="requests.selectedRequest.graduateIds"/>
+            </div>
+      </div>
+    </div>
+  </div>
+  <div class="row col-lg-offset-3" show.bind="courseSelected">
+      <span class="col-lg-8 " id="numberOfStudentsError"></span>
+  </div>
+
+  <!-- Begin and End Date -->
+  <div class="row" show.bind="sandBoxClient || courseSelected">
+    <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="START_END_DATES.content"></div>
+      <div class="col-lg-5">
+        <div class="form-group topMargin">
+           <label class="col-sm-3 form-control-label ">Start Date</label>
+           <div class="col-sm-8">
+            <flat-picker disabled.bind="showLockMessage" controlid="startDate" config.bind="config" change.delegate="changeBeginDate($event)"  
+                value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
+           <span id='startDateError'></span>
+           </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="form-group topMargin">
+          <label class="col-sm-3 form-control-label ">End Date</label>
+          <div class="col-sm-8">
+            <flat-picker disabled.bind="showLockMessage" controlid="endDate" config.bind="config" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
+           <span id='endDateError'></span>
+          </div>
+        </div>
+      </div>
+       
+    </div>
+
+  <div show.bind="sessionId == -1 && requestType == -1" innerhtml.bind="CLIENT_REQUEST_START.content"></div>
+  <div show.bind="sessionId != -1 && requestType == -1 && useSandbox" innerhtml.bind="SESSION_SELECTED.content"></div>
+  
+  <div show.bind="showInfoBox" class="topMargin leftMargin" style="display: none;" id="infoBox"></div>
+</template>

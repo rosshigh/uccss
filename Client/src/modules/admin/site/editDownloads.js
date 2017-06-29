@@ -132,7 +132,7 @@ export class EditProducts {
             "Are you sure you want to delete the download?", 
             "Delete Download", 
             ['Yes', 'No']
-            ).then(response => {
+            ).whenClosed(response => {
                 if(!response.wasCancelled){
                     this.deleteDownload();    
                 }
@@ -156,7 +156,7 @@ export class EditProducts {
                 "The item has been changed. Do you want to save your changes?", 
                 "Save Changes", 
                 ['Yes', 'No']
-                ).then(response => {
+                ).whenClosed(response => {
                     if(!response.wasCancelled){
                        this.save();
                     } else {
@@ -218,7 +218,7 @@ export class EditProducts {
             "You can't delete that category because there are exisitng downloads that use it?",
             "Can't Delete Category",
             ['OK']
-        ).then(response => {
+        ).whenClosed(response => {
             
         });
         } else {
@@ -226,7 +226,7 @@ export class EditProducts {
                 "Are you sure you want to delete the category?",
                 "Delete Category",
                 ['Yes', 'No']
-            ).then(response => {
+            ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.deleteCategory();
                 }

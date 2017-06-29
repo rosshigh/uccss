@@ -4,7 +4,9 @@ var express = require('express'),
   passport = require('passport'),
   Model = mongoose.model('Curriculum'),
   CurriculumCategory = mongoose.model('CurriculumCategory'),
-  logger = require('../../config/logger');
+  logger = require('../../config/logger'),
+  multer = require('multer'),
+  mkdirp = require('mkdirp');
 
   var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -137,5 +139,53 @@ module.exports = function (app) {
     })
 
   });
+
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {      
+      var path = config.uploads + '/curriculum/' + req.params.container;
+      mkdirp(path, function(err) {
+        if(err){
+          res.status(500).json(err);
+        } else {
+          cb(null, path);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+  });
+
+  var upload = multer({ storage: storage });
+
+  router.post('/api/curriculum/upload/:id/:container', extendTimeout, upload.any(), function(req, res, next){
+      Model.findById(req.params.id, function(err, download){
+        if(err){
+          return next(err);
+        } else {
+          for(var i = 0, x = req.files.length; i<x; i++){
+            var file =  {
+              originalFilename: req.files[i].originalname,
+              fileName: req.files[i].filename,
+              dateUploaded: new Date()
+            };
+            download.file = file;
+          }
+          download.save(function(err, download) {
+            if(err){
+              return next(err);
+            } else {
+              res.status(200).json(download);
+            }
+          });
+        }
+      });
+
+  });
+
+  function extendTimeout (req, res, next) {
+    res.setTimeout(512000, function () { /* Handle timeout */ logger.log('Timeout', 'error') });
+    next();
+  }
 
 };

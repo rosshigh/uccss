@@ -183,10 +183,6 @@ export class Systems{
     refreshClients(status){
          for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
             this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status);
-            // this.selectedSystem.clients[i].clientStatus = status;
-            // this.selectedSystem.clients[i].idsAvailable = this.selectedSystem.idsAvailable;
-            // this.selectedSystem.clients[i].lastIdAllocated = 0;
-            // this.selectedSystem.clients[i].assignments = new Array();
         }
     }
 
@@ -220,6 +216,22 @@ export class Systems{
             }  
         }
       }
+    }
+
+    selectClientFromNumber(systemId, client){
+        this.selectedClient = null;
+        for(var i = 0, x = this.systemsArray.length; i < x; i++){
+            if(this.systemsArray[i]._id === systemId){
+                this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
+                for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                    if(this.systemsArray[i].clients[j].client === client){
+                        this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
+                        this.clientIndex = j;
+                        break;
+                    }
+                }  
+            }
+        }
     }
 
     emptyClient(clientNo, status){

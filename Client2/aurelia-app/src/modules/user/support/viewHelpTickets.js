@@ -104,7 +104,7 @@ export class ViewHelpTickets {
   }
 
   updateArray() {
-    this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+    this.dataTable.updateArray(this.helpTickets.helpTicketsArray); 
     this._cleanUpFilters();
   }
 
@@ -167,21 +167,62 @@ export class ViewHelpTickets {
 
   async getDetails(){
     this.showRequestDetails = false;
-    // this.helpTickets.selectedHelpTicket.content[0].comments = this.helpTickets.selectedHelpTicket.content[0].comments ? this.helpTickets.selectedHelpTicket.content[0].comments : " ";
     if(this.helpTickets.selectedHelpTicket.requestId){
-      // await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
-      if(this.helpTickets.selectedHelpTicket.systemId){
-        this.showRequestDetails = true;
-        for(var i = 0; i < this.systems.systemsArray.length; i++){
-          if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
-            // this.systems.selectedSystemFromId(this.helpTickets.selectedHelpTicket.systemId);
-            this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
-            break;
-          }
-        }
+      if(this.helpTickets.selectedHelpTicket.requestId.assignments && this.helpTickets.selectedHelpTicket.requestId.assignments.length > 0) this.showRequestDetails = true;
+      this.showCourse = false;
+      this.course = "";
+      this.showCourse = true;
+      if(this.helpTickets.selectedHelpTicket.courseId) {
+        this.course = this.helpTickets.selectedHelpTicket.courseId.number + " - " + this.helpTickets.selectedHelpTicket.courseId.name;
+      } else {
+        this.course = this.config.SANDBOX_NAME
       }
-    }
+    } 
   }
+
+  // async getDetails(){
+  //    this.requestDetailsUpdated = false;
+  //   this.showRequestDetails = false;
+  //   if(this.helpTickets.selectedHelpTicket.requestId){
+  //     if(!this.helpTickets.selectedHelpTicket.systemId){
+  //       this.showRequestDetails = true;
+  //       for(var i = 0; i < this.systems.systemsArray.length; i++){
+  //         if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+  //           this.systems.selectClientFromNumber(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.client);
+  //           return;
+  //         }
+  //       }
+  //     } else {
+  //       let response = await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
+  //       if(!response.error){
+  //         if(this.requests.selectedRequest.assignments && this.requests.selectedRequest.assignments.length > 0){
+  //           this.requestDetailsUpdated = true;
+  //           this.helpTickets.selectedHelpTicket.systemId = this.requests.selectedRequest.assignments[0].systemId;
+  //           this.helpTickets.selectedHelpTicket.client = this.requests.selectedRequest.assignments[0].client;
+  //            this.showRequestDetails = true;
+  //           for(var i = 0; i < this.systems.systemsArray.length; i++){
+  //             if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+  //               this.systems.selectClientFromNumber(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.client);
+  //               return;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   // this.showRequestDetails = false;
+  //   // if(this.helpTickets.selectedHelpTicket.requestId){
+  //   //   if(this.helpTickets.selectedHelpTicket.systemId){
+  //   //     this.showRequestDetails = true;
+  //   //     for(var i = 0; i < this.systems.systemsArray.length; i++){
+  //   //       if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
+  //   //         this.systems.selectClientFromNumber(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.client);
+  //   //         break;
+  //   //       }
+  //   //     }
+  //   //   }
+  //   // }
+  // }
 
   getName(){
     for(var i = 0; i < this.people.peopleArray.length; i++){

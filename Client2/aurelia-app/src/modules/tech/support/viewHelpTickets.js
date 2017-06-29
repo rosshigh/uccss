@@ -51,12 +51,10 @@ export class ViewHelpTickets {
     this.templatingEngine = templatingEngine;
     this.requests = requests;
     this.documents = documents;
-  };
 
-  canActivate() {
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
     this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
-  }
+  };
 
   /*****************************************************************************************
   * Retrieve the help tickets, sessions, downloads and people
@@ -83,12 +81,6 @@ export class ViewHelpTickets {
     this.helpTicketTypes = this.config.HELP_TICKET_STATUSES.filter(item => {
        return item.code !== this.config.CLOSED_HELPTICKET_STATUS;
     })
-
-    // if(params.id) {
-    //   this.notesHistory = true;
-    //   this.helpTickets.selectHelpTicketByID(params.id);
-    //   this.openHelpTicket();
-    // }
 
     this.helpTicketTypeLookupArray = new Array();
     this.helpTickets.helpTicketTypesArray.forEach(item => {
@@ -206,11 +198,12 @@ export class ViewHelpTickets {
     //Make the selected help ticket the selected help ticket
     this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
+    this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();
 
     let categoryIndex = this.helpTickets.selectedHelpTicket.helpTicketCategory;
     let subTypeIndex = this.getIndex(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes, this.helpTickets.selectedHelpTicket.content[0].type);
-     this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
+    this.clientRequired = this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].clientRequired;
     this.createOutputForm(this.helpTickets.helpTicketTypesArray[categoryIndex].subtypes[subTypeIndex].outputForm);
 
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -277,36 +270,19 @@ export class ViewHelpTickets {
   }
 
   async getDetails(){
-    this.requestDetailsUpdated = false;
     this.showRequestDetails = false;
     if(this.helpTickets.selectedHelpTicket.requestId){
-      if(this.helpTickets.selectedHelpTicket.systemId){
-        this.showRequestDetails = true;
-        for(var i = 0; i < this.systems.systemsArray.length; i++){
-          if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
-            this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
-            return;
-          }
-        }
+      if(this.helpTickets.selectedHelpTicket.requestId.assignments && this.helpTickets.selectedHelpTicket.requestId.assignments.length > 0) this.showRequestDetails = true;
+      this.showCourse = false;
+      this.course = "";
+      this.showCourse = true;
+      if(this.helpTickets.selectedHelpTicket.courseId) {
+        this.course = this.helpTickets.selectedHelpTicket.courseId.number + " - " + this.helpTickets.selectedHelpTicket.courseId.name;
       } else {
-        let response = await this.requests.getClientRequest(this.helpTickets.selectedHelpTicket.requestId);
-        if(!response.error){
-          if(this.requests.selectedRequest.assignments && this.requests.selectedRequest.assignments.length > 0){
-            this.requestDetailsUpdated = true;
-            this.helpTickets.selectedHelpTicket.systemId = this.requests.selectedRequest.assignments[0].systemId;
-            this.helpTickets.selectedHelpTicket.clientId = this.requests.selectedRequest.assignments[0].clientId;
-             this.showRequestDetails = true;
-            for(var i = 0; i < this.systems.systemsArray.length; i++){
-              if(this.systems.systemsArray[i]._id === this.helpTickets.selectedHelpTicket.systemId){
-                this.systems.selectClientFromID(this.helpTickets.selectedHelpTicket.systemId, this.helpTickets.selectedHelpTicket.clientId);
-                return;
-              }
-            }
-          }
-        }
+        this.course = this.config.SANDBOX_NAME
       }
-    }
-  } 
+    } 
+  }
 
   getName(){
     for(var i = 0; i < this.people.uccPeople.length; i++){
@@ -315,8 +291,8 @@ export class ViewHelpTickets {
     return "someone";
   }
 
-  async save(){
-    var changes = this.helpTickets.isHelpTicketDirty();
+  async save(changes){
+    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId"]);
      if(changes && changes.length > 0){
        changes.forEach(item => {
          this.helpTickets.selectedHelpTicket.audit.push({
@@ -539,25 +515,21 @@ export class ViewHelpTickets {
   }
     
   back() {
-     var changes = this.helpTickets.isHelpTicketDirty();
-     if (this.helpTickets.isHelpTicketDirty().length) {
+     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId"]);
+     if (changes.length) {
        let that = this;
-        if(this.requestDetailsUpdated) { 
-          this.message = "The product assignment details were updated.  Do you want to save the changes?"
-        } else {
-          this.message = "The help ticket has been changed. Do you want to save your changes?"
-        }
-          return this.dialog.showMessage(
-              that.message,
-              "Save Changes",
-              ['Yes', 'No']
-          ).then(response => {
-              if (!response.wasCancelled) {
-                  this.save();
-              } else {
-                  this._cleanUp();
-              }
-          });
+        this.message = "The help ticket has been changed. Do you want to save your changes?"
+        return this.dialog.showMessage(
+            that.message,
+            "Save Changes",
+            ['Yes', 'No']
+        ).then(response => {
+            if (!response.wasCancelled) {
+                this.save(changes);
+            } else {
+                this._cleanUp();
+            }
+        });
       } else {
           this._cleanUp();
       }

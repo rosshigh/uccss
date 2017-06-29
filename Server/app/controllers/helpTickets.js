@@ -19,6 +19,8 @@ module.exports = function (app, config) {
   router.get('/api/helpTickets', requireAuth, function(req, res, next){
     writeLog.log('Get helpTicket','verbose');
     var query = buildQuery(req.query, Model.find())
+    .populate('courseId')
+    .populate('requestId')
     query.exec()
     .then(object => {
       res.status(200).json(object);

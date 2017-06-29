@@ -445,6 +445,16 @@ export class People {
         return newObj;
     }
 
+    async getCourse(personId, courseId){
+        let url = this.data.COURSES_SERVICE + '?filter=[and]personId|eq|' + personId + ":_id|eq|" + courseId
+        let response = await this.data.get(url)
+        if(!response.error){
+            this.selectedCourse = response[0];
+        } else {
+             this.selectedCourse = this.emptyCourse();
+        }
+    }
+
     async saveCourse() {
         if(!this.selectedCourse){
             return;

@@ -4,7 +4,10 @@ import {HttpClient} from 'aurelia-http-client';
 @inject(HttpClient)
 export class AppConfig {
 
+
     HOST = location.origin;
+
+    DOWNLOAD_URL = this.HOST + '/uploadedFiles';
 
     BASE_URL = "http://localhost:5000/api/";
     IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
@@ -12,7 +15,7 @@ export class AppConfig {
     // BASE_URL = this.HOST + "/api/";
     // IMG_DOWNLOAD_URL = this.HOST + '/img/'
 
-    INSTITUTIONS_ACTIVE = '01';
+INSTITUTIONS_ACTIVE = '01';
    ACTIVE_PERSON = "01";
    INACTIVE_PERSON = "02";
 
@@ -62,6 +65,13 @@ export class AppConfig {
                       { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
                       { code: this.REPLIED_REQUEST_CODE, description: 'Replied', status: "danger" }];
 
+    SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1';      //Name used for sandbox requests
+    ID_WILDCARD = "#";                          //Wildcard in id templates
+    SANDBOX_NAME = "Trial Client"
+    FIRST_DEFAULT_ID = 1;
+    FACULTY_ID_BUFFER = 2;
+    DEFAULT_FACULTY_IDS = 2;
+    
     ASSIGNED_CLIENT_CODE = 4;
     UNASSIGNED_CLIENT_CODE = 1;
     SHARED_CLIENT_CODE = 2;

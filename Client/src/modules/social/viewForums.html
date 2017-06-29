@@ -1,0 +1,12 @@
+<template>
+	<div class="panel panel-info">  
+      <div class="panel-body">
+        <div class="row">
+			<div show.bind="!forumSelected" class="container">
+				<compose view="./components/forumList.html"></compose>
+			</div>
+            <div show.bind="forumSelected" class="col-lg-12">
+                <compose view="./components/forumPage.html"></compose>
+            </div> 
+      </div> 
+</template>

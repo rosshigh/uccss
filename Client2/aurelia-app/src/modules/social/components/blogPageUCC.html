@@ -10,8 +10,8 @@
 		</div>
 		<div class="col-lg-2 topMargin" innerhtml='${social.selectedBlog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>
 		<div class="col-lg-10">
-			<h3>${social.selectedBlog.title}</h3>
-			<div class="topMargin" innerhtml.bind="social.selectedBlog.text"></div>
+		 	<input value.bind="social.selectedBlog.title"  class="form-control" placeholder="Title" type="text"/>
+			<editor value.bind="social.selectedBlog.text" toolbar.bind="toolbar" height="500"></editor>      
 		</div>
 	</div>
 </template>

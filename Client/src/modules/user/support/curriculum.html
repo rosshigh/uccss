@@ -62,6 +62,11 @@
 					<div show.bind="curriculum.selectedCurriculum.description.length > 0" class="panel-body" innerhtml.bind="curriculum.selectedCurriculum.description">
 				</div>
 			</div>
+			<div class="row">
+				<div class="topMargin bigLeftMargin" show.bind="curriculum.selectedCurriculum.file.fileName != undefined">
+					<a href="${config.DOWNLOAD_URL}/curriculum/${curriculum.selectedCurriculum.category}/${curriculum.selectedCurriculum.file.fileName}" innerhtml.bind='curriculum.selectedCurriculum.file.fileName' target='_blank'></a>
+				</div>
+			</div>
 			<div show.bind="addComment">
 				<h3>Comments are not anonymous</h3>
 				 <editor value.bind="comment" height="250"></editor>

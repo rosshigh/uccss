@@ -1,0 +1,26 @@
+<template>
+	<div class="container">
+		<div class="bottomMargin list-group-item">
+			<span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+			<span show.bind="!social.selectedBlog.active" click.delegate="toggleActivation()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Activate"><i class="fa fa-eye fa-lg fa-border" aria-hidden="true"></i></span>
+			<span show.bind="social.selectedBlog.active" click.delegate="toggleActivation()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Inactivate"><i class="fa fa-eye-slash fa-lg fa-border" aria-hidden="true"></i></span>		
+			<span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+				data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+				title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+			<span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
+				title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>		
+		</div>
+		<div class="col-lg-2 topMargin" innerhtml='${social.selectedBlog.personId | gravatarUrlId:people.peopleArray:100:1}'></div>
+		<div class="col-lg-10">
+			<input value.bind="social.selectedBlog.title"  class="form-control" id="editTitle" placeholder="Title" type="text"/>
+			<br/>
+			<input value.bind="social.selectedBlog.teaser"  class="form-control" id="editTeaser" placeholder="Teaser" type="text"/>
+			<br/>
+			<editor value.bind="social.selectedBlog.text" toolbar.bind="toolbar" id="blogContent" height="500"></editor>      
+		</div>
+	</div>
+</template>

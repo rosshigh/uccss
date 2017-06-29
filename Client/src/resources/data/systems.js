@@ -48,6 +48,17 @@ export class Systems{
         }
     }
 
+    selectedSystemFromId(id){
+      this.selectedSystem = null;
+      for(var i = 0, x = this.systemsArray.length; i < x; i++){
+        if(this.systemsArray[i]._id === id){
+          this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
+          this.editIndex = i;
+          break;
+        }
+      };
+    }
+
     emptySystem(){
         var newSystemObj = {};
         newSystemObj.sid = "";
@@ -175,6 +186,22 @@ export class Systems{
             }  
         }
       }
+    }
+
+     selectClientFromNumber(systemId, client){
+        this.selectedClient = null;
+        for(var i = 0, x = this.systemsArray.length; i < x; i++){
+            if(this.systemsArray[i]._id === systemId){
+                this.selectedSystem = this.utils.copyObject(this.systemsArray[i]);
+                for(var j = 0; j < this.systemsArray[i].clients.length; j++){
+                    if(this.systemsArray[i].clients[j].client === client){
+                        this.selectedClient = this.utils.copyObject(this.systemsArray[i].clients[j]);
+                        this.clientIndex = j;
+                        break;
+                    }
+                }  
+            }
+        }
     }
 
     emptyClient(clientNo, status){

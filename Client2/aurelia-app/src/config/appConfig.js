@@ -16,6 +16,7 @@ export class AppConfig {
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
     DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
     DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents';  
+    DOCUMENT_FILE_CURRICULUM_URL = this.HOST + '/uploadedFiles/curriculum';
     SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/'
 
     //User roles

@@ -12,9 +12,13 @@ import moment from 'moment';
 @inject(DataTable, Curriculum, Products, AppConfig, Utils, CommonDialogs, Validation)
 export class EditCurriculum {
     curriculumItemSelected = false;
-    // navControl = "newsNavButtons";
     spinnerHTML = "";
 	newItem = false;
+    selectedFile = "";
+    removedFiles = new Array();
+    filesSelected = false;
+    newDownload = false;
+    selectedFiles;
 
     toolbar = [
 		['style', ['style', 'bold', 'italic', 'underline','clear']],
@@ -97,12 +101,34 @@ export class EditCurriculum {
         if(this.validation.validate(1)){
             let serverResponse = await this.curriculum.save();
             if (!serverResponse.error) {
+                if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    this.uploading = true;
+                    await this.curriculum.uploadFile(this.filesToUpload);
+                     this.utils.showNotification("The item was saved");
+                    this._cleanUp();
+                } else {
+                    this.utils.showNotification("The item was saved");
+                    this._cleanUp();
+                }
                  this.dataTable.updateArray(this.curriculum.curriculumArray);
-                this.utils.showNotification("The item was saved");
-                this._cleanUp();
             }
             this.curriculumItemSelected = false;
         }
+    }
+
+     changeFiles() {
+        this.filesToUpload = new Array(); 
+        for(var i = 0; i < this.files.length; i++){
+            let addFile = true;
+            this.filesToUpload.forEach(item => {
+                if(item.name === this.files[i].name) addFile = false;
+            })
+            if(addFile) this.filesToUpload.push(this.files[i]);
+        }
+    }
+
+    removeFile(index){
+        this.filesToUpload.splice(index,1);
     }
 
 	filterList(){
@@ -232,6 +258,10 @@ export class EditCurriculum {
     _cleanUp(){
         this.showCategoryForm = false;
         this.curriculumItemSelected = false;
+        this.selectedFiles = undefined;
+        this.files = null;
+        this.selectedFile = "";
+        this.filesToUpload = new Array();
     }
 
     _setupValidation(){

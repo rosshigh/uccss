@@ -99,6 +99,8 @@ export class EditPeople {
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.personSelected = true;
+
+        this.setFirstTab();
     }
 
     async new() {
@@ -108,6 +110,8 @@ export class EditPeople {
         this.oldEmail = this.people.selectedPerson.email;
         $("#editFirstName").focus();
         this.personSelected = true;
+
+        this.setFirstTab()
     }
 
     filterRoles(){
@@ -234,12 +238,16 @@ export class EditPeople {
     }
 
     async openEditCourseForm() {
-        if (!this.showCourses) await this.refreshCourses();
+        if(!this.showCourses) {
+            await this.refreshCourses();
+        }  
         this.showCourses = !this.showCourses;
     }
 
     async refreshCourses() {
-        await this.people.getCoursesArray(true, '?filter=personId|eq|' + this.people.selectedPerson._id + '&order=number');
+        if(this.people.selectedPerson._id){
+            await this.people.getCoursesArray(true, '?filter=personId|eq|' + this.people.selectedPerson._id + '&order=number');
+        }
     }
 
     editACourse(index, el) {
@@ -484,6 +492,14 @@ export class EditPeople {
                 this.utils.showNotification("There was a problem saving the person");
             }
         } 
+    }
+
+    setFirstTab(){
+        $("#peopleFormListGroup.list-group").children().removeClass('active');
+        let target = $("#peopleFormListGroup.list-group").children()[0];
+        $(target).addClass('active');
+        $(".in").removeClass('active').removeClass('in');
+        $("#AddressTab").addClass('in').addClass('active');
     }
 
     async changeTab(el, index) {

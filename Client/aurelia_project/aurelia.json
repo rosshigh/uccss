@@ -222,6 +222,14 @@
             "path": "../node_modules/summernote/dist/",
             "main": "summernote"
           },
+          {
+            "name": "fuelux",
+            "path": "../node_modules/fuelux/dist",
+            "main": "js/fuelux.min",
+            "resources": [
+              "css/fuelux.min.css"
+            ]
+          },
          "extend",
          "moment"
         ]

@@ -220,4 +220,11 @@ export class Curriculum {
          return exists;
     }
 
+    async uploadFile(files){
+        let response = await this.data.uploadFiles(files, this.CURRICULUM_SERVICE + "/upload"  + "/" + this.selectedCurriculum._id + '/' + this.selectedCurriculum.category);
+        if(!response.error){
+            this.curriculumArray[this.editIndex].file = response.file;
+        }
+    }
+
 }

@@ -17,6 +17,11 @@ var CurriculumSchema = new Schema({
 	rating: { type: Number },
 	raters: { type: Number, default: 0 },
 	comments: [ { type: String } ],
+  file: {
+    originalFilename: { type: String },
+    fileName: { type: String },
+    dateUploaded: { type: Date, default: Date.now }
+  },
 	customerComments: [{
 		authorEmail: { type: String },
 		comment: { type: String },

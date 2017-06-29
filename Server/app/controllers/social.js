@@ -63,12 +63,24 @@ module.exports = function (app) {
 		})
 	});
 
+	router.delete('/api/blogs/:id', requireAuth, function(req, res, next){
+		writeLog.log('Delete blog ' + req.params.id, 'verbose');
+		Blog.remove({_id: req.params.id})
+		.exec()
+		.then(result => {
+			res.status(204).json(result);
+		})
+		.catch(error => {
+			return next(error);
+		})
+	});
+
 	router.get('/api/forums', function(req, res, next){
 		logger.log('Get Blogs', 'verbose');
 		var query = buildQuery(req.query, Forum.find())
 		query
 			.sort('dateCreated')
-      		.populate('children')
+      		.populate('messages')
 			.exec(function(err, object){
 				if (err) {
 					return next(err);
@@ -120,7 +132,7 @@ module.exports = function (app) {
 		var query = buildQuery(req.query, ForumMessage.find())
 		query
 			.sort('dateCreated')
-      		.populate('children')
+      		.populate('messages')
 			.exec(function(err, object){
 				if (err) {
 					return next(err);
@@ -143,11 +155,20 @@ module.exports = function (app) {
 	});
 
 	router.post('/api/forumMessages', requireAuth, function(req, res, next){
-		logger.log('Create blog', "verbose");
-		var forum =  new ForumMessage(req.body);
+		logger.log('Create forum message', "verbose");
+		var forum =  new ForumMessage(req.body); 
 		forum.save()
 			.then(item => {		
-				res.status(200).json(item);	
+				Forum.findById(item.parentId)
+				.then(topic => {
+					if(!topic.messages) topic.messages = new Array();
+					topic.messages.push(item._id);
+					topic.save();
+					res.status(200).json(item);	
+				})
+				.catch(error => {
+					return next(error);
+				})
 			}) 
 			.catch(error => {
 				return next(error);

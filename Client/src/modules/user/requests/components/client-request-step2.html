@@ -1,0 +1,30 @@
+<template>
+  <div class="row">
+    <div class="col-md-12"  >
+      <div  class="well well-sm col-md-10 col-sm-offset-1" innerhtml.bind ="siteInfo.selectMessageByKey('SELECT_PRODUCT_WELL').content.replace('REQUEST_LIMIT', config.REQUEST_LIMIT)"></div>
+    </div>
+    
+    <div class="col-md-12" >
+      <div class="col-md-5 topMargin">
+        <label id="productList">Available Products</label>
+        <div class="well well2 overFlow" style="height:400px;">
+          <input class="form-control" value.bind="filter" input.trigger="filterList()" placeholder="Filter products"/>
+          <ul class="list-group">
+            <a  click.trigger="selectProduct($event)" type="button" repeat.for="product of filteredProductsArray" id="${product._id}"
+                    mouseover.delegate="showCurriculum(product, $event)" mouseout.delegate="hideCurriculum()"
+                    class="list-group-item dropbtn">${product.name}</a>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-5 col-md-offset-1 topMargin">
+        <label id="requestProductsLabel">Requested Products</label>
+        <div class="well well2 overflow" style="height:400px;">
+          <ul class="list-group">
+            <a show.bind="!product.delete" click.trigger="removeProduct($event)" type="button" repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
+                    class="list-group-item dropbtn">${product.productId | lookupValue:products.productsArray:"_id":"name"}</a>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
