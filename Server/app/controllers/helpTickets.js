@@ -441,7 +441,7 @@ module.exports = function (app, config) {
     HelpTicketTypes.findOneAndUpdate({_id: req.body._id}, req.body, {safe:true, multi:false})
     .exec()
     .then(result => {
-        res.status(200).json(result);
+        res.status(200).json({message: "Help Ticket Type Updated"});
       })
       .catch(error => {
         return next(error);

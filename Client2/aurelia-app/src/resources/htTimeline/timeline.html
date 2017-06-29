@@ -12,7 +12,7 @@
                   <p>${helpTickets.selectedHelpTicket.personId | person:people:'fullName'}</p>
                   <div class="row">
                     <div class="col-lg-4">
-                      <span id="container"></span>
+                      <span class="col-sm-11 col-sm-offset-1" id="container"></span>
                       <h4 show.bind="showCourse" class="col-sm-11 col-sm-offset-1 topMargin">Course: ${course}</h4>
                       <div show.bind="showRequestDetails">
                         <h4  class="col-sm-11 col-sm-offset-1 topMargin">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>
