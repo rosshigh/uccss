@@ -27460,7 +27460,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                changes = changes ? changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId"]);
+                changes = changes ? changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
                 if (changes && changes.length > 0) {
                   changes.forEach(function (item) {
                     _this3.helpTickets.selectedHelpTicket.audit.push({
@@ -27835,7 +27835,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
     ViewHelpTickets.prototype.back = function back() {
       var _this5 = this;
 
-      var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId"]);
+      var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
       if (changes.length) {
         var that = this;
         this.message = "The help ticket has been changed. Do you want to save your changes?";

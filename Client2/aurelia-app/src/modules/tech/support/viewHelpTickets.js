@@ -291,7 +291,7 @@ export class ViewHelpTickets {
   }
 
   async save(changes){
-    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId"]);
+    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId","institutionId"]);
      if(changes && changes.length > 0){
        changes.forEach(item => {
          this.helpTickets.selectedHelpTicket.audit.push({
@@ -514,7 +514,7 @@ export class ViewHelpTickets {
   }
     
   back() {
-     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId"]);
+     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId","institutionId"]);
      if (changes.length) {
        let that = this;
         this.message = "The help ticket has been changed. Do you want to save your changes?"
