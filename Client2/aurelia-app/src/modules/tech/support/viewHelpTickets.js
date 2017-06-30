@@ -64,8 +64,8 @@ export class ViewHelpTickets {
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.helpTickets.getHelpTicketArray("?filter=helpTicketStatus|lt|" + this.config.CLOSED_HELPTICKET_STATUS + "&order=createdDate:DSC", true),
-      this.people.getPeopleArray(),
-      this.people.getInstitutionsArray('?order=name'),
+      // this.people.getPeopleArray(),
+      // this.people.getInstitutionsArray('?order=name'),
       this.config.getConfig()
     ]);
 
@@ -117,7 +117,7 @@ export class ViewHelpTickets {
 
   showProfile(helpTicket, el){
       this.profileHelpTicket = helpTicket;
-      this.people.selectedPersonFromId(helpTicket.personId);
+      // this.people.selectedPersonFromId(helpTicket.personId._id);
       $(".hoverProfile").css("top", el.clientY - 175);
       $(".hoverProfile").css("left", el.clientX - 100);
       $(".hoverProfile").css("display", "block");
@@ -127,9 +127,9 @@ export class ViewHelpTickets {
      $(".hoverProfile").css("display", "none");
   }
 
-  sendAnEmail(id){
-    if(id){
-      let email = {emailBody: "", emailSubject: "", emailId: id};
+  sendAnEmail(person){   
+    if(person){
+      let email = {emailBody: "", emailSubject: "", person: person};
       return this.dialog.showEmail(
             "Enter Email",
             email,
@@ -144,14 +144,13 @@ export class ViewHelpTickets {
     }
   }
 
-  async sendTheEmail(email){
-    console.log( email.email.emailBody);
-    if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
+  async sendTheEmail(email){ 
     if(email){
         var message = {
-            id: email.email.emailId,
+            id: email.email.person._id,
+            fullName: email.email.person.fullName,
             message : email.email.emailBody,
-            email: this.people.selectedPerson.email,
+            email: email.email.person.email,
             subject: email.email.emailSubject,
             audit: {
                 property: 'Send Message',
@@ -292,7 +291,7 @@ export class ViewHelpTickets {
   }
 
   async save(changes){
-    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId"]);
+    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId"]);
      if(changes && changes.length > 0){
        changes.forEach(item => {
          this.helpTickets.selectedHelpTicket.audit.push({
@@ -311,10 +310,10 @@ export class ViewHelpTickets {
           var email = new Object();
           var lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length -1 ];
           if(this.sendEmail){
-              this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+              // this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
               email.reason = 2;
-              email.fullName = this.people.selectedPerson.fullName;
-              email.email = this.people.selectedPerson.email;
+              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
+              email.email = this.helpTickets.selectedHelpTicket.personId.email; //this.people.selectedPerson.email;
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               if(lastChange.property == 'helpTicketStatus') {
@@ -385,10 +384,10 @@ export class ViewHelpTickets {
     this._createResponse();
     var email = new Object();
     if(this.sendEmail){
-       this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+      //  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
         email.reason = status;
-        email.fullName = this.people.selectedPerson.fullName;
-        email.email = this.people.selectedPerson.email;
+        email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
+        email.email = this.helpTickets.selectedHelpTicket.personId.email; //this.people.selectedPerson.email;
         email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
         email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
         email.message = status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS ? this.userObj.fullName + " has asked for more information." : this.userObj.fullName + " has responded to the help ticket."
@@ -413,12 +412,12 @@ export class ViewHelpTickets {
           email.personId = this.userObj._id;
           email.status = this.config.REVIEW_HELPTICKET_STATUS;
           if(this.sendEmail){    
-            this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+            // this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
               email.reason = 2;
-              email.fullName = this.people.selectedPerson.fullName;
+              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
               email.personId = this.userObj._id;
               email.status = this.config.REVIEW_HELPTICKET_STATUS;
-              email.email = this.people.selectedPerson.email;
+              email.email = this.helpTickets.selectedHelpTicket.personId.email; //this.people.selectedPerson.email;
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
@@ -450,10 +449,10 @@ export class ViewHelpTickets {
           this.helpTickets.selectedHelpTicket.audit.push(obj);
           var email = new Object();
           if(this.sendEmail){
-            this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
+            // this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
               email.reason = status;
-              email.fullName = this.people.selectedPerson.fullName;
-              email.email = this.people.selectedPerson.email;
+              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
+              email.email = this.helpTickets.selectedHelpTicket.personId.email; //this.people.selectedPerson.email;
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = "The status was changed to " + description;
@@ -515,7 +514,7 @@ export class ViewHelpTickets {
   }
     
   back() {
-     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId"]);
+     var changes = this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId"]);
      if (changes.length) {
        let that = this;
         this.message = "The help ticket has been changed. Do you want to save your changes?"
@@ -634,29 +633,15 @@ export class ViewHelpTickets {
   }
 
   customOwnerFilter(value, item, context){
-    var foo = value.toUpperCase();
-    for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
-      if(context.people.peopleArray[i]._id == item.owner[0].personId) {
-        return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
-      }
-    }
+      if(item.owner[0].personId === null) return false;
+      return item.owner[0].personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
   }
 
   customNameFilter(value, item, context){
-    var foo = value.toUpperCase();
-    for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
-      if(context.people.peopleArray[i]._id == item.personId) {
-        return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
-      }
-    }
+      return item.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
   }
 
-   institutionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
-    }
+  institutionCustomFilter(value, item, context){
+      return item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+  }
 }

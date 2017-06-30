@@ -21,7 +21,7 @@ var HelpTicketContentSchema = new Schema({
     dateUploaded: { type: Date, default: Date.now }
   } ],
   confidential: { type: Boolean, default: false },
-  personId: { type: Schema.Types.ObjectId, ref: 'person' },
+  personId: { type: Schema.Types.ObjectId, ref: 'Person' },
   content: { type: Schema.Types.Mixed },
   displayForm: { type: String },
 	documents: [{
@@ -44,15 +44,15 @@ var HelpTicketSchema = new Schema({
   helpTicketCategory: { type: String },
   helpTicketStatus: { type: Number, required: true },
   keyWords: { type: String },
-  personId: { type: Schema.Types.ObjectId, ref: 'person' },
-  institutionId: { type: Schema.Types.ObjectId },
+  personId: { type: Schema.Types.ObjectId, ref: 'Person' },
+  institutionId: { type: Schema.Types.ObjectId, ref: 'Institution' },
   requestId: { type: Schema.Types.ObjectId, ref: 'ClientRequestDetail' },
   systemId: {type: Schema.Types.ObjectId },
   client: {type: Number },
   priority: { type: Number },
   content: [HelpTicketContentSchema],
   owner: [{
-    personId: { type: Schema.Types.ObjectId },
+    personId: { type: Schema.Types.ObjectId, ref: 'Person' },
     dateAssigned: { type: Date, default: Date.now }
   }],
   audit: [{
