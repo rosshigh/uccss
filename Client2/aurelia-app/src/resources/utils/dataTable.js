@@ -721,6 +721,11 @@ export class DataTable{
             var result = (a[propertyName[0]][propertyName[1]] < b[propertyName[0]][propertyName[1]]) ? -1 : (a[propertyName[0]][propertyName[1]] > b[propertyName[0]][propertyName[1]]) ? 1 : 0;
             return result * this.sortDirection;
           });
+    } else if (type == 'custom'){
+      if(typeof propertyName == 'function'){
+        var sortArray = this.utils.copyArray(this.baseArray);  
+        this.baseArray = propertyName(this.sortProperty, this.sortDirection, sortArray, this.context);
+      }
     }
      this.startRecord = this.DEFAULT_START;
       this.firstVisible = 1;

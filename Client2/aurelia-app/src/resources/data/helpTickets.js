@@ -147,7 +147,7 @@ export class HelpTickets {
 
     }
 
-    async updateOwner(email){
+    async updateOwner(email, userObj){
          if(!this.selectedHelpTicket){
             return;
         }
@@ -158,7 +158,13 @@ export class HelpTickets {
                 email.helpTicketNo = response.helpTicketNo;
                 this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
             }
-            this.selectedHelpTicket = this.utils.copyObject(response);
+            // this.selectedHelpTicket = this.utils.copyObject(response);
+            this.selectedHelpTicket.owner[0].personId = {
+                    _id: userObj._id,
+                    firstName: userObj.firstName,
+                    lastName: userObj.lastName,
+                    fullName: userObj.fullName
+            }
             this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
         } else {
                 this.data.processError(response, "There was an error updating the help ticket.");

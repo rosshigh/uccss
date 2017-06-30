@@ -406,13 +406,12 @@ export class ViewHelpTickets {
     if(helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
-    if(this.helpTickets.selectedHelpTicket.owner[0].personId != this.userObj._id){
+    if(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id){
       if(!this.showLockMessage){
           var email = new Object();
           email.personId = this.userObj._id;
           email.status = this.config.REVIEW_HELPTICKET_STATUS;
           if(this.sendEmail){    
-            // this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
               email.reason = 2;
               email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
               email.personId = this.userObj._id;
@@ -422,7 +421,7 @@ export class ViewHelpTickets {
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
           }
-          let serverResponse = await this.helpTickets.updateOwner(email);
+          let serverResponse = await this.helpTickets.updateOwner(email, this.userObj);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
             this.utils.showNotification("The help ticket was updated");
@@ -449,10 +448,9 @@ export class ViewHelpTickets {
           this.helpTickets.selectedHelpTicket.audit.push(obj);
           var email = new Object();
           if(this.sendEmail){
-            // this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
               email.reason = status;
-              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; //this.people.selectedPerson.fullName;
-              email.email = this.helpTickets.selectedHelpTicket.personId.email; //this.people.selectedPerson.email;
+              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
+              email.email = this.helpTickets.selectedHelpTicket.personId.email; 
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = "The status was changed to " + description;
@@ -643,5 +641,16 @@ export class ViewHelpTickets {
 
   institutionCustomFilter(value, item, context){
       return item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+  }
+
+  customOwnerSorter(sortProperty, sortDirection, sortArray, context){
+    context.sortDirection = context.sortDirection === null ? 1 : context.sortDirection === 1 ? -1 : 1;
+    return sortArray.sort((a,b) => {
+      if(a.owner[0].personId === null && b.owner[0].personId === null) return 0;
+      if(a.owner[0].personId === null && b.owner[0].personId !== null) return context.sortDirection * -1;
+      if(a.owner[0].personId !== null && b.owner[0].personId === null) return context.sortDirection;
+      var result = (a.owner[0].personId.lastName < b.owner[0].personId.lastName) ? -1 : (a.owner[0].personId.lastName > b.owner[0].personId.lastName) ? 1 : 0;
+      return result *context.sortDirection;
+    })
   }
 }

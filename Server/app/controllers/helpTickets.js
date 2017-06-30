@@ -204,7 +204,21 @@ module.exports = function (app, config) {
     Model.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false})
     .exec()
     .then(result => {
-        res.status(200).json(result); 
+      Model.findOne({_id: req.body._id})
+        .populate('courseId', 'name number')
+        .populate('requestId')
+        .populate('personId','email firstName lastName phone mobile nickName')
+        .populate('content.personId','email firstName lastName phone mobile nickName')
+        .populate('institutionId', 'name')
+        .populate('owner.personId', 'firstName lastName _id')
+        .exec()
+        .then(response => {
+          res.status(200).json(response); 
+        })
+        .catch(err => {
+          res.status(200).json(result); 
+        })
+        
       })
       .catch(error => {
         return next(error);
