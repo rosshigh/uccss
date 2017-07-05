@@ -1,5 +1,5 @@
 <template>
-	<div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId | gravatarUrlId:people:100:1"></div>
+	<div class="smart-timeline-icon bottomMarginLg" innerhtml.bind="event.personId.email | gravatarUrl:100:1"></div>
 	<div class="smart-timeline-time">
 		<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>
 		<p><span if.bind="event.emailSent"  ><i class="fa fa-envelope" aria-hidden="true"></i></span></p>
@@ -7,7 +7,7 @@
 	</div>
 	<div class="smart-timeline-content borderTop leftJustify">
 		<div class="form-group">
-			<p>${event.personId | lookupValue:people:'_id':fullName'}</p>
+			<p>${event.personId.fullName}</p>
 			<div class="row">
 				<div class="topMargin bottomMargin"  innerhtml.bind="event.content.comments ? event.content.comments : ' ' "></div>
 			</div>

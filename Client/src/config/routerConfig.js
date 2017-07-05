@@ -78,7 +78,12 @@ export default class {
                   name: 'documents',      
                   settings: { auth: true, roles: [] }
                  },
-                // // { route: 'notes',           moduleId: './modules/admin/notes/notes',            name: 'notes',          settings: { auth: true, roles: [] } },
+                { 
+                  route: 'notes',           
+                  moduleId: './modules/admin/notes/notes',            
+                  name: 'notes',          
+                  settings: { auth: true, roles: [] } 
+                },
                 // // { route: 'logout',          moduleId: './modules/home/logout',                  name: 'logout',        settings: { auth: true, roles: [] } },
                 {
                   route: 'facco',
@@ -92,22 +97,42 @@ export default class {
                   name: 'support',        
                   settings: { auth: true, roles: [] }
                  },
-                // { route: 'analytics',       moduleId: './modules/analytics/analytics',          name: 'analytics',     settings: { auth: true, roles: [] } },
+                {
+                  route: 'analytics',
+                  moduleId: './modules/analytics/analytics',          
+                  name: 'analytics',     
+                  settings: { auth: true, roles: [] } 
+                },
                 {
                    route: 'clientRequests',  
                    moduleId: './modules/user/requests/clientRequests', 
                    name: 'clientRequests', 
                    settings: { auth: true, roles: [] } 
                 },
-                // { route: 'techHt',          moduleId: './modules/tech/support/support',         name: 'techHt',         settings: { auth: true, roles: [] } },
-                // { route: 'techRq',          moduleId: './modules/tech/requests/assignments',    name: 'techRq',          settings: { auth: true, roles: [] } },
+                { 
+                  route: 'techHt',          
+                  moduleId: './modules/tech/support/support',         
+                  name: 'techHt',         
+                  settings: { auth: true, roles: [] }
+                },
+                {
+                   route: 'techRq',
+                   moduleId: './modules/tech/requests/assignments',
+                   name: 'techRq',
+                   settings: { auth: true, roles: [] } 
+                },
                 { 
                   route: 'social',          
                   moduleId: './modules/social/social',                
                   name: 'social',          
                   settings: { auth: true, roles: [] }
                  },
-                // { route: 'htNote/:id',      moduleId: './modules/tech/support/support',         name: 'htNote',         settings: { auth: true, roles: [] } }
+                { 
+                  route: 'htNote/:id',      
+                  moduleId: './modules/tech/support/support',         
+                  name: 'htNote',         
+                  settings: { auth: true, roles: [] } 
+                }
             ]);
 
             config.mapUnknownRoutes('home');

@@ -265,10 +265,9 @@ export class People {
         }
     }
 
-
-  activateAccountEmail(email){
-    this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
-  }
+    activateAccountEmail(email){
+        this.data.saveObject(email, this.PEOPLE_SERVICE + "/facDev/activate", 'post');
+    }
 
     //Institutions
     async getInstitutionsArray(options, refresh) {
@@ -372,23 +371,138 @@ export class People {
     }
 
     //notes
+   async getNotesArray(options, refresh){
+        if (!this.notesArray || refresh) {
+            var url = this.NOTES_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.notesArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+    }
+
     async getRemindersArray(options, refresh){
-       if (!this.remindersArray || refresh) {
-           var url = this.NOTES_SERVICE;
-           url += options ? options : "";
-           try {
-               let serverResponse = await this.data.get(url);
-               if (!serverResponse.error) {
-                   this.remindersArray = serverResponse;
-                   this.remindersArray = this.remindersArray.filter(item => {
-                       return item.isReminder;
-                   });
-               }
-           } catch (error) {
-               console.log(error);
-           }
-       }
-   }
+        if (!this.remindersArray || refresh) {
+            var url = this.NOTES_SERVICE;
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.remindersArray = serverResponse;
+                    this.remindersArray = this.remindersArray.filter(item => {
+                        return item.isReminder;
+                    });
+                    return serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                    return undefined;
+                }
+            } catch (error) {
+                console.log(error);
+                return undefined;
+            }
+        }
+    }
+
+    selectNote(index) {
+        if (index === undefined) {
+            this.selectedNote = this.emptyNote();
+        } else {
+            try {
+                this.selectedNote = this.utils.copyObject(this.notesArray[index]);
+                this.editNoteIndex = index;
+            } catch (error) {
+                console.log(error);
+                this.selectedNote = this.emptyNote();
+            }
+
+        }
+    }
+
+    selectNoteById(id){
+        if(!id) return;
+        for(let i = 0; i < this.notesArray.length; i++){
+            if(this.notesArray[i]._id === id){
+                this.selectedNote = this.utils.copyObject(this.notesArray[i]);
+                this.editNoteIndex = i;
+                return;
+            }
+        }
+        this.selectedNote = this.emptyNote();
+    }
+
+    emptyNote() {
+        var obj  = new Object();
+        obj.note = "";
+        obj.dateCreated = new Date();
+        obj.category = "";
+        return obj;
+    }
+
+    async saveNote(index){
+        if(!this.selectedNote){
+            return;
+        }
+
+        if(!this.selectedNote._id){
+            let serverResponse = await this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "post");
+            if (!serverResponse.error) {
+                if(this.notesArray){
+                    this.notesArray.push(this.selectedNote);
+                    this.editNoteIndex = this.notesArray.length - 1;
+                }
+            } else {
+                this.data.processError(response, "There was an error creating the note.");
+                }
+            return serverResponse;
+        } else {
+            var serverResponse = await this.data.saveObject(this.selectedNote, this.NOTES_SERVICE, "put");
+            if (!serverResponse.error) {
+                this.notesArray[this.editNoteIndex] = this.utils.copyObject(this.selectedNote, this.notesArray[this.editNoteIndex]);
+            } else {
+                this.data.processError(response, "There was an error updating the course.");
+            }
+            return serverResponse;
+        }
+    }
+
+    async saveReminder(item, index){
+        console.log(item)
+        if(item === undefined){
+            return;
+        }
+      
+        var serverResponse = await this.data.saveObject(item, this.NOTES_SERVICE, "put");
+        if (!serverResponse.error) {
+            this.remindersArray[index] = this.utils.copyObject(this.noteToSave, this.remindersArray[index]);
+        } else {
+            this.data.processError(response, "There was an error updating the course.");
+        }
+        return serverResponse;
+    }
+
+    async deleteNote(){
+        if(!this.selectedNote){
+            return;
+        }
+
+        let serverResponse = await this.data.deleteObject(this.NOTES_SERVICE + '/' + this.selectedNote._id);
+        if (!serverResponse.error) {
+            this.notesArray.splice(this.editNoteIndex, 1);
+            this.editNoteIndex = - 1;
+        }
+        return serverResponse;
+
+    }
 
    //courses
     async getCoursesArray(refresh, options, fields) { 

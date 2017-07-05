@@ -70,7 +70,7 @@ export class ViewHelpTickets {
 
     let responses = await Promise.all([
       this.helpTickets.getHelpTicketArray("?filter=personId|eq|" + this.userObj._id + "&order=modifiedDate:DSC", true),
-      this.people.getUCCStaff(uccRoles),
+      // this.people.getUCCStaff(uccRoles),
       this.helpTickets.getHelpTicketTypes('?order=category'),
       this.sessions.getSessionsArray('?order=startDate', true),
       this.apps.getDownloadsArray(true, '?filter=helpTicketRelevant|eq|true&order=name'),
@@ -78,7 +78,7 @@ export class ViewHelpTickets {
       this.config.getConfig()
     ]);
 
-    this.people = this.people.uccPeople;
+    // this.people = this.people.uccPeople;
 
     this.updateArray();
 
@@ -128,7 +128,7 @@ export class ViewHelpTickets {
       } else {
         if(response[0].personId !== this.userObj._id){
           this.lockObject = response[0];
-          this.responseMessage = "Help Ticket is currently locked by " + this.getName();
+          this.responseMessage = "Help Ticket is currently locked by " + await this.getName();
           this.showLockMessage = true;  
         }
       }
@@ -224,9 +224,10 @@ export class ViewHelpTickets {
   //   // }
   // }
 
-  getName(){
-    for(var i = 0; i < this.people.peopleArray.length; i++){
-      if(this.people.peopleArray[i]._id == this.lockObject.personId) return this.people.peopleArray[i].fullName;
+  async getName(){
+    let response = await this.people.getPerson(this.lockObject.personId)
+    if(!response.error){
+      return response.fullName;
     }
     return "someone";
   }
@@ -254,11 +255,9 @@ export class ViewHelpTickets {
   }
 
   async saveResponse() {
-    // if(this.validation.validate(1)){
     this._createResponse();
      var email = new Object();
     if(this.sendEmail){
-      //  this.people.selectedPersonFromId(this.helpTickets.selectedHelpTicket.personId);
         email.reason = 2;
         email.fullName = this.userObj.fullName;
         email.email = this.userObj.email;
@@ -274,7 +273,6 @@ export class ViewHelpTickets {
       if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
     }
     this._cleanUp();
-    // }
   }
 
   closeHelpTicket(helpTicket){

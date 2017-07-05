@@ -1,0 +1,25 @@
+<template>
+    <div class="subMenu-container">
+        <nav class="navbar navbar-inverse subMenu">
+            <div class="navbar-header">
+                <a class="navbar-brand">Notes</a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="panel panel-default rightMargin leftMargin">
+      <div class="panel-body">
+        <div class="row">
+            <div show.bind="noteSelected === 'No'">
+                <compose view="./components/notesTable.html"></compose>
+            </div> 
+            <div show.bind="noteSelected === 'Yes'" >
+                <compose view="./components/notesForm.html"></compose>
+            </div>
+             <div show.bind="noteSelected === 'helpTicket'" >
+                <compose view="./components/helpTicket.html"></compose>
+            </div>
+        </div> 
+      </div> 
+
+</template>

@@ -337,24 +337,6 @@ module.exports = function (app, config) {
             // Data reception is done, do whatever with it!
             res.status(200).json(str);
         });
-
-    // var optionsget = {
-    //     host : 'api.openweathermap.org', 
-    //     path : '/data/2.5/weather?q=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931', 
-    //     method : 'GET'
-    // };
-
-    // logger.log(optionsget.path);
-    
-    // var reqGet = http.request(optionsget, function(response) {
-    //     console.log("statusCode: ", response.statusCode);
-    //     var str = '';
-    
-    //     res.on('data', function(d) {
-    //         str = JSON.parse(d);
-    //         console.log(str)
-    //         res.status(200).json(str);
-    //     });
     
     });
 
@@ -401,11 +383,9 @@ module.exports = function (app, config) {
           res.status(500).json(err);
         } else {       
           if(!object || object.length === 0){          
-            var error = new Error('No notes found');
-            error.status = 404;
-            return next(error);
+            res.status(200).json({"message": "No Notes Found"});
           } else {
-             res.status(200).json(object);
+            res.status(200).json(object);
           }
         }
       });

@@ -1,0 +1,167 @@
+<template>
+    <div class="col-lg-12">
+      <div class="row">
+        <span class="leftMargin largeFont">${viewHelpTicketsHeading}</span>
+      </div>
+
+    <!-- Buttons -->
+    <div class="row">
+      <div class="bottomMargin list-group-item leftMargin rightMargin" id="toolbar">
+          <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Back"><i class="fa fa-arrow-left fa-lg fa-border" aria-hidden="true"></i></span>
+          <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+          <span click.delegate="respond()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Respond"><i class="fa fa-paper-plane fa-lg fa-border" aria-hidden="true"></i></span>
+          <span click.delegate="ownHelpTicket()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg fa-border" aria-hidden="true"></i></span>
+          <span click.delegate="flag()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Flag"><i class="fa fa-flag fa-lg fa-border" aria-hidden="true"></i></span>
+          <span show.bind="showLockMessage" click.delegate="_unlock()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Unlock"><i class="fa fa-unlock-alt fa-lg fa-border" aria-hidden="true"></i></span>
+          <span class="pull-right">${lockMessage}</span>
+      </div> 
+    </div>
+    
+    <!-- Help Ticket Header -->
+    <div class="topMargin">
+        <!-- Enter Response -->
+        <div show.bind="enterResponse" class="topMargin bottomMargin ">
+
+          <div class="panel panel-default leftMargin rightMargin" style="background-color:ghostwhite;">
+            <div class="panel-body">
+              <div class="list-group-item col-md-12 topMargin">
+                <span  click.delegate="saveResponse(config.REVIEW_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save Response"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true" ></i></span>
+                <span  click.delegate="saveResponse(config.CUSTOMER_ACTION_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Customer Action"><i class="fa fa-users fa-lg fa-border" aria-hidden="true"></i></span>
+                <span  click.delegate="saveResponse(config.CLOSED_HELPTICKET_STATUS)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Save and Close"><i class="fa fa-window-close-o fa-lg fa-border" aria-hidden="true"></i></span>
+                <span  click.delegate="cancelResponse()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
+              </div>
+              <div class="row">
+                  <div class="col-lg-1 topMargin">
+                      <div class="checkbox ">
+                        <label>
+                          <input change.delegate="confidentialChecked()" checked.bind="helpTickets.selectedHelpTicketContent.confidential" id="confidentialCheckBox" type="checkbox"> Tech Staff
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 topMargin">
+                      <div class="checkbox">
+                        <label>
+                          <input disabled.bind="sendMailDisable" checked.bind="sendEmail" type="checkbox"> Send Email
+                        </label>
+                      </div>
+                    </div>
+                </div>
+               
+                <div class="leftMargin rightMargin">
+                      <editor value.bind="responseMessage" height="250"></editor>
+                      <p>&nbsp;</p>
+
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="col-lg-3">
+                              <label class="btn btn-primary">
+                                  Browse for files <input type="file" style="display: none;" change.delegate="changeFiles()"files.bind="files" multiple>
+                              </label>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <button click.delegate="insertDocument()" class="btn btn-primary">Insert Document</button>
+                        </div>
+                        <div class="col-lg-6 topMargin">
+                          <div class="col-lg-10">
+                              <ul>
+                                  <li repeat.for = "file of filesToUpload" class="list-group-item">${file.name}<span click.delegate="removeFile($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                              </ul>
+                          </div>
+                        </div>
+                        <div class='col-lg-6 topMargin'>
+                          <div class="col-lg-10">
+                            <ul>
+                                <li repeat.for = "file of helpTickets.selectedHelpTicketContent.documents" class="list-group-item">${file.fileName}<span click.delegate="removeDocument($index)" class="pull-right"><i class="fa fa-trash" aria-hidden="true"></i></span></li>
+                            </ul>
+                          </div>
+                      </div>
+                </div>
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <!-- widget content -->
+        <div class="row">
+          <div class="panel panel-default  leftMargin rightMargin">        
+            <div class="panel-body">
+              <div class="row">
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Customer: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>
+                  </div>
+                </div>
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>
+                  </div>
+                </div>
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class=" col-md-offset-1">Type:</label>
+                      <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="dataTable.filterList($event)" class="form-control col-md-offset-1" id="helpTicketType">
+                          <option repeat.for="type of helpTickets.helpTicketTypesArray | helpTicketSubtypes" model.bind="type.type">${type.description}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Status</label>
+                      <select id="helpTicketStatus" value.bind="helpTickets.selectedHelpTicket.helpTicketStatus" class="form-control col-md-offset-1">
+                        <option repeat.for="status of config.HELP_TICKET_STATUSES" model.bind="status.code">${status.description}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Priority</label>
+                      <select id="priority" value.bind="helpTickets.selectedHelpTicket.priority" class="form-control col-md-offset-1">
+                        <option repeat.for="priority of config.HELP_TICKET_PRIORITIES" model.bind="$index">${priority.priority}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Keywords</label>
+                      <input type="text" value.bind="helpTickets.selectedHelpTicket.keyWords" class="form-control col-md-offset-1">
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <compose view="../../../../resources/htTimeline/timeline.html"></compose>
+  
+    </div>
+</template>

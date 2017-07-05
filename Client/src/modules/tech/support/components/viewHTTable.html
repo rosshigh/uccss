@@ -1,0 +1,113 @@
+<template>
+  <div class="col-lg-12">
+    <div class="hover" innerhtml.bind="commentShown"></div>
+    <div class="hoverProfile" >
+        <span  click.delegate="hideProfile()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o" aria-hidden="true"></i></span>
+        <span  click.delegate="sendAnEmail(profileHelpTicket.personId)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
+        <hr/>
+        <div class="col-md-4">
+          <div style="height:100px;width:100px;" innerhtml.bind="profileHelpTicket.personId.email | gravatarUrl:100:6"></div>
+        </div>
+        <div class="col-md-8">
+          <h5>Nickname: ${profileHelpTicket.personId.nickName}</h5>
+          <h5>Phone: ${profileHelpTicket.personId.phone  | formatPhone}</h5>
+          <h5>Mobile: ${profileHelpTicket.personId.mobile | formatPhone}</h5>
+        </div>
+    </div>
+
+    <div class='row'>
+      <div class='bottomMargin'>
+        <table id="helpTicketTable" class="table table-striped table-hover">
+          <thead>
+            <tr>
+                <td colspan='colSpan'>
+                  <div class="checkbox">
+                    <label>
+                      <input disabled.bind="sendMailDisable" checked.bind="sendEmail" type="checkbox"> Send Email
+                    </label>
+                  </div>
+                </td>
+            </tr>
+            <tr>
+              <td colspan.bind='colSpan'><compose view="../../../../resources/elements/table-navigation-bar.html"></compose></td>
+            </tr>
+            <tr>
+              <td colspan='colSpan'>
+                <span click.delegate="refresh()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Refresh"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                <span click.delegate="_cleanUpFilters()" class="mousePointer" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Clear Filters"><i class="fa fa-filter fa-ban" aria-hidden="true"></i></span>
+                <span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
+              </td>
+            </tr>
+            <tr>
+              <th></th>
+              <th>
+                <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
+              </th>
+              <th>
+                <input value.bind="ownerFilterValue" input.delegate="dataTable.filterList(ownerFilterValue, { type: 'custom',  filter: customOwnerFilter, collectionProperty: 'owner', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
+              </th>
+              <th>
+                <select value.bind="helpTicketStatusFilter" input.delegate="dataTable.filterList($event, { type: 'value',  filter: 'helpTicketStatusFilter',  collectionProperty: 'helpTicketStatus', displayProperty: 'helpTicketStatus',  compare:'match'} )" class="form-control">
+                  <option value=""></option>
+                  <option repeat.for="status of helpTicketTypes"
+                          value.bind="status.code">${status.description}</option>
+                </select>
+              </th>
+              <th>
+                <input type="date" value.bind="createdDateFilterValue" input.delegate="dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )"  class="form-control" />
+              </th>
+               <th>
+                <input type="date" value.bind="modifiedDateFilterValue" input.delegate="dataTable.filterList(modifiedDateFilterValue, {type: 'date', filter: 'modifiedDate',  collectionProperty: 'modifiedDate', compare: 'after'} )"  class="form-control" />
+              </th>
+              <th>
+                <input value.bind="personFilterValue" input.delegate="dataTable.filterList(personFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )"  class="form-control" />
+              </th>
+              <th>
+                <input value.bind="institutionFilterValue" input.delegate="dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )"  class="form-control" />
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>No <span click.trigger="dataTable.sortArray('helpTicketNo')"><i class="fa fa-sort"></i></span></th>
+              <th style="width:20em">Type <span click.trigger="dataTable.sortArray('helpTicketType')"><i class="fa fa-sort"></i></span><br></th>
+              <th style="width:15em">Owner <span click.trigger="dataTable.sortArray(customOwnerSorter, 'custom')"><i class="fa fa-sort"></i></span></th></th>
+              <th style="width:10em;">Status <span click.trigger="dataTable.sortArray('helpTicketStatus')"><i class="fa fa-sort"></i></span><br></th>
+              <th style="width:8em">Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
+              <th style="width:8em">Date Updated <span click.trigger="dataTable.sortArray('modifiedDate')"><i class="fa fa-sort"></i></span></th>
+              <th style="width:15em">Faculty <span click.trigger="dataTable.sortArray('personId.lastName')"><i class="fa fa-sort"></i></span></th>
+              <th style="width:20em">Institution <span click.trigger="dataTable.sortArray('institutionId.name')"><i class="fa fa-sort"></i></span></th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr repeat.for="helpTicket of dataTable.displayArray" class="${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}">
+              <td  data-title="referenceNo">${helpTicket.helpTicketNo}</td>
+              <td  mouseover.delegate="showComment(helpTicket, $event)" mouseout.delegate="hideComment()" click.delegate="selectHelpTicket($event, $index)"
+                data-title="type">${helpTicket.helpTicketType | helpTicketType:helpTickets.helpTicketTypesArray}
+              </td>
+              <td data-title="Owner">
+                <span show.bind="helpTicket.owner[0].personId === null" click.trigger="ownHelpTicket(helpTicket)" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Take Ownership"><i class="fa fa-child fa-lg" aria-hidden="true"></i></span>
+                <span class="dropbtn" click.trigger="ownHelpTicket(helpTicket)" show.bind="helpTicket.owner[0].personId !== null"> ${helpTicket.owner[0].personId.fullName}</span>
+              </td>
+              <td class="dropbtn" data-title="Status">
+                <div class="dropdown">
+                  <span class="dropbtn"> ${helpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}
+                    <div show.bind="helpTicket.helpTicketStatus !== config.CLOSED_HELPTICKET_STATUS && helpTicket.helpTicketStatus !== config.NEW_HELPTICKET_STATUS" class="dropdown-content">
+                      <a href="#" click.trigger="changeStatus(helpTicket, status.code, status.description)" repeat.for="status of config.HELP_TICKET_STATUSES | helpTicketStatuses:removeHTStatus">${status.description}</a>
+                    </div>
+                  </span>
+                </div>
+              </td>
+              <td  data-title="Created Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.createdDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+              <td  data-title="Modified Date" click.delegate="selectHelpTicket($event, $index)">${helpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:false}</td>
+              <td class="dropbtn" style="width:10rem;" data-title="Customer" click.delegate="showProfile(helpTicket, $event)"  >${helpTicket.personId.firstName} ${helpTicket.personId.lastName}</td>
+              <td  data-title="Insitution">${helpTicket.institutionId.name}</td>
+              <td class="dropbtn"  click.delegate="sendAnEmail(helpTicket.personId)" data-title="Email" >${helpTicket.personId.email}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+</template>

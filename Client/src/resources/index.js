@@ -34,6 +34,10 @@ export function configure(config) {
     './value-converters/sort-date-time',
     './value-converters/file-type',
     './value-converters/format-digits',
-    './value-converters/onoff-switch'
+    './value-converters/format-phone',
+    './value-converters/onoff-switch',
+    './value-converters/get-array-value',
+    './value-converters/help-ticket-statuses',
+    './value-converters/stat-value'    
   ]);
 }

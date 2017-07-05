@@ -5,7 +5,7 @@
 
  <div class="parallax1">
     <div if.bind="config.HOME_WELCOME.length === 0" class="pull-right topMargin rightMargin">
-        <img src="/img/UCC_LOGO_UCCSS.jpg" width="300px">
+        <img if.bind="config.HOME_WELCOME.length === 0" src="/img/UCC_LOGO_UCCSS.jpg" width="300px">
     </div>
      <div if.bind="config.HOME_WELCOME.length > 0" class="caption">
       <span class="border">${config.HOME_WELCOME}</span> 

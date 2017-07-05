@@ -127,6 +127,30 @@ export class HelpTickets {
 
     }
 
+    async updateOwner(email, userObj){
+         if(!this.selectedHelpTicket){
+            return;
+        }
+
+        var response = await this.data.saveObject(email, this.HELP_TICKET_SERVICES + "/owner/" + this.selectedHelpTicket._id, "put");
+        if (!response.error) {
+            if(email.email){
+                email.helpTicketNo = response.helpTicketNo;
+                this.data.saveObject(email, this.HELP_TICKET_EMAIL, "post");
+            }
+            this.selectedHelpTicket.owner[0].personId = {
+                    _id: userObj._id,
+                    firstName: userObj.firstName,
+                    lastName: userObj.lastName,
+                    fullName: userObj.fullName
+            }
+            this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.helpTicketsArray[this.editIndex].baseIndex]);
+        } else {
+                this.data.processError(response, "There was an error updating the help ticket.");
+            }
+        return response;
+    }
+
     async updateStatus(email){
          if(!this.selectedHelpTicket){
             return;
@@ -204,20 +228,24 @@ export class HelpTickets {
         }
     }
 
-    isHelpTicketDirty(){
+    isHelpTicketDirty(obj, skip){
       if(this.selectedHelpTicket){
             if(this.selectedHelpTicket._id){
-                var obj = this.helpTicketsArray[this.editIndex];
+                var obj = obj ? this.helpTicketsArray[this.editIndex] : obj;
             } else {
                 var obj = this.emptyHelpTicket();
             }
-            return this.utils.objectsEqual(this.selectedHelpTicket, obj);
+            return this.utils.objectsEqual(this.selectedHelpTicket, obj, skip);
         }
         return new Array();
     }
 
-    async uploadFile(files,content, helpTicket){
-        let response = await this.data.uploadFiles(files,  this.HELP_TICKET_SERVICES + "/upload/" + helpTicket._id + '/' + helpTicket.helpTicketNo + '/' + content);
+    async uploadFile(files,content){
+        let response = await this.data.uploadFiles(files,  this.HELP_TICKET_SERVICES + "/upload/" + this.selectedHelpTicket._id + '/' + this.selectedHelpTicket.helpTicketNo + '/' + content);
+        if(!response.error){
+            this.selectedHelpTicket = this.utils.copyObject(response);
+            this.helpTicketsArray[this.editIndex] = this.utils.copyObject(this.selectedHelpTicket, this.helpTicketsArray[this.editIndex]);
+        }
     }
 
     async getHelpTicketTypes(options, refresh){

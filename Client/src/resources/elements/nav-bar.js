@@ -66,7 +66,7 @@ export class NavBar {
                         "You must have an active account to access the web site.  Contact your faculty coordinator to activate your account.",
                         "Account Not Active",
                         ['OK']
-                    ).then(response => {
+                    ).whenClosed(response => {
                           this.logout();
                     });
                 } else {
@@ -104,7 +104,7 @@ export class NavBar {
                 "Enter Note",
                 note,
                 ['Submit', 'Cancel']
-            ).then(response => {
+            ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.saveNote(response.output);
                 } else {

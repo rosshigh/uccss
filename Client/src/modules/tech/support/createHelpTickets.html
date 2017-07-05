@@ -1,0 +1,13 @@
+<template>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="col-lg-4">
+            <compose view='./components/helpTicketType.html'></compose>
+            <compose view='./components/Requests.html' show.bind="showRequests"></compose>
+        </div>
+        <div class="col-lg-8">
+            <compose show.bind="showAdditionalInfo" view='./components/helpTicketDetails.html'></compose>
+        </div>
+      </div>
+    </div>
+</template>
