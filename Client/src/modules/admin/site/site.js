@@ -11,6 +11,10 @@ export class Site{
         this.config = config;
     }
 
+    activate(){
+         this.config.getConfig(true);
+    }
+
     attached(){
         $(".nav a").on("click", function(){
             $(".nav").find(".active").removeClass("active");

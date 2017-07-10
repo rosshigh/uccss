@@ -1,8 +1,9 @@
 var Mongoose = require('mongoose'),
+  Person = require('./people').Person,
   Schema = Mongoose.Schema;
 
 var BlogSchema = new Schema({
-	personId: { type: Schema.Types.ObjectId },
+	personId: { type: Schema.Types.ObjectId, ref: "Person" },
 	dateCreated: { type: Date,  default: Date.now },
 	title: { type: String },
 	text: { type: String },
@@ -16,7 +17,7 @@ module.exports = Mongoose.model('Blog', BlogSchema);
 
 var ForumSchema = new Schema({
 	 dateCreated: { type: Date,  default: Date.now },
-	 personId: { type: Schema.Types.ObjectId },
+	 personId: { type: Schema.Types.ObjectId, ref: "Person" },
 	 title: { type: String },
 	 text: { type: String },
 	 lastPostDate: { type: Date },
@@ -30,7 +31,7 @@ var ForumSchema = new Schema({
 module.exports = Mongoose.model('Forum', ForumSchema);
 
 var ForumMessage = new Schema({
-	 personId: { type: Schema.Types.ObjectId },
+	 personId: { type: Schema.Types.ObjectId, ref: "Person" },
 	 dateCreated: { type: Date,  default: Date.now },
 	 title: { type: String },
 	 text: { type: String },

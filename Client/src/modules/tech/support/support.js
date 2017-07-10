@@ -18,6 +18,10 @@ export class Support{
         });
     }
 
+    activate(){
+         this.config.getConfig(true);
+    }
+
     getClass(first){
         return first ? 'active' : '';
     }

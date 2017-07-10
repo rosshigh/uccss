@@ -18,6 +18,10 @@ export class FacCo{
         });
     }
 
+    activate(){
+         this.config.getConfig(true);
+    }
+
     configureRouter(config, router) {
         config.map([
         {

@@ -1,15 +1,13 @@
 import {inject} from 'aurelia-framework';
 import {Social} from '../../resources/data/social';
-import {People} from '../../resources/data/people';
 import {AppConfig} from '../../config/appConfig';
 
-@inject(Social, People, AppConfig)
+@inject(Social, AppConfig)
 export class ViewBlogs{
 	blogSelected = false;
 
-	constructor(social, people, config){
+	constructor(social,  config){
 		this.social = social;
-		this.people = people;
 		this.config = config;
 	}
 
@@ -19,7 +17,6 @@ export class ViewBlogs{
 
 	async activate(){
 		let responses = await Promise.all([
-            this.people.getPeopleArray(),
 			this.social.getBlogArray('?order=-dateCreated',true)
 		]);
 	}
@@ -28,7 +25,7 @@ export class ViewBlogs{
 		this.selectedIndex = index;
 		this.social.blogArray[index].views = this.social.blogArray[index].views ? this.social.blogArray[index].views + 1 : 1;
 		this.social.selectBlog(index);
-		this.social.saveBlog();
+		this.social.updateViews()
 		this.blogSelected = true;
 		
 	}
@@ -37,7 +34,7 @@ export class ViewBlogs{
 		if(index === 999) index = this.selectedIndex;
 		this.social.blogArray[index].likes = this.social.blogArray[index].likes ? this.social.blogArray[index].likes + 1 : 1;
 		this.social.selectBlog(index);
-		this.social.saveBlog();
+		this.social.updateViews();
 	}
 
 	back(){

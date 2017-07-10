@@ -17,6 +17,7 @@ module.exports = function (app) {
 	router.get('/api/blogs', function(req, res, next){
 		logger.log('Get Blogs', 'verbose');
 		var query = buildQuery(req.query, Blog.find())
+		.populate('personId', 'firstName lastName email')
 		query.exec(function(err, object){
 			if (err) {
 			return next(err);
@@ -29,6 +30,7 @@ module.exports = function (app) {
 	router.get('/api/blogs/:id', requireAuth, function(req, res, next){
 		logger.log('Get blog '+ req.params.id, 'verbose');
 		Blog.findById(req.params.id)
+		.populate('personId', 'firstName, lastName, fullName, email')
 		.exec()
 		.then(object => {
 			res.status(200).json(object);
@@ -81,6 +83,7 @@ module.exports = function (app) {
 		query
 			.sort('dateCreated')
       		.populate('messages')
+			.populate('personId', 'firstName, lastName, fullName, email')
 			.exec(function(err, object){
 				if (err) {
 					return next(err);

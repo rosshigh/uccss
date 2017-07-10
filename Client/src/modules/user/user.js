@@ -50,6 +50,7 @@ export class User {
 
   async activate(){
     await this.getData();
+    this.config.getConfig(true);
 
     this.helpTicketArray = [
         {

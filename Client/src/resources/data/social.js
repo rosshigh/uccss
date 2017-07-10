@@ -58,7 +58,7 @@ export class Social {
                 if(this.blogArray) this.blogArray.push(this.selectedBlog);
             } else {
                      this.data.processError(response, "There was an error creating the blog.");
-                }
+            }
             return response;
         } else {
             var response = await this.data.saveObject(this.selectedBlog, url, "put");
@@ -72,6 +72,14 @@ export class Social {
             return response;
         }
 	}
+
+    updateViews(){
+        if(!this.selectedBlog){
+		     return;
+        }
+        var url = this.BLOGS_SERVICES;
+        this.data.saveObject(this.selectedBlog, url, "put");
+    }
 
     async deleteBlog(){
          if(this.selectedBlog._id){

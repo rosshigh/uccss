@@ -1,0 +1,1 @@
+forever start -l c:\uccss\forever-log\forever.out -o c:\uccss\forever-log\out.log -e c:\uccss\forever-log\erro.log index.js

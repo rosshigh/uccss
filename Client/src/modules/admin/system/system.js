@@ -17,6 +17,10 @@ export class System{
             $(this).parent().addClass("active");
         });
     }
+
+    activate(){
+         this.config.getConfig(true);
+    }
     
     configureRouter(config, router) {
         config.map([
