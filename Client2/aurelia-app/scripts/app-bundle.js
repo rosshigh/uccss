@@ -150,8 +150,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             _classCallCheck(this, AppConfig);
 
             this.HOST = location.origin;
-            this.BASE_URL = this.HOST + "/api/";
-            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
+            this.BASE_URL = "http://localhost:5000/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/';
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';

@@ -77,7 +77,7 @@ export class EditPeople {
     }
 
     async save() {
-        if(this.validation.validate(1)){
+         if(this.validation.validate(1)){
             let serverResponse = await this.people.saveInstitution();
             if (!serverResponse.error) {
                 this.dataTable.updateArray(this.people.institutionsArray);
@@ -86,7 +86,17 @@ export class EditPeople {
                  this.utils.showNotification("There was a problem updating saving the institution");
             }
             this._cleanUp();
-        } 
+        } else {
+            if(!this.people.selectedInstitution.institutionType || !this.people.selectedInstitution.memberType || !this.people.selectedInstitution.institutionStatus || !this.people.selectedInstitution.highestDegree){
+                 return this.dialog.showMessage(
+                    "The IS4UA fields on the IS4UA tab are required", 
+                    "Missing Data", 
+                    ['OK']
+                    ).then(response => {
+                        
+                    });
+            }
+        }
     }
 
     delete(){

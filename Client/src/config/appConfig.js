@@ -9,11 +9,11 @@ export class AppConfig {
 
     DOWNLOAD_URL = this.HOST + '/uploadedFiles';
 
-    BASE_URL = "http://localhost:5000/api/";
-    IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
+    // BASE_URL = "http://localhost:5000/api/";
+    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
 
-    // BASE_URL = this.HOST + "/api/";
-    // IMG_DOWNLOAD_URL = this.HOST + '/img/'
+    BASE_URL = this.HOST + "/api/";
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'
 
 INSTITUTIONS_ACTIVE = '01';
    ACTIVE_PERSON = "01";
@@ -104,135 +104,135 @@ INSTITUTIONS_ACTIVE = '01';
 
     REFRESH_KEYWORDS = ["ERPSIM"];
 
-    HELP_TICKET_TYPES = [
-          {
-            "code": 0,
-            "description": "Help with My Product Requests",
-            "message": "This includes any problems with requested or assigned products in current sessions. </p>",
-            "showSubtypes": true,
-            "subtypes": [
-                {
-                    "code": this.HELP_TICKET_CURRICULUM_TYPE,
-                    "description": "Issues with curriculum exercises",
-                    "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
-                    "clientRequired": true,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_PASSWORD_RESET_TYPE,
-                    "description": "Reset Passwords",
-                    "message": "Select the product and enter the user ids of the passwords you need reset.<br><br><p>If the user ids are on a ERP system, you can reset passwords and unlock user accounts in transaction SU01.</p>",
-                    "clientRequired": true,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_LOGON_TYPE,
-                    "description": "Other logon or connection problems",
-                    "message": "Select the product and describe the problem as thouroughly as possible.",
-                    "clientRequired": true,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_CLIENT_REFRESH_TYPE,
-                    "description": "Refresh an ERPSim client",
-                    "message": "Select the client to refresh",
-                    "clientRequired": true,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_CLIENT_OTHER_TYPE,
-                    "description": "Other",
-                    "message": "Select the product request and enter a description of the problem.",
-                    "clientRequired": true,
-                    "appsRequired": false,
-                    "show": false
-                }
+    // HELP_TICKET_TYPES = [
+    //       {
+    //         "code": 0,
+    //         "description": "Help with My Product Requests",
+    //         "message": "This includes any problems with requested or assigned products in current sessions. </p>",
+    //         "showSubtypes": true,
+    //         "subtypes": [
+    //             {
+    //                 "code": this.HELP_TICKET_CURRICULUM_TYPE,
+    //                 "description": "Issues with curriculum exercises",
+    //                 "message": "Select the product for which you need help and provide as much information about the curriculum as possible.  <br><br><p>If you can, upload screen shots of error messages.</p>",
+    //                 "clientRequired": true,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_PASSWORD_RESET_TYPE,
+    //                 "description": "Reset Passwords",
+    //                 "message": "Select the product and enter the user ids of the passwords you need reset.<br><br><p>If the user ids are on a ERP system, you can reset passwords and unlock user accounts in transaction SU01.</p>",
+    //                 "clientRequired": true,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_LOGON_TYPE,
+    //                 "description": "Other logon or connection problems",
+    //                 "message": "Select the product and describe the problem as thouroughly as possible.",
+    //                 "clientRequired": true,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_CLIENT_REFRESH_TYPE,
+    //                 "description": "Refresh an ERPSim client",
+    //                 "message": "Select the client to refresh",
+    //                 "clientRequired": true,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_CLIENT_OTHER_TYPE,
+    //                 "description": "Other",
+    //                 "message": "Select the product request and enter a description of the problem.",
+    //                 "clientRequired": true,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             }
 
-            ]
-        },
-        {
-            "code": 1,
-            "description": "Desktop Application Help",
-            "message": "This includes applications other than those hosted at the UCC.  Select the product from the drop down list and provide as much information about the error as possible.<br><br><p>If possible upload screen shots that show the problem.</p>",
-            "clientRequired": false,
-            "appsRequired": true,
-            "show": false,
-            "showSubtypes": false,
-            "subtypes": [
-                {
-                    "code": this.HELP_TICKET_APP_ERROR_TYPE,
-                    "description": "Application or Installation problems",
-                    "message": "Select the application software and provide as many details as possible.",
-                    "clientRequired": false,
-                    "appsRequired": true,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_APP_LICENSE_TYPE,
-                    "description": "License keys for analytics software",
-                    "message": "Select the application software.",
-                    "clientRequired": false,
-                    "appsRequired": true,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_APP_OTHER_TYPE,
-                    "description": "Other issuew with software",
-                    "message": "Select the application software.",
-                    "clientRequired": false,
-                    "appsRequired": true,
-                    "show": false
-                }
-            ]
-        },
-        {
-            "code": 2,
-            "description": "Other",
-            "message": "Use this for any issue that doesn't fall easily into one of the other categories.",
-            "clientRequired": false,
-            "appsRequired": false,
-            "show": false,
-            "showSubtypes": false,
-            "subtypes": [
-                {
-                    "code": this.HELP_TICKET_OTHER_UA_TYPE,
-                    "description": "Questions about the UA or UA Learning Hub",
-                    "message": "Select the application software and provide as many details as possible.",
-                    "clientRequired": false,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_OTHER_UCCSS_TYPE,
-                    "description": "Questions about the UCCSS or faculy accounts",
-                    "message": "Select the application software.",
-                    "clientRequired": false,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_OTHER_CURRICULUM_TYPE,
-                    "description": "General questions on UA curriculum",
-                    "message": "Select the application software.",
-                    "clientRequired": false,
-                    "appsRequired": false,
-                    "show": false
-                },
-                {
-                    "code": this.HELP_TICKET_OTHER_TYPE,
-                    "description": "Other questions",
-                    "message": "Select the application software.",
-                    "clientRequired": false,
-                    "appsRequired": false,
-                    "show": false
-                }
-            ]
-        }
-    ];
+    //         ]
+    //     },
+    //     {
+    //         "code": 1,
+    //         "description": "Desktop Application Help",
+    //         "message": "This includes applications other than those hosted at the UCC.  Select the product from the drop down list and provide as much information about the error as possible.<br><br><p>If possible upload screen shots that show the problem.</p>",
+    //         "clientRequired": false,
+    //         "appsRequired": true,
+    //         "show": false,
+    //         "showSubtypes": false,
+    //         "subtypes": [
+    //             {
+    //                 "code": this.HELP_TICKET_APP_ERROR_TYPE,
+    //                 "description": "Application or Installation problems",
+    //                 "message": "Select the application software and provide as many details as possible.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": true,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_APP_LICENSE_TYPE,
+    //                 "description": "License keys for analytics software",
+    //                 "message": "Select the application software.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": true,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_APP_OTHER_TYPE,
+    //                 "description": "Other issuew with software",
+    //                 "message": "Select the application software.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": true,
+    //                 "show": false
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         "code": 2,
+    //         "description": "Other",
+    //         "message": "Use this for any issue that doesn't fall easily into one of the other categories.",
+    //         "clientRequired": false,
+    //         "appsRequired": false,
+    //         "show": false,
+    //         "showSubtypes": false,
+    //         "subtypes": [
+    //             {
+    //                 "code": this.HELP_TICKET_OTHER_UA_TYPE,
+    //                 "description": "Questions about the UA or UA Learning Hub",
+    //                 "message": "Select the application software and provide as many details as possible.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_OTHER_UCCSS_TYPE,
+    //                 "description": "Questions about the UCCSS or faculy accounts",
+    //                 "message": "Select the application software.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_OTHER_CURRICULUM_TYPE,
+    //                 "description": "General questions on UA curriculum",
+    //                 "message": "Select the application software.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             },
+    //             {
+    //                 "code": this.HELP_TICKET_OTHER_TYPE,
+    //                 "description": "Other questions",
+    //                 "message": "Select the application software.",
+    //                 "clientRequired": false,
+    //                 "appsRequired": false,
+    //                 "show": false
+    //             }
+    //         ]
+    //     }
+    // ];
     
     NEW_HELPTICKET_STATUS = 1; 
     REVIEW_HELPTICKET_STATUS = 2;
@@ -385,6 +385,17 @@ INSTITUTIONS_ACTIVE = '01';
         this.TEMP_SCALE = this.getParameter('TEMP_SCALE');
         this.HELP_TICKET_EMAIL_LIST = this.getParameter('HELP_TICKET_EMAIL_LIST');
         this.SESSION_EXPLANATION = this.getParameter('SESSION_EXPLANATION');
+        this.SUBMENU_BACKGROUND = this.getParameter('SUBMENU_BACKGROUND');
+        this.SUBMENU_COLOR = this.getParameter('SUBMENU_COLOR');
+        this.ACTIVE_SUBMENU_COLOR = this.getParameter('ACTIVE_SUBMENU_COLOR');
+        this.SUBMENU_BACKGROUND = this.getParameter('SUBMENU_BACKGROUND');
+        this.MENU_COLOR = this.getParameter('MENU_COLOR');
+        this.MENU_BACKGROUND = this.getParameter('MENU_BACKGROUND');
+        this.ACTIVE_MENU_COLOR = this.getParameter('ACTIVE_MENU_COLOR');
+        this.MENU_BACKGROUND = this.getParameter('MENU_BACKGROUND');
+        this.HOVER_SUBMENU_BACKGROUND = this.getParameter('HOVER_SUBMENU_BACKGROUND');
+
+
     }
 
     getParameter(parameter){

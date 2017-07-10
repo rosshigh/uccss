@@ -20,6 +20,7 @@ export class Documents {
     showDocumentForm = false;
     showDocuments = false;
     displayTitle = "";
+    title="Documents";
 
     constructor(router, datatable, documents, people, utils, config, dialog, validation, eventAggregator) {
         this.router = router;
@@ -33,10 +34,8 @@ export class Documents {
         this.eventAggregator = eventAggregator;
         this.validation = validation;
         this.validation.initialize(this);
-    }
 
-    canActivate(){
-        this.userObj = JSON.parse(sessionStorage.getItem('user')); 
+         this.userObj = JSON.parse(sessionStorage.getItem('user')); 
     }
 
     async activate() {

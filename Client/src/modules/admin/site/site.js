@@ -1,11 +1,14 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
+import {AppConfig} from '../../../config/appConfig'; 
 
-@inject(Router)
+@inject(Router, AppConfig)
 export class Site{
+    title="Site Information"
     
-    constructor(router){
+    constructor(router, config){
         this.router = router;
+        this.config = config;
     }
 
     attached(){

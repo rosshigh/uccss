@@ -1,4 +1,14 @@
 <template>
+    <style>
+        .navbar-inverse {
+            color: ${config.SUBMENU_COLOR};
+            background-color:${config.SUBMENU_BACKGROUND}
+        }
+        .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {
+            color: ${config.ACTIVE_SUBMENU_COLOR};
+            background-color:${config.SUBMENU_BACKGROUND}
+        }
+    </style>
   <div class="${item.priority} textContainer banner" repeat.for="item of siteinfo.siteArray | infoFilter:'SYST'">
       <h4 class="leftMargin">${item.title}</h4>
   </div>

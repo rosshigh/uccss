@@ -14,7 +14,7 @@ export class Notes{
 	showCategoryForm = false;
 	showDates = true;
 	spinnerHTML = "";
-	navControl = "notesNavButtons";
+	title="Notes";
 	days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "uesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
     
 	configT = {
@@ -39,15 +39,13 @@ export class Notes{
 		this.people = people;
 		this.utils = utils;
 		this.helpTickets = helpTickets;
+
+		 this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
 	attached(){
         $('[data-toggle="tooltip"]').tooltip();
     }
-
-	canActivate(){
-		 this.userObj = JSON.parse(sessionStorage.getItem('user'));
-	}
 
     async activate() {
 		 let responses = await Promise.all([

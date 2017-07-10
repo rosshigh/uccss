@@ -1,14 +1,18 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
+import {AppConfig} from '../../../config/appConfig'; 
 
-@inject(Router)
+@inject(Router, AppConfig)
 export class Customers{
+
+    title="Customers";
     
     tabs = [{id: 'editPeople', label: 'People'},{id: 'editInstitutions', label: 'Institutions'}];
     tabPath = "modules/admin/customers/";
     
-    constructor(router){
+    constructor(router, config){
         this.router = router;
+        this.config = config;
     }
 
     attached(){

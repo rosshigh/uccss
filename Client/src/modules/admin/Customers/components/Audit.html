@@ -16,7 +16,7 @@
                     <td>${change.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
                     <td>${change.oldValue}</td>
 					<td>${change.newValue}</td>
-					<td>${change.personId | lookupValue:people.peopleArray:"_id":fullName"}</td>
+					<td>${change.personId | lookupValue:people.peopleArray:"_id":"fullName"}</td>
                 </tr>
             </tbody>
         </table>

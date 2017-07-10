@@ -19,6 +19,7 @@ export class EditInventory {
     showDocuments = false;
     address = "";
     description = "";
+    title="Inventory";
 
     tabs = [ {id: 'Maintenance', title: 'Maintenance'}, {id: 'History', title: 'History'},{id: 'Purchase', title: 'Purchase'}, {id: 'Technical', title: "Technical"}, {id: 'Documents', title: "Documents"}];
     tabPath = './';

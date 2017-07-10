@@ -1,4 +1,14 @@
 <template>
+    <style>
+        .navbar-inverse {
+            color: ${appConfig.SUBMENU_COLOR};
+            background-color:${appConfig.SUBMENU_BACKGROUND}
+        }
+        .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {
+            color: ${appConfig.ACTIVE_SUBMENU_COLOR};
+            background-color:${appConfig.SUBMENU_BACKGROUND}
+        }
+    </style>
     <div class="subMenu-container">
         <nav class="navbar navbar-inverse subMenu">
             <div class="navbar-header">

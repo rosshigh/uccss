@@ -5,16 +5,19 @@ import {Utils} from '../../resources/utils/utils';
 import {is4ua} from '../../resources/data/is4ua';
 import {People} from '../../resources/data/people';
 import { CommonDialogs } from '../../resources/dialogs/common-dialogs';
+import {AppConfig} from '../../config/appConfig';
 
-@inject(is4ua,People, Router, Utils, Validation, CommonDialogs)
+@inject(is4ua,People, Router, Utils, Validation, CommonDialogs, AppConfig)
 export class Profile {
+    title="Profile";
 
-    constructor(is4ua, people, router, utils, validation, dialog) {
+    constructor(is4ua, people, router, utils, validation, dialog, config) {
         this.is4ua = is4ua;
         this.people = people;
         this.router = router;
         this.utils = utils;
         this.dialog = dialog;
+        this.config = config;
         this.validation = validation;
         this.validation.initialize(this);
         this._setupValidation();

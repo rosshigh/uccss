@@ -4,13 +4,13 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(Router, AppConfig)
 export class Social{
+
+    title="Social";
     
     constructor(router, config){
         this.router = router;
         this.config = config;
-    }
 
-    canActivate(){
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
         this.blogAuthor = this.userObj.roles.indexOf('BLOG') > -1;
         this.uccStaff = this.userObj.roles.indexOf('BLOG') > -1;

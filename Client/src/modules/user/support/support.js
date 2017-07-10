@@ -1,17 +1,17 @@
 import { inject } from 'aurelia-framework';
 import { Router } from "aurelia-router";
+import {AppConfig} from '../../../config/appConfig'; 
 
-@inject(Router)
+@inject(Router, AppConfig)
 export class Support {
+    title="Support";
 
-    constructor(router) {
+    constructor(router, config) {
         this.router = router;
-    }
-
-    canActivate(){
+        this.config = config;
+        
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
-
 
     attached(){
         $(".nav a").on("click", function(){

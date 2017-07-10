@@ -6,11 +6,11 @@ export class AppConfig {
 
     HOST = location.origin; 
 
-    // BASE_URL = "http://localhost:5000/api/"; 
-    // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
+    BASE_URL = "http://localhost:5000/api/"; 
+    IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/' 
 
-    BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
+    // BASE_URL = this.HOST + "/api/";
+    // IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
