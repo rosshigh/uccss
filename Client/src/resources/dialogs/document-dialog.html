@@ -1,7 +1,12 @@
 <template>
+    <style>
+		ux-dialog-header {
+			color: ${config.SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+		}
+	</style>
 	<ux-dialog style="width:800px;">
 		<ux-dialog-header>${model.title}</ux-dialog-header>
-
 		<ux-dialog-body>
 			<div class="panel panel-default">
 				<div class="panel-body">

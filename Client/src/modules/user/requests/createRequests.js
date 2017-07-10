@@ -15,7 +15,6 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 
 import fuelux from 'fuelux';
 import moment from 'moment';
-// import $ from 'jquery';
 
 @inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator)
 export class ViewHelpTickets {
@@ -38,7 +37,7 @@ export class ViewHelpTickets {
   minStartDate = "1/1/1900";
   maxStartDate = "1/1/9999";
   startDate = "";
-  config = {};
+  configDate = {};
 
   constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea) {
     this.router = router;
@@ -134,6 +133,7 @@ export class ViewHelpTickets {
     var that = this;
 
     wizard.on('actionclicked.fu.wizard', function(e, data) {
+      that.step = data.step;
       if(data.direction !== "previous"){
         if (!that.validation.validate(data.step)){
           e.preventDefault(); 
@@ -228,7 +228,7 @@ export class ViewHelpTickets {
 
   changeBeginDate(evt){
     if(evt.detail && evt.detail.value.date !== ""){
-      this.minEndDate = moment(evt.detail.value.date).format("MM/DD/YYYY");
+      this.minEndDate = moment(evt.detail.value.date).format("YYYY-MM-DD");
       this.requests.selectedRequest.endDate = moment.max(this.requests.selectedRequest.startDate, this.requests.selectedRequest.endDate);
     }
   }
@@ -398,6 +398,15 @@ export class ViewHelpTickets {
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
           if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
+            return false;
+          }
+        }
+        return true;
+      }
+    },{"rule":"custom","message":"Required dates must be after course start date",
+      "valFunction":function(context){
+        for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
+          if(!moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isAfter(context.requests.selectedRequest.startDate)){
             return false;
           }
         }

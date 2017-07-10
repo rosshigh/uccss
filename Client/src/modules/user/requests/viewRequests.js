@@ -47,14 +47,14 @@ export class ViewRequests {
     $("#existingRequestInfo").fadeOut(); 
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate',true ),
-      this.people.getPeopleArray(),
+      // this.people.getPeopleArray(),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
       this.products.getProductsArray('?filter=active|eq|true&order=Category'),
       this.systems.getSystemsArray(),
       this.config.getConfig() 
     ]);
-    this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: "Sandbox"});
-    await this.getRequests();
+    this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME});
+    // await this.getRequests();
   }
 
   deactivate(){
@@ -62,14 +62,22 @@ export class ViewRequests {
   }
 
   async getRequests() {
-      let sessionString = "";
-      this.sessions.sessionsArray.forEach(item => {
-        sessionString += item._id + ":";
-      });
-      sessionString = sessionString.substring(0, sessionString.length-1);
-      sessionString = "/" + this.userObj._id + "/" + sessionString;
-      await this.requests.getClientRequestsArray(sessionString, true);
-      this.dataTable.updateArray(this.requests.requestsArray);
+    if (this.selectedSession) {
+          this.sessions.selectSessionById(this.selectedSession);
+          await this.requests.getClientRequestsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':personId|eq|' + this.userObj._id, true);
+          if(this.requests.requestsArray && this.requests.requestsArray.length){
+            
+              this.dataTable.updateArray(this.requests.requestsArray);
+          } 
+      } 
+      // let sessionString = "";
+      // this.sessions.sessionsArray.forEach(item => {
+      //   sessionString += item._id + ":";
+      // });
+      // sessionString = sessionString.substring(0, sessionString.length-1);
+      // sessionString = "/" + this.userObj._id + "/" + sessionString;
+      // await this.requests.getClientRequestsArray(sessionString, true);
+      // this.dataTable.updateArray(this.requests.requestsArray);
   }
 
   async refresh() {

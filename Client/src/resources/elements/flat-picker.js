@@ -55,13 +55,13 @@ export class FlatPickerCustomElement {
 
 	startdateChanged(newValue, oldValue) {
 		if(this.flatpickr){
-			this.flatpickr.set("minDate",newValue);
+			this.flatpickr.set("minDate", newValue);
 		}
 	}
 
 	enddateChanged(newValue, oldValue) {
 		if(this.flatpickr){
-			this.flatpickr.set("maxDate",newValue);
+			this.flatpickr.set("maxDate", newValue);
 		}
 	}
 

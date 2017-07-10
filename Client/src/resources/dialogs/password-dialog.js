@@ -1,11 +1,13 @@
 import {inject} from "aurelia-framework";
 import {DialogController} from 'aurelia-dialog';
 import Validation from '../../resources/utils/validation';
+import {AppConfig} from '../../config/appConfig';
 
-@inject(DialogController, Validation)
+@inject(DialogController, Validation, AppConfig)
 export class PasswordDialog {
-constructor(dialogController, validation) {
+constructor(dialogController, validation, config) {
     this.dialogController = dialogController;
+    this.config = config;
     this.validation = validation;
     this.validation.initialize(this);
     this._setupValidation();

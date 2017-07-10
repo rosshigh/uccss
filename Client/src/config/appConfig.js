@@ -47,8 +47,6 @@ INSTITUTIONS_ACTIVE = '01';
 
     SESSION_STATUSES = ["Closed","Active","Requests","Next"];
 
-    SANDBOX_ID = 'a1a1a1a1a1a1a1a1a1a1a1a1'; 
-
     ASSIGNED_REQUEST_CODE = 2;
     UNASSIGNED_REQUEST_CODE = 1;
     UPDATED_REQUEST_CODE = 3;

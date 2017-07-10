@@ -33,7 +33,7 @@ module.exports = function (app) {
         if(object){
           res.status(200).json(object);
         } else {
-          res.status(404).json({message: "No requests were found"});
+          res.status(200).json({message: "No requests were found"});
         }
       })
       .catch(err => {

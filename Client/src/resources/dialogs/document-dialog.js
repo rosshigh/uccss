@@ -1,12 +1,14 @@
 import {DialogController} from 'aurelia-dialog';
 import {inject} from 'aurelia-framework';
 import {DocumentsServices} from '../data/documents';
+import {AppConfig} from '../../config/appConfig'
 
-@inject(DialogController, DocumentsServices)
+@inject(DialogController, DocumentsServices, AppConfig)
 export class DocumentDialog {
-  constructor(dialogController, documents) {
+  constructor(dialogController, documents, config) {
     this.dialogController = dialogController;
     this.documents = documents;
+    this.config = config;
   }
   
   activate(model) {

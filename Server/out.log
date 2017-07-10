@@ -18,3 +18,11 @@ Call completed
 [36mverbose[39m: ::1 finished request
 [36mverbose[39m: Get Blogs
 [36mverbose[39m: ::1 finished request
+[32minfo[39m: Polling...
+[32minfo[39m: /data/2.5/weather?q=Milwaukee&APPID=0f85bb931f8faad7e35b6f685aa4e931
+statusCode:  200
+GET result:
+
+
+
+Call completed
