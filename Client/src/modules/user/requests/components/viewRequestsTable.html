@@ -2,7 +2,7 @@
 
   <div class="container">
     <div class='row'>
-      <div show.if="dataTable.displayArray.length > 0" class='bottomMargin'>
+      <div show.bind="dataTable.displayArray.length > 0" class='bottomMargin'>
         <compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
         <div id="no-more-tables">
           <table class="table table-striped table-hover cf">
@@ -57,7 +57,7 @@
           </table>
         </div>
       </div>
-      <div show.if="dataTable.displayArray.length === 0" class="bottomMargin">
+      <div show.bind="dataTable.displayArray.length === 0" class="bottomMargin">
         <h4>You have no existing requests</h4>
       </div>
     </div>
