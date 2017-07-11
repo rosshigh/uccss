@@ -143,22 +143,21 @@ module.exports = function (app) {
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {      
       var path = config.uploads + '/curriculum/' + req.params.container;
-      // mkdirp(path, function(err) {
-      //   if(err){
-      //     res.status(500).json(err);
-      //   } else {
           cb(null, path);
-      //   }
-      // });
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);
     }
   });
 
-  var upload = multer({ storage: storage });
+  var upload = multer({ storage: storage }).any();
 
-  router.post('/api/curriculum/upload/:id/:container', extendTimeout, upload.any(), function(req, res, next){
+  router.post('/api/curriculum/upload/:id/:container', extendTimeout,  function(req, res, next){
+    upload(req, res, function (err) {
+      if(err){
+        console.log(err);
+      }
+      console.log('uploaded')
       Model.findById(req.params.id, function(err, download){
         if(err){
           return next(err);
@@ -180,7 +179,7 @@ module.exports = function (app) {
           });
         }
       });
-
+    });
   });
 
   function extendTimeout (req, res, next) {
