@@ -250,6 +250,10 @@ export class People {
         }
     }
 
+    sendNewRegisterEmail(email){       
+        this.data.saveObject(email, this.PERSON_REGISTER + "/facDev", 'post');
+    }
+
     sendBuikEmail(email){
         if(email.email){
             var serverResponse = this.data.saveObject(email, this.PEOPLE_SERVICE + '/sendBulkEmail', "post");

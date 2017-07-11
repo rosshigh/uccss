@@ -174,6 +174,30 @@ export class ClientRequests {
         }
     }
 
+    async assignRequest(email){
+        if(!this.selectedRequest){
+            return;
+        }
+        var url = email ? this.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.CLIENT_REQUESTS_SERVICES + '/assign';
+         var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
+        if(!serverResponse.error){
+            if(this.requestsArray && this.editRequestIndex){
+                this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
+            }
+        }
+        return serverResponse;
+    }
+
+    selectRequestDetail(index){
+          if(index === undefined || index > this.requestsDetailsArray.length - 1){
+              this.emptyRequestDetail();
+          } else {
+              this.selectedRequestDetail = this.requestsDetailsArray[index];
+              this.requestDetailIndex = index;
+          }
+          return this.selectedRequestDetail;
+    }
+
     setSelectedRequestDetail(request){
       this.selectedRequestDetail = this.utils.copyObject(request);
     }
@@ -224,6 +248,27 @@ export class ClientRequests {
           });
          return sessionCount;
       }
+    }
+
+    async sendCustomerMessage(message){
+        var serverResponse = await this.data.saveObject(message, this.CUSTOMER_ACTION, "put");
+        return serverResponse;
+    }
+
+    updateDetailStatuses(selectedRequestNo, status){
+        this.requestsDetailsArray.forEach(item => {
+            if(item.requestId && item.requestId.clientRequestNo == selectedRequestNo){
+                if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+            }
+        })
+    }
+
+    updateDetailStatus(id, status){
+         this.requestsDetailsArray.forEach(item => {
+            if(item.requestId._id == id){
+                if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+            }
+        })
     }
 
     groupRequestsByInstitution(){

@@ -79,7 +79,7 @@ module.exports = Mongoose.model('ClientRequestDetail', ClientRequestDetailsSchem
 var ClientRequestSchema = new Schema({
   clientRequestNo: { type: Number },
   courseId: { type: Schema.Types.ObjectId },
-  personId: { type:  Schema.Types.ObjectId },
+  personId: { type:  Schema.Types.ObjectId, ref: 'Person' },
   sessionId: { type: Schema.Types.ObjectId, required: true },
   studentIdsAssigned: { type: Number }, //?
   graduateIds: { type: Number, default: 0, min : 0 },

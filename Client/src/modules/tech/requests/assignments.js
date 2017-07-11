@@ -22,6 +22,7 @@ export class Assignments {
     showAudit = false;
     lastIDidsRemaining = -1;
     isChecked = false;
+    title="Tech Staff Client Assignments"
 
     spinnerHTML = "";
 
@@ -36,6 +37,7 @@ export class Assignments {
         this.config = config;
         this.validation = validation;
         this.validation.initialize(this);
+        this._setUpValidation();
         this.people = people;
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -45,20 +47,17 @@ export class Assignments {
         this.requests = requests;
         this.systems = systems;
         this.dialog = dialog;
+
+         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     };
 
     attached(){
         $('[data-toggle="tooltip"]').tooltip();
     }
     
-    canActivate(){
-         this.userObj = JSON.parse(sessionStorage.getItem('user'));
-    }
-
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
-            this.people.getPeopleArray('?filter=personStatus|eq|01&order=lastName'),
             this.people.getInstitutionsArray( '?order=name'),
             this.products.getProductsArray('?filter=active|eq|true&order=Category'),
             this.systems.getSystemsArray(),
@@ -69,7 +68,7 @@ export class Assignments {
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
         this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
-        this._setUpValidation();
+
     }
 
     async getRequests() {
@@ -102,7 +101,6 @@ export class Assignments {
         $(this.nameFilter).val("");
         $(this.nickNameFilter).val("");
         this.filterInAssigned();
-        // this.dataTable.updateArray(this.requests.requestsDetailsArray);
     }
 
     // /*****************************************************************************************************
@@ -124,7 +122,7 @@ export class Assignments {
         //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
-        this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
         this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
 
         this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
@@ -697,8 +695,6 @@ export class Assignments {
                                         this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
                                         this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                         this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
-                                        // this.proposedClient[j].assignments[k].firstFacID = this.assignmentDetails[i].firstFacID;
-                                        // this.proposedClient[j].assignments[k].lastFacID = this.assignmentDetails[i].lastFacID;
                                         this.systems.updateClient(this.proposedClient[j]);
                                     }
                                 }
@@ -776,8 +772,6 @@ export class Assignments {
     async saveEdit(){
         var email = false;
         this.buildAuditDetail();
-        // this.requests.setSelectedRequest(this.requestToSave);
-        // let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
         let serverResponse = await this.requests.saveRequestDetail(email);
         if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");
@@ -946,7 +940,11 @@ export class Assignments {
              this.model = 'header';
              this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
              this.requestId = this.profileRequest.requestId._id;
-             this.course = this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
+             if(this.profileRequest.requestId.courseId === this.config.SANDBOX_ID) {
+                 this.course = this.config.SANDBOX_NAME;
+             } else {
+                this.course = this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
+             }
              this.productName = undefined;
              this.hideProfile();
          } else {
@@ -958,12 +956,12 @@ export class Assignments {
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
-        let email = {emailBody: "", emailSubject: subject, emailId: this.requestId};
+        let email = {emailBody: "", emailSubject: subject, emailId: this.profileRequest.requestId.personId.email};
         return this.dialog.showEmail(
                 "Enter Email",
                 email,
                 ['Submit', 'Cancel']
-            ).then(response => {
+            ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.sendTheEmail(response.output);
                 } else {
@@ -973,7 +971,7 @@ export class Assignments {
     }
 
     async sendTheEmail(email){
-        if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
+        // if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
         if(email){
             if(this.model === 'header'){
                 this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
@@ -985,7 +983,7 @@ export class Assignments {
             this.message = {
                 id: this.requestId,
                 customerMessage : email.email.emailBody,
-                toEmail: this.people.selectedPerson.email,
+                toEmail: email.email.emailId,
                 subject: email.email.emailSubject,
                 clientRequestNo: this.selectedRequestNo,
                 product: this.productName,
@@ -1009,7 +1007,7 @@ export class Assignments {
 
     showProfile(request, el){
         this.profileRequest = request;
-        this.people.selectedPersonFromId(request.requestId.personId);
+        // this.people.selectedPersonFromId(request.requestId.personId);
         $(".hoverProfile").css("top", el.clientY - 175);
         $(".hoverProfile").css("left", el.clientX - 300);
         $(".hoverProfile").css("display", "block");
@@ -1089,7 +1087,7 @@ export class Assignments {
        
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
-        this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
         this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
         this.editStartDate = this.requests.selectedRequestDetail.requestId.startDate;
         this.originalRequestDetail = this.utils.copyObject(this.requests.selectedRequestDetail);

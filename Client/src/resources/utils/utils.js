@@ -204,4 +204,16 @@ export class Utils{
       .replace( / (.)/g, function($1) { return $1.toUpperCase(); })
       .replace( / /g, '' );
   }
+
+  lookupValue(value, array, lookUpProperty, returnProperty){
+      if(!value || !array){
+        return;
+      }
+      for(var i = 0, x = array.length; i < x; i++){
+        if(array[i][lookUpProperty] == value) {
+            return array[i][returnProperty];
+        }
+      }
+      return null;
+    }
 }

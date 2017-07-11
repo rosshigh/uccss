@@ -39,6 +39,8 @@ export function configure(config) {
     './value-converters/onoff-switch',
     './value-converters/get-array-value',
     './value-converters/help-ticket-statuses',
-    './value-converters/stat-value'    
+    './value-converters/stat-value',
+    './value-converters/filter-clients',
+    './value-converters/overlap'    
   ]);
 }

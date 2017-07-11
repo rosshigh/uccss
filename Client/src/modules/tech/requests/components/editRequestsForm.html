@@ -39,7 +39,7 @@
           <td>${item.property}</td>
           <td>${item.oldValue}</td>
           <td>${item.newValue}</td>
-          <td>${item.personId  | person:people.peopleArray:"fullName"}</td>
+          <td>${item.personId.fullName}</td>
         </tr>
       </tbody>
     </table>
@@ -47,7 +47,7 @@
 
 	<div show.bind="!showAudit" class="col-lg-10 col-lg-offset-1">
 		<h4>Request No. ${requests.selectedRequestDetail.requestNo}</h4>
-		<h5 class="dropbtn" click.delegate="showProfile(requests.selectedRequestDetail, $event)">Faculty: ${requests.selectedRequestDetail.requestId.personId | lookupValue:people.peopleArray:"_id":"fullName"} <i class="fa fa-info" aria-hidden="true"></i></h5>
+		<h5 class="dropbtn" click.delegate="showProfile(requests.selectedRequestDetail, $event)">Faculty: ${requests.selectedRequestDetail.requestId.personId.fullName} <i class="fa fa-info" aria-hidden="true"></i></h5>
 		<h5>Institution: ${requests.selectedRequestDetail.requestId.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</h5>
 	
 	<div class="col-lg-5" >

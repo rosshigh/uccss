@@ -217,21 +217,10 @@ if(env === 'development'){
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-    // return new Promise(function(resolve, reject) {
       mailObject.body = CustomerActionTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject; 
       sendGrid(mailObject)
-      //     .then(result => {
-            
-      //         if (result.statusCode === 202) {     
-      //           resolve(result);
-      //         } else {                  
-      //           reject(Error(result));
-      //         }
-      //     })
-
-      // });
   }
 
   genericEmail = function(mailObject){
@@ -465,24 +454,15 @@ if(env === 'development'){
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
-    //  return new Promise(function(resolve, reject) {
-        var mail = {
-            from: emailConfig.emailAddress,
-            to: mailObject.email,
-            subject: 'Customer Action Required',
-            template: 'client-request-customer-action',
-            context: mailObject.context
-        };
+    var mail = {
+        from: emailConfig.emailAddress,
+        to: mailObject.email,
+        subject: 'Customer Action Required',
+        template: 'client-request-customer-action',
+        context: mailObject.context
+    };
 
-        nodeMailerSendMail(mail)
-    //     .then(result => {      
-    //           if (result.rejected.length === 0) {     
-    //             resolve(result);
-    //           } else {
-    //             reject(Error(result));
-    //           }
-    //       })
-    // });   
+    nodeMailerSendMail(mail)
   }
 
   genericEmail = function(mailObject){

@@ -47,14 +47,12 @@ export class ViewRequests {
     $("#existingRequestInfo").fadeOut(); 
     let responses =  await Promise.all([
       this.sessions.getSessionsArray('?filter=[or]sessionStatus|Active:Requests&order=startDate',true ),
-      // this.people.getPeopleArray(),
       this.people.getCoursesArray(true, "?filter=personId|eq|" + this.userObj._id),
       this.products.getProductsArray('?filter=active|eq|true&order=Category'),
       this.systems.getSystemsArray(),
       this.config.getConfig() 
     ]);
     this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME});
-    // await this.getRequests();
   }
 
   deactivate(){
@@ -66,18 +64,9 @@ export class ViewRequests {
           this.sessions.selectSessionById(this.selectedSession);
           await this.requests.getClientRequestsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':personId|eq|' + this.userObj._id, true);
           if(this.requests.requestsArray && this.requests.requestsArray.length){
-            
               this.dataTable.updateArray(this.requests.requestsArray);
           } 
       } 
-      // let sessionString = "";
-      // this.sessions.sessionsArray.forEach(item => {
-      //   sessionString += item._id + ":";
-      // });
-      // sessionString = sessionString.substring(0, sessionString.length-1);
-      // sessionString = "/" + this.userObj._id + "/" + sessionString;
-      // await this.requests.getClientRequestsArray(sessionString, true);
-      // this.dataTable.updateArray(this.requests.requestsArray);
   }
 
   async refresh() {
@@ -87,12 +76,12 @@ export class ViewRequests {
     this.spinnerHTML = "";
   }
 
-  setDates(){
-    this.minStartDate = this.sessions.selectedSession.startDate;
-    this.maxStartDate = this.sessions.selectedSession.endDate;
-    this.minEndDate = this.sessions.selectedSession.startDate;
-    this.maxEndDate = this.sessions.selectedSession.endDate;
-  }
+  // setDates(){
+  //   this.minStartDate = this.sessions.selectedSession.startDate;
+  //   this.maxStartDate = this.sessions.selectedSession.endDate;
+  //   this.minEndDate = this.sessions.selectedSession.startDate;
+  //   this.maxEndDate = this.sessions.selectedSession.endDate;
+  // }
 
   async edit(product, el, index) { 
     this.requestSelected = true;
@@ -104,7 +93,7 @@ export class ViewRequests {
     this.requests.selectRequstById(product.requestId);
     this.sessions.selectSessionById(this.requests.selectedRequest.sessionId);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-    this.setDates();
+    // this.setDates();
    
     if(this.requests.selectedRequestDetail.assignments.length){
       this.selectedAssignmentIndex = 0;

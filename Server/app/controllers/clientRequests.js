@@ -28,6 +28,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
+      .populate('personId', 'firstName lastName fullName email')
       .exec()
       .then(object => {
         if(object){
@@ -260,11 +261,11 @@ module.exports = function (app) {
         }) 
   });
 
-  router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){
+  router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){   
     if(req.body.customerMessage){    
       if(req.body.model === 'header'){
-        Model.findById(req.body.id, function(err, request){   
-          if(request){  
+        Model.findById(req.body.id, function(err, request){          
+          if(request){             
             request.customerMessage = req.body.customerMessage;
             request.requestStatus = req.body.requestStatus;
             request.requestDetails.forEach(item => {   
@@ -290,7 +291,7 @@ module.exports = function (app) {
                     session: req.body.session,
                     customerMessage: req.body.customerMessage
                   }
-                };
+                };              
                 customerAction(obj)
                 res.status(200).json(request);
               }
@@ -352,7 +353,7 @@ module.exports = function (app) {
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
-    query.populate('requestId')
+    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId'}})
     query.exec()
       .then(object => {
         if(object){
