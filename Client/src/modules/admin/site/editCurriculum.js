@@ -160,7 +160,7 @@ export class EditCurriculum {
 			"Are you sure you want to delete the item?", 
 			"Delete Item", 
 			['Yes', 'No']
-			).then(response => {
+			).whenClosed(response => {
 				if(!response.wasCancelled){
 					this.deleteItem();    
 				}
@@ -183,7 +183,7 @@ export class EditCurriculum {
                 "The item has been changed. Do you want to save your changes?", 
                 "Save Changes", 
                 ['Yes', 'No']
-                ).then(response => {
+                ).whenClosed(response => {
                     if(!response.wasCancelled){
                         this.save();    
                     } else {
@@ -239,7 +239,7 @@ export class EditCurriculum {
                 "Are you sure you want to delete the category?",
                 "Delete Category",
                 ['Yes', 'No']
-            ).then(response => {
+            ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.deleteCategory();
                 }

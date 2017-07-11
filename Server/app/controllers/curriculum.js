@@ -143,13 +143,13 @@ module.exports = function (app) {
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {      
       var path = config.uploads + '/curriculum/' + req.params.container;
-      mkdirp(path, function(err) {
-        if(err){
-          res.status(500).json(err);
-        } else {
+      // mkdirp(path, function(err) {
+      //   if(err){
+      //     res.status(500).json(err);
+      //   } else {
           cb(null, path);
-        }
-      });
+      //   }
+      // });
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);

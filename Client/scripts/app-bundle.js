@@ -18838,7 +18838,7 @@ define('modules/admin/site/editCurriculum',['exports', 'aurelia-framework', '../
         EditCurriculum.prototype.delete = function _delete() {
             var _this2 = this;
 
-            return this.dialog.showMessage("Are you sure you want to delete the item?", "Delete Item", ['Yes', 'No']).then(function (response) {
+            return this.dialog.showMessage("Are you sure you want to delete the item?", "Delete Item", ['Yes', 'No']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
                     _this2.deleteItem();
                 }
@@ -18884,7 +18884,7 @@ define('modules/admin/site/editCurriculum',['exports', 'aurelia-framework', '../
 
             var changes = this.curriculum.isDirty(this.originalCurriculumObject);
             if (changes.length) {
-                return this.dialog.showMessage("The item has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).then(function (response) {
+                return this.dialog.showMessage("The item has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
                         _this3.save();
                     } else {
@@ -18959,7 +18959,7 @@ define('modules/admin/site/editCurriculum',['exports', 'aurelia-framework', '../
             if (this.curriculum.curriculumExist(this.curriculum.selectedCurriculum.category)) {
                 return this.dialog.showMessage("You can't delete that category because there are exisitng curricula that use it?", "Can't Delete Category", ['OK']).then(function (response) {});
             } else {
-                return this.dialog.showMessage("Are you sure you want to delete the category?", "Delete Category", ['Yes', 'No']).then(function (response) {
+                return this.dialog.showMessage("Are you sure you want to delete the category?", "Delete Category", ['Yes', 'No']).whenClosed(function (response) {
                     if (!response.wasCancelled) {
                         _this4.deleteCategory();
                     }
