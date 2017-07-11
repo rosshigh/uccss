@@ -45,8 +45,8 @@ define('environment',["exports"], function (exports) {
     value: true
   });
   exports.default = {
-    debug: true,
-    testing: true
+    debug: false,
+    testing: false
   };
 });
 define('main',['exports', './environment', 'regenerator-runtime'], function (exports, _environment, _regeneratorRuntime) {

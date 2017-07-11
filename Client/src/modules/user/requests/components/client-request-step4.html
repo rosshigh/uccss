@@ -28,7 +28,7 @@
         <tr repeat.for="request of requests.selectedRequest.requestDetails">
           <td>${request.productId | lookupValue:products.productsArray:"_id":"name"}</td>
           <td> 
-            <div if.bind="step === 3" class="form-group  col-md-8">
+            <div class="form-group  col-md-8">
                <flat-picker controlid="requiredDate-${$index}" config="configDate" value.bind="request.requiredDate" startdate.bind="minRequiredDate" enddate.bind="maxRequiredDate"></flat-picker>
             </div>
           </td>

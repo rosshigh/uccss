@@ -5,7 +5,7 @@ window.regeneratorRuntime = regeneratorRuntime;
 
 //Configure Bluebird Promises.
 Promise.config({
-  longStackTraces: environment.debug,
+  longStackTraces: false,
   warnings: {
     wForgottenReturn: false
   }
