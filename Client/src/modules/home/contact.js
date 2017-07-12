@@ -5,13 +5,12 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(SiteInfo, People, AppConfig)
 export class Contact {
-	title="UCC Contact Information";
 
 	constructor( siteinfo, people, config ) {
-    this.siteinfo = siteinfo;
+    	this.siteinfo = siteinfo;
 		this.people = people;
 		this.config = config;
-  }
+  	}
 
 	async activate() {
 		let uccRoles = "";

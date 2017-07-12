@@ -19,9 +19,9 @@ export default class {
                   settings: { auth: false, roles: [] }
                 },
                 {
-                  route: 'contact',
-                  moduleId: './modules/home/contact',
-                  name: 'Contact',
+                  route: 'about',
+                  moduleId: './modules/home/about',
+                  name: 'About',
                   settings: { auth: false, roles: [] }
                 },
                 {

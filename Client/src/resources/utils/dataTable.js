@@ -141,7 +141,7 @@ export class DataTable{
     this.buildDisplayArray();
   }
 
-  updateTake(el){
+  updateTake(){
     this.take = this.numRowsShown;
     this.startRecord = 0;
     this.lastVisible = parseInt(this.firstVisible) + parseInt(this.take) - 1;
@@ -245,7 +245,7 @@ export class DataTable{
             case 'custom':
               keep = filterItem.options.filter(filterItem.value, item, that.context);
               break;
-            case 'text':
+            case 'text':  
               if(filterItem.options.compare.indexOf('not') > -1){
                 keep = matchValue.toUpperCase().indexOf(filterItem.value.toUpperCase()) == -1;
               } else {

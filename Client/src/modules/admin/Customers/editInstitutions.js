@@ -9,7 +9,7 @@ import Validation from '../../../resources/utils/validation';
 import $ from 'jquery';
 
 @inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation)
-export class EditPeople {
+export class EditInstitutions {
     institutionSelected = false;
     spinnerHTML = "";
 
