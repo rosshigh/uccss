@@ -114,7 +114,6 @@ export class User {
           this.showRequests = this.requests.updatedRequests + this.requests.unassignedRequests;
           this.showHelpTickets = this.helpTickets.newHelpTickets;
           this.showCarousel = this.siteinfo.showCarousel();
-          this.people.getPeopleArray('?order=lastName&filter=personStatus|eq|01',true);
     } else {
         var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
         this.countHeader = "Your Institution's Recent Request History";

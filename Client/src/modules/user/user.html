@@ -1,14 +1,4 @@
 <template>
-    <style>
-        .navbar-inverse {
-            color: ${config.SUBMENU_COLOR};
-            background-color:${config.SUBMENU_BACKGROUND}
-        }
-        .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {
-            color: ${config.ACTIVE_SUBMENU_COLOR};
-            background-color:${config.SUBMENU_BACKGROUND}
-        }
-    </style>
   <compose view="./components/banner.html"></compose>
 
   <div class="fluid-container">
@@ -24,11 +14,6 @@
                 <div class="bigMarginTop leftMargin">
                     <compose view="./components/uccInformation.html"></compose>
                 </div>
-
-                <h2 class="underline bottomMargin">Useful Links</h2>
-                <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
-                    <compose view="./components/homePageLinks.html"></compose>
-                </div>
             </div>
 
             <div class="col-lg-4">
@@ -39,15 +24,25 @@
 
             <div class="col-lg-3 col-lg-offset-1">
                 <a class="twitter-timeline"  href="https://twitter.com/hashtag/SAPNextGen" data-widget-id="826153620517376000">#SAPNextGen Tweets</a>
-
-                <div>
-                    <h2 show.bind="siteinfo.siteArray | infoFilter:'NEWS':true" class="underline topMargin">UCC and UA News</h2>
-                    <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
-                        <compose view="./components/newsItem.html"></compose>
-                    </div>
+            </div>
+        </div>
+        <div class="row">
+             <div class="col-lg-3 bigTopMargin leftMargin">
+                <h2 class="underline bottomMargin">Useful Links</h2>
+                <div repeat.for="item of siteinfo.siteArray | infoFilter:'OLNK'">
+                    <compose view="./components/homePageLinks.html"></compose>
                 </div>
-
-                <h2 class="underline topMargin">Useful Information</h2>
+            </div>
+            
+            <div class="col-lg-4 bigTopMargin">
+                <h2 show.bind="siteinfo.siteArray | infoFilter:'NEWS':true" class="underline topMargin">UCC and UA News</h2>
+                <div repeat.for="item of siteinfo.siteArray | infoFilter:'NEWS'">
+                    <compose view="./components/newsItem.html"></compose>
+                </div>
+            </div>
+ 
+            <div class="col-lg-3 col-lg-offset-1 bigTopMargin">
+                <h2 class="underline">Useful Information</h2>
                 <div repeat.for="item of siteinfo.siteArray | infoFilter:'DLNK'">
                     <compose view="./components/newsItem.html"></compose>
                 </div>

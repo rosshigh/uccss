@@ -287,3 +287,8 @@ ux-dialog-header {
     background-color: #ffbd00 ;
     color: white;
 }
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
