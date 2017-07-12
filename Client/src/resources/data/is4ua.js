@@ -9,7 +9,7 @@ export class is4ua {
     }
 
     async loadIs4ua(){
-        if(!this.personStatusArray){
+        // if(!this.personStatusArray){
         let responses = await this.data.get(this.data.IS4UA);
 
         this.personStatusArray = responses[0].personStatus;
@@ -24,7 +24,7 @@ export class is4ua {
         this.institutionTypes = responses[0].institutionTypes;
         this.memberTypes = responses[0].memberTypes;
         this.highestDegrees = responses[0].highestDegree;
-        }
+        // }
     }
 
     async loadProductKeys() {

@@ -7899,15 +7899,10 @@ define('resources/data/is4ua',['exports', 'aurelia-framework', './dataServices']
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                if (this.personStatusArray) {
-                                    _context.next = 14;
-                                    break;
-                                }
-
-                                _context.next = 3;
+                                _context.next = 2;
                                 return this.data.get(this.data.IS4UA);
 
-                            case 3:
+                            case 2:
                                 responses = _context.sent;
 
 
@@ -7924,7 +7919,7 @@ define('resources/data/is4ua',['exports', 'aurelia-framework', './dataServices']
                                 this.memberTypes = responses[0].memberTypes;
                                 this.highestDegrees = responses[0].highestDegree;
 
-                            case 14:
+                            case 13:
                             case 'end':
                                 return _context.stop();
                         }
