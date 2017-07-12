@@ -21,20 +21,6 @@ module.exports = function (app) {
     .catch(error => {
       return next(error);
     })
-    // query.populate({
-    //   path: 'clients'
-    // //  ,
-    // //  populate: {
-    // //    path: 'assignments.assignment',
-    // //    model : 'ClientRequestDetail' }
-    // })
-    // .exec(function(err, object){
-    //     if (err) {
-    //       return next(err);
-    //     } else {
-    //       res.status(200).json(object);
-    //     }
-    //   });
   });
 
   router.get('/api/systems/clients', requireAuth, function(req, res, next){

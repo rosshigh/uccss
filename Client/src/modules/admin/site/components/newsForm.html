@@ -37,6 +37,16 @@
                     </div>
                 </div>
             </div>
+             <div class="row" show.bind="siteinfo.selectedItem.itemType == 'ILNK'">
+                <div class="col-sm-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="editCategory" class="col-sm-2 control-label hideOnPhone">Category</label>
+                        <div class="col-sm-8">
+                             <input value.bind="siteinfo.selectedItem.category" id="editUrl" class="form-control " placeholder="Category" type="text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-sm-12 col-lg-12">
                     <div class="form-group">

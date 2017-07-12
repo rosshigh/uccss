@@ -25,8 +25,9 @@ module.exports = function (app, config) {
   router.get('/api/people', requireAuth,  function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
-    query.exec( function(err, object){
-        if (err) {
+    query
+      .exec( function(err, object){
+        if (err) { 
           res.status(500).json(err);
         } else {
           res.status(200).json(object);
@@ -104,7 +105,7 @@ module.exports = function (app, config) {
       });
   });
  
-  router.post('/api/people', requireAuth, function(req, res, next){
+  router.post('/api/people', requireAuth, function(req, res, next){ 
     logger.log('Create Person', 'verbose');
     var person =  new Model(req.body);  
       person.save(function ( err, object ){

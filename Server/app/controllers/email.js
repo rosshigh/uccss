@@ -225,19 +225,10 @@ if(env === 'development'){
 
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");    
-    // return new Promise(function(resolve, reject) {
       mailObject.body = GenericTemplateCompiled(mailObject.context);
       mailObject.to_email = mailObject.email;
       mailObject.subject = mailObject.subject; 
       sendGrid(mailObject)
-        // .then(result => {
-        //     if (result.statusCode === 202) {     
-        //       resolve(result);
-        //     } else {
-        //       reject(Error(result));
-        //     }
-        // })
-    // });
   }
 
   annualUpdateContactInfo = function(mailObject){

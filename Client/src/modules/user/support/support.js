@@ -20,6 +20,11 @@ export class Support {
         });
     }    
 
+
+    activate(){
+         this.config.getConfig(true);
+    }
+
     configureRouter(config, router) {
         config.map([
             {
