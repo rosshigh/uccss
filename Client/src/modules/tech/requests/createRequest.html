@@ -89,7 +89,7 @@
 				<div class="well well2 overflow" style="height:400px;">
 					<ul class="list-group">
 						<a  show.bind="!product.delete" click.trigger="removeProduct($event)" type="button" repeat.for="product of requests.selectedRequest.requestDetails" id="${product.productId}"
-								class="list-group-item dropbtn">${product.productId | productName:products.productsArray}</a>
+								class="list-group-item dropbtn">${product.productId | lookupValue:products.productsArray:"_id":"name"}</a>
 					</ul>
 				</div>
 			</div>
@@ -104,7 +104,7 @@
 						</tr>
 						<tbody id="requiredProductsTable">
 						<tr repeat.for="request of requests.selectedRequest.requestDetails">
-						<td>${request.productId | productName:products.productsArray}</td>
+						<td>${request.productId | lookupValue:products.productsArray:"_id":"name"}</td>
 						<td>
 							<div class="form-group  col-md-8">
 							<flat-picker controlid="requiredDate-${$index}" config.bind="config" value.bind="request.requiredDate" startdate.bind="minRequiredDate" enddate.bind="maxRequiredDate"></flat-picker>
