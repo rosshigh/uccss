@@ -18,7 +18,7 @@
                 click.trigger="requestChosen($event, $index)">
               <td>${product.courseId | lookupValue:people.coursesArray:"_id":"name"}</td>
               <td>${product.sessionId | session:sessions.sessionsArray}</td>
-              <td>${product.productId | lookupValue:products.productsArray:"_id":"name"}</td>
+              <td>${product.productId | lookupValue:products.productsArray:"_id":"name"}</td> 
               <td>${product.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
               <td>${product.client}</td>
               <td>${product.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
