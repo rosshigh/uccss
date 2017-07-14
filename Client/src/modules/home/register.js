@@ -9,6 +9,7 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(Router, People, is4ua, Utils, AppConfig, CommonDialogs, Validation)
 export class Register {
+  title="Create a new Account"
 
   constructor(router, people, is4ua, utils, config, dialog, validation) {
     this.router = router;
@@ -33,6 +34,7 @@ export class Register {
     await this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name&fields=_id name');
     await this.is4ua.loadIs4ua();
     this.people.selectPerson();
+    this.config.getConfig(true);
   }
 
   async checkEmail(){
