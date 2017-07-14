@@ -20665,7 +20665,7 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
         EditNews.prototype.changeFiles = function changeFiles() {
             this.filesToUpload = new Array();
             this.filesToUpload.push(this.files[0]);
-            this.siteinfo.selectedItem.url = this.config.SITE_FILE_DOWNLOAD_URL + this.filesToUpload[0].name;
+            this.siteinfo.selectedItem.url = this.config.DOWNLOAD_URL + '/site/' + this.filesToUpload[0].name;
             this.siteinfo.selectedItem.file.fileName = this.filesToUpload[0].name;
         };
 
@@ -20703,9 +20703,8 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
                                 this.newsItemSelected = false;
                                 this.selectedFiles = undefined;
                                 this.files = undefined;
-                                this._cleanUpFilters();
 
-                            case 8:
+                            case 7:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -20735,7 +20734,6 @@ define('modules/admin/site/editNews',['exports', 'aurelia-framework', '../../../
             } else {
                 this.newsItemSelected = false;
             }
-            this._cleanUpFilters();
         };
 
         EditNews.prototype._cleanUp = function _cleanUp() {
