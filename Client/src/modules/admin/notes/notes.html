@@ -1,19 +1,6 @@
 <template>
     <compose view='../../../resources/elements/submenu.html'></compose>
-
-    <div class="panel panel-default rightMargin leftMargin">
-      <div class="panel-body">
-        <div class="row">
-            <div show.bind="noteSelected === 'No'">
-                <compose view="./components/notesTable.html"></compose>
-            </div> 
-            <div show.bind="noteSelected === 'Yes'" >
-                <compose view="./components/notesForm.html"></compose>
-            </div>
-             <div show.bind="noteSelected === 'helpTicket'" >
-                <compose view="./components/helpTicket.html"></compose>
-            </div>
-        </div> 
-      </div> 
-
-</template>
+    <div class="col-lg-12">
+        <router-view></router-view>
+    </div>
+</template

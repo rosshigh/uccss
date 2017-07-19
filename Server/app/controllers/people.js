@@ -14,6 +14,7 @@ var express = require('express'),
     passport = require('passport'),
     Promise = require('bluebird'),
     config = require('../../config/config'),
+    Event = mongoose.model('Event'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
 
     var requireAuth = passport.authenticate('jwt', { session: false }),
@@ -426,4 +427,53 @@ module.exports = function (app, config) {
     })
   });
 
+  router.get('/api/events', requireAuth,  function(req, res, next){
+    logger.log('Get events','verbose');
+    var query = buildQuery(req.query, Event.find())
+    query.exec( function(err, object){
+        if (err) {
+          res.status(500).json(err);
+        } else {       
+          if(!object || object.length === 0){          
+            res.status(200).json({"message": "No Events Found"});
+          } else {
+            res.status(200).json(object);
+          }
+        }
+      });
+  });
+
+  router.post('/api/events', requireAuth, function(req, res, next){
+    logger.log('Create Event', 'verbose');
+    var event =  new Event(req.body);  
+      event.save(function ( err, object ){
+        if (err) {
+           return next(err);
+        } else {
+          res.status(201).json(object);
+        }
+      });
+  });
+
+  router.put('/api/events', requireAuth, function(req, res, next){
+    logger.log('Update event ' + req.body._id, 'verbose');  
+    Event.findOneAndUpdate({_id: req.body._id}, req.body, {new:true, safe:true, multi:false}, function(err, event){
+      if (err) {
+        return next(err);
+      } else {
+        res.status(200).json(event);
+      }
+    })
+  });
+
+  router.delete('/api/events/:id', requireAuth, function(req, res, next){
+    logger.log('Delete event ' + req.params.id,'verbose');
+    Event.remove({ _id: req.params.id }, function(err, result){
+      if (err) {
+         return next(err);
+      } else {
+        res.status(200).json({msg: "Event Deleted"});
+      }
+    })
+  });
 };

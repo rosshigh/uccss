@@ -231,7 +231,15 @@
             ]
           },
          "extend",
-         "moment"
+         "moment",
+        {
+            "name": "fullcalendar",
+            "path": "../node_modules/fullcalendar/dist",
+            "main": "fullcalendar",
+            "resources": [
+             "fullcalendar.css"
+           ]
+          }
         ]
       }
     ]

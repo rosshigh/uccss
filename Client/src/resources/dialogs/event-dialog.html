@@ -1,0 +1,22 @@
+<template>
+	<style>
+		ux-dialog-header {
+			color: ${config.SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+		}
+	</style>
+  <ux-dialog style="max-width: 600px">
+    <ux-dialog-header>${model.title}</ux-dialog-header>
+
+    <ux-dialog-body>
+		<select class="form-control" value.bind="model.selectedCategory">
+			<option repeat.for="option of model.note.noteCategories" model.bind="$index">${option}</option>
+		</select>
+      	<editor value.bind="model.note.noteBody" height="250"></editor>
+    </ux-dialog-body>
+
+    <ux-dialog-footer>
+      <button class="btn btn-primary smallMarginRight" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

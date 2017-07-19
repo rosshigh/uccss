@@ -1,6 +1,7 @@
 export function configure(config) {
   config.globalResources([
     './editor/editor',
+    './elements/calendar',
     './elements/submenu',
     './elements/nav-bar',
     './elements/rate-it',
