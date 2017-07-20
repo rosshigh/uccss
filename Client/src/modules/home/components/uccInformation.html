@@ -1,6 +1,6 @@
 <template>
-	<div class="home-page-header underline">UCC Session Information</div>
-	<div class="col-lg-3">
+	<div class="home-page-header underline">${config.HOME_PAGE_UCC_TITLE}</div>
+	<div id="leftContainer" class="col-lg-3"><!--
 		<h3 class="underline">Current Sessions</h3>
 		<div class="list-group">
 			<a class="list-group-item" repeat.for="session of sessions.sessionsArray | sessionType:'Active:Requests:Next'">
@@ -10,17 +10,22 @@
 				<p class="list-group-item-text">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>
 			</a>
 		</div>
+		-->
 	</div>
-	<div class="col-lg-4 col-lg-offset-1">
+	<div id="middleContainer" class="col-lg-4 col-lg-offset-1">
+		<!--
 		<h3 class="underline">Sessions Schedule</h3>
 		<div repeat.for="item of siteinfo.siteArray | infoFilter:'INFO'">
 			<h3>${item.title}</h3>
 			<span innerhtml="${item.content}"></span>
 		</div>
+		-->
 	</div>
-	<div class="col-lg-3">
+	<div id="rightContainer" class="col-lg-3">
+		<!--
 		<h3 class="underline">UCC Sessions</h3>
 		<span innerhtml.bind="config.SESSION_EXPLANATION"></span>
+		-->
 	</div>
 
 </template>

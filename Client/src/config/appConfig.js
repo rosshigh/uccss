@@ -392,7 +392,10 @@ INSTITUTIONS_ACTIVE = '01';
         this.ACTIVE_MENU_COLOR = this.getParameter('ACTIVE_MENU_COLOR');
         this.MENU_BACKGROUND = this.getParameter('MENU_BACKGROUND');
         this.HOVER_SUBMENU_BACKGROUND = this.getParameter('HOVER_SUBMENU_BACKGROUND');
-
+        this.HOME_PAGE_UCC_TITLE = this.getParameter('HOME_PAGE_UCC_TITLE');
+        this.HOME_PAGE_LEFT = this.getParameter('HOME_PAGE_LEFT');
+        this.HOME_PAGE_MIDDLE = this.getParameter('HOME_PAGE_MIDDLE');
+        this.HOME_PAGE_RIGHT = this.getParameter('HOME_PAGE_RIGHT');
 
     }
 

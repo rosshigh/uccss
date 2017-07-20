@@ -5,17 +5,29 @@
 			background-color:${config.SUBMENU_BACKGROUND}
 		}
 	</style>
-  <ux-dialog style="max-width: 600px">
+  <ux-dialog style="max-width: 800px">
     <ux-dialog-header>${model.title}</ux-dialog-header>
 
     <ux-dialog-body>
-		<select class="form-control" value.bind="model.selectedCategory">
-			<option repeat.for="option of model.note.noteCategories" model.bind="$index">${option}</option>
-		</select>
-      	<editor value.bind="model.note.noteBody" height="250"></editor>
+		<label>Title</label>
+		<input class="form-control" value.bind="model.event.eventTitle"></input>
+		<label>Start Time</label>
+		<flat-picker controlid="startDate" config.bind="flatpickrConfig" value.bind="model.event.eventStart"></flat-picker>
+		<div class="form-group">
+			<div class="checkbox">
+				<label class="pull-left">
+					<input id="activeProduct" checked.bind="model.event.allDay" type="checkbox"> All day
+				</label>
+			</div>
+		</div>
+		<br/>
+		<div show.bind="!model.event.allDay">
+			<label>End Time</label>
+			<flat-picker controlid="endDate" config.bind="flatpickrConfig" value.bind="model.event.eventEnd"></flat-picker>
+		</div>
     </ux-dialog-body>
 
-    <ux-dialog-footer>
+    <ux-dialog-footer> 
       <button class="btn btn-primary smallMarginRight" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
     </ux-dialog-footer>
   </ux-dialog>

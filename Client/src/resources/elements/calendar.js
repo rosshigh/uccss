@@ -17,6 +17,7 @@ export class calendar {
   @bindable events = [];
   @bindable options;
   @bindable view;
+  @bindable that;
 
   subscription = null;
 
@@ -26,6 +27,27 @@ export class calendar {
 
     this.subscription = this.bindingEngine.collectionObserver(this.events).subscribe( (splices) => {this.eventListChanged(splices)});
   }
+
+  fireEvent(element, type, data) {
+		   let changeEvent;
+
+			if (window.CustomEvent) {
+				changeEvent = new CustomEvent('change', {
+					detail: {
+						value: data
+					},
+					bubbles: true
+				});
+			} else {
+				changeEvent = document.createEvent('CustomEvent');
+				changeEvent.initCustomEvent('change', true, true, {
+					detail: {
+						value: data
+					}
+				});
+			}
+			this.element.dispatchEvent(changeEvent);
+	}
 
   eventListChanged(splices) {
     if(this.calendar)
@@ -52,6 +74,7 @@ export class calendar {
       defaultView: this.view || 'month',
       weekends: this.weekends,
       firstDay: 1,
+      // timezone: 'local',
       dayClick: (date, jsEvent, view) => this.dayClick(date, jsEvent, view),
       eventClick: (event) => this.eventClick(event),
       events: eventSource

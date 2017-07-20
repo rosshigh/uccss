@@ -37,7 +37,7 @@ export class CommonDialogs {
   }
 
   showEvent( title = 'Enter Event', event, options){
-    return this.dialogService.open({ viewModel: EventDialog, model: { title, note, options } })
+    return this.dialogService.open({ viewModel: EventDialog, model: { title, event, options } })
   }
 
 }

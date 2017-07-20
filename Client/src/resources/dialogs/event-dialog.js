@@ -4,6 +4,11 @@ import {AppConfig} from '../../config/appConfig';
 
 @inject(DialogController, AppConfig)
 export class EventDialog {
+
+	flatpickrConfig = {
+		enableTime: true
+	}
+
   constructor(dialogController, config) {
     this.dialogController = dialogController;
     this.config = config;

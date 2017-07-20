@@ -3,7 +3,7 @@ import {DataServices} from './dataServices';
 import {Utils} from '../utils/utils';
 
 @inject(DataServices, Utils)
-export class People {
+export class Events {
 
     EVENTS_SERVICE = 'events';
 
@@ -19,7 +19,11 @@ export class People {
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
-                    this.eventArray = serverResponse;
+                    if(Object.prototype.toString.call(serverResponse) == '[object Array]'){
+                        this.eventArray = serverResponse;
+                    } else {
+                        this.eventArray = new Array();;                        
+                    }
                 } else {
                     this.data.processError(serverResponse);
                 }
@@ -29,7 +33,7 @@ export class People {
         }
 	}
 
-	selectEvent(index, array) {
+	selectEvent(index) {
         if (index === undefined) {
             this.selectedEvent = this.emptyEvent();
         } else {
@@ -40,13 +44,14 @@ export class People {
 	
 	emptyEvent(){
 		var obj = new Object();
-		eventTitle = "";
-		eventType = "";
+		obj.title = "";
+        obj.eventType = "";
+        obj.allDay = false
 		return obj;
 	}
 
 	async saveEvent() {
-       if (!this.selectedPerson._id) {
+       if (!this.selectedEvent._id) {
 			let response = await this.data.saveObject(this.selectedEvent, this.EVENTS_SERVICE, "post")
 				if (!response.error) {
 					if(this.eventArray){

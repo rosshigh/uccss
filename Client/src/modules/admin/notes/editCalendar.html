@@ -1,6 +1,7 @@
 <template>
  
-  <calendar events.bind="events" view="month" weekends.bind="false" day-click.bind="eventDialog" 
-  event-click.bind="eventClicked" options.bind="{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }"></calendar>
+  <calendar events.bind="events" view="month" weekends.bind="false" day-click.bind="dayClicked" 
+  event-click.bind="eventClicked" options.bind="{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }" 
+  change.delegate="eventDialog($event)"></calendar>
   
 </template>
