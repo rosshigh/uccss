@@ -1668,6 +1668,10 @@ define('modules/home/home',['exports', 'aurelia-framework', '../../resources/dat
         }();
 
         Home.prototype.attached = function attached() {
+            var extendedInput = $('.extend');
+            for (var i = 0; i < extendedInput.length; i++) {
+                this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
+            }
             $("#leftContainer").html(this.config.HOME_PAGE_LEFT);
             var el1 = document.getElementById('leftContainer');
 

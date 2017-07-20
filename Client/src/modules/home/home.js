@@ -28,6 +28,10 @@ export class Home {
     }
 
     attached(){
+        let extendedInput = $('.extend');
+        for(let i = 0; i < extendedInput.length; i++){
+            this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
+        }
         $("#leftContainer").html(this.config.HOME_PAGE_LEFT)
          let el1 = document.getElementById('leftContainer');
 
