@@ -27,17 +27,22 @@ export class Home {
          ]);
     }
 
-    attached(){
-        let extendedInput = $('.extend');
-        for(let i = 0; i < extendedInput.length; i++){
-            this.helpTickets.selectedHelpTicketContent.content[$(extendedInput[i]).attr('id')] = "";
-        }
+    async attached(){
+        setTimeout(() => {
+            setTimeout(() => {
+                this.letsEnhance();
+            }, 100);
+        }, 100);
+
+    }
+
+    letsEnhance(){
         $("#leftContainer").html(this.config.HOME_PAGE_LEFT)
          let el1 = document.getElementById('leftContainer');
 
         if (el1) {
             if (!el1.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({element: el1, bindingContext: this});
+              this.templatingEngine.enhance({element: el1, bindingContext: this});
             }
         }
         
@@ -46,7 +51,7 @@ export class Home {
 
         if (el2) {
             if (!el2.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({element: el2, bindingContext: this});
+              this.templatingEngine.enhance({element: el2, bindingContext: this});
             }
         }
 
@@ -55,10 +60,9 @@ export class Home {
 
         if (el3) {
             if (!el3.querySelectorAll('.au-target').length) {
-                this.templatingEngine.enhance({element: el3, bindingContext: this});
+              this.templatingEngine.enhance({element: el3, bindingContext: this});
             }
         }
-
     }
 
 
