@@ -14,6 +14,13 @@ export class AppConfig {
 
     BASE_URL = this.HOST + "/api/";
     IMG_DOWNLOAD_URL = this.HOST + '/img/' 
+     HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
+    PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
+    DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
+    DOCUMENT_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/documents';  
+    DOCUMENT_FILE_CURRICULUM_URL = this.HOST + '/uploadedFiles/curriculum';
+    SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/';
+    PERSON_IMAGE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/peopleImages';
 
 INSTITUTIONS_ACTIVE = '01';
    ACTIVE_PERSON = "01";

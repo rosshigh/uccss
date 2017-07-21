@@ -50,8 +50,11 @@ export class Profile {
             this.people.getInstitutionsArray('?fields=_id name&order=name'),
             this.is4ua.loadIs4ua()
         ]);
-
+        this.config.getConfig(true);
         this.user = this.people.selectedPerson;
+        if(this.people.selectedPerson.file.fileName) {
+            this.personImage = this.people.selectedPerson.file.fileName;
+        }
     }
 
     buildAudit(){
@@ -78,8 +81,12 @@ export class Profile {
             this.buildAudit();
             let response = await this.people.savePerson()
             if(!response.error){
-                this.utils.showNotification("Your profile has been updated");
-                this.router.navigate("user");
+                 if (this.filesToUpload && this.filesToUpload.length > 0) {
+                    await this.people.uploadFile(this.filesToUpload);
+                    this.personImage = this.people.selectedPerson._id + this.people.selectedPerson.file.fileName.substring(this.people.selectedPerson.file.fileName.indexOf('.'))
+                }
+                this.utils.showNotification("Your profile has been updated.");
+                this.showPreview = false;
             } else {
                 this.utils.showNotification("An error occurred updating your profile");
             }
@@ -113,6 +120,41 @@ export class Profile {
 
     cancel(){
         this.utils.copyObject(this.users, this.people.selectedPerson);
+    }
+
+    changeFiles(){
+        if(this.files[0].size > 100000){
+            this.utils.showNotification("That image is too large.  The limit is 100,000 KB");
+            return;
+        }
+        this.filesToUpload = new Array(); 
+        this.filesToUpload.push(this.files[0]);
+        this.people.selectedPerson.file.fileName = this.filesToUpload[0].name;
+        this.previewFile();
+    }
+
+    previewFile() {
+        var preview = this.preview;
+        var reader  = new FileReader(); 
+        this.showPreview = true;
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if ( this.files[0]) {
+            reader.readAsDataURL( this.files[0]);
+        } else {
+            preview.src = "";
+        }
+    }
+
+	deleteImage(){
+        this.people.selectedPerson.file = new Object();
+        this.preview.src="";
+        document.getElementById("fileUpload").value = "";
+        this.personImage = undefined;
+        this.showPreview = false;
     }
 
 }

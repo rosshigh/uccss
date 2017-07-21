@@ -17,7 +17,7 @@ module.exports = function (app) {
 	router.get('/api/blogs', function(req, res, next){
 		logger.log('Get Blogs', 'verbose');
 		var query = buildQuery(req.query, Blog.find())
-		.populate('personId', 'firstName lastName email')
+		.populate('personId', 'firstName lastName email file')
 		query.exec(function(err, object){
 			if (err) {
 			return next(err);

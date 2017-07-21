@@ -28,7 +28,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate('personId', 'firstName lastName fullName email')
+      .populate('personId', 'firstName lastName fullName email file')
       .exec()
       .then(object => {
         if(object){
@@ -353,7 +353,7 @@ module.exports = function (app) {
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
-    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId'}})
+    query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
     query.exec()
       .then(object => {
         if(object){

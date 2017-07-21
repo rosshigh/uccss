@@ -5,7 +5,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     Model = mongoose.model('Person'),
     Note = mongoose.model('Note'),
-     http = require('http'),
+    http = require('http'),
     PasswordReset =  mongoose.model('PasswordReset'),
     path = require('path'),
     logger = require('../../config/logger'),
@@ -15,6 +15,8 @@ var express = require('express'),
     Promise = require('bluebird'),
     config = require('../../config/config'),
     Event = mongoose.model('Event'),
+    multer = require('multer'),
+    mkdirp = require('mkdirp'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
 
     var requireAuth = passport.authenticate('jwt', { session: false }),
@@ -475,5 +477,47 @@ module.exports = function (app, config) {
         res.status(200).json({msg: "Event Deleted"});
       }
     })
+  });
+
+   var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+
+      var path = config.uploads + '/peopleImages';
+     
+      mkdirp(path, function(err) {
+        if(err){
+          res.status(500).json(err);
+        } else {
+          cb(null, path);
+        }
+      });
+    },
+    filename: function (req, file, cb) {
+      cb(null, req.params.id + file.originalname.substring(file.originalname.indexOf('.')));
+    }
+  });
+
+  var upload = multer({ storage: storage});
+
+  router.post('/api/people/upload/:id',  upload.any(), function(req, res, next){
+     writeLog.log('Upload File ', 'verbose');    
+      Model.findById(req.params.id, function(err, person){   
+        if(err){
+          return next(err);
+        } else {                
+            person.file =  {
+              originalilename: req.files[0].originalname,
+              fileName: req.files[0].filename,
+              dateUploaded: new Date()
+            };             
+            person.save(function(err, person) {
+              if(err){
+                return next(err);
+              } else {
+                res.status(200).json(person);
+              }
+            });
+          }        
+      });
   });
 };

@@ -9,13 +9,25 @@
           <span click.delegate="changePassword()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Change Password"><i class="fa fa-key fa-lg fa-border" aria-hidden="true"></i></span>
           <span click.delegate="cancel()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cancel Changes"><i class="fa fa-ban fa-lg fa-border" aria-hidden="true"></i></span>
       </div>
-      <div class="topMargin col-lg-1">
-          <div style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
-          <div class="topMargin">
-              <h6>Register your email with <a href="https://en.gravatar.com/">gravatar.com</a> to show your image.</h6>
-          </div>
+      <div class="topMargin col-lg-2">
+        <div show.bind="personImage" class="topMargin">
+            <img class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${personImage}" height="100">
+        </div>
+        <div show.bind="!personImage" style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
+        <div class="topMargin">
+            <h6>Register your email with <a href="https://en.gravatar.com/">gravatar.com</a> to show your image.</h6>
+        </div>
+        
+        <label class="btn btn-primary">
+                Or Upload a Photo&hellip; <input type="file" id="fileUpload" style="display: none;" change.delegate="changeFiles()" files.bind="files">
+        </label>
+        <button show.bind="people.selectedPerson.file.fileName" class="btn btn-danger topMargin" click.trigger="deleteImage()">Delete Image</button>
+        <div show.bind="showPreview" class="topMargin">
+            <img id="preview"  class="circular--square leftMargin" src="" height="100" alt="Image preview..." ref="preview">
+            <label>Preview</label>
+        </div>
       </div>
-      <div class="col-sm-12 col-lg-10 leftMargin topMargin">
+      <div class="col-lg-9 leftMargin topMargin">
         <form class="form-horizontal">
           <div class="row">
             <!-- Row 1 -->

@@ -6,7 +6,12 @@
         <span  click.delegate="sendAnEmail(profileHelpTicket.personId)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
         <hr/>
         <div class="col-md-4">
-          <div style="height:100px;width:100px;" innerhtml.bind="profileHelpTicket.personId.email | gravatarUrl:100:6"></div>
+          <div show.bind="profileHelpTicket.personId.file.fileName" class="topMargin">
+              <img class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${profileHelpTicket.personId.file.fileName}" height="100">
+          </div>
+          <div show.bind="!profileHelpTicket.personId.file.fileName" style="height:100px;width:100px;" innerhtml.bind="profileHelpTicket.personId.email | gravatarUrl:100:6"></div>
+        
+        <!--  <div style="height:100px;width:100px;" innerhtml.bind="profileHelpTicket.personId.email | gravatarUrl:100:6"></div> -->
         </div>
         <div class="col-md-8">
           <h5>Nickname: ${profileHelpTicket.personId.nickName}</h5>

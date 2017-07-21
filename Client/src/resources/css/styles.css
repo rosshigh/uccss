@@ -292,3 +292,7 @@ ux-dialog-header {
     float: none;
     margin: 0 auto;
 }
+
+.circular--square {
+  border-radius: 50%;
+}

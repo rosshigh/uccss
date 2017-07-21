@@ -18,6 +18,7 @@ export class People {
     NOTES_SERVICE = "notes";
     INSTITUTION_SERVICES = "institutions";
     COURSES_SERVICE = 'courses';
+    PEOPLE_UPLOAD_SERVICE = '/people/upload/';
 
     constructor(data, utils) {
         this.data = data;
@@ -159,6 +160,7 @@ export class People {
         obj.institution = "";
         obj.active = false;
         obj.coursesArray = new Array();
+        obj.file = new Object();
         var auditObj = {
             property: "Created",
             eventDate: new Date()
@@ -240,6 +242,10 @@ export class People {
            return this.utils.objectsEqual(this.selectedPerson, obj);
        }
    }
+
+    async uploadFile(files){
+        let response = await this.data.uploadFiles(files,  this.PEOPLE_UPLOAD_SERVICE + "/" + this.selectedPerson._id);
+    }
 
     async sendCustomerMessage(message){
         if(message.email){

@@ -27,6 +27,11 @@ var PersonSchema = new Schema({
   ext: { type: String },
   mobile: { type: String },
   fax: { type: String },
+  file: {
+    originalFilename: { type: String },
+    fileName: { type: String },
+    dateUploaded: { type: Date, default: Date.now }
+  } ,
 
   //Address
   address1: { type: String },
