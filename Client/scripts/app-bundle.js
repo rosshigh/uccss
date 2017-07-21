@@ -3118,7 +3118,7 @@ define('modules/user/profile',['exports', 'aurelia-framework', 'aurelia-router',
 
                                 this.config.getConfig(true);
                                 this.user = this.people.selectedPerson;
-                                if (this.people.selectedPerson.file.fileName) {
+                                if (this.people.selectedPerson.file && this.people.selectedPerson.file.fileName) {
                                     this.personImage = this.people.selectedPerson.file.fileName;
                                 }
 
