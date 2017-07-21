@@ -234,7 +234,8 @@ export class EditProducts {
         this.categoryIndex = index;
         this.documents.selectCategory(index);
         await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-        this.showDocuments = true;
+        this.showDocuments = true; 
+        this.showDocumentForm = false;
       }
     }
 
