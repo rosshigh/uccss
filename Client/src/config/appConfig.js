@@ -404,6 +404,7 @@ INSTITUTIONS_ACTIVE = '01';
         this.HOME_PAGE_LEFT = this.getParameter('HOME_PAGE_LEFT');
         this.HOME_PAGE_MIDDLE = this.getParameter('HOME_PAGE_MIDDLE');
         this.HOME_PAGE_RIGHT = this.getParameter('HOME_PAGE_RIGHT');
+        this.UCC_PARALLAX_LOGO = this.getParameter('UCC_PARALLAX_LOGO');
 
     }
 
