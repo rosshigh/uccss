@@ -8,7 +8,7 @@
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
       <div repeat.for="item of siteinfo.siteArray | infoFilter:'CARO'" class="${$first ? 'item active' : 'item'}">
-        <img src="${item.url}" class="d-block img-fluid img-responsive"  alt="${item.title}">
+        <a href="${item.url}" target="_blank"><img src="${item.url}" class="d-block img-fluid img-responsive"  alt="${item.title}"></a>
         <div class="carousel-caption">
           <h3>${item.title}</h3>
         </div>
