@@ -127,6 +127,7 @@ export class Profile {
             this.utils.showNotification("That image is too large.  The limit is 100,000 KB");
             return;
         }
+        if(!this.people.selectedPerson.file) this.people.selectedPerson.file = new Object();
         this.filesToUpload = new Array(); 
         this.filesToUpload.push(this.files[0]);
         this.people.selectedPerson.file.fileName = this.filesToUpload[0].name;
