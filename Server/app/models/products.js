@@ -6,6 +6,7 @@ var ProductSchema = new Schema({
   name: { type: String, require: true }, 
   clientInfo: { type: String },
   productInfo: { type: String },
+  productDescription: { type: String },
   status: { type: String },
   active: { type: Boolean, require: true },
   clientRelevant: { type: Boolean },

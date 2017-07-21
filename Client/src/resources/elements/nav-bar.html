@@ -21,12 +21,15 @@
                     <span class="icon-bar"></span>
                 </button>
                  
-                <a if.bind="isAuthenticated"  class="navbar-brand" href="#/user"><img  src="/img/UCC_LOGO_HOME.png" ></a>
-                <a if.bind="!isAuthenticated" class="navbar-brand" href="#/home"><img  src="/img/UCC_LOGO_HOME.png" ></a>
-                 <!--
-                <a if.bind="isAuthenticated" class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
-                <a if.bind="!isAuthenticated" class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
-                -->
+                <span if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0">
+                    <a if.bind="isAuthenticated"  class="navbar-brand" href="#/user"><img  src="/img/${config.NAVBAR_LOGO}" ></a>
+                    <a if.bind="!isAuthenticated" class="navbar-brand" href="#/home"><img  src="/img/${config.NAVBAR_LOGO}" ></a>
+                </span>
+                 <span if.bind="!config.NAVBAR_LOGO || config.NAVBAR_LOGO.length===0">
+                    <a if.bind="isAuthenticated" class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
+                    <a if.bind="!isAuthenticated" class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
+                </span>
+              
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->

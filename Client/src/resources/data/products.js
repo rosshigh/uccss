@@ -81,9 +81,9 @@ export class Products {
         if(!id) return null;
         for(var i = 0; i < this.productsArray.length; i++){
             if(this.productsArray[i]._id === id){
-                if(this.productsArray[i].productInfo) {
+                if(this.productsArray[i].productDescription) {
                     return {
-                                info: this.productsArray[i].productInfo,
+                                info: this.productsArray[i].productDescription,
                                 productId: id,
                                 header: this.productsArray[i].name
                             }

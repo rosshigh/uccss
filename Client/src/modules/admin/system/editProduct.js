@@ -20,7 +20,7 @@ export class EditProducts {
     removedFiles = new Array();
     spinnerHTML = "";
 
-    tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}];
+    tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}, {id: 'Description'}];
     tabPath = './';
 
     toolbar = [
