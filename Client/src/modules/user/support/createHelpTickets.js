@@ -74,7 +74,7 @@ export class CreateHelpTickets{
         this.stepsMessage = this.getMessage('RECREATE_STEPS');
     }
 
-	async categoryChanged(){
+	async categoryChanged(){ 
         this.showAdditionalInfo = false;
         if(this.helpTickets.selectedHelpTicket.helpTicketCategory > -1){
             this.requestsRequired = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].requestsRequired;
@@ -86,7 +86,7 @@ export class CreateHelpTickets{
                 this.resources = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].documents;
                 this.helpTicketType = this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].type;
                 this.helpTickets.selectedHelpTicket.helpTicketType = this.helpTicketType;
-                this.showAdditionalInfo = true;
+                if((this.requestsRequired && clientRequestsArray.length > 0) || !this.requestsRequired) this.showAdditionalInfo = true;
                 this.createInputForm(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].inputForm)
                 this.setupValidation(this.helpTickets.helpTicketTypesArray[this.helpTickets.selectedHelpTicket.helpTicketCategory].subtypes[0].validation);
             } else {

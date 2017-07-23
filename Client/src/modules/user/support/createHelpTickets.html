@@ -4,7 +4,7 @@
         <div class="col-lg-4">
             <compose view='./components/helpTicketType.html'></compose>
 
-            <compose show.bind="helpTicketType != 'NULL'" view='./components/Requests.html' show.bind="requestsRequired"></compose>
+            <compose show.bind="helpTicketType != 'NULL' && requestsRequired" view='./components/Requests.html'></compose>
            
         </div>
         <div class="col-lg-8">
