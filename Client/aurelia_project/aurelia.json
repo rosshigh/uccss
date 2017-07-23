@@ -232,13 +232,28 @@
           },
          "extend",
          "moment",
-        {
+          {
             "name": "fullcalendar",
             "path": "../node_modules/fullcalendar/dist",
             "main": "fullcalendar",
             "resources": [
              "fullcalendar.css"
            ]
+          },
+          {
+            "name": "chart.js",
+            "path": "../node_modules/chart.js/dist",
+            "main": "Chart.min.js"
+          },
+          {
+            "name": "aurelia-chart",
+            "path": "../node_modules/aurelia-chart/dist/amd",
+            "main": "index",
+            "resources": [
+              "elements/chart-element.html",
+              "elements/chart-element.js"
+            ],
+            "deps": ["chart.js"]
           }
         ]
       }

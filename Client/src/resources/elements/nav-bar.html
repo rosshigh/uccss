@@ -68,7 +68,7 @@
                     <li if.bind="userObj.userRole >= config.USER_ROLE"><a href="#/facco">Faculty Coordinator</a></li>
                     <li if.bind="isAuthenticated"><a href="#/support">Support</a></li>
                     <li if.bind="isAuthenticated"><a href="#/clientRequests">Product Requests</a></li>
-                    <li if.bind="isAuthenticated && userObj.userRole >= config.UCC_TECH_ROLE"><a href="#/analytics">Analytics</a></li>
+                    <li if.bind="isAuthenticated && userObj.userRole >= config.UA_ROLE"><a href="#/analytics">Analytics</a></li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">

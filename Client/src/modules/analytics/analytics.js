@@ -39,6 +39,14 @@ export class Analytics{
             nav: true,
             name: 'helpTickets',
             title: 'Help Tickets'
+        },
+        {
+            route: 'institutions',
+            moduleId: './institutions',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'institutions',
+            title: 'Institutions'
         }
         ]);
 

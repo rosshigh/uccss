@@ -23,9 +23,9 @@ export class AppConfig {
     SITE_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/site/';
     PERSON_IMAGE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/peopleImages';
 
-INSTITUTIONS_ACTIVE = '01';
-   ACTIVE_PERSON = "01";
-   INACTIVE_PERSON = "02";
+    INSTITUTIONS_ACTIVE = '01';
+    ACTIVE_PERSON = "01";
+    INACTIVE_PERSON = "02";
 
     ROLES = [{ role: 'USER', label: 'User', UCConly: false, authLevel: 2 },
             { role: 'PROV', label: "Provisional", UCConly: false, authLevel: 1 },
@@ -41,10 +41,12 @@ INSTITUTIONS_ACTIVE = '01';
             { role: "EDIR", label: "Executive Director", UCConly: true, authLevel: 11},
             { role: "TDIR", label: "Technical Director", UCConly: true, authLevel: 11},
             { role: "TMGR", label: "Technical Manager", UCConly: true, authLevel: 11},
-            { role: "STUT", label: "Student Worker", UCConly: true, authLevel: 8}];
+            { role: "STUT", label: "Student Worker", UCConly: true, authLevel: 8},
+            { role: "UAST", label: "UA Staff", UCConly: false, authLevel: 7}];
 
     UCC_ROLE = 6;
     UCC_TECH_ROLE = 8;
+    UA_ROLE = 7;
     USER_ROLE = 4;
     PROV_USER = 1;
 

@@ -16,6 +16,7 @@ export function configure(aurelia) {
     .standardConfiguration()
     .globalResources("aurelia-mask")
     .plugin("aurelia-dialog")
+    .plugin("aurelia-chart")
     .plugin('aurelia-notification', config => {
       config.configure({
         translate: false,  // 'true' needs aurelia-i18n to be configured

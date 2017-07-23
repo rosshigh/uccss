@@ -4,13 +4,25 @@
 		<div>
 			<ul class="list-group">
 				<button click.trigger="typeChanged(category, $event)" type="button"  repeat.for="category of categories"
-					id="${category.code}" class="${selectedCategory.code === category.code ? 'list-group-item rowSelected categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
+					id="${category.code}" class="${$first ? 'list-group-item active categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
 			</ul>
 		</div>
 	</div>
 
     <div class="panel panel-default rightMargin leftMargin col-lg-9">
       <div class="panel-body">
+            <div class="row">
+      <!-- Session Select -->
+      <div class="col-lg-4">
+        <div class="form-group topMargin leftMargin">
+            <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
+              <option value="">Select a session</option>
+              <option repeat.for="session of sessions.sessionsArray"
+                      value.bind="session._id">Session ${session.session} - ${session.year}</option>
+            </select>
+        </div>
+      </div>
+    </div>
         <div class="row">
             <div show.bind="selectedCategory.code === 0">
                 <compose view="./components/requestsByInstitution.html"></compose>

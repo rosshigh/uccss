@@ -42,6 +42,6 @@ export function configure(config) {
     './value-converters/help-ticket-statuses',
     './value-converters/stat-value',
     './value-converters/filter-clients',
-    './value-converters/overlap'    
+    './value-converters/overlap'
   ]);
 }

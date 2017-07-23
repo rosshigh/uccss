@@ -117,7 +117,22 @@ export class ClientRequests {
 
     async getClientRequestsDetailsArray(options, refresh){
         if (!this.requestsArray || refresh) {
-          var url = this.CLIENT_REQUEST_DETAILS;
+          var url = this.CLIENT_REQUEST_DETAILS; 
+          url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.requestsDetailsArray = serverResponse;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    async getClientRequestsDetailsArrayAnalytics(options, refresh){
+        if (!this.requestsArray || refresh) {
+          var url = this.CLIENT_REQUEST_DETAILS + "/analytics"; 
           url += options ? options : "";
             try {
                 let serverResponse = await this.data.get(url);
@@ -281,7 +296,7 @@ export class ClientRequests {
                 return result;
             });
 
-        this.analyticsResultArray = new Array();
+        this.analyticsInstitutionResultArray = new Array();
         var instID = "";
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
@@ -290,13 +305,13 @@ export class ClientRequests {
         }
         var that = this;
         sortedArray.forEach(function(item){
-            if(item.requestId.institutionId != instID){
-                instID = item.requestId.institutionId;
+            if(item.requestId.institutionId.name != instID){
+                instID = item.requestId.institutionId.name;
                 var obj = that.utils.copyObject(templateObj);
-                obj.institutionId = item.requestId.institutionId;
-                that.analyticsResultArray.push(obj);
+                obj.name = item.requestId.institutionId.name;
+                that.analyticsInstitutionResultArray.push(obj);
             }
-            that.analyticsResultArray[that.analyticsResultArray.length-1][item.requestStatus] += 1;
+            that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
         })
         
     }
@@ -311,7 +326,7 @@ export class ClientRequests {
                 return result;
             });
 
-        this.analyticsResultArray = new Array();
+        this.analyticsProductsResultArray = new Array();
         var prodID = "";
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
@@ -324,9 +339,9 @@ export class ClientRequests {
                 prodID = item.productId;
                 var obj = this.utils.copyObject(templateObj);
                 obj.productId = item.productId;
-                this.analyticsResultArray.push(obj);
+                this.analyticsProductsResultArray.push(obj);
             }
-            this.analyticsResultArray[this.analyticsResultArray.length-1][item.requestStatus] += 1;
+            this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;
         })
     }
 

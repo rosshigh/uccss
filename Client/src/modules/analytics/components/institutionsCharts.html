@@ -1,0 +1,52 @@
+<template>
+	<!--
+	<fieldset class="col-lg-4" >
+        <legend>Line Graph via Attribute</legend>
+        <canvas id="line-chart" chart="type: line; should-update: false; data.bind: SimpleLineData"></canvas>
+        <p>Changing the data wont change this graph as it is not update-able</p>
+	</fieldset>
+	 <chart  class="col-lg-2" id="dynamic-pie-chart" type="pie" style="width: 50%; height: 50%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutData"></chart>
+-->
+    <fieldset class="col-lg-4">
+        <legend>Institution Types</legend>
+        <chart id="institutionTypesChart" type="doughnut" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutData"></chart>
+<!--       
+        <div>
+            <label>Values</label>
+            <div repeat.for="i of DynamicDoughnutData.datasets[0].data.length">
+                <input value.bind="DynamicDoughnutData.datasets[0].data[i]" placeholder="Value ${$index + 1}"/>
+            </div>
+        </div>
+
+        <p>Both charts are using the same dataset behind the scenes, so changing one will change both.</p>
+        <p>Changing the above value should trigger a chart refresh after 2 seconds</p>
+        <p>Although dynamically added entries will not be tracked currently</p>
+        <button click.delegate="addEntry()">Add Entry</button>
+		<button click.delegate="resetPieData()">Reset</button>
+		-->
+	</fieldset>
+	    <fieldset class="col-lg-4">
+        <legend>Member Types</legend>
+		<chart id="memberTypesChart" type="doughnut" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutDataMT"></chart>
+	</fieldset>
+	</fieldset>
+	    <fieldset class="col-lg-4">
+        <legend>Highest Degrees</legend>
+		<chart id="highestDegreesChart" type="doughnut" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutDataHD"></chart>
+	</fieldset>
+	</fieldset>
+	    <fieldset class="col-lg-4">
+        <legend>Countries</legend>
+		<chart id="countriesChart" type="doughnut" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutDataCountries"></chart>
+	</fieldset>
+	</fieldset>
+	    <fieldset class="col-lg-8">
+        <legend>Regions</legend>
+		<chart id="regionsChart" type="bar" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutDataRegions"></chart>
+	</fieldset>
+	</fieldset>
+	    <fieldset class="col-lg-4">
+        <legend>Status</legend>
+		<chart id="statusChart" type="doughnut" style="width: 80%; height: 80%; display: block;" should-update="true" throttle="2000" data.bind="DynamicDoughnutDataStatus"></chart>
+	</fieldset>
+</template>
