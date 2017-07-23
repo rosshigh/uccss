@@ -251,7 +251,8 @@
             "main": "index",
             "resources": [
               "elements/chart-element.html",
-              "elements/chart-element.js"
+              "elements/chart-element.js",
+              "attributes/chart-attribute.js"
             ],
             "deps": ["chart.js"]
           }
