@@ -90,17 +90,18 @@
             </th>
             <th></th>
           </tr>
-          <tr click.delegate="clickTable($index, $event, request)" repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
-            <td data-title="requestNo">${request.requestNo}</td>
+          <tr  repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
+            <td click.delegate="clickTable($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
             <td data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
             <td data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
             <td show.bind="config.SANDBOX_USED"  data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID:config.SANDBOX_NAME}</td>
             <td mouseover.delegate="showComment(request, $event)" mouseout.delegate="hideComment()"   data-title="status">${request.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
             <td data-title="ids-requested">${request.requestId | idsRequested}
             <td data-title="product">${request.productId | lookupValue:products.productsArray:"_id":"name"}</td>
-            <td class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId.fullName}</td>
+            <td class="dropbtn" data-title="Name">${request.requestId.personId.fullName}</td>
             <td  data-title="Name"${request.requestId.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
-            <td><span click.delegate="editRequest($index)" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span></td>
+            <td><span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span></td>
+             <!-- click.delegate="editRequest($index)" click.delegate="showProfile(request, $event)"-->
           </tr>
         </tbody>
       </table>
