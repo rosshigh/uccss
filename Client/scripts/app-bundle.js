@@ -24479,6 +24479,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.utils.showNotification("You need to assign a system to this product before you can assign this request");
             }
 
+            console.log(this.requests.selectedRequestDetail);
             this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
             if (this.selectedRow) this.selectedRow.children().removeClass('info');
