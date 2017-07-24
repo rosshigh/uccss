@@ -24467,6 +24467,14 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.editIndex = this.dataTable.getOriginalIndex(index);
 
             this.products.selectedProductFromId('5964d133503dd106746c1309');
+
+            this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+
+            this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
         };
 
         Assignments.prototype.clientRequired = function clientRequired() {
