@@ -10,6 +10,7 @@ var ClientsSchema = new Schema({
   lastIdAssigned: { type: Number, default: 0 },
   lastFacIdAssigned: { type: Number, default: 0 },
   clientStatus: { type: String, require: true },
+  productId: {type: Schema.Types.ObjectId },
   assignments: [{
     assignment: {type: Schema.Types.ObjectId, ref: 'ClientRequestDetail'},
     institutionId: {type: Schema.Types.ObjectId},

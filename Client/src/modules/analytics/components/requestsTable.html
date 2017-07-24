@@ -7,17 +7,20 @@
                     <thead class="cf">
                         <tr>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestId.institutionId.name'})">Institution  </span><span><i class="fa fa-sort"></i></span></th>
+                            <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'total'})">Total  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '1'})">${config.REQUEST_STATUS[0].description}  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '2'})">${config.REQUEST_STATUS[1].description}  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '3'})">${config.REQUEST_STATUS[2].description}  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '4'})">${config.REQUEST_STATUS[3].description}  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '5'})">${config.REQUEST_STATUS[4].description}  </span><span><i class="fa fa-sort"></i></span></th>
                             <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '6'})">${config.REQUEST_STATUS[5].description}  </span><span><i class="fa fa-sort"></i></span></th>
+                            <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: '7'})">${config.REQUEST_STATUS[6].description}  </span><span><i class="fa fa-sort"></i></span></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr repeat.for="stat of dataTable.displayArray">
                             <td data-title="Institution">${stat.name}</td>
+                            <td data-title="Institution">${stat.total}</td>
                             <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
                         </tr>
                     </tbody>

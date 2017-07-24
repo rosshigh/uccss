@@ -15,6 +15,7 @@ export class EditSystem {
     systemSelected = false;
     editClients = false;
     spinnerHTML = "";
+    selectedProduct = "";
 
     constructor(systems, products, validation, utils, datatable, config, dialog, sessions) {
         this.systems = systems;
@@ -142,6 +143,15 @@ export class EditSystem {
     }
  
     generateClients() {
+         if(this.selectedProduct === ""){
+             return this.dialog.showMessage(
+                "You must select a product.", 
+                "Select a Product", 
+                ['OK']
+                ).whenClosed(response => {
+                    return;
+                });
+        }
         if(!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3){
             return this.dialog.showMessage(
                 "Clients must have three digits", 
@@ -162,7 +172,7 @@ export class EditSystem {
                     return;
                 });
         }
-        var result = this.systems.generateClients(start, end, this.editClientStatus);
+        var result = this.systems.generateClients(start, end, this.editClientStatus, this.selectedProduct);
         if (result.error) {
             this.utils.showNotification(result.error);
         }

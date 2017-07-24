@@ -112,6 +112,10 @@
 								</select>
 							</div>
 							<h6 class="col-lg-12">Client interval: ${config.CLIENT_INTERVAL}</h6>
+							<select class="form-control topMargin" value.bind="selectedProduct">
+								<option value="">Choose a product</option>
+								<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
+							</select>
 						</div>
 					</div>
 				</div>
@@ -127,6 +131,7 @@
 								<span class="col-sm-8">
 									<h5>Client ${client.client} <span class="leftMargin">IDs: ${client.idsAvailable}</span></h5>
 									<h6>Status: ${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</h6>
+									<h7>${client.productId | lookupValue:products.productsArray:"_id":"name"}</h7>
 									<h7>Assignments: ${client.assignments.length}</h7>
 								</span>
 								<span class="col-sm-4">

@@ -131,7 +131,7 @@ export class Systems{
         }
     }
 
-    generateClients(start, end, status){
+    generateClients(start, end, status, product){
         if(!this.selectedSystem){
             return {error: "No system selected."};
         }
@@ -141,7 +141,7 @@ export class Systems{
         if( start > 0 &&  end > 0 && end >= start){
             for(var i = start; i <= end; i += this.config.CLIENT_INTERVAL){
                 if(this._findClient(i, 0, lastClientIndex) < 0){
-                    this.selectedSystem.clients.push(this.emptyClient(i, status));
+                    this.selectedSystem.clients.push(this.emptyClient(i, status, product));
                 }
             }
             return true;
@@ -204,7 +204,7 @@ export class Systems{
         }
     }
 
-    emptyClient(clientNo, status){
+    emptyClient(clientNo, status, product){
         let obj = new Object();
         obj.client = clientNo;
         obj.clientStatus = status;
@@ -215,6 +215,7 @@ export class Systems{
         obj.lastIdAssigned = 0;
         obj.lastFacIdAssigned = 0;
         obj.firstFacIdAssigned = 0;
+        obj.productId = product ? product : null;
         return obj;
     }
 

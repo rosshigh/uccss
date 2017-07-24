@@ -300,6 +300,7 @@ export class ClientRequests {
         var instID = "";
         var numStatuses = this.config.REQUEST_STATUS.length;
         var templateObj = new Object();
+         templateObj['total'] = 0;
         for(var i = 0; i < numStatuses; i++){
             templateObj[this.config.REQUEST_STATUS[i].code] = 0;
         }
@@ -311,6 +312,7 @@ export class ClientRequests {
                 obj.name = item.requestId.institutionId.name;
                 that.analyticsInstitutionResultArray.push(obj);
             }
+            that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
             that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
         })
         

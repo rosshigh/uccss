@@ -587,4 +587,17 @@ export class People {
         }
     }
 
+    async requestPasswordReset(obj){
+        let serverResponse = await this.data.saveObject(obj, this.PASSWORD_RESET, "post");
+        return serverResponse;
+    }
+
+    async getPasswordReset(validationCode){
+        let serverResponse = await this.data.get(this.PASSWORD_RESET + '/' + validationCode);
+        if(!serverResponse.code){
+            this.selectedPerson = serverResponse;
+        }
+        return serverResponse;
+    }
+
 }

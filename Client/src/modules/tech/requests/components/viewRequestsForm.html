@@ -312,7 +312,7 @@
             <label class="control-label col-sm-3 hideOnPhone">Systems</label>
             <select change.trigger="systemSelected()" id="systemSelect" value.bind="selectedSystem" class="form-control">
                 <option value="">-- Select a System --</option>
-                <option repeat.for='system of products.selectedProduct.systems' value="${system.systemId}">${system.sid}</option>
+                <option repeat.for='system of products.selectedProduct.systems' value="${system.systemId}">${system.sid}</option> 
             </select>
         </div>
         <div show.bind="systems.selectedSystem.clients.length > 0" class="topMargin">
@@ -322,14 +322,16 @@
                 <th class="col-sm-1">Client</th>
                 <th class="col-sm-1">Status</th>
                 <th class="col-sm-1">IDs Available</th>
-                <th class="col-sm-9">Assignments</th>
+                <th>Product</th>
+                <th class="col-sm-6">Assignments</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant">
+              <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant:products.selectedProduct._id">
                 <td>${client.client}</td>
                 <td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>
                 <td>${client.idsAvailable}</td>
+                <td>${products.selectedProduct.name}</td>
                 <td>
                   <table class="col-sm-12">
                     <tr repeat.for="assignment of client.assignments">

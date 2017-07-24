@@ -1,7 +1,12 @@
 export class FilterClientsValueConverter {
-  toView(array, unassigned, unassignedCode, sandbox, sandboxCode, client, clientRelevant) {
+  toView(array, unassigned, unassignedCode, sandbox, sandboxCode, client, clientRelevant, product) {
     if(array){
-        if(!clientRelevant) return array;
+        // if(!clientRelevant) return array;
+        if(product){
+            array = array.filter(item => {
+                return item.productId === product;
+            })
+        }
         if(client){
             return array.filter((item) => {
                 return item._id == client;
