@@ -9,6 +9,8 @@ var    mongoose = require('mongoose'),
     fs = require('fs'),
     emailConfig = require('../../config/email-config');
 
+    var env = 'production';
+
 module.exports = function (app) {
   
 
@@ -16,7 +18,7 @@ module.exports = function (app) {
 };
 
  
-var env = process.env.NODE_ENV || 'development';
+// var env = process.env.NODE_ENV || 'development';
 
 if(env === 'development'){
   var sg = require('sendgrid')(emailConfig.sg_key);
