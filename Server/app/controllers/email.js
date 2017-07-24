@@ -380,7 +380,7 @@ if(env === 'development'){
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
-          from: emailemailConfig.emailAddress,
+          from: emailConfig.emailAddress,
           to: toEmail,
           subject: 'Help Ticket Updated',
           template: 'help-ticket-updated',
@@ -399,7 +399,7 @@ if(env === 'development'){
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
      var mail = {
-          from: emailemailConfig.emailAddress,
+          from: emailConfig.emailAddress,
           to: toEmail,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
