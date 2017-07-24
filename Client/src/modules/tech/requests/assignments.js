@@ -103,6 +103,16 @@ export class Assignments {
         this.filterInAssigned();
     }
 
+    clickTable(index, el, request){
+        if($(el.target).hasClass('fa-pencil')) {
+            this.editRequest(index);
+        } else if($(el.target).hasClass('dropbtn')){
+            this.showProfile(request, event);
+        } else {
+            this.selectRequest(index, el, request)
+        }
+    }
+
     // /*****************************************************************************************************
     //  * User selected a requests table
     //  * index - index of the item selected
@@ -137,9 +147,9 @@ export class Assignments {
 
         this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
-        // if (this.selectedRow) this.selectedRow.children().removeClass('info');
-        // this.selectedRow = $(el.target).closest('tr');
-        // this.selectedRow.children().addClass('info')
+        if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        this.selectedRow = $(el.target).closest('tr');
+        this.selectedRow.children().addClass('info')
     }
     
     clientRequired(){
