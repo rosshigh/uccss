@@ -40,7 +40,7 @@ var config = {
     },
     port: 80,
     db: 'mongodb://localhost/uccss',
-    corsDomain: 'http://129.89.93.81',
+    corsDomain: 'http://ucc.uwm.edu',
     secret: "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     uploads: './public/uploadedFiles',
     UCC_HOME: "Milwaukee",
