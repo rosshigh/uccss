@@ -38,7 +38,7 @@ export class EditSystem {
     async activate() {
         let responses = await Promise.all([
             this.systems.getSystemsArray('?order=sid'),
-            this.products.getProductsArray('?filter=active|eq|true'),
+            this.products.getProductsArray('?filter=active|eq|true&order=name'),
             this.sessions.getSessionsArray(),
             this.config.getConfig(),
             this.config.getSessions()
@@ -86,6 +86,7 @@ export class EditSystem {
             this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
             let serverResponse = await this.systems.saveSystem();
             if (!serverResponse.error) {
+                if(this.saveProduct) this.products.saveProduct();
                 this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
                 this._cleanUp();
             } 
@@ -141,7 +142,7 @@ export class EditSystem {
     editClientsButton(){
         this.editClients = !this.editClients;
     }
- 
+
     generateClients() {
          if(this.selectedProduct === ""){
              return this.dialog.showMessage(
@@ -172,9 +173,23 @@ export class EditSystem {
                     return;
                 });
         }
+        this.saveProduct = true;
         var result = this.systems.generateClients(start, end, this.editClientStatus, this.selectedProduct);
         if (result.error) {
             this.utils.showNotification(result.error);
+        } else {
+            this.products.selectedProductFromId(this.selectedProduct);
+            if(this.products.selectedProduct.systems) {
+                this.products.selectedProduct.systems.forEach(item => {
+                    if(item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
+                })
+            } else {
+                this.saveProduct = true
+            }
+            if(this.saveProduct){
+                this.products.selectedProduct.systems.push({systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid} );
+                
+            }
         }
     }
 
@@ -194,7 +209,6 @@ export class EditSystem {
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    // this.saveClients = true; 
                     this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);    
                 }
             });

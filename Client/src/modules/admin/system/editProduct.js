@@ -55,8 +55,8 @@ export class EditProducts {
 
     async activate() {
         let responses = await Promise.all([
-            this.products.getProductsArray('?order=name'),
-            this.systems.getSystemsArray('?order=sid'),
+            this.products.getProductsArray('?order=name', true),
+            this.systems.getSystemsArray('?order=sid', true),
             this.is4ua.loadIs4ua(),
             this.documents.getDocumentsCategoriesArray(),
             this.config.getConfig()
