@@ -497,6 +497,7 @@ if(env === 'development'){
           template: 'password-reset',
           context: mailObject.context
       };
+        console.log(mail);  
       nodeMailerSendMail(mail)   
   }
 

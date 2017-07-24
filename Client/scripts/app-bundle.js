@@ -24444,6 +24444,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         };
 
         Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
+            this.proposedClient = new Array();
+            this.assignmentDetails = new Array();
+            this.profileRequest = undefined;
+
+            this.enableButton = false;
             this.requestSelected = 'form';
         };
 

@@ -121,12 +121,12 @@ export class Assignments {
     //  ****************************************************************************************************/
     selectRequest(index, el, request) {
         //Initiate temp arrays to hold selected clients and assignment details
-        // this.proposedClient = new Array();
-        // this.assignmentDetails = new Array();
-        // this.profileRequest = undefined;
+        this.proposedClient = new Array();
+        this.assignmentDetails = new Array();
+        this.profileRequest = undefined;
         
-        // //Initiate interface flags
-        // this.enableButton = false;
+        //Initiate interface flags
+        this.enableButton = false;
         this.requestSelected = 'form';
 
         // //Retrieve relevant data
