@@ -1,5 +1,5 @@
 
-var HOST = "http://129.89.93.81/"
+var HOST = "http://172.16.93.90/"
 
 var emailConfig = {
 	smtp: 'smtprelay.uwm.edu',
@@ -7,7 +7,7 @@ var emailConfig = {
 	 sg_key: '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',
 	UCCSS_NAME: "University of Wisconsin-Milwaukee UCCSS",
 	UCC_LOGO: HOST + 'img/uwm_logo.jpg',
-	HOST: "http://129.89.93.81/",
+	HOST: "http://172.16.93.90/",
 	UCC_PHONE: '414-229-3333', 
 	UCC_EMAIL: 'ucc@uwm.edu',
 	CREATE_REQUEST_WHATS_NEXT: "We will assign the client in accordance with the required date. You will recieve an email when the client is assigned and you can check back in the UCCSS for the status of the request and the details when the client is assigned.",
