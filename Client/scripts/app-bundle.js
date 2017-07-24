@@ -24453,7 +24453,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
             this.editIndex = this.dataTable.getOriginalIndex(index);
 
-            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+            this.products.selectedProductFromId('5964d133503dd106746c1309');
         };
 
         Assignments.prototype.clientRequired = function clientRequired() {
