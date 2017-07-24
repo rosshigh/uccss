@@ -147,7 +147,7 @@ export class Assignments {
         }
         
         // this.clientRequired();
-
+console.log(this.requests.selectedRequestDetail);
         this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
