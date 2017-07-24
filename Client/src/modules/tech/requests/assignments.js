@@ -132,7 +132,7 @@ export class Assignments {
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.selectedRequestDetail = this.utils.copyObject(request);
-        // this.requests.selectRequestDetailFromId(request._id);
+        this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
         this.products.selectedProductFromId(this.selectedRequestDetail.productId);
         // this.products.selectedProductFromId('5964d133503dd106746c1309');
