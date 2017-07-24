@@ -136,7 +136,7 @@ export class Assignments {
         // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
         this.products.selectedProductFromId('5964d133503dd106746c1309');
 
-        // this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+        this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
         // this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
         
@@ -146,11 +146,11 @@ export class Assignments {
         
         // this.clientRequired();
 
-        // this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
+        this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
-        // if (this.selectedRow) this.selectedRow.children().removeClass('info');
-        // this.selectedRow = $(el.target).closest('tr');
-        // this.selectedRow.children().addClass('info')
+        if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        this.selectedRow = $(el.target).closest('tr');
+        this.selectedRow.children().addClass('info')
     }
     
     clientRequired(){
