@@ -5871,6 +5871,19 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             return this.selectedRequestDetail;
         };
 
+        ClientRequests.prototype.selectRequestDetailFromId = function selectRequestDetailFromId(id) {
+            var _this = this;
+
+            this.requestsDetailsArray.forEach(function (item, index) {
+                if (item._id === id) {
+                    _this.selectedRequestDetail = _this.utils.copyObject(item);
+                    _this.requestDetailIndex = index;
+                    return;
+                }
+            });
+            return null;
+        };
+
         ClientRequests.prototype.setSelectedRequestDetail = function setSelectedRequestDetail(request) {
             this.selectedRequestDetail = this.utils.copyObject(request);
         };
@@ -6007,21 +6020,21 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         }();
 
         ClientRequests.prototype.updateDetailStatuses = function updateDetailStatuses(selectedRequestNo, status) {
-            var _this = this;
+            var _this2 = this;
 
             this.requestsDetailsArray.forEach(function (item) {
                 if (item.requestId && item.requestId.clientRequestNo == selectedRequestNo) {
-                    if (item.requestStatus != _this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+                    if (item.requestStatus != _this2.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
                 }
             });
         };
 
         ClientRequests.prototype.updateDetailStatus = function updateDetailStatus(id, status) {
-            var _this2 = this;
+            var _this3 = this;
 
             this.requestsDetailsArray.forEach(function (item) {
                 if (item.requestId._id == id) {
-                    if (item.requestStatus != _this2.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
+                    if (item.requestStatus != _this3.config.ASSIGNED_REQUEST_CODE) item.requestStatus = status;
                 }
             });
         };
@@ -6057,7 +6070,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.groupRequestsByProduct = function groupRequestsByProduct() {
-            var _this3 = this;
+            var _this4 = this;
 
             if (!this.requestsDetailsArray) {
                 return;
@@ -6078,11 +6091,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             sortedArray.forEach(function (item) {
                 if (item.productId != prodID) {
                     prodID = item.productId;
-                    var obj = _this3.utils.copyObject(templateObj);
+                    var obj = _this4.utils.copyObject(templateObj);
                     obj.productId = item.productId;
-                    _this3.analyticsProductsResultArray.push(obj);
+                    _this4.analyticsProductsResultArray.push(obj);
                 }
-                _this3.analyticsProductsResultArray[_this3.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
+                _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
             });
         };
 
@@ -24452,6 +24465,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.requestSelected = 'form';
 
             this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.requests.selectRequestDetailFromId(request._id);
 
             this.products.selectedProductFromId('5964d133503dd106746c1309');
         };

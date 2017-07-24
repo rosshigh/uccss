@@ -213,6 +213,17 @@ export class ClientRequests {
           return this.selectedRequestDetail;
     }
 
+    selectRequestDetailFromId(id){
+        this.requestsDetailsArray.forEach((item, index) => {
+          if(item._id === id){
+            this.selectedRequestDetail = this.utils.copyObject(item);
+            this.requestDetailIndex = index;
+            return;
+          }
+        });
+        return null;
+    }
+
     setSelectedRequestDetail(request){
       this.selectedRequestDetail = this.utils.copyObject(request);
     }
