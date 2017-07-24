@@ -10423,9 +10423,11 @@ define('resources/data/people',['exports', 'aurelia-framework', './dataServices'
                                 }
 
                                 this.remindersArray = serverResponse;
-                                this.remindersArray = this.remindersArray.filter(function (item) {
-                                    return item.isReminder;
-                                });
+                                if (Object.prototype.toString.call(this.remindersArray) === '[object Array]') {
+                                    this.remindersArray = this.remindersArray.filter(function (item) {
+                                        return item.isReminder;
+                                    });
+                                }
                                 return _context17.abrupt('return', serverResponse);
 
                             case 13:

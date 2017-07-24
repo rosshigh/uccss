@@ -408,9 +408,11 @@ export class People {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
                     this.remindersArray = serverResponse;
-                    this.remindersArray = this.remindersArray.filter(item => {
-                        return item.isReminder;
-                    });
+                    if(Object.prototype.toString.call(this.remindersArray) === '[object Array]'){
+                        this.remindersArray = this.remindersArray.filter(item => {
+                            return item.isReminder;
+                        });
+                    }
                     return serverResponse;
                 } else {
                     this.data.processError(serverResponse);
