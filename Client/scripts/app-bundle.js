@@ -24439,11 +24439,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             } else if ($(el.target).hasClass('dropbtn')) {
                 this.showProfile(request, event);
             } else {
-                this.selectRequest(index, el, request);
+                this.selectARequest(index, el, request);
             }
         };
 
-        Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
+        Assignments.prototype.selectARequest = function selectARequest(index, el, request) {
             this.proposedClient = new Array();
             this.assignmentDetails = new Array();
             this.profileRequest = undefined;

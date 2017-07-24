@@ -109,7 +109,7 @@ export class Assignments {
         } else if($(el.target).hasClass('dropbtn')){
             this.showProfile(request, event);
         } else {
-            this.selectRequest(index, el, request)
+            this.selectARequest(index, el, request)
         }
     }
 
@@ -119,7 +119,7 @@ export class Assignments {
     //  * el - event object
     //  * request - the selected request object
     //  ****************************************************************************************************/
-    selectRequest(index, el, request) {
+    selectARequest(index, el, request) {
         //Initiate temp arrays to hold selected clients and assignment details
         this.proposedClient = new Array();
         this.assignmentDetails = new Array();
