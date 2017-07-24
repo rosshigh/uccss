@@ -131,10 +131,10 @@ export class Assignments {
 
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.requests.selectRequestDetailFromId(request._id);
+        // this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
         // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-        // this.products.selectedProductFromId('5964d133503dd106746c1309');
+        this.products.selectedProductFromId('5964d133503dd106746c1309');
 
         // this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
