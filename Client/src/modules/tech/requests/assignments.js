@@ -79,7 +79,7 @@ export class Assignments {
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
               
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                  this.filterInAssigned();
+                  this.filterInAssigned('unassigned');
             } else {
                 this.displayArray = new Array();
             }
@@ -1078,11 +1078,8 @@ export class Assignments {
 
 
     filterInAssigned() {
-        if (!this.isChecked) {
-            this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
-        } else {
-             this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
-        }
+        this.requestFilter = filterInAssigned ? filterInAssigned : this.requestFilter;
+        this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
     }
 
     editRequest(index){
@@ -1128,24 +1125,23 @@ export class Assignments {
     
   }
 
-  customCourseFilter(value, item, context){
-    if(item.requestId.courseId == context.config.SANDBOX_ID && value == context.config.SANDBOX_ID) return true;
-    if(item.requestId.courseId != context.config.SANDBOX_ID && value != context.config.SANDBOX_ID) return true;    
-    return false;
-  }
+customCourseFilter(value, item, context){
+if(item.requestId.courseId == context.config.SANDBOX_ID && value == context.config.SANDBOX_ID) return true;
+if(item.requestId.courseId != context.config.SANDBOX_ID && value != context.config.SANDBOX_ID) return true;    
+return false;
+}
 
-  customNameFilter(value, item, context){
-    var foo = value.toUpperCase();
-    for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
-      if(context.people.peopleArray[i]._id == item.requestId.personId) {
-        return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
-      }
+customNameFilter(value, item, context){
+var foo = value.toUpperCase();
+for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
+    if(context.people.peopleArray[i]._id == item.requestId.personId) {
+    return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
     }
-  }
+}
+}
 
-  statusCustomFilter(value, item, context){
-    if(item.requestStatus == value) return false;
-    return true;
+statusCustomFilter(value, item, context){
+    return item.requestStatus == value;
 }
 
  institutionCustomFilter(value, item, context){
