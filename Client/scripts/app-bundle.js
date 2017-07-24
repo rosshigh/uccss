@@ -24439,7 +24439,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             } else if ($(el.target).hasClass('dropbtn')) {
                 this.showProfile(request, event);
             } else {
-                this.selectRequest(index, el, request);
+                this.requestSelected = 'form';
             }
         };
 

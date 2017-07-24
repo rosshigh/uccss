@@ -109,7 +109,8 @@ export class Assignments {
         } else if($(el.target).hasClass('dropbtn')){
             this.showProfile(request, event);
         } else {
-            this.selectRequest(index, el, request)
+            // this.selectRequest(index, el, request)
+             this.requestSelected = 'form';
         }
     }
 
