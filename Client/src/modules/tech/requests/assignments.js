@@ -132,22 +132,21 @@ export class Assignments {
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.selectedRequestDetail = this.utils.copyObject(request);
-        this.requests.selectRequestDetailFromId(request._id);
+        // this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
         this.products.selectedProductFromId(this.selectedRequestDetail.productId);
         // this.products.selectedProductFromId('5964d133503dd106746c1309');
 
-        this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+        this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
-        // this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+        // this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         
         if(!this.products.selectedProduct.systems[0] ){
              this.utils.showNotification("You need to assign a system to this product before you can assign this request");
         }
         
-        // this.clientRequired();
-console.log(this.requests.selectedRequestDetail);
+        this.clientRequired();
         this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
@@ -170,33 +169,33 @@ console.log(this.requests.selectedRequestDetail);
         this.studentIDTemplateAvailable = this.studentIDTemplates.length > 0 && this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1; 
         this.facultyIDTemplateAvailable = this.facultyIDTemplates.length > 0
             && this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
-            && this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID;
+            && this.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID;
 
         if(this.products.selectedProduct.systems[0]) {
             this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
             setTimeout(function(){$('#systemSelect option:eq(1)').attr('selected', 'true')}, 250);;
         }
-        this.customerMessageText = this.requests.selectedRequestDetail.customerMessage ? this.requests.selectedRequestDetail.customerMessage : "";
+        this.customerMessageText = this.selectedRequestDetail.customerMessage ? this.selectedRequestDetail.customerMessage : "";
         this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
         
         //Check if the request is a sandbox request
-        if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+        if (this.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
             this.idBuffer =localStorage.getItem('idSandboxBuffer')  ? localStorage.getItem('idSandboxBuffer') : this.config.SANDBOX_ID_BUFFER;
             this.numberOfIds = localStorage.getItem('sandBoxIDs')  ? localStorage.getItem('sandBoxIDs') : this.config.SANDBOX_ID_COUNT;
             this.sandBoxOnly = true;
         } else {
             this.idBuffer = localStorage.getItem('idBuffer')  ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
-            this.numberOfIds = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds)
-                + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds)
-                + parseInt(this.requests.selectedRequestDetail.requestId.addUndergraduates)
-                + parseInt(this.requests.selectedRequestDetail.requestId.addGraduates);
+            this.numberOfIds = parseInt(this.selectedRequestDetail.requestId.graduateIds)
+                + parseInt(this.selectedRequestDetail.requestId.undergradIds)
+                + parseInt(this.selectedRequestDetail.requestId.addUndergraduates)
+                + parseInt(this.selectedRequestDetail.requestId.addGraduates);
             this.sandBoxOnly = false;
         }
 
         //Check to see if an assignment has already been made
-        if (!this.requests.selectedRequestDetail.assignments || this.requests.selectedRequestDetail.assignments.length == 0) {
+        if (!this.selectedRequestDetail.assignments || this.selectedRequestDetail.assignments.length == 0) {
             //No assignment has been made
-            this.requests.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
+            this.selectedRequestDetail.techComments = this.products.selectedProduct.productInfo ? this.products.selectedProduct.productInfo : "";
             this.idsRequired = parseInt(this.numberOfIds) + parseInt(this.idBuffer);
             this.idsRemaining = this.idsRequired;
             this.existingRequest = false;
@@ -207,12 +206,12 @@ console.log(this.requests.selectedRequestDetail);
             //An assignment has already been made
             this.existingRequest = true;
             this.unassignedOnly = false;
-            this.idsAssigned = this.requests.selectedRequestDetail.idsAssigned;
+            this.idsAssigned = this.selectedRequestDetail.idsAssigned;
             this.idsRequired = parseInt(this.numberOfIds)
             this.numberOfIds = this.numberOfIds - this.idsAssigned > 0 ? this.numberOfIds - this.idsAssigned : 0;
             this.totalIdsAssigned = this.idsAssigned;
             this.idsRemaining = this.idsRequired - this.idsAssigned > 0 ? this.idsRequired - this.idsAssigned : 0;
-            this.assignmentDetails = this.requests.selectedRequestDetail.assignments;
+            this.assignmentDetails = this.selectedRequestDetail.assignments;
             this.findAssignedClients(); 
         }
 
@@ -232,10 +231,10 @@ console.log(this.requests.selectedRequestDetail);
         //Don't allow a client to be selected if there are no ids to be assigned
         if (this.idsRemaining > 0) {
             //Make sure the selected client is compatible with the selected request
-            if (this.products.selectedProduct.clientRelevant && this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
+            if (this.products.selectedProduct.clientRelevant && this.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
                 message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
             }
-            if (this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
+            if (this.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
                 message = "The request is for a regular course and the client is a sandbox client";
                 // this.utils.showNotification("The request is for a regular course and the client is a sandbox client", "", "", "", "", 5);
                 // return;
@@ -379,7 +378,7 @@ console.log(this.requests.selectedRequestDetail);
             }
             //Strip off the last colon
              this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.substring(0,this.assignmentDetails[this.assignmentDetailIndex].studentUserIds.length-1);
-             this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex],  this.assignmentDetails[this.assignmentDetailIndex], this.requests.selectedRequestDetail._id) ? '' : 'danger' ;
+             this.assignmentDetails[this.assignmentDetailIndex].notValid = this.validateIDRange(this.proposedClient[this.assignmentDetailIndex],  this.assignmentDetails[this.assignmentDetailIndex], this.selectedRequestDetail._id) ? '' : 'danger' ;
              if(this.assignmentDetails[this.assignmentDetailIndex].notValid != 'danger') this.validation.makeValid( $("#errorRange"));
         }
         
@@ -390,10 +389,10 @@ console.log(this.requests.selectedRequestDetail);
     calcFacIDRangeFromTemplate(){
         //If there is no template configured for faculty ids or if this is a sandbox request set the faculty ids to empty string
         if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
-            || this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
+            || this.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
             || this.facultyIDTemplates.length == 0) {
 
-            if(this.requests.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID) this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
+            if(this.selectedRequestDetail.requestId.courseId !== this.config.SANDBOX_ID) this.assignmentDetails[this.assignmentDetailIndex].facultyUserIds = this.products.selectedProduct.defaultFacultyIdPrefix;
         } else {
             var selectedFacultyIDTemplates = new Array();
             if (this.selectedStudentIDTemplate.length == 0){
@@ -455,7 +454,7 @@ console.log(this.requests.selectedRequestDetail);
                 this.assignmentDetails[this.assignmentDetailIndex].studentPassword = this.products.selectedProduct.defaultStudentPassword;
             }
             //Sandbox assignments don't have faculty ids so set the password to empty string
-            if (this.requests.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
+            if (this.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID) {
                 this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
             } else {
                 //If the product faculty password template is defined with a wildcard calculate the password
@@ -612,7 +611,7 @@ console.log(this.requests.selectedRequestDetail);
         this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
         
         for(var i = 0; i<this.proposedClient[index].assignments.length; i++){
-            if(this.proposedClient[index].assignments[i].assignment == this.requests.selectedRequestDetail._id){
+            if(this.proposedClient[index].assignments[i].assignment == this.selectedRequestDetail._id){
                 this.proposedClient[index].assignments.splice(i,1);
                 if(this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID ) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
                 break;
@@ -620,14 +619,14 @@ console.log(this.requests.selectedRequestDetail);
         }
         this.systems.updateClient(this.proposedClient[index]);
         this.assignmentDetails.splice(index, 1);
-        if(this.assignmentDetails.length == 0) this.requests.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE
+        if(this.assignmentDetails.length == 0) this.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE
         
         //Construct the object to submit to the server
-        this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-        this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-        this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+        this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+        this.selectedRequestDetail.assignments = this.assignmentDetails;
+        this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.requestDetailsToSave = new Array();
-        var request = this.utils.copyObject(this.requests.selectedRequestDetail);
+        var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
         this.requestToSave.requestDetailsToSave.push(request);
         
@@ -673,7 +672,7 @@ console.log(this.requests.selectedRequestDetail);
         if (this.validation.validate(1, this)) {
             if(this._buildRequest()){
                 this.requests.setSelectedRequest(this.requestToSave);
-                let email = this.requests.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
+                let email = this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
                 let serverResponse = await this.requests.assignRequest(email);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");
@@ -689,7 +688,7 @@ console.log(this.requests.selectedRequestDetail);
      ****************************************************************************************************/
     _buildRequest(){
         //Check to see if this assignment already exists
-        if(this.requests.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE){  
+        if(this.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE){  
             for(var i = 0; i < this.assignmentDetails.length; i++){
                 for(var j = 0; j < this.proposedClient.length; j++){
                     var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
@@ -701,7 +700,7 @@ console.log(this.requests.selectedRequestDetail);
                             //Search for the assignment in the client and update it
                             if(this.proposedClient[j].assignments){
                                 for(var k = 0; k<this.proposedClient[j].assignments.length; k++){
-                                    if(this.proposedClient[j].assignments[k].assignment == this.requests.selectedRequestDetail._id){
+                                    if(this.proposedClient[j].assignments[k].assignment == this.selectedRequestDetail._id){
                                         var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                                         this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
                                         this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
@@ -715,15 +714,15 @@ console.log(this.requests.selectedRequestDetail);
                         } else {
                             //It's a new assignment
                             this.assignmentDetails[i].assignedDate = new Date();
-                            this.requests.selectedRequestDetail.assignedDate = new Date();
-                            if(this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                            this.selectedRequestDetail.assignedDate = new Date();
+                            if(this.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
                             var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                             this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
                             this.proposedClient[i].assignments.push({
-                                assignment: this.requests.selectedRequestDetail._id,
+                                assignment: this.selectedRequestDetail._id,
                                 studentIDRange: this.assignmentDetails[i].studentUserIds,
                                 facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                                institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                                institutionId: this.selectedRequestDetail.requestId.institutionId,
                                 firstID: this.assignmentDetails[i].firstID,
                                 lastID: this.assignmentDetails[i].lastID,  
                             });
@@ -736,9 +735,9 @@ console.log(this.requests.selectedRequestDetail);
         } else {
             //First assignment for this request
             if(this.provisionalAssignment){
-                this.requests.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
+                this.selectedRequestDetail.requestStatus = this.config.PROVISIONAL_REQUEST_CODE;
             } else {
-                this.requests.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
+                this.selectedRequestDetail.requestStatus = this.config.ASSIGNED_REQUEST_CODE;
             }
             
             
@@ -746,15 +745,15 @@ console.log(this.requests.selectedRequestDetail);
             for(var i = 0; i < this.proposedClient.length; i++){
                 this.assignmentDetails[i].assignedDate = new Date();
                 this.assignmentDetails[i].modifiedDate = new Date();
-                if(this.requests.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
+                if(this.selectedRequestDetail.requestId.courseId != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
                 if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                 this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
                 this.proposedClient[i].assignments.push({
-                    assignment: this.requests.selectedRequestDetail._id,
+                    assignment: this.selectedRequestDetail._id,
                     studentIDRange: this.assignmentDetails[i].studentUserIds,
                     facultyIDRange: this.assignmentDetails[i].facultyUserIds,
-                    institutionId: this.requests.selectedRequestDetail.requestId.institutionId,
+                    institutionId: this.selectedRequestDetail.requestId.institutionId,
                     firstID: this.assignmentDetails[i].firstID,
                     lastID: this.assignmentDetails[i].lastID,   
                     assignedDate: new Date()                 
@@ -764,18 +763,18 @@ console.log(this.requests.selectedRequestDetail);
         }
         
         //Construct the object to submit to the server
-        this.requests.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
-        this.requests.selectedRequestDetail.assignments = this.assignmentDetails;
-        this.requestToSave = this.utils.copyObject(this.requests.selectedRequestDetail.requestId);
+        this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+        this.selectedRequestDetail.assignments = this.assignmentDetails;
+        this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.audit.push({
            property: 'Assigned',
-           newValue: this.requests.selectedRequestDetail.requestNo,
-           oldValue: this.requests.selectedRequestDetail.productId,
+           newValue: this.selectedRequestDetail.requestNo,
+           oldValue: this.selectedRequestDetail.productId,
            eventDate: new  Date(),
            personId: this.userObj._id
         })
         this.requestToSave.requestDetailsToSave = new Array();
-        var request = this.utils.copyObject(this.requests.selectedRequestDetail);
+        var request = this.utils.copyObject(this.selectedRequestDetail);
         delete request['requestId'];
         this.requestToSave.requestDetailsToSave.push(request);
 
@@ -796,9 +795,9 @@ console.log(this.requests.selectedRequestDetail);
     }
 
     buildAuditDetail(){
-        var obj = this.requests.selectedRequestDetail;
+        var obj = this.selectedRequestDetail;
         if(obj.productId != this.originalRequestDetail.productId){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: "productId",
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.productId,
@@ -807,7 +806,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requestStatus != this.originalRequestDetail.requestStatus){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: 'requestStatus',
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requestStatus,
@@ -816,7 +815,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requestId.undergradIds != this.originalRequestDetail.requestId.undergradIds){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: "undergradIds",
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requestId.undergradIds,
@@ -825,7 +824,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requestId.graduateIds != this.originalRequestDetail.requestId.graduateIds){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: "graduateIds",
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requestId.graduateIds,
@@ -834,7 +833,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requestId.startDate != this.originalRequestDetail.requestId.startDate){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: 'startDate',
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetailrequestId.startDate,
@@ -843,7 +842,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requestId.endDate != this.originalRequestDetail.requestId.endDate){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: 'endDate',
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requestId.endDate,
@@ -852,7 +851,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
         if(obj.requiredDate != this.originalRequestDetail.requiredDate){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: "requiredDate",
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requiredDate,
@@ -861,7 +860,7 @@ console.log(this.requests.selectedRequestDetail);
             })
         }
          if(obj.requestId.courseId != this.originalRequestDetail.requestId.courseId){
-            this.requests.selectedRequestDetail.requestId.audit.push({
+            this.selectedRequestDetail.requestId.audit.push({
                 property: 'courseId',
                 eventDate: new Date(),
                 oldValue: this.originalRequestDetail.requestId.courseId,
@@ -962,10 +961,10 @@ console.log(this.requests.selectedRequestDetail);
              this.hideProfile();
          } else {
             this.model = 'detail';
-            this.requestId =  this.requests.selectedRequestDetail._id;
-            this.productName = this.utils.lookupValue(this.requests.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
-            this.selectedRequestNo = this.requests.selectedRequestDetail.requestId.clientRequestNo;
-            this.course = this.utils.lookupValue(this.requests.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
+            this.requestId =  this.selectedRequestDetail._id;
+            this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+            this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
+            this.course = this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
@@ -1100,12 +1099,12 @@ console.log(this.requests.selectedRequestDetail);
        
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
-        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-        this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-        this.editStartDate = this.requests.selectedRequestDetail.requestId.startDate;
-        this.originalRequestDetail = this.utils.copyObject(this.requests.selectedRequestDetail);
+        // this.people.selectedPersonFromId(this.selectedRequestDetail.requestId.personId);
+        this.products.selectedProductFromId(this.selectedRequestDetail.productId);
+        this.editStartDate = this.selectedRequestDetail.requestId.startDate;
+        this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
         this.personCourses = this.people.coursesArray.filter(item => {
-            return item.personId == this.requests.selectedRequestDetail.requestId.personId;
+            return item.personId == this.selectedRequestDetail.requestId.personId;
         })
 
         this.requestSelected = 'edit';
