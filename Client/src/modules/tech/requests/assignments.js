@@ -109,8 +109,7 @@ export class Assignments {
         } else if($(el.target).hasClass('dropbtn')){
             this.showProfile(request, event);
         } else {
-            // this.selectRequest(index, el, request)
-             this.requestSelected = 'form';
+            this.selectRequest(index, el, request)
         }
     }
 
@@ -122,35 +121,35 @@ export class Assignments {
     //  ****************************************************************************************************/
     selectRequest(index, el, request) {
         //Initiate temp arrays to hold selected clients and assignment details
-        this.proposedClient = new Array();
-        this.assignmentDetails = new Array();
-        this.profileRequest = undefined;
+        // this.proposedClient = new Array();
+        // this.assignmentDetails = new Array();
+        // this.profileRequest = undefined;
         
-        //Initiate interface flags
-        this.enableButton = false;
+        // //Initiate interface flags
+        // this.enableButton = false;
         this.requestSelected = 'form';
 
-        //Retrieve relevant data
-        this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.requests.selectRequestDetail(this.editIndex);
-        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-        this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+        // //Retrieve relevant data
+        // this.editIndex = this.dataTable.getOriginalIndex(index);
+        // this.requests.selectRequestDetail(this.editIndex);
+        // // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+        // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
 
-        this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+        // this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
-        this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+        // this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
         
-        if(!this.products.selectedProduct.systems[0] ){
-             this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-        }
+        // if(!this.products.selectedProduct.systems[0] ){
+        //      this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+        // }
         
-        this.clientRequired();
+        // this.clientRequired();
 
-        this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
+        // this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
-        if (this.selectedRow) this.selectedRow.children().removeClass('info');
-        this.selectedRow = $(el.target).closest('tr');
-        this.selectedRow.children().addClass('info')
+        // if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        // this.selectedRow = $(el.target).closest('tr');
+        // this.selectedRow.children().addClass('info')
     }
     
     clientRequired(){

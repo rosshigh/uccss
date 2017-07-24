@@ -152,8 +152,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.HOST = location.origin;
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
-            this.BASE_URL = this.HOST + "/api/";
-            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
+            this.BASE_URL = "http://localhost:5000/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/';
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -24439,38 +24439,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             } else if ($(el.target).hasClass('dropbtn')) {
                 this.showProfile(request, event);
             } else {
-                this.requestSelected = 'form';
+                this.selectRequest(index, el, request);
             }
         };
 
         Assignments.prototype.selectRequest = function selectRequest(index, el, request) {
-            this.proposedClient = new Array();
-            this.assignmentDetails = new Array();
-            this.profileRequest = undefined;
-
-            this.enableButton = false;
             this.requestSelected = 'form';
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.requests.selectRequestDetail(this.editIndex);
-
-            this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-
-            this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
-
-            this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
-
-            if (!this.products.selectedProduct.systems[0]) {
-                this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-            }
-
-            this.clientRequired();
-
-            this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
         };
 
         Assignments.prototype.clientRequired = function clientRequired() {
