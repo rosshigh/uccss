@@ -134,16 +134,17 @@ export class Assignments {
         this.selectedRequestDetail = this.utils.copyObject(request);
         // this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
-        // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-        this.products.selectedProductFromId('5964d133503dd106746c1309');
+        this.products.selectedProductFromId(this.selectedRequestDetail.productId);
+        // this.products.selectedProductFromId('5964d133503dd106746c1309');
 
         this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
         // this.oldRequest = this.utils.copyObject(this.requests.selectedRequestDetail);
+        this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         
-        // if(!this.products.selectedProduct.systems[0] ){
-        //      this.utils.showNotification("You need to assign a system to this product before you can assign this request");
-        // }
+        if(!this.products.selectedProduct.systems[0] ){
+             this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+        }
         
         // this.clientRequired();
 

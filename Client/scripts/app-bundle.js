@@ -24467,9 +24467,16 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.editIndex = this.dataTable.getOriginalIndex(index);
             this.selectedRequestDetail = this.utils.copyObject(request);
 
-            this.products.selectedProductFromId('5964d133503dd106746c1309');
+            this.products.selectedProductFromId(this.selectedRequestDetail.productId);
+
 
             this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
+
+            this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
+
+            if (!this.products.selectedProduct.systems[0]) {
+                this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+            }
 
             this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
