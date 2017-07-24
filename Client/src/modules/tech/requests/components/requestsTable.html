@@ -91,7 +91,7 @@
             <th></th>
           </tr>
           <tr  repeat.for="request of dataTable.displayArray" class="${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}">
-            <td click.delegate="clickTable($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
+            <td click.delegate="selectARequest($index, $event, request)" data-title="requestNo">${request.requestNo}</td>
             <td data-title="requiredDate">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
             <td data-title="dateCreated">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>
             <td show.bind="config.SANDBOX_USED"  data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID:config.SANDBOX_NAME}</td>
