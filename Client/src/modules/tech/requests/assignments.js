@@ -130,10 +130,10 @@ export class Assignments {
         this.requestSelected = 'form';
 
         // //Retrieve relevant data
-        // this.editIndex = this.dataTable.getOriginalIndex(index);
-        // this.requests.selectRequestDetail(this.editIndex);
-        // // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
-        // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
+        this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.requests.selectRequestDetail(this.editIndex);
+        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
+        this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
 
         // this.provisionalAssignment = this.requests.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         
