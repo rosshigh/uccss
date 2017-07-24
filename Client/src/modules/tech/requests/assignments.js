@@ -21,7 +21,7 @@ export class Assignments {
     roundTo10 = false;
     showAudit = false;
     lastIDidsRemaining = -1;
-    isChecked = false;
+    isCheckedAssigned = false;
     title="Tech Staff Client Assignments"
 
     spinnerHTML = "";
@@ -79,7 +79,7 @@ export class Assignments {
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
               
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
-                  this.filterInAssigned('unassigned');
+                  this.filterInAssigned();
             } else {
                 this.displayArray = new Array();
             }
@@ -137,7 +137,7 @@ export class Assignments {
         }
         
         this.clientRequired();
-        this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
+        this.selectedSystem = this.products.selectedProduct.systems[0].systemId ? this.products.selectedProduct.systems[0].systemId : undefined;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -1078,8 +1078,11 @@ export class Assignments {
 
 
     filterInAssigned() {
-        this.requestFilter = filterInAssigned ? filterInAssigned : this.requestFilter;
-        this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
+        // if(this.isCheckedAssigned){
+        //     this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
+        // } else {
+            this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
+        // }
     }
 
     editRequest(index){
