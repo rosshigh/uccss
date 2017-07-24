@@ -139,7 +139,7 @@ export class NavBar {
     async reminders(){
 
         let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
-        if(response && !response.error && this.people){
+        if(response && !response.error && this.people && Object.prototype.toString.call(this.people.remindersArray) === '[object Array]'){
             toastr.options.closeButton = true;
             toastr.options.closeMethod = 'fadeOut';
             toastr.options.closeDuration = 300;

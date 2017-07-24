@@ -14649,7 +14649,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                             case 2:
                                 response = _context5.sent;
 
-                                if (response && !response.error && this.people) {
+                                if (response && !response.error && this.people && Object.prototype.toString.call(this.people.remindersArray) === '[object Array]') {
                                     toastr.options.closeButton = true;
                                     toastr.options.closeMethod = 'fadeOut';
                                     toastr.options.closeDuration = 300;
