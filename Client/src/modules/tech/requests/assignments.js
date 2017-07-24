@@ -103,16 +103,6 @@ export class Assignments {
         this.filterInAssigned();
     }
 
-    clickTable(index, el, request){
-        if($(el.target).hasClass('fa-pencil')) {
-            this.editRequest(index);
-        } else if($(el.target).hasClass('dropbtn')){
-            this.showProfile(request, event);
-        } else {
-            this.selectARequest(index, el, request)
-        }
-    }
-
     // /*****************************************************************************************************
     //  * User selected a requests table
     //  * index - index of the item selected
@@ -134,7 +124,7 @@ export class Assignments {
         this.selectedRequestDetail = this.utils.copyObject(request);
         // this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
-        this.products.selectedProductFromId(this.selectedRequestDetail.productId);
+        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
         // this.products.selectedProductFromId('5964d133503dd106746c1309');
 
         this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
@@ -357,7 +347,7 @@ export class Assignments {
             return;
         }
         //If there is no template, set the range to empty string
-        if (this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
+        if (this.products.selectedProduct.defaultStudentIdPrefix && this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) == -1 || this.studentIDTemplates.length == 0) {
             this.assignmentDetails[this.assignmentDetailIndex].studentUserIds = this.products.selectedProduct.defaultStudentIdPrefix;
         } else {
             //Determine if user has selected a template and if not, select the first one
@@ -388,7 +378,7 @@ export class Assignments {
     
     calcFacIDRangeFromTemplate(){
         //If there is no template configured for faculty ids or if this is a sandbox request set the faculty ids to empty string
-        if (this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
+        if (this.products.selectedProduct.defaultFacultyIdPrefix && this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) == -1
             || this.selectedRequestDetail.requestId.courseId === this.config.SANDBOX_ID
             || this.facultyIDTemplates.length == 0) {
 
@@ -445,7 +435,7 @@ export class Assignments {
             var prefix;
             var len;
             //If the product student password template is defined with a wildcard calculate the password 
-            if (this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+            if (this.products.selectedProduct.defaultStudentPassword && this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) != -1) {
                 len = this.products.selectedProduct.defaultStudentPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultStudentPassword.indexOf(this.config.ID_WILDCARD) + 1;
                 prefix = "9" + "000".substr(0, len - 1);
                 random = Math.floor(Math.random() * parseInt(prefix));
@@ -458,7 +448,7 @@ export class Assignments {
                 this.assignmentDetails[this.assignmentDetailIndex].facultyPassword = "";
             } else {
                 //If the product faculty password template is defined with a wildcard calculate the password
-                if (this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
+                if (this.products.selectedProduct.defaultFacultyPassword && this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) != -1) {
                     len = this.products.selectedProduct.defaultFacultyPassword.lastIndexOf(this.config.ID_WILDCARD) - this.products.selectedProduct.defaultFacultyPassword.indexOf(this.config.ID_WILDCARD) + 1;
                     prefix = "9" + "000".substr(0, len - 1);
                     random = Math.floor(Math.random() * parseInt(prefix));
@@ -769,7 +759,7 @@ export class Assignments {
         this.requestToSave.audit.push({
            property: 'Assigned',
            newValue: this.selectedRequestDetail.requestNo,
-           oldValue: this.selectedRequestDetail.productId,
+           oldValue: this.selectedRequestDetail.productId._id,
            eventDate: new  Date(),
            personId: this.userObj._id
         })
@@ -796,12 +786,12 @@ export class Assignments {
 
     buildAuditDetail(){
         var obj = this.selectedRequestDetail;
-        if(obj.productId != this.originalRequestDetail.productId){
+        if(obj.productId != this.originalRequestDetail.productId._id){
             this.selectedRequestDetail.requestId.audit.push({
                 property: "productId",
                 eventDate: new Date(),
-                oldValue: this.originalRequestDetail.productId,
-                newValue: obj.productId,
+                oldValue: this.originalRequestDetail.productId._id,
+                newValue: obj.productId._id,
                 personId: this.userObj._id
             })
         }
@@ -962,7 +952,7 @@ export class Assignments {
          } else {
             this.model = 'detail';
             this.requestId =  this.selectedRequestDetail._id;
-            this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId, this.products.productsArray, '_id', 'name');
+            this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
             this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
             this.course = this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
          }  
@@ -1100,11 +1090,11 @@ export class Assignments {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.requests.selectRequestDetail(this.editIndex);
         // this.people.selectedPersonFromId(this.selectedRequestDetail.requestId.personId);
-        this.products.selectedProductFromId(this.selectedRequestDetail.productId);
+        this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
         this.editStartDate = this.selectedRequestDetail.requestId.startDate;
         this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
         this.personCourses = this.people.coursesArray.filter(item => {
-            return item.personId == this.selectedRequestDetail.requestId.personId;
+            return item.personId == this.selectedRequestDetail.requestId.personId._id;
         })
 
         this.requestSelected = 'edit';
@@ -1154,26 +1144,42 @@ export class Assignments {
   }
 
   statusCustomFilter(value, item, context){
-        if(item.requestStatus == value) return false;
-        return true;
-    }
+    if(item.requestStatus == value) return false;
+    return true;
+}
 
  institutionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.requestId.institutionId == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
+    for(let i = 0; i < context.people.institutionsArray.length; i++){
+        if(item.requestId.institutionId == context.people.institutionsArray[i]._id) {
+            return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
         }
-        return false;
     }
+    return false;
+}
 
-    customProductNameFilter(value, item, context){
-        for(let i = 0; i < context.products.productsArray.length; i++){
-            if(item.productId == context.products.productsArray[i]._id) {
-                return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
+customProductNameFilter(value, item, context){
+    for(let i = 0; i < context.products.productsArray.length; i++){
+        if(item.productId._id == context.products.productsArray[i]._id) {
+            return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
         }
-        return false;
     }
+    return false;
+}
+
+customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
+        sortArray.forEach((item) => {
+          var obj = context.dataTable.findObj(context.config.REQUEST_STATUS, 'code', item.requestStatus);
+          item['sortProperty'] = obj ? obj['description'] : null;
+        })
+
+        return sortArray.sort((a, b) => {
+			var result = (a['sortProperty'] < b['sortProperty']) ? -1 : (a['sortProperty'] > b['sortProperty']) ? 1 : 0;
+			return result * sortDirection;
+		});
+	}
+
+customInstitutionsSorter(){
+
+}
 
 }

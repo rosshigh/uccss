@@ -46,18 +46,14 @@
           <tr>
             <th class="col-xs-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestNo'})">No </span><span><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requiredDate'})">Due </span><span><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Created </span><span><i class="fa fa-sort"></i></span></th>
             <th show.bind="config.SANDBOX_USED" class="col-lg-1">Type</th>
-            <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')"><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customRequestStatusSorter, propertyName: 'requestStatus'})">Status </span><i class="fa fa-sort"></i></th>   
             <th class="col-sm-1">IDS Requestd</th>
-            <th class="col-lg-2">Product <span click.trigger="dataTable.sortArray('productId', 'id', products.productsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('requestId.personId.lastName')"><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Institution <span click.trigger="dataTable.sortArray('requestId.institutionId', 'id', people.institutionsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-2"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'productId.name'})">Product </span><span><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestId.personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionsSorter, propertyName: 'requestId.institutionId'})">Institution </span><i class="fa fa-sort"></i></th>
             <th style="width:20px;"></th>
-            <!--
-              No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
-              Due <span click.trigger="dataTable.sortArray('requiredDate')"><i class="fa fa-sort"></i></span></th>
-              -->
           </tr>
         </thead>
         <tbody>
@@ -101,11 +97,10 @@
             <td click.delegate="selectARequest($index, $event, request)" show.bind="config.SANDBOX_USED"  data-title="courseId">${request.requestId.courseId | sandbox:config.SANDBOX_ID:config.SANDBOX_NAME}</td>
             <td click.delegate="selectARequest($index, $event, request)" mouseover.delegate="showComment(request, $event)" mouseout.delegate="hideComment()"   data-title="status">${request.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</td>
             <td click.delegate="selectARequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
-            <td click.delegate="selectARequest($index, $event, request)" data-title="product">${request.productId | lookupValue:products.productsArray:"_id":"name"}</td>
-            <td class="dropbtn" data-title="Name">${request.requestId.personId.fullName}</td>
-            <td click.delegate="showProfile(request, $event)" data-title="Name"${request.requestId.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</td>
+            <td click.delegate="selectARequest($index, $event, request)" data-title="product">${request.productId.name}</td>
+            <td class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId.fullName}</td>
+            <td click.delegate="showProfile(request, $event)" data-title="Name"${request.requestId.institutionId.name}</td>
             <td><span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" click.delegate="editRequest($index)" aria-hidden="true"></i></span></td>
-             <!-- click.delegate="editRequest($index)" -->
           </tr>
         </tbody>
       </table>

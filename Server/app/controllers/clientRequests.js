@@ -353,6 +353,26 @@ module.exports = function (app) {
   router.get('/api/clientRequestsDetails', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');
     var query = buildQuery(req.query, ClientRequestDetail.find());
+    query
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+      .populate({ path: "productId", model: "Product", select: "name"})
+      .exec()
+      .then(object => {
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(404).json({message: "No requests were found"});
+        }
+      })
+      .catch(err => {
+        return next(err);
+      })
+  });
+
+  router.get('/api/clientRequestsDetailsOLD', requireAuth, function(req, res, next){
+    logger.log('Get clientRequests', 'verbose');
+    var query = buildQuery(req.query, ClientRequestDetail.find());
     query.populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
     query.exec()
       .then(object => {
