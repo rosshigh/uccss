@@ -137,9 +137,9 @@ export class Assignments {
 
         this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
 
-        if (this.selectedRow) this.selectedRow.children().removeClass('info');
-        this.selectedRow = $(el.target).closest('tr');
-        this.selectedRow.children().addClass('info')
+        // if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        // this.selectedRow = $(el.target).closest('tr');
+        // this.selectedRow.children().addClass('info')
     }
     
     clientRequired(){

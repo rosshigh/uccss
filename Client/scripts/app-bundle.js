@@ -24457,10 +24457,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.clientRequired();
 
             this.selectedSystem = this.products.selectedProduct.systems[0].systemId;
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
         };
 
         Assignments.prototype.clientRequired = function clientRequired() {
