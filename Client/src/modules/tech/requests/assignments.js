@@ -131,6 +131,7 @@ export class Assignments {
 
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
+        this.requests.selectedRequestDetail = this.utils.copyObject(request);
         // this.requests.selectRequestDetailFromId(request._id);
         // this.requests.selectRequestDetail(this.editIndex);
         // this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);

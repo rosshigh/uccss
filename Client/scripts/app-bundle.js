@@ -24465,6 +24465,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.requestSelected = 'form';
 
             this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.requests.selectedRequestDetail = this.utils.copyObject(request);
 
             this.products.selectedProductFromId('5964d133503dd106746c1309');
 
