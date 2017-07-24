@@ -44,8 +44,8 @@
             <td></td>
           </tr>
           <tr>
-            <th class="col-xs-1">No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
-            <th class="col-lg-1">Due <span click.trigger="dataTable.sortArray('requiredDate')"><i class="fa fa-sort"></i></span></th>
+            <th class="col-xs-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requestNo'})">No </span><span><i class="fa fa-sort"></i></span></th>
+            <th class="col-lg-1"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'requiredDate'})">Due </span><span><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Requested <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
             <th show.bind="config.SANDBOX_USED" class="col-lg-1">Type</th>
             <th class="col-lg-1">Status <span click.trigger="dataTable.sortArray('requestStatus', 'id', config.REQUEST_STATUS, 'code', 'description')"><i class="fa fa-sort"></i></span></th>
@@ -54,6 +54,10 @@
             <th class="col-lg-1">Faculty <span click.trigger="dataTable.sortArray('requestId.personId.lastName')"><i class="fa fa-sort"></i></span></th>
             <th class="col-lg-1">Institution <span click.trigger="dataTable.sortArray('requestId.institutionId', 'id', people.institutionsArray, '_id', 'name')"><i class="fa fa-sort"></i></span></th>
             <th style="width:20px;"></th>
+            <!--
+              No <span click.trigger="dataTable.sortArray('requestNo')"><i class="fa fa-sort"></i></span></th>
+              Due <span click.trigger="dataTable.sortArray('requiredDate')"><i class="fa fa-sort"></i></span></th>
+              -->
           </tr>
         </thead>
         <tbody>
