@@ -24452,7 +24452,8 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
             this.requestSelected = 'form';
 
             this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.requests.selectRequestDetail(this.editIndex);
+
+            this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
         };
 
         Assignments.prototype.clientRequired = function clientRequired() {
