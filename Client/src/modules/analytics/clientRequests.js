@@ -327,16 +327,17 @@ export class ClientRequestAnalytics {
         this.productTableSelected = false;
     }
 
-    customProductSorter(sortProperty, sortDirection, sortArray, context){ 
-        sortArray.forEach((item) => {
-          var obj = context.dataTable.findObj(context.products.productsArray, '_id', item.productId);
-          item['sortProperty'] = obj ? obj['name'] : null;
-        })
-
+    customProductSorter(sortProperty, sortDirection, sortArray, context){  
         return sortArray.sort((a, b) => {
-			var result = (a['sortProperty'] < b['sortProperty']) ? -1 : (a['sortProperty'] > b['sortProperty']) ? 1 : 0;
+			var result = (a['productId']['name'] < b['productId']['name']) ? -1 : (a['productId']['name'] > b['productId']['name']) ? 1 : 0;
 			return result * sortDirection;
 		});
-	}
-
+    }
+    
+    customInstitutionSorter(sortProperty, sortDirection, sortArray, context){  
+        return sortArray.sort((a, b) => {
+			var result = (a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
+			return result * sortDirection;
+		});
+    }
 }
