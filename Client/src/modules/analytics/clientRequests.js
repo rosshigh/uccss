@@ -340,4 +340,12 @@ export class ClientRequestAnalytics {
 			return result * sortDirection;
 		});
     }
+
+    customNameFilterValue(value, item, context){
+        return item.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+     customProductFilterValue(value, item, context){
+        return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
 }
