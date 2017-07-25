@@ -44,6 +44,7 @@ export class EditSystem {
             this.config.getSessions()
         ]);
         this.dataTable.updateArray(this.systems.systemsArray);
+        this.clientInterval = this.config.CLIENT_INTERVAL
     }
 
     async refresh() {
@@ -174,7 +175,7 @@ export class EditSystem {
                 });
         }
         this.saveProduct = true;
-        var result = this.systems.generateClients(start, end, this.editClientStatus, this.selectedProduct);
+        var result = this.systems.generateClients(start, end, this.editClientStatus, this.selectedProduct, parseInt(this.clientInterval));
         if (result.error) {
             this.utils.showNotification(result.error);
         } else {

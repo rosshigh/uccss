@@ -65,6 +65,11 @@
 				<select multiple value.bind="systems.selectedSystem.sessions" class="form-control">
 					<option value="${session.session}"  repeat.for="session of config.SESSION_PARAMS">${session.session}</option>
 				</select>
+			</div><div class="col-lg-12">
+				<label for="editTerms" class="form-control-label">Sessions</label>
+				<select multiple value.bind="systems.selectedSystem.sessions" class="form-control">
+					<option value="${session.session}"  repeat.for="session of config.SESSION_PARAMS">${session.session}</option>
+				</select>
 			</div>
 			<div class="col-lg-12 bottomMargin">
 				<label for="editIdsAvailable" class="form-control-label">IDS Available</label>
@@ -111,11 +116,18 @@
 									<option repeat.for="status of config.CLIENT_STATUSES" value="${status.code}">${status.description}</option>
 								</select>
 							</div>
-							<h6 class="col-lg-12">Client interval: ${config.CLIENT_INTERVAL}</h6>
-							<select class="form-control topMargin"  value.bind="selectedProduct">
-								<option value="">Choose a product</option>
-								<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
-							</select>
+							
+								<div class="col-lg-3">
+									<label  class="form-control-label topMargin">Client Interval</label>
+									<input value.bind="clientInterval" id="clientInterval" placeholder="Interval" class="form-control input-sm" type="number" />
+								</div>
+							<div class="col-lg-8">
+								<label  class="form-control-label topMargin">Product</label>
+								<select class="form-control col-lg-8"  value.bind="selectedProduct">
+									<option value="">Choose a product</option>
+									<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
+								</select>
+							</div>
 						</div>
 					</div>
 				</div>
