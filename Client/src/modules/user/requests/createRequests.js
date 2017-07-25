@@ -376,7 +376,6 @@ export class ViewHelpTickets {
       "valFunction":function(context){
         if(context.requestType === "sandboxCourse"){
           return true;
-        // } else if(($("#undergraduates").val() === "" || $("#undergraduates").val() == 0) && ($("#graduates").val() === "" || $("#graduates").val() == 0)){
         } else if(context.requests.selectedRequest.undergradIds == 0 && context.requests.selectedRequest.graduateIds == 0){
           return false;
         } else {
@@ -398,15 +397,6 @@ export class ViewHelpTickets {
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
           if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
-            return false;
-          }
-        }
-        return true;
-      }
-    },{"rule":"custom","message":"Required dates must be after course start date",
-      "valFunction":function(context){
-        for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-          if(!moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isAfter(context.requests.selectedRequest.startDate)){
             return false;
           }
         }

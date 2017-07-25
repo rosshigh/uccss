@@ -21,7 +21,7 @@ export class Assignments {
     roundTo10 = false;
     showAudit = false;
     lastIDidsRemaining = -1;
-    isCheckedAssigned = false;
+    isCheckedAssigned = true;
     title="Tech Staff Client Assignments"
 
     spinnerHTML = "";
@@ -77,7 +77,9 @@ export class Assignments {
              this.setDates(false);
             await this.requests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length){
-              
+                this.requests.requestsDetailsArray.forEach(item => {
+                    if(item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+                })
                 this.dataTable.updateArray(this.requests.requestsDetailsArray);
                   this.filterInAssigned();
             } else {
@@ -1078,11 +1080,11 @@ export class Assignments {
 
 
     filterInAssigned() {
-        // if(this.isCheckedAssigned){
-        //     this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
-        // } else {
+        if(this.isCheckedAssigned){
+            this.dataTable.filterList(this.config.ASSIGNED_REQUEST_CODE, { type: 'custom',  filter: this.statusCustomFilter, compare:'custom'} )
+        } else {
             this.dataTable.updateArray(this.requests.requestsDetailsArray,'requiredDate',-1);
-        // }
+        }
     }
 
     editRequest(index){
@@ -1128,57 +1130,69 @@ export class Assignments {
     
   }
 
-customCourseFilter(value, item, context){
-if(item.requestId.courseId == context.config.SANDBOX_ID && value == context.config.SANDBOX_ID) return true;
-if(item.requestId.courseId != context.config.SANDBOX_ID && value != context.config.SANDBOX_ID) return true;    
-return false;
-}
+// customCourseFilter(value, item, context){
+// if(item.requestId.courseId == context.config.SANDBOX_ID && value == context.config.SANDBOX_ID) return true;
+// if(item.requestId.courseId != context.config.SANDBOX_ID && value != context.config.SANDBOX_ID) return true;    
+// return false;
+// }
 
 customNameFilter(value, item, context){
-var foo = value.toUpperCase();
-for(let i = 0, x = context.people.peopleArray.length; i < x; i++){
-    if(context.people.peopleArray[i]._id == item.requestId.personId) {
-    return context.people.peopleArray[i].fullName.toUpperCase().indexOf(foo) > -1;
-    }
-}
+    return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
 }
 
 statusCustomFilter(value, item, context){
-    return item.requestStatus == value;
+     if(item.requestStatus == value) return false;
+        return true;
 }
 
  institutionCustomFilter(value, item, context){
-    for(let i = 0; i < context.people.institutionsArray.length; i++){
-        if(item.requestId.institutionId == context.people.institutionsArray[i]._id) {
-            return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-        }
-    }
-    return false;
+    return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
 }
 
-customProductNameFilter(value, item, context){
-    for(let i = 0; i < context.products.productsArray.length; i++){
-        if(item.productId._id == context.products.productsArray[i]._id) {
-            return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-        }
+    courseCustomFilter(value, item, context){
+        return item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
-    return false;
-}
 
-customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
-        sortArray.forEach((item) => {
-          var obj = context.dataTable.findObj(context.config.REQUEST_STATUS, 'code', item.requestStatus);
-          item['sortProperty'] = obj ? obj['description'] : null;
-        })
+    customProductNameFilter(value, item, context){
+        for(let i = 0; i < context.products.productsArray.length; i++){
+            if(item.productId._id == context.products.productsArray[i]._id) {
+                return context.products.productsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            }
+        }
+        return false;
+    }
 
+    // customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
+    //     sortArray.forEach((item) => {
+    //         var obj = context.dataTable.findObj(context.config.REQUEST_STATUS, 'code', item.requestStatus);
+    //         item['sortProperty'] = obj ? obj['description'] : null;
+    //     })
+
+    //     return sortArray.sort((a, b) => {
+    //         var result = (a['sortProperty'] < b['sortProperty']) ? -1 : (a['sortProperty'] > b['sortProperty']) ? 1 : 0;
+    //         return result * sortDirection;
+    //     });
+    // }
+
+    customCourseSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
-			var result = (a['sortProperty'] < b['sortProperty']) ? -1 : (a['sortProperty'] > b['sortProperty']) ? 1 : 0;
-			return result * sortDirection;
-		});
-	}
+            var result = (a['requestId']['courseId']['name'] < b['requestId']['courseId']['name']) ? -1 : (a['requestId']['courseId']['name'] > b['requestId']['courseId']['name']) ? 1 : 0;
+            return result * sortDirection;
+        });
+    }
 
-customInstitutionsSorter(){
+    customInstitutionsSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+            var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
+            return result * sortDirection;
+        });
+    }
 
-}
+    customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+            var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
+            return result * sortDirection;
+        });
+    }
 
 }

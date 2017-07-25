@@ -354,11 +354,11 @@ module.exports = function (app, config) {
   })
 
   router.get('/api/uccStaff/:uccRoles', function(req, res, next){
-    logger.log('Getting UCC Staff', 'verbose');
+    logger.log('Getting UCC Staff', 'verbose');  
     let roles = req.params.uccRoles.split(':');
     Model.find({roles: {$in: roles}}).exec()
     .then(people => {    
-      if(people){
+      if(people){      
         var uccPeople = people.filter(item => {
           if(item.institutionId == config.UCC_ID) return true;
         })
