@@ -117,7 +117,7 @@ export default class {
                 },
                 {
                    route: 'techRq',
-                   moduleId: './modules/tech/requests/assignments',
+                   moduleId: './modules/tech/requests/techRequests',
                    name: 'techRq',
                    settings: { auth: true, roles: [] } 
                 },

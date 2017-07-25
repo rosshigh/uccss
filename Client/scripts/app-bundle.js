@@ -526,7 +526,7 @@ define('config/routerConfig',['exports', 'aurelia-framework', 'aurelia-router'],
           settings: { auth: true, roles: [] }
         }, {
           route: 'techRq',
-          moduleId: './modules/tech/requests/assignments',
+          moduleId: './modules/tech/requests/techRequests',
           name: 'techRq',
           settings: { auth: true, roles: [] }
         }, {
@@ -26380,6 +26380,13 @@ define('modules/tech/requests/techRequests',['exports', 'aurelia-framework', 'au
                 nav: true,
                 name: 'createRequest',
                 title: 'Create Request'
+            }, {
+                route: 'clientRequestsAnalytics',
+                moduleId: '../../analytics/clientRequests',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'clientRequests',
+                title: 'Client Requests Analytics'
             }]);
 
             this.router = router;

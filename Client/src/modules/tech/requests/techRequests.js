@@ -37,6 +37,14 @@ export class Customers{
             nav: true,
             name: 'createRequest',
             title: 'Create Request'
+        },
+         {
+            route: 'clientRequestsAnalytics',
+            moduleId: '../../analytics/clientRequests',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'clientRequests',
+            title: 'Client Requests Analytics'
         }
         ]);
 
