@@ -336,7 +336,7 @@ export class ClientRequestAnalytics {
     
     customInstitutionSorter(sortProperty, sortDirection, sortArray, context){  
         return sortArray.sort((a, b) => {
-			var result = (a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
+			var result = (a['name'] < b['name']) ? -1 : (a['name'] > b['name']) ? 1 : 0;
 			return result * sortDirection;
 		});
     }
