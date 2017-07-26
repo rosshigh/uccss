@@ -25996,6 +25996,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                 year = date.getFullYear();
 
                                 this.message = {
+                                    reason: 3,
                                     id: this.requestId,
                                     customerMessage: email.email.emailBody,
                                     toEmail: email.email.emailId,

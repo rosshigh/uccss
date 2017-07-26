@@ -160,7 +160,7 @@ module.exports = function (app) {
           break;
         case 3:
            var context = {
-                      products: req.body.products,
+                      product: req.body.product,
                       requestNo: req.body.clientRequestNo,
                       name: req.body.name,
                     }   

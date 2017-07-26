@@ -1023,9 +1023,9 @@ export class Assignments {
              var date = new Date(this.requiredDate);
             var day = date.getDate();
             var month = date.getMonth() + 1;
-            var year = date.getFullYear();
-            // mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
+            var year = date.getFullYear(); 
             this.message = {
+                reason: 3,
                 id: this.requestId,
                 customerMessage : email.email.emailBody,
                 toEmail: email.email.emailId,
