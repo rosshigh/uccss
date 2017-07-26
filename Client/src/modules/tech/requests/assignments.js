@@ -944,11 +944,12 @@ export class Assignments {
              this.model = 'header';
              this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
              this.requestId = this.profileRequest.requestId._id;
-             if(this.profileRequest.requestId.courseId === this.config.SANDBOX_ID) {
-                 this.course = this.config.SANDBOX_NAME;
-             } else {
-                this.course = this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
-             }
+            //  if(this.profileRequest.requestId.courseId === this.config.SANDBOX_ID) {
+            //      this.course = this.config.SANDBOX_NAME;
+            //  } else {
+                this.course = this.profileRequest.requestId.courseId.name;
+                // this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
+            //  }
              this.productName = undefined;
              this.hideProfile();
          } else {
@@ -956,7 +957,8 @@ export class Assignments {
             this.requestId =  this.selectedRequestDetail._id;
             this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
             this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
-            this.course = this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
+            this.course = this.profileRequest.requestId.courseId.name;
+            // this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
@@ -975,7 +977,6 @@ export class Assignments {
     }
 
     async sendTheEmail(email){
-        // if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
         if(email){
             if(this.model === 'header'){
                 this.requests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
@@ -1087,11 +1088,12 @@ export class Assignments {
         }
     }
 
-    editRequest(index){
+    editRequest(index, request){
        
         this.editIndex = this.dataTable.getOriginalIndex(index);
-        this.requests.selectRequestDetail(this.editIndex);
-        // this.people.selectedPersonFromId(this.selectedRequestDetail.requestId.personId);
+        this.selectedRequestDetail = this.utils.copyObject(request);
+        // this.requests.selectRequestDetail(this.editIndex);
+        // this.people.selectedPersonFromId(this.requests.selectedRequestDetail.requestId.personId);
         this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
         this.editStartDate = this.selectedRequestDetail.requestId.startDate;
         this.originalRequestDetail = this.utils.copyObject(this.selectedRequestDetail);
@@ -1136,18 +1138,18 @@ export class Assignments {
 // return false;
 // }
 
-customNameFilter(value, item, context){
-    return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
-}
+    customNameFilter(value, item, context){
+        return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
 
-statusCustomFilter(value, item, context){
-     if(item.requestStatus == value) return false;
+    statusCustomFilter(value, item, context){
+        if(item.requestStatus == value) return false;
         return true;
-}
+    }
 
- institutionCustomFilter(value, item, context){
-    return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-}
+    institutionCustomFilter(value, item, context){
+        return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
 
     courseCustomFilter(value, item, context){
         return item.requestId.courseId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
