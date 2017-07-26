@@ -1027,7 +1027,7 @@ export class Assignments {
             this.message = {
                 reason: 3,
                 id: this.requestId,
-                customerMessage : email.email.emailBody,
+                customerMessage : email.email.emailBody, 
                 email: email.email.emailId,
                 subject: email.email.emailSubject,
                 clientRequestNo: this.selectedRequestNo,
