@@ -415,7 +415,7 @@ if(env === 'development'){
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-      // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+     
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.ASSIGN_REQUEST = emailConfig.ASSIGN_REQUEST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -445,7 +445,7 @@ if(env === 'development'){
         template: 'client-request-customer-action',
         context: mailObject.context
     };
-console.log(mail)
+
     nodeMailerSendMail(mail)
   }
 
