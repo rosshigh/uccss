@@ -236,6 +236,29 @@ export class ClientRequests {
         return newObj;
     }
 
+    async saveRequestDetail(){
+        if(!this.selectedRequestDetail){
+            return;
+        }
+        let response = await this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
+        if(!response.error){
+            this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
+            return response;
+        }
+    }
+
+    isRequestDetailDirty(obj){
+      if(this.selectedRequestDetail){
+          if(!obj){
+              var obj = this.emptyRequestDetail();
+          }
+            var skip = ['audit'];
+            return this.utils.objectsEqual(this.selectedRequestDetail, obj, skip);
+        }
+        return new Array();
+    }
+
+
     async getClientRequest(id){
          let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + id);
         if (!serverResponse.error) {
