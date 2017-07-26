@@ -502,8 +502,7 @@ if(env === 'development'){
   }
 
   sendBulkEmails = function(mailObject){
-    mailObject.recipients.forEach(item => {
-     
+    mailObject.recipients.forEach(item => { 
       var mail = {
         from: emailConfig.emailAddress,
         to: item.email,
@@ -514,6 +513,19 @@ if(env === 'development'){
       nodeMailerSendMail(mail); 
     })  
 
+  }
+
+  test = function(mailObj){
+    var mail = {
+        from: 'ucc@uwm.edu',
+        to: mailObj.email,
+        cc:  mailObj.cc,
+        subject: 'subject',
+        template: "generic",
+        context: { name: 'name', message: 'message'}
+      }
+      console.log(mail);
+      nodeMailerSendMail(mail);
   }
 
 }

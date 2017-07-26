@@ -162,4 +162,15 @@ module.exports = function (app, config) {
 	router.route('/test/crash').get(function(req, res, next){
 		process.exit(-1) 
 	})
+
+	router.route('/test/email').get(function(req, res, next){
+		  var context = {}            
+          var mailObj = {
+            email: 'hightowe@uwm.edu',
+            cc: 'rhightower@gmail.com',
+            context: context
+          }         
+		  
+          test(mailObj); 
+	})
 }
