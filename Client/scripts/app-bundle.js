@@ -4951,13 +4951,13 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                     break;
                                 }
 
-                                if (!this.userObj.city) {
+                                if (!this.userObj.postalCode) {
                                     _context2.next = 39;
                                     break;
                                 }
 
                                 _context2.next = 33;
-                                return this.siteinfo.getWeather(this.userObj.city);
+                                return this.siteinfo.getWeather(this.userObj.postalCode);
 
                             case 33:
                                 weather = _context2.sent;

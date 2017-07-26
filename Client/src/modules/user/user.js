@@ -53,13 +53,6 @@ export class User {
     };
 
   return t;
-    //   var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
-    //   if(!d.getElementById(id)){
-    //       js=d.createElement(s);
-    //       js.id=id;
-    //       js.src=p+"://platform.twitter.com/widgets.js";
-    //       fjs.parentNode.insertBefore(js,fjs);
-    //     }
   }
 
   async activate(){
@@ -155,8 +148,8 @@ export class User {
     this.temp = undefined;
 
     if(!sessionStorage.getItem('weather')){
-            if(this.userObj.city){
-            let weather = await this.siteinfo.getWeather(this.userObj.city);
+            if(this.userObj.postalCode){
+            let weather = await this.siteinfo.getWeather(this.userObj.postalCode);
             this.temp =  (parseFloat(weather.main.temp) - 273.15);
             if(this.config.TEMP_SCALE == 'C'){
                 this.temp = this.temp.toFixed(1) + "\u00b0 C";

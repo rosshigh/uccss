@@ -327,7 +327,7 @@ module.exports = function (app, config) {
 
   router.get('/api/getWeather/:city', function(req, res, next){
     logger.log("Getting weather for " + req.params.city, 'verbose')
-
+    var city = req.params.city.split(' ').join('%20');
     return http.get({
         host: 'api.openweathermap.org',
         path: '/data/2.5/weather?q=' + req.params.city + '&APPID=0f85bb931f8faad7e35b6f685aa4e931'
