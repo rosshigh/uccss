@@ -25948,7 +25948,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.course = this.profileRequest.requestId.courseId.name;
                 this.productName = this.profileRequest.productId.name;
                 this.requiredDate = this.profileRequest.requiredDate;
-                var _email = { emailBody: "", emailSubject: subject, emailId: this.profileRequest.requestId.personId.email };
+                this.email = this.profileRequest.requestId.personId.email;
                 this.hideProfile();
             } else {
                 this.model = 'detail';
@@ -25957,11 +25957,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
                 this.course = this.selectedRequestDetail.requestId.courseId.name;
                 this.requiredDate = this.selectedRequestDetail.requiredDate;
-                var _email2 = { emailBody: "", emailSubject: subject, emailId: this.selectedRequestDetail.requestId.personId.email };
+                this.email = this.selectedRequestDetail.requestId.personId.email;
             }
 
             var subject = "Question about product request " + this.selectedRequestNo;
-
+            var email = { emailBody: "", emailSubject: subject, emailId: this.email };
             return this.dialog.showEmail("Enter Email", email, ['Submit', 'Cancel']).whenClosed(function (response) {
                 if (!response.wasCancelled) {
                     _this6.sendTheEmail(response.output);

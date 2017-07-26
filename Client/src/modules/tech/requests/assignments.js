@@ -984,7 +984,7 @@ export class Assignments {
             this.course = this.profileRequest.requestId.courseId.name;
             this.productName = this.profileRequest.productId.name;
              this.requiredDate = this.profileRequest.requiredDate;
-            let email = {emailBody: "", emailSubject: subject, emailId: this.profileRequest.requestId.personId.email};
+            this.email = this.profileRequest.requestId.personId.email;
             this.hideProfile();
          } else {
             this.model = 'detail';
@@ -993,11 +993,11 @@ export class Assignments {
             this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
             this.course = this.selectedRequestDetail.requestId.courseId.name;
             this.requiredDate = this.selectedRequestDetail.requiredDate;
-            let email = {emailBody: "", emailSubject: subject, emailId: this.selectedRequestDetail.requestId.personId.email};
+            this.email = this.selectedRequestDetail.requestId.personId.email;
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
-       
+        let email = {emailBody: "", emailSubject: subject, emailId: this.email};
         return this.dialog.showEmail(
                 "Enter Email",
                 email,
