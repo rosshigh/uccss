@@ -318,7 +318,7 @@ if(env === 'development'){
   newCustomer = function(mailObject){
     logger.log("Fac Dev new account email", "verbose");
 
-    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
     mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -327,28 +327,29 @@ if(env === 'development'){
     var mail = {
         from: emailConfig.emailAddress,
         to: mailObject.email,
+        cc: mailObject.cc,
         subject: 'UCCSS account created',
         template: 'new-customer',
         context: mailObject.context
     };
      nodeMailerSendMail(mail);
 
-    if(mailObject.cc) {   
-      var mail = {
-        from: emailConfig.emailAddress,
-        to:  mailObject.cc,
-        subject: 'UCCSS account created',
-        template: 'new-customer',
-        context: mailObject.context
-      };        
-      nodeMailerSendMail(mail) ;
-    }
+    // if(mailObject.cc) {   
+    //   var mail = {
+    //     from: emailConfig.emailAddress,
+    //     to:  mailObject.cc,
+    //     subject: 'UCCSS account created',
+    //     template: 'new-customer',
+    //     context: mailObject.context
+    //   };        
+    //   nodeMailerSendMail(mail) ;
+    // }
   }
 
   helpTicketCreated = function(mailObject){
       logger.log("Help Ticket Created email", "verbose");
 
-      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
@@ -356,6 +357,7 @@ if(env === 'development'){
       var mail = {
         from: emailConfig.emailAddress,
         to: toEmail,
+        cc: mailObject.cc,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
         context: mailObject.context
@@ -363,17 +365,17 @@ if(env === 'development'){
 
       nodeMailerSendMail(mail)  
 
-      if(mail.cc) {       
-        mail.template = 'help-ticket-staff-created',
-        mail.to = mail.cc;      
-        nodeMailerSendMail(mail)  
-      }
+      // if(mail.cc) {       
+      //   mail.template = 'help-ticket-staff-created',
+      //   mail.to = mail.cc;      
+      //   nodeMailerSendMail(mail)  
+      // }
   }
 
   helpTicketUpdated = function(mailObject){
       logger.log("Help Ticket Update email", "verbose");
       
-      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.HOST = emailConfig.HOST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -382,6 +384,7 @@ if(env === 'development'){
       var mail = {
           from: emailConfig.emailAddress,
           to: toEmail,
+          cc: mailObject.cc,
           subject: 'Help Ticket Updated',
           template: 'help-ticket-updated',
           context: mailObject.context
@@ -392,7 +395,7 @@ if(env === 'development'){
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
-    var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.HOST = emailConfig.HOST;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -401,6 +404,7 @@ if(env === 'development'){
      var mail = {
           from: emailConfig.emailAddress,
           to: toEmail,
+          cc: mailObject.cc,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
           context: mailObject.context
@@ -411,7 +415,7 @@ if(env === 'development'){
 
   requestCreated = function(mailObject){
      logger.log("Request Created email", "verbose");
-      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -419,6 +423,7 @@ if(env === 'development'){
       var mail = {
             from: emailConfig.emailAddress,
             to: toEmail,
+            cc: mailObject.cc,
             subject: 'Product Request Created',
             template: 'client-request-created',
             context: mailObject.context
@@ -429,7 +434,7 @@ if(env === 'development'){
 
   requestUpdated = function(mailObject){
     logger.log("Request Update email", "verbose");
-      var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+      // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
       mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -437,6 +442,7 @@ if(env === 'development'){
       var mail = {
           from: emailConfig.emailAddress,
           to: toEmail,
+          cc: mailObject.cc,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
           context: mailObject.context
@@ -460,7 +466,6 @@ if(env === 'development'){
 
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");  
-    // return new Promise(function(resolve, reject) {
       var mail = {
           from: emailConfig.emailAddress,
           to: mailObject.email,
@@ -468,15 +473,7 @@ if(env === 'development'){
           template: 'generic',
           context: mailObject.context
       };
-      nodeMailerSendMail(mail)
-    //   .then(result => {      
-    //         if (result.rejected.length === 0) {     
-    //           resolve(result);
-    //         } else {
-    //           reject(Error(result));
-    //         }
-    //     })
-    // });      
+      nodeMailerSendMail(mail)    
   }
 
   annualUpdateContactInfo = function(mailObject){
