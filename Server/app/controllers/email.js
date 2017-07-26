@@ -477,7 +477,7 @@ if(env === 'development'){
   }
 
   annualUpdateContactInfo = function(mailObject){
-     logger.log("Update Contact Info email", "verbose");   
+     logger.log("Update Contact Info email", "verbose");    
   }
 
   passwordReset = function(mailObject){
