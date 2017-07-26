@@ -446,7 +446,7 @@ export class ViewHelpTickets {
         this.products.selectedProductFromId(detail.productId);
         var date = new Date(detail.requiredDate);
         var day = date.getDate();
-        var month = date.getMonth();
+        var month = date.getMonth() + 1;
         var year = date.getFullYear();
         mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
       });
