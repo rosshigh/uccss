@@ -25955,7 +25955,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.requestId = this.selectedRequestDetail._id;
                 this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
                 this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
-                this.course = this.profileRequest.requestId.courseId.name;
+                this.course = this.selectedRequestDetail.requestId.courseId.name;
             }
 
             var subject = "Question about product request " + this.selectedRequestNo;

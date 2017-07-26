@@ -994,7 +994,7 @@ export class Assignments {
             this.requestId =  this.selectedRequestDetail._id;
             this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
             this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
-            this.course = this.profileRequest.requestId.courseId.name;
+            this.course = this.selectedRequestDetail.requestId.courseId.name;
             // this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
          }  
             
