@@ -129,7 +129,7 @@ export class ViewHelpTickets {
             "Enter Email",
             email,
             ['Submit', 'Cancel']
-        ).then(response => {
+        ).whenClosed(response => {
             if (!response.wasCancelled) {
                 this.sendTheEmail(response.output);
             } else {
@@ -482,7 +482,7 @@ export class ViewHelpTickets {
                 "Save Changes",
                 note,
                 ['Submit', 'Cancel']
-            ).then(response => {
+            ).whenClosed(response => {
                 if (!response.wasCancelled) {
                     this.saveNote(response.output);
                 } else {
@@ -513,7 +513,7 @@ export class ViewHelpTickets {
             that.message,
             "Save Changes",
             ['Yes', 'No']
-        ).then(response => {
+        ).whenClosed(response => {
             if (!response.wasCancelled) {
                 this.save(changes);
             } else {
@@ -591,7 +591,7 @@ export class ViewHelpTickets {
               "Select Document",
               document,
               ['Submit', 'Cancel']
-          ).then(response => {
+          ).whenClosed(response => {
               if (!response.wasCancelled) {
                 this.helpTickets.selectedHelpTicketContent.documents = this.helpTickets.selectedHelpTicketContent.documents ? this.helpTickets.selectedHelpTicketContent.documents : new Array();
                 response.output.documents.documents.forEach(item => {
