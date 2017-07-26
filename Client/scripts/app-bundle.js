@@ -25946,7 +25946,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
                 this.requestId = this.profileRequest.requestId._id;
                 this.course = this.profileRequest.requestId.courseId.name;
-                this.productName = this.profileRequest.requestId.productId.name;
+                this.productName = this.profileRequest.productId.name;
                 this.requiredDate = this.profileRequest.requiredDate;
                 this.hideProfile();
             } else {
