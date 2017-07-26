@@ -445,8 +445,8 @@ if(env === 'development'){
         template: 'client-request-customer-action',
         context: mailObject.context
     };
-console.log(mail)
-    // nodeMailerSendMail(mail)
+
+    nodeMailerSendMail(mail)
   }
 
   genericEmail = function(mailObject){

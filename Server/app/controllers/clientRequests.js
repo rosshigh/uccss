@@ -167,7 +167,7 @@ module.exports = function (app) {
             email: req.body.email,
             context: context 
           }            
-console.log(mailObj)                                 
+                              
           customerAction(mailObj);
           break;
        }
