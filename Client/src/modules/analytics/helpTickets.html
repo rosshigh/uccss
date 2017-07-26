@@ -1,3 +1,39 @@
 <template>
-    <h1>Help Tickets</h1>
+    <div class="col-lg-2">
+		<h4>Categories</h4>
+		<div>
+			<ul class="list-group">
+				<button click.trigger="typeChanged(category, $event)" type="button"  repeat.for="category of categories"
+					id="${category.code}" class="${$first ? 'list-group-item active categoryButtons' : 'list-group-item categoryButtons'}">${category.description}</button>
+			</ul>
+		</div>
+	</div>
+
+    <div class="panel panel-default rightMargin leftMargin col-lg-9">
+      <div class="panel-body">
+            <div class="row">
+      <!-- Session Select -->
+      <div class="col-lg-4">
+        <div class="form-group topMargin leftMargin">
+            <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
+              <option value="">Select a session</option>
+              <option value="all">All Sessions</option>
+              <option repeat.for="session of sessions.sessionsArray"
+                      value.bind="session._id">Session ${session.session} - ${session.year}</option>
+            </select>
+        </div>
+      </div>
+    </div>
+        <div class="row">
+            <div show.bind="selectedCategory.code === 0">
+                <compose view="./components/helpTicketsByType.html"></compose>
+            </div>
+             <div show.bind="selectedCategory.code === 1">
+                <compose view="./components/helpTicketsByProducts.html"></compose>
+            </div>
+            <div show.bind="selectedCategory.code === 1">
+                <compose view="./components/helpTicketsByInstitution.html"></compose>
+            </div>
+        </div> 
+      </div> 
 </template>

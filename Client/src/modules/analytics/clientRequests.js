@@ -41,26 +41,23 @@ export class ClientRequestAnalytics {
         this.products = products;
         this.requests = requests;
         this.systems = systems;
+
+        this.userObj = JSON.parse(sessionStorage.getItem('user'));
     };
 
     attached() {
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    canActivate() {
-        this.userObj = JSON.parse(sessionStorage.getItem('user'));
-    }
-
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
-            this.people.getPeopleArray('?order=lastName'),
+            // this.people.getPeopleArray('?order=lastName'),
             this.people.getInstitutionsArray('?order=name'),
-            this.products.getProductsArray('?order=name'),
-            this.systems.getSystemsArray(),
+            // this.products.getProductsArray('?order=name'),
+            // this.systems.getSystemsArray(),
             this.config.getConfig()
         ]);
-        // this.dataTable.updateArray(this.requests.requestsDetailsArray);
         this.selectedCategory = this.categories[0];
         this.getInstitutionRequests();
         this.getProductsRequests();
@@ -135,7 +132,6 @@ export class ClientRequestAnalytics {
             data[4].push(item["5"]);
             data[5].push(item["6"]);
             data[6].push(item["7"]);
-            // data[7].push(item['total']);
             categories.push(item.name); 
         });
 

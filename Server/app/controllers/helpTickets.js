@@ -34,6 +34,24 @@ module.exports = function (app, config) {
     })
   });
 
+  router.get('/api/helpTickets/analytics', requireAuth, function(req, res, next){
+    writeLog.log('Get helpTicket','verbose');
+    var query = buildQuery(req.query, Model.find())
+    .populate('courseId', 'name number')
+    .populate('requestId')
+    .populate('personId','email firstName lastName phone mobile nickName file')
+    .populate('institutionId', 'name')
+    .populate('owner.personId', 'firstName lastName _id')
+    .populate({ path: 'productId', model: 'Product', select: 'name'})
+    query.exec()
+    .then(object => {
+      res.status(200).json(object);
+    })
+    .catch(error => {
+       return next(error);
+    })
+  });
+
   router.get('/api/helpTickets/current',requireAuth,  function(req, res, next){
     writeLog.log('Get helpTicket', 'verbose');
     Model.find( { $or:[ {'helpTicketStatus':1}, {'helpTicketStatus':2}, {'helpTicketStatus':3} ]})
