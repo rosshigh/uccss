@@ -10,7 +10,7 @@ export class ClientRequests {
   CLIENT_REQUEST_DETAILS='clientRequestsDetails';
   CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
   CUSTOMER_ACTION = 'clientRequests/customerAction';
-  CLIENT_REQIEST_EMAIL = "clientRequests/sendMail";
+  CLIENT_REQUEST_EMAIL = "clientRequests/sendMail";
 
     constructor(data, utils, config) {
         this.data = data;
@@ -196,6 +196,9 @@ export class ClientRequests {
         var url = email ? this.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.CLIENT_REQUESTS_SERVICES + '/assign';
          var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
         if(!serverResponse.error){
+            if(email.email){
+                this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+            }
             if(this.requestsArray && this.editRequestIndex){
                 this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
             }
@@ -257,7 +260,6 @@ export class ClientRequests {
         }
         return new Array();
     }
-
 
     async getClientRequest(id){
          let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + id);

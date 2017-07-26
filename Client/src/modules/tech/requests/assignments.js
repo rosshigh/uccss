@@ -664,7 +664,8 @@ export class Assignments {
         if (this.validation.validate(1, this)) {
             if(this._buildRequest()){
                 this.requests.setSelectedRequest(this.requestToSave);
-                let email = this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
+                // let email = this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
+                var email = this._buildEmailObject();
                 let serverResponse = await this.requests.assignRequest(email);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");
@@ -674,6 +675,41 @@ export class Assignments {
             }
         }
     }
+
+     _buildEmailObject(){
+        var mailObject = new Object();
+        if(this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail){
+            mailObject.reason = 2;
+            mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
+            mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName; 
+            mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
+            mailObject.email = this.selectedRequestDetail.requestId.personId.email; 
+            mailObject.product = [this.selectedRequestDetail.productId.name];
+            mailObject.course = this.selectedRequestDetail.productId.name;
+            mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
+            mailObject.message = "Your product request has been updated."
+        }
+        console.log(mailObject)
+        // if(this.config.SEND_EMAILS) {
+        // mailObject.products = new Array();
+        // this.requests.selectedRequest.requestDetails.forEach((detail, index) => {
+        //     this.products.selectedProductFromId(detail.productId);
+        //     var date = new Date(detail.requiredDate);
+        //     var day = date.getDate();
+        //     var month = date.getMonth() + 1;
+        //     var year = date.getFullYear();
+        //     mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
+        // });
+
+        // mailObject.comments = this.requests.selectedRequest.comments;
+        // mailObject.name = this.userObj.fullName;
+        // mailObject.numStudents =  parseInt(this.requests.selectedRequest.undergradIds) + parseInt(this.requests.selectedRequest.graduateIds);
+        // mailObject.email = this.userObj.email
+        // mailObject.cc = this.config.REQUESTS_EMAIL_LIST ? this.config.REQUESTS_EMAIL_LIST : "";
+        // }
+		
+		return mailObject;
+	}
 
     /*****************************************************************************************************
      * Build the data objects to send to the server 

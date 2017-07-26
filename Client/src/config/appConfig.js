@@ -408,6 +408,7 @@ export class AppConfig {
         this.HOME_PAGE_RIGHT = this.getParameter('HOME_PAGE_RIGHT');
         this.UCC_PARALLAX_LOGO = this.getParameter('UCC_PARALLAX_LOGO');
         this.NAVBAR_LOGO = this.getParameter('NAVBAR_LOGO');
+        this.PRODUCT_REQUESTS_EMAIL_LIST = this.getParameter('PRODUCT_REQUESTS_EMAIL_LIST');
 
     }
 

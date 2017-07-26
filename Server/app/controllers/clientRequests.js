@@ -134,7 +134,8 @@ module.exports = function (app) {
                       products: req.body.products,
                       numStudents: req.body.numStudents,
                       requestNo: req.body.clientRequestNo,
-                      comments: req.body.comments
+                      comments: req.body.comments,
+                      name: req.body.fullName
                     }   
           var mailObj = {
             email: req.body.email,
@@ -143,13 +144,12 @@ module.exports = function (app) {
           }                                     
           requestCreated(mailObj);
           break;
-        case 2:
+        case 2: //request Updated
           var context = {
-                      products: req.body.products,
-                      numStudents: req.body.numStudents,
-                      requestNo: req.body.clientRequestNo,
+                      products: req.body.product,
+                      requestNo: req.body.requestNo,
                       name: req.body.name,
-                      comments: req.body.comments
+                      numStudents: req.body.numStudents
                     }   
           var mailObj = {
             email: req.body.email,
@@ -192,30 +192,30 @@ module.exports = function (app) {
                 if(error){
                   return next(error);
                 } else { 
-                  if(req.query.email == 1 && request._id){
-                    var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
-                      .then(requestResult => {  
-                        Person.findById(requestResult.personId, function(error, person){
-                          if(error){
-                            return next(error);
-                          } else {
-                            if(person){
-                              var mailObj = {
-                                email: person.email,
-                                context: request
-                              }                    
-                              requestUpdated(mailObj) 
-                            }
-                            res.status(200).json(requestResult);                                
-                          }           
-                        })
-                      })
-                      .catch(error => { //Promise
-                        return next(error);
-                      }) 
-                  } else {
+                  // if(req.query.email == 1 && request._id){
+                  //   var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
+                  //     .then(requestResult => {  
+                  //       Person.findById(requestResult.personId, function(error, person){
+                  //         if(error){
+                  //           return next(error);
+                  //         } else {
+                  //           if(person){
+                  //             var mailObj = {
+                  //               email: person.email,
+                  //               context: request
+                  //             }                    
+                  //             requestUpdated(mailObj) 
+                  //           }
+                  //           res.status(200).json(requestResult);                                
+                  //         }           
+                  //       })
+                  //     })
+                  //     .catch(error => { //Promise
+                  //       return next(error);
+                  //     }) 
+                  // } else {
                     res.status(200).json(request);
-                  }
+                  // }
                 }
           })
         })
@@ -609,6 +609,7 @@ module.exports = function (app) {
 				});
 
   });
+
 };
 
   function updateRequest(clientRequest, req, res, next){

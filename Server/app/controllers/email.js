@@ -395,7 +395,7 @@ if(env === 'development'){
 
   helpTicketClosed = function(mailObject){
     logger.log("Help Ticket Closed email", "verbose");
-    // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
+    
     mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
     mailObject.context.HOST = emailConfig.HOST;
     mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
@@ -436,7 +436,7 @@ if(env === 'development'){
     logger.log("Request Update email", "verbose");
       // var toEmail = mailObject.cc ? mailObject.email + ',' + mailObject.cc : mailObject.email;
       mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
-      mailObject.context.CREATE_REQUEST_WHATS_NEXT = emailConfig.CREATE_REQUEST_WHATS_NEXT;
+      mailObject.context.ASSIGN_REQUEST = emailConfig.ASSIGN_REQUEST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
@@ -453,6 +453,10 @@ if(env === 'development'){
 
   customerAction = function(mailObject){
     logger.log("Customer Action email", "verbose");
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.topMessage = "We need some additional information in order to fulfill your request"
     var mail = {
         from: emailConfig.emailAddress,
         to: mailObject.email,

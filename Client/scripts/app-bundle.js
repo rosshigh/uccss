@@ -395,6 +395,7 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
             this.HOME_PAGE_RIGHT = this.getParameter('HOME_PAGE_RIGHT');
             this.UCC_PARALLAX_LOGO = this.getParameter('UCC_PARALLAX_LOGO');
             this.NAVBAR_LOGO = this.getParameter('NAVBAR_LOGO');
+            this.PRODUCT_REQUESTS_EMAIL_LIST = this.getParameter('PRODUCT_REQUESTS_EMAIL_LIST');
         };
 
         AppConfig.prototype.getParameter = function getParameter(parameter) {
@@ -5908,7 +5909,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             this.CLIENT_REQUEST_DETAILS = 'clientRequestsDetails';
             this.CLIENT_REQUEST_LOCK_SERVICES = 'clientRequestLocks';
             this.CUSTOMER_ACTION = 'clientRequests/customerAction';
-            this.CLIENT_REQIEST_EMAIL = "clientRequests/sendMail";
+            this.CLIENT_REQUEST_EMAIL = "clientRequests/sendMail";
 
             this.data = data;
             this.utils = utils;
@@ -6341,6 +6342,9 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 serverResponse = _context8.sent;
 
                                 if (!serverResponse.error) {
+                                    if (email.email) {
+                                        this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                                    }
                                     if (this.requestsArray && this.editRequestIndex) {
                                         this.requestsArray[this.editRequestIndex] = this.utils.copyObject(this.selectedRequest);
                                     }
@@ -25583,7 +25587,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                 }
 
                                 this.requests.setSelectedRequest(this.requestToSave);
-                                email = this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail;
+                                email = this._buildEmailObject();
                                 _context7.next = 6;
                                 return this.requests.assignRequest(email);
 
@@ -25616,6 +25620,25 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
             return save;
         }();
+
+        Assignments.prototype._buildEmailObject = function _buildEmailObject() {
+            var mailObject = new Object();
+            if (this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail) {
+                mailObject.reason = 2;
+                mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
+                mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName;
+                mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
+                mailObject.email = this.selectedRequestDetail.requestId.personId.email;
+                mailObject.product = [this.selectedRequestDetail.productId.name];
+                mailObject.course = this.selectedRequestDetail.productId.name;
+                mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
+                mailObject.message = "Your product request has been updated.";
+            }
+            console.log(mailObject);
+
+
+            return mailObject;
+        };
 
         Assignments.prototype._buildRequest = function _buildRequest() {
             if (this.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE) {
