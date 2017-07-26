@@ -18,8 +18,8 @@
             <form class="form-horizontal topMargin">
                 <div class="row">
                     <div class="col-lg-1">
-                         <div if.bind="profileHelpTicket.personId.file.fileName" class="topMargin">
-                            <img class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${people.selectedPerson.file.fileName}" height="100">
+                         <div  class="topMargin">
+                            <img if.bind="profileHelpTicket.personId.file.fileName" class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${people.selectedPerson.file.fileName}" height="100">
                         </div>
                         <div if.bind="!profileHelpTicket.personId.file.fileName" style="height:100px;width:100px;" innerhtml.bind="people.selectedPerson.email | gravatarUrl:100:6"></div>
                     </div>

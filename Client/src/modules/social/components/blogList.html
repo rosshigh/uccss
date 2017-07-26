@@ -1,8 +1,8 @@
 <template>
 	<ul>
 		<li show.bind="blog.active" class="list-group-item" style="margin-top:5px;" repeat.for="blog of social.blogArray">
-		<div class="media-left" if.bind="blog.personId.file.fileName">
-			<img class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${blog.personId.file.fileName}" height="100">
+		<div class="media-left">
+			<img  if.bind="blog.personId.file.fileName" class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${blog.personId.file.fileName}" height="100">
 		</div>
 		<div  class="media-left" if.bind="!blog.personId.file.fileName" style="height:100px;width:100px;" innerhtml.bind="blog.personId.email | gravatarUrl:100:6"></div>
 			<div class="media-body">

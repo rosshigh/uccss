@@ -14,8 +14,8 @@
 			<span click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom"
 				title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>		
 		</div>
-		<div class="media-left" if.bind="social.selectedBlog.personId.file.fileName">
-			<img class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${social.selectedBlog.personId.file.fileName}" height="100">
+		<div class="media-left" >
+			<img if.bind="social.selectedBlog.personId.file.fileName" class="circular--square leftMargin" src ="${config.PERSON_IMAGE_DOWNLOAD_URL}/${social.selectedBlog.personId.file.fileName}" height="100">
 		</div>
 		<div if.bind="!social.selectedBlog.personId.file.fileName" class="col-lg-2 topMargin" innerhtml='${social.selectedBlog.personId.email | gravatarUrl:100:1}'></div>
 		<div class="col-lg-10">
