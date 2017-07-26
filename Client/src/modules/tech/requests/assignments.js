@@ -983,7 +983,7 @@ export class Assignments {
             this.requestId = this.profileRequest.requestId._id;
             this.course = this.profileRequest.requestId.courseId.name;
             this.productName = this.profileRequest.productId.name;
-             this.requiredDate = this.profileRequest.requiredDate;
+            this.requiredDate = this.profileRequest.requiredDate;
             this.email = this.profileRequest.requestId.personId.email;
             this.hideProfile();
          } else {
@@ -1028,7 +1028,7 @@ export class Assignments {
                 reason: 3,
                 id: this.requestId,
                 customerMessage : email.email.emailBody,
-                toEmail: email.email.emailId,
+                email: email.email.emailId,
                 subject: email.email.emailSubject,
                 clientRequestNo: this.selectedRequestNo,
                 product: [{name: this.productName, requiredDate: month + "/" + day + "/" + year}],

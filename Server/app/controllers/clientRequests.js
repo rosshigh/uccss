@@ -165,7 +165,6 @@ module.exports = function (app) {
                     }   
           var mailObj = {
             email: req.body.email,
-            cc: req.body.cc,
             context: context 
           }            
                                  

@@ -25999,7 +25999,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                     reason: 3,
                                     id: this.requestId,
                                     customerMessage: email.email.emailBody,
-                                    toEmail: email.email.emailId,
+                                    email: email.email.emailId,
                                     subject: email.email.emailSubject,
                                     clientRequestNo: this.selectedRequestNo,
                                     product: [{ name: this.productName, requiredDate: month + "/" + day + "/" + year }],
