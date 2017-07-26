@@ -139,7 +139,7 @@ export class Assignments {
         }
         
         this.clientRequired();
-        this.selectedSystem = this.products.selectedProduct.systems[0].systemId ? this.products.selectedProduct.systems[0].systemId : undefined;
+        this.selectedSystem = this.products.selectedProduct.systems[0].systemId && this.products.selectedProduct.systems.length > 0 ? this.products.selectedProduct.systems[0].systemId : undefined;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -999,7 +999,7 @@ export class Assignments {
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
-        let email = {emailBody: "", emailSubject: subject, emailId: this.profileRequest.requestId.personId.email};
+        let email = {emailBody: "", emailSubject: subject, emailId: this.selectedRequestDetail.requestId.personId.email};
         return this.dialog.showEmail(
                 "Enter Email",
                 email,
