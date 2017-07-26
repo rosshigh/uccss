@@ -161,15 +161,15 @@ module.exports = function (app) {
         case 3:
            var context = {
                       product: req.body.product,
-                      requestNo: req.body.clientRequestNo,
-                      name: req.body.name,
+                      requestNo: req.body.clientRequestNo
                     }   
           var mailObj = {
             email: req.body.email,
             cc: req.body.cc,
             context: context 
-          }                                     
-          requestDeleted(mailObj);
+          }            
+                                 
+          customerAction(mailObj);
           break;
        }
     }

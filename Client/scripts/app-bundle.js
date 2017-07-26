@@ -6558,7 +6558,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                         switch (_context12.prev = _context12.next) {
                             case 0:
                                 _context12.next = 2;
-                                return this.data.saveObject(message, this.CUSTOMER_ACTION, "put");
+                                return this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
 
                             case 2:
                                 serverResponse = _context12.sent;

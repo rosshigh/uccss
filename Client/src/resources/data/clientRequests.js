@@ -302,7 +302,7 @@ export class ClientRequests {
     }
 
     async sendCustomerMessage(message){
-        var serverResponse = await this.data.saveObject(message, this.CUSTOMER_ACTION, "put");
+        var serverResponse = await this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
         return serverResponse;
     }
 
