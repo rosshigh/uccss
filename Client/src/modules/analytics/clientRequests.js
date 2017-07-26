@@ -94,6 +94,23 @@ export class ClientRequestAnalytics {
             await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.requests.groupRequestsByInstitution();
+                this.totalsInstitutionArray = new Array();
+                this.config.REQUEST_STATUS.forEach(item => {
+                    this.totalsInstitutionArray.push(0);
+                });
+                this.totalsInstitutionArray.push(0);
+                this.requests.analyticsInstitutionResultArray.forEach(item => {
+                    this.totalsInstitutionArray[0] += item['total'];
+                    this.totalsInstitutionArray[1] += item[1];
+                    this.totalsInstitutionArray[2] += item[2];
+                    this.totalsInstitutionArray[3] += item[3];
+                    this.totalsInstitutionArray[4] += item[4];
+                    this.totalsInstitutionArray[5] += item[5];
+                    this.totalsInstitutionArray[6] += item[6];
+                    this.totalsInstitutionArray[7] += item[7];
+                    
+                });
+
                 this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
                 this.institutionChartDataFunction();
             } else {

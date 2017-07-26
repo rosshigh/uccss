@@ -43,12 +43,12 @@
           <div class="form-group">
             <h5 class="panel-title">ITS: ${systems.selectedSystem.its}</h3>
           </div>
-          <label class="topMargin">Helpful Documents</label>
+          <label show.bind="products.selectedProduct.documents && products.selectedProduct.documents.length > 0" class="topMargin">Helpful Documents</label>
           <div class="list-group">
-            <a  repeat.for="document of products.selectedProduct.documents" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}"  target="_blank">${document.fileName}</a>
+            <a repeat.for="document of products.selectedProduct.documents" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}"  target="_blank">${document.fileName}</a>
           </div>
-          <label class="topMargin">Assignment Comments</label>
-          <div class="col-lg-12 topMargin" innerhtml.bind="requests.selectedRequestDetail.techComments"></div>
+          <label show.bind="requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0" class="topMargin">Assignment Comments</label>
+          <div class="col-lg-12 topMargin well" innerhtml.bind="requests.selectedRequestDetail.techComments"></div>
         </div>
       </div>
     </div>
