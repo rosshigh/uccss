@@ -978,24 +978,20 @@ export class Assignments {
 
     customerActionDialog(){
          if(this.profileRequest){
-             this.model = 'header';
-             this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
-             this.requestId = this.profileRequest.requestId._id;
-            //  if(this.profileRequest.requestId.courseId === this.config.SANDBOX_ID) {
-            //      this.course = this.config.SANDBOX_NAME;
-            //  } else {
-                this.course = this.profileRequest.requestId.courseId.name;
-                // this.utils.lookupValue(this.profileRequest.requestId.courseId, this.people.coursesArray, '_id', 'number');
-            //  }
-             this.productName = undefined;
-             this.hideProfile();
+            this.model = 'header';
+            this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
+            this.requestId = this.profileRequest.requestId._id;
+            this.course = this.profileRequest.requestId.courseId.name;
+            this.productName = this.profileRequest.requestId.productId.name;
+             this.requiredDate = this.profileRequest.requiredDate;
+            this.hideProfile();
          } else {
             this.model = 'detail';
             this.requestId =  this.selectedRequestDetail._id;
-            this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
+            this.productName = this.selectedRequestDetail.productId.name;
             this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
             this.course = this.selectedRequestDetail.requestId.courseId.name;
-            // this.utils.lookupValue(this.selectedRequestDetail.requestId.courseId, this.people.coursesArray, '_id', 'number');
+            this.requiredDate = this.selectedRequestDetail.requiredDate;
          }  
             
         let subject = "Question about product request " +  this.selectedRequestNo;
@@ -1022,13 +1018,18 @@ export class Assignments {
             }
             
             this.filterInAssigned();
+             var date = new Date(this.requiredDate);
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            // mailObject.products.push({id: detail.productId, requiredDate: month + "/" + day + "/" + year, name: this.products.selectedProduct.name})    
             this.message = {
                 id: this.requestId,
                 customerMessage : email.email.emailBody,
                 toEmail: email.email.emailId,
                 subject: email.email.emailSubject,
                 clientRequestNo: this.selectedRequestNo,
-                product: this.productName,
+                product: [{name: this.productName, requiredDate: month + "/" + day + "/" + year}],
                 session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
                 course: this.course,
                 requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,

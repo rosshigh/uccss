@@ -25945,17 +25945,17 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 this.model = 'header';
                 this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
                 this.requestId = this.profileRequest.requestId._id;
-
                 this.course = this.profileRequest.requestId.courseId.name;
-
-                this.productName = undefined;
+                this.productName = this.profileRequest.requestId.productId.name;
+                this.requiredDate = this.profileRequest.requiredDate;
                 this.hideProfile();
             } else {
                 this.model = 'detail';
                 this.requestId = this.selectedRequestDetail._id;
-                this.productName = this.utils.lookupValue(this.selectedRequestDetail.productId._id, this.products.productsArray, '_id', 'name');
+                this.productName = this.selectedRequestDetail.productId.name;
                 this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
                 this.course = this.selectedRequestDetail.requestId.courseId.name;
+                this.requiredDate = this.selectedRequestDetail.requiredDate;
             }
 
             var subject = "Question about product request " + this.selectedRequestNo;
@@ -25971,13 +25971,13 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
         Assignments.prototype.sendTheEmail = function () {
             var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email) {
-                var serverResponse;
+                var date, day, month, year, serverResponse;
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                         switch (_context10.prev = _context10.next) {
                             case 0:
                                 if (!email) {
-                                    _context10.next = 8;
+                                    _context10.next = 12;
                                     break;
                                 }
 
@@ -25988,13 +25988,18 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                 }
 
                                 this.filterInAssigned();
+                                date = new Date(this.requiredDate);
+                                day = date.getDate();
+                                month = date.getMonth() + 1;
+                                year = date.getFullYear();
+
                                 this.message = {
                                     id: this.requestId,
                                     customerMessage: email.email.emailBody,
                                     toEmail: email.email.emailId,
                                     subject: email.email.emailSubject,
                                     clientRequestNo: this.selectedRequestNo,
-                                    product: this.productName,
+                                    product: [{ name: this.productName, requiredDate: month + "/" + day + "/" + year }],
                                     session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
                                     course: this.course,
                                     requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
@@ -26006,17 +26011,17 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                         personId: this.userObj._id
                                     }
                                 };
-                                _context10.next = 6;
+                                _context10.next = 10;
                                 return this.requests.sendCustomerMessage(this.message);
 
-                            case 6:
+                            case 10:
                                 serverResponse = _context10.sent;
 
                                 if (!serverResponse.error) {
                                     this.utils.showNotification("The message was sent");
                                 }
 
-                            case 8:
+                            case 12:
                             case 'end':
                                 return _context10.stop();
                         }
