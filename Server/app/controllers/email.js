@@ -356,7 +356,7 @@ if(env === 'development'){
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
         from: emailConfig.emailAddress,
-        to: toEmail,
+        to: mailObject.email,
         cc: mailObject.cc,
         subject: 'Help Ticket Created',
         template: 'help-ticket-created',
@@ -383,7 +383,7 @@ if(env === 'development'){
       mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
       var mail = {
           from: emailConfig.emailAddress,
-          to: toEmail,
+          to: mailObject.email,
           cc: mailObject.cc,
           subject: 'Help Ticket Updated',
           template: 'help-ticket-updated',
@@ -403,7 +403,7 @@ if(env === 'development'){
     mailObject.context.UCCSS_NAME = emailConfig.UCCSS_NAME;
      var mail = {
           from: emailConfig.emailAddress,
-          to: toEmail,
+          to: mailObject.email,
           cc: mailObject.cc,
           subject: 'Help Ticket Closed',
           template: 'help-ticket-closed',
@@ -422,7 +422,7 @@ if(env === 'development'){
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
             from: emailConfig.emailAddress,
-            to: toEmail,
+            to:  mailObject.email,
             cc: mailObject.cc,
             subject: 'Product Request Created',
             template: 'client-request-created',
@@ -441,7 +441,7 @@ if(env === 'development'){
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
       var mail = {
           from: emailConfig.emailAddress,
-          to: toEmail,
+          to: mailObject.email,
           cc: mailObject.cc,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
