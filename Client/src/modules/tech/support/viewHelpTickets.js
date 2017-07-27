@@ -396,6 +396,7 @@ export class ViewHelpTickets {
   }
 
   async ownHelpTicket(helpTicket) {
+    return;
     if(helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
@@ -427,6 +428,7 @@ export class ViewHelpTickets {
   }
 
   async changeStatus(helpTicket, status, description){
+    return;
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
