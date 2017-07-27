@@ -647,6 +647,7 @@ export class Assignments {
     }
 
     async deleteRequest() {
+        this.requests.setSelectedRequest(this.selectedRequestDetail);
         let serverResponse = await this.requests.deleteRequest();
         if (!serverResponse.error) {
             this.filterInAssigned()

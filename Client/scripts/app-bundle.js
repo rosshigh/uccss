@@ -25599,10 +25599,11 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                _context6.next = 2;
+                                this.requests.setSelectedRequest(this.selectedRequestDetail);
+                                _context6.next = 3;
                                 return this.requests.deleteRequest();
 
-                            case 2:
+                            case 3:
                                 serverResponse = _context6.sent;
 
                                 if (!serverResponse.error) {
@@ -25613,7 +25614,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                                 }
                                 this.requestSelected = 'table';
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context6.stop();
                         }
