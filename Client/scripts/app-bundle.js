@@ -25631,7 +25631,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                 mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
                 mailObject.email = this.selectedRequestDetail.requestId.personId.email;
                 mailObject.product = [this.selectedRequestDetail.productId.name];
-                mailObject.course = this.selectedRequestDetail.productId.name;
+                mailObject.course = this.selectedRequestDetail.requestId.courseId.name;
                 mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
                 mailObject.message = "Your product request has been updated.";
             }
@@ -26042,7 +26042,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
         Assignments.prototype.showProfile = function showProfile(request, el) {
             this.profileRequest = request;
-
             $(".hoverProfile").css("top", el.clientY - 175);
             $(".hoverProfile").css("left", el.clientX - 300);
             $(".hoverProfile").css("display", "block");

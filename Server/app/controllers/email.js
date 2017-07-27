@@ -420,15 +420,16 @@ if(env === 'development'){
       mailObject.context.ASSIGN_REQUEST = emailConfig.ASSIGN_REQUEST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+      mailObject.context.topMessage = "Your client for the following product request has been assigned"
       var mail = {
           from: emailConfig.emailAddress,
           to: mailObject.email,
-          cc: mailObject.cc,
+          // cc: mailObject.cc,
           subject: 'Product Request Updated',
           template: 'client-request-updated',
           context: mailObject.context
       };
-
+console.log(mail)
       nodeMailerSendMail(mail)   
   }
 

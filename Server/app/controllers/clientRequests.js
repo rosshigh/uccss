@@ -155,7 +155,8 @@ module.exports = function (app) {
             email: req.body.email,
             cc: req.body.cc,
             context: context 
-          }                                     
+          }                   
+          console.log(mailObj)                  
           requestUpdated(mailObj);
           break;
         case 3:
