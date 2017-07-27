@@ -162,7 +162,7 @@ module.exports = function (app) {
            var context = {
                       product: req.body.product,
                       requestNo: req.body.clientRequestNo,
-                      topicMessage: req.body.customerMessage
+                      customerMessage: req.body.customerMessage
                     }   
           var mailObj = {
             email: req.body.email,
