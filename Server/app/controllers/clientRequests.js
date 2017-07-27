@@ -146,7 +146,7 @@ module.exports = function (app) {
           break;
         case 2: //request Updated
           var context = {
-                      products: req.body.product,
+                      product: req.body.product,
                       requestNo: req.body.requestNo,
                       name: req.body.name,
                       numStudents: req.body.numStudents
