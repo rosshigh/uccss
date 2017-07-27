@@ -25617,7 +25617,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
         }();
 
         Assignments.prototype._buildEmailObject = function _buildEmailObject() {
-            var mailObject = new Object();
+            var mailObject = {};
             var date = new Date(this.selectedRequestDetail.requiredDate);
             var day = date.getDate();
             var month = date.getMonth() + 1;

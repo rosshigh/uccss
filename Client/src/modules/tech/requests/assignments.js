@@ -677,7 +677,7 @@ export class Assignments {
     }
 
      _buildEmailObject(){
-        var mailObject = new Object();
+        let mailObject = {};
          var date = new Date(this.selectedRequestDetail.requiredDate);
         var day = date.getDate();
         var month = date.getMonth() + 1;
