@@ -25578,12 +25578,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 if (!this.validation.validate(1, this)) {
-                                    _context7.next = 12;
+                                    _context7.next = 8;
                                     break;
                                 }
 
                                 if (!this._buildRequest()) {
-                                    _context7.next = 12;
+                                    _context7.next = 8;
                                     break;
                                 }
 
@@ -25595,19 +25595,13 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
                             case 6:
                                 serverResponse = _context7.sent;
 
-                                if (serverResponse.status) {
-                                    _context7.next = 12;
-                                    break;
+                                if (!serverResponse.status) {
+                                    this.utils.showNotification("The request was updated");
+                                    this.systems.saveSystem();
+                                    this._cleanUp();
                                 }
 
-                                this.utils.showNotification("The request was updated");
-                                _context7.next = 11;
-                                return this.systems.saveSystem();
-
-                            case 11:
-                                this._cleanUp();
-
-                            case 12:
+                            case 8:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -25624,19 +25618,20 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', 'aur
 
         Assignments.prototype._buildEmailObject = function _buildEmailObject() {
             var mailObject = new Object();
+            var date = new Date(this.selectedRequestDetail.requiredDate);
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
             if (this.selectedRequestDetail.requestStatus !== this.config.PROVISIONAL_REQUEST_CODE && this.sendEmail) {
                 mailObject.reason = 2;
                 mailObject.numStudents = parseInt(this.selectedRequestDetail.requestId.undergradIds) + parseInt(this.selectedRequestDetail.requestId.graduateIds);
                 mailObject.fullName = this.selectedRequestDetail.requestId.personId.fullName;
                 mailObject.requestNo = this.selectedRequestDetail.requestId.clientRequestNo;
                 mailObject.email = this.selectedRequestDetail.requestId.personId.email;
-                mailObject.product = [this.selectedRequestDetail.productId.name];
-                mailObject.course = this.selectedRequestDetail.requestId.courseId.name;
+                mailObject.product = [{ name: this.selectedRequestDetail.productId.name, requiredDate: month + "/" + day + "/" + year }], mailObject.course = this.selectedRequestDetail.requestId.courseId.name;
                 mailObject.cc = this.config.PRODUCT_REQUESTS_EMAIL_LIST ? this.config.PRODUCT_REQUESTS_EMAIL_LIST : "";
                 mailObject.message = "Your product request has been updated.";
             }
-            console.log(mailObject);
-
 
             return mailObject;
         };
