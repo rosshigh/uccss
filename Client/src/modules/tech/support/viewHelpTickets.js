@@ -396,7 +396,6 @@ export class ViewHelpTickets {
   }
 
   async ownHelpTicket(helpTicket) {
-    return;
     if(helpTicket) {
       this.helpTickets.selectHelpTicketByID(helpTicket._id);
     }
@@ -410,7 +409,7 @@ export class ViewHelpTickets {
               email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
               email.personId = this.userObj._id;
               email.status = this.config.REVIEW_HELPTICKET_STATUS;
-              email.email = this.helpTickets.selectedHelpTicket.personId.email; 
+              // email.email = this.helpTickets.selectedHelpTicket.personId.email; 
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
@@ -428,7 +427,6 @@ export class ViewHelpTickets {
   }
 
   async changeStatus(helpTicket, status, description){
-    return;
     this.helpTickets.selectHelpTicketByID(helpTicket._id);
       var response = await this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
       if (!response.error) {
@@ -445,7 +443,7 @@ export class ViewHelpTickets {
           if(this.sendEmail){
               email.reason = status;
               email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
-              email.email = this.helpTickets.selectedHelpTicket.personId.email; 
+              // email.email = this.helpTickets.selectedHelpTicket.personId.email; 
               email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
               email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
               email.message = "The status was changed to " + description;

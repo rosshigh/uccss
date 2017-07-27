@@ -28542,9 +28542,38 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                return _context9.abrupt('return');
+                if (helpTicket) {
+                  this.helpTickets.selectHelpTicketByID(helpTicket._id);
+                }
 
-              case 10:
+                if (!(this.helpTickets.selectedHelpTicket.owner[0].personId === null || this.helpTickets.selectedHelpTicket.owner[0].personId._id != this.userObj._id)) {
+                  _context9.next = 12;
+                  break;
+                }
+
+                if (this.showLockMessage) {
+                  _context9.next = 12;
+                  break;
+                }
+
+                email = new Object();
+
+                email.personId = this.userObj._id;
+                email.status = this.config.REVIEW_HELPTICKET_STATUS;
+                if (this.sendEmail) {
+                  email.reason = 2;
+                  email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName;
+                  email.personId = this.userObj._id;
+                  email.status = this.config.REVIEW_HELPTICKET_STATUS;
+
+                  email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+                  email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+                  email.message = this.userObj.fullName + " has taken ownership of the help ticket.";
+                }
+                _context9.next = 9;
+                return this.helpTickets.updateOwner(email, this.userObj);
+
+              case 9:
                 serverResponse = _context9.sent;
 
                 if (!serverResponse.error) {
@@ -28555,7 +28584,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   this._cleanUp();
                 }
 
-              case 13:
+              case 12:
               case 'end':
                 return _context9.stop();
             }
@@ -28577,18 +28606,20 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                return _context10.abrupt('return');
+                this.helpTickets.selectHelpTicketByID(helpTicket._id);
+                _context10.next = 3;
+                return this.helpTickets.getHelpTicketLock(this.helpTickets.selectedHelpTicket._id);
 
-              case 4:
+              case 3:
                 response = _context10.sent;
 
                 if (response.error) {
-                  _context10.next = 17;
+                  _context10.next = 16;
                   break;
                 }
 
                 if (!(response.helpTicketId === 0)) {
-                  _context10.next = 17;
+                  _context10.next = 16;
                   break;
                 }
 
@@ -28606,16 +28637,16 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 if (this.sendEmail) {
                   email.reason = status;
                   email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName;
-                  email.email = this.helpTickets.selectedHelpTicket.personId.email;
+
                   email.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
                   email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
                   email.message = "The status was changed to " + description;
                 }
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
-                _context10.next = 14;
+                _context10.next = 13;
                 return this.helpTickets.saveHelpTicket(email);
 
-              case 14:
+              case 13:
                 serverResponse = _context10.sent;
 
                 if (!serverResponse.error) {
@@ -28624,7 +28655,7 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                 }
                 this._cleanUp();
 
-              case 17:
+              case 16:
               case 'end':
                 return _context10.stop();
             }
