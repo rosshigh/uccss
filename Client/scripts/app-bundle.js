@@ -6366,6 +6366,64 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             return assignRequest;
         }();
 
+        ClientRequests.prototype.deleteRequest = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                if (this.selectedRequestDetail._id) {
+                                    _context9.next = 2;
+                                    break;
+                                }
+
+                                return _context9.abrupt('return');
+
+                            case 2:
+                                _context9.next = 4;
+                                return this.data.deleteObject(this.data.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+
+                            case 4:
+                                serverResponse = _context9.sent;
+
+                                if (serverResponse.error) {
+                                    _context9.next = 10;
+                                    break;
+                                }
+
+                                this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+                                return _context9.abrupt('return', serverResponse);
+
+                            case 10:
+                                return _context9.abrupt('return', undefined);
+
+                            case 11:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function deleteRequest() {
+                return _ref9.apply(this, arguments);
+            }
+
+            return deleteRequest;
+        }();
+
+        ClientRequests.prototype.isRequestDirty = function isRequestDirty(obj) {
+            if (this.selectedRequest) {
+                if (!obj) {
+                    var obj = this.emptyRequest();
+                }
+                var skip = ['audit'];
+                return this.utils.objectsEqual(this.selectedRequest, obj, skip);
+            }
+            return new Array();
+        };
+
         ClientRequests.prototype.selectRequestDetail = function selectRequestDetail(index) {
             if (index === undefined || index > this.requestsDetailsArray.length - 1) {
                 this.emptyRequestDetail();
@@ -6402,44 +6460,44 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.saveRequestDetail = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 if (this.selectedRequestDetail) {
-                                    _context9.next = 2;
+                                    _context10.next = 2;
                                     break;
                                 }
 
-                                return _context9.abrupt('return');
+                                return _context10.abrupt('return');
 
                             case 2:
-                                _context9.next = 4;
+                                _context10.next = 4;
                                 return this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
 
                             case 4:
-                                response = _context9.sent;
+                                response = _context10.sent;
 
                                 if (response.error) {
-                                    _context9.next = 8;
+                                    _context10.next = 8;
                                     break;
                                 }
 
                                 this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
-                                return _context9.abrupt('return', response);
+                                return _context10.abrupt('return', response);
 
                             case 8:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
             function saveRequestDetail() {
-                return _ref9.apply(this, arguments);
+                return _ref10.apply(this, arguments);
             }
 
             return saveRequestDetail;
@@ -6457,56 +6515,56 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getClientRequest = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(id) {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(id) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context11.prev = _context11.next) {
                             case 0:
-                                _context10.next = 2;
+                                _context11.next = 2;
                                 return this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + id);
 
                             case 2:
-                                serverResponse = _context10.sent;
+                                serverResponse = _context11.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedRequest = serverResponse;
                                 }
-                                return _context10.abrupt('return', serverResponse);
+                                return _context11.abrupt('return', serverResponse);
 
                             case 5:
                             case 'end':
-                                return _context10.stop();
+                                return _context11.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee11, this);
             }));
 
             function getClientRequest(_x14) {
-                return _ref10.apply(this, arguments);
+                return _ref11.apply(this, arguments);
             }
 
             return getClientRequest;
         }();
 
         ClientRequests.prototype.getSessionCount = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(sessionArray, numSessions, options, requestStatus) {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(sessionArray, numSessions, options, requestStatus) {
                 var url, response, sessions, sessionCount, i;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 url = this.CLIENT_REQUESTS_SERVICES;
 
                                 url += options ? options : "";
-                                _context11.next = 4;
+                                _context12.next = 4;
                                 return this.data.get(url);
 
                             case 4:
-                                response = _context11.sent;
+                                response = _context12.sent;
 
                                 if (response.error) {
-                                    _context11.next = 13;
+                                    _context12.next = 13;
                                     break;
                                 }
 
@@ -6533,39 +6591,9 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                         }
                                     }
                                 });
-                                return _context11.abrupt('return', sessionCount);
+                                return _context12.abrupt('return', sessionCount);
 
                             case 13:
-                            case 'end':
-                                return _context11.stop();
-                        }
-                    }
-                }, _callee11, this);
-            }));
-
-            function getSessionCount(_x15, _x16, _x17, _x18) {
-                return _ref11.apply(this, arguments);
-            }
-
-            return getSessionCount;
-        }();
-
-        ClientRequests.prototype.sendCustomerMessage = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(message) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
-                    while (1) {
-                        switch (_context12.prev = _context12.next) {
-                            case 0:
-                                console.log(message);
-                                _context12.next = 3;
-                                return this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
-
-                            case 3:
-                                serverResponse = _context12.sent;
-                                return _context12.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context12.stop();
                         }
@@ -6573,8 +6601,38 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee12, this);
             }));
 
-            function sendCustomerMessage(_x19) {
+            function getSessionCount(_x15, _x16, _x17, _x18) {
                 return _ref12.apply(this, arguments);
+            }
+
+            return getSessionCount;
+        }();
+
+        ClientRequests.prototype.sendCustomerMessage = function () {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(message) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                    while (1) {
+                        switch (_context13.prev = _context13.next) {
+                            case 0:
+                                console.log(message);
+                                _context13.next = 3;
+                                return this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
+
+                            case 3:
+                                serverResponse = _context13.sent;
+                                return _context13.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context13.stop();
+                        }
+                    }
+                }, _callee13, this);
+            }));
+
+            function sendCustomerMessage(_x19) {
+                return _ref13.apply(this, arguments);
             }
 
             return sendCustomerMessage;
@@ -6667,53 +6725,29 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getRequestLock = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(id) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
-                    while (1) {
-                        switch (_context13.prev = _context13.next) {
-                            case 0:
-                                _context13.next = 2;
-                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
-
-                            case 2:
-                                response = _context13.sent;
-
-                                if (response.error) {
-                                    _context13.next = 7;
-                                    break;
-                                }
-
-                                return _context13.abrupt('return', response);
-
-                            case 7:
-                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
-
-                            case 8:
-                            case 'end':
-                                return _context13.stop();
-                        }
-                    }
-                }, _callee13, this);
-            }));
-
-            function getRequestLock(_x20) {
-                return _ref13.apply(this, arguments);
-            }
-
-            return getRequestLock;
-        }();
-
-        ClientRequests.prototype.removeRequestLock = function () {
             var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(id) {
+                var response;
                 return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
                         switch (_context14.prev = _context14.next) {
                             case 0:
                                 _context14.next = 2;
-                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
 
                             case 2:
+                                response = _context14.sent;
+
+                                if (response.error) {
+                                    _context14.next = 7;
+                                    break;
+                                }
+
+                                return _context14.abrupt('return', response);
+
+                            case 7:
+                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+
+                            case 8:
                             case 'end':
                                 return _context14.stop();
                         }
@@ -6721,8 +6755,32 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee14, this);
             }));
 
-            function removeRequestLock(_x21) {
+            function getRequestLock(_x20) {
                 return _ref14.apply(this, arguments);
+            }
+
+            return getRequestLock;
+        }();
+
+        ClientRequests.prototype.removeRequestLock = function () {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(id) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                    while (1) {
+                        switch (_context15.prev = _context15.next) {
+                            case 0:
+                                _context15.next = 2;
+                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+
+                            case 2:
+                            case 'end':
+                                return _context15.stop();
+                        }
+                    }
+                }, _callee15, this);
+            }));
+
+            function removeRequestLock(_x21) {
+                return _ref15.apply(this, arguments);
             }
 
             return removeRequestLock;

@@ -206,6 +206,32 @@ export class ClientRequests {
         return serverResponse;
     }
 
+    async deleteRequest(){
+        if(!this.selectedRequestDetail._id){
+            return;
+        }
+
+       let serverResponse = await this.data.deleteObject(this.data.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+        if (!serverResponse.error) {
+            this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+            return serverResponse;
+        } else {
+            return undefined;
+        }
+
+    }
+
+     isRequestDirty(obj){
+      if(this.selectedRequest){
+          if(!obj){
+              var obj = this.emptyRequest();
+          }
+            var skip = ['audit'];
+            return this.utils.objectsEqual(this.selectedRequest, obj, skip);
+        }
+        return new Array();
+    }
+
     selectRequestDetail(index){
           if(index === undefined || index > this.requestsDetailsArray.length - 1){
               this.emptyRequestDetail();
