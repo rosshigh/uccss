@@ -58,7 +58,7 @@ export class ClientRequestAnalytics {
         ]);
         this.selectedCategory = this.categories[0];
         this.selectedSession = this.sessions.sessionsArray[0]._id;
-        await this.getInstitutionRequests();
+        this.getInstitutionRequests();
         this.getProductsRequests();
     }
 
@@ -75,6 +75,7 @@ export class ClientRequestAnalytics {
                 break;
             case 1:
                 this.getProductsRequests();
+                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                 this.selectedTab = "products";
                 break;
         }
@@ -97,7 +98,7 @@ export class ClientRequestAnalytics {
             this.sessions.selectSessionById(this.selectedSession);
             await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                this.requests.groupRequestsByInstitution();
+                await this.requests.groupRequestsByInstitution();
                 this.totalsInstitutionArray = new Array();
                 this.config.REQUEST_STATUS.forEach(item => {
                     this.totalsInstitutionArray.push(0);
@@ -117,16 +118,11 @@ export class ClientRequestAnalytics {
 
                 this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
                 this.institutionChartDataFunction();
-            } else {
-                this.displayArray = new Array();
-            }
-        } else {
-            this.displayArray = new Array();
+            } 
         }
     }
 
-    institutionChartDataFunction(){
-        
+    institutionChartDataFunction(){        
         var data = new Array();
         var categories = new Array();
         
@@ -224,7 +220,6 @@ export class ClientRequestAnalytics {
             await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
             if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                 this.requests.groupRequestsByProduct();
-                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                 this.productChartDataFunction();
             } else {
                 this.displayArray = new Array();
@@ -345,10 +340,10 @@ export class ClientRequestAnalytics {
     }
 
     showInstitutionGraph(){
-        this.institutionTableSelected = false;
+        this.institutionTableSelected = false;     
     }
 
-     showProductTable(){
+    showProductTable(){
         this.productTableSelected = true;
     }
 

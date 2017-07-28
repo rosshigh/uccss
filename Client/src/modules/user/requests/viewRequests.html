@@ -1,24 +1,21 @@
 <template>
     <div class="panel panel-default">
       <div class="panel-body">
-        <div class="row">
-                <!-- Session Select -->
-            <div class="col-lg-4">
-                <div class="form-group topMargin leftMargin">
-                    <select show.bind="!requestSelected" value.bind="selectedSession" change.delegate="getRequests()" id="session" class="form-control">
-                    <option value="">Select a session</option>
-                    <option repeat.for="session of sessions.sessionsArray"
-                            value.bind="session._id">Session ${session.session} - ${session.year}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div show.bind="!requestSelected" class="col-lg-12">
-                <compose view="./components/viewRequestsTable.html"></compose>
-            </div> 
-            <div show.bind="requestSelected" class="col-lg-12">
-                <compose view="./components/viewRequestsForm.html"></compose>
+        <div class="col-lg-4">
+            <div class="form-group topMargin leftMargin">
+                <select show.bind="!requestSelected" value.bind="selectedSession" change.delegate="getRequests()" id="session" class="form-control">
+                <option repeat.for="session of sessions.sessionsArray"
+                        value.bind="session._id">Session ${session.session} - ${session.year}</option>
+                </select>
             </div>
         </div>
-      </div> 
+
+        <div show.bind="!requestSelected" class="col-lg-12">
+            <compose view="./components/viewRequestsTable.html"></compose>
+        </div> 
+        <div show.bind="requestSelected" class="col-lg-12">
+            <compose view="./components/viewRequestsForm.html"></compose>
+        </div>
+      </div>
+    </div> 
 </template>

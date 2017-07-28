@@ -754,13 +754,10 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
                                 this.selectedCategory = this.categories[0];
                                 this.selectedSession = this.sessions.sessionsArray[0]._id;
-                                _context.next = 7;
-                                return this.getInstitutionRequests();
-
-                            case 7:
+                                this.getInstitutionRequests();
                                 this.getProductsRequests();
 
-                            case 8:
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -788,6 +785,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                     break;
                 case 1:
                     this.getProductsRequests();
+                    this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                     this.selectedTab = "products";
                     break;
             }
@@ -841,7 +839,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 if (!this.selectedSession) {
-                                    _context3.next = 8;
+                                    _context3.next = 14;
                                     break;
                                 }
 
@@ -851,36 +849,35 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                 return this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
 
                             case 5:
-                                if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
-                                    this.requests.groupRequestsByInstitution();
-                                    this.totalsInstitutionArray = new Array();
-                                    this.config.REQUEST_STATUS.forEach(function (item) {
-                                        _this.totalsInstitutionArray.push(0);
-                                    });
-                                    this.totalsInstitutionArray.push(0);
-                                    this.requests.analyticsInstitutionResultArray.forEach(function (item) {
-                                        _this.totalsInstitutionArray[0] += item['total'];
-                                        _this.totalsInstitutionArray[1] += item[1];
-                                        _this.totalsInstitutionArray[2] += item[2];
-                                        _this.totalsInstitutionArray[3] += item[3];
-                                        _this.totalsInstitutionArray[4] += item[4];
-                                        _this.totalsInstitutionArray[5] += item[5];
-                                        _this.totalsInstitutionArray[6] += item[6];
-                                        _this.totalsInstitutionArray[7] += item[7];
-                                    });
-
-                                    this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
-                                    this.institutionChartDataFunction();
-                                } else {
-                                    this.displayArray = new Array();
+                                if (!(this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length)) {
+                                    _context3.next = 14;
+                                    break;
                                 }
-                                _context3.next = 9;
-                                break;
+
+                                _context3.next = 8;
+                                return this.requests.groupRequestsByInstitution();
 
                             case 8:
-                                this.displayArray = new Array();
+                                this.totalsInstitutionArray = new Array();
+                                this.config.REQUEST_STATUS.forEach(function (item) {
+                                    _this.totalsInstitutionArray.push(0);
+                                });
+                                this.totalsInstitutionArray.push(0);
+                                this.requests.analyticsInstitutionResultArray.forEach(function (item) {
+                                    _this.totalsInstitutionArray[0] += item['total'];
+                                    _this.totalsInstitutionArray[1] += item[1];
+                                    _this.totalsInstitutionArray[2] += item[2];
+                                    _this.totalsInstitutionArray[3] += item[3];
+                                    _this.totalsInstitutionArray[4] += item[4];
+                                    _this.totalsInstitutionArray[5] += item[5];
+                                    _this.totalsInstitutionArray[6] += item[6];
+                                    _this.totalsInstitutionArray[7] += item[7];
+                                });
 
-                            case 9:
+                                this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
+                                this.institutionChartDataFunction();
+
+                            case 14:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -896,7 +893,6 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
         }();
 
         ClientRequestAnalytics.prototype.institutionChartDataFunction = function institutionChartDataFunction() {
-
             var data = new Array();
             var categories = new Array();
 
@@ -998,7 +994,6 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                             case 5:
                                 if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
                                     this.requests.groupRequestsByProduct();
-                                    this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                                     this.productChartDataFunction();
                                 } else {
                                     this.displayArray = new Array();
@@ -6842,35 +6837,63 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             });
         };
 
-        ClientRequests.prototype.groupRequestsByInstitution = function groupRequestsByInstitution() {
-            if (!this.requestsDetailsArray) {
-                return;
-            }
-            var sortedArray = this.requestsDetailsArray.sort(function (a, b) {
-                var result = a['requestId'].institutionId.name < b['requestId'].institutionId.name ? -1 : a['requestId'].institutionId.name > b['requestId'].institutionId.name ? 1 : 0;
-                return result;
-            });
+        ClientRequests.prototype.groupRequestsByInstitution = function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+                var sortedArray, instID, numStatuses, templateObj, i, that;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                if (this.requestsDetailsArray) {
+                                    _context14.next = 2;
+                                    break;
+                                }
 
-            this.analyticsInstitutionResultArray = new Array();
-            var instID = "";
-            var numStatuses = this.config.REQUEST_STATUS.length;
-            var templateObj = new Object();
-            templateObj['total'] = 0;
-            for (var i = 0; i < numStatuses; i++) {
-                templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+                                return _context14.abrupt('return');
+
+                            case 2:
+                                sortedArray = this.requestsDetailsArray.sort(function (a, b) {
+                                    var result = a['requestId'].institutionId.name < b['requestId'].institutionId.name ? -1 : a['requestId'].institutionId.name > b['requestId'].institutionId.name ? 1 : 0;
+                                    return result;
+                                });
+
+
+                                this.analyticsInstitutionResultArray = new Array();
+                                instID = "";
+                                numStatuses = this.config.REQUEST_STATUS.length;
+                                templateObj = new Object();
+
+                                templateObj['total'] = 0;
+                                for (i = 0; i < numStatuses; i++) {
+                                    templateObj[this.config.REQUEST_STATUS[i].code] = 0;
+                                }
+                                that = this;
+
+                                sortedArray.forEach(function (item) {
+                                    if (item.requestId.institutionId.name != instID) {
+                                        instID = item.requestId.institutionId.name;
+                                        var obj = that.utils.copyObject(templateObj);
+                                        obj.name = item.requestId.institutionId.name;
+                                        that.analyticsInstitutionResultArray.push(obj);
+                                    }
+                                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['total'] += 1;
+                                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1][item.requestStatus] += 1;
+                                });
+
+                            case 11:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function groupRequestsByInstitution() {
+                return _ref14.apply(this, arguments);
             }
-            var that = this;
-            sortedArray.forEach(function (item) {
-                if (item.requestId.institutionId.name != instID) {
-                    instID = item.requestId.institutionId.name;
-                    var obj = that.utils.copyObject(templateObj);
-                    obj.name = item.requestId.institutionId.name;
-                    that.analyticsInstitutionResultArray.push(obj);
-                }
-                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['total'] += 1;
-                that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1][item.requestStatus] += 1;
-            });
-        };
+
+            return groupRequestsByInstitution;
+        }();
 
         ClientRequests.prototype.groupRequestsByProduct = function groupRequestsByProduct() {
             var _this4 = this;
@@ -6909,53 +6932,29 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getRequestLock = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(id) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
-                    while (1) {
-                        switch (_context14.prev = _context14.next) {
-                            case 0:
-                                _context14.next = 2;
-                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
-
-                            case 2:
-                                response = _context14.sent;
-
-                                if (response.error) {
-                                    _context14.next = 7;
-                                    break;
-                                }
-
-                                return _context14.abrupt('return', response);
-
-                            case 7:
-                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
-
-                            case 8:
-                            case 'end':
-                                return _context14.stop();
-                        }
-                    }
-                }, _callee14, this);
-            }));
-
-            function getRequestLock(_x20) {
-                return _ref14.apply(this, arguments);
-            }
-
-            return getRequestLock;
-        }();
-
-        ClientRequests.prototype.removeRequestLock = function () {
             var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(id) {
+                var response;
                 return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
                         switch (_context15.prev = _context15.next) {
                             case 0:
                                 _context15.next = 2;
-                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
 
                             case 2:
+                                response = _context15.sent;
+
+                                if (response.error) {
+                                    _context15.next = 7;
+                                    break;
+                                }
+
+                                return _context15.abrupt('return', response);
+
+                            case 7:
+                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+
+                            case 8:
                             case 'end':
                                 return _context15.stop();
                         }
@@ -6963,8 +6962,32 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee15, this);
             }));
 
-            function removeRequestLock(_x21) {
+            function getRequestLock(_x20) {
                 return _ref15.apply(this, arguments);
+            }
+
+            return getRequestLock;
+        }();
+
+        ClientRequests.prototype.removeRequestLock = function () {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(id) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                    while (1) {
+                        switch (_context16.prev = _context16.next) {
+                            case 0:
+                                _context16.next = 2;
+                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+
+                            case 2:
+                            case 'end':
+                                return _context16.stop();
+                        }
+                    }
+                }, _callee16, this);
+            }));
+
+            function removeRequestLock(_x21) {
+                return _ref16.apply(this, arguments);
             }
 
             return removeRequestLock;
@@ -54341,9 +54364,9 @@ define('text!modules/analytics/components/productRequestsDetail.html', ['module'
 define('text!modules/analytics/components/productRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"summerTable\" class='col-lg-12'>\n        <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n        <table class=\"table table-striped table-hover cf\">\n            <thead class=\"cf\">\n                <tr>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customProductSorter, propertyName: 'productId'})\">Product </span><i class=\"fa fa-sort\"></i></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                    <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                </tr>\n                 <tr>\n                    <th>\n                        <input value.bind=\"productFilterValue\" input.delegate=\"dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductFilterValue, compare:'custom'} )\"  class=\"form-control\" />\n                    </th>\n                    <th></th>\n                    <th></th>\n                    <th></th>\n                    <th></th>\n                    <th></th>\n                    <th></th>\n                    <th></th>\n                    <th></th> \n                    <th></th> \n                </tr>\n            </thead>\n            <tbody>\n                <tr click.delegate=\"showProductDetail(stat)\" repeat.for=\"stat of dataTable.displayArray\">\n                    <td data-title=\"Product\">${stat.productId.name}</td>\n                    <td data-title=\"Institution\">${stat.total}</td>\n                    <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    <compose show.bind=\"!summerTable\" view=\"./productRequestsDetail.html\"></compose>\n</template>"; });
 define('text!modules/analytics/components/requestsByInstitution.html', ['module'], function(module) { module.exports = "<template>\n  <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showInstitutionTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showInstitutionGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsInstitutionChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/analytics/components/requestsByProducts.html', ['module'], function(module) { module.exports = "<template>\n    <div show.bind=\"selectedSession\">\n    <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"showProductTable()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Table\"><i class=\"fa fa-table fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"showProductGraph()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Graphs\"><i class=\"fa fa-pie-chart fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div show.bind=\"productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./productRequestsTable.html\"></compose>\n          </div> \n          <div show.bind=\"!productTableSelected\" class=\"col-lg-12\">\n              <compose view=\"./requestsProductChart.html\"></compose>\n          </div>\n        </div>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests</legend>\n\t\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
+define('text!modules/analytics/components/requestsInstitutionChart.html', ['module'], function(module) { module.exports = "<template>\n\t</fieldset>\n\t    <fieldset if.bind=\"!institutionTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests</legend>\n\t\t\t<chart id=\"institutionRequestsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"institutionChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
 define('text!modules/analytics/components/requestsProductChart.html', ['module'], function(module) { module.exports = "<template>\n\t    <fieldset if.bind=\"!productTableSelected\" class=\"col-lg-12\">\n\t\t\t<legend>Requests</legend>\n\t\t\t<chart id=\"regionsChart\" type=\"horizontalBar\" style=\"width: 100%; height: 100%; display: block;\" should-update=\"true\" throttle=\"2000\" data.bind=\"productChartData\"></chart>\n\t\t</fieldset>\n</template>"; });
-define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n                <table class=\"table table-striped table-hover cf\">\n                    <thead class=\"cf\">\n                        <tr>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'productId'})\">Institution  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                        </tr>\n                        <tr>\n                            <th>\n                                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: customNameFilterValue, compare:'custom'} )\"  class=\"form-control\" />\n                            </th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                        </tr>\n                        <tr>\n                            <th>Totals:</th>\n                            <th repeat.for=\"total of totalsInstitutionArray\">${total}</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr repeat.for=\"stat of dataTable.displayArray\">\n                            <td data-title=\"Institution\">${stat.name}</td>\n                            <td data-title=\"Institution\">${stat.total}</td>\n                            <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!modules/analytics/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-10 col-lg-offset-1\">\n        <div class='row'>\n            <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\n            <div id=\"no-more-tables\">\n                <table class=\"table table-striped table-hover cf\">\n                    <thead class=\"cf\">\n                        <tr>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionSorter, propertyName: 'productId'})\">Institution  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'total'})\">Total  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '1'})\">${config.REQUEST_STATUS[0].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '2'})\">${config.REQUEST_STATUS[1].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '3'})\">${config.REQUEST_STATUS[2].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '4'})\">${config.REQUEST_STATUS[3].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '5'})\">${config.REQUEST_STATUS[4].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '6'})\">${config.REQUEST_STATUS[5].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                            <th><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: '7'})\">${config.REQUEST_STATUS[6].description}  </span><span><i class=\"fa fa-sort\"></i></span></th>\n                        </tr>\n                        <tr>\n                            <th>\n                                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: customNameFilterValue, compare:'custom'} )\"  class=\"form-control\" />\n                            </th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                            <th></th>\n                        </tr>\n                        <tr>\n                            <th>Totals:</th>\n                            <th repeat.for=\"total of totalsInstitutionArray\">${total}</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr repeat.for=\"stat of dataTable.displayArray\">\n                            <td data-title=\"Institution\">${stat.name}</td>\n                            <td data-title=\"Total\">${stat.total}</td>\n                            <td data-title=\"${config.REQUEST_STATUS[$index].description}\" repeat.for=\"status of config.REQUEST_STATUS\">${stat | statValue:config.REQUEST_STATUS:$index}</td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/facco/components/peopleTable.html', ['module'], function(module) { module.exports = "<template>\r\n   <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n      <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n      <div id=\"no-more-tables\">\r\n          <table class=\"table table-striped table-hover cf\">\r\n              <thead class=\"cf\">\r\n                  <tr>\r\n                      <td colspan='7'>\r\n                          <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                          <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n                      </td>\r\n                  </tr>\r\n                  <tr>\r\n                      <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'lastName'})\">Name </span><i class=\"fa fa-sort\"></i></th>\r\n                      <th style=\"width:15rem;\">Phone</th>\r\n                      <th style=\"width:15rem;\">Mobile</th>\r\n                      <th style=\"width:20rem;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'email'})\">Email </span> <i class=\"fa fa-sort\"></i></th>\r\n                      <th>Role</th>\r\n                      <th>Status</th>\r\n                      <th>Change Status</th>\r\n                  </tr>\r\n              </thead>\r\n              <tbody>\r\n                  <tr>\r\n                      <th>\r\n                          <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'text',  filter: 'nameFilter', collectionProperty: 'fullName', compare:'match'} )\"  class=\"form-control\" />\r\n                      </th>\r\n                      <th></th>\r\n                      <th></th>\r\n                      <th></th>\r\n                      <th>\r\n                         <input value.bind=\"roleFilter\" input.delegate=\"dataTable.filterList(roleFilter, { type: 'custom', filter: customRoleFilter, compare: 'custom'})\"  class=\"form-control\" />\r\n                      </th>\r\n                      <th>\r\n                          <select value.bind=\"personStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'personStatusFilter',  collectionProperty: 'personStatus', displayProperty: 'personStatus',  compare:'match'} )\" class=\"form-control\" >\r\n                              <option value=\"\"></option>\r\n                              <option repeat.for='status of is4ua.personStatusArray' value='${status.code}'>${status.description}</option>\r\n                          </select>\r\n                      </th>\r\n                      <th></th>\r\n                  </tr>\r\n                  <tr  repeat.for=\"person of dataTable.displayArray\">\r\n                      <td  data-title=\"Name\">${person.fullName}</td>\r\n                      <td  data-title=\"Phone\">${person.phone | phoneNumber}</td>\r\n                      <td  data-title=\"Phone\">${person.mobile | phoneNumber}</td>\r\n                      <td  data-title=\"Email\">${person.email}</td>\r\n                      <td  data-title=\"Role\">${person.roles}</td>\r\n                      <td  data-title=\"Status\">${person.personStatus | lookupValue:is4ua.personStatusArray:\"code\":\"description\"}</td>\r\n                      <td data-title=\"Update\" style=\"width: 100px\" click.trigger=\"updateStatus(person)\" innerhtml.bind=\"person.personStatus | personStatusButton\">\r\n                  </tr>\r\n              </tbody>\r\n          </table>\r\n      </div>\r\n  </div>\r\n</template>\r\n"; });
 define('text!modules/facco/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"col-lg-5\" show.bind=\"showRequest\">\r\n    \t<div class=\"panel panel-primary topMargin\">\r\n      \t\t<div class=\"panel-heading\">\r\n        \t\t<h3 class=\"panel-title\">${selectedProductID | lookupValue:products.productsArray:\"_id\":\"name\"}</h3>\r\n      \t\t</div>\r\n\t      \t<div class=\"panel-body\">\r\n\t        \t<h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"desscription\"}</h5>\r\n\t        \t<h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n\t        \t<h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\r\n\t      \t</div>\r\n    \t</div>\r\n  \t</div>\r\n</template>"; });
 define('text!modules/facco/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\r\n<div class=\"col-lg-10 col-lg-offset-1\">\r\n    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n      <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n          <thead class=\"cf\">\r\n            <tr>\r\n              <td colspan='7'>\r\n                <span click.delegate=\"refresh()\" class=\"smallMarginRight\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\r\n                <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\r\n              </td>\r\n            </tr>\r\n            <tr>\r\n              <th class=\"col-xs-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestNo'})\">No </span> <i class=\"fa fa-sort\"></i></th>\r\n              <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requiredDate'})\">Due </span><i class=\"fa fa-sort\"></i></th>\r\n              <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Created </span><i class=\"fa fa-sort\"></i></th>\r\n              <th class=\"col-lg-1\">Type</th>\r\n              <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestStatus'})\">Status </span><i class=\"fa fa-sort\"></i></th>\r\n              <th class=\"col-sm-1\">IDS Requestd</th>\r\n              <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'name', searchProperty: 'productId', surrogateArray: products.productsArray, surrogateProperty: '_id', type: 'lookup'})\">Product </span> <i class=\"fa fa-sort\"></i></th>\r\n              <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'fullName', searchProperty: 'requestId.personId', surrogateArray: people.instutionPeopleArray, surrogateProperty: '_id', type: 'lookup'})\">Faculty </span><i class=\"fa fa-sort\"></i></th>\r\n            </tr>\r\n          </thead>\r\n          <tbody>\r\n            <tr>\r\n              <th></th>\r\n              <th>\r\n                <input value.bind=\"requiredDateFilter\" change.delegate=\"dataTable.filterList(requiredDateFilter, { type: 'date',  filter: 'requiredDateFilter', collectionProperty: 'requiredDate', compare:'after' })\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"createdDateFilter\" change.delegate=\"dataTable.filterList(createdDateFilter, { type: 'date',  filter: 'createdDateFilter', collectionProperty: 'createdDate', compare:'after' })\" type=\"date\" class=\"form-control datepicker\" data-dateformat=config.DATE_FORMAT_TABLE>\r\n              </th>\r\n              <th>\r\n           \t\t<select value.bind=\"courseFilter\" input.delegate=\"dataTable.filterList($event, { type: 'custom',  filter: courseCustomFilter,  collectionProperty: 'requestId.courseId', displayProperty: 'courseId',  compare:'custom'} )\" class=\"form-control\" >\r\n                \t<option value=\"\"></option>\r\n                   <option  value=\"${config.SANDBOX_ID}\">Sandbox</option>\r\n                   <option  value=\"Regular\">Regular</option>\r\n              \t</select>\r\n              </th>\r\n              <th>\r\n               \t<select value.bind=\"requestStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )\" class=\"form-control\" >\r\n\t                  <option value=\"\"></option>\r\n\t                   <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\r\n\t              </select>\r\n              </th>\r\n              <th></th>\r\n              <th>\r\n              \t<select value.bind=\"productFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'productFilter',  collectionProperty: 'productId', displayProperty: 'name',  compare:'match'} )\" class=\"form-control\" >\r\n\t                  <option value=\"\"></option>\r\n\t                  <option repeat.for=\"product of products.productsArray\" value=\"${product._id}\">${product.name}</option>\r\n\t              </select>\r\n              </th>\r\n              <th>\r\n                <input value.bind=\"nameFilterValue\" input.delegate=\"dataTable.filterList(nameFilterValue, { type: 'custom',  filter: nameCustomFilter, collectionProperty: 'fullName', compare:'custom'} )\"  class=\"form-control\" />\r\n              </th>\r\n            </tr>\r\n            <tr click.trigger=\"selectRequest($index, $event, request)\" repeat.for=\"request of dataTable.displayArray\">\r\n              <td data-title=\"Request No\">${request.requestNo}</td>\r\n              <td data-title=\"Required Date\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n              <td data-title=\"Date Created\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n              <td data-title=\"Course\">${request.requestId.courseId | sandbox:config.SANDBOX_ID}</td>\r\n              <td data-title=\"Status\">${request.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\r\n              <td data-title=\"IDs Requested\">${request.requestId | idsRequested}\r\n              <td data-title=\"Product\">${request.productId | lookupValue:products.productsArray:\"_id\":\"name\"}</td>\r\n              <td data-title=\"Person\">${request.requestId.personId | lookupValue:people.instutionPeopleArray:\"_id\":\"fullName\"}</td>\r\n            </tr>\r\n          </tbody>\r\n        </table>\r\n      </div>\r\n    </div>\r\n  </div>\r\n  </div>\r\n</template>"; });
@@ -54375,7 +54398,7 @@ define('text!modules/user/components/uccInformation.html', ['module'], function(
 define('text!modules/user/requests/clientRequests.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>     \n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template>"; });
 define('text!modules/user/requests/createRequests.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"fuelux/css/fuelux.min.css\"></require>\n<require from=\"flatpickr/flatpickr.css\"></require>\n<div class=\"row\">\n <span  show.bind=\"showLockMessage\" class=\"leftMargin bottomMargin\" >Request is currently locked by ${lockObject.personId | lookupValue:people.peopleArray:\"_id\":'fullName'}</span>\n \n</div>\n  <div class=\"fuelux col-lg-7 blackText\" style=\"height:1000px;\">\n    <div class=\"wizard\" data-initialize=\"wizard\" id=\"myWizard\">\n      <div class=\"steps-container\">\n        <ul class=\"steps\">\n          <li data-step=\"1\"  data-target=\"#step1\" class=\"active\">\n            <span class=\"badge badge-info\">1</span>Step 1<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"2\" data-target=\"#step2\">\n            <span class=\"badge\">2</span>Step 2<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"3\" data-target=\"#step3\">\n            <span class=\"badge\">3</span>Step 3<span class=\"chevron\"></span>\n          </li>\n          <li data-step=\"4\" data-target=\"#step4\">\n            <span class=\"badge\">4</span>Step 4<span class=\"chevron\"></span>\n          </li>\n        </ul>\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn btn-default btn-prev btn-md\">\n           <span><i class=\"fa fa-chevron-left\" aria-hidden=\"true\"></i></span>Prev</button>\n        <button type=\"button\" class=\"btn btn-primary btn-next btn-md\" data-last=\"Complete\">Next\n          <span><i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i></span>\n        </button>\n      </div>\n      <div class=\"step-content\">\n\n        <div class=\"step-pane active\" id=\"step1\" data-step=\"1\">\n          <h3><strong>Step 1 </strong> - Course Information</h3>\n          <compose view=\"./components/client-request-step1.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step2\"  data-step=\"2\">\n          <h3><strong>Step 2 </strong> - Products</h3>\n\n          <compose view=\"./components/client-request-step2.html\"></compose>\n\n        </div>\n\n        <div class=\"step-pane\" id=\"step3\"  data-step=\"3\">\n          <h3><strong>Step 3 </strong> - Additional Comments</h3>\n          <compose view=\"./components/client-request-step3.html\"></compose>\n        </div>\n\n        <div class=\"step-pane\" id=\"step4\"  data-step=\"4\">\n          <h3><strong>Step 4 </strong> - Requested Dates</h3>\n          <compose view=\"./components/client-request-step4.html\"></compose>\n        </div>\n\n      </div>\n    </div>\n  </div>\n  <div class=\"col-lg-4 leftMargin\" id=\"SessionInfo\">\n\t\t\t<h2 class=\"underline\">Current Sessions</h2>\n\t\t\t<div class=\"list-group\">\n\t\t\t\t<a class=\"list-group-item\" repeat.for=\"session of sessions.sessionsArray\">\n\t\t\t\t\t<h4 class=\"list-group-item-heading\">${session.sessionStatus}: Session ${session.session} - ${session.year}</h4>\n\t\t\t\t\t<p class=\"list-group-item-text\">Requests open: ${session.requestsOpenDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t\t<p class=\"list-group-item-text\">Clients available: ${session.startDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t\t<p class=\"list-group-item-text\">Session ends: ${session.endDate | dateFormat:config.DATE_FORMAT_TABLE}</p>\n\t\t\t\t</a>\n    </div>\n  </div>\n  <div show.bind=\"sessionSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Session: ${sessions.selectedSession.session} - ${sessions.selectedSession.year}</h4></div> \n  <div show.bind=\"sandBoxClient\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${config.SANDBOX_NAME}</h4></div> \n  <div show.bind=\"courseSelected\" class=\"topMargin col-lg-4 leftMargin\"><h4>Course: ${people.selectedCourse.number} - ${people.selectedCourse.name}</h4></div> \n  <div class=\"topMargin col-lg-4 leftMargin\" style=\"display: none;\" id=\"existingRequestInfo\"></div>\n\n  <div id=\"curriculumInfo\" class=\"topMargin col-lg-4 leftMargin\" >\n    <div class=\"panel panel-default\" >\n      <div class=\"panel-heading\">${productInfoObject.header}</div>\n      <div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\n    </div>\n  </div>\n</div>\n  \n</template>\n"; });
 define('text!modules/user/requests/viewProducts.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"container\">\n   <div class=\"col-lg-5 topMargin\">\n        <label id=\"productList\">Available Products</label>\n        <div class=\"well well2 overFlow\">\n          <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter products\"/>\n          <ul class=\"list-group\">\n            <a  click.trigger=\"selectProduct($event)\" type=\"button\" repeat.for=\"product of filteredProductsArray\" id=\"${product._id}\"\n                    mouseover.delegate=\"showCurriculum(product, $event)\" mouseout.delegate=\"hideCurriculum()\"\n                    class=\"list-group-item dropbtn\">${product.name}</a>\n          </ul>\n        </div>\n\t</div>\n\t <div id=\"curriculumInfo\" class=\"topMargin col-lg-6 leftMargin\">\n\t\t<div class=\"col-lg-6\" style=\"position:fixed;\">\n\t\t\t<h2>${productInfoObject.header}</h2>\n\t\t\t<div class=\"panel-body\" innerhtml.bind=\"productInfoObject.info\"></div>\n\t\t</div>\n\t</div>\n  </div>\n</template>"; });
-define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n                <!-- Session Select -->\n            <div class=\"col-lg-4\">\n                <div class=\"form-group topMargin leftMargin\">\n                    <select show.bind=\"!requestSelected\" value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n                    <option value=\"\">Select a session</option>\n                    <option repeat.for=\"session of sessions.sessionsArray\"\n                            value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n                    </select>\n                </div>\n            </div>\n\n            <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsTable.html\"></compose>\n            </div> \n            <div show.bind=\"requestSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/viewRequestsForm.html\"></compose>\n            </div>\n        </div>\n      </div> \n</template>"; });
+define('text!modules/user/requests/viewRequests.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-default\">\n      <div class=\"panel-body\">\n        <div class=\"col-lg-4\">\n            <div class=\"form-group topMargin leftMargin\">\n                <select show.bind=\"!requestSelected\" value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n                <option repeat.for=\"session of sessions.sessionsArray\"\n                        value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n                </select>\n            </div>\n        </div>\n\n        <div show.bind=\"!requestSelected\" class=\"col-lg-12\">\n            <compose view=\"./components/viewRequestsTable.html\"></compose>\n        </div> \n        <div show.bind=\"requestSelected\" class=\"col-lg-12\">\n            <compose view=\"./components/viewRequestsForm.html\"></compose>\n        </div>\n      </div>\n    </div> \n</template>"; });
 define('text!modules/user/support/createHelpTickets.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n        <div class=\"col-lg-4\">\r\n            <compose view='./components/helpTicketType.html'></compose>\r\n\r\n            <compose show.bind=\"helpTicketType != 'NULL' && requestsRequired\" view='./components/Requests.html'></compose>\r\n           \r\n        </div>\r\n        <div class=\"col-lg-8\">\r\n            <compose show.bind=\"showAdditionalInfo && helpTicketType != 'NULL'\" view='./components/helpTicketDetails.html'></compose>\r\n        </div>\r\n      </div>\r\n    </div> <!-- Panel Body -->\r\n</template>"; });
 define('text!modules/user/support/curriculum.html', ['module'], function(module) { module.exports = "<template>\r\n\t<div class=\"col-lg-3\">\r\n\t\t<h4>Curriculum Categories</h4>\r\n\t\t<div>\r\n\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t<button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"category of curriculum.curriculumCatArray\"\r\n\t\t\t\t\tid=\"${category.name}\" class=\"list-group-item\">${category.name}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n\t<div class=\"col-lg-9\">\r\n\t\t<div show.bind=\"typeSelected != '' && !curriculumSelected\" style='padding:15px;'>\r\n\t\t\t<div class='row'>\r\n\t\t\t\t<div class='col-lg-12 bottomMargin'>\r\n\t\t\t\t\t<table id=\"newsTable\" class=\"table table-striped table-hover\">\r\n\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<td colspan='4'>\r\n\t\t\t\t\t\t\t\t\t<compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<th>Title </th>\r\n\t\t\t\t\t\t\t\t<th>Rating</th>\r\n\t\t\t\t\t\t\t\t<th>Rate It</th>\r\n\t\t\t\t\t\t\t\t<th>Products</th>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t<tr repeat.for=\"curriculum of curriculumArray\">\r\n\t\t\t\t\t\t\t\t<td click.delegate=\"selectCurriculum(curriculum)\" data-title=\"Title\" class=\"col-lg-6\">${curriculum.title}</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\">${curriculum.rating | formatDigits:2}</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Rating\" class=\"col-lg-2\">\r\n\t\t\t\t\t\t\t\t\t<rate-it id=\"${curriculum._id}\" change.delegate=\"rateCurriculum($event)\" rating.two-way=\"curriculum.rating\" raters.bind=\"curriculum.raters\"></rate-it>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t<td data-title=\"Products\" class=\"col-lg-4\">\r\n\t\t\t\t\t\t\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t\t\t\t\t\t\t<li repeat.for=\"product of curriculum.products\" class=\"list-group-item\">${product | lookupValue:products.productsArray:\"_id\":\"name\"}</li>\r\n\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t</table>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div show.bind=\"curriculumSelected\">\r\n\t\t\t<div class=\"bottomMargin list-group-item leftMargin rightMargin\">\r\n\t\t\t\t<span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span click.delegate=\"add()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Add Comment\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span show.bind=\"addComment\" click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\r\n\t\t\t\t\tdata-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<span show.bind=\"addComment\" click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n\t\t\t\t\ttitle=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"panel panel-default leftMargin rightMargin\">\r\n\t\t\t\t <div class=\"panel-heading\">\r\n\t\t\t\t\t<h3 class=\"panel-title\">${curriculum.selectedCurriculum.title}</h3>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div show.bind=\"curriculum.selectedCurriculum.description.length > 0\" class=\"panel-body\" innerhtml.bind=\"curriculum.selectedCurriculum.description\">\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"topMargin bigLeftMargin\" show.bind=\"curriculum.selectedCurriculum.file.fileName != undefined\">\r\n\t\t\t\t\t<a href=\"${config.DOWNLOAD_URL}/curriculum/${curriculum.selectedCurriculum.category}/${curriculum.selectedCurriculum.file.fileName}\" innerhtml.bind='curriculum.selectedCurriculum.file.fileName' target='_blank'></a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div show.bind=\"addComment\">\r\n\t\t\t\t<h3>Comments are not anonymous</h3>\r\n\t\t\t\t <editor value.bind=\"comment\" height=\"250\"></editor>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"well well-sm topMargin leftMargin rightMargin\" show.bind=\"curriculum.selectedCurriculum.customerComments.length > 0\">\r\n\t\t\t\t<!-- Timeline Content -->\r\n\t\t\t\t<div class=\"smart-timeline\">\r\n\t\t\t\t\t<ul class=\"smart-timeline-list\">\r\n\t\t\t\t\t\t<li  repeat.for=\"comment of curriculum.selectedCurriculum.customerComments\">\r\n\t\t\t\t\t\t\t<compose view=\"./components/comment.html\"></compose>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n</template>"; });
 define('text!modules/user/support/downloads.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"panel panel-default\">\r\n      <div class=\"panel-body\">\r\n          <div class=\"col-lg-3\">\r\n\t\t<h4>Download Categories</h4>\r\n\t\t<div>\r\n\t\t\t<ul class=\"list-group\">\r\n\t\t\t\t<button click.trigger=\"typeChanged($event, $index)\" type=\"button\" repeat.for=\"type of downloads.appCatsArray\" id=\"${type.downCatcode}\"\r\n\t\t\t\t\tclass=\"list-group-item\">${type.description}</button>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t</div>\r\n       \r\n\r\n        <div show.bind=\"typeSelected != ''\" class=\"col-lg-9\" style='padding:15px;'>\r\n            <div class='row'>\r\n                <div class='col-lg-12 bottomMargin'>\r\n                    <table id=\"newsTable\" class=\"table table-striped table-hover\">\r\n                        <thead>\r\n                            <tr>\r\n                                <td colspan='3'>\r\n                                    <compose view=\"../../../resources/elements/table-navigation-bar.html\"></compose>\r\n                                </td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th >Name </th>\r\n                                <th>File</th>\r\n                                <th >Decription</th>\r\n                            </tr>\r\n                        </thead>\r\n                        <tbody>\r\n                            <tr repeat.for=\"item of dataTable.displayArray\">\r\n                                <td data-title=\"name\" class=\"col-md-2\">${item.name}</td>\r\n                                <td data-title=\"originalFilename\" class=\"col-md-2\">\r\n                                    <a href=\"${config.DOWNLOAD_URL}/downloads/${typeSelected}/${item.file.originalFilename}\" target=\"_blank\">${item.file.originalFilename}</a>\r\n                                </td>\r\n                                <td data-title=\"description\" class=\"col-md-8\">\r\n                                    <div>${item.description}</div>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n   </div>\r\n</template>"; });

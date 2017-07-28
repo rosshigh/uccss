@@ -349,7 +349,7 @@ export class ClientRequests {
         })
     }
 
-    groupRequestsByInstitution(){
+    async groupRequestsByInstitution(){
         if(!this.requestsDetailsArray) {
             return;
         }
