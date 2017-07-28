@@ -155,6 +155,7 @@ export class ClientRequestAnalytics {
 
         this.institutionChartData = {
             labels: categories,
+             maintainAspectRatio: false,
             datasets: [
                 {
                     label: this.config.REQUEST_STATUS[0].description,
@@ -264,6 +265,9 @@ export class ClientRequestAnalytics {
 
         this.productChartData = {
             labels: categories,
+
+                    maintainAspectRatio: false,
+
             datasets: [
                 {
                     label: this.config.REQUEST_STATUS[0].description,

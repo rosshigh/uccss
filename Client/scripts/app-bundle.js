@@ -925,6 +925,7 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
             this.institutionChartData = {
                 labels: categories,
+                maintainAspectRatio: false,
                 datasets: [{
                     label: this.config.REQUEST_STATUS[0].description,
                     data: data[0],
@@ -1053,6 +1054,9 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
             this.productChartData = {
                 labels: categories,
+
+                maintainAspectRatio: false,
+
                 datasets: [{
                     label: this.config.REQUEST_STATUS[0].description,
                     data: data[0],
