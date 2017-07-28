@@ -403,7 +403,7 @@ export class ClientRequests {
             if(item.productId.name != prodID){
                 prodID = item.productId.name;
                 var obj = this.utils.copyObject(templateObj);
-                obj.productId = item.productId.name;
+                obj.productId = item.productId;
                 this.analyticsProductsResultArray.push(obj);
             }
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;

@@ -429,7 +429,7 @@ if(env === 'development'){
           template: 'client-request-updated',
           context: mailObject.context
       };
-console.log(mail)
+
       nodeMailerSendMail(mail)   
   }
 
@@ -446,7 +446,7 @@ console.log(mail)
         template: 'client-request-customer-action',
         context: mailObject.context
     };
-console.log(mail);
+
     nodeMailerSendMail(mail)
   }
 

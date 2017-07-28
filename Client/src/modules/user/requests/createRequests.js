@@ -396,7 +396,8 @@ export class ViewHelpTickets {
     this.validation.addRule(4,"productListTable",[{"rule":"custom","message":"Enter all required dates",
       "valFunction":function(context){
         for(var i = 0; i < context.requests.selectedRequest.requestDetails.length; i++ ){
-          if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""){
+          if(!context.requests.selectedRequest.requestDetails[i].requiredDate || context.requests.selectedRequest.requestDetails[i].requiredDate === ""
+            || moment(context.requests.selectedRequest.requestDetails[i].requiredDate).isBefore(context.minStartDate) ){
             return false;
           }
         }

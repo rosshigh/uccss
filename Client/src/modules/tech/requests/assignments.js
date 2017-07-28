@@ -202,20 +202,15 @@ export class Assignments {
         this.profileRequest = undefined;
         
         //Initiate interface flags
-        // this.enableButton = false;
         this.requestSelected = 'form';
 
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.selectedRequestDetail = this.utils.copyObject(request);
-        // this.clientRequests.FromId(request._id);
-		// this.clientRequests.(this.editIndex);
 		this.productId = this.selectedRequestDetail.productId._id;
         this.products.selectedProductFromId(this.productId);
 
         this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
-        
-        // this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         
         if(!this.products.selectedProduct.systems[0] ){
@@ -254,10 +249,7 @@ export class Assignments {
 			this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
 			//Select the system in the interface
 			this.selectedSystemId = this.systems.selectedSystem._id;
-            // setTimeout(function(){$('#systemSelect option:eq(1)').attr('selected', 'true')}, 250);;
         }
-        // this.customerMessageText = this.selectedRequestDetail.customerMessage ? this.selectedRequestDetail.customerMessage : "";
-        // this.clientsRequired = this.products.selectedProduct.clientRelevant ? this.products.selectedProduct.clientRelevant : false;
         
         //Check if the request is a sandbox request
         if (this.selectedRequestDetail.requestId.courseId._id === this.config.SANDBOX_ID) {
@@ -268,8 +260,6 @@ export class Assignments {
             this.idBuffer = localStorage.getItem('idBuffer')  ? localStorage.getItem('idBuffer') : this.config.REGULAR_ID_BUFFER;
             this.numberOfIds = parseInt(this.selectedRequestDetail.requestId.graduateIds)
                 + parseInt(this.selectedRequestDetail.requestId.undergradIds);
-                // + parseInt(this.selectedRequestDetail.requestId.addUndergraduates)
-                // + parseInt(this.selectedRequestDetail.requestId.addGraduates);
             this.sandBoxOnly = false;
         }
 
@@ -394,9 +384,7 @@ export class Assignments {
 		//Create a new assignment
 		this.assignmentDetails.push({
 			staffId : this.userObj._id, 
-			// assignedDate : new Date(),
 			client : client.client,
-			// client : client._id,
 			systemId : client.systemId,
 			firstID: this.firstID,
 			lastID : this.lastID,
@@ -409,13 +397,6 @@ export class Assignments {
 		//Calculate the total ids assigned so far
 		this.totalIdsAssigned = parseInt(this.totalIdsAssigned) + parseInt(this.lastID) - parseInt(this.firstID);
 		this.assignmentDetailIndex = this.assignmentDetails.length - 1;
-		
-		// this.assignmentDetails[this.assignmentDetailIndex].firstID = this.firstID;
-		// this.assignmentDetails[this.assignmentDetailIndex].lastID = this.lastID;
-		// this.proposedClient[this.assignmentDetailIndex].firstFacIdAssigned =  this.firstNumericFacID;
-		// this.assignmentDetails[this.assignmentDetailIndex].firstFacID = this.firstNumericFacID;
-		// this.proposedClient[this.assignmentDetailIndex].lastFacIdAssigned =  this.lastNumericFacID;
-		// this.assignmentDetails[this.assignmentDetailIndex].lastFacID = this.lastNumericFacID;
 		
 		//Calculate the user ids and passwords
 		if(this.studentIDTemplates.length)
@@ -1039,7 +1020,8 @@ export class Assignments {
         await this.products.saveProduct();
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
         this.showAddStudentTemplate = false;
-	}
+    }
+    
     openSettings(){
         this.showSettings = ! this.showSettings;
         if( this.showSettings){
@@ -1098,11 +1080,19 @@ export class Assignments {
     }
 
     clearFilters(){
-        $(this.courseFilter).val("");
-        $(this.requestStatus).val("");
-        $(this.productFilter).val("");
-        $(this.nameFilter).val("");
-        $(this.nickNameFilter).val("");
+        this.requiredDateFilterValue = "";
+        this.createdDateFilterValue = "";
+        this.requestStatusFilter = "";
+        this.productFilterValue = "";
+        this.courseFilterValue = "";
+        this.helpTicketTypeFilterValue = "";
+        this.institutionFilterValue = "";
+         this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+        // $(this.courseFilter).val("");
+        // $(this.requestStatus).val("");
+        // $(this.productFilter).val("");
+        // $(this.nameFilter).val("");
+        // $(this.nickNameFilter).val("");
         this.filterInAssigned();
     }
 		

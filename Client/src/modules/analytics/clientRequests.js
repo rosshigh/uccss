@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {Router} from "aurelia-router";
-
+import {CommonDialogs} from '../../resources/dialogs/common-dialogs';
 import {DataTable} from '../../resources/utils/dataTable';
 import {Sessions} from '../../resources/data/sessions';
 import {Systems} from '../../resources/data/systems';
@@ -11,10 +11,10 @@ import {Utils} from '../../resources/utils/utils';
 import {People} from '../../resources/data/people';
 
 import moment from 'moment';
-import $ from 'jquery';
 
-@inject(Router, AppConfig, People, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
+@inject(Router, AppConfig, CommonDialogs, People, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
 export class ClientRequestAnalytics {
+    summerTable = true;
     categories = [
         {
             code: 0,
@@ -30,9 +30,10 @@ export class ClientRequestAnalytics {
     institutionTableSelected = true;
     productTableSelected = true;
 
-    constructor(router, config, people, datatable, utils, sessions, products, systems, requests) {
+    constructor(router, config, dialog, people, datatable, utils, sessions, products, systems, requests) {
         this.router = router;
         this.config = config;
+        this.dialog = dialog;
         this.people = people;
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -255,7 +256,7 @@ export class ClientRequestAnalytics {
             data[4].push(item["5"]);
             data[5].push(item["6"]);
             data[6].push(item["7"]);
-            categories.push(item.productId); 
+            categories.push(item.productId.name); 
         });
 
         this.productChartData = {
@@ -321,6 +322,17 @@ export class ClientRequestAnalytics {
         };
     }
 
+    async showProductDetail(product){
+        this.summerTable = !this.summerTable;
+        if(!this.summerTable){
+            let response = await this.requests.getClientRequestsDetailsArray('?filter=[and]productId|eq|' + product.productId._id + ':sessionId|eq|' + this.selectedSession, true);
+            this.dataTable.updateArray(this.requests.requestsDetailsArray);
+            this.selectedProductDetails = product.productId.name;
+        } else {
+            this. getProductsRequests();
+        }
+    }
+
     showInstitutionTable(){
         this.institutionTableSelected = true;
     }
@@ -335,6 +347,76 @@ export class ClientRequestAnalytics {
 
     showProductGraph(){
         this.productTableSelected = false;
+    }
+
+    customerActionDialog(){
+         if(this.profileRequest){
+            this.model = 'header';
+            this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
+            this.requestId = this.profileRequest.requestId._id;
+            this.course = this.profileRequest.requestId.courseId ? this.profileRequest.requestId.courseId.name : this.config.SANDBOX_NAME;
+            this.productName = this.profileRequest.productId.name;
+            this.requiredDate = this.profileRequest.requiredDate;
+            this.email = this.profileRequest.requestId.personId.email;
+            this.hideProfile();
+         } 
+            
+        let subject = "Question about product request " +  this.selectedRequestNo;
+        let email = {emailBody: "", emailSubject: subject, emailId: this.email};
+        return this.dialog.showEmail(
+                "Enter Email",
+                email,
+                ['Submit', 'Cancel']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.sendTheEmail(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+    }
+
+    async sendTheEmail(email){
+        if(email){
+            var date = new Date(this.requiredDate);
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear(); 
+            this.message = {
+                reason: 3,
+                id: this.requestId,
+                customerMessage : email.email.emailBody, 
+                email: email.email.emailId,
+                subject: email.email.emailSubject,
+                clientRequestNo: this.selectedRequestNo,
+                product: [{name: this.productName, requiredDate: month + "/" + day + "/" + year}],
+                session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
+                course: this.course,
+                requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                model: this.model,
+                audit: {
+                    property: 'Send Message',
+                    eventDate: new Date(),
+                    newValue: email.email.emailBody,
+                    personId: this.userObj._id
+                }
+            };     
+            let serverResponse = await this.requests.sendCustomerMessage(this.message);
+            if (!serverResponse.error) {
+                this.utils.showNotification("The message was sent");
+            }
+        } 
+    }
+	
+	showProfile(request, el){
+        this.profileRequest = request;
+        $(".hoverProfile").css("top", el.clientY - 250);
+        $(".hoverProfile").css("left", el.clientX - 300);
+        $(".hoverProfile").css("display", "block");
+    }
+
+    hideProfile(){
+        $(".hoverProfile").css("display", "none");
     }
 
     customProductSorter(sortProperty, sortDirection, sortArray, context){  
@@ -355,7 +437,34 @@ export class ClientRequestAnalytics {
         return item.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
-     customProductFilterValue(value, item, context){
+    customProductFilterValue(value, item, context){
         return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    // customInstitutionsSorter(sortProperty, sortDirection, sortArray, context){ 
+    //     return sortArray.sort((a, b) => {
+    //         var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
+    //         return result * sortDirection;
+    //     });
+    // }
+
+    customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+            var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
+            return result * sortDirection;
+        });
+    }
+
+    customNameFilter(value, item, context){
+        return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    statusCustomFilter(value, item, context){
+        if(item.requestStatus == value) return false;
+        return true;
+    }
+
+    institutionCustomFilter(value, item, context){
+        return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }
