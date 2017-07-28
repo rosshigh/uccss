@@ -455,6 +455,13 @@ export class ClientRequestAnalytics {
         });
     }
 
+    customInstituteSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+            var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
+            return result * sortDirection;
+        });
+    }
+
     customNameFilter(value, item, context){
         return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
