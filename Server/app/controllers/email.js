@@ -447,7 +447,7 @@ console.log(mail)
         context: mailObject.context
     };
 console.log(mail);
-    // nodeMailerSendMail(mail)
+    nodeMailerSendMail(mail)
   }
 
   genericEmail = function(mailObject){
