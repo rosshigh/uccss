@@ -1088,11 +1088,6 @@ export class Assignments {
         this.helpTicketTypeFilterValue = "";
         this.institutionFilterValue = "";
          this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-        // $(this.courseFilter).val("");
-        // $(this.requestStatus).val("");
-        // $(this.productFilter).val("");
-        // $(this.nameFilter).val("");
-        // $(this.nickNameFilter).val("");
         this.filterInAssigned();
     }
 		
@@ -1149,6 +1144,13 @@ export class Assignments {
             var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
             return result * sortDirection;
         });
+    }
+
+    customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+			var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+			return result * sortDirection;
+		});
     }
 
 }

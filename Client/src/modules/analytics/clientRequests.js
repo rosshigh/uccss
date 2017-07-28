@@ -441,13 +441,6 @@ export class ClientRequestAnalytics {
         return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
-    // customInstitutionsSorter(sortProperty, sortDirection, sortArray, context){ 
-    //     return sortArray.sort((a, b) => {
-    //         var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
-    //         return result * sortDirection;
-    //     });
-    // }
-
     customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
             var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
@@ -460,6 +453,13 @@ export class ClientRequestAnalytics {
             var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
             return result * sortDirection;
         });
+    }
+
+    customRequestStatusSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+			var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+			return result * sortDirection;
+		});
     }
 
     customNameFilter(value, item, context){

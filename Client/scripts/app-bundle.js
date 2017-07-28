@@ -1292,6 +1292,13 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
             });
         };
 
+        ClientRequestAnalytics.prototype.customRequestStatusSorter = function customRequestStatusSorter(sortProperty, sortDirection, sortArray, context) {
+            return sortArray.sort(function (a, b) {
+                var result = a[sortProperty] < b[sortProperty] ? -1 : a[sortProperty] > b[sortProperty] ? 1 : 0;
+                return result * sortDirection;
+            });
+        };
+
         ClientRequestAnalytics.prototype.customNameFilter = function customNameFilter(value, item, context) {
             return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
         };
@@ -26355,7 +26362,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             this.helpTicketTypeFilterValue = "";
             this.institutionFilterValue = "";
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-
             this.filterInAssigned();
         };
 
@@ -26410,6 +26416,13 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         Assignments.prototype.customPersonSorter = function customPersonSorter(sortProperty, sortDirection, sortArray, context) {
             return sortArray.sort(function (a, b) {
                 var result = a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName'] ? -1 : a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName'] ? 1 : 0;
+                return result * sortDirection;
+            });
+        };
+
+        Assignments.prototype.customRequestStatusSorter = function customRequestStatusSorter(sortProperty, sortDirection, sortArray, context) {
+            return sortArray.sort(function (a, b) {
+                var result = a[sortProperty] < b[sortProperty] ? -1 : a[sortProperty] > b[sortProperty] ? 1 : 0;
                 return result * sortDirection;
             });
         };
