@@ -378,6 +378,14 @@ export class ClientRequests {
             that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;
             that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1][item.requestStatus] += 1;
         })
+
+        this.analyticsInstitutionResultArray.forEach(item => {
+            var total = 0;
+            this.config.REQUEST_STATUS.forEach((status, index) => {
+                total += item[index];
+            })
+           item['total'] = total;
+        })
         
     }
 

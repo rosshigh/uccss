@@ -6839,6 +6839,8 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
 
         ClientRequests.prototype.groupRequestsByInstitution = function () {
             var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+                var _this4 = this;
+
                 var sortedArray, instID, numStatuses, templateObj, i, that;
                 return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
@@ -6880,7 +6882,15 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                     that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1][item.requestStatus] += 1;
                                 });
 
-                            case 11:
+                                this.analyticsInstitutionResultArray.forEach(function (item) {
+                                    var total = 0;
+                                    _this4.config.REQUEST_STATUS.forEach(function (status, index) {
+                                        total += item[index];
+                                    });
+                                    item['total'] = total;
+                                });
+
+                            case 12:
                             case 'end':
                                 return _context14.stop();
                         }
@@ -6896,7 +6906,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         }();
 
         ClientRequests.prototype.groupRequestsByProduct = function groupRequestsByProduct() {
-            var _this4 = this;
+            var _this5 = this;
 
             if (!this.requestsDetailsArray) {
                 return;
@@ -6917,11 +6927,11 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             sortedArray.forEach(function (item) {
                 if (item.productId.name != prodID) {
                     prodID = item.productId.name;
-                    var obj = _this4.utils.copyObject(templateObj);
+                    var obj = _this5.utils.copyObject(templateObj);
                     obj.productId = item.productId;
-                    _this4.analyticsProductsResultArray.push(obj);
+                    _this5.analyticsProductsResultArray.push(obj);
                 }
-                _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
+                _this5.analyticsProductsResultArray[_this5.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
             });
         };
 
