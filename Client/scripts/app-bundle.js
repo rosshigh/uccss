@@ -754,10 +754,13 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
                                 this.selectedCategory = this.categories[0];
                                 this.selectedSession = this.sessions.sessionsArray[0]._id;
-                                this.getInstitutionRequests();
-                                this.getProductsRequests();
+                                _context.next = 7;
+                                return this.getInstitutionRequests();
 
                             case 7:
+                                this.getProductsRequests();
+
+                            case 8:
                             case 'end':
                                 return _context.stop();
                         }

@@ -58,7 +58,7 @@ export class ClientRequestAnalytics {
         ]);
         this.selectedCategory = this.categories[0];
         this.selectedSession = this.sessions.sessionsArray[0]._id;
-        this.getInstitutionRequests();
+        await this.getInstitutionRequests();
         this.getProductsRequests();
     }
 
