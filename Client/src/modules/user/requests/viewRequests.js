@@ -53,6 +53,8 @@ export class ViewRequests {
       this.config.getConfig() 
     ]);
     this.people.coursesArray.push({_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME});
+    this.selectedSession = this.sessions.sessionsArray[0]._id;
+    this.getRequests();
   }
 
   deactivate(){
@@ -75,13 +77,6 @@ export class ViewRequests {
     await this.getRequests();
     this.spinnerHTML = "";
   }
-
-  // setDates(){
-  //   this.minStartDate = this.sessions.selectedSession.startDate;
-  //   this.maxStartDate = this.sessions.selectedSession.endDate;
-  //   this.minEndDate = this.sessions.selectedSession.startDate;
-  //   this.maxEndDate = this.sessions.selectedSession.endDate;
-  // }
 
   async edit(product, el, index) { 
     this.requestSelected = true;

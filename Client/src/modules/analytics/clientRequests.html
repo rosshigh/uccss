@@ -16,7 +16,6 @@
       <div class="col-lg-4">
         <div class="form-group topMargin leftMargin">
             <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
-              <option value="">Select a session</option>
               <option repeat.for="session of sessions.sessionsArray"
                       value.bind="session._id">Session ${session.session} - ${session.year}</option>
             </select>

@@ -57,6 +57,7 @@ export class ClientRequestAnalytics {
             this.config.getConfig()
         ]);
         this.selectedCategory = this.categories[0];
+        this.selectedSession = this.sessions.sessionsArray[0]._id;
         this.getInstitutionRequests();
         this.getProductsRequests();
     }
@@ -64,7 +65,9 @@ export class ClientRequestAnalytics {
     typeChanged(category, el){
         this.selectedCategory = category;
         $('.categoryButtons').removeClass('active');
-        $(el.target).addClass('active');
+        if(el) {
+            $(el.target).addClass('active');
+        } 
         switch(category.code){
             case 0:
                 this.getInstitutionRequests();

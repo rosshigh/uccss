@@ -3,14 +3,12 @@ import {Router} from "aurelia-router";
 import {AppConfig} from '../../../config/appConfig'; 
 
 @inject(Router, AppConfig)
-export class Customers{
-    
-    tabs = [{id: 'editPeople', label: 'People'},{id: 'editInstitutions', label: 'Institutions'}];
-    tabPath = "modules/admin/customers/";
+export class TechRequests{
+    title="Tech Staff Client Assignments"
     
     constructor(router, config){
         this.router = router;
-        this.appConfig = config;
+        this.config = config;
     }
 
     attached(){
@@ -19,6 +17,10 @@ export class Customers{
             $(this).parent().addClass("active");
         });
     }
+
+    activate(){
+         this.config.getConfig(true);
+    }   
     
     configureRouter(config, router) {
         config.map([

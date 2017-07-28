@@ -57,7 +57,8 @@ export class Assignments {
         this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
         this.unassignedOnly = localStorage.getItem('unassignedOnly')  ? localStorage.getItem('unassignedOnly') == "true" : false;
         this.numberOfFacIDs = this.config.DEFAULT_FACULTY_IDS;
-
+        this.selectedSession = this.sessions.sessionsArray[0]._id;
+        this.getRequests();
 	}
 	
 	async getRequests() {
