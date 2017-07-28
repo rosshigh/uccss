@@ -25054,6 +25054,9 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.displayArray = new Array();
 
                             case 8:
+                                this.clearFilters();
+
+                            case 9:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -26179,6 +26182,15 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             this.lastID = 0;
             this.requestSelected = 'table';
             this.customerMessage = false;
+        };
+
+        Assignments.prototype.clearFilters = function clearFilters() {
+            $(this.courseFilter).val("");
+            $(this.requestStatus).val("");
+            $(this.productFilter).val("");
+            $(this.nameFilter).val("");
+            $(this.nickNameFilter).val("");
+            this.filterInAssigned();
         };
 
         Assignments.prototype.filterInAssigned = function filterInAssigned() {

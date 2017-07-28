@@ -76,6 +76,7 @@ export class Assignments {
         } else {
             this.displayArray = new Array();
         }
+        this.clearFilters();
 	}
 
 	async refresh() {
@@ -1094,6 +1095,15 @@ export class Assignments {
         this.lastID = 0;
         this.requestSelected = 'table';
         this.customerMessage = false;
+    }
+
+    clearFilters(){
+        $(this.courseFilter).val("");
+        $(this.requestStatus).val("");
+        $(this.productFilter).val("");
+        $(this.nameFilter).val("");
+        $(this.nickNameFilter).val("");
+        this.filterInAssigned();
     }
 		
 	filterInAssigned() {
