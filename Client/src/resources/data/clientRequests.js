@@ -355,7 +355,7 @@ export class ClientRequests {
         }
         var sortedArray = this.requestsDetailsArray 
             .sort((a, b) => {
-                var result = (a['requestId'].institutionId < b['requestId'].institutionId) ? -1 : (a['requestId'].institutionId > b['requestId'].institutionId) ? 1 : 0;
+                var result = (a['requestId'].institutionId.name < b['requestId'].institutionId.name) ? -1 : (a['requestId'].institutionId.name > b['requestId'].institutionId.name) ? 1 : 0;
                 return result;
             });
 
@@ -387,7 +387,7 @@ export class ClientRequests {
         }
         var sortedArray = this.requestsDetailsArray 
             .sort((a, b) => {
-                var result = (a.productId < b.productId) ? -1 : (a.productId > b.productId) ? 1 : 0;
+                var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
                 return result;
             });
 
@@ -400,10 +400,10 @@ export class ClientRequests {
         }
 
         sortedArray.forEach(item => {
-            if(item.productId != prodID){
-                prodID = item.productId;
+            if(item.productId.name != prodID){
+                prodID = item.productId.name;
                 var obj = this.utils.copyObject(templateObj);
-                obj.productId = item.productId;
+                obj.productId = item.productId.name;
                 this.analyticsProductsResultArray.push(obj);
             }
             this.analyticsProductsResultArray[this.analyticsProductsResultArray.length-1][item.requestStatus] += 1;

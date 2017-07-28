@@ -255,7 +255,7 @@ export class ClientRequestAnalytics {
             data[4].push(item["5"]);
             data[5].push(item["6"]);
             data[6].push(item["7"]);
-            categories.push(item.productId.name); 
+            categories.push(item.productId); 
         });
 
         this.productChartData = {
