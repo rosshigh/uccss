@@ -1,10 +1,16 @@
 <template>
+	<style>
+        .menuButtons {
+			color: ${config.ACTIVE_SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+        }
+    </style>
 	<div class="col-lg-3">
 		<h4>Curriculum Categories</h4>
 		<div>
-			<ul class="list-group">
+			<ul id="buttonGroup" class="list-group">
 				<button click.trigger="typeChanged($index, $event)" type="button" repeat.for="category of curriculum.curriculumCatArray"
-					id="${category.name}" class="list-group-item">${category.name}</button>
+					id="${category.name}" class="${ $first ? 'list-group-item menuButtons' : 'list-group-item'}">${category.name}</button>
 			</ul>
 		</div>
 	</div>

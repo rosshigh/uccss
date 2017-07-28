@@ -1,12 +1,18 @@
 <template>
+    <style>
+        .menuButtons {
+			color: ${config.ACTIVE_SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+        }
+    </style>
     <div class="panel panel-default">
       <div class="panel-body">
           <div class="col-lg-3">
 		<h4>Download Categories</h4>
 		<div>
-			<ul class="list-group">
+			<ul class="list-group" id="buttonGroup">
 				<button click.trigger="typeChanged($event, $index)" type="button" repeat.for="type of downloads.appCatsArray" id="${type.downCatcode}"
-					class="list-group-item">${type.description}</button>
+					class="${ $first ? 'menuButtons list-group-item' : 'list-group-item'}">${type.description}</button>
 			</ul>
 		</div>
 	</div>

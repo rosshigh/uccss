@@ -41,6 +41,11 @@ export class Download {
 
     typeChanged(el) {
         if (el.target.id != "") {
+            $("#buttonGroup").children().removeClass('menuButtons');
+            $("#buttonGroup").children().css("background-color","");
+            $("#buttonGroup").children().css("color","");
+            $(el.target).css("background-color",this.config.SUBMENU_BACKGROUND);
+            $(el.target).css("color",this.config.ACTIVE_SUBMENU_COLOR);
             this.typeSelected = el.target.id;
             this.filterList();
         }

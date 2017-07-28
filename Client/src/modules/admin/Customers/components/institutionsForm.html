@@ -1,4 +1,10 @@
 <<template>
+    <style>
+        .menuButtons {
+			color: ${config.ACTIVE_SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+        }
+    </style>
     <div class="col-lg-12">
         <div class="bottomMargin list-group-item leftMargin rightMargin">
             <span click.delegate="back()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
@@ -69,7 +75,7 @@
                                 <div class="panel-body">
                                     <div class="col-lg-2">
                                         <div id="instFormListGroup" class="list-group">
-                                            <a class="${ $first ? 'active' : ''} list-group-item" repeat.for="tab of tabs" href="" class="list-group-item" click.delegate="changeTab($event, $index)">
+                                            <a class="${ $first ? 'menuButtons' : ''} list-group-item" repeat.for="tab of tabs" href="" class="list-group-item" click.delegate="changeTab($event, $index)">
                                                 <h4 id="${tab.id}" class="list-group-item-heading">${tab.title}</h4>
                                             </a>
                                         </div>

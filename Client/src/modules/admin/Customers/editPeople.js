@@ -405,24 +405,41 @@ export class EditPeople {
     setFirstTab(){
         $("#peopleFormListGroup.list-group").children().removeClass('active');
         let target = $("#peopleFormListGroup.list-group").children()[0];
-        $(target).addClass('active');
+        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
+        // $(target).addClass('active');
         $(".in").removeClass('active').removeClass('in');
         $("#AddressTab").addClass('in').addClass('active');
     }
 
-    async changeTab(el, index) {
-        $("#peopleFormListGroup.list-group").children().removeClass('active');
-        var target = $(el.target);
-        if (target.is('a')) target = $(target.children()[0]);
-        target.parent().addClass('active');
+    async changeTab(el, index){
+        $("#peopleFormListGroup.list-group").children().removeClass('menuButtons');
+        $("#peopleFormListGroup.list-group").children().css("background-color","");
+        $("#peopleFormListGroup.list-group").children().css("color","");
+        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         $(".in").removeClass('active').removeClass('in');
-        $("#" + target.html() + "Tab").addClass('in').addClass('active');
-        switch (target.attr('id')) {
+        $("#" + el.target.id + "Tab").addClass('in').addClass('active');
+         switch (target.attr('id')) {
             case 'Courses':
                 await this.refreshCourses();
                 break;
         }
     }
+
+    // async changeTab(el, index) {
+    //     $("#peopleFormListGroup.list-group").children().removeClass('active');
+    //     var target = $(el.target);
+    //     if (target.is('a')) target = $(target.children()[0]);
+    //     target.parent().addClass('active');
+    //     $(".in").removeClass('active').removeClass('in');
+    //     $("#" + target.html() + "Tab").addClass('in').addClass('active');
+    //     switch (target.attr('id')) {
+    //         case 'Courses':
+    //             await this.refreshCourses();
+    //             break;
+    //     }
+    // }
  
     _cleanUp(){
         this.institutionId = "";

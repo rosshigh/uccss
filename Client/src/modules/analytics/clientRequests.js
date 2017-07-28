@@ -64,9 +64,12 @@ export class ClientRequestAnalytics {
 
     typeChanged(category, el){
         this.selectedCategory = category;
-        $('.categoryButtons').removeClass('active');
+        $('.categoryButtons').css("background-color","");
+         $('.categoryButtons').css("color","");
+        $('.categoryButtons').removeClass('menuButtons');
         if(el) {
-            $(el.target).addClass('active');
+            $(el.target).css("background-color", this.config.SUBMENU_BACKGROUND);
+             $(el.target).css("color", this.config.ACTIVE_SUBMENU_COLOR);
         } 
         switch(category.code){
             case 0:
@@ -126,10 +129,6 @@ export class ClientRequestAnalytics {
         var data = new Array();
         var categories = new Array();
         
-        // this.requests.analyticsInstitutionResultArray.forEach((item, index) => {
-        //     item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
-        // });
-
         this.config.REQUEST_STATUS.forEach(item => {
             data.push(new Array());
         })
@@ -234,10 +233,6 @@ export class ClientRequestAnalytics {
         
         var data = new Array();
         var categories = new Array();
-        
-        // this.requests.analyticsProductsResultArray.forEach((item, index) => {
-        //     item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
-        // });
 
         this.config.REQUEST_STATUS.forEach(item => {
             data.push(new Array());
