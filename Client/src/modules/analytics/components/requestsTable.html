@@ -36,7 +36,7 @@
                     </thead>
                     <tbody>
                         <tr repeat.for="stat of dataTable.displayArray">
-                            <td data-title="Institution">${stat.name}</td>ASSIGNED_REQUEST_CODE
+                            <td data-title="Institution">${stat.name}</td>
                             <td data-title="Total">${stat.total}</td>
                             <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
                         </tr>
