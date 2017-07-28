@@ -48,7 +48,7 @@
             <a repeat.for="document of products.selectedProduct.documents" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}"  target="_blank">${document.fileName}</a>
           </div>
           <label show.bind="requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0" class="topMargin">Assignment Comments</label>
-          <div class="col-lg-12 topMargin well" innerhtml.bind="requests.selectedRequestDetail.techComments"></div>
+          <div show.bind="requests.selectedRequestDetail.techComments && requests.selectedRequestDetail.techComments.length > 0" class="col-lg-12 topMargin well" innerhtml.bind="requests.selectedRequestDetail.techComments"></div>
         </div>
       </div>
     </div>

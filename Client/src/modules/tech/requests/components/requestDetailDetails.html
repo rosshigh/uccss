@@ -5,9 +5,9 @@
         <h3 class="panel-title">${selectedProductID | lookupValue:products.productsArray:"_id":"name"}</h3>
       </div>
       <div class="panel-body">
-        <h5>Request status: ${requests.selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</h5>
-        <h5>Assigned system: ${requests.selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h5>
-        <h5>Assigned client: ${requests.selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:"_id":"sid"}</h5>
+        <h5>Request status: ${selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}</h5>
+        <h5>Assigned system: ${selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h5>
+        <h5>Assigned client: ${selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:"_id":"sid"}</h5>
       </div>
     </div>
   </div>

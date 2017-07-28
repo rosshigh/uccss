@@ -118,7 +118,7 @@ module.exports = function (app) {
           if (err) {
             return next(err);
           } else {                                
-            res.status(200).json({message: "request created"});
+            res.status(200).json(result);
           }
         }) 
       })
@@ -134,14 +134,14 @@ module.exports = function (app) {
                       products: req.body.products,
                       numStudents: req.body.numStudents,
                       requestNo: req.body.clientRequestNo,
-                      comments: req.body.comments,
-                      name: req.body.fullName
+                      comments: req.body.comments
                     }   
           var mailObj = {
             email: req.body.email,
             cc: req.body.cc,
             context: context 
           }                                     
+
           requestCreated(mailObj);
           break;
         case 2: //request Updated
@@ -447,7 +447,8 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequestsDetails', function(req, res, next){
-    logger.log('Update request detail', 'verbose');   
+    logger.log('Update request detail', 'verbose');  
+console.log(req.body)     
     Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
       if(err) return next(err);
         ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){

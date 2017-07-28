@@ -166,7 +166,7 @@ export class ClientRequests {
                 if(email.email){
                     email.clientRequestNo = serverResponse.clientRequestNo;
                     email.reason = 1;
-                    this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
                 }
                 if(this.requestsArray){
                     this.requestsArray.push(this.selectedRequest);
@@ -179,7 +179,7 @@ export class ClientRequests {
                  if(email.email){
                     email.requestNo = this.selectedRequest.requestNo;
                      email.reason = 2;
-                    this.data.saveObject(email, this.CLIENT_REQIEST_EMAIL, "post");
+                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
                 }
                 if(this.requestsArray && this.editRequestIndex){
                     this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
@@ -211,7 +211,7 @@ export class ClientRequests {
             return;
         }
 
-       let serverResponse = await this.data.deleteObject(this.data.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+       let serverResponse = await this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
         if (!serverResponse.error) {
             this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
             return serverResponse;
@@ -253,7 +253,7 @@ export class ClientRequests {
         return null;
     }
 
-    setSelectedRequestDetail(request){
+    setTheSelectedRequestDetail(request){
       this.selectedRequestDetail = this.utils.copyObject(request);
     }
 

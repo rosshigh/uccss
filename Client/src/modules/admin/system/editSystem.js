@@ -94,6 +94,14 @@ export class EditSystem {
         }
     }
 
+    async saveBackups(system) {
+        this.systems.setSelectedSystem(system);
+        let serverResponse = await this.systems.saveSystem();
+        if (!serverResponse.error) {
+            this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
+        } 
+    }
+
     toggleSandBox(index){
         if(this.systems.selectedSystem.clients[index].assignments.length > 0){
             this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");

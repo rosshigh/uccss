@@ -3,7 +3,7 @@ import {Router} from "aurelia-router";
 import {AppConfig} from '../../../config/appConfig'; 
 
 @inject(Router, AppConfig)
-export class System{
+export class EditSystem{
     title="System";
     
     constructor(router, config){

@@ -21,7 +21,7 @@
               <h5>Product: ${selectedRequestDetail.productId.name}</h5>
           </div>
           <div class="col-lg-12">
-            <h5>Course: ${selectedRequestDetail.requestId.courseId | courseName:people.coursesArray:config.SANDBOX_ID:config.SANDBOX_NAME}</h5>
+            <h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>
           </div>
         </div>
          <div class="col-lg-4">
@@ -69,7 +69,7 @@
           <td>${item.property}</td>
           <td>${item.oldValue}</td>
           <td>${item.newValue}</td>
-          <td>${item.personId.fullName}</td>
+          <td>${item.personId | lookupValue:people.uccPeople:"_id":"fullName"}</td>
         </tr>
       </tbody>
     </table>
@@ -105,7 +105,7 @@
       </div>
     </div>
     <div class="row leftMargin rightMargin">
-      <table class="table table-striped table-hover">
+      <table id="assignmentTable" class="table table-striped table-hover">
         <thead>
           <tr>
             <th class="col-sm-1">System</th>
@@ -164,7 +164,7 @@
               </select>
             </div>
         </div>
-        <!-- Add Student ID Template -->
+
             <div class="row" show.bind="showAddStudentTemplate">
                 <div class="panel panel-default col-md-12 editPanel">
                     <div class="panel-body">
@@ -189,17 +189,7 @@
                     </div>
                 </div>
             </div>
-            <!--
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label class="pull-left">
-                            <input checked.bind="roundTo10" id="roundTo10CheckBox" type="checkbox" change.trigger="changeRoundTo10()" data-toggle="checkbox"> Round to 10
-                        </label>
-                    </div>
-                </div>
-            </div>
-             -->
+
           </div>
 
         <div class="row">
@@ -276,7 +266,7 @@
       </div>
     </div>
 
-    <!-- Systems and Clients -->
+ 
     <div  class="panel panel-default col-lg-6 rightMargin leftMargin">
       <div class="panel-body">
         <div class="row">
@@ -297,15 +287,17 @@
                 </div>
             </div>
         </div>
+ 
         <div class="form-group">
             <label class="control-label col-sm-3 hideOnPhone">Systems</label>
-            <select change.trigger="systemSelected()" id="systemSelect" value.bind="selectedSystem" class="form-control">
-                <option value="">-- Select a System --</option>
-                <option repeat.for='system of products.selectedProduct.systems' value="${system.systemId}">${system.sid}</option> 
+            <select change.trigger="systemSelected()" class="form-control" value.bind="selectedSystemId">
+                <option model.bind="null">-- Select a System --</option>
+                <option repeat.for='sys of products.selectedProduct.systems' model.bind="sys.systemId">${sys.sid}</option>
             </select>
         </div>
-        <div show.bind="systems.selectedSystem.clients.length > 0" class="topMargin">
-          <table class="table table-striped table-hover">
+
+        <div  class="topMargin">
+          <table id="clientTable" class="table table-striped table-hover">
             <thead>
               <tr>
                 <th class="col-sm-1">Client</th>
@@ -316,7 +308,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:selectedAssignedClient:products.selectedProduct.clientRelevant:products.selectedProduct._id">
+              <tr class="dropbtn" click.trigger="selectClient($index, client, $event)" repeat.for="client of systems.selectedSystem.clients | 
+                  filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:products.selectedProduct._id">
                 <td>${client.client}</td>
                 <td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</td>
                 <td>${client.idsAvailable}</td>

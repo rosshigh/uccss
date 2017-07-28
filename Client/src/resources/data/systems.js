@@ -59,6 +59,10 @@ export class Systems{
       };
     }
 
+    setSelectedSystem(system){
+        this.selectedSystem = this.utils.copyObject(system);
+    }
+
     emptySystem(){
         var newSystemObj = {};
         newSystemObj.sid = "";

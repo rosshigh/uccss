@@ -73,7 +73,7 @@
 		</div>
 		<div class="topMargin">
 			<label class="form-control-label ">Product</label>
-			<select class="form-control" value.bind="selectedRequestDetail.productId">
+			<select class="form-control" value.bind="selectedRequestDetail.productId._id">
 				<option repeat.for="product of products.productsArray" value="${product._id}">${product.name}</option>
 			</select>
 		</div>

@@ -19,7 +19,9 @@ var SystemSchema = new Schema({
   dbVersion: { type: String },
   ipAddress: { type: String },
   notes: { type: String },
-  dateModified: { type: Date } 
+  dateModified: { type: Date },
+  goldBackup: { type: Boolean },
+  snapShot: { type: Boolean } 
 });
 
 SystemSchema.pre('save', function(next){

@@ -21,6 +21,8 @@
                     <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'server'})">Server </span><span><i class="fa fa-sort"></i></span></th>
                     <th class="hidden-xs hidden-sm">Instance</th>
                     <th class="hidden-xs hidden-sm">Status</th>
+                    <th>Gold Backup</th>
+                    <th>Snapshot</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,13 +44,30 @@
                             <option value=false>Inactive</option>
                         </select>
                     </th>
+                    <th></th>
+                    <th></th>
                 </tr>
-                <tr click.trigger="edit($index, $event)" repeat.for="system of dataTable.displayArray">
-                    <td data-title="Session">${system.sid}</td>
-                    <td data-title="StartDate">${system.description}</td>
-                    <td  class="hidden-xs hidden-sm" data-title="EndDate">${system.server}</td>
-                    <td  class="hidden-xs hidden-sm" data-title="RequestsOpen">${system.instance}</td>
-                    <td  class="hidden-xs hidden-sm" data-title="createdDate">${system.active | translateStatus}</td>
+                <tr repeat.for="system of dataTable.displayArray">
+                    <td click.trigger="edit($index, $event)" data-title="Session">${system.sid}</td>
+                    <td click.trigger="edit($index, $event)" data-title="StartDate">${system.description}</td>
+                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="EndDate">${system.server}</td>
+                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="RequestsOpen">${system.instance}</td>
+                    <td click.trigger="edit($index, $event)"  class="hidden-xs hidden-sm" data-title="createdDate">${system.active | translateStatus}</td>
+                    <td  data-title="Gold">
+                        <div class="checkbox">
+                            <label>
+                                <input change.delegate="saveBackups(system)" checked.bind="system.goldBackup" type="checkbox">
+                            </label>
+                        </div>
+                    </td>
+                    <td  data-title="Snapshot">
+                        <div class="checkbox">
+                            <label>
+                                <input change.delegate="saveBackups(system)" checked.bind="system.snapShot" type="checkbox">
+                            </label>
+                        </div>
+                    </td>
+
                 </tr>
             </tbody>
         </table>
