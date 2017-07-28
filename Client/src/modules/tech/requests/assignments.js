@@ -101,7 +101,7 @@ export class Assignments {
 	async saveEdit(){
         var email = {};
         this.buildAuditDetail();
-        this.clientRequests.setSelectedRequestDetail(this.selectedRequestDetail);
+        this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");

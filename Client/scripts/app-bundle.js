@@ -25120,7 +25120,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 email = {};
 
                                 this.buildAuditDetail();
-                                this.clientRequests.setSelectedRequestDetail(this.selectedRequestDetail);
+                                this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
                                 _context4.next = 5;
                                 return this.clientRequests.saveRequestDetail();
 
