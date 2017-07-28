@@ -126,9 +126,9 @@ export class ClientRequestAnalytics {
         var data = new Array();
         var categories = new Array();
         
-        this.requests.analyticsInstitutionResultArray.forEach((item, index) => {
-            item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
-        });
+        // this.requests.analyticsInstitutionResultArray.forEach((item, index) => {
+        //     item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
+        // });
 
         this.config.REQUEST_STATUS.forEach(item => {
             data.push(new Array());
@@ -235,9 +235,9 @@ export class ClientRequestAnalytics {
         var data = new Array();
         var categories = new Array();
         
-        this.requests.analyticsProductsResultArray.forEach((item, index) => {
-            item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
-        });
+        // this.requests.analyticsProductsResultArray.forEach((item, index) => {
+        //     item.total = item["1"] + item["2"] + item["4"] +  item["5"] +  item["6"] +  item["7"]; 
+        // });
 
         this.config.REQUEST_STATUS.forEach(item => {
             data.push(new Array());
