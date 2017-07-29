@@ -1,42 +1,5 @@
 <template>
-	<tree-node data.bind="uploadedFileList" callback.call="deleteFile(data)" level.bind="0" selected-file.bind="selectedFile" selected-node.bind="selectedNode" max-level.bind="1"></tree-node>
-</template>
-	<!--
-	<compose view="../../../../resources/elements/table-navigation-bar.html"></compose>
-	<div id="no-more-tables">
-		<table class="table table-striped table-hover cf">
-			<thead class="cf">
-				<tr>
-					<td colspan='3'>
-						<span class="pull-right" id="spinner" innerhtml.bind="spinnerHTML"></span>
-					</td>
-				</tr>
-				<tr>
-					<th>Category<span click.trigger="dataTable.sortArray('event')"><i class="fa fa-sort"></i></span></th>
-					<th>Name <span click.trigger="dataTable.sortArray('fileName')"><i class="fa fa-sort"></i></span></th>
-					<th>Delete </th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<th>
-						<input input.delegate="dataTable.filterList($event)" id="category" type="text" placeholder="Filter Event" class="form-control" ref="eventFilter"/>
-					</th>
-					<th>
-						<input input.delegate="dataTable.filterList($event)" id="fileName" type="text" placeholder="Filter Email" class="form-control" ref="dataFilter" />
-					</th>
-					<th>
-						
-					</th>
-				</tr>
-				<tr repeat.for="item of dataTable.displayArray">
-					<td data-title="Event">${item.category}</td>
-					<td data-title="Data"><a href="${config.host}${item.file}" target="_blank">${item.fileName}</a></td>
-					<td data-title="Delete" click.trigger="deleteFile($index)"><i class="fa fa-trash"></i></td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="topMargin">
+		<tree-node data.bind="uploadedFileList" callback.call="deleteFile(data)" level.bind="0" selected-file.bind="selectedFile" selected-node.bind="selectedNode" max-level.bind="1"></tree-node>
 	</div>
-
 </template>
-	-->

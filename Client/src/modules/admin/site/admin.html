@@ -1,45 +1,30 @@
 <template>
+	<style>
+        .menuButtons {
+			color: ${config.ACTIVE_SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+        }
+    </style>
 	<div class="fluid-container">
-		<div class="row">
-			<div class="col-lg-2">
-				<select  change.delegate="typeSelected()" class="form-control" value.bind="screenToShow">
-					<option value="">Select an option</option>
-					<option value="auth">Authorization Log</option>
-					<option value="log">Transaction Log</option>
-					<option value="files">Files</option>
-				</select>
+
+		<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="col-lg-3">
+			<h4>Files</h4>
+			<div>
+				<ul class="list-group" id="buttonGroup">
+					<button click.trigger="typeSelected($event, $index, type)" type="button" repeat.for="type of tabs" id="${type.screenToShow}"
+						class="${ $first ? 'menuButtons list-group-item' : 'list-group-item'}">${type.id}</button>
+				</ul>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-lg-2 topMargin">
-				<div show.bind="fileList.length" class="panel panel-default">
-					<div class="panel-body">
-						<div class="col-sm-12 col-lg-12">
-							<div class="form-group">
-								<div class="input-group">
-									<span click.delegate="deleteFiles()" class="smallMarginRight input-group-addon" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Delete oldest files"><i class="fa fa-trash" aria-hidden="true"></i></span>
-									<input value.bind="filesToDelete" id="filesToDelete" class="form-control"  type="number" ria-describedby="basic-addon1"/>
-								</div>
-							</div>
-						</div>
-						<label>Files</label>
-                        <div class="well well2 overFlow" style="height:600px;">
-                            <ul show.bind="screenToShow !== 'files'" class="list-group">
-                                <button click.trigger="fileSelected($index)" type="button" repeat.for="file of fileList" id="${type.code}" class="list-group-item">${file}</button>
-                            </ul>
-							 <ul show.bind="screenToShow === 'files'" class="list-group">
-                                <button click.trigger="uploadedFileSelected(file)" type="button" repeat.for="file of fileList" id="${$index}" class="list-group-item">${file.folder}</button>
-                            </ul>
-                        </div>
-					</div>
-				</div>
-			</div>
-			<div show.bind="fileContents.length && screenToShow !== 'files'" class="col-lg-9 topMargin">
-				<compose view='./components/logFileTable.html'></compose>
-			</div>
-			<div show.bind="showFileList && screenToShow === 'files'" class="col-lg-9 topMargin">
-				<compose view='./components/uploadedFilesTable.html'></compose>
-			</div>
+		<div class="col-lg-9">
+			
+			<compose if.bind="(screenToShow == 'log' || screenToShow == 'auth') && fileList.length" view='./components/logFileTable.html'></compose>
+			
+			<compose if.bind="screenToShow === 'forl' || screenToShow === 'fore' || screenToShow === 'foro'" view='./components/foreverLogs.html'></compose>
+			
+			<compose if.bind="showFileList && screenToShow === 'files'" view='./components/uploadedFilesTable.html'></compose>
 		</div>
 	</div>
 </template>

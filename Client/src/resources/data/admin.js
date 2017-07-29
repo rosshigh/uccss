@@ -6,18 +6,69 @@ export class AdminData{
 	AUTH_SERVICE = "/adminLog/";
 	LOG_SERVICE = "/log/";
 	FILES_SERVICE = '/files/';
+	FOREVER_SERVICE = '/foreverLog/'
 
 	constructor(data){
 		this.data = data;
 	}
 
-	async getAuthLogs(){
-		let response = await this.data.get(this.AUTH_SERVICE);
+	async getLogs(type){
+		let url;
+		switch(type){
+			case 'auth':
+				url = this.AUTH_SERVICE;
+				break;
+			case 'log':
+				url = this.LOG_SERVICE;
+				break;
+			case 'forl':
+				url = this.FOREVER_SERVICE + 'fileList/f';
+				break;
+			case 'fore':
+				url = this.FOREVER_SERVICE + 'fileList/e';
+				break;
+			case 'foro':
+				url = this.FOREVER_SERVICE + 'fileList/o';
+				break;
+		}
+		let response = await this.data.get(url);
 		if(!response.error){
-			this.authLogFileArray = response;
+			this.logFileArray = response;
 		} 
 		return response;
+
 	}
+
+	async getLogFile(fileName, type){ 
+		if(fileName && type){
+				let url; 
+			switch(type){
+				case 'auth':
+					url = this.AUTH_SERVICE;
+					break;
+				case 'log':
+					url = this.LOG_SERVICE;
+					break;
+				case 'forl':
+				case 'fore':
+				case 'foreo':
+					url = this.FOREVER_SERVICE;
+			}
+			let response = await this.data.get(url + fileName);
+			if(!response.error){
+				this.logContents = response;
+			}
+			return response;
+		}
+	}
+
+	// async getAuthLogs(){
+	// 	let response = await this.data.get(this.AUTH_SERVICE);
+	// 	if(!response.error){
+	// 		this.authLogFileArray = response;
+	// 	} 
+	// 	return response;
+	// }
 
 	async getAuthLogFile(fileName){
 		if(fileName){
@@ -37,23 +88,23 @@ export class AdminData{
 		return response;
 	}
 
-	async getLogs(){
-		let response = await this.data.get(this.LOG_SERVICE);
-		if(!response.error){
-			this.authLogFileArray = response;
-		} 
-		return response;
-	}
+	// async getLogs(){
+	// 	let response = await this.data.get(this.LOG_SERVICE);
+	// 	if(!response.error){
+	// 		this.authLogFileArray = response;
+	// 	} 
+	// 	return response;
+	// }
 
-	async getLogFile(fileName){
-		if(fileName){
-			let response = await this.data.get(this.LOG_SERVICE + fileName);
-			if(!response.error){
-				this.logContents = response;
-			}
-			return response;
-		}
-	}
+	// async getLogFile(fileName){
+	// 	if(fileName){
+	// 		let response = await this.data.get(this.LOG_SERVICE + fileName);
+	// 		if(!response.error){
+	// 			this.logContents = response;
+	// 		}
+	// 		return response;
+	// 	}
+	// }
 
 	async deleteLogFiles(filesToDelete){
 		let obj = {
@@ -66,7 +117,6 @@ export class AdminData{
 	async getFiles(){
 		let response = await this.data.get(this.FILES_SERVICE);
 		if(!response.error){
-			// this.fileArray = response;
 			this.parseFileList(response);
 		} 
 		return response;
@@ -167,36 +217,6 @@ export class AdminData{
 		}
 		return -1;
 	}
-
-	// parseFileList(response){
-	// 	this.filesArray = new Array();
-	// 	this.foldersArray = new Array();
-	// 	response.forEach(item => {
-	// 		let paths = item.split("\\");
-	// 		let index = this.folderIndex(paths[2]);
-	// 		if( index === -1){
-	// 			this.filesArray.push({
-	// 				folder: paths[2],
-	// 				files: new Array()
-	// 			});
-	// 			index = this.filesArray.length - 1;
-	// 		}
-
-	// 		this.filesArray[index].files.push({
-	// 			file: item.replace('public\\', ""),
-	// 			category: paths.length > 4 ? paths[3] : "",
-	// 			fileName: paths[paths.length - 1]
-	// 		})
-	// 	})
-	// }
-
-	// folderIndex(folder){
-	// 	let index = -1;
-	// 	for(let i = 0; i < this.filesArray.length; i++){
-	// 		if(this.filesArray[i].folder === folder) index = i;
-	// 	}
-	// 	return index;
-	// }
 
 	async deleteFile(file){
 		if(file){

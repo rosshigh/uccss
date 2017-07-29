@@ -11,7 +11,17 @@ import moment from "moment";
 export class Admin {
 	screenToShow = "";
 	spinnerHTML = "";
+	foreverLog = "";
 	showFileList = false;
+
+	tabs = [
+		{ id: 'Authorization Log', screenToShow: 'auth' }, 
+		{ id: 'Transaction Log', screenToShow: 'log' }, 
+		{ id: 'Files', screenToShow: 'files' }, 
+		{ id: 'Forever Log', screenToShow: 'forl' }, 
+		{ id: 'Forever Error Log', screenToShow: 'fore' },
+		{id: "Forever Out Log", screenToShow: 'foro'}];
+    tabPath = './';
 
 
 	constructor(dataTable, config, utils, admin, dialog, EventAggregator){
@@ -23,18 +33,12 @@ export class Admin {
 		this.dialog = dialog;
 		this.ea = EventAggregator;
 
-		// this.fileList = {
-		// 	name: "Files",
-		// 	value: "file_list",
-		// 	children: [
-		// 		{ name: "downloads", value: "downloads"},
-		// 		{ name: "helpTickets", value: "helpTickets"}
-		// 	]
-		// };
+		this.userObj = JSON.parse(sessionStorage.getItem('user'));
+
 	}
 
-	canActivate(){
-        this.userObj = JSON.parse(sessionStorage.getItem('user'));
+	activate(){
+        this.firstLoad();
     }
 
 	attached(){
@@ -50,21 +54,40 @@ export class Admin {
 		this.fileSelected(this.fileIndex);
 	}
 
-	async typeSelected(){
+	async firstLoad(){
+		this.screenToShow = 'auth';
+		let response = await this.admin.getLogs(this.screenToShow);
+		if(!response.error){
+			this.fileList = this.utils.copyArray(response);
+			for(let i = 0; i < this.fileList.length; i++){
+				this.fileList[i] = this.fileList[i].substring(0,this.fileList[i].indexOf('.log'));
+			};
+			this.fileList.reverse();
+		}
+	}
+
+    updateButtons(el) {
+        if (el.target.id != "") {
+            $("#buttonGroup").children().removeClass('menuButtons');
+            $("#buttonGroup").children().css("background-color","");
+            $("#buttonGroup").children().css("color","");
+            $(el.target).css("background-color",this.config.BUTTONS_BACKGROUND);
+            $(el.target).css("color",this.config.ACTIVE_SUBMENU_COLOR);
+        }
+    }
+
+	async typeSelected(el, index, type){
+		this.updateButtons(el, index)
 		this.clearFilters();
+		this.screenToShow = type.screenToShow;
 		switch(this.screenToShow){
 			case 'auth':
-				let response = await this.admin.getAuthLogs();
-				if(!response.error){
-					this.fileList = this.utils.copyArray(response);
-					for(let i = 0; i < this.fileList.length; i++){
-						this.fileList[i] = this.fileList[i].substring(0,this.fileList[i].indexOf('.log'));
-					};
-					this.fileList.reverse();
-				}
-				break; 
 			case 'log':
-				let logResponse = await this.admin.getLogs();
+			case 'forl':
+			case 'fore':
+			case 'foro':
+				this.foreverLog = "";
+				let logResponse = await this.admin.getLogs(this.screenToShow);
 				if(!logResponse.error){
 					this.fileList = this.utils.copyArray(logResponse);
 					for(let i = 0; i < this.fileList.length; i++){
@@ -111,7 +134,7 @@ export class Admin {
 				}
 				break;
 			case 'log':
-				let logResponse = await this.admin.getLogFile(this.fileList[index] + '.log');
+				let logResponse = await this.admin.getLogFile(this.fileList[index] + '.log', this.screenToShow);
 				if(!logResponse.error){
 					this.fileContents = new Array();
 					for(let i = 0; i < this.admin.logContents.length; i++){
@@ -141,6 +164,14 @@ export class Admin {
 					this.dataTable.updateArray(this.fileContents);
 				}
 				break;
+				case 'forl':
+				case 'fore':
+				case 'foro':
+					let foreveLogResponse = await this.admin.getLogFile(this.fileList[index] + '.log', this.screenToShow);
+					if(!foreveLogResponse.error){
+						this.foreverLog = foreveLogResponse;
+					}
+					break;
 			default:
 				this.fileList = new Array();
 		}

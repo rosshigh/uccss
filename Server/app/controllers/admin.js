@@ -11,6 +11,7 @@ var express = require('express'),
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
   const logFolder = './log/';
+  const foreverLogFolder = './forever-log/';
 
 module.exports = function (app, config) {
   app.use('/api', router);
@@ -158,6 +159,82 @@ module.exports = function (app, config) {
 		}
 
 	})
+
+	router.route('/foreverLog/fileList/:type').get(function(req, res, next){
+		logger.log('Get forever log files', 'verbose');
+		const fs = require('fs');
+		fs.readdir(foreverLogFolder, (err, files) => {
+			if(err) {
+				 return next(err);
+			} else {
+				files = files.filter(item => {
+					return item.substring(0,1) === req.params.type;
+				})
+				if(files) res.status(200).json(files);
+			}
+		})
+	});
+
+	router.route('/foreverLog/:fileName').get(function(req, res, next){
+		logger.log('Get forever log file' + req.params.fileName, 'verbose');
+		let filePath = foreverLogFolder + req.params.fileName;
+		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
+			if (!err){
+				res.status(200).json(data)
+				// data = data.split('\n');				
+				// let dataArray = new Array();
+				// data.forEach(item => {
+				// 	var obj = new Object();
+				// 	let array = item;				
+				// 	array.forEach(item2 => {
+				// 		let propArray = item2.split('"').join('').replace('\r','').split(":");
+				// 		if(propArray[0] === 'timestamp'){
+				// 			obj[propArray[0]] = propArray[1] + ':' + propArray[2] + ':' + propArray[3];
+				// 		} else {
+				// 			obj[propArray[0]] = propArray[1];
+				// 		}
+				// 	})
+				// 	dataArray.push(obj);
+				// });
+				// res.status(200).json(dataArray)
+			} else{
+				return next(err);
+			}
+
+		});
+	});
+
+	router.route('/foreverLog/').put(function(req, res, next){
+		logger.log('Deleting ' + req.body.files.length + ' forever log files', 'verbose');
+		if(req.body.files){
+			try {
+				req.body.files.forEach(file => {
+					let fileName = foreverLogFolder + file + '.log';					
+					fs.unlink(fileName);
+				});
+				res.status(200).json({message: "Files deleted"});
+			}
+			catch(err){
+				 return next(err);
+			}
+		}
+	});
+
+	router.route('/foreverLog/rename/:file/:newName').put(function(req, res, next){
+		logger.log('Renaming forever log file', 'verbose');
+		try {
+			let fileName = foreverLogFolder + req.params.file + '.log';
+			let newFileName = foreverLogFolder + req.params.newName + '.log';
+			fs.rename(fileName, newFileName, function(err) {
+				if ( err ) console.log('ERROR: ' + err);
+			});
+			res.status(200).json({message: "File renamed"});
+		}
+		catch(err){
+				return next(err);
+		}
+	});
+
 
 	router.route('/test/crash').get(function(req, res, next){
 		process.exit(-1) 
