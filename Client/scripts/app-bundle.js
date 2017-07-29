@@ -7462,7 +7462,7 @@ define('resources/data/curriculum',['exports', 'aurelia-framework', '../utils/ut
                 if (!obj) {
                     var obj = this.emptyCurriculum();
                 }
-                return this.utils.objectsEqual(this.selectedCurriculum, obj);
+                return this.utils.objectsEqual(this.selectedCurriculum, obj, ['file']);
             }
             return new Array();
         };

@@ -114,9 +114,9 @@ export class Curriculum {
 	isDirty(obj){
       if(this.selectedCurriculum){
 		if(!obj){
-			var obj = this.emptyCurriculum();
+			var obj = this.emptyCurriculum(); 
 		}
-		return this.utils.objectsEqual(this.selectedCurriculum, obj);
+		return this.utils.objectsEqual(this.selectedCurriculum, obj, ['file']);
         }
         return new Array();
     }
