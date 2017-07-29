@@ -174,18 +174,11 @@ export class EditInstitutions {
         $("#institutionStatus").val("");
     }
 
-    // async changeTab(el, index){
-    //     $("#instFormListGroup.list-group").children().removeClass('active');
-    //     $(el.target).parent().addClass('active');
-    //     $(".in").removeClass('active').removeClass('in');
-    //     $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-    // }
-
     async changeTab(el, index){
         $("#instFormListGroup.list-group").children().removeClass('menuButtons');
         $("#instFormListGroup.list-group").children().css("background-color","");
         $("#instFormListGroup.list-group").children().css("color","");
-        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
         $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         $(".in").removeClass('active').removeClass('in');
         $("#" + el.target.id + "Tab").addClass('in').addClass('active');

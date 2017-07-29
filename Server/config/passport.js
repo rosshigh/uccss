@@ -14,26 +14,29 @@ var localOptions = {
 };
 
 var localLogin = new localStrategy(localOptions, function(email, password, next){
-  User.findOne({email: {$regex: new RegExp('^' + email.toLowerCase(), 'i')}}, function(err,user){
-    if(err){
-      return next(err);
-    } else {    
-      if(!user){
-        next(new NotFoundError("404",{ message: "Email not found."}));
-      } else {       
-        user.comparePassword(password, function (err, isMatch) {
-          if (err) {
-            return next(err);
-          } else if(!isMatch){
-            return next(new UnauthorizedAccessError("401", {message: 'Invalid username or password'}));
-          } else {
-            logAuth.log('logon-' + user.email, 'info');
-            return next(null, user);
-          }
-        });
+  var query = User.findOne({email: {$regex: new RegExp('^' + email.toLowerCase(), 'i')}});
+  query
+    .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode city institutionStatus'})
+    .exec( function(err, user){
+      if(err){
+        return next(err);
+      } else {    
+        if(!user){
+          next(new NotFoundError("404",{ message: "Email not found."}));
+        } else {       
+          user.comparePassword(password, function (err, isMatch) {
+            if (err) {
+              return next(err);
+            } else if(!isMatch){
+              return next(new UnauthorizedAccessError("401", {message: 'Invalid username or password'}));
+            } else {
+              logAuth.log('logon-' + user.email, 'info');
+              return next(null, user);
+            }
+          });
+        }
       }
-    }
-  });
+    });
 });
 
 var jwtOptions = {

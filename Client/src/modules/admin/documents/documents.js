@@ -45,7 +45,7 @@ export class Documents {
             this.config.getConfig()
         ]);
         this.filteredDocumentArray = this.documents.docCatsArray;
-        this.dataTable.updateArray(this.documents.docCatsArray);
+        await this.selectFirstCategory()
     }
 
     attached(){
@@ -66,7 +66,6 @@ export class Documents {
 
     editDocument(index, el){
         this.editIndex = this.dataTable.getOriginalIndex(index);
-        // this.displayIndex = index + parseInt(this.dataTable.startRecord);
         this.documents.selectDocument(this.editIndex);
          this.displayTitle = "Files";
 
@@ -88,6 +87,16 @@ export class Documents {
         }
     }
 
+    async selectFirstCategory(){
+        this.categoryIndex = 0;
+        this.documents.selectCategory(0);
+        await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+        this.dataTable.updateArray(this.documents.documentsArray);
+        this.showDocuments = true;
+        this.showDocumentForm =  false;
+        this.displayTitle = "Documents";
+    }
+
     async typeChanged(index, el){
       if(index >= 0){
         this.categoryIndex = index;
@@ -98,9 +107,15 @@ export class Documents {
         this.showDocumentForm =  false;
         this.displayTitle = "Documents";
 
-        if (this.selectedRow) this.selectedRow.removeClass('info');
-        this.selectedRow = $(el.target);
-        this.selectedRow.addClass('info')
+        $("#categoryList.list-group").children().removeClass('menuButtons');
+        $("#categoryList.list-group").children().css("background-color","");
+        $("#categoryList.list-group").children().css("color","");
+        $(el.target).css("background-color",this.config.BUTTONS_BACKGROUND);
+        $(el.target).css("color",this.config.ACTIVE_SUBMENU_COLOR);
+
+        // if (this.selectedRow) this.selectedRow.removeClass('info');
+        // this.selectedRow = $(el.target);
+        // this.selectedRow.addClass('info')
       }
     }
 

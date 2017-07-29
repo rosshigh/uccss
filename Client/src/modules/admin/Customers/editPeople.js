@@ -84,7 +84,7 @@ export class EditPeople {
         this.editIndex = this.dataTable.getOriginalIndex(index);
         this.people.selectPerson(this.editIndex);
         this.oldEmail = this.people.selectedPerson.email;
-        this.institutionId = this.people.selectedPerson.institutionId;
+        this.institutionId = this.people.selectedPerson.institutionId._id;
         this.orginalObject = this.people.selectedPerson;
         this.filterRoles();
         this.newPerson = false;
@@ -145,7 +145,7 @@ export class EditPeople {
             if(this.people.selectedPerson._id){
                 this.buildAudit();
             } else {
-                this.people.selectedPerson.institutionId = this.institutionId;
+                this.people.selectedPerson.institutionId._id = this.institutionId;
             }
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
@@ -222,9 +222,9 @@ export class EditPeople {
                 ['Yes', 'No']
             ).whenClosed(response => {
                 if (!response.wasCancelled) {
-                    this.people.selectedPerson.institutionId = this.institutionId;
+                    this.people.selectedPerson.institutionId._id = this.institutionId;
                 } else {
-                    this.institutionId = this.people.selectedPerson.institutionId;
+                    this.institutionId = this.people.selectedPerson.institutionId._id;
                 }
             });
         }
@@ -405,7 +405,7 @@ export class EditPeople {
     setFirstTab(){
         $("#peopleFormListGroup.list-group").children().removeClass('active');
         let target = $("#peopleFormListGroup.list-group").children()[0];
-        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
         $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         // $(target).addClass('active');
         $(".in").removeClass('active').removeClass('in');
@@ -416,7 +416,7 @@ export class EditPeople {
         $("#peopleFormListGroup.list-group").children().removeClass('menuButtons');
         $("#peopleFormListGroup.list-group").children().css("background-color","");
         $("#peopleFormListGroup.list-group").children().css("color","");
-        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
         $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         $(".in").removeClass('active').removeClass('in');
         $("#" + el.target.id + "Tab").addClass('in').addClass('active');
@@ -427,20 +427,6 @@ export class EditPeople {
         }
     }
 
-    // async changeTab(el, index) {
-    //     $("#peopleFormListGroup.list-group").children().removeClass('active');
-    //     var target = $(el.target);
-    //     if (target.is('a')) target = $(target.children()[0]);
-    //     target.parent().addClass('active');
-    //     $(".in").removeClass('active').removeClass('in');
-    //     $("#" + target.html() + "Tab").addClass('in').addClass('active');
-    //     switch (target.attr('id')) {
-    //         case 'Courses':
-    //             await this.refreshCourses();
-    //             break;
-    //     }
-    // }
- 
     _cleanUp(){
         this.institutionId = "";
         this.personSelected = false;
@@ -519,25 +505,26 @@ export class EditPeople {
     }
 
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
-		var sortProperty = 'name';
-        sortArray.forEach((item) => {
-          var obj = context.dataTable.findObj(context.people.institutionsArray, '_id', item.institutionId);
-          item[sortProperty] = obj ? obj[sortProperty] : null;
-        })
+		// var sortProperty = 'name';
+        // sortArray.forEach((item) => {
+        //   var obj = context.dataTable.findObj(context.people.institutionsArray, '_id', item.institutionId);
+        //   item[sortProperty] = obj ? obj[sortProperty] : null;
+        // })
 
         return sortArray.sort((a, b) => {
-			var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+			var result = (a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
 			return result * sortDirection;
 		});
 	}
 
 	institutionCustomFilter(value, item, context){
-        for(let i = 0; i < context.people.institutionsArray.length; i++){
-            if(item.institutionId == context.people.institutionsArray[i]._id) {
-                return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-            }
-        }
-        return false;
+        return context.people.institutionId[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        // for(let i = 0; i < context.people.institutionsArray.length; i++){
+        //     if(item.institutionId == context.people.institutionsArray[i]._id) {
+        //         return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        //     }
+        // }
+        // return false;
     }
 
 	customRoleFilter(value, item, context){

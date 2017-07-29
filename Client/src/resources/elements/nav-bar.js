@@ -56,8 +56,7 @@ export class NavBar {
     async loginSuccess() {
         this.userObj = JSON.parse(sessionStorage.getItem('user'));
         if (this.userObj) {
-            var instObj = await this.people.getInstitution(this.userObj.institutionId);
-            if (instObj.institutionStatus !== this.config.INSTITUTIONS_ACTIVE) {
+            if (this.userObj.institutionId.institutionStatus !== this.config.INSTITUTIONS_ACTIVE) {
                 this.utils.showNotification("You must belong to an active institution to access the web site");
                 this.logout();
             } else {

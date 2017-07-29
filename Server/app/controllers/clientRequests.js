@@ -193,30 +193,7 @@ module.exports = function (app) {
                 if(error){
                   return next(error);
                 } else { 
-                  // if(req.query.email == 1 && request._id){
-                  //   var query = Model.findOne({_id: request._id}).populate('requestDetails').exec()                   
-                  //     .then(requestResult => {  
-                  //       Person.findById(requestResult.personId, function(error, person){
-                  //         if(error){
-                  //           return next(error);
-                  //         } else {
-                  //           if(person){
-                  //             var mailObj = {
-                  //               email: person.email,
-                  //               context: request
-                  //             }                    
-                  //             requestUpdated(mailObj) 
-                  //           }
-                  //           res.status(200).json(requestResult);                                
-                  //         }           
-                  //       })
-                  //     })
-                  //     .catch(error => { //Promise
-                  //       return next(error);
-                  //     }) 
-                  // } else {
                     res.status(200).json(request);
-                  // }
                 }
           })
         })
@@ -448,7 +425,7 @@ module.exports = function (app) {
 
   router.put('/api/clientRequestsDetails', function(req, res, next){
     logger.log('Update request detail', 'verbose');  
-console.log(req.body)     
+    
     Model.findOneAndUpdate({_id: req.body.requestId._id}, req.body.requestId, function(err, request){
       if(err) return next(err);
         ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){

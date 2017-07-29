@@ -261,20 +261,11 @@ export class EditProducts {
         $("#productListGroup.list-group").children().removeClass('menuButtons');
         $("#productListGroup.list-group").children().css("background-color","");
         $("#productListGroup.list-group").children().css("color","");
-        $(el.target).parent().css("background-color",this.config.SUBMENU_BACKGROUND);
+        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
         $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         $(".in").removeClass('active').removeClass('in');
         $("#" + el.target.id + "Tab").addClass('in').addClass('active');
     }
-
-    //  changeTab(el, index){
-    //     $("#productListGroup.list-group").children().removeClass('active');
-    //     var target = $( event.target );
-    //     if(target.is('a')) target = $(target.children()[0]);
-    //     target.parent().addClass('active');
-    //     $(".in").removeClass('active').removeClass('in');
-    //     $("#" + target.html() + "Tab").addClass('in').addClass('active');
-    // }
 
 	systemCustomFilter(value, item, context){
 		for(let i = 0; i < item.systems.length; i++){

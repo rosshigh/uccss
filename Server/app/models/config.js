@@ -24,6 +24,7 @@ var ConfigSchema = new Schema({
   dateModified: { type: Date, default: Date.now },
   readOnly: { type: Boolean, default: false },
   type: { type: String },
+  category: { type: String },
   description: { type: String }
 });
 

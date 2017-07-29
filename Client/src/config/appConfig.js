@@ -409,6 +409,7 @@ export class AppConfig {
         this.UCC_PARALLAX_LOGO = this.getParameter('UCC_PARALLAX_LOGO');
         this.NAVBAR_LOGO = this.getParameter('NAVBAR_LOGO');
         this.PRODUCT_REQUESTS_EMAIL_LIST = this.getParameter('PRODUCT_REQUESTS_EMAIL_LIST');
+        this.BUTTONS_BACKGROUND = this.getParameter('BUTTONS_BACKGROUND');
 
     }
 

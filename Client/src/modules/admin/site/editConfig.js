@@ -11,6 +11,11 @@ export class EditConfig {
     
     navControl = "configNavButtons";
     spinnerHTML = "";
+    tabCode = "a";
+
+    tabs = [{ id: 'Assignments' }, { id: 'Interface' }, { id: 'UCC Information' }];
+    tabPath = './';
+
 
     constructor(datatable, siteConfig, utils, config) {
         this.dataTable = datatable;
@@ -27,6 +32,8 @@ export class EditConfig {
     async activate() {
         await this.siteConfig.getConfigArray(true);
         this.dataTable.updateArray(this.siteConfig.configArray);
+         this.visibleCategory = "a";
+        this.filterList();
     }
 
     async refresh() {
@@ -34,6 +41,7 @@ export class EditConfig {
         await this.siteConfig.getConfigArray(true)
         await this.config.getConfig(true);
         this.dataTable.updateArray(this.siteConfig.configArray);
+        this.filterList();
         this.spinnerHTML = "";
     }
 
@@ -79,6 +87,20 @@ export class EditConfig {
 
 	cancel(){
 		this.siteConfig.configArray
-	}
+    }
+
+    filterList(){
+        this.dataTable.filterList( this.visibleCategory, { type: 'text', filter: 'category', collectionProperty: 'category', compare: 'match'});
+    }
+    
+    async changeTab(el, index){
+        $("#configListGroup.list-group").children().removeClass('menuButtons');
+        $("#configListGroup.list-group").children().css("background-color","");
+        $("#configListGroup.list-group").children().css("color","");
+        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
+        $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
+        this.visibleCategory = el.target.id.substring(0,1).toLowerCase();
+        this.filterList();
+    }
 
 }

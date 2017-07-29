@@ -28,7 +28,9 @@ module.exports = function (app, config) {
   router.get('/api/people', requireAuth,  function(req, res, next){
     logger.log('Get people','verbose');
     var query = buildQuery(req.query, Model.find())
+
     query
+      .populate({ path: 'institutionId', model: 'Institution', select: 'name postalCode active'})
       .exec( function(err, object){
         if (err) { 
           res.status(500).json(err);
