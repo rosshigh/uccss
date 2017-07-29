@@ -389,7 +389,7 @@ module.exports = function (app, config) {
           res.status(500).json(err);
         } else {       
           if(!object || object.length === 0){          
-            res.status(200).json({"message": "No Notes Found"});
+            res.status(200).json(new Array());
           } else {
             res.status(200).json(object);
           }

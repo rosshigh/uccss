@@ -381,7 +381,7 @@ export class People {
     }
 
     //notes
-   async getNotesArray(options, refresh){
+    async getNotesArray(options, refresh){
         if (!this.notesArray || refresh) {
             var url = this.NOTES_SERVICE;
             url += options ? options : "";
@@ -516,7 +516,8 @@ export class People {
 
     }
 
-   //courses
+   
+    //courses
     async getCoursesArray(refresh, options, fields) { 
         if (!this.coursesArray || refresh) {
               var url = this.COURSES_SERVICE;
