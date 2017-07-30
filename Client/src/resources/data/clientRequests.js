@@ -137,7 +137,7 @@ export class ClientRequests {
             try {
                 let serverResponse = await this.data.get(url);
                 if (!serverResponse.error) {
-                    this.requestsDetailsArray = serverResponse;
+                    this.requestsDetailsArrayAnalytics = serverResponse;
                 }
             } catch (error) {
                 console.log(error);
@@ -350,10 +350,10 @@ export class ClientRequests {
     }
 
     async groupRequestsByInstitution(){
-        if(!this.requestsDetailsArray) {
+        if(!this.requestsDetailsArrayAnalytics) {
             return;
         }
-        var sortedArray = this.requestsDetailsArray 
+        var sortedArray = this.requestsDetailsArrayAnalytics 
             .sort((a, b) => {
                 var result = (a['requestId'].institutionId.name < b['requestId'].institutionId.name) ? -1 : (a['requestId'].institutionId.name > b['requestId'].institutionId.name) ? 1 : 0;
                 return result;
@@ -382,10 +382,10 @@ export class ClientRequests {
     }
 
     groupRequestsByProduct(){
-         if(!this.requestsDetailsArray) {
+         if(!this.requestsDetailsArrayAnalytics) {
             return;
         }
-        var sortedArray = this.requestsDetailsArray 
+        var sortedArray = this.requestsDetailsArrayAnalytics 
             .sort((a, b) => {
                 var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
                 return result;

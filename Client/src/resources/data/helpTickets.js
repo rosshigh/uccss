@@ -36,6 +36,21 @@ export class HelpTickets {
         }
     }
 
+    async getHelpTicketsArrayAnalytics(options, refresh){
+        if (!this.requestsArray || refresh) {
+          var url = this.HELP_TICKET_SERVICES + "/analytics"; 
+          url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.helpTicketArrayAnalytics = serverResponse;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
     async getCurrentCount(options){
         var url = this.HELP_TICKET_SERVICES +'/current/count';
         url += options ? "/" + options : "";
@@ -308,6 +323,32 @@ export class HelpTickets {
             return response;
         }
     }  
+
+    groupRequestsByType(){
+        if(!this.helpTicketArrayAnalytics) {
+            return;
+        }
+        var sortedArray = this.helpTicketArrayAnalytics 
+            .sort((a, b) => {
+                var result = (a.helpTicketType < b.helpTicketType) ? -1 : (a.helpTicketType > b.helpTicketType) ? 1 : 0;
+                return result;
+            });
+
+        this.helpTicketTypeArrayAnalytics = new Array();
+        var type = "";
+        var templateObj = new Object({helpTicketType: "", count: 0});
+
+        sortedArray.forEach(item => {
+            if(item.helpTicketType != type){
+                type = item.helpTicketType;
+                var obj = this.utils.copyObject(templateObj);
+                obj.helpTicketType = item.helpTicketType;
+                this.helpTicketTypeArrayAnalytics.push(obj);
+            }
+            this.helpTicketTypeArrayAnalytics[this.helpTicketTypeArrayAnalytics.length-1].count += 1;
+        })
+
+    }
 
     lockHelpTicket(obj){
         if(obj.helpTicketId) {

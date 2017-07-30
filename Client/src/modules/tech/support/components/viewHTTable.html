@@ -42,6 +42,17 @@
               </td>
             </tr>
             <tr>
+              <th><span class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketNo'})">No </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:20em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketType'})">Type </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {type: 'custom', sorter: customOwnerSorter, propertyName: 'ownder'})">Owner </span><i class="fa fa-sort"></i></th>                   
+              <th style="width:10em;"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'helpTicketStatus'})">Status </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'createdDate'})">Date Created </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:8em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'modifiedDate'})">Modified Created </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:15em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'personId.lastName'})">Faculty </span><span><i class="fa fa-sort"></i></span></th>
+              <th style="width:20em"><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'institutionId.name'})">Institution </span><span><i class="fa fa-sort"></i></span></th>
+              <th>Email</th>
+            </tr>
+            <tr>
               <th></th>
               <th>
                 <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
@@ -70,17 +81,7 @@
               </th>
               <th></th>
             </tr>
-            <tr>
-              <th>No <span click.trigger="dataTable.sortArray('helpTicketNo')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:20em">Type <span click.trigger="dataTable.sortArray('helpTicketType')"><i class="fa fa-sort"></i></span><br></th>
-              <th style="width:15em">Owner <span click.trigger="dataTable.sortArray(customOwnerSorter, 'custom')"><i class="fa fa-sort"></i></span></th></th>
-              <th style="width:10em;">Status <span click.trigger="dataTable.sortArray('helpTicketStatus')"><i class="fa fa-sort"></i></span><br></th>
-              <th style="width:8em">Date Created <span click.trigger="dataTable.sortArray('createdDate')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:8em">Date Updated <span click.trigger="dataTable.sortArray('modifiedDate')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:15em">Faculty <span click.trigger="dataTable.sortArray('personId.lastName')"><i class="fa fa-sort"></i></span></th>
-              <th style="width:20em">Institution <span click.trigger="dataTable.sortArray('institutionId.name')"><i class="fa fa-sort"></i></span></th>
-              <th>Email</th>
-            </tr>
+            
           </thead>
           <tbody>
             <tr repeat.for="helpTicket of dataTable.displayArray" class="${helpTicket.priority | getArrayValue:config.HELP_TICKET_PRIORITIES:'status'}">

@@ -132,7 +132,7 @@ module.exports = function (app, config) {
 
 	router.route('/files/').get(function(req, res, next){
 		let filesFilder = config.uploads;
-		console.log(filesFilder)
+
 		dir.files(filesFilder, function(err, files) {
 			if (err)  return next(err);
 				if(files) res.status(200).json(files);
@@ -181,22 +181,6 @@ module.exports = function (app, config) {
 		fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
 			if (!err){
 				res.status(200).json(data)
-				// data = data.split('\n');				
-				// let dataArray = new Array();
-				// data.forEach(item => {
-				// 	var obj = new Object();
-				// 	let array = item;				
-				// 	array.forEach(item2 => {
-				// 		let propArray = item2.split('"').join('').replace('\r','').split(":");
-				// 		if(propArray[0] === 'timestamp'){
-				// 			obj[propArray[0]] = propArray[1] + ':' + propArray[2] + ':' + propArray[3];
-				// 		} else {
-				// 			obj[propArray[0]] = propArray[1];
-				// 		}
-				// 	})
-				// 	dataArray.push(obj);
-				// });
-				// res.status(200).json(dataArray)
 			} else{
 				return next(err);
 			}
@@ -234,7 +218,6 @@ module.exports = function (app, config) {
 				return next(err);
 		}
 	});
-
 
 	router.route('/test/crash').get(function(req, res, next){
 		process.exit(-1) 

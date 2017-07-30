@@ -68,7 +68,7 @@ export class ClientRequestAnalytics {
          $('.categoryButtons').css("color","");
         $('.categoryButtons').removeClass('menuButtons');
         if(el) {
-            $(el.target).css("background-color", this.config.SUBMENU_BACKGROUND);
+            $(el.target).css("background-color", this.config.BUTTONS_BACKGROUND);
              $(el.target).css("color", this.config.ACTIVE_SUBMENU_COLOR);
         } 
         switch(category.code){
@@ -99,8 +99,8 @@ export class ClientRequestAnalytics {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
-            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
+            if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
                 await this.requests.groupRequestsByInstitution();
                 this.totalsInstitutionArray = new Array();
                 this.config.REQUEST_STATUS.forEach(item => {
@@ -216,8 +216,8 @@ export class ClientRequestAnalytics {
         if (this.selectedSession) {
             this.numCols = this.config.REQUEST_STATUS.length + 1
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession, true);
-            if (this.requests.requestsDetailsArray && this.requests.requestsDetailsArray.length) {
+            await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
+            if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
                 this.requests.groupRequestsByProduct();
                 this.productChartDataFunction();
             } else {
