@@ -432,6 +432,32 @@ export class HelpTickets {
         })
     }
 
+    groupHelpTicketsByStatus(){
+         if(!this.helpTicketArrayAnalytics) {
+            return;
+        }
+
+        var sortedArray = this.helpTicketArrayAnalytics 
+            .sort((a, b) => {
+                var result = (a.helpTicketStatus < b.helpTicketStatus) ? -1 : (a.helpTicketStatus > b.helpTicketStatus) ? 1 : 0;
+                return result;
+            });
+
+        this.helpTicketStatusArrayAnalytics = new Array();
+        var type = "";
+        var templateObj = new Object({helpTicketStatus: "", count: 0});
+
+        sortedArray.forEach(item => {
+            if(item.helpTicketStatus != type){
+                type = item.helpTicketStatus;
+                var obj = this.utils.copyObject(templateObj);
+                obj.helpTicketStatus = item.helpTicketStatus;
+                this.helpTicketStatusArrayAnalytics.push(obj);
+            }
+            if(this.helpTicketStatusArrayAnalytics[this.helpTicketStatusArrayAnalytics.length-1]) this.helpTicketStatusArrayAnalytics[this.helpTicketStatusArrayAnalytics.length-1].count += 1;
+        })
+    }
+
     lockHelpTicket(obj){
         if(obj.helpTicketId) {
             var response = this.data.saveObject(obj, this.HELP_TICKET_LOCK_SERVICES, "post");

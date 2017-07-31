@@ -1,17 +1,17 @@
 import {inject} from 'aurelia-framework';
 
 import {DataTable} from '../../resources/utils/dataTable';
-import {Sessions} from '../../resources/data/sessions';
-import {Systems} from '../../resources/data/systems';
+// import {Sessions} from '../../resources/data/sessions';
+// import {Systems} from '../../resources/data/systems';
 // import {Products} from '../../resources/data/products';
 import {HelpTickets} from '../../resources/data/helpTickets';
 import {AppConfig} from '../../config/appConfig';
 import {Utils} from '../../resources/utils/utils';
-import {People} from '../../resources/data/people';
+// import {People} from '../../resources/data/people';
 
 import moment from 'moment';
 
-@inject( AppConfig, People, DataTable, Utils, Sessions,  Systems, HelpTickets)
+@inject( AppConfig,  DataTable, Utils, HelpTickets)
 export class HelpTicketAnalytics {
     chartOptions = { legend: { display: false } };
     backgroundColors =['#cc3300','#99e600','#0099cc','#ff0066','#6666ff','#1a8cff','#000080','#66ff99','#1aff66','#808000','#ffff66','#4d4d00','#ccffff','#006666','#339933','#b3ffff','#000099','#66ff33','#269900','#ffff00','#ffff66','#9999ff','#6600cc','#009933','','#0000b3','#ff0000','#00004d','#0000cc','#ff0000','#ff0000','#ffb3b3','#ffb3b3','#e63900','#ffb3b3','#330d00','#ffb3b3','#3333ff','#0000cc'];
@@ -32,10 +32,10 @@ export class HelpTicketAnalytics {
             code: 3,
             description: 'Help Tickets by People'
         },
-		// {
-        //     code: 4,
-        //     description: 'Help Tickets by Status'
-        // }
+		{
+            code: 4,
+            description: 'Help Tickets by Status'
+        }
     ]
     backgroundColors =['#cc3300','#99e600','#0099cc','#ff0066','#6666ff','#006666','#000080','#66ff99','#1aff66','#808000','#ffff66','#4d4d00','#ccffff','#006666','#339933','#b3ffff','#000099','#66ff33','#269900','#ffff00','#ffff66','#9999ff','#6600cc','#009933','','#0000b3','#ff0000','#00004d','#0000cc','#ff0000','#ff0000','#ffb3b3','#ffb3b3','#e63900','#ffb3b3','#330d00','#ffb3b3','#3333ff','#0000cc'];
     selectedTab = "types";
@@ -43,8 +43,9 @@ export class HelpTicketAnalytics {
     curriculumtableSelected = true;
     institutiontableSelected = true;
     peopleTableSelected = true;
+    statusTableSelected = true;
 
-    constructor(config, people, datatable, utils, sessions, systems, helpTickets) {
+    constructor(config,  datatable, utils, helpTickets) {
         this.config = config;
         this.dataTable = datatable;
         this.dataTable.initialize(this);
@@ -68,7 +69,7 @@ export class HelpTicketAnalytics {
 		this.getInstitutionHelpTickets();
         this.getCurriculumHelpTickets();
         this.getPeopleHelpTickets();
-		// this.getPeopleHelpTickets();
+		this.getStatusHelpTickets();
     }
 
     typeChanged(category, el){
@@ -100,6 +101,11 @@ export class HelpTicketAnalytics {
                 this.getPeopleHelpTickets();
                 this.dataTable.updateArray(this.helpTickets.helpTicketPeopleArrayAnalytics);
 				this.selectedTab = 'people'
+                break;
+            case 4:
+                this.getStatusHelpTickets();
+                this.dataTable.updateArray(this.helpTickets.helpTicketStatusArrayAnalytics);
+				this.selectedTab = 'status'
 				break;
         }
     }
@@ -285,6 +291,58 @@ export class HelpTicketAnalytics {
         };
     }
 
+    async getStatusHelpTickets(){
+        if (this.selectedTab) {
+            await this.helpTickets.getHelpTicketsArrayAnalytics();
+            if (this.helpTickets.helpTicketArrayAnalytics && this.helpTickets.helpTicketArrayAnalytics.length) {
+                this.helpTickets.groupHelpTicketsByStatus();
+                this.substituteStatusDescriptions();
+                this.statusChartDataFunction();
+            } else {
+                this.displayArray = new Array();
+            }
+        } else {
+            this.displayArray = new Array();
+        }
+    }
+
+    substituteStatusDescriptions(){
+        this.helpTickets.helpTicketStatusArrayAnalytics.forEach((item,index) => {
+            for(let i = 0; i < this.config.HELP_TICKET_STATUSES.length; i++){
+                if(this.config.HELP_TICKET_STATUSES[i].code == item.helpTicketStatus) {
+                    this.helpTickets.helpTicketStatusArrayAnalytics[index].helpTicketStatus = this.config.HELP_TICKET_STATUSES[i].description;
+                }
+            }
+        });
+    }
+
+    statusChartDataFunction(){
+        var data = new Array();
+        var categories = new Array();
+
+        var sortedArray = this.helpTickets.helpTicketStatusArrayAnalytics.sort((a,b) => {
+            return (a['helpTicketStatus'] < b['helpTicketStatus']) ? -1 : (a['helpTicketStatus'] > b['helpTicketStatus']) ? 1 : 0;
+        });
+
+        sortedArray.forEach(item => {
+            categories.push(item.helpTicketStatus);
+            data.push(item.count);
+        })
+        
+        this.statusChartData = {
+            labels: categories,
+            datasets: [
+                {
+                    data: data,
+                    backgroundColor: this.backgroundColors,
+                    hoverBackgroundColor: this.backgroundColors,
+                    hoverBorderWidth: 2,
+                    hoverBorderColor: 'lightgrey'
+                }
+            ]
+        };
+    }
+
     showTypeTable(){
         this.typeTableSelected = true;
     }
@@ -315,6 +373,14 @@ export class HelpTicketAnalytics {
 
     showPeopleGraph(){  
         this.peopleTableSelected = false;
+    }
+
+    showStatusTable(){
+        this.statusTableSelected = true;
+    }
+
+    showStatusGraph(){
+        this.statusTableSelected = false;
     }
 
     customHelpTicketTypeFilter(value, item, context){
