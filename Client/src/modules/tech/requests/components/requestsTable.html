@@ -92,7 +92,7 @@
             <td click.delegate="selectARequest($index, $event, request)" data-title="ids-requested">${request.requestId | idsRequested}
             <td click.delegate="selectARequest($index, $event, request)" data-title="product">${request.productId.name}</td>
             <td data-title="Course">${request.requestId.courseId.name}</td>
-            <td class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId.fullName}</td>
+            <td class="dropbtn" click.delegate="showProfile(request, $event)" data-title="Name">${request.requestId.personId.fullName} <i class="fa fa-info" aria-hidden="true"></i></td>
             <td data-title="Name">${request.requestId.institutionId.name}</td>
             <td><span class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" click.delegate="editRequest($index, request)" aria-hidden="true"></i></span></td>
           </tr>

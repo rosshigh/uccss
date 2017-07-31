@@ -82,7 +82,7 @@ export class ViewRequests {
     this.requestSelected = true;
     this.selectedDetailIndex = index;
     this.showDetails = true;
-    this.requests.setSelectedRequestDetail(product);
+    this.requests.setTheSelectedRequestDetail(product); 
     this.customerActionRequired = this.requests.selectedRequestDetail.requestStatus == this.config.CUSTOMER_ACTION_REQUEST_CODE;
     this.customerMessage = this.requests.selectedRequestDetail.customerMessage;
     this.requests.selectRequstById(product.requestId);
