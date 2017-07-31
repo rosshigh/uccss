@@ -14,6 +14,7 @@ import moment from 'moment';
 
 @inject(Router, AppConfig, CommonDialogs, People, DataTable, Utils, Sessions, Products, Systems, ClientRequests)
 export class ClientRequestAnalytics {
+    chartOptions = { legend: { display: false } };
     summerTable = true;
     categories = [
         {

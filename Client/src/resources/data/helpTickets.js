@@ -350,6 +350,88 @@ export class HelpTickets {
 
     }
 
+    groupRequestsByCurriculum(){
+        if(!this.helpTicketArrayAnalytics) {
+            return;
+        }
+
+        let filteredArray = this.helpTicketArrayAnalytics.filter(item => {
+            return item.content[0].content.curriculumTitle != undefined;
+        })
+
+        var sortedArray = filteredArray 
+            .sort((a, b) => {
+                var result = (a.content[0].content.curriculumTitle < b.content[0].content.curriculumTitle) ? -1 : (a.content[0].content.curriculumTitle > b.content[0].content.curriculumTitle) ? 1 : 0;
+                return result;
+            });
+
+        this.helpTicketCurriculumArrayAnalytics = new Array();
+        var type = "";
+        var templateObj = new Object({curriculum: "", count: 0});
+
+        sortedArray.forEach(item => {
+            if(item.content[0].content.curriculumTitle != type){
+                type = item.content[0].content.curriculumTitle;
+                var obj = this.utils.copyObject(templateObj);
+                obj.curriculumTitle = item.content[0].content.curriculumTitle;
+                this.helpTicketCurriculumArrayAnalytics.push(obj);
+            }
+            if(this.helpTicketCurriculumArrayAnalytics[this.helpTicketCurriculumArrayAnalytics.length-1]) this.helpTicketCurriculumArrayAnalytics[this.helpTicketCurriculumArrayAnalytics.length-1].count += 1;
+        })
+    }
+
+     groupHelpTicketsByInstitution(){
+        if(!this.helpTicketArrayAnalytics) {
+            return;
+        }
+
+        var sortedArray = this.helpTicketArrayAnalytics 
+            .sort((a, b) => {
+                var result = (a.institutionId.name < b.institutionId.name) ? -1 : (a.institutionId.name > b.institutionId.name) ? 1 : 0;
+                return result;
+            });
+
+        this.helpTicketInstitutionArrayAnalytics = new Array();
+        var type = "";
+        var templateObj = new Object({institution: "", count: 0});
+
+        sortedArray.forEach(item => {
+            if(item.institutionId.name != type){
+                type = item.institutionId.name;
+                var obj = this.utils.copyObject(templateObj);
+                obj.institution = item.institutionId.name;
+                this.helpTicketInstitutionArrayAnalytics.push(obj);
+            }
+            if(this.helpTicketInstitutionArrayAnalytics[this.helpTicketInstitutionArrayAnalytics.length-1]) this.helpTicketInstitutionArrayAnalytics[this.helpTicketInstitutionArrayAnalytics.length-1].count += 1;
+        })
+    }
+
+    groupHelpTicketsByPeople(){
+         if(!this.helpTicketArrayAnalytics) {
+            return;
+        }
+
+        var sortedArray = this.helpTicketArrayAnalytics 
+            .sort((a, b) => {
+                var result = (a.personId.fullName < b.personId.fullName) ? -1 : (a.personId.fullName > b.personId.fullName) ? 1 : 0;
+                return result;
+            });
+
+        this.helpTicketPeopleArrayAnalytics = new Array();
+        var type = "";
+        var templateObj = new Object({name: "", count: 0});
+
+        sortedArray.forEach(item => {
+            if(item.personId.fullName != type){
+                type = item.personId.fullName;
+                var obj = this.utils.copyObject(templateObj);
+                obj.name = item.personId.fullName;
+                this.helpTicketPeopleArrayAnalytics.push(obj);
+            }
+            if(this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1]) this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1].count += 1;
+        })
+    }
+
     lockHelpTicket(obj){
         if(obj.helpTicketId) {
             var response = this.data.saveObject(obj, this.HELP_TICKET_LOCK_SERVICES, "post");

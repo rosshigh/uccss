@@ -1,0 +1,18 @@
+<template>
+    <div class="row">
+        <div class="col-lg-12">
+          <div class="bottomMargin list-group-item leftMargin rightMargin">
+            <span click.delegate="showCurriculumTable()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                data-original-title="Table"><i class="fa fa-table fa-lg fa-border" aria-hidden="true"></i></span>
+            <span click.delegate="showCurriculumGraph()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                data-original-title="Graphs"><i class="fa fa-pie-chart fa-lg fa-border" aria-hidden="true"></i></span>
+          </div>
+          <div show.bind="curriculumtableSelected" class="col-lg-12">
+              <compose view="./curriculumHTTable.html"></compose>
+          </div> 
+          <div show.bind="!curriculumtableSelected" class="col-lg-12">
+              <compose view="./curriculumHTChart.html"></compose>
+          </div>
+        </div>
+    </div>
+</template>

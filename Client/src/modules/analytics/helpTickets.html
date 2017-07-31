@@ -17,25 +17,17 @@
 
     <div class="panel panel-default rightMargin leftMargin col-lg-9">
       <div class="panel-body">
-      <!-- Session Select -->
-        <div class="col-lg-4">
-            <div class="form-group topMargin leftMargin">
-                <select value.bind="selectedSession" change.delegate="getSessionData()" id="session" class="form-control">
-                <option value="">Select a session</option>
-                <option value="all">All Sessions</option>
-                <option repeat.for="session of sessions.sessionsArray"
-                        value.bind="session._id">Session ${session.session} - ${session.year}</option>
-                </select>
-            </div>
-        </div>
-        <div show.bind="selectedCategory.code === 0">
+        <div show.bind="selectedTab === 'types'" >
             <compose view="./components/helpTicketsByType.html"></compose>
         </div>
-        <div show.bind="selectedCategory.code === 1">
-            <compose view="./components/helpTicketsByProducts.html"></compose>
+        <div show.bind="selectedTab === 'curriculum'">
+            <compose view="./components/helpTicketsByCurriculum.html"></compose>
         </div>
-        <div show.bind="selectedCategory.code === 2">
+        <div show.bind="selectedTab === 'institutions'">
             <compose view="./components/helpTicketsByInstitution.html"></compose>
+        </div>
+         <div show.bind="selectedTab === 'people'">
+            <compose view="./components/helpTicketsByPeople.html"></compose>
         </div>
       </div> 
     </div>
