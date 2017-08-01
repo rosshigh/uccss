@@ -2841,7 +2841,7 @@ define('modules/facco/viewRequests',['exports', 'aurelia-framework', '../../reso
 
                                 this.sessions.selectSessionById(this.selectedSession);
                                 _context2.next = 4;
-                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId);
+                                return this.requests.getClientRequestsDetailFaccoArray(this.selectedSession, this.userObj.institutionId._id);
 
                             case 4:
                                 this.dataTable.updateArray(this.requests.requestsDetailsArray);

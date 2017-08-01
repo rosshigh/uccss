@@ -47,7 +47,7 @@ export class ViewRequests {
     async getRequests() {
         if (this.selectedSession) {
             this.sessions.selectSessionById(this.selectedSession);
-            await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId);
+            await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  this.userObj.institutionId._id);
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
         } else {
             this.dataTable.updateArray([]);
