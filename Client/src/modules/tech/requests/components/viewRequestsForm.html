@@ -290,9 +290,9 @@
  
         <div class="form-group">
             <label class="control-label col-sm-3 hideOnPhone">Systems</label>
-            <select change.trigger="systemSelected()" class="form-control" value.bind="selectedSystemId">
+            <select change.delegate="systemSelected()" class="form-control" value.bind="selectedSystemId">
                 <option model.bind="null">-- Select a System --</option>
-                <option repeat.for='sys of products.selectedProduct.systems' model.bind="sys.systemId">${sys.sid}</option>
+                <option  repeat.for='sys of products.selectedProduct.systems' model.bind="sys.systemId">${sys.sid}</option>
             </select>
         </div>
 

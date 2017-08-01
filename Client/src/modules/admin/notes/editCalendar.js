@@ -19,8 +19,8 @@ export class EditCalendar {
   async activate(){
     await this.eventLayer.getEventsArray('?filter=eventActive|eq|true', true);
     this.eventLayer.eventArray.forEach(item => {
-      item.start = moment(new Date(item.start));
-      item.end =  moment(new Date(item.end));
+      // item.start = moment(new Date(item.start));
+      // item.end =  moment(new Date(item.end));
       this.events.push(item);
     })
   }
