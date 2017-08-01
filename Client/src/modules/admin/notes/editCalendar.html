@@ -1,13 +1,13 @@
 <template>
 	<div show.bind="eventLayer.selectedEvent.title" class="panel panel-default col-lg-3 bigTopMargin">
-		 <div class="bottomMargin list-group-item leftMargin rightMargin">
-            <span click.delegate="save()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
-                data-original-title="Save"><i class="fa fa-floppy-o fa-lg fa-border" aria-hidden="true"></i></span>
+		 <div class="bottomMargin list-group-item topMargin">
+						<span click.delegate="edit()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title=""
+                data-original-title="Edit"><i class="fa fa-pencil fa-lg fa-border" aria-hidden="true"></i></span>
             <span show.bind="eventLayer.selectedEvent._id" click.delegate="delete()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip"
                 data-placement="bottom" title="" data-original-title="Delete"><i class="fa fa-trash fa-lg fa-border text-danger" aria-hidden="true"></i></span>
 			</div>
       <div class="panel-body">
-			<h4>Title: ${eventLayer.selectedEvent.title}</h4>
+			<h4>${eventLayer.selectedEvent.title}</h4>
 				<br/>
 			<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>
 				<br/>
@@ -17,8 +17,7 @@
 				<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>
 			</div>
 				<br/>
-			<h4>Notes</h4>
-			<div class="col-lg-12" show.bind="eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0" innerhtml.bind="eventLayer.selectedEvent.notes" ></div>
+			<div class="col-lg-12 topMargin" show.bind="eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0" innerhtml.bind="eventLayer.selectedEvent.notes" ></div>
 		</div>
   </div>
   <div class="col-lg-9">

@@ -25,6 +25,13 @@
 			<label>End Time</label>
 			<flat-picker controlid="endDate" config.bind="flatpickrConfig" value.bind="model.event.eventEnd"></flat-picker>
 		</div>
+		<div class="form-group">
+			<div class="checkbox">
+				<label class="pull-left">
+					<input id="uccRelated" checked.bind="model.event.scope" type="checkbox"> UCC related
+				</label>
+			</div>
+		</div>
 		<label>Notes</label>
 		<editor value.bind="model.event.notes" height="250"></editor>
     </ux-dialog-body>

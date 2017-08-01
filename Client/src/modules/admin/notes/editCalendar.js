@@ -17,11 +17,9 @@ export class EditCalendar {
   }
 
   async activate(){
-    await this.eventLayer.getEventsArray('?filter=eventActive|eq|true', true);
+    await this.eventLayer.getEventsArray('', true);
     this.eventLayer.eventArray.forEach(item => {
-      // item.start = moment(new Date(item.start));
-      // item.end =  moment(new Date(item.end));
-      this.events.push(item);
+      if(item.personId === this.userObj._id || item.scope === 'u') this.events.push(item);
     })
   }
 
@@ -43,7 +41,7 @@ export class EditCalendar {
   }
 
   eventDialog(evt){
-    var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, eventEnd: evt.detail.value.date, notes: ""};
+    var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: ""};
     return this.dialog.showEvent(
           "Enter Event",
           event,
@@ -59,23 +57,28 @@ export class EditCalendar {
 
   async saveEvent(event)
   {
-    console.log(event);
     this.eventLayer.selectEvent();
     this.eventLayer.selectedEvent.start = event.event.eventStart
     this.eventLayer.selectedEvent.end = event.event.eventEnd
     this.eventLayer.selectedEvent.title = event.event.eventTitle;
     this.eventLayer.selectedEvent.personId = this.userObj._id;
     this.eventLayer.selectedEvent.notes = event.event.notes;
-    console.log(this.eventLayer.selectedEvent)
+    this.eventLayer.selectedEvent.scope = event.event.scope ? "u" : "p";
     let response = await this.eventLayer.saveEvent();
     if(!response.error){
-       response.start = moment(new Date(this.eventLayer.selectedEvent.start));
-      response.end =  moment(new Date(this.eventLayer.selectedEvent.end));
       this.events.push(this.eventLayer.selectedEvent)
     } else {
       this.utils.showNotification("There was a problem saving the event");
     }
 
+  }
+
+  async delete(){
+    let response = await this.eventLayer.deleteEvent()
+    if(!response.error){
+      this.events.splice(this.eventLayer.editIndex,1);
+      this.eventLayer.selectEvent();
+    }
   }
 
 }

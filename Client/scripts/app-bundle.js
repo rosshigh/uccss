@@ -152,8 +152,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.HOST = location.origin;
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
-            this.BASE_URL = this.HOST + "/api/";
-            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
+            this.BASE_URL = "http://localhost:5000/api/";
+            this.IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/';
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -9173,6 +9173,7 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
             } else {
                 for (var i = 0; i < this.eventArray.length; i++) {
                     if (this.eventArray[i]._id === eventId) {
+                        this.editIndex = i;
                         this.selectedEvent = this.utils.copyObject(this.eventArray[i]);
                         return;
                     }
@@ -9187,6 +9188,7 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
             obj.eventType = "";
             obj.allDay = false;
             obj.notes = "";
+            obj.scope = "p";
             return obj;
         };
 
@@ -9211,7 +9213,8 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
 
                                 if (!response.error) {
                                     if (this.eventArray) {
-                                        this.eventArray.push(response);;
+                                        this.selectedEvent = response;
+                                        this.eventArray.push(response);
                                     }
                                 } else {
                                     this.data.processError(response, "There was an error creating the event.");
@@ -20950,11 +20953,11 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.eventLayer.getEventsArray('?filter=eventActive|eq|true', true);
+                return this.eventLayer.getEventsArray('', true);
 
               case 2:
                 this.eventLayer.eventArray.forEach(function (item) {
-                  _this.events.push(item);
+                  if (item.personId === _this.userObj._id || item.scope === 'u') _this.events.push(item);
                 });
 
               case 3:
@@ -20992,7 +20995,7 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
     EditCalendar.prototype.eventDialog = function eventDialog(evt) {
       var _this2 = this;
 
-      var event = { eventTitle: "", eventStart: evt.detail.value.date, allDay: false, eventEnd: evt.detail.value.date, notes: "" };
+      var event = { eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: "" };
       return this.dialog.showEvent("Enter Event", event, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
           _this2.saveEvent(response.output);
@@ -21009,29 +21012,26 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                console.log(event);
                 this.eventLayer.selectEvent();
                 this.eventLayer.selectedEvent.start = event.event.eventStart;
                 this.eventLayer.selectedEvent.end = event.event.eventEnd;
                 this.eventLayer.selectedEvent.title = event.event.eventTitle;
                 this.eventLayer.selectedEvent.personId = this.userObj._id;
                 this.eventLayer.selectedEvent.notes = event.event.notes;
-                console.log(this.eventLayer.selectedEvent);
-                _context2.next = 10;
+                this.eventLayer.selectedEvent.scope = event.event.scope ? "u" : "p";
+                _context2.next = 9;
                 return this.eventLayer.saveEvent();
 
-              case 10:
+              case 9:
                 response = _context2.sent;
 
                 if (!response.error) {
-                  response.start = (0, _moment2.default)(new Date(this.eventLayer.selectedEvent.start));
-                  response.end = (0, _moment2.default)(new Date(this.eventLayer.selectedEvent.end));
                   this.events.push(this.eventLayer.selectedEvent);
                 } else {
                   this.utils.showNotification("There was a problem saving the event");
                 }
 
-              case 12:
+              case 11:
               case 'end':
                 return _context2.stop();
             }
@@ -21044,6 +21044,39 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
       }
 
       return saveEvent;
+    }();
+
+    EditCalendar.prototype.delete = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        var response;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.eventLayer.deleteEvent();
+
+              case 2:
+                response = _context3.sent;
+
+                if (!response.error) {
+                  this.events.splice(this.eventLayer.editIndex, 1);
+                  this.eventLayer.selectEvent();
+                }
+
+              case 4:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function _delete() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return _delete;
     }();
 
     return EditCalendar;
@@ -21143,7 +21176,7 @@ define('modules/admin/notes/editNotes',['exports', 'aurelia-framework', 'aurelia
 						switch (_context.prev = _context.next) {
 							case 0:
 								_context.next = 2;
-								return Promise.all([this.people.getPeopleArray(), this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true), this.config.getConfig()]);
+								return Promise.all([this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true), this.config.getConfig()]);
 
 							case 2:
 								responses = _context.sent;
@@ -27133,7 +27166,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         };
 
         Assignments.prototype.customNameFilter = function customNameFilter(value, item, context) {
-            return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+            return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
         };
 
         Assignments.prototype.statusCustomFilter = function statusCustomFilter(value, item, context) {
@@ -55098,7 +55131,7 @@ define('text!resources/dialogs/document-dialog.html', ['module'], function(modul
 define('text!resources/dialogs/documentForm.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"no-more-tables\">\r\n        <table class=\"table table-striped table-hover cf\">\r\n            <thead class=\"cf\">\r\n                <tr>\r\n                    <th>Add</th>\r\n                    <th>Name</th>\r\n                    <th>Version</th>\r\n                    <th>Date Uploaded</th>\r\n                </tr>\r\n            </thead>\r\n            <tbody>\r\n                <tr repeat.for=\"item of documents.selectedDocument.files\">\r\n                    <td click.trigger=\"addDocument($index)\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></td>\r\n                    <td data-title=\"Name\"><a target=\"_blank\" href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${documents.selectedDocument.categoryCode}/${documents.selectedDocument.name}/${item.fileName}\">${item.originalFilename}</a></td>\r\n                    <td data-title=\"Version\">${item.version}</td>\r\n                    <td data-title=\"Date Uploaded\">${item.dateUploaded | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </div>\r\n</template>"; });
 define('text!resources/dialogs/documentsTable.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class='row'>\r\n        <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n            <div id=\"no-more-tables\">\r\n                <table class=\"table table-striped table-hover cf\">\r\n                    <thead class=\"cf\">\r\n                        <tr>\r\n                            <th>Name </th>\r\n                            <th>Description</th>\r\n                            <th>Date Created</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr click.trigger=\"chooseDocument($index, $event)\" repeat.for=\"item of documents.documentsArray\">\r\n                            <td data-title=\"name\">${item.name}</td>\r\n                            <td data-title=\"description\">${item.description}</td>\r\n                            <td data-title=\"createdDate\">${item.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!resources/dialogs/email-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n\t<ux-dialog style=\"max-width: 600px\">\n    \t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body>\n\t\t\t<input class=\"form-control bottomMargin\" value.bind=\"model.email.emailSubject\" placeholder=\"Subject\"/>\n\t\t\t<editor value.bind=\"model.email.emailBody\" height=\"250\"></editor>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<button class=\"btn btn-primary\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t</ux-dialog-footer>\n  \t</ux-dialog>\n</template>\n"; });
-define('text!resources/dialogs/event-dialog.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n  <ux-dialog style=\"max-width: 800px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n\t\t<label>Title</label>\n\t\t<input class=\"form-control\" value.bind=\"model.event.eventTitle\" ref=\"titleInput\"></input>\n\t\t<label>Start Time</label>\n\t\t<flat-picker controlid=\"startDate\" config.bind=\"flatpickrConfig\" value.bind=\"model.event.eventStart\"></flat-picker>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"checkbox\">\n\t\t\t\t<label class=\"pull-left\">\n\t\t\t\t\t<input id=\"activeProduct\" checked.bind=\"model.event.allDay\" type=\"checkbox\"> All day\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t</div>\n\t\t<br/>\n\t\t<div show.bind=\"!model.event.allDay\">\n\t\t\t<label>End Time</label>\n\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"flatpickrConfig\" value.bind=\"model.event.eventEnd\"></flat-picker>\n\t\t</div>\n\t\t<label>Notes</label>\n\t\t<editor value.bind=\"model.event.notes\" height=\"250\"></editor>\n    </ux-dialog-body>\n\n    <ux-dialog-footer> \n      <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>"; });
+define('text!resources/dialogs/event-dialog.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n  <ux-dialog style=\"max-width: 800px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n\t\t<label>Title</label>\n\t\t<input class=\"form-control\" value.bind=\"model.event.eventTitle\" ref=\"titleInput\"></input>\n\t\t<label>Start Time</label>\n\t\t<flat-picker controlid=\"startDate\" config.bind=\"flatpickrConfig\" value.bind=\"model.event.eventStart\"></flat-picker>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"checkbox\">\n\t\t\t\t<label class=\"pull-left\">\n\t\t\t\t\t<input id=\"activeProduct\" checked.bind=\"model.event.allDay\" type=\"checkbox\"> All day\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t</div>\n\t\t<br/>\n\t\t<div show.bind=\"!model.event.allDay\">\n\t\t\t<label>End Time</label>\n\t\t\t<flat-picker controlid=\"endDate\" config.bind=\"flatpickrConfig\" value.bind=\"model.event.eventEnd\"></flat-picker>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"checkbox\">\n\t\t\t\t<label class=\"pull-left\">\n\t\t\t\t\t<input id=\"uccRelated\" checked.bind=\"model.event.scope\" type=\"checkbox\"> UCC related\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t</div>\n\t\t<label>Notes</label>\n\t\t<editor value.bind=\"model.event.notes\" height=\"250\"></editor>\n    </ux-dialog-body>\n\n    <ux-dialog-footer> \n      <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>"; });
 define('text!resources/dialogs/message-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n  <ux-dialog style=\"max-width: 325px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n      ${model.message}\n    </ux-dialog-body>\n\n    <ux-dialog-footer>\n      <button repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>\n"; });
 define('text!resources/dialogs/note-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n  <ux-dialog style=\"max-width: 600px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n\t\t<select class=\"form-control\" value.bind=\"model.selectedCategory\">\n\t\t\t<option repeat.for=\"option of model.note.noteCategories\" model.bind=\"$index\">${option}</option>\n\t\t</select>\n      \t<editor value.bind=\"model.note.noteBody\" height=\"250\"></editor>\n    </ux-dialog-body>\n\n    <ux-dialog-footer>\n      <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>\n"; });
 define('text!resources/dialogs/password-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n\t<ux-dialog style=\"width: 600px;\">\n\t\t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body style=\"height:300px;\">\n\t\t\t<h6>Password should be at least ${thresholdLength} characters long and should contuxn a combination of the following groups:  </h6>\n\t\t\t\t<ul>\n\t\t\t\t\t<li><h6>lowercase letters</h6></li>\n\t\t\t\t\t<li><h6>uppercase letters</h6></li>\n\t\t\t\t\t<li><h6> digits or special characters</h6></li>\n\t\t\t\t</ul>\n\t\t\t<div class=\"topMargin\" style=\"height:50px;\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<label for=\"register_password\" class=\"col-sm-3 control-label\">Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password\" type=\"password\" attach-focus=\"true\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password\"\n\t\t\t\t\t\tblur.trigger=\"passwordComplexity()\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<div class=\"form-group topMargin\" >\n\t\t\t\t\t<label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t</ux-dialog-footer>\n\t</ux-dialog>\n</template>\n"; });
@@ -55118,7 +55151,7 @@ define('text!modules/admin/Customers/editInstitutions.html', ['module'], functio
 define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-3\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"/>\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul id=\"categoryList\" class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"${ $first ? 'menuButtons' : ''} list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-9\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n   \n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
-define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\n\t\t <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n      <div class=\"panel-body\">\n\t\t\t<h4>Title: ${eventLayer.selectedEvent.title}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\n\t\t\t<br/>\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t</div>\n\t\t\t\t<br/>\n\t\t\t<h4>Notes</h4>\n\t\t\t<div class=\"col-lg-12\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\n\t\t</div>\n  </div>\n  <div class=\"col-lg-9\">\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"false\" day-click.bind=\"dayClicked\" \n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\n  </div>\n</template>"; });
+define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\n\t\t <div class=\"bottomMargin list-group-item topMargin\">\n\t\t\t\t\t\t<span click.delegate=\"edit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n      <div class=\"panel-body\">\n\t\t\t<h4>${eventLayer.selectedEvent.title}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\n\t\t\t<br/>\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t</div>\n\t\t\t\t<br/>\n\t\t\t<div class=\"col-lg-12 topMargin\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\n\t\t</div>\n  </div>\n  <div class=\"col-lg-9\">\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"false\" day-click.bind=\"dayClicked\" \n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\n  </div>\n</template>"; });
 define('text!modules/admin/notes/editNotes.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"noteSelected === 'No'\">\n                <compose view=\"./components/notesTable.html\"></compose>\n            </div> \n            <div show.bind=\"noteSelected === 'Yes'\" >\n                <compose view=\"./components/notesForm.html\"></compose>\n            </div>\n             <div show.bind=\"noteSelected === 'helpTicket'\" >\n                <compose view=\"./components/helpTicket.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>"; });
 define('text!modules/admin/notes/notes.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template"; });
 define('text!modules/admin/site/admin.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n        .menuButtons {\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n        }\n    </style>\n\t<div class=\"fluid-container\">\n\n\t\t<div class=\"panel panel-default\">\n\t\t<div class=\"panel-body\">\n\t\t\t<div class=\"col-lg-3\">\n\t\t\t<h4>Files</h4>\n\t\t\t<div>\n\t\t\t\t<ul class=\"list-group\" id=\"buttonGroup\">\n\t\t\t\t\t<button click.trigger=\"typeSelected($event, $index, type)\" type=\"button\" repeat.for=\"type of tabs\" id=\"${type.screenToShow}\"\n\t\t\t\t\t\tclass=\"${ $first ? 'menuButtons list-group-item' : 'list-group-item'}\">${type.id}</button>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-9\">\n\t\t\t\n\t\t\t<compose if.bind=\"(screenToShow == 'log' || screenToShow == 'auth') && fileList.length\" view='./components/logFileTable.html'></compose>\n\t\t\t\n\t\t\t<compose if.bind=\"screenToShow === 'forl' || screenToShow === 'fore' || screenToShow === 'foro'\" view='./components/foreverLogs.html'></compose>\n\t\t\t\n\t\t\t<compose if.bind=\"showFileList && screenToShow === 'files'\" view='./components/uploadedFilesTable.html'></compose>\n\t\t</div>\n\t</div>\n</template>"; });

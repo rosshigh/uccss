@@ -48,6 +48,7 @@ export class Events {
         } else {
             for(var i = 0; i < this.eventArray.length; i++){
                 if(this.eventArray[i]._id === eventId) {
+                    this.editIndex = i;
                     this.selectedEvent = this.utils.copyObject(this.eventArray[i]);
                     return;
                 }
@@ -62,6 +63,7 @@ export class Events {
         obj.eventType = "";
         obj.allDay = false
         obj.notes = "";
+        obj.scope = "p";
 		return obj;
 	}
 
@@ -70,7 +72,8 @@ export class Events {
 			let response = await this.data.saveObject(this.selectedEvent, this.EVENTS_SERVICE, "post")
 				if (!response.error) {
 					if(this.eventArray){
-						this.eventArray.push(response);;
+                        this.selectedEvent = response;
+						this.eventArray.push(response);
 					}
 				} else {
 					this.data.processError(response, "There was an error creating the event.");

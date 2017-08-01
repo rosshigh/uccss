@@ -49,7 +49,7 @@ export class editNotes{
 
     async activate() {
 		 let responses = await Promise.all([
-			this.people.getPeopleArray(),
+			// this.people.getPeopleArray(),
 			this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true),
 			this.config.getConfig()
 		 ]);

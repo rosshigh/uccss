@@ -13,7 +13,8 @@ var EventSchema = new Schema({
   eventType: { type: String },
   eventReference: { type: Schema.Types.ObjectId },
   eventActive: { type: Boolean, default: true },
-  notes: { type: String }
+  notes: { type: String },
+  scope: { type: String }
 });
 
 module.exports = Mongoose.model('Event', EventSchema);

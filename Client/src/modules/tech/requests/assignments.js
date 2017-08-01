@@ -1101,7 +1101,7 @@ export class Assignments {
 	}
 	
 	customNameFilter(value, item, context){
-        return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
+        return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
     statusCustomFilter(value, item, context){
