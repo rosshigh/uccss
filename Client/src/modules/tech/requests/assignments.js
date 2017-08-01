@@ -67,7 +67,7 @@ export class Assignments {
             await this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
                 this.clientRequests.requestsDetailsArray.forEach(item => {
-                    if(item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+                    if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
                 })
                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
                 this.filterInAssigned();

@@ -30,7 +30,9 @@ export class EditCalendar {
   }
 
   selectEvent(event){
-    this.eventLayer.selectEventById(event.detail.value.date._id);
+    if(event.detail.value){
+      this.eventLayer.selectEventById(event.detail.value.date._id);
+    }
   }
 
   dayClicked(start){
@@ -59,16 +61,17 @@ export class EditCalendar {
   {
     console.log(event);
     this.eventLayer.selectEvent();
-    this.eventLayer.selectedEvent.start = moment(event.event.eventStart).format('YYYY-MM-DD, h:mm:ss a');
-    this.eventLayer.selectedEvent.end = moment(event.event.eventEnd).format('YYYY-MM-DD, h:mm:ss a');
+    this.eventLayer.selectedEvent.start = event.event.eventStart
+    this.eventLayer.selectedEvent.end = event.event.eventEnd
     this.eventLayer.selectedEvent.title = event.event.eventTitle;
     this.eventLayer.selectedEvent.personId = this.userObj._id;
+    this.eventLayer.selectedEvent.notes = event.event.notes;
     console.log(this.eventLayer.selectedEvent)
     let response = await this.eventLayer.saveEvent();
     if(!response.error){
        response.start = moment(new Date(this.eventLayer.selectedEvent.start));
       response.end =  moment(new Date(this.eventLayer.selectedEvent.end));
-      this.eventLayer.push(this.eventLayer.selectedEvent)
+      this.events.push(this.eventLayer.selectedEvent)
     } else {
       this.utils.showNotification("There was a problem saving the event");
     }

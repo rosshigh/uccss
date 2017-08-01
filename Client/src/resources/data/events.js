@@ -61,7 +61,7 @@ export class Events {
 		obj.title = "";
         obj.eventType = "";
         obj.allDay = false
-        notes = "";
+        obj.notes = "";
 		return obj;
 	}
 

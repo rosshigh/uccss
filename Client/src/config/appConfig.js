@@ -410,6 +410,7 @@ export class AppConfig {
         this.NAVBAR_LOGO = this.getParameter('NAVBAR_LOGO');
         this.PRODUCT_REQUESTS_EMAIL_LIST = this.getParameter('PRODUCT_REQUESTS_EMAIL_LIST');
         this.BUTTONS_BACKGROUND = this.getParameter('BUTTONS_BACKGROUND');
+        this.ACTIVE_REQUEST_OVERLAP = this.getParameter('ACTIVE_REQUEST_OVERLAP');
 
     }
 

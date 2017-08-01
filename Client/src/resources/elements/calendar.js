@@ -55,7 +55,7 @@ export class calendar {
 					}
 				});
 			} else {
-        	changeEvent = document.createEvent('CustomEvent');
+        changeEvent = document.createEvent('CustomEvent');
 				changeEvent.initCustomEvent('click', true, true, {
 					detail: {
 						value: data

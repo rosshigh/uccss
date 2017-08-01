@@ -37,7 +37,18 @@ export class ViewHelpTickets {
   minStartDate = "1/1/1900";
   maxStartDate = "1/1/9999";
   startDate = "";
-  configDate = {};
+  configDate = {
+    "disable": [
+        function(date) {
+            // return true to disable
+            return (date.getDay() === 6 || date.getDay() === 0);
+
+        }
+    ],
+    "locale": {
+        "firstDayOfWeek": 1 // start week on Monday
+    }
+  };
 
   constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea) {
     this.router = router;

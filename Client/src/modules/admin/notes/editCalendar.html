@@ -2,8 +2,7 @@
   <div class="col-lg-3">
     <label>Title</label>
 		<input class="form-control" value.bind="eventLayer.selectedEvent.title">${eventLayer.selectedEvent.title}</input>
-		<label>Start Time</label>
-		<flat-picker controlid="startDate" config.bind="flatpickrConfig" value.bind="eventLayer.selectedEvent.start"></flat-picker>
+		<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>
     	<div class="form-group">
 			<div class="checkbox">
 				<label class="pull-left">
@@ -13,11 +12,10 @@
 		</div>
 		<br/>
 		<div show.bind="!eventLayer.selectedEvent.allDay">
-			<label>End Time</label>
-			<flat-picker controlid="endDate" config.bind="flatpickrConfig" value.bind="eventLayer.selectedEvent.end"></flat-picker>
+			<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>
 		</div>
     <label>Notes</label>
-    <textarea show.bind="eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0" innerhtml.bind="eventLayer.selectedEvent.notes" rows="10"></textarea>
+    <div class="col-lg-12" show.bind="eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0" innerhtml.bind="eventLayer.selectedEvent.notes" ></div>
   </div>
   <div class="col-lg-9">
     <calendar events.bind="events" view="month" weekends.bind="false" day-click.bind="dayClicked" 

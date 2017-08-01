@@ -82,7 +82,7 @@ export class EditConfig {
             }
         }
         this.siteConfig.configArray[index].value = this.siteConfig.configArray[index].value == 'false' || this.siteConfig.configArray[index].value == false;
-        this.dataTable.updateArray(this.siteConfig.configArray);
+        // this.dataTable.updateArray(this.siteConfig.configArray);
     }
 
 	cancel(){

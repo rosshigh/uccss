@@ -44,6 +44,7 @@ export function configure(config) {
     './value-converters/stat-value',
     './value-converters/filter-clients',
     './value-converters/overlap',
-    './value-converters/filter-array'
+    './value-converters/filter-array',
+    './value-converters/filter-sessions'
   ]);
 }
