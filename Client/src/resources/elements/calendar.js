@@ -32,20 +32,36 @@ export class calendar {
 		   let changeEvent;
 
 			if (window.CustomEvent) {
-				changeEvent = new CustomEvent('change', {
-					detail: {
-						value: data
-					},
-					bubbles: true
-				});
-			} else {
+        if(type === 'dayClicked'){
+          changeEvent = new CustomEvent('change', {
+            detail: {
+              value: data
+            },
+            bubbles: true
+          });
+        } else {
+          changeEvent = new CustomEvent('click', {
+            detail: {
+              value: data
+            },
+            bubbles: true
+          });
+        }
+			} else if(type === 'dayClicked'){
 				changeEvent = document.createEvent('CustomEvent');
 				changeEvent.initCustomEvent('change', true, true, {
 					detail: {
 						value: data
 					}
 				});
-			}
+			} else {
+        	changeEvent = document.createEvent('CustomEvent');
+				changeEvent.initCustomEvent('click', true, true, {
+					detail: {
+						value: data
+					}
+				});
+      }
 			this.element.dispatchEvent(changeEvent);
 	}
 

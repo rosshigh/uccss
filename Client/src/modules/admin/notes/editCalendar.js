@@ -10,15 +10,15 @@ export class EditCalendar {
 
   constructor(dialog, events, utils) {
     this.dialog = dialog;
-    this.event = events;
+    this.eventLayer = events;
     this.utils = utils;
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'));
   }
 
   async activate(){
-    await this.event.getEventsArray('?filter=eventActive|eq|true', true);
-    this.event.eventArray.forEach(item => {
+    await this.eventLayer.getEventsArray('?filter=eventActive|eq|true', true);
+    this.eventLayer.eventArray.forEach(item => {
       item.start = moment(new Date(item.start));
       item.end =  moment(new Date(item.end));
       this.events.push(item);
@@ -26,15 +26,22 @@ export class EditCalendar {
   }
 
   eventClicked(start){
-    console.log(start);
+    this.fireEvent(this.element, 'eventClicked', { date: start });
+  }
+
+  selectEvent(event){
+    this.eventLayer.selectEventById(event.detail.value.date._id);
   }
 
   dayClicked(start){
-   this.fireEvent(this.element, 'dayClicked', { date: start });
+    let startIndex = start._d.toString().indexOf('GMT-0') + 5;
+    let hours = parseInt(start._d.toString().substring(startIndex, startIndex+1));
+    start = moment(start).add(5, 'hours');
+    this.fireEvent(this.element, 'dayClicked', { date: start });
   }
 
   eventDialog(evt){
-    var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, eventEnd: evt.detail.value.date};
+    var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, eventEnd: evt.detail.value.date, notes: ""};
     return this.dialog.showEvent(
           "Enter Event",
           event,
@@ -51,17 +58,17 @@ export class EditCalendar {
   async saveEvent(event)
   {
     console.log(event);
-    this.event.selectEvent();
-    this.event.selectedEvent.start =moment(event.event.eventStart).format('YYYY-MM-DD, h:mm:ss a');
-    this.event.selectedEvent.end = moment(event.event.eventEnd).format('YYYY-MM-DD, h:mm:ss a');
-    this.event.selectedEvent.title = event.event.eventTitle;
-    this.event.selectedEvent.personId = this.userObj._id;
-    console.log(this.event.selectedEvent)
-    let response = await this.event.saveEvent();
+    this.eventLayer.selectEvent();
+    this.eventLayer.selectedEvent.start = moment(event.event.eventStart).format('YYYY-MM-DD, h:mm:ss a');
+    this.eventLayer.selectedEvent.end = moment(event.event.eventEnd).format('YYYY-MM-DD, h:mm:ss a');
+    this.eventLayer.selectedEvent.title = event.event.eventTitle;
+    this.eventLayer.selectedEvent.personId = this.userObj._id;
+    console.log(this.eventLayer.selectedEvent)
+    let response = await this.eventLayer.saveEvent();
     if(!response.error){
-       response.start = moment(new Date(this.event.selectedEvent.start));
-      response.end =  moment(new Date(this.event.selectedEvent.end));
-      this.events.push(this.event.selectedEvent)
+       response.start = moment(new Date(this.eventLayer.selectedEvent.start));
+      response.end =  moment(new Date(this.eventLayer.selectedEvent.end));
+      this.eventLayer.push(this.eventLayer.selectedEvent)
     } else {
       this.utils.showNotification("There was a problem saving the event");
     }

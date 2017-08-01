@@ -12,7 +12,8 @@ var EventSchema = new Schema({
   url: { type: String },
   eventType: { type: String },
   eventReference: { type: Schema.Types.ObjectId },
-  eventActive: { type: Boolean, default: true }
+  eventActive: { type: Boolean, default: true },
+  notes: { type: String }
 });
 
 module.exports = Mongoose.model('Event', EventSchema);

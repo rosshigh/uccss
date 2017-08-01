@@ -505,11 +505,6 @@ export class EditPeople {
     }
 
 	customInstitutionSorter(sortProperty, sortDirection, sortArray, context){
-		// var sortProperty = 'name';
-        // sortArray.forEach((item) => {
-        //   var obj = context.dataTable.findObj(context.people.institutionsArray, '_id', item.institutionId);
-        //   item[sortProperty] = obj ? obj[sortProperty] : null;
-        // })
 
         return sortArray.sort((a, b) => {
 			var result = (a['institutionId']['name'] < b['institutionId']['name']) ? -1 : (a['institutionId']['name'] > b['institutionId']['name']) ? 1 : 0;
@@ -518,13 +513,7 @@ export class EditPeople {
 	}
 
 	institutionCustomFilter(value, item, context){
-        return context.people.institutionId[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-        // for(let i = 0; i < context.people.institutionsArray.length; i++){
-        //     if(item.institutionId == context.people.institutionsArray[i]._id) {
-        //         return context.people.institutionsArray[i].name.toUpperCase().indexOf(value.toUpperCase()) > -1;
-        //     }
-        // }
-        // return false;
+        return item.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 
 	customRoleFilter(value, item, context){

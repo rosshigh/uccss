@@ -33,7 +33,7 @@ export class EditPeople {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true),
+            this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id + '&order=lastName', true),
             this.is4ua.loadIs4ua(),
            this.config.getConfig()
         ]);

@@ -40,13 +40,28 @@ export class Events {
 			this.selectedEvent = this.utils.copyObject(this.eventArray[index]);
 			this.editIndex = index;
         }
-	}
+    }
+    
+    selectEventById(eventId){
+        if(eventId == undefined) {
+            this.selectedEvent = this.emptyEvent();
+        } else {
+            for(var i = 0; i < this.eventArray.length; i++){
+                if(this.eventArray[i]._id === eventId) {
+                    this.selectedEvent = this.utils.copyObject(this.eventArray[i]);
+                    return;
+                }
+            }
+        }
+         this.selectedEvent = this.emptyEvent();
+    }
 	
 	emptyEvent(){
 		var obj = new Object();
 		obj.title = "";
         obj.eventType = "";
         obj.allDay = false
+        notes = "";
 		return obj;
 	}
 

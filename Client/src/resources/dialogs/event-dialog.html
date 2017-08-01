@@ -10,7 +10,7 @@
 
     <ux-dialog-body>
 		<label>Title</label>
-		<input class="form-control" value.bind="model.event.eventTitle"></input>
+		<input class="form-control" value.bind="model.event.eventTitle" ref="titleInput"></input>
 		<label>Start Time</label>
 		<flat-picker controlid="startDate" config.bind="flatpickrConfig" value.bind="model.event.eventStart"></flat-picker>
 		<div class="form-group">
@@ -25,6 +25,8 @@
 			<label>End Time</label>
 			<flat-picker controlid="endDate" config.bind="flatpickrConfig" value.bind="model.event.eventEnd"></flat-picker>
 		</div>
+		<label>Notes</label>
+		<editor value.bind="model.event.notes" height="250"></editor>
     </ux-dialog-body>
 
     <ux-dialog-footer> 

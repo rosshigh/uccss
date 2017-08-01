@@ -1,7 +1,27 @@
 <template>
- 
-  <calendar events.bind="events" view="month" weekends.bind="false" day-click.bind="dayClicked" 
-  event-click.bind="eventClicked" options.bind="{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }" 
-  change.delegate="eventDialog($event)"></calendar>
-  
+  <div class="col-lg-3">
+    <label>Title</label>
+		<input class="form-control" value.bind="eventLayer.selectedEvent.title">${eventLayer.selectedEvent.title}</input>
+		<label>Start Time</label>
+		<flat-picker controlid="startDate" config.bind="flatpickrConfig" value.bind="eventLayer.selectedEvent.start"></flat-picker>
+    	<div class="form-group">
+			<div class="checkbox">
+				<label class="pull-left">
+					<input id="activeProduct" checked.bind="eventLayer.selectedEvent.allDay" type="checkbox"> All day
+				</label>
+			</div>
+		</div>
+		<br/>
+		<div show.bind="!eventLayer.selectedEvent.allDay">
+			<label>End Time</label>
+			<flat-picker controlid="endDate" config.bind="flatpickrConfig" value.bind="eventLayer.selectedEvent.end"></flat-picker>
+		</div>
+    <label>Notes</label>
+    <textarea show.bind="eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0" innerhtml.bind="eventLayer.selectedEvent.notes" rows="10"></textarea>
+  </div>
+  <div class="col-lg-9">
+    <calendar events.bind="events" view="month" weekends.bind="false" day-click.bind="dayClicked" 
+    event-click.bind="eventClicked" options.bind="{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }" 
+    change.delegate="eventDialog($event)" click.delegate="selectEvent($event)"></calendar>
+  </div>
 </template>

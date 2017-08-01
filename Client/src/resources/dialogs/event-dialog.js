@@ -17,6 +17,10 @@ export class EventDialog {
   activate(model) {
     this.model = model;
   }
+
+  attached(){
+    $(this.titleInput).focus();
+  }
   
   selectOption(option) {
     if(isCancel(option)) {
