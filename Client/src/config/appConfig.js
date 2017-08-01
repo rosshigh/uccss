@@ -13,7 +13,7 @@ export class AppConfig {
     // IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/'
 
     BASE_URL = this.HOST + "/api/";
-    IMG_DOWNLOAD_URL = this.HOST + '/img/' 
+    IMG_DOWNLOAD_URL = this.HOST + '/img/'  
 
      HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
     PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
