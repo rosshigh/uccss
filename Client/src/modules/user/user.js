@@ -113,7 +113,7 @@ export class User {
         let responses = await Promise.all([
             this.helpTickets.getCurrentCount(),
             this.requests.getCurrentCount(),
-            this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true),
+            this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId._id, true),
             this.sessions.getSessionsArray('?order=startDate'),
             this.siteinfo.getInfoArray(true, options),
              this.config.getConfig()
@@ -122,7 +122,7 @@ export class User {
           this.showHelpTickets = this.helpTickets.newHelpTickets;
           this.showCarousel = this.siteinfo.showCarousel();
     } else {
-        var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
+        var countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId._id;
         this.countHeader = "Your Institution's Recent Request History";
         let responses = await Promise.all([
           this.helpTickets.getCurrentCount('?filter=personId|eq|'+ this.userObj._id),

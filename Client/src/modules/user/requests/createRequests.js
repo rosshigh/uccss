@@ -419,7 +419,7 @@ export class ViewHelpTickets {
     }
 
     this.requests.selectedRequest.audit[0].personId = this.userObj._id;
-    this.requests.selectedRequest.institutionId = this.userObj.institutionId;
+    this.requests.selectedRequest.institutionId = this.userObj.institutionId._id;
     this.requests.selectedRequest.sessionId = this.sessionId;
     this.requests.selectedRequest.courseId = this.courseId;
     this.requests.selectedRequest.personId = this.userObj._id;

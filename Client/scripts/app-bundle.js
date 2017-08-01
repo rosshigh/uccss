@@ -2539,7 +2539,7 @@ define('modules/facco/editPeople',['exports', 'aurelia-framework', '../../resour
                             case 0:
                                 this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
                                 _context2.next = 3;
-                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+                                return this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id + '&order=lastName', true);
 
                             case 3:
                                 this.dataTable.updateArray(this.people.instutionPeopleArray);
@@ -5221,7 +5221,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                                 this.countHeader = "Recent Request History";
                                 _context2.next = 8;
-                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
+                                return Promise.all([this.helpTickets.getCurrentCount(), this.requests.getCurrentCount(), this.requests.getClientRequestsDetailsArray('?filter=institutionId|eq|' + this.userObj.institutionId._id, true), this.sessions.getSessionsArray('?order=startDate'), this.siteinfo.getInfoArray(true, options), this.config.getConfig()]);
 
                             case 8:
                                 responses = _context2.sent;
@@ -5233,7 +5233,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                 break;
 
                             case 14:
-                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId;
+                                countOptions = '?filter=institutionId|eq|' + this.userObj.institutionId._id;
 
                                 this.countHeader = "Your Institution's Recent Request History";
                                 _context2.next = 18;
@@ -31954,7 +31954,7 @@ define('modules/user/requests/createRequests',['exports', 'aurelia-framework', '
       }
 
       this.requests.selectedRequest.audit[0].personId = this.userObj._id;
-      this.requests.selectedRequest.institutionId = this.userObj.institutionId;
+      this.requests.selectedRequest.institutionId = this.userObj.institutionId._id;
       this.requests.selectedRequest.sessionId = this.sessionId;
       this.requests.selectedRequest.courseId = this.courseId;
       this.requests.selectedRequest.personId = this.userObj._id;
@@ -33219,7 +33219,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                             case 0:
                                 this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
                                 this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
-                                this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;;
+                                this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId._id;
                                 this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
 
                                 if (!this.showTypes) {
@@ -33237,7 +33237,7 @@ define('modules/user/support/createHelpTickets',['exports', 'aurelia-framework',
                                 this.helpTickets.selectedHelpTicketContent.displayForm = this.inputForm;
                                 this.helpTickets.selectedHelpTicket.content.push(this.helpTickets.selectedHelpTicketContent);
 
-                            case 10:
+                            case 9:
                             case 'end':
                                 return _context6.stop();
                         }

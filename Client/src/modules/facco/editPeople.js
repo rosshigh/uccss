@@ -43,7 +43,7 @@ export class EditPeople {
 
     async refresh(){
         this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-        await this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName', true);
+        await this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id+ '&order=lastName', true);
         this.dataTable.updateArray(this.people.instutionPeopleArray);
         this.spinnerHTML = "";
     }

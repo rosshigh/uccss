@@ -268,7 +268,7 @@ export class CreateHelpTickets{
     async buldHelpTicket(){
         this.helpTickets.selectedHelpTicket.owner = [{ "personId": "b1b1b1b1b1b1b1b1b1b1b1b1", "date": new Date() }];
         this.helpTickets.selectedHelpTicket.personId = this.userObj._id;
-        this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId;;
+        this.helpTickets.selectedHelpTicket.institutionId = this.userObj.institutionId._id;
         this.helpTickets.selectedHelpTicket.sessionId = this.selectedSessionId;
        
         if(!this.showTypes){
