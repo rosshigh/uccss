@@ -37,7 +37,7 @@ export class ViewRequests {
     async activate() {
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
-            this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId + '&order=lastName'),
+            this.people.getInstitutionPeople('?filter=institutionId|eq|' + this.userObj.institutionId._id + '&order=lastName'),
             this.products.getProductsArray('?filter=active|eq|true&order=name'),
             this.systems.getSystemsArray(),
             this.config.getConfig()
