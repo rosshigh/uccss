@@ -7,6 +7,7 @@ import moment from 'moment';
 @inject(CommonDialogs, Events, Utils)
 export class EditCalendar {
   events = [];
+  colors = ['#ff6600','#0066ff'];
 
   constructor(dialog, events, utils) {
     this.dialog = dialog;
@@ -19,8 +20,14 @@ export class EditCalendar {
   async activate(){
     await this.eventLayer.getEventsArray('', true);
     this.eventLayer.eventArray.forEach(item => {
+      if(item.scope === "u"){
+        item.color = this.colors[0];
+      } else {
+        item.color = this.colors[1];
+      }
       if(item.personId === this.userObj._id || item.scope === 'u') this.events.push(item);
     })
+    this.eventLayer.selectEvent();
   }
 
   eventClicked(start){
@@ -40,8 +47,13 @@ export class EditCalendar {
     this.fireEvent(this.element, 'dayClicked', { date: start });
   }
 
-  eventDialog(evt){
-    var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: ""};
+  eventDialog(evt, event){
+    if(event){
+      var event = {eventTitle: event.title, eventStart: event.start, allDay: event.allDay, scope: event.scope === 'u', eventEnd: event.end, notes: event.notes, id: event._id};
+    } else {
+      var event = {eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: ""};
+    }
+    
     return this.dialog.showEvent(
           "Enter Event",
           event,
@@ -55,18 +67,41 @@ export class EditCalendar {
       });
   }
 
+  edit(evt){
+    this.eventDialog(evt, this.eventLayer.selectedEvent);
+  }
+
   async saveEvent(event)
   {
     this.eventLayer.selectEvent();
+    let put = false;
+    if(event.event.id) {
+      put = true;
+    }
+    this.eventLayer.selectedEvent._id = event.event.id;
     this.eventLayer.selectedEvent.start = event.event.eventStart
     this.eventLayer.selectedEvent.end = event.event.eventEnd
     this.eventLayer.selectedEvent.title = event.event.eventTitle;
     this.eventLayer.selectedEvent.personId = this.userObj._id;
     this.eventLayer.selectedEvent.notes = event.event.notes;
     this.eventLayer.selectedEvent.scope = event.event.scope ? "u" : "p";
+   
     let response = await this.eventLayer.saveEvent();
     if(!response.error){
-      this.events.push(this.eventLayer.selectedEvent)
+      if(!put) {
+        this.events.push(this.eventLayer.selectedEvent)
+      } else {
+        this.events.forEach((item, index) => {
+          if(item._id === this.eventLayer.selectedEvent._id) {
+            this.events[index] = this.eventLayer.selectedEvent;
+          }
+        })
+      }
+      if(this.eventLayer.selectedEvent.scope === "u"){
+        this.eventLayer.selectedEvent.color = this.colors[0];
+      } else {
+        this.eventLayer.selectedEvent.color = this.colors[1];
+      }
     } else {
       this.utils.showNotification("There was a problem saving the event");
     }

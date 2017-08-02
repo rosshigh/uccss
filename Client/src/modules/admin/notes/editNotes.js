@@ -168,32 +168,32 @@ export class editNotes{
 		
 	}
 
-	openReminderForm(){
-		this.people.selectedNote.reminderType = "T";
-		this.people.selectedNote.dateRemind = new Date();	
-		this.people.selectedNote.dateEndRemind = new Date();
-	}
+	// openReminderForm(){
+	// 	this.people.selectedNote.reminderType = "T";
+	// 	this.people.selectedNote.dateRemind = new Date();	
+	// 	this.people.selectedNote.dateEndRemind = new Date();
+	// }
    
-	typeSelected(){
-		this.showDates = true;
-		switch($(this.reminderType).val()){
-				case "W":
-					this.days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "Tuesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
-					break;
-				case "M":
-					this.days = new Array();
-					for(let i = 1; i < 31; i++){
-						this.days.push({number: i, day: i});
-					}
-					break;
-				case "D":
-					break;
-				case "T":
-					this.people.selectedNote.reminderType = "T";
-					this.people.selectedNote.dateRemind = new Date();	
-					// this.people.selectedNote.dateEndRemind = new Date();	
-				// default:
-				// 	 this.showDates = true;
-		}
-	}
+	// typeSelected(){
+	// 	this.showDates = true;
+	// 	switch($(this.reminderType).val()){
+	// 			case "W":
+	// 				this.days = [{number: 0, day: "Sunday"},{number: 1, day: "Monday"},{number: 2, day: "Tuesday"},{number: 3, day: "Wednesday"},{number: 4, day: "Thursday"},{number: 5, day: "Friday"},{number: 6, day: "Saturday"}];
+	// 				break;
+	// 			case "M":
+	// 				this.days = new Array();
+	// 				for(let i = 1; i < 31; i++){
+	// 					this.days.push({number: i, day: i});
+	// 				}
+	// 				break;
+	// 			case "D":
+	// 				break;
+	// 			case "T":
+	// 				this.people.selectedNote.reminderType = "T";
+	// 				this.people.selectedNote.dateRemind = new Date();	
+	// 				// this.people.selectedNote.dateEndRemind = new Date();	
+	// 			// default:
+	// 			// 	 this.showDates = true;
+	// 	}
+	// }
 }

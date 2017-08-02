@@ -71,7 +71,7 @@ export class NavBar {
                 } else {
                     if (!this.userObj.userRole)  this.logout();
                     sessionStorage.setItem('role',this.userObj.userRole)
-                    this.reminders();
+                    // this.events();
                     this.router.navigate("user");
                 }
             }
@@ -135,105 +135,113 @@ export class NavBar {
         $(".hoverProfile").css("display", "none");
     }
 
-    async reminders(){
-
-        let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
-        if(response && !response.error && this.people && Object.prototype.toString.call(this.people.remindersArray) === '[object Array]'){
-            toastr.options.closeButton = true;
-            toastr.options.closeMethod = 'fadeOut';
-            toastr.options.closeDuration = 300;
-            toastr.options.closeEasing = 'swing';
-            this.timeReminders = new Array();
-            var now = new Date();
-            var weekDay = now.getDay()
-            var monthDay = now.getDate();
-            this.reccurentReminders = new Array();
-            this.people.remindersArray.forEach((item, index) => {
-                switch(item.reminderType){
-                     case "D":
-                        if(!item.lastSeen || !moment(now).isSame(item.lastSeen,'day')) {
-                            if(item.priority == 1){
-                                toastr.error(item.note, "Reminder");
-                            } else {
-                                toastr.info(item.note, "Reminder");
-                            }
-                            item.lastSeen = now;
-                            this.people.saveReminder(item, index);
-                        }
-                        break;
-                    case "W":
-                        if(item.reminderDay == weekDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'day'))) {
-                            if(item.priority == 1){
-                                toastr.error(item.note, "Reminder");
-                            } else {
-                                toastr.info(item.note, "Reminder");
-                            }
-                            item.lastSeen = now;
-                            this.people.saveReminder(item, index);
-                        }
-                        break;
-                    case "M":
-                        if(item.reminderDay == monthDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
-                            if(item.priority == 1){
-                                toastr.error(item.note, "Reminder");
-                            } else {
-                                toastr.info(item.note, "Reminder");
-                            }
-                            item.lastSeen = now;
-                            this.people.saveReminder(item, index);
-                        }
-                        break;
-                    case "A":
-                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
-                            if(item.priority == 1){
-                                toastr.error(item.note, "Reminder");
-                            } else {
-                                toastr.info(item.note, "Reminder");
-                            }
-                            item.lastSeen = now;
-                            this.people.saveReminder(item, index);
-                        }
-                        break;
-                    case "T":
-                        if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
-                            let diff = moment(now).diff(item.dateStartRemind, 'minutes');
-                            if(diff >= -15){
-                                if(item.priority == 1){
-                                    toastr.error(item.note, "Reminder");
-                                } else {
-                                    toastr.info(item.note, "Reminder");
-                                }
-                                item.lastSeen = now;
-                                this.people.saveReminder(item, index);
-                            } else {
-                                this.timeReminders.push({item: item, index: index});
-                            }
-                        }
-                }
-            })
-
-            if(this.timeReminders.length > 0){
-                 setInterval(() => {
-                    console.log('Checked reminders');
-                    var now = new Date();
-                    this.timeReminders.forEach(item => {
-                        let diff = moment().diff(item.item.dateStartRemind, 'minutes');
-                        if(diff >= -15){
-                            if(item.priority == 1){
-                                toastr.error(item.item.note, "Reminder");
-                            } else {
-                                toastr.info(item.note, "Reminder");
-                            }
-                            item.lastSeen = now;
-                            this.people.saveReminder(item.item, item.index);
-                        }
-                    });
-
-                }, 10000);
+    async events(){
+        await this.eventLayer.getEventsArray('', true);
+        let today = new Date();
+        this.eventLayer.eventArray.forEach(item => {
+            if(item.personId === this.userObj._id || item.scope === 'u') {
+                if(moment(today).isBetween(item.start, item.end));
+                this.events.push(item);
             }
+        })
+
+        // let response = await this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+        // if(response && !response.error && this.people && Object.prototype.toString.call(this.people.remindersArray) === '[object Array]'){
+        //     toastr.options.closeButton = true;
+        //     toastr.options.closeMethod = 'fadeOut';
+        //     toastr.options.closeDuration = 300;
+        //     toastr.options.closeEasing = 'swing';
+        //     this.timeReminders = new Array();
+        //     var now = new Date();
+        //     var weekDay = now.getDay()
+        //     var monthDay = now.getDate();
+        //     this.reccurentReminders = new Array();
+        //     this.people.remindersArray.forEach((item, index) => {
+        //         switch(item.reminderType){
+        //              case "D":
+        //                 if(!item.lastSeen || !moment(now).isSame(item.lastSeen,'day')) {
+        //                     if(item.priority == 1){
+        //                         toastr.error(item.note, "Reminder");
+        //                     } else {
+        //                         toastr.info(item.note, "Reminder");
+        //                     }
+        //                     item.lastSeen = now;
+        //                     this.people.saveReminder(item, index);
+        //                 }
+        //                 break;
+        //             case "W":
+        //                 if(item.reminderDay == weekDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'day'))) {
+        //                     if(item.priority == 1){
+        //                         toastr.error(item.note, "Reminder");
+        //                     } else {
+        //                         toastr.info(item.note, "Reminder");
+        //                     }
+        //                     item.lastSeen = now;
+        //                     this.people.saveReminder(item, index);
+        //                 }
+        //                 break;
+        //             case "M":
+        //                 if(item.reminderDay == monthDay && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+        //                     if(item.priority == 1){
+        //                         toastr.error(item.note, "Reminder");
+        //                     } else {
+        //                         toastr.info(item.note, "Reminder");
+        //                     }
+        //                     item.lastSeen = now;
+        //                     this.people.saveReminder(item, index);
+        //                 }
+        //                 break;
+        //             case "A":
+        //                 if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+        //                     if(item.priority == 1){
+        //                         toastr.error(item.note, "Reminder");
+        //                     } else {
+        //                         toastr.info(item.note, "Reminder");
+        //                     }
+        //                     item.lastSeen = now;
+        //                     this.people.saveReminder(item, index);
+        //                 }
+        //                 break;
+        //             case "T":
+        //                 if(moment(now).isSame(item.dateStartRemind,'day') && (!item.lastSeen || !moment(now).isSame(item.lastSeen,'month'))) {
+        //                     let diff = moment(now).diff(item.dateStartRemind, 'minutes');
+        //                     if(diff >= -15){
+        //                         if(item.priority == 1){
+        //                             toastr.error(item.note, "Reminder");
+        //                         } else {
+        //                             toastr.info(item.note, "Reminder");
+        //                         }
+        //                         item.lastSeen = now;
+        //                         this.people.saveReminder(item, index);
+        //                     } else {
+        //                         this.timeReminders.push({item: item, index: index});
+        //                     }
+        //                 }
+        //         }
+        //     })
+
+        //     if(this.timeReminders.length > 0){
+        //          setInterval(() => {
+        //             console.log('Checked reminders');
+        //             var now = new Date();
+        //             this.timeReminders.forEach(item => {
+        //                 let diff = moment().diff(item.item.dateStartRemind, 'minutes');
+        //                 if(diff >= -15){
+        //                     if(item.priority == 1){
+        //                         toastr.error(item.item.note, "Reminder");
+        //                     } else {
+        //                         toastr.info(item.note, "Reminder");
+        //                     }
+        //                     item.lastSeen = now;
+        //                     this.people.saveReminder(item.item, item.index);
+        //                 }
+        //             });
+
+        //         }, 10000);
+        //     }
 
 
-        }
+        // }
     }
 
 }

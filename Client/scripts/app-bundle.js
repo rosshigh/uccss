@@ -5038,7 +5038,7 @@ define('modules/user/resetPassword',['exports', 'aurelia-framework', 'aurelia-ro
 		return ResetPassword;
 	}()) || _class);
 });
-define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _moment) {
+define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '../../resources/utils/utils', '../../config/appConfig', '../../resources/data/siteInfo', '../../resources/data/sessions', '../../resources/data/people', '../../resources/data/helpTickets', '../../resources/data/clientRequests', '../../resources/data/events', 'moment'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _appConfig, _siteInfo, _sessions, _people, _helpTickets, _clientRequests, _events, _moment) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -5091,8 +5091,8 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
     var _dec, _class;
 
-    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests, _people.People), _dec(_class = function () {
-        function User(router, utils, config, siteinfo, sessions, helpTickets, requests, people) {
+    var User = exports.User = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _utils.Utils, _appConfig.AppConfig, _siteInfo.SiteInfo, _sessions.Sessions, _helpTickets.HelpTickets, _clientRequests.ClientRequests, _people.People, _events.Events), _dec(_class = function () {
+        function User(router, utils, config, siteinfo, sessions, helpTickets, requests, people, events) {
             _classCallCheck(this, User);
 
             this.router = router;
@@ -5103,6 +5103,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
             this.helpTickets = helpTickets;
             this.requests = requests;
             this.people = people;
+            this.events = events;
         }
 
         User.prototype.attached = function attached() {
@@ -5149,6 +5150,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
 
                             case 2:
                                 this.config.getConfig(true);
+                                this.getEvents();
 
                                 this.helpTicketArray = [{
                                     value: this.helpTickets.newHelpTickets || 0,
@@ -5184,7 +5186,7 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
                                     label: "Customer Action"
                                 }];
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context.stop();
                         }
@@ -5329,6 +5331,49 @@ define('modules/user/user',['exports', 'aurelia-framework', 'aurelia-router', '.
             }
 
             return getData;
+        }();
+
+        User.prototype.getEvents = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var _this2 = this;
+
+                var today;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.eventArray = new Array();
+                                _context3.next = 3;
+                                return this.events.getEventsArray('', true);
+
+                            case 3:
+                                today = new Date();
+
+                                this.events.eventArray.forEach(function (item) {
+                                    if (item.personId === _this2.userObj._id || item.scope === 'u') {
+                                        console.log(item.start);
+                                        console.log(item.end);
+                                        console.log((0, _moment2.default)(today).isBetween(item.start, item.end));
+                                        if ((0, _moment2.default)(today).isBetween(item.start, item.end)) {
+                                            _this2.eventArray.push(item);
+                                        }
+                                    }
+                                });
+                                console.log(this.eventArray);
+
+                            case 6:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function getEvents() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return getEvents;
         }();
 
         User.prototype.moreInfoExists = function moreInfoExists(item) {
@@ -9158,6 +9203,59 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
             return getEventsArray;
         }();
 
+        Events.prototype.getEventsPersonArray = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(personId, refresh) {
+                var url, serverResponse;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                if (!(!this.eventArray || refresh)) {
+                                    _context2.next = 12;
+                                    break;
+                                }
+
+                                url = this.EVENTS_SERVICE + "/" + personId;
+                                _context2.prev = 2;
+                                _context2.next = 5;
+                                return this.data.get(url);
+
+                            case 5:
+                                serverResponse = _context2.sent;
+
+                                if (!serverResponse.error) {
+                                    if (Object.prototype.toString.call(serverResponse) == '[object Array]') {
+                                        this.eventArray = serverResponse;
+                                    } else {
+                                        this.eventArray = new Array();;
+                                    }
+                                } else {
+                                    this.data.processError(serverResponse);
+                                }
+                                _context2.next = 12;
+                                break;
+
+                            case 9:
+                                _context2.prev = 9;
+                                _context2.t0 = _context2['catch'](2);
+
+                                console.log(_context2.t0);
+
+                            case 12:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this, [[2, 9]]);
+            }));
+
+            function getEventsPersonArray(_x3, _x4) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return getEventsPersonArray;
+        }();
+
         Events.prototype.selectEvent = function selectEvent(index) {
             if (index === undefined) {
                 this.selectedEvent = this.emptyEvent();
@@ -9193,23 +9291,23 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
         };
 
         Events.prototype.saveEvent = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
                 var response, _response;
 
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
                                 if (this.selectedEvent._id) {
-                                    _context2.next = 8;
+                                    _context3.next = 8;
                                     break;
                                 }
 
-                                _context2.next = 3;
+                                _context3.next = 3;
                                 return this.data.saveObject(this.selectedEvent, this.EVENTS_SERVICE, "post");
 
                             case 3:
-                                response = _context2.sent;
+                                response = _context3.sent;
 
                                 if (!response.error) {
                                     if (this.eventArray) {
@@ -9219,65 +9317,23 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
                                 } else {
                                     this.data.processError(response, "There was an error creating the event.");
                                 }
-                                return _context2.abrupt('return', response);
+                                return _context3.abrupt('return', response);
 
                             case 8:
-                                _context2.next = 10;
+                                _context3.next = 10;
                                 return this.data.saveObject(this.selectedEvent, this.EVENTS_SERVICE, "put");
 
                             case 10:
-                                _response = _context2.sent;
+                                _response = _context3.sent;
 
                                 if (!_response.error) {
                                     if (this.eventArray) {
                                         this.eventArray[this.editIndex] = this.utils.copyObject(this.selectedEvent, this.eventArray[this.editIndex]);
                                     }
                                 }
-                                return _context2.abrupt('return', _response);
+                                return _context3.abrupt('return', _response);
 
                             case 13:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function saveEvent() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return saveEvent;
-        }();
-
-        Events.prototype.deleteEvent = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!this.selectedEvent._id) {
-                                    _context3.next = 6;
-                                    break;
-                                }
-
-                                _context3.next = 3;
-                                return this.data.deleteObject(this.EVENTS_SERVICE + '/' + this.selectedEvent._id);
-
-                            case 3:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    this.eventArray.splice(this.editIndex, 1);
-                                    this.editIndex = -1;
-                                }
-                                return _context3.abrupt('return', serverResponse);
-
-                            case 6:
-                                return _context3.abrupt('return', null);
-
-                            case 7:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -9285,8 +9341,50 @@ define('resources/data/events',['exports', 'aurelia-framework', './dataServices'
                 }, _callee3, this);
             }));
 
-            function deleteEvent() {
+            function saveEvent() {
                 return _ref3.apply(this, arguments);
+            }
+
+            return saveEvent;
+        }();
+
+        Events.prototype.deleteEvent = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                if (!this.selectedEvent._id) {
+                                    _context4.next = 6;
+                                    break;
+                                }
+
+                                _context4.next = 3;
+                                return this.data.deleteObject(this.EVENTS_SERVICE + '/' + this.selectedEvent._id);
+
+                            case 3:
+                                serverResponse = _context4.sent;
+
+                                if (!serverResponse.error) {
+                                    this.eventArray.splice(this.editIndex, 1);
+                                    this.editIndex = -1;
+                                }
+                                return _context4.abrupt('return', serverResponse);
+
+                            case 6:
+                                return _context4.abrupt('return', null);
+
+                            case 7:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function deleteEvent() {
+                return _ref4.apply(this, arguments);
             }
 
             return deleteEvent;
@@ -15667,7 +15765,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                                 this.userObj = JSON.parse(sessionStorage.getItem('user'));
 
                                 if (!this.userObj) {
-                                    _context2.next = 17;
+                                    _context2.next = 16;
                                     break;
                                 }
 
@@ -15678,7 +15776,7 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
 
                                 this.utils.showNotification("You must belong to an active institution to access the web site");
                                 this.logout();
-                                _context2.next = 15;
+                                _context2.next = 14;
                                 break;
 
                             case 7:
@@ -15694,18 +15792,18 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                             case 11:
                                 if (!this.userObj.userRole) this.logout();
                                 sessionStorage.setItem('role', this.userObj.userRole);
-                                this.reminders();
+
                                 this.router.navigate("user");
 
-                            case 15:
-                                _context2.next = 19;
+                            case 14:
+                                _context2.next = 18;
                                 break;
 
-                            case 17:
+                            case 16:
                                 this.utils.showNotification("There was a problem validating your account");
                                 this.router.navigate("home");
 
-                            case 19:
+                            case 18:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -15827,115 +15925,27 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
             (0, _jquery2.default)(".hoverProfile").css("display", "none");
         };
 
-        NavBar.prototype.reminders = function () {
+        NavBar.prototype.events = function () {
             var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
                 var _this3 = this;
 
-                var response, now, weekDay, monthDay;
+                var today;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 _context5.next = 2;
-                                return this.people.getRemindersArray('?filter=personId|eq|' + this.userObj._id, true);
+                                return this.eventLayer.getEventsArray('', true);
 
                             case 2:
-                                response = _context5.sent;
+                                today = new Date();
 
-                                if (response && !response.error && this.people && Object.prototype.toString.call(this.people.remindersArray) === '[object Array]') {
-                                    toastr.options.closeButton = true;
-                                    toastr.options.closeMethod = 'fadeOut';
-                                    toastr.options.closeDuration = 300;
-                                    toastr.options.closeEasing = 'swing';
-                                    this.timeReminders = new Array();
-                                    now = new Date();
-                                    weekDay = now.getDay();
-                                    monthDay = now.getDate();
-
-                                    this.reccurentReminders = new Array();
-                                    this.people.remindersArray.forEach(function (item, index) {
-                                        switch (item.reminderType) {
-                                            case "D":
-                                                if (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day')) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this3.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "W":
-                                                if (item.reminderDay == weekDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'day'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this3.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "M":
-                                                if (item.reminderDay == monthDay && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this3.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "A":
-                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this3.people.saveReminder(item, index);
-                                                }
-                                                break;
-                                            case "T":
-                                                if ((0, _moment2.default)(now).isSame(item.dateStartRemind, 'day') && (!item.lastSeen || !(0, _moment2.default)(now).isSame(item.lastSeen, 'month'))) {
-                                                    var diff = (0, _moment2.default)(now).diff(item.dateStartRemind, 'minutes');
-                                                    if (diff >= -15) {
-                                                        if (item.priority == 1) {
-                                                            toastr.error(item.note, "Reminder");
-                                                        } else {
-                                                            toastr.info(item.note, "Reminder");
-                                                        }
-                                                        item.lastSeen = now;
-                                                        _this3.people.saveReminder(item, index);
-                                                    } else {
-                                                        _this3.timeReminders.push({ item: item, index: index });
-                                                    }
-                                                }
-                                        }
-                                    });
-
-                                    if (this.timeReminders.length > 0) {
-                                        setInterval(function () {
-                                            console.log('Checked reminders');
-                                            var now = new Date();
-                                            _this3.timeReminders.forEach(function (item) {
-                                                var diff = (0, _moment2.default)().diff(item.item.dateStartRemind, 'minutes');
-                                                if (diff >= -15) {
-                                                    if (item.priority == 1) {
-                                                        toastr.error(item.item.note, "Reminder");
-                                                    } else {
-                                                        toastr.info(item.note, "Reminder");
-                                                    }
-                                                    item.lastSeen = now;
-                                                    _this3.people.saveReminder(item.item, item.index);
-                                                }
-                                            });
-                                        }, 10000);
+                                this.eventLayer.eventArray.forEach(function (item) {
+                                    if (item.personId === _this3.userObj._id || item.scope === 'u') {
+                                        if ((0, _moment2.default)(today).isBetween(item.start, item.end)) ;
+                                        _this3.events.push(item);
                                     }
-                                }
+                                });
 
                             case 4:
                             case 'end':
@@ -15945,11 +15955,11 @@ define('resources/elements/nav-bar',['exports', 'aurelia-framework', 'aurelia-ro
                 }, _callee5, this);
             }));
 
-            function reminders() {
+            function events() {
                 return _ref5.apply(this, arguments);
             }
 
-            return reminders;
+            return events;
         }();
 
         return NavBar;
@@ -20936,6 +20946,7 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
       _classCallCheck(this, EditCalendar);
 
       this.events = [];
+      this.colors = ['#ff6600', '#0066ff'];
 
       this.dialog = dialog;
       this.eventLayer = events;
@@ -20957,10 +20968,16 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
 
               case 2:
                 this.eventLayer.eventArray.forEach(function (item) {
+                  if (item.scope === "u") {
+                    item.color = _this.colors[0];
+                  } else {
+                    item.color = _this.colors[1];
+                  }
                   if (item.personId === _this.userObj._id || item.scope === 'u') _this.events.push(item);
                 });
+                this.eventLayer.selectEvent();
 
-              case 3:
+              case 4:
               case 'end':
                 return _context.stop();
             }
@@ -20992,10 +21009,15 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
       this.fireEvent(this.element, 'dayClicked', { date: start });
     };
 
-    EditCalendar.prototype.eventDialog = function eventDialog(evt) {
+    EditCalendar.prototype.eventDialog = function eventDialog(evt, event) {
       var _this2 = this;
 
-      var event = { eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: "" };
+      if (event) {
+        var event = { eventTitle: event.title, eventStart: event.start, allDay: event.allDay, scope: event.scope === 'u', eventEnd: event.end, notes: event.notes, id: event._id };
+      } else {
+        var event = { eventTitle: "", eventStart: evt.detail.value.date, allDay: false, scope: false, eventEnd: evt.detail.value.date, notes: "" };
+      }
+
       return this.dialog.showEvent("Enter Event", event, ['Submit', 'Cancel']).whenClosed(function (response) {
         if (!response.wasCancelled) {
           _this2.saveEvent(response.output);
@@ -21005,33 +21027,59 @@ define('modules/admin/notes/editCalendar',['exports', 'aurelia-framework', '../.
       });
     };
 
+    EditCalendar.prototype.edit = function edit(evt) {
+      this.eventDialog(evt, this.eventLayer.selectedEvent);
+    };
+
     EditCalendar.prototype.saveEvent = function () {
       var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(event) {
-        var response;
+        var _this3 = this;
+
+        var put, response;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 this.eventLayer.selectEvent();
+                put = false;
+
+                if (event.event.id) {
+                  put = true;
+                }
+                this.eventLayer.selectedEvent._id = event.event.id;
                 this.eventLayer.selectedEvent.start = event.event.eventStart;
                 this.eventLayer.selectedEvent.end = event.event.eventEnd;
                 this.eventLayer.selectedEvent.title = event.event.eventTitle;
                 this.eventLayer.selectedEvent.personId = this.userObj._id;
                 this.eventLayer.selectedEvent.notes = event.event.notes;
                 this.eventLayer.selectedEvent.scope = event.event.scope ? "u" : "p";
-                _context2.next = 9;
+
+                _context2.next = 12;
                 return this.eventLayer.saveEvent();
 
-              case 9:
+              case 12:
                 response = _context2.sent;
 
                 if (!response.error) {
-                  this.events.push(this.eventLayer.selectedEvent);
+                  if (!put) {
+                    this.events.push(this.eventLayer.selectedEvent);
+                  } else {
+                    this.events.forEach(function (item, index) {
+                      if (item._id === _this3.eventLayer.selectedEvent._id) {
+                        _this3.events[index] = _this3.eventLayer.selectedEvent;
+                      }
+                    });
+                  }
+                  if (this.eventLayer.selectedEvent.scope === "u") {
+                    this.eventLayer.selectedEvent.color = this.colors[0];
+                  } else {
+                    this.eventLayer.selectedEvent.color = this.colors[1];
+                  }
                 } else {
                   this.utils.showNotification("There was a problem saving the event");
                 }
 
-              case 11:
+              case 14:
               case 'end':
                 return _context2.stop();
             }
@@ -21454,32 +21502,6 @@ define('modules/admin/notes/editNotes',['exports', 'aurelia-framework', 'aurelia
 
 			return navigateToHelpTicket;
 		}();
-
-		editNotes.prototype.openReminderForm = function openReminderForm() {
-			this.people.selectedNote.reminderType = "T";
-			this.people.selectedNote.dateRemind = new Date();
-			this.people.selectedNote.dateEndRemind = new Date();
-		};
-
-		editNotes.prototype.typeSelected = function typeSelected() {
-			this.showDates = true;
-			switch ($(this.reminderType).val()) {
-				case "W":
-					this.days = [{ number: 0, day: "Sunday" }, { number: 1, day: "Monday" }, { number: 2, day: "Tuesday" }, { number: 3, day: "Wednesday" }, { number: 4, day: "Thursday" }, { number: 5, day: "Friday" }, { number: 6, day: "Saturday" }];
-					break;
-				case "M":
-					this.days = new Array();
-					for (var i = 1; i < 31; i++) {
-						this.days.push({ number: i, day: i });
-					}
-					break;
-				case "D":
-					break;
-				case "T":
-					this.people.selectedNote.reminderType = "T";
-					this.people.selectedNote.dateRemind = new Date();
-			}
-		};
 
 		return editNotes;
 	}()) || _class);
@@ -55151,7 +55173,7 @@ define('text!modules/admin/Customers/editInstitutions.html', ['module'], functio
 define('text!modules/admin/Customers/editPeople.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleTable.html\"></compose>\n            </div> \n            <div show.bind=\"personSelected && !bulkEmailSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/peopleForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/documents/documents.html', ['module'], function(module) { module.exports = "<template>\r\n    <style>\r\n        .menuButtons {\r\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\r\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\r\n        }\r\n    </style>\r\n    <compose view='../../../resources/elements/submenu.html'></compose>\r\n\r\n    <div class=\"panel panel-default\">\r\n        <div class=\"panel-body\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-3\">\r\n                    <div class=\"bottomMargin list-group-item\">\r\n                        <span click.delegate=\"newCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"New Category\"><i class=\"fa fa-plus fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span disabled.bind=\"showDocuments\" click.delegate=\"editCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span> \r\n                    </div>\r\n                    <div show.bind=\"categoryForm\">\r\n                        <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\r\n                            <div class=\"panel-body\">\r\n                                <div class=\"bottomMargin\">\r\n                                    <div class=\"bottomMargin list-group-item\">\r\n                                        <span click.delegate=\"backCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" \r\n                                            title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\r\n                                            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\r\n                                                                                    \r\n                                    </div>\r\n                                </div>\r\n                                <div class=\"form-group\">\r\n                                    <input id=\"name\" value.bind=\"documents.selectedCat.description\" type=\"text\" placeholder=\"Category Name\" class=\"form-control\"/>\r\n                                </div>\r\n                            </div>\r\n\r\n                        </div>\r\n                    </div>\r\n                    <div show.bind=\"!categoryForm\">\r\n                        <label>Available Categories</label>\r\n                        <div class=\"well well2 overFlow\" style=\"height:600px;\">\r\n                            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter Categories\" />\r\n                            <ul id=\"categoryList\" class=\"list-group\">\r\n                                <button click.trigger=\"typeChanged($index, $event)\" type=\"button\" repeat.for=\"type of filteredDocumentArray\" id=\"${type.code}\" class=\"${ $first ? 'menuButtons' : ''} list-group-item\">${type.description}</button>\r\n                            </ul>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div show.bind=\"showDocuments\" class=\"col-lg-9\" >\r\n                    <div class='col-lg-10 col-lg-offset-1 bottomMargin'>\r\n                        <h3>${documents.selectedCat.description}</h3>\r\n                        <h5>${displayTitle}</h5>\r\n                    </div>\r\n                    <div show.bind=\"showDocumentForm\">\r\n                        <compose view=\"./components/documentForm.html\"></compose>\r\n                    </div>\r\n                    <compose show.bind=\"!showDocumentForm\" view=\"./components/documentsTable.html\"></compose>\r\n                </div>\r\n            </div>\r\n</template>"; });
 define('text!modules/admin/inventory/editInventory.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n   \n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryTable.html\"></compose>\n            </div> \n            <div show.bind=\"systemSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/inventoryForm.html\"></compose>\n            </div>\n        </div> \n      </div> \n</template>"; });
-define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\n\t\t <div class=\"bottomMargin list-group-item topMargin\">\n\t\t\t\t\t\t<span click.delegate=\"edit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n      <div class=\"panel-body\">\n\t\t\t<h4>${eventLayer.selectedEvent.title}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\n\t\t\t<br/>\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t</div>\n\t\t\t\t<br/>\n\t\t\t<div class=\"col-lg-12 topMargin\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\n\t\t</div>\n  </div>\n  <div class=\"col-lg-9\">\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"false\" day-click.bind=\"dayClicked\" \n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\n  </div>\n</template>"; });
+define('text!modules/admin/notes/editCalendar.html', ['module'], function(module) { module.exports = "<template>\n\n  <div class=\"col-lg-9\">\n    <calendar events.bind=\"events\" view=\"month\" weekends.bind=\"true\" day-click.bind=\"dayClicked\" \n    event-click.bind=\"eventClicked\" options.bind=\"{ eventLimit: true, header: {left: 'My title', right:  'today month,agendaWeek,agendaDay,list prev,next'} }\" \n    change.delegate=\"eventDialog($event)\" click.delegate=\"selectEvent($event)\"></calendar>\n\t</div>\n\t<div show.bind=\"eventLayer.selectedEvent.title\" class=\"panel panel-default col-lg-3 bigTopMargin\">\n\t\t <div class=\"bottomMargin list-group-item topMargin\">\n\t\t\t\t\t\t<span click.delegate=\"edit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"eventLayer.selectedEvent._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n\t\t\t</div>\n      <div class=\"panel-body\">\n\t\t\t<h4>${eventLayer.selectedEvent.title}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4>Start: ${eventLayer.selectedEvent.start | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t\t<br/>\n\t\t\t<h4 show.bind=\"eventLayer.selectedEvent.allDay\">All Day</h4>\n\t\t\t<br/>\n\t\t\t<div show.bind=\"!eventLayer.selectedEvent.allDay\">\n\t\t\t\t<h4>End: ${eventLayer.selectedEvent.end | dateFormat:'MMMM Do YYYY, h:mm:ss a'}</h4>\n\t\t\t</div>\n\t\t\t\t<br/>\n\t\t\t<div class=\"col-lg-12 topMargin\" show.bind=\"eventLayer.selectedEvent.notes && eventLayer.selectedEvent.notes.length > 0\" innerhtml.bind=\"eventLayer.selectedEvent.notes\" ></div>\n\t\t</div>\n  </div>\n</template>"; });
 define('text!modules/admin/notes/editNotes.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n\n    <div class=\"panel panel-default rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"noteSelected === 'No'\">\n                <compose view=\"./components/notesTable.html\"></compose>\n            </div> \n            <div show.bind=\"noteSelected === 'Yes'\" >\n                <compose view=\"./components/notesForm.html\"></compose>\n            </div>\n             <div show.bind=\"noteSelected === 'helpTicket'\" >\n                <compose view=\"./components/helpTicket.html\"></compose>\n            </div>\n        </div> \n      </div> \n\n</template>"; });
 define('text!modules/admin/notes/notes.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template"; });
 define('text!modules/admin/site/admin.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n        .menuButtons {\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n        }\n    </style>\n\t<div class=\"fluid-container\">\n\n\t\t<div class=\"panel panel-default\">\n\t\t<div class=\"panel-body\">\n\t\t\t<div class=\"col-lg-3\">\n\t\t\t<h4>Files</h4>\n\t\t\t<div>\n\t\t\t\t<ul class=\"list-group\" id=\"buttonGroup\">\n\t\t\t\t\t<button click.trigger=\"typeSelected($event, $index, type)\" type=\"button\" repeat.for=\"type of tabs\" id=\"${type.screenToShow}\"\n\t\t\t\t\t\tclass=\"${ $first ? 'menuButtons list-group-item' : 'list-group-item'}\">${type.id}</button>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-9\">\n\t\t\t\n\t\t\t<compose if.bind=\"(screenToShow == 'log' || screenToShow == 'auth') && fileList.length\" view='./components/logFileTable.html'></compose>\n\t\t\t\n\t\t\t<compose if.bind=\"screenToShow === 'forl' || screenToShow === 'fore' || screenToShow === 'foro'\" view='./components/foreverLogs.html'></compose>\n\t\t\t\n\t\t\t<compose if.bind=\"showFileList && screenToShow === 'files'\" view='./components/uploadedFilesTable.html'></compose>\n\t\t</div>\n\t</div>\n</template>"; });
@@ -55246,7 +55268,7 @@ define('text!modules/admin/inventory/components/Maintenance.html', ['module'], f
 define('text!modules/admin/inventory/components/Purchase.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Name</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorName\"  class=\"form-control\" placeholder=\"Vendor Name\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Date Purchased</label>\n\t\t\t\t\t<flat-picker controlid=\"datePurchased\" config.bind=\"config\" value.bind=\"inventory.selectedInventory.datePurchased\"></flat-picker>\n\t\t\t\t<!--\t<date-picker value.two-way=\"inventory.selectedInventory.datePurchased\"  controlid=\"createdDate\"></date-picker> -->\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>PO Number</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.poNumber\"  class=\"form-control\" placeholder=\"PO Number\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Contact </label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorContact\"  class=\"form-control\" placeholder=\"Contact Name\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Phone</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorPhone\"  class=\"form-control\" placeholder=\"Phone\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Vendor Email</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.vendorEmail\"  class=\"form-control\" placeholder=\"Email\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
 define('text!modules/admin/inventory/components/Technical.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"row\">\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Admin User ID</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.adminUserId\"  class=\"form-control\" placeholder=\"Admin User ID\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>Admin Password</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.adminPassword\"  class=\"form-control\" placeholder=\"Admin Password\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"col-lg-3\">\n\t\t\t<div class=\"form-group\">\n\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t<label>System URL</label>\n\t\t\t\t\t<input value.bind=\"inventory.selectedInventory.systemUrl\"  class=\"form-control\" placeholder=\"System URL\" type=\"text\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div class=\"topMargin\">\n        <table  class=\"table table-striped table-hover\">\n            <thead>\n                <tr>\n                    <td colspan='6'>\n                        <span click.delegate=\"newIP()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New Course\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                    </td>\n                </tr>\n                <tr>\n                    <th style=\"width:20rem;\">IP </th>\n                    <th style=\"width:30rem;\">Description</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr id=\"selectCourse\" click.delegate=\"editIP($index, $event)\"  repeat.for=\"address of inventory.selectedInventory.IPAddress\">\n                    <td data-title=\"Address\">${address.address} </td>\n                    <td data-title=\"Descriptino\">${address.description}</td>\n                </tr>\n            </tbody>\n        </table>\n\n        <div class=\"row\" show.bind=\"addressSelected\">\n            <div class=\"panel panel-default col-md-12\">\n                <div class=\"panel-body\">\n                    <div class=\"bottomMargin\">\n                        <div class=\"bottomMargin list-group-item\">\n                            <span click.delegate=\"saveAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                            <span click.delegate=\"cancelEditAddress()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                        </div>  \n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"number\" value.bind=\"address\" ref=\"ipAddress\" type=\"text\" placeholder=\"Address\" class=\"form-control\"/>\n                    </div>\n                    <div class=\"form-group\">\n                        <input id=\"name\" value.bind=\"description\" ref=\"ipDescription\" type=\"text\" placeholder=\"Description\" class=\"form-control\"/>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/notes/components/helpTicket.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"fluid-container\">\n\t <div class=\"row\">\n        <span class=\"leftMargin largeFont\">Help Ticket ${helpTickets.selectedHelpTicket.helpTicketNo}</span>\n    </div>\n\n    <!-- Buttons -->\n    <div class=\"bottomMargin leftMargin rightMargin list-group-item\">\n      <span click.delegate=\"backHelpTicket()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n        data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div>\n\n    <!-- Help Ticket Header -->\n    <div class=\"topMargin\">\n      <!-- Enter Response -->\n      <div class=\"row\">\n        <div class=\"list-group-item leftMargin rightMargin\">\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate\n                    | dateFormat:'h:mm A'}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupValue:config.HELP_TICKET_TYPES:\"code\":\"description}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <h3 class=\"col-md-offset-1\">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:\"code\":\"description\"}</h3>\n                </div>\n              </div>\n            </div>\n            <div class=\"row\">\n              <div class=\"col-md-6\">\n                <div class=\"form-group\">\n                  <label class=\"col-md-offset-1\">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  lookupValue:people.peopleArray:\"_id\":'fullName'}</label>\n                </div>\n              </div>\n              <div class=\"col-md-5\">\n                <div class=\"form-group col-md-10\">\n                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>\n                </div>\n              </div>\n            </div>\n        </div>\n      </div>\n    </div>\n    <compose view=\"../../../../resources/htTimeline/timeline.html\"></compose>\n</div>\n</template>"; });
-define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\n<div class=\"panel-body\">\n    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>      \n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n</div>\n</div>\n\n<div class=\"row\">\n    <div class=\"col-sm-12 col-lg-12\">\n        <div class=\"form-group\">\n            <div class=\"checkbox col-lg-offset-2\">\n                <label>\n                                <input checked.bind=\"people.selectedNote.isReminder\"  type=\"checkbox\"> This note is a reminder\n                            </label>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"people.selectedNote.isReminder\">\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderType\" class=\"col-lg-2 control-label\">Reminder Type</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderType\" change.delegate=\"typeSelected()\" id=\"reminderType\"\n                        ref=\"reminderType\">\n                                        <option value=\"\">Type of Reminder</option>\n                                        <option value=\"T\">Time</option>\n                                        <option value=\"D\">Daily</option>\n                                        <option value=\"W\">Weekly</option>\n                                        <option value=\"M\">Monthly</option>\n                                        <option value=\"A\">Annual</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"priority\" class=\"col-lg-2 control-label\">Priority</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.priority\" id=\"priority\" ref=\"priority\">\n                                        <option value=\"0\">Information</option>\n                                        <option value=\"1\">Critical</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div show.bind=\"people.selectedNote.reminderType === 'W' || people.selectedNote.reminderType === 'M'\" class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderDay\" class=\"col-lg-2 control-label\">Day</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderDay\" id=\"reminderDay\">\n                                        <option value=\"\">Choose the day</option>\n                                        <option repeat.for=\"day of days\" value=\"${day.number}\">${day.day}</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"showDates\">\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType === 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Date and time</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateRemindT\" config.bind=\"configT\" value.bind=\"people.selectedNote.dateStartRemind\"></flat-picker>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType !== 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Start Date</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateStartRemind\" config.bind=\"config\" value.bind=\"test\"></flat-picker>\n                </div>\n            </div>\n        </div>\n\n\n        <div class=\"row\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"input-dateEndRemind\" class=\"col-lg-2 control-label \">End Date</label>\n                    <div class=\"col-lg-8\">\n                        <flat-picker id.bind=\"dateEndRemind\" config.bind=\"config\" value.bind=\"people.selectedNote.dateEndRemind\"></flat-picker>\n                       \n\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class=\"col-lg-8  col-lg-offset-2 topMargin\">\n    <editor value.bind=\"people.selectedNote.note\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\n\n</div>\n\n</form>\n\n</div>\n</template>"; });
+define('text!modules/admin/notes/components/notesForm.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n    <div class=\"col-lg-12\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\"\n                data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span show.bind=\"people.selectedNote._id\" click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n                data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n        </div>\n\n        <form class=\"form-horizontal topMargin\">\n\n            <div class=\"row\">\n                <div class=\"col-sm-12 col-lg-12\">\n                    <div class=\"form-group\">\n                        <label for=\"editType\" class=\"col-lg-2 control-label hideOnPhone\">Type</label>\n                        <div class=\"col-lg-8\">\n                            <select value.bind=\"people.selectedNote.category\" class=\"form-control\" id=\"itemType\">\n                                <option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n                            </select>\n                            <a class=\"btn btn-link\" click.trigger=\"openEditCatForm('new')\" aria-hidden=\"true\">(Add a Category)</a>\n                            <a class=\"btn btn-link\" disable.bind=\"people.selectedNote.category !== ''\" click.trigger=\"openEditCatForm('edit')\" aria-hidden=\"true\">(Edit this Category)</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div show.bind=\"showCategoryForm\" class=\"row col-lg-8 col-lg-offset-2\">\n                <div class=\"panel panel-default\" style=\"background-color:ghostwhite;\">\n<div class=\"panel-body\">\n    <div class=\"list-group-item bottomMargin col-sm-12 topMargin\">\n        <span click.delegate=\"saveCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Save Category\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancelEditCategory()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n            title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span show.bind=\" editCategoryFlag\" click.delegate=\"deleteCat()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\"\n            data-placement=\"bottom\" title=\"\" data-original-title=\"Delete Category\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>      \n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"editTitle\" class=\"col-sm-2 control-label hideOnPhone\">Title</label>\n                <div class=\"col-sm-8\">\n                    <input value.bind=\"categoryDescription\" id=\"editCategoryName\" class=\"form-control \" placeholder=\"Category\" type=\"text\" />\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n</div>\n</div>\n<!--\n<div class=\"row\">\n    <div class=\"col-sm-12 col-lg-12\">\n        <div class=\"form-group\">\n            <div class=\"checkbox col-lg-offset-2\">\n                <label>\n                                <input checked.bind=\"people.selectedNote.isReminder\"  type=\"checkbox\"> This note is a reminder\n                            </label>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"people.selectedNote.isReminder\">\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderType\" class=\"col-lg-2 control-label\">Reminder Type</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderType\" change.delegate=\"typeSelected()\" id=\"reminderType\"\n                        ref=\"reminderType\">\n                                        <option value=\"\">Type of Reminder</option>\n                                        <option value=\"T\">Time</option>\n                                        <option value=\"D\">Daily</option>\n                                        <option value=\"W\">Weekly</option>\n                                        <option value=\"M\">Monthly</option>\n                                        <option value=\"A\">Annual</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"priority\" class=\"col-lg-2 control-label\">Priority</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.priority\" id=\"priority\" ref=\"priority\">\n                                        <option value=\"0\">Information</option>\n                                        <option value=\"1\">Critical</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div show.bind=\"people.selectedNote.reminderType === 'W' || people.selectedNote.reminderType === 'M'\" class=\"row\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"reminderDay\" class=\"col-lg-2 control-label\">Day</label>\n                <div class=\"col-lg-8\">\n                    <select class=\"form-control\" value.two-way=\"people.selectedNote.reminderDay\" id=\"reminderDay\">\n                                        <option value=\"\">Choose the day</option>\n                                        <option repeat.for=\"day of days\" value=\"${day.number}\">${day.day}</option>\n                                    </select>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div show.bind=\"showDates\">\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType === 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Date and time</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateRemindT\" config.bind=\"configT\" value.bind=\"people.selectedNote.dateStartRemind\"></flat-picker>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\" show.bind=\"people.selectedNote.reminderType !== 'T'\">\n        <div class=\"col-sm-12 col-lg-12\">\n            <div class=\"form-group\">\n                <label for=\"input-dateRemind\" class=\"col-lg-2 control-label\">Start Date</label>\n                <div class=\"col-lg-8\">\n                    <flat-picker id.bind=\"dateStartRemind\" config.bind=\"config\" value.bind=\"test\"></flat-picker>\n                </div>\n            </div>\n        </div>\n\n\n        <div class=\"row\">\n            <div class=\"col-sm-12 col-lg-12\">\n                <div class=\"form-group\">\n                    <label for=\"input-dateEndRemind\" class=\"col-lg-2 control-label \">End Date</label>\n                    <div class=\"col-lg-8\">\n                        <flat-picker id.bind=\"dateEndRemind\" config.bind=\"config\" value.bind=\"people.selectedNote.dateEndRemind\"></flat-picker>\n                       \n\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n-->\n<div class=\"col-lg-8  col-lg-offset-2 topMargin\">\n    <editor value.bind=\"people.selectedNote.note\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\n\n</div>\n\n</form>\n\n</div>\n</template>"; });
 define('text!modules/admin/notes/components/notesTable.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"col-lg-12\" style='padding:15px;'>\n        <div class='row'>\n            <div class='col-lg-12 bottomMargin'>\n                <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                <div id=\"no-more-tables\">\n                    <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                        <thead class=\"cf\">\n                            <tr>\n                                <td colspan='5'>\n                                    <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                    <span click.delegate=\"new()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"New\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></span>\n                                    <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                </td>\n                            </tr>\n                            <tr>\n                                <th style=\"width:250px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'category'})\">Category </span><i class=\"fa fa-sort\"></i></th>\n                                <th style=\"width:8em;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'reminderType'})\">Reminder Type </span><i class=\"fa fa-sort\"></i></th>\n                                <th style=\"width:150px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'dateStartRemind'})\">Start </span><i class=\"fa fa-sort\"></i></th>\n                                <th style=\"width:150px;\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'note'})\">Note </span><i class=\"fa fa-sort\"></i></th>\n                                <th></th>\n                                <th>Help Ticket No</th>\n                                <th></th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            <tr>\n                                <th>\n                                   <select change.delegate=\"dataTable.filterList($event)\" class=\"form-control \" id=\"category\" compare=\"id\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"\"></option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"${type}\" repeat.for=\"type of userObj.noteCategories\">${type}</optionp>\n\t\t\t\t\t\t\t\t\t</select>\n                                </th>\n                                 <th>\n                                     <select class=\"form-control\" id=\"reminderType\"  change.delegate=\"dataTable.filterList($event)\" id=\"reminderType\"\n                                        compare=\"id\" type=\"select-one\" ref=\"reminderType\">\n                                            <option value=\"\"></option>\n                                            <option value=\"T\">Time</option>\n                                            <option value=\"D\">Daily</option>\n                                            <option value=\"W\">Weekly</option>\n                                            <option value=\"M\">Monthly</option>\n                                            <option value=\"A\">Annual</option>\n                                    </select>\n                                 </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"dateStartRemind\" type=\"date\" placeholder=\"Filter Date\" class=\"form-control\"/>\n                                </th>\n                                <th>\n                                    <input input.delegate=\"dataTable.filterList($event)\" id=\"note\" type=\"text\" placeholder=\"Filter note\" class=\"form-control\"/>\n                                </th>\n                                <th></th>\n                                <th></th>\n                                <th></th>\n                            </tr>\n                            <tr class=\"${item.isReminder} ? 'warning' : ''}\" repeat.for=\"item of dataTable.displayArray\">\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Category\">${item.category}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\">${item.reminderType}</td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Date Start\" style=\"width: 75px\">\n                                    <div>${item.dateStartRemind | dateFormat:config.DATE_FORMAT_TABLE}</div>\n                                </td>\n                                <td click.trigger=\"edit($index, $event)\" data-title=\"Type\" innerhtml = ${item.note}></td>\n                                <td style=\"width:5rem;\">\n                                    <span show.bind=\"item.reference\" click.trigger=\"navigateToHelpTicket(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"View\"><i class=\"fa fa-eye fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                                <td style=\"width:5rem;\" click.trigger=\"edit($index, $event)\">${item.helpTicketNo}</td>\n                                <td style=\"width:5rem;\">\n                                    <span  click.trigger=\"delete(item)\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg\" aria-hidden=\"true\"></i></span>\n                                </td>\n                            </tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!modules/admin/site/components/configForm.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"col-lg-12 bottomMargin\">\n        <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        </div> \n\t</div>\n\n\t<div class=\"row bigTopMargin\">\n\t\t<div class=\"col-lg-10 col-lg-offset-1\">\n\t\t\t<div class=\"form-group\">\n\t\t \t\t<editor value.bind=\"siteConfig.configArray[selectedIndex].value\" toolbar.bind=\"toolbar\" height=\"250\"></editor>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div innerhtml.bind=\"siteConfig.configArray[selectedIndex].value\" class=\"col-lg-10 col-lg-offset-1 bigTopMargin\">\n\t</div>\n</template>"; });
 define('text!modules/admin/site/components/configTable.html', ['module'], function(module) { module.exports = "<template>\n     <style>\n        .menuButtons {\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\n        }\n    </style>\n    <div class=\"col-lg-2 lefMargin\">\n        <div id=\"configListGroup\" class=\"list-group\">\n            <a class=\"${ $first ? 'menuButtons' : ''} list-group-item\" repeat.for=\"tab of tabs\" href=\"\" class=\"list-group-item\" click.delegate=\"changeTab($event, $index)\">\n                <h4 id=\"${tab.id}\" class=\"list-group-item-heading\">${tab.id}</h4>\n            </a>\n        </div>\n    </div>\n    <div class=\"col-lg-10\">\n        <div class=\"col-lg-12 col-sm-12\" style='padding:15px;'>\n            <div class='row'>\n                <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n                    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                    <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel Changes\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                </div>   \n                <div class='col-lg-12 bottomMargin'>\n                    <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n                    <div id=\"no-more-tables\">\n                        <table id=\"newsTable\" class=\"table table-striped table-hover cf\">\n                            <thead class=\"cf\">\n                                <tr>\n                                    <td colspan='5'>\n                                        <span click.delegate=\"refresh()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\"\n                                            title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n                                        <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <th style=\"width:200px;\"><span class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'parameter'})\">Parameter </span><span><i class=\"fa fa-sort\"></i></span></th>\n                                    <th style=\"width:300px;\">Description</th>\n                                    <th style=\"width:100px;\">Value</th>\n                                    <th style=\"width:200px;\">Date Modified</th>\n                                </tr>\n                            </thead>\n                            <tbody>\n                                <tr>\n                                    <th>\n                                        <input value.bind=\"parameterFilterValue\" input.delegate=\"dataTable.filterList(parameterFilterValue, { type: 'text',  filter: 'parameterFilter', collectionProperty: 'parameter', displayProperty: 'parameter',  compare:'match'} )\"  class=\"form-control\" />\n                                    </th>\n                                    <th></th>\n                                    <th></th>\n                                </tr>\n                                <tr  repeat.for=\"item of dataTable.displayArray\">\n                                    <td data-title=\"Parameter\">${item.parameter}</td>\n                                    <td data-title=\"Description\">${item.description}</td>\n                                    <td data-title=\"Value\">\n                                        <input show.bind=\"item.type == 'value'\" readonly.bind=\"item.readOnly\" value.bind=\"item.value\" id=\"editValue\" class=\"form-control\" type=\"text\" />\n                                        <div show.bind=\"item.type == 'boolean'\">\n                                            <span  click.delegate=\"switchValue(item)\" innerhtml=\"${item.value | onoffSwitch}\"></span>\n                                        </div>\n                                        <div show.bind=\"item.type == 'html'\">\n                                            <span click.delegate=\"edit(item)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n                                        </div> \n                                    </td>\n\n                                    <td data-title=\"Modified Date\"><div>${item.dateModified | dateFormat:config.DATE_FORMAT_TABLE}</div></td>\n                                </tr>\n                            </tbody>\n                        </table>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>"; });

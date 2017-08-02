@@ -31,7 +31,28 @@ export class Events {
                 console.log(error);
             }
         }
+    }
+    
+    async getEventsPersonArray(personId, refresh) {
+        if (!this.eventArray || refresh) {
+            var url = this.EVENTS_SERVICE + "/" + personId;
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    if(Object.prototype.toString.call(serverResponse) == '[object Array]'){
+                        this.eventArray = serverResponse;
+                    } else {
+                        this.eventArray = new Array();;                        
+                    }
+                } else {
+                    this.data.processError(serverResponse);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
 	}
+    
 
 	selectEvent(index) {
         if (index === undefined) {

@@ -447,6 +447,24 @@ module.exports = function (app, config) {
       });
   });
 
+  router.get('/api/events/:personId', requireAuth, function(req, res, next){
+    logger.log('Get person and ucc events', 'verbose');
+    var query = Event.find()
+      .where({personId: req.params.personId})
+      .where({scope: "u"})
+      .exec()
+      .then(object => {
+         if(!object || object.length === 0){          
+            res.status(200).json({"message": "No Events Found"});
+          } else {
+            res.status(200).json(object);
+          }
+      })
+      .catch(err => {
+         res.status(500).json(err);
+      })
+  });
+
   router.post('/api/events', requireAuth, function(req, res, next){
     logger.log('Create Event', 'verbose');
     var event =  new Event(req.body);  

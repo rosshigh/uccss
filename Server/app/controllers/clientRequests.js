@@ -28,7 +28,8 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-      .populate('personId', 'firstName lastName fullName email file')
+       .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+      // .populate('personId', 'firstName lastName fullName email file')
       .exec()
       .then(object => {
         if(object){

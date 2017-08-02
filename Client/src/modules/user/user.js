@@ -7,12 +7,13 @@ import {Sessions} from '../../resources/data/sessions';
 import {People} from '../../resources/data/people';
 import {HelpTickets} from '../../resources/data/helpTickets';
 import {ClientRequests} from '../../resources/data/clientRequests';
+import {Events} from '../../resources/data/events';
 import moment from 'moment';
 
-@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests, People)
+@inject(Router, Utils, AppConfig, SiteInfo, Sessions, HelpTickets, ClientRequests, People, Events)
 export class User {
 
-  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests, people){
+  constructor(router, utils, config, siteinfo, sessions, helpTickets, requests, people, events){
     this.router = router;
     this.utils = utils;
     this.config = config;
@@ -21,6 +22,7 @@ export class User {
     this.helpTickets = helpTickets;
     this.requests = requests;
     this.people = people;
+    this.events = events;
   };
 
   attached(){
@@ -58,6 +60,7 @@ export class User {
   async activate(){
     await this.getData();
     this.config.getConfig(true);
+    this.getEvents();
 
     this.helpTicketArray = [
         {
@@ -178,6 +181,23 @@ export class User {
     }
 
   }
+
+   async getEvents(){
+    this.eventArray = new Array();
+    await this.events.getEventsArray('', true); 
+    let today = new Date();
+    this.events.eventArray.forEach(item => {
+        if(item.personId === this.userObj._id || item.scope === 'u') {
+            console.log(item.start)
+            console.log(item.end)
+            console.log(moment(today).isBetween(item.start, item.end))
+            if(moment(today).isBetween(item.start, item.end)){
+                 this.eventArray.push(item);
+            }
+        }
+    })
+    console.log(this.eventArray)
+   }
 
   moreInfoExists(item){
       return item.url && item.url.length > 0;
