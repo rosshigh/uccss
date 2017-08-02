@@ -27,7 +27,7 @@ export class EditCalendar {
       }
       if(item.personId === this.userObj._id || item.scope === 'u') this.events.push(item);
     })
-    this.eventLayer.selectEvent();
+    // this.eventLayer.selectEvent();
   }
 
   eventClicked(start){
@@ -41,8 +41,8 @@ export class EditCalendar {
   }
 
   dayClicked(start){
-    let startIndex = start._d.toString().indexOf('GMT-0') + 5;
-    let hours = parseInt(start._d.toString().substring(startIndex, startIndex+1));
+    // let startIndex = start._d.toString().indexOf('GMT-0') + 5;
+    // let hours = parseInt(start._d.toString().substring(startIndex, startIndex+1));
     start = moment(start).add(5, 'hours');
     this.fireEvent(this.element, 'dayClicked', { date: start });
   }
@@ -78,6 +78,11 @@ export class EditCalendar {
     if(event.event.id) {
       put = true;
     }
+
+    // var objEvent = this.eventLayer.createEvent(event.event);
+    // objEvent.personId = this.userObj._id;
+    // objEvent._id = event.event.id;
+    // this.eventLayer.setEvent(objEvent);
     this.eventLayer.selectedEvent._id = event.event.id;
     this.eventLayer.selectedEvent.start = event.event.eventStart
     this.eventLayer.selectedEvent.end = event.event.eventEnd

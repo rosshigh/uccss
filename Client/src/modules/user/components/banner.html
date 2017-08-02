@@ -15,6 +15,7 @@
 					<a href="#/support" class="rightMargin" if.bind="showHelpTickets > 0" style="text-decoration: none;">Help Tickets <span class="badge">${showHelpTickets}</span></a>
 				</span>
 				<span show.bind="userObj.userRole >= config.UCC_ROLE">
+          <a href="#/notes/editCalendar" class="rightMargin" if.bind="eventArray.length > 0" style="text-decoration: none;">Events <span class="badge">${eventArray.length}</span></a>  
 					<a href="#/techRq" class="rightMargin" if.bind="showRequests > 0" style="text-decoration: none;">Requests <span class="badge">${showRequests}</span></a>            
 					<a href="#/techHt" class="rightMargin" if.bind="showHelpTickets > 0" style="text-decoration: none;">Help Tickets <span class="badge">${showHelpTickets}</span></a>
 				</span>

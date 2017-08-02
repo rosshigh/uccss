@@ -18,7 +18,10 @@
             <label for="editFirstUsableID " class="control-label ">First usable ID</label>
             <input value.bind="products.selectedProduct.firstAllowableId " id="editFirstUsableID " class="form-control " placeholder="First Usable ID " type="number " />
           </div>
-
+          <div class="form=group">
+            <h4>Systems assigned to this product: ${products.selectedProduct.systems | systemList}</h4>
+            <h6>To change the systems assigned to a product, create clients on the Systems page</h6>
+          </div>
         
       </div>
            

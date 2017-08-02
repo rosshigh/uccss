@@ -88,6 +88,14 @@ export class EditSystem {
             let serverResponse = await this.systems.saveSystem();
             if (!serverResponse.error) {
                 if(this.saveProduct) this.products.saveProduct();
+                if( this.productsToUpdate &&  this.productsToUpdate.length > 0){
+                    this.productsToUpdate.forEach(item => {
+                        this.products.selectedProductFromId(item._id);
+                        this.products.selectedProduct.systems = item.systems;
+                        this.products.saveProduct()
+                    });
+                    this.productsToUpdate = new Array();
+                }
                 this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
                 this._cleanUp();
             } 
@@ -162,6 +170,15 @@ export class EditSystem {
                     return;
                 });
         }
+        if(this.idsAvailable === "0"){
+             return this.dialog.showMessage(
+                "You must enter the number of IDs available.", 
+                "Enter IDS Available", 
+                ['OK']
+                ).whenClosed(response => {
+                    return;
+                });
+        }
         if(!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3){
             return this.dialog.showMessage(
                 "Clients must have three digits", 
@@ -188,7 +205,7 @@ export class EditSystem {
             this.utils.showNotification(result.error);
         } else {
             this.products.selectedProductFromId(this.selectedProduct);
-            if(this.products.selectedProduct.systems) {
+            if(this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
                 this.products.selectedProduct.systems.forEach(item => {
                     if(item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
                 })
@@ -218,7 +235,7 @@ export class EditSystem {
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);    
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);   
                 }
             });
     }
@@ -236,7 +253,26 @@ export class EditSystem {
     }
     
     deleteAllClients(){
+        var id =  this.systems.selectedSystem._id;
+        this.productsToUpdate = new Array();
+        var processedProducts = new Array();
+        this.systems.selectedSystem.clients.forEach(item => {
+            if(processedProducts.indexOf(item.productId) === -1){
+                processedProducts.push(item.productId);
+                this.products.selectedProductFromId(item.productId);
+                if(this.products.selectedProduct._id){
+                    this.products.selectedProduct.systems.forEach((system, index) => {
+                        if(system.systemId === id) {
+                            this.products.selectedProduct.systems.splice(index, 1);
+                            this.productsToUpdate.push(this.products.selectedProduct);
+                        }
+                    })
+                }
+            }
+           
+        })
         this.systems.deleteAllClients();
+
         this.utils.showNotification("You must save the system to complete the deletion");
     }
 
@@ -261,8 +297,30 @@ export class EditSystem {
                 ['Yes', 'No']
                 ).whenClosed(response => {
                     if (!response.wasCancelled) {
+                        var productId = this.systems.selectedSystem.clients[index].productId;
+                        var id = this.systems.selectedSystem._id;
+                        var noUpdates = true;
+                        this.productsToUpdate = new Array();
+                        if(this.systems.selectedSystem.clients.length > 0){
+                            for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
+                                if(this.systems.selectedSystem.clients[i].productId === productId) {
+                                    noUpdates = false;
+                                    break;
+                                }
+                            }
+                        }
                         this.systems.selectedSystem.clients.splice(index,1);
+                        if(!noUpdates){
+                            this.products.selectedProductFromId(productId);
+                             this.products.selectedProduct.systems.forEach((system, index) => {
+                                if(system.systemId === id) {
+                                    this.products.selectedProduct.systems.splice(index, 1);
+                                    this.productsToUpdate.push(this.products.selectedProduct);
+                                }
+                            })
+                        }
                     }
+                    this.utils.showNotification("You must save the system to complete the deletion");
                 });
         }
     }
@@ -333,6 +391,10 @@ export class EditSystem {
         }
     }
 
+    cancel(){
+        this.systems.selectSystem(this.editIndex);
+    }
+
     _setupValidation(){
         this.validation.addRule(1,"editSid",[{"rule":"required","message":"SID is required", "value": "systems.selectedSystem.sid"},
         {"rule":"custom", "message":"A system with that SID already exists",
@@ -372,5 +434,10 @@ export class EditSystem {
                 return true;
             }}]);
         this.validation.addRule(1,"editInst",[{"rule":"required","message":"Instance is required", "value": "systems.selectedSystem.instance"}]);
+    }
+
+    selectProduct(){
+        this.products.selectedProductFromId(this.selectedProduct);
+        if(this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
     }
 }

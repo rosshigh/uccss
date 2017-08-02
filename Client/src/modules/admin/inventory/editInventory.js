@@ -3,14 +3,15 @@ import {Router} from "aurelia-router";
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import {Utils} from '../../../resources/utils/utils';
 import {Inventory} from '../../../resources/data/inventory';
+import {Events} from '../../../resources/data/events';
 import Validation from '../../../resources/utils/validation';
 import {DataTable} from '../../../resources/utils/dataTable';
 import {AppConfig} from '../../../config/appConfig';
 import {DocumentsServices} from '../../../resources/data/documents';
 
-import $ from 'jquery';
+import moment from 'moment';
 
-@inject(Router,  Inventory, Validation, Utils, DataTable, AppConfig, CommonDialogs, DocumentsServices)
+@inject(Router,  Inventory, Validation, Utils, DataTable, AppConfig, CommonDialogs, DocumentsServices, Events)
 export class EditInventory {
     systemSelected = false;
     spinnerHTML = "";
@@ -24,7 +25,7 @@ export class EditInventory {
     tabs = [ {id: 'Maintenance', title: 'Maintenance'}, {id: 'History', title: 'History'},{id: 'Purchase', title: 'Purchase'}, {id: 'Technical', title: "Technical"}, {id: 'Documents', title: "Documents"}];
     tabPath = './';
 
-    constructor(router, inventory, validation, utils, datatable, config, dialog, documents) {
+    constructor(router, inventory, validation, utils, datatable, config, dialog, documents, events) {
         this.router = router;
         this.inventory = inventory;
         this.utils = utils;
@@ -35,7 +36,10 @@ export class EditInventory {
         this.config = config;
         this.dialog = dialog;
         this.documents = documents;
+        this.eventLayer = events;
         // this._setupValidation();
+
+         this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
     attached(){
@@ -47,8 +51,10 @@ export class EditInventory {
             this.inventory.getInventoryArray('?order=systemName', true),
             this.config.getConfig(),
             this.documents.getDocumentsCategoriesArray(),
-            this.config.getSessions()
+            this.config.getSessions(),
+            this.eventLayer.getEventsArray('', true)
         ]);
+
         this.dataTable.updateArray(this.inventory.inventoryArray);
         this.filteredDocumentArray = this.documents.docCatsArray;
     }
@@ -73,6 +79,16 @@ export class EditInventory {
         this.systemSelected = true;
         $("#editSystemName").focus();
         this.isDuplicate = false;
+
+        this.eventScheduled = false;
+        this.eventLayer.eventArray.forEach(item => {
+            if(item.title.indexOf(this.inventory.selectedInventory.systemName) > -1){
+                this.eventScheduled = true;
+                this.eventObject = {
+                    day: moment(item.start).format('YYYY-MM-DD')
+                }
+            }
+        })
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -173,6 +189,25 @@ export class EditInventory {
 
     removeDocument(index){
         this.inventory.selectedInventory.documents.splice(index, 1);
+    }
+
+    async scheduleEvent(){
+        if(this.inventory.selectedInventory.maintenanceAlert === "0" || !this.inventory.selectedInventory.maintenanceAlert){
+            this.utils.showNotification('You have to enter a number of days.')
+            return;
+        }
+
+        this.eventLayer.selectEvent();
+        this.eventLayer.selectedEvent.start = moment(this.inventory.selectedInventory.maintenanceEndDate).subtract(parseInt(this.inventory.selectedInventory.maintenanceAlert), 'days');
+        this.eventLayer.selectedEvent.end = this.eventLayer.selectedEvent.start
+        this.eventLayer.selectedEvent.title = this.inventory.selectedInventory.systemName + ' expiration notice';
+        this.eventLayer.selectedEvent.personId = this.userObj._id;
+        this.eventLayer.selectedEvent.scope = "u";
+    
+        let response = await this.eventLayer.saveEvent();
+        if(!response.error){
+            this.utils.showNotification('The event was scheuled');
+        }
     }
 
     async typeChanged(index){

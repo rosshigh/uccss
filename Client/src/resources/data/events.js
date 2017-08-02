@@ -2,6 +2,8 @@ import {inject} from 'aurelia-framework';
 import {DataServices} from './dataServices';
 import {Utils} from '../utils/utils';
 
+import moment from 'moment';
+
 @inject(DataServices, Utils)
 export class Events {
 
@@ -77,10 +79,26 @@ export class Events {
         }
          this.selectedEvent = this.emptyEvent();
     }
+
+    setEvent(event){
+        this.selectedEvent = this.utils.copyObject(event);
+    }
+
+    createEvent(event){
+        var obj = new Object();
+        obj.title = event.eventTitle;
+        obj.end =event.eventEnd
+        obj.start =event.eventStart
+        obj.eventType = "";
+        obj.allDay = false
+        obj.notes = event.notes;
+        obj.scope = event.scope ? "u" : "p";
+		return obj;
+    }
 	
 	emptyEvent(){
 		var obj = new Object();
-		obj.title = "";
+        obj.title = "";
         obj.eventType = "";
         obj.allDay = false
         obj.notes = "";

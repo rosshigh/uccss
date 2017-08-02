@@ -31,6 +31,14 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label  class="control-label col-lg-2 topMargin">Product</label>
+					<div class="col-lg-10">
+					<select class="form-control topMargin"  value.bind="selectedClient.productId">
+						<option value="">Choose a product</option>
+						<option repeat.for="product of products.productsArray" model.bind="product._id">${product.name}</option>
+					</select>
+				</div>				
+				<div class="form-group">
 					<label for="status" class="col-lg-2 control-label topMargin">Status</label>
 					<div class="col-lg-10">
 						<select value.bind="selectedClient.clientStatus" class="form-control topMargin" id="status">

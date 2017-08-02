@@ -5,6 +5,7 @@ import {inject} from 'aurelia-framework';
 @inject(DataServices)
 export class AddSystems{
     filter = "";
+    enable = false;
 
   @bindable
   selectedproduct;
@@ -26,6 +27,10 @@ export class AddSystems{
     //  this.systemsArray = this.systemsarray;
   }
 
+  enableEdit(){
+    this.enable = true;
+  }
+
   filterList(){
       if(this.filter){
         var thisFilter = this.filter
@@ -39,9 +44,11 @@ export class AddSystems{
   }
 
   selectSystem(el, system){
-    if(!this._systemAlreadySelected(system.sid)){
-      this.systemchanges.push({productId: this.selectedproduct._id, systemId: system._id, operation: "add"});
-      this.selectedproduct.systems.push({sid: system.sid, systemId: system._id});
+    if(this.enable){
+      if(!this._systemAlreadySelected(system.sid)){
+        this.systemchanges.push({productId: this.selectedproduct._id, systemId: system._id, operation: "add"});
+        this.selectedproduct.systems.push({sid: system.sid, systemId: system._id});
+      }
     }
   }
 
@@ -53,18 +60,20 @@ export class AddSystems{
   }
 
   removeSystem(el, system){
-    for(var i = 0; i<this.selectedproduct.systems.length; i++){
-      if(system.systemId === this.selectedproduct.systems[i].systemId){
-        for(var j = 0; j < this.systemchanges.length; j++){
-          if(this.systemchanges[j].systemId ===system.systemId ) break; 
+    if(this.enable){
+      for(var i = 0; i<this.selectedproduct.systems.length; i++){
+        if(system.systemId === this.selectedproduct.systems[i].systemId){
+          for(var j = 0; j < this.systemchanges.length; j++){
+            if(this.systemchanges[j].systemId ===system.systemId ) break; 
+          }
+          if(this.systemChanges && j === this.systemChanges.length) {
+            this.systemchanges.splice(j,1);
+          } else {
+            this.systemchanges.push({productId: this.selectedproduct._id, systemId: system.systemId, operation: "delete"});
+          }
+            this.selectedproduct.systems.splice(i,1);
+          break;
         }
-        if(this.systemChanges && j === this.systemChanges.length) {
-          this.systemchanges.splice(j,1);
-        } else {
-          this.systemchanges.push({productId: this.selectedproduct._id, systemId: system.systemId, operation: "delete"});
-        }
-          this.selectedproduct.systems.splice(i,1);
-        break;
       }
     }
   }

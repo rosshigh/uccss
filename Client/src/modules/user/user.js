@@ -177,7 +177,6 @@ export class User {
             this.ucctemp = (parseFloat(this.ucctemp) * 1.8 + 32).toFixed(1) + "\u00b0 F";
         }
         this.uccweatherIcon = this.config.IMG_DOWNLOAD_URL  + 'icons/' + uccweather.icon + ".png";
-        console.log(this.uccweatherIcon)
     }
 
   }
@@ -185,18 +184,18 @@ export class User {
    async getEvents(){
     this.eventArray = new Array();
     await this.events.getEventsArray('', true); 
-    let today = new Date();
+    let today =  moment(new Date()).format('YYYY-MM-DD');
     this.events.eventArray.forEach(item => {
         if(item.personId === this.userObj._id || item.scope === 'u') {
-            console.log(item.start)
-            console.log(item.end)
-            console.log(moment(today).isBetween(item.start, item.end))
-            if(moment(today).isBetween(item.start, item.end)){
+            let start = moment(item.start).format('YYYY-MM-DD')
+            let end = moment(item.end).format('YYYY-MM-DD')
+            if(moment(today).isBetween(start, end)){
+                 this.eventArray.push(item);
+            } else if(moment(today).isSame(start)){
                  this.eventArray.push(item);
             }
         }
     })
-    console.log(this.eventArray)
    }
 
   moreInfoExists(item){

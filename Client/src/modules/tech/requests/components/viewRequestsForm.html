@@ -291,8 +291,8 @@
         <div class="form-group">
             <label class="control-label col-sm-3 hideOnPhone">Systems</label>
             <select change.delegate="systemSelected()" class="form-control" value.bind="selectedSystemId">
-                <option model.bind="null">-- Select a System --</option>
-                <option  repeat.for='sys of products.selectedProduct.systems' model.bind="sys.systemId">${sys.sid}</option>
+              <!--  <option model.bind="null">-- Select a System --</option> -->
+                <option  repeat.for='sys of products.selectedProduct.systems | sessionSystems:sessions.selectedSession.session:systems.systemsArray' model.bind="sys.systemId">${sys.sid}</option>
             </select>
         </div>
 
@@ -317,7 +317,7 @@
                 <td>
                   <table class="col-sm-12">
                     <tr repeat.for="assignment of client.assignments">
-                      <td><div class="col-lg-12 list-group-item"><h5 class="list-group-item-heading">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:"_id":"requestNo"}</h5><p class="list-group-item-text"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId | lookupValue:people.institutionsArray:"_id":"name"}</p></div></td>
+                      <td><div class="col-lg-12 list-group-item"><h5 class="list-group-item-heading">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:"_id":"requestNo"}</h5><p class="list-group-item-text"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId.name}</p></div></td>
                     </tr>
                   </table>
                 </td>

@@ -90,7 +90,7 @@ export class calendar {
       defaultView: this.view || 'month',
       weekends: this.weekends,
       firstDay: 1,
-      // timezone: 'local',
+      timezone: 'Chicago/United States',
       dayClick: (date, jsEvent, view) => this.dayClick(date, jsEvent, view),
       eventClick: (event) => this.eventClick(event),
       events: eventSource

@@ -245,13 +245,6 @@ export class Assignments {
             && this.products.selectedProduct.defaultFacultyIdPrefix.indexOf(this.config.ID_WILDCARD) != -1
             && this.selectedRequestDetail.requestId.courseId._id !== this.config.SANDBOX_ID;
 
-		//If the product has a system configured, select the first system on the list
-        if(this.products.selectedProduct.systems[0]) {
-			this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-			//Select the system in the interface
-			this.selectedSystemId = this.systems.selectedSystem._id;
-        }
-        
         //Check if the request is a sandbox request
         if (this.selectedRequestDetail.requestId.courseId._id === this.config.SANDBOX_ID) {
             this.idBuffer = localStorage.getItem('idSandboxBuffer')  ? localStorage.getItem('idSandboxBuffer') : this.config.SANDBOX_ID_BUFFER;
@@ -288,6 +281,13 @@ export class Assignments {
         }
 
         this.assignmentDetailIndex = -1;
+
+        //If the product has a system configured, select the first system on the list
+        if(this.products.selectedProduct.systems[0]) {
+			this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
+			//Select the system in the interface
+			this.selectedSystemId = this.systems.selectedSystem._id;
+        }
         
         this.calcLastID();
 	}
@@ -982,10 +982,10 @@ export class Assignments {
         } 
     }
 	
-	showProfile(request, el){
+	showProfile(request, el){ 
         this.profileRequest = request;
-        $(".hoverProfile").css("top", el.clientY - 175);
-        $(".hoverProfile").css("left", el.clientX - 300);
+        // $(".hoverProfile").css("top", el.clientY - 175);
+        // $(".hoverProfile").css("left", el.clientX - 300);
         $(".hoverProfile").css("display", "block");
     }
 
@@ -1140,14 +1140,22 @@ export class Assignments {
 
     customInstitutionsSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
-            var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
+            if(a['requestId']['institutionId']['name'] && b['requestId']['institutionId']['name']) {
+                var result = (a['requestId']['institutionId']['name'] < b['requestId']['institutionId']['name']) ? -1 : (a['requestId']['institutionId']['name'] > b['requestId']['institutionId']['name']) ? 1 : 0;
+            } else {
+                 var result = -1;
+            }
             return result * sortDirection;
         });
     }
 
     customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
-            var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
+            if(a['requestId']['personId']['lastName'] && b['requestId']['personId']['lastName']){
+                var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
+            } else {
+                var result = -1;
+            }
             return result * sortDirection;
         });
     }

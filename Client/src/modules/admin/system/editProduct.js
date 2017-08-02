@@ -20,7 +20,7 @@ export class EditProducts {
     removedFiles = new Array();
     spinnerHTML = "";
 
-    tabs = [{id: 'Systems'},{id: 'Assignments'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}, {id: 'Description'}];
+    tabs = [{id: 'Assignments'}, {id: 'Systems'}, {id: 'is4ua'}, {id: 'Documents'}, {id: 'Notes'}, {id: 'Description'}];
     tabPath = './';
 
     toolbar = [
@@ -147,6 +147,19 @@ export class EditProducts {
     }
 
     async deleteProduct(){
+        return this.dialog.showMessage(
+        "Are you sure you want to delete this product?", 
+        "Delete Product", 
+        ['Yes', 'No']
+        ).whenClosed(response => {
+            if(!response.wasCancelled){
+                this.deleteAProduct();
+            }
+        });
+       
+    }
+
+   async deleteAProduct(){
         var name = this.products.selectedProduct.name;
         let serverResponse = await this.products.deleteProduct();
         if (!serverResponse.error) {

@@ -1,5 +1,20 @@
 <template>
-   <div class="hover" innerhtml.bind="commentShown"></div>
+  <style>
+    .tooltip {
+      background: #1496bb;
+      bottom: 100%;
+      color: #fff;
+      display: block;
+      left: -25px;
+      margin-bottom: 15px;
+      opacity: 0;
+      padding: 20px;
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+    }
+  </style>
+   <div class="hover tooltip" innerhtml.bind="commentShown"></div>
     <div class="hoverProfile" >
       <span  click.delegate="hideProfile()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Close"><i class="fa fa-window-close-o" aria-hidden="true"></i></span>
       <span  click.delegate="customerActionDialog()" class="smallMarginRight" bootstrap-tooltip data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Send Email"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>

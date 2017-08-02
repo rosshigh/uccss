@@ -97,10 +97,27 @@
 		<div class="col-lg-3">
 			<div class="form-group">
 				<div class="col-sm-10">
+					<label show.bind="!eventScheduled" class="control-label">Days of warning before expiration</label>
+					<label show.bind="eventScheduled" class="control-label">Days of warning before expiration (event scheduled for ${eventObject.day})</label>
+					<div class="input-group">
+						<input value.bind="inventory.selectedInventory.maintenanceAlert" type="number" placeholder="Days" class="form-control">
+						 <span click.delegate="scheduleEvent()" class="input-group-addon">
+							<i class="fa fa-calendar" aria-hidden="true"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--
+			<button class="btn btn-default" type="button">Button</button>
+		<div class="col-lg-3">
+			<div class="form-group">
+				<div class="col-sm-10">
 					<label>Days of warning before expiration</label>
 					<input value.bind="inventory.selectedInventory.maintenanceAlert"  class="form-control" placeholder="Days" type="number" />
 				</div>
 			</div>
 		</div>
+		-->
 	</div>
 </template>

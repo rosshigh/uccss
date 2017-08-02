@@ -156,7 +156,7 @@ export class Systems{
 
     refreshClients(status){
          for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status);
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, this.selectedSystem.clients[i].productId );
         }
     }
 
