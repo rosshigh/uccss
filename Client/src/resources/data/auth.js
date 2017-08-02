@@ -2,17 +2,19 @@ import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {DataServices} from './dataServices';
 import {AppConfig} from '../../config/appConfig';
-
-@inject(EventAggregator, DataServices, AppConfig)
+import {SessionObj} from './sessionData';
+ 
+@inject(EventAggregator, DataServices, AppConfig, SessionObj)
 export class Auth {
 
 	loginUrl = 'users/login';
 	logoutUrl = 'users/logout';
 
-	constructor(eventAggregator, data, config){
+	constructor(eventAggregator, data, config, sessionObj){
 		this.eventAggregator = eventAggregator;
 		this.data = data;
 		this.config = config;
+		this.sessionObj = sessionObj;
 	}
 
 	async login(email, password) {
@@ -24,8 +26,12 @@ export class Auth {
 		let response = await this.data.login(content, this.loginUrl);
 		if(!response.error){
 			response.user.userRole = this.setRole(response.user.roles);
+			
 			sessionStorage.setItem('token', response.token);
 			sessionStorage.setItem('user', JSON.stringify(response.user));
+			this.sessionObj.token = response.token;
+			this.sessionObj.user = response.user;
+			
 		}
 		this.eventAggregator.publish('auth:login', response);
 		return response;

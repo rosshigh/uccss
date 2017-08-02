@@ -28,8 +28,7 @@ module.exports = function (app) {
     var query = buildQuery(req.query, Model.find());
     query.sort(req.query.order)
       .populate('requestDetails')
-       .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
-      // .populate('personId', 'firstName lastName fullName email file')
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
       .exec()
       .then(object => {
         if(object){
@@ -180,27 +179,35 @@ module.exports = function (app) {
 
   router.put('/api/clientRequests/assign', requireAuth, function(req, res, next){
     logger.log('Assign clientRequest ' + req.body._id);          
-    let clientRequest = new Model(req.body);     
-    let tasks = new Array();   
-    if(req.body.requestDetailsToSave){
-       req.body.requestDetailsToSave.forEach((detail, index) => {               
-            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-       });
-    }      
- 
-    Promise.all(tasks)
-        .then(request => {      
-          Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
-                if(error){
-                  return next(error);
-                } else { 
-                    res.status(200).json(request);
-                }
-          })
-        })
-        .catch(error => { //Promise        
-            return next(error);
-        }) 
+    
+    if(req.body._id){
+      var query = Model.findById(req.body._id, function(err, clientRequest){
+        if(err){
+          return next(error);
+        }
+        clientRequest.requestStatus = req.body.requestStatus;
+        let tasks = new Array();   
+        if(req.body.requestDetailsToSave){
+          req.body.requestDetailsToSave.forEach((detail, index) => {               
+                tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+          });
+        }      
+    
+        Promise.all(tasks)
+            .then(request => {      
+              Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
+                    if(error){
+                      return next(error);
+                    } else { 
+                      res.status(200).json(request);
+                    }
+              })
+            })
+            .catch(error => { //Promise        
+                return next(error);
+            })
+      })
+    }
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){

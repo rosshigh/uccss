@@ -10,13 +10,14 @@ import {Utils} from '../../../resources/utils/utils';
 import {People} from '../../../resources/data/people';
 import Validation from '../../../resources/utils/validation';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
+import {SessionObj} from '../../../resources/data/sessionData';
 import Flatpickr from 'flatpickr';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 import fuelux from 'fuelux';
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator, SessionObj)
 export class ViewHelpTickets {
   sessionSelected = false;
   courseSelected = false;
@@ -50,7 +51,7 @@ export class ViewHelpTickets {
     }
   };
 
-  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea) {
+  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea, sessionObj) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -65,8 +66,10 @@ export class ViewHelpTickets {
     this.siteInfo = siteInfo;
     this.dialog = dialog;
     this.ea = ea;
+    this.sessionObj = sessionObj;
 
-     this.userObj = JSON.parse(sessionStorage.getItem('user'));;
+     this.userObj = JSON.parse(sessionStorage.getItem('user'));
+     if(!this.userObj) this.userObj = this.sessionObj.user;
 
   };
 
@@ -90,6 +93,13 @@ export class ViewHelpTickets {
       this.typeSelected = true;
       this.regularClient = true;
       this.requestType = "regularCourse";
+    }
+  }
+
+  canActivate(){
+    if(!this.userObj) {
+      this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+      this.router.navigate("home");
     }
   }
 
@@ -422,7 +432,7 @@ export class ViewHelpTickets {
   }
 
   _buildRequest(){
-    if(this.existingRequest){
+    if(this.existingRequest && this.userObj._id){
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
         if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;

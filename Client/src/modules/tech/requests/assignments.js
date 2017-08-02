@@ -806,6 +806,7 @@ export class Assignments {
         if(this.selectedRequestDetail.requestStatus == this.config.ASSIGNED_REQUEST_CODE){  
             for(var i = 0; i < this.assignmentDetails.length; i++){
                 for(var j = 0; j < this.proposedClient.length; j++){
+                    //Save the previous ids assigned and available from the proposed client
                     var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
                     var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
                     if(this.assignmentDetails[i].client == this.proposedClient[j].client){
@@ -1128,7 +1129,11 @@ export class Assignments {
 
     customCourseSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
-            var result = (a['requestId']['courseId']['name'] < b['requestId']['courseId']['name']) ? -1 : (a['requestId']['courseId']['name'] > b['requestId']['courseId']['name']) ? 1 : 0;
+            if(a['requestId']['courseId']['name'] && b['requestId']['courseId']['name']) {
+                var result = (a['requestId']['courseId']['name'] < b['requestId']['courseId']['name']) ? -1 : (a['requestId']['courseId']['name'] > b['requestId']['courseId']['name']) ? 1 : 0;
+            } else {
+                var result = -1;
+            }
             return result * sortDirection;
         });
     }
