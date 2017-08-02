@@ -984,6 +984,7 @@ export class Assignments {
 	
 	showProfile(request, el){ 
         this.profileRequest = request;
+        this.showProfileId = request._id;
         // $(".hoverProfile").css("top", el.clientY - 175);
         // $(".hoverProfile").css("left", el.clientX - 300);
         $(".hoverProfile").css("display", "block");
