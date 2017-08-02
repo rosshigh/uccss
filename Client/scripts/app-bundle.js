@@ -27243,10 +27243,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.showProfile = function showProfile(request, el) {
             this.profileRequest = request;
-            this.showProfileId = request._id;
-            console.log(el.clientY);
-            console.log(el.clientX);
+            console.log(el.screenY);
+            console.log(el.screenX);
+            console.log(window.pageYOffset);
 
+            $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 300);
+            $(".hoverProfile").css("left", el.clientX - 500);
             $(".hoverProfile").css("display", "block");
         };
 
