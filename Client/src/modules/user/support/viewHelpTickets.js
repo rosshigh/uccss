@@ -20,6 +20,7 @@ export class ViewHelpTickets {
   showLockMessage = false; 
   responseMessage = "";
   isChecked = true;
+  nohelpTickets = true;
 
   spinnerHTML = "";
   filterValues = new Array();
@@ -46,6 +47,17 @@ export class ViewHelpTickets {
     this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
   };
 
+  canActivate(){
+    if(!this.userObj) {
+        this.userObj = this.config.user;
+        this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+        if(!this.userObj) {
+            this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+            this.router.navigate("home");
+        }
+    }
+  }   
+
   attached() {
     this.toolTips();
   }
@@ -69,6 +81,10 @@ export class ViewHelpTickets {
       this.systems.getSystemsArray(),
       this.config.getConfig()
     ]);
+
+    if(this.helpTickets.helpTicketsArray && this.helpTickets.helpTicketsArray.length > 0){
+      this.nohelpTickets = false;
+    }
 
     this.people = this.people.uccPeople;
 

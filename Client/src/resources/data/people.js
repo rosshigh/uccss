@@ -142,6 +142,12 @@ export class People {
       }
     }
 
+    setSelectedPerson(userObj){
+        if(userObj) {
+            this.selectedPerson = this.utils.copyObject(userObj);
+        }
+    }
+
     emptyPerson() {
         var obj  = new Object();
         obj.lastName = "";
@@ -191,32 +197,32 @@ export class People {
         }
     }
 
-   async savePerson(register) {
-       if (!this.selectedPerson._id) {
-           if(register) {
-               var url = this.PERSON_REGISTER;
-           } else {
-               var url = this.PEOPLE_SERVICE;
-           }
-           let response = await this.data.saveObject(this.selectedPerson, url, "post")
-               if (!response.error) {
-                   if(this.peopleArray){
-                       this.peopleArray.push(response);;
-                   }
-               } else {
-                    this.data.processError(response, "There was an error creating the account.");
-               }
-               return response;
-       } else {
-           let response = await this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put")
-               if (!response.error) {
-                   if(this.peopleArray){
-                       this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
-                   }
-               }
-               return response;
-       }
-   }
+    async savePerson(register) {
+        if (!this.selectedPerson._id) {
+            if(register) {
+                var url = this.PERSON_REGISTER;
+            } else {
+                var url = this.PEOPLE_SERVICE;
+            }
+            let response = await this.data.saveObject(this.selectedPerson, url, "post")
+                if (!response.error) {
+                    if(this.peopleArray){
+                        this.peopleArray.push(response);;
+                    }
+                } else {
+                        this.data.processError(response, "There was an error creating the account.");
+                }
+                return response;
+        } else {
+            let response = await this.data.saveObject(this.selectedPerson, this.PEOPLE_SERVICE, "put")
+                if (!response.error) {
+                    if(this.peopleArray){
+                        this.peopleArray[this.editIndex] = this.utils.copyObject(this.selectedPerson, this.peopleArray[this.editIndex]);
+                    }
+                }
+                return response;
+        }
+    }
 
     async deletePerson(){
         if(this.selectedPerson._id){
@@ -230,18 +236,18 @@ export class People {
         return null;
     }
 
-   isPersonDirty(originalObj){
-       if(this.selectedPerson){
-           if(originalObj){
-               var obj = originalObj;
-           } else if(this.selectedPerson._id){
-               var obj = this.selectedPersonFromId(this.selectedPerson._id)
-           } else {
-               var obj = this.emptyPerson();
-           }
-           return this.utils.objectsEqual(this.selectedPerson, obj);
-       }
-   }
+    isPersonDirty(originalObj){
+        if(this.selectedPerson){
+            if(originalObj){
+                var obj = originalObj;
+            } else if(this.selectedPerson._id){
+                var obj = this.selectedPersonFromId(this.selectedPerson._id)
+            } else {
+                var obj = this.emptyPerson();
+            }
+            return this.utils.objectsEqual(this.selectedPerson, obj);
+        }
+    }
 
     async uploadFile(files){
         let response = await this.data.uploadFiles(files,  this.PEOPLE_UPLOAD_SERVICE + "/" + this.selectedPerson._id);
@@ -267,6 +273,29 @@ export class People {
         } else {
             return {error: "no email"};
         }
+    }
+
+    async getEmailLog(options, refresh){
+        if(!this.selectedPerson._id){
+            return;
+        }
+
+        if (!this.emailArray || refresh) {
+            var url = this.PEOPLE_SERVICE + "/emailLog";
+            url += options ? options : "";
+            try {
+                let serverResponse = await this.data.get(url);
+                if (!serverResponse.error) {
+                    this.emailArray = serverResponse;
+                } else {
+                    this.data.processError(serverResponse);
+                  
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
     }
 
     updatePassword(obj){
@@ -457,6 +486,7 @@ export class People {
         obj.note = "";
         obj.dateCreated = new Date();
         obj.category = "";
+        obj.type = "g";
         return obj;
     }
 

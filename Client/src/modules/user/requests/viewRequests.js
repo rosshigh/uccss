@@ -18,6 +18,7 @@ export class ViewRequests {
   requestSelected = false;
   showLockMessage = false;
   showRequests = false;
+  noRequests = true;
   statusClass = ["", "unassigned", "assigned","","customer"];
 
   navControl = "requestsNavButtons";
@@ -41,6 +42,17 @@ export class ViewRequests {
 
     this.userObj = JSON.parse(sessionStorage.getItem('user'))
   };
+
+	canActivate(){
+		if(!this.userObj) {
+			this.userObj = this.config.user;
+			this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+			if(!this.userObj) {
+				this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+				this.router.navigate("home");
+			}
+    }
+  } 
 
   async activate() {
     $("#infoBox").fadeOut();
@@ -66,8 +78,11 @@ export class ViewRequests {
           this.sessions.selectSessionById(this.selectedSession);
           await this.requests.getClientRequestsArray('?filter=[and]sessionId|eq|' + this.selectedSession + ':personId|eq|' + this.userObj._id, true);
           if(this.requests.requestsArray && this.requests.requestsArray.length){
-              this.dataTable.updateArray(this.requests.requestsArray);
-          } 
+            this.dataTable.updateArray(this.requests.requestsArray);
+            this.noRequests = false;
+          } else {
+            this.noRequests = true;
+          }
       } 
   }
 
@@ -84,16 +99,17 @@ export class ViewRequests {
     this.showDetails = true;
     this.requests.setTheSelectedRequestDetail(product); 
     this.customerActionRequired = this.requests.selectedRequestDetail.requestStatus == this.config.CUSTOMER_ACTION_REQUEST_CODE;
-    this.customerMessage = this.requests.selectedRequestDetail.customerMessage;
     this.requests.selectRequstById(product.requestId);
+    this.customerMessage = this.requests.selectedRequest.customerMessage ? this.requests.selectedRequest.customerMessage : ""; 
     this.sessions.selectSessionById(this.requests.selectedRequest.sessionId);
     this.products.selectedProductFromId(this.requests.selectedRequestDetail.productId);
-    // this.setDates();
    
     if(this.requests.selectedRequestDetail.assignments.length){
       this.selectedAssignmentIndex = 0;
       this.systems.selectedSystemFromId(this.requests.selectedRequestDetail.assignments[this.selectedAssignmentIndex].systemId);
     }
+
+    this.selectedRowAss = $("#assignmentTable").closest('tr');
     
     if (this.selectedRow) this.selectedRow.children().removeClass('info');
     this.selectedRow = $(el.target).closest('tr');
@@ -111,7 +127,7 @@ export class ViewRequests {
       this.requestSelected = true;
       this.customerActionRequired = true;
       this.selectedDetailIndex = -1;
-      this.customerMessage = request.customerMessage;
+      this.customerMessage = request.customerMessage ? request.customerMessage : "";
 
       if (this.selectedRow) this.selectedRow.children().removeClass('info');
       this.selectedRow = $(el.target).closest('tr');
@@ -183,9 +199,16 @@ export class ViewRequests {
     this.requests.selectedRequest.requestDetailsToSave.forEach((item) => {
         this.requests.selectedRequest.requestDetails.push(item._id)
     });
+    var flushRequestArray = false;
+    if(this.requests.selectedRequest.requestDetails.length === 1) flushRequestArray = true;
     let serverResponse = await this.requests.saveRequest(this.config.SEND_EMAILS);
     if (!serverResponse.error) {
-      this.getRequests();
+      if(flushRequestArray){
+        this.requests.requestsArray = new Array();
+        this.dataTable.updateArray(this.requests.requestsArray);
+      } else {
+        this.getRequests();
+      }
       this.utils.showNotification("The request was deleted");
     }
     this._cleanUp();
@@ -196,9 +219,13 @@ export class ViewRequests {
     this.customeResponse = "";
   }
 
-  selectAssignment(assign, index){
+  selectAssignment(assign, index, el){
     this.selectedAssignmentIndex = index;
     this.systems.selectedSystemFromId(assign.systemId);
+
+    if (this.selectedRowAss) this.selectedRowAss.children().removeClass('info');
+    this.selectedRowAss = $(el.target).closest('tr');
+    this.selectedRowAss.children().addClass('info')
   }
   
   cancel(){

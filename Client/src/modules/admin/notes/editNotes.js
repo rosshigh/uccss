@@ -5,10 +5,11 @@ import {AppConfig} from '../../../config/appConfig';
 import {People} from '../../../resources/data/people';
 import {Utils} from '../../../resources/utils/utils';
 import {HelpTickets} from '../../../resources/data/helpTickets';
+import {ClientRequests} from '../../../resources/data/clientRequests';
 import Flatpickr from 'flatpickr';
 import moment from 'moment';
 
-@inject(Router, DataTable, AppConfig, People, Utils, HelpTickets)
+@inject(Router, DataTable, AppConfig, People, Utils, HelpTickets, ClientRequests)
 export class editNotes{
 	noteSelected = "No";
 	showCategoryForm = false;
@@ -31,7 +32,7 @@ export class editNotes{
 		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
 	];
 
-    constructor(router, dataTable, config, people, utils, helpTickets){
+    constructor(router, dataTable, config, people, utils, helpTickets, requests){
 		this.router = router;
 		this.dataTable = dataTable;
 		this.dataTable.initialize(this);
@@ -39,6 +40,7 @@ export class editNotes{
 		this.people = people;
 		this.utils = utils;
 		this.helpTickets = helpTickets;
+		this.requests = requests;
 
 		 this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
@@ -49,7 +51,7 @@ export class editNotes{
 
     async activate() {
 		 let responses = await Promise.all([
-			// this.people.getPeopleArray(),
+			this.helpTickets.getHelpTicketTypes('?order=category'),
 			this.people.getNotesArray('?filter=personId|eq|' + this.userObj._id + '&order=dateCreated', true),
 			this.config.getConfig()
 		 ]);
@@ -130,7 +132,7 @@ export class editNotes{
 	}
 
 	async saveCategory(){
-		this.people.selectedPersonFromId(this.userObj._id);
+		this.people.setSelectedPerson(this.userObj);
 		if(this.editCategoryFlag){
 			this.userObj.noteCategories[this.editCategoryIndex] =  this.categoryDescription;
 			this.people.selectedPerson.noteCategories[this.editCategoryIndex] =  this.categoryDescription;
@@ -158,14 +160,43 @@ export class editNotes{
 		this.noteSelected = "No";
 	}
 
-	async navigateToHelpTicket(note){
-		let response = await this.helpTickets.getHelpTicket(note.reference);
-		if(!response.error){
-			this.noteSelected = "helpTicket";
-		} else {
-			this.utils.showNotification("Help Ticket not found");
+	async navigateToDocument(note){
+		if(note.type === 'h'){
+			let response = await this.helpTickets.getHelpTicket(note.reference);
+			if(!response.error){
+				this.noteSelected = "helpTicket";
+			} else {
+				this.utils.showNotification("Help Ticket not found");
+			}
+		} else if(note.type === 'r'){
+			let response = await this.requests. getRequestDetail(note.reference);
+			if(!response.error){
+				this.noteSelected = "request";
+				if(this.requests.selectedRequestDetail.requestId.courseId === null) {
+					this.requests.selectedRequestDetail.requestId.courseId = {name: this.config.SANDBOX_NAME};
+				}
+				this.idsRequired = parseInt(this.requests.selectedRequestDetail.requestId.graduateIds) + parseInt(this.requests.selectedRequestDetail.requestId.undergradIds);
+				this.totalIdsAssigned = 0;
+				if(this.requests.selectedRequestDetail.assignments && this.requests.selectedRequestDetail.assignments.length > 0){
+					this.requests.selectedRequestDetail.assignments.forEach(item => {
+						this.totalIdsAssigned += item.idsAssigned;
+					})
+				}
+				this.idsRemaining = this.idsRequired - this.totalIdsAssigned;
+			} else {
+				this.utils.showNotification("Help Ticket not found");
+			}
 		}
 		
+		
+	}
+
+	notesCustomFilter(value, item, context){
+		return item.note.toUpperCase().indexOf(value.toUpperCase()) > -1;
+	}
+
+	categoryCustomFilter(value, item, context){
+		return item.category.toUpperCase().indexOf(value.toUpperCase()) > -1;
 	}
 
 	// openReminderForm(){

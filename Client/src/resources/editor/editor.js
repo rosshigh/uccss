@@ -9,21 +9,21 @@ export class Editor {
 
   @bindable({ defaultBindingMode: bindingMode.twoWay }) value;
 	@bindable height = 250;
+	@bindable editorid =  "summernote-" + this.guid();
 	@bindable toolbar = [
-		['style', ['style', 'bold', 'italic', 'underline','clear']],
+		['style', ['style', 'bold', 'clear']],
 		['color', ['color']],
 		['font', ['strikethrough', 'superscript', 'subscript']],
 		['layout', ['ul', 'ol', 'paragraph']],
-		['insert', [ 'link', 'table', 'hello']],
+		['insert', ['picture', 'link', 'table', 'hello']],
 		['misc', ['undo', 'redo', 'fullscreen']]
 	];
 
-	editorId = null;
 	editor = null;
 
 	constructor(element, observerLocator) {
 		this.element = element;
-		this.editorId = "summernote-" + this.guid();
+		// this.editorId = "summernote-" + this.guid();
 		this.subscriptions = [
 			observerLocator
 				.getObserver(this, 'value')
@@ -37,14 +37,15 @@ export class Editor {
 
 	attached() {
     var that = this;
-		this.editor = $(`#${this.editorId}`);
+		this.editor = $(`#${this.editorid}`);
 		this.editor.data('view-model', this);
 		this.editor.summernote({
 			height: this.height,
 			toolbar: this.toolbar,
       callbacks: {
         onChange: function(contents) {
-          that.value = contents;
+					that.value = contents;
+					$("#" +  this.editorid).summernote('editor.saveRange');
         }
       }
 		});

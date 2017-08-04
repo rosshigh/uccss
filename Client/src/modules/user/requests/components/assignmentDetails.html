@@ -1,8 +1,9 @@
 <template>
     <div show.bind="requests.selectedRequestDetail.assignments.length > 0">
+      <h4 class="topMargin"><strong>Assignments</strong></h4>
       <div show.bind="requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE" class="panel panel-primary topMargin">
         <div class="panel-body">  
-
+<!--
           <table class="table table-striped table-hover">
             <thead>
               <tr>
@@ -13,36 +14,60 @@
               </tr>
             </thead>
             <tbody>
-              <tr repeat.for="assign of requests.selectedRequestDetail.assignments" click.trigger="selectAssignment(assign, $index)">
-                <td>${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
-                <td>${assign.client}</td>
-                <td>${assign.studentUserIds}</td>
-                <td>${assign.studentPassword}</td>
+              <tr id="assignmentTable" class="${$first ? 'first' : ''" repeat.for="assign of requests.selectedRequestDetail.assignments"  click.trigger="selectAssignment(assign, $index, $event)">
+                <td class="${$first ? 'info' : ''}">${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</td>
+                <td class="${$first ? 'info' : ''}">${assign.client}</td>
+                <td class="${$first ? 'info' : ''}">${assign.studentUserIds}</td>
+                <td class="${$first ? 'info' : ''}">${assign.studentPassword}</td>
               </tr>
             </tbody>
           </table>
-         
-          <h4 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="topMargin"><strong>Faculty IDs</strong></h4>
-          <div class="form-group">
-            <h5 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="panel-title">Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h3>
-          </div>
-          <div class="form-group">
-            <h5 show.bind="requests.selectedRequest.courseId != config.SANDBOX_ID" class="panel-title">Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>
-          </div>
-       
-          <h4 class="bigTopMargin"><strong>System Details</strong></h4>
-          <div class="form-group">
-            <h5 class="panel-title">SID: ${systems.selectedSystem.sid}</h3>
-          </div>
-          <div class="form-group">
-            <h5 class="panel-title">Server: ${systems.selectedSystem.server}</h3>
-          </div>
-          <div class="form-group">
-            <h5 class="panel-title">System Number: ${systems.selectedSystem.instance}</h3>
-          </div>
-          <div class="form-group">
-            <h5 class="panel-title">ITS: ${systems.selectedSystem.its}</h3>
-          </div>
+-->
+          <ul>
+						<li class="list-group-item" repeat.for="assign of requests.selectedRequestDetail.assignments">
+             <compose if.bind="systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type" view="./erp.html"></compose>
+             <compose if.bind="systems.selectedSystem.type === 'HANA'" view="./hana.html"></compose>
+              <!--
+							<span class="col-lg-4">
+                <h5 class="leftMargin">System ${assign.systemId | lookupValue:systems.systemsArray:"_id":"sid"}</h5>
+                <h5 class="leftMargin">Client: ${assign.client} </h5>
+                <h5 class="leftMargin">Server: ${systems.selectedSystem.server} </h5>
+                <h5 class="leftMargin">System Number: ${systems.selectedSystem.instance} </h5>
+                <h5 class="leftMargin">ITS: ${systems.selectedSystem.its} </h5>
+              </span>
+
+              <span class="col-lg-6">
+                <h5>Student IDs: ${assign.studentUserIds}</h5>
+                <h5>Student Password: ${assign.studentPassword}</h5>
+                <span show.bind="requests.selectedRequest.courseId !== null">
+                  <h5>Faculty IDs: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyUserIds}</h5>
+                  <h5>Faculty Password: ${requests.selectedRequestDetail.assignments[selectedAssignmentIndex].facultyPassword}</h5>
+                </span>
+              </span>
+              -->
+						</li>
+          </ul>
+<!--                   
+          <div class="row">
+            <div class="col-lg-5">
+              <h4 class="topMargin"><strong>System Details</strong></h4>
+              <div class="form-group">
+                <h5 class="panel-title">SID: ${systems.selectedSystem.sid}</h3>
+              </div>
+              <div class="form-group">
+                <h5 class="panel-title">Server: ${systems.selectedSystem.server}</h3>
+              </div>
+              <div class="form-group">
+                <h5 class="panel-title">System Number: ${systems.selectedSystem.instance}</h3>
+              </div>
+              <div class="form-group">
+                <h5 class="panel-title">ITS: ${systems.selectedSystem.its}</h3>
+              </div>
+            </div>
+                  </div>
+-->
+
+    
           <label show.bind="products.selectedProduct.documents && products.selectedProduct.documents.length > 0" class="topMargin">Helpful Documents</label>
           <div class="list-group">
             <a repeat.for="document of products.selectedProduct.documents" href="${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}"  target="_blank">${document.fileName}</a>

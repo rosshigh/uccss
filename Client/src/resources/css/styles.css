@@ -1,5 +1,9 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+.bold {
+    font-weight: bold;
+}
+
 .banner {
     height: 50px;
     width: 100%;
@@ -145,14 +149,8 @@
     background-color: white;
     padding: 10px;
      right:0;
-    top:0;
+    bottom:0;
 }
-
-  .sticky {
-     position: fixed;
-     top: 0;
-     right: 0;
-  }
 
 .overFlow {
     overflow-y:scroll;

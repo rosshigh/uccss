@@ -15,6 +15,7 @@ var express = require('express'),
     Promise = require('bluebird'),
     config = require('../../config/config'),
     Event = mongoose.model('Event'),
+    EmailLog = mongoose.model('EmailLog'),
     multer = require('multer'),
     mkdirp = require('mkdirp'),
     DuplicateRecordError = require(path.join(__dirname, "../../config", "errors", "DuplicateRecordError.js"));
@@ -97,7 +98,21 @@ module.exports = function (app, config) {
           }
         }
       });
-  })
+  });
+
+  router.get('/api/people/emailLog', requireAuth,  function(req, res, next){
+    logger.log('Get people email log','verbose');
+console.log(req.query)    
+    var query = buildQuery(req.query, EmailLog.find())
+    query
+      .exec( function(err, object){
+        if (err) { 
+          res.status(500).json(err);
+        } else {
+          res.status(200).json(object);
+        }
+      }); 
+  });
 
   router.get('/api/people/:id', requireAuth, function(req, res, next){
     logger.log('Get person [%s]', req.params.id,'verbose');
@@ -181,7 +196,7 @@ module.exports = function (app, config) {
     });
   });
 
-   router.post('/api/people/facDev/activate',  function(req, res, next){
+  router.post('/api/people/facDev/activate',  function(req, res, next){
              
       var mailObj = {
         email: req.body.email,
@@ -247,14 +262,19 @@ module.exports = function (app, config) {
         };
   
         genericEmail(obj)
-          // .then(result => {
-              person.audit.push(req.body.audit);
-              person.save();
-              res.status(200).json({message: "Email Sent"});
-          // })
-          // .catch(error => {
-          //     return next(error);
-          // });
+
+        var LogEntry = new EmailLog({
+          personId: req.body.id,
+          email: req.body.email,
+          body: req.body.message,
+          from: req.body.from,
+          topic: 'g',
+          subject: req.body.subject
+        });
+
+        LogEntry.save();
+         
+        res.status(200).json({message: "Email Sent"});
         
     })
     .catch(error => {
@@ -540,4 +560,5 @@ module.exports = function (app, config) {
           }        
       });
   });
+
 };

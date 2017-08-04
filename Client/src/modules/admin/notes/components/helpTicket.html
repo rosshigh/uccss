@@ -14,47 +14,83 @@
     <div class="topMargin">
       <!-- Enter Response -->
       <div class="row">
-        <div class="list-group-item leftMargin rightMargin">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <h3 class="col-md-offset-1">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate
-                    | dateFormat:'h:mm A'}</h3>
+          <div class="panel panel-default  leftMargin rightMargin">        
+            <div class="panel-body">
+              <div class="row">
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Customer: ${helpTickets.selectedHelpTicket.personId.fullName}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Institution: ${helpTickets.selectedHelpTicket.institutionId.name}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Last modified: ${helpTickets.selectedHelpTicket.modifiedDate | dateFormat:config.DATE_FORMAT_TABLE:true}</h5>
+                  </div>
+                </div>
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Created: ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD'} ${helpTickets.selectedHelpTicket.createdDate | dateFormat:'h:mm A'}</h5>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-5">
-                <div class="form-group col-md-10">
-                  <h3>Type: ${helpTickets.selectedHelpTicket.helpTicketType | lookupValue:config.HELP_TICKET_TYPES:"code":"description}</h3>
+              <div class="row">
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h5>
+                  </div>
+                </div>
+                 <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Keywords: ${helpTickets.selectedHelpTicket.keyWords}</h5>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <h5 class="col-md-offset-1">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId.fullName}</h5>
+                  </div>
                 </div>
               </div>
+              <div class="row">
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class=" col-md-offset-1">Type:</label>
+                      <select value.bind="helpTickets.selectedHelpTicket.helpTicketType"  class="form-control col-md-offset-1" id="helpTicketType">
+                          <option repeat.for="type of helpTickets.helpTicketTypesArray | helpTicketSubtypes" model.bind="type.type">${type.description}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Status</label>
+                      <select id="helpTicketStatus" value.bind="helpTickets.selectedHelpTicket.helpTicketStatus" class="form-control col-md-offset-1">
+                        <option repeat.for="status of config.HELP_TICKET_STATUSES" model.bind="status.code">${status.description}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Priority</label>
+                      <select id="priority" value.bind="helpTickets.selectedHelpTicket.priority" class="form-control col-md-offset-1">
+                        <option repeat.for="priority of config.HELP_TICKET_PRIORITIES" model.bind="$index">${priority.priority}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <div class="input-group col-lg-11">
+                      <label class="col-md-offset-1">Keywords</label>
+                      <input type="text" value.bind="helpTickets.selectedHelpTicket.keyWords" class="form-control col-md-offset-1">
+                    </div>
+                  </div>
+                </div>
             </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <h3 class="col-md-offset-1">Session: ${helpTickets.selectedHelpTicket.sessionId | session:sessions.sessionsArray}</h3>
-                </div>
-              </div>
-              <div class="col-md-5">
-                <div class="form-group col-md-10">
-                  <h3>Status: ${helpTickets.selectedHelpTicket.helpTicketStatus | lookupValue:config.HELP_TICKET_STATUSES:"code":"description"}</h3>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="col-md-offset-1">Owner: ${helpTickets.selectedHelpTicket.owner[0].personId |  lookupValue:people.peopleArray:"_id":'fullName'}</label>
-                </div>
-              </div>
-              <div class="col-md-5">
-                <div class="form-group col-md-10">
-                  <label>Keywords: ${helpTickets.selectedHelpTicket.keyWords}</label>
-                </div>
-              </div>
-            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      
     <compose view="../../../../resources/htTimeline/timeline.html"></compose>
 </div>
 </template>

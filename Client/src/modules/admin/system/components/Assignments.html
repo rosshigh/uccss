@@ -16,7 +16,7 @@
           </div>
           <div class="form-group ">
             <label for="editFirstUsableID " class="control-label ">First usable ID</label>
-            <input value.bind="products.selectedProduct.firstAllowableId " id="editFirstUsableID " class="form-control " placeholder="First Usable ID " type="number " />
+            <input value.bind="products.selectedProduct.firstAllowableId " id="editFirstUsableID " class="form-control " placeholder="First Usable ID " type="number" />
           </div>
           <div class="form=group">
             <h4>Systems assigned to this product: ${products.selectedProduct.systems | systemList}</h4>
@@ -38,13 +38,13 @@
         <label class="control-label hideOnPhone">Clients</label>
           <div class="checkbox">
             <label class="pull-left">
-              <input  id="clientRelevant" checked.bind="products.selectedProduct.clientRelevant" type="checkbox"> Required
+              <input  id="clientRelevant" checked.bind="products.selectedProduct.clientRelevant" type="checkbox"> Not client relevant
             </label>
           </div>
         </div>
         <div class="form-group ">
             <label for="editLastUsableID " class="control-label ">Last usable ID</label>
-            <input value.bind="products.selectedProduct.lastAllowableId " id="editLastUsableID " class="form-control " placeholder="Last Usable ID " type="number " />
+            <input value.bind="products.selectedProduct.lastAllowableId " id="editLastUsableID " class="form-control " placeholder="Last Usable ID " type="number" />
         </div>
       </div>
     </div>

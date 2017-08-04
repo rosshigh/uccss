@@ -1,5 +1,12 @@
 <template>
-
+  <style>
+    .warning {
+      background-color: #fcf8e3;
+    }
+    .assign{
+      background-color: #d9edf7;
+    }
+  </style>
   <div class="container">
     <div class='row'>
       <div show.bind="dataTable.displayArray.length > 0" class='bottomMargin'>
@@ -44,7 +51,7 @@
                 </td>
                 <td>
                   <ul>
-                    <li class="${detail.requestStatus | requestStatusClass:statusClass:request:config.CUSTOMER_ACTION_REQUEST_CODE} list-group-item" click.delegate="edit(detail, $event, $index)" repeat.for="detail of request.requestDetails" >
+                    <li class="${detail.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1} list-group-item" click.delegate="edit(detail, $event, $index)" repeat.for="detail of request.requestDetails" >
                       <h5>${detail.productId | lookupValue:products.productsArray:"_id":"name"}</h5>
                       Status: ${detail.requestStatus | lookupValue:config.REQUEST_STATUS:"code":"description"}
                       <h7 class="leftMargin">Required: ${detail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h7>
@@ -56,9 +63,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div show.bind="dataTable.displayArray.length === 0" class="bottomMargin">
-        <h4>You have no existing requests</h4>
       </div>
     </div>
   </div>

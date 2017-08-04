@@ -11,6 +11,9 @@
         </div>
 
         <div show.bind="!requestSelected" class="col-lg-12">
+            <div show.bind="noRequests" class="bottomMargin leftMargin">
+                <h4>You have no existing requests for this session</h4>
+            </div>
             <compose view="./components/viewRequestsTable.html"></compose>
         </div> 
         <div show.bind="requestSelected" class="col-lg-12">

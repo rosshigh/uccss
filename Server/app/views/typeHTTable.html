@@ -1,0 +1,33 @@
+<template>
+    <div class="col-lg-10 col-lg-offset-1">
+        <div class='row'>
+            <compose view="../../../resources/elements/table-navigation-bar.html"></compose>
+            <div id="no-more-tables">
+                <table class="table table-striped table-hover cf">
+                    <thead class="cf">
+                        <tr>
+                            <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'description'})">Type  </span><span><i class="fa fa-sort"></i></span></th>
+                            <th><span  class="sortable" click.trigger="dataTable.sortArray($event, {propertyName: 'count'})">Count  </span><span><i class="fa fa-sort"></i></span></th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <input value.bind="helpTicketTypeFilterValue" input.delegate="dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customHelpTicketTypeFilter, collectionProperty: 'helpTicketType', displayProperty: 'helpTicketType',  compare:'custom'} )"  class="form-control" />
+                            </th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Totals:</th>
+                            <th>${total}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="stat of dataTable.displayArray">
+                            <td data-title="Type">${stat.description}</td>
+                            <td data-title="Total">${stat.count}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>

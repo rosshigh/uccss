@@ -17,7 +17,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import fuelux from 'fuelux';
 import moment from 'moment';
 
-@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator, SessionObj)
+@inject(Router, AppConfig, Validation, People, CommonDialogs, DataTable, Utils, Sessions, Products, ClientRequests, SiteInfo, EventAggregator)
 export class ViewHelpTickets {
   sessionSelected = false;
   courseSelected = false;
@@ -51,7 +51,7 @@ export class ViewHelpTickets {
     }
   };
 
-  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea, sessionObj) {
+  constructor(router, config, validation, people, dialog, datatable, utils, sessions,  products, requests, siteInfo, ea) {
     this.router = router;
     this.config = config;
     this.validation = validation;
@@ -66,10 +66,8 @@ export class ViewHelpTickets {
     this.siteInfo = siteInfo;
     this.dialog = dialog;
     this.ea = ea;
-    this.sessionObj = sessionObj;
 
      this.userObj = JSON.parse(sessionStorage.getItem('user'));
-     if(!this.userObj) this.userObj = this.sessionObj.user;
 
   };
 
@@ -98,8 +96,11 @@ export class ViewHelpTickets {
 
   canActivate(){
     if(!this.userObj) {
-      this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
-      this.router.navigate("home");
+      this.userObj = this.config.user;
+      if(!this.userObj) {
+        this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+        this.router.navigate("home");
+      }
     }
   }
 
@@ -212,14 +213,14 @@ export class ViewHelpTickets {
       $("#input-startDate").val("")
        $("#input-endDate").val("")
     }  
-    this.minStartDate = this.sessions.selectedSession.startDate;
+    this.minStartDate = moment(this.sessions.selectedSession.startDate).add(7, 'hours').format('YYYY-MM-DD');
     this.maxStartDate = this.sessions.selectedSession.endDate;
     this.minEndDate = this.sessions.selectedSession.startDate;
     this.maxEndDate = this.sessions.selectedSession.endDate;
 
-    var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY,'days');
+    var nowPlusLeeway = moment(new Date()).add(this.config.REQUEST_LEEWAY + 1,'days');
     this.minRequiredDate = moment.max(nowPlusLeeway, moment(this.sessions.selectedSession.startDate));
-    this.minRequiredDate = moment(this.minRequiredDate._d).format('YYYY-MM-DD');
+    this.minRequiredDate = moment(this.minRequiredDate).add(7, 'hours').format('YYYY-MM-DD');
     this.maxRequiredDate = this.sessions.selectedSession.endDate;
   }
 

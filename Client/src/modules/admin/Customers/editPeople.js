@@ -15,11 +15,12 @@ export class EditPeople {
     showPassword = false;
     customerEmail = false;
     bulkEmailSelected = false;
+    youSelectedAnEmail = false;
     emailSubject = "";
     emailMessage = "";
     spinnerHTML = "";
 
-    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"}];
+    tabs = [{ id: 'Address' }, { id: 'Roles' }, { id: 'Courses' }, { id: 'Password' }, { id: 'Audit' },{id: "Email"},{id: "Log"}];
     tabPath = './';
 
     toolbar = [
@@ -90,12 +91,23 @@ export class EditPeople {
         this.newPerson = false;
         $("#editFirstName").focus();
 
+        this.people.getEmailLog('?filter=personId|eq|' + this.people.selectedPerson._id + '&order=date', true);
+
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
         this.selectedRow.children().addClass('info')
         this.personSelected = true;
         
         this.setFirstTab();
+    }
+
+    selectEmail(email){
+        this.selectedEmail = email;
+        this.youSelectedAnEmail = true;
+    }
+
+    backEmail(){
+        this.youSelectedAnEmail = false;
     }
 
     async new() {
@@ -145,7 +157,7 @@ export class EditPeople {
             if(this.people.selectedPerson._id){
                 this.buildAudit();
             } else {
-                this.people.selectedPerson.institutionId._id = this.institutionId;
+                this.people.selectedPerson.institutionId = this.institutionId;
             }
             let serverResponse = await this.people.savePerson();
             if (!serverResponse.error) {
@@ -325,7 +337,7 @@ export class EditPeople {
 
     sendAnEmail(id){
         if(id){
-            let email = {emailBody: "", emailSubject: "", emailId: id};
+            let email = {emailBody: "", emailSubject: "", emailId: id, from: this.userObj._id};
             return this.dialog.showEmail(
                     "Enter Email",
                     email,
@@ -344,16 +356,12 @@ export class EditPeople {
         if(!this.people.selectedPerson || this.people.selectedPerson._id !== email.email.emailId) this.people.selectedPersonFromId(email.email.emailId);
         if(email){
             var message = {
+                from: email.email.from,
                 id: email.email.emailId,
                 message : email.email.emailBody,
                 email: this.people.selectedPerson.email,
                 subject: email.email.emailSubject,
-                audit: {
-                    property: 'Send Message',
-                    eventDate: new Date(),
-                    newValue: email.email.emailBody,
-                    personId: this.userObj._id
-                }
+
             };     
             let serverResponse = await this.people.sendCustomerMessage(message);
             if (!serverResponse.error) {
@@ -365,7 +373,8 @@ export class EditPeople {
     async sendCustomerEmail(){
         if(this.emailMessage){
             var message = {
-                id: this.people.selectedPerson._id,
+                id: this.people.selectedPerson._id, 
+                from:  this.userObj._id,
                 message : this.emailMessage,
                 email: this.people.selectedPerson.email,
                 subject: this.emailSubject,
@@ -405,11 +414,10 @@ export class EditPeople {
     setFirstTab(){
         $("#peopleFormListGroup.list-group").children().removeClass('active');
         let target = $("#peopleFormListGroup.list-group").children()[0];
-        $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
-        $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
-        // $(target).addClass('active');
-        $(".in").removeClass('active').removeClass('in');
-        $("#AddressTab").addClass('in').addClass('active');
+        // $(el.target).parent().css("background-color",this.config.BUTTONS_BACKGROUND);
+        // $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
+        // $(".in").removeClass('active').removeClass('in');
+        // $("#AddressTab").addClass('in').addClass('active');
     }
 
     async changeTab(el, index){
@@ -420,7 +428,7 @@ export class EditPeople {
         $(el.target).parent().css("color",this.config.ACTIVE_SUBMENU_COLOR);
         $(".in").removeClass('active').removeClass('in');
         $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-         switch (target.attr('id')) {
+         switch (el.target.id) {
             case 'Courses':
                 await this.refreshCourses();
                 break;

@@ -303,24 +303,24 @@ export class ViewHelpTickets {
       if (!response.error) {
         if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
           var email = new Object();
-          var lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length -1 ];
-          if(this.sendEmail){
-              email.reason = 2;
-              email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
-              email.email = this.helpTickets.selectedHelpTicket.personId.email; 
-              email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-              email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-              if(lastChange.property == 'helpTicketStatus') {
-                email.reason = lastChange.newValue;
-                email.message =  "The status was changed to " + this.getStatusDescription(lastChange.newValue);
-              } else if (lastChange.property == 'priority'){
-                email.reason = 2;
-                email.message =  "The priority was changed to " + this.config.HELP_TICKET_PRIORITIES[lastChange.newValue].priority;
-              } else {
-                var email = new Object();
-              }
+          // var lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length -1 ];
+          // if(this.sendEmail){
+          //     email.reason = 2;
+          //     email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
+          //     email.email = this.helpTickets.selectedHelpTicket.personId.email; 
+          //     email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
+          //     email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
+          //     if(lastChange.property == 'helpTicketStatus') {
+          //       email.reason = lastChange.newValue;
+          //       email.message =  "The status was changed to " + this.getStatusDescription(lastChange.newValue);
+          //     } else if (lastChange.property == 'priority'){
+          //       email.reason = 2;
+          //       email.message =  "The priority was changed to " + this.config.HELP_TICKET_PRIORITIES[lastChange.newValue].priority;
+          //     } else {
+          //       var email = new Object();
+          //     }
            
-          }
+          // }
           let serverResponse = await this.helpTickets.saveHelpTicket(email);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -493,11 +493,12 @@ export class ViewHelpTickets {
 
   async saveNote(note){
         this.people.selectNote();
+        this.people.selectedNote.type = "h";
         this.people.selectedNote.personId = this.userObj._id;
         this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
         this.people.selectedNote.note = note.note.noteBody;
         this.people.selectedNote.reference = this.helpTickets.selectedHelpTicket._id;
-        this.people.selectedNote.helpTicketNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
+        this.people.selectedNote.referenceNo = this.helpTickets.selectedHelpTicket.helpTicketNo;
         let response = await this.people.saveNote();
             if(!response.error){
                 this.utils.showNotification('The note was saved');

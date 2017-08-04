@@ -17,7 +17,8 @@ export class Assignments {
 	requestSelected = 'table';
 	title="Tech Staff Client Assignments";
 	spinnerHTML = "";
-	isCheckedAssigned = true;
+    isCheckedAssigned = true;
+    noRequests = true;
 
     constructor( config, validation, dialog, datatable, utils, sessions, products, systems, people, requests) {
         this.config = config;
@@ -44,9 +45,9 @@ export class Assignments {
     async activate() { 
         let responses = await Promise.all([
             this.sessions.getSessionsArray('?filter=[in]sessionStatus[list]Active:Requests&order=startDate', true),
-            this.products.getProductsArray('?filter=active|eq|true&order=name'),
-            this.systems.getSystemsArray(),
-            this.config.getConfig()
+            this.products.getProductsArray('?filter=active|eq|true&order=name', true),
+            this.systems.getSystemsArray('', true),
+            this.config.getConfig(true)
         ]);
          let uccRoles = "";
 		this.config.ROLES.forEach(item => {
@@ -66,12 +67,14 @@ export class Assignments {
             this.sessions.selectSessionById(this.selectedSession);
             await this.clientRequests.getClientRequestsDetailsArray('?filter=sessionId|eq|' + this.selectedSession, true);
             if(this.clientRequests.requestsDetailsArray && this.clientRequests.requestsDetailsArray.length){
+                this.noRequests = false;
                 this.clientRequests.requestsDetailsArray.forEach(item => {
                     if(item.requestId && item.requestId.courseId === null) item.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
                 })
                 this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
                 this.filterInAssigned();
             } else {
+                this.noRequests = true;
                 this.displayArray = new Array();
             }
         } else {
@@ -214,12 +217,43 @@ export class Assignments {
         this.provisionalAssignment = this.selectedRequestDetail.requestStatus == this.config.PROVISIONAL_REQUEST_CODE;
         this.oldRequest = this.utils.copyObject(this.selectedRequestDetail);
         
-        if(!this.products.selectedProduct.systems[0] ){
+        if(!this.products.selectedProduct.systems[0]){
              this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+        } else {
+            let systemConfigured = false;
+            this.session = this.sessions.selectedSession.session.toUpperCase();
+            this.productSystems = new Array();
+            this.products.selectedProduct.systems.forEach(item => {
+                this.systems.selectedSystemFromId(item.systemId);
+                if(this.systems.selectedSystem.sessions.indexOf(this.session) > -1) {
+                    this.systemConfigured = true;
+                    this.productSystems.push(this.systems.selectedSystem);
+                }
+            });
+            this.productSystems = this.productSystems.sort((a, b) => {
+                return (a['sid'] < b['sid']) ? -1 : (a['sid'] > b['sid']) ? 1 : 0;
+            });
+             if(!this.systemConfigured){
+                this.utils.showNotification("You need to assign a system to this product before you can assign this request");
+             } 
+        }
+
+         //If the product has a system configured, select the first system on the list
+       
+        if(this.productSystems.length > 0) {
+			this.systems.selectedSystemFromId(this.productSystems[0]._id);
+			//Select the system in the interface
+            this.selectedSystemId = this.systems.selectedSystem._id;
+            this.clientsConfigured = false;
+            for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
+                if(this.systems.selectedSystem.clients[i].productId === this.products.selectedProduct._id){
+                    this.clientsConfigured = true;
+                    break;
+                }
+            }    
         }
         
         this.clientRequired();
-        // this.selectedSystem = this.products.selectedProduct.systems[0].systemId && this.products.selectedProduct.systems.length > 0 ? this.products.selectedProduct.systems[0].systemId : undefined;
 
         if (this.selectedRow) this.selectedRow.children().removeClass('info');
         this.selectedRow = $(el.target).closest('tr');
@@ -281,13 +315,6 @@ export class Assignments {
         }
 
         this.assignmentDetailIndex = -1;
-
-        //If the product has a system configured, select the first system on the list
-        if(this.products.selectedProduct.systems[0]) {
-			this.systems.selectedSystemFromId(this.products.selectedProduct.systems[0].systemId);
-			//Select the system in the interface
-			this.selectedSystemId = this.systems.selectedSystem._id;
-        }
         
         this.calcLastID();
 	}
@@ -906,30 +933,44 @@ export class Assignments {
         if(!this.products.selectedProduct.clientRelevant){
             this.calcAssignment();
         }
+        this.clientsConfigured = false;
+        for(let i = 0; i < this.systems.selectedSystem.clients.length; i++){
+            if(this.systems.selectedSystem.clients[i].productId === this.products.selectedProduct._id){
+                this.clientsConfigured = true;
+                break;
+            }
+        }  
     }
 
-	customerActionDialog(){
+	async customerActionDialog(){ 
          if(this.profileRequest){
+           await this.clientRequests.getRequest(this.profileRequest.requestId._id);
             this.model = 'header';
-            this.selectedRequestNo = this.profileRequest.requestId.clientRequestNo;
-            this.requestId = this.profileRequest.requestId._id;
-            this.course = this.profileRequest.requestId.courseId.name;
-            this.productName = this.profileRequest.productId.name;
-            this.requiredDate = this.profileRequest.requiredDate;
-            this.email = this.profileRequest.requestId.personId.email;
             this.hideProfile();
          } else {
-            this.model = 'detail';
-            this.requestId =  this.selectedRequestDetail._id;
-            this.productName = this.selectedRequestDetail.productId.name;
-            this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
-            this.course = this.selectedRequestDetail.requestId.courseId.name;
-            this.requiredDate = this.selectedRequestDetail.requiredDate;
-            this.email = this.selectedRequestDetail.requestId.personId.email;
+            await this.clientRequests.getRequest(this.selectedRequestDetail.requestId._id);
+            // this.model = 'detail';
+            // this.requestId =  this.selectedRequestDetail.requestId._id;
+            // // this.productName = this.selectedRequestDetail.productId.name;
+            // this.selectedRequestNo = this.selectedRequestDetail.requestId.clientRequestNo;
+            // this.course = this.selectedRequestDetail.requestId.courseId.name;
+            // this.email = this.selectedRequestDetail.requestId.personId.email;
+            // this.personId = this.selectedRequestDetail.requestId.personId._id;
+            // this.products = this.selectedRequestDetail;
+            // this.products.requestId = this.products.requestId._id;
+            // this.productsSelected = new Array();
          }  
+        
+        this.selectedRequestNo = this.clientRequests.selectedRequest.clientRequestNo;
+        this.requestId = this.clientRequests.selectedRequest._id;
+        this.course = this.clientRequests.selectedRequest.courseId !== null ? this.clientRequests.selectedRequest.courseId.name : this.config.SANDBOX_NAME;
+        this.email = this.clientRequests.selectedRequest.personId.email;
+        this.personId = this.clientRequests.selectedRequest.personId._id;
+        this.products = this.clientRequests.selectedRequest.requestDetails;
+        this.productsSelected = new Array();
             
         let subject = "Question about product request " +  this.selectedRequestNo;
-        let email = {emailBody: "", emailSubject: subject, emailId: this.email};
+        let email = {emailBody: "", emailSubject: subject, emailId: this.email, products: this.products, productsSelected: this.productsSelected};
         return this.dialog.showEmail(
                 "Enter Email",
                 email,
@@ -945,11 +986,20 @@ export class Assignments {
 
     async sendTheEmail(email){
         if(email){
-            if(this.model === 'header'){
-                this.clientRequests.updateDetailStatuses(this.selectedRequestNo, this.config.CUSTOMER_ACTION_REQUEST_CODE);
-            } else {
-                this.clientRequests.updateDetailStatus( this.requestId,  this.config.CUSTOMER_ACTION_REQUEST_CODE);
-            }
+
+            this.clientRequests.selectedRequest.requestStatus = this.config.CUSTOMER_ACTION_REQUEST_CODE;
+            var updateIds = new Array();
+            this.productsSelected.forEach(item => {
+                this.clientRequests.selectedRequest.requestDetails[item.index].audit.push({
+                        property: 'Customer Action',
+                        newValue: this.config.CUSTOMER_ACTION_REQUEST_CODE,
+                        oldValue: item.requestStatus,
+                        eventDate: new  Date(),
+                        personId: this.userObj._id
+                    });
+                    this.clientRequests.selectedRequest.requestDetails[item.index].requestStatus = this.config.CUSTOMER_ACTION_REQUEST_CODE;
+                    updateIds.push(item._id);
+            })
             
             this.filterInAssigned();
              var date = new Date(this.requiredDate);
@@ -958,37 +1008,44 @@ export class Assignments {
             var year = date.getFullYear(); 
             this.message = {
                 reason: 3,
+                personId: this.personId,
+                from: this.userObj._id,
                 id: this.requestId,
                 customerMessage : email.email.emailBody, 
                 email: email.email.emailId,
                 subject: email.email.emailSubject,
                 clientRequestNo: this.selectedRequestNo,
-                product: [{name: this.productName, requiredDate: month + "/" + day + "/" + year}],
+                // product: [{name: this.productName, requiredDate: month + "/" + day + "/" + year}],
                 session: this.sessions.selectedSession.session + ' ' + this.sessions.selectedSession.year,
                 course: this.course,
                 requestStatus: this.config.CUSTOMER_ACTION_REQUEST_CODE,
                 model: this.model,
-                audit: {
-                    property: 'Send Message',
-                    eventDate: new Date(),
-                    newValue: email.email.emailBody,
-                    personId: this.userObj._id
-                }
             };     
-            let serverResponse = await this.clientRequests.sendCustomerMessage(this.message);
-            if (!serverResponse.error) {
-                this.utils.showNotification("The message was sent");
+
+            this.clientRequests.selectedRequest.audit.push({
+                property: 'Send Message',
+                eventDate: new Date(),
+                newValue: email.email.emailBody,
+                personId: this.userObj._id
+            });
+            this.clientRequests.selectedRequest.customerMessage = email.email.emailBody;
+            let response = await this.clientRequests.saveRequestWithId();
+            if(!response.error){
+                this.clientRequests.updateStatuses(updateIds, this.config.CUSTOMER_ACTION_REQUEST_CODE);
+                this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+                let serverResponse = await this.clientRequests.sendCustomerMessage(this.message);
+                if (!serverResponse.error) {
+                    this.utils.showNotification("The message was sent");
+                }
+                this.filterInAssigned();
             }
+
         } 
     }
 	
 	showProfile(request, el){ 
         this.profileRequest = request;
-        console.log(el.screenY);
-        console.log(el.screenX);
-        console.log(window.pageYOffset)
-
-        $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 300);
+        $(".hoverProfile").css("top", window.pageYOffset + el.clientY - 175);
         $(".hoverProfile").css("left", el.clientX - 500);
         $(".hoverProfile").css("display", "block");
     }
@@ -1055,7 +1112,7 @@ export class Assignments {
         this.facultyDetails = !this.facultyDetails;
     }
 	
-	changeUnassignedOnlychangeUnassignedOnly(){
+	changeUnassignedOnly(){
         localStorage.setItem('unassignedOnly', this.unassignedOnly);
     }
 		
@@ -1084,6 +1141,35 @@ export class Assignments {
         this.requestSelected = 'table';
         this.customerMessage = false;
     }
+
+    flag(){
+     var note = {noteBody: "", noteCategories: this.userObj.noteCategories, selectedCategory: 0};
+         return this.dialog.showNote(
+                "Save Changes",
+                note,
+                ['Submit', 'Cancel']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.saveNote(response.output);
+                } else {
+                    console.log("Cancelled");
+                }
+            });
+  }
+
+  async saveNote(note){
+        this.people.selectNote();
+        this.people.selectedNote.type = "r";
+        this.people.selectedNote.personId = this.userObj._id;
+        this.people.selectedNote.category = this.userObj.noteCategories[note.selectedCategory];
+        this.people.selectedNote.note = note.note.noteBody;
+        this.people.selectedNote.reference = this.selectedRequestDetail._id;
+        this.people.selectedNote.referenceNo = this.selectedRequestDetail.requestId.clientRequestNo;
+        let response = await this.people.saveNote();
+            if(!response.error){
+                this.utils.showNotification('The note was saved');
+            }
+  }
 
     clearFilters(){
         this.requiredDateFilterValue = "";

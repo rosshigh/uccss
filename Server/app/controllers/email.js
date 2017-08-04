@@ -9,7 +9,7 @@ var    mongoose = require('mongoose'),
     fs = require('fs'),
     emailConfig = require('../../config/email-config');
 
-    var env = 'production';
+    // var env = 'production';
 
 module.exports = function (app) {
   
@@ -18,7 +18,7 @@ module.exports = function (app) {
 };
 
  
-// var env = process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'development';
 
 if(env === 'development'){
   var sg = require('sendgrid')(emailConfig.sg_key);
@@ -452,14 +452,18 @@ if(env === 'development'){
 
   genericEmail = function(mailObject){
     logger.log("Generic email", "verbose");  
-      var mail = {
-          from: emailConfig.emailAddress,
-          to: mailObject.email,
-          subject: mailObject.subject,
-          template: 'generic',
-          context: mailObject.context
-      };
-      nodeMailerSendMail(mail)    
+    mailObject.context.UCC_LOGO = emailConfig.UCC_LOGO;
+    mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
+    mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
+    mailObject.context.topMessage = "A message from the UCC"
+    var mail = {
+        from: emailConfig.emailAddress,
+        to: mailObject.email,
+        subject: mailObject.subject,
+        template: 'generic',
+        context: mailObject.context
+    };
+    nodeMailerSendMail(mail)    
   }
 
   annualUpdateContactInfo = function(mailObject){

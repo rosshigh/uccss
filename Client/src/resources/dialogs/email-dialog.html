@@ -10,7 +10,16 @@
 
 		<ux-dialog-body>
 			<input class="form-control bottomMargin" value.bind="model.email.emailSubject" placeholder="Subject"/>
-			<editor value.bind="model.email.emailBody" height="250"></editor>
+
+			<ul show.bind="model.email.products && model.email. products.length" class="list-group">
+				<li click.delegate="selectProduct(product, $index)" repeat.for="product of model.email.products" class="list-group-item">
+					${product.productId.name}
+				</li>
+			</ul>
+
+			<div class="topMargin">
+				<editor value.bind="model.email.emailBody" height="250" editorid.two-way="editorId"></editor>
+			</div>
 		</ux-dialog-body>
 
 		<ux-dialog-footer>

@@ -23,6 +23,8 @@ export class User {
     this.requests = requests;
     this.people = people;
     this.events = events;
+
+    this.userObj = JSON.parse(sessionStorage.getItem('user'));
   };
 
   attached(){
@@ -39,6 +41,16 @@ export class User {
         }
     }
   }
+
+  canActivate(){
+    if(!this.userObj) {
+        this.userObj = this.config.user;
+        if(!this.userObj) {
+            this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+            this.router.navigate("home");
+        }
+    }
+  }   
 
   updateTwitter(d,s,id){
     var js, fjs = d.getElementsByTagName(s)[0],
@@ -107,7 +119,6 @@ export class User {
   }
 
   async getData(){
-    this.userObj = JSON.parse(sessionStorage.getItem('user'));
     var currentDate = moment(new Date()).format("MM-DD-YYYY");
     var options = '?filter=expiredDate|gt|' + currentDate + '&order=sortOrder';
     if(this.userObj.userRole >= this.config.UCC_ROLE){

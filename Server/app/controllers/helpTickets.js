@@ -104,19 +104,20 @@ module.exports = function (app, config) {
 
   router.get('/api/helpTickets/:id', requireAuth, function(req, res, next){
     writeLog.log('Get help ticket '+ req.params.id, 'verbose');
-    Model.findById(req.params.id)
+    Model.findOne({_id: req.params.id})
+    .populate('courseId', 'name number')
+    .populate('requestId')
+    .populate('personId','email firstName lastName phone mobile nickName file')
+    .populate('content.personId','email firstName lastName phone mobile nickName')
+    .populate('institutionId', 'name')
+    .populate('owner.personId', 'firstName lastName _id')
     .exec()
-      .then(object => {
-        if(object){
-          res.status(200).json(object);
-        } else {
-          res.status(404).json({message: "Not Found"});
-        }
-        
-      })
-      .catch(error => {
-        return next(error);
-      })
+    .then(object => {
+      res.status(200).json(object);
+    })
+    .catch(error => {
+       return next(error);
+    })
   });
 
   router.post('/api/helpTickets/', requireAuth, function(req, res, next){
@@ -166,7 +167,21 @@ module.exports = function (app, config) {
             if (err) {
               return next(err);
             } else {
-              res.status(200).json(result);
+
+            var query = Model.findOne({_id: req.params.id})
+              .populate('courseId', 'name number')
+              .populate('requestId')
+              .populate('personId','email firstName lastName phone mobile nickName file')
+              .populate('institutionId', 'name')
+              .populate('owner.personId', 'firstName lastName _id')
+              .populate({ path: 'productId', model: 'Product', select: 'name'})
+              query.exec()
+              .then(object => {
+                res.status(200).json(object);
+              })
+              .catch(error => {
+                return next(error);
+              })
             }
           })
         } else {

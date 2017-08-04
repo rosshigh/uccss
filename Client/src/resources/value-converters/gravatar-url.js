@@ -5,7 +5,7 @@
  export class GravatarUrlValueConverter {
 
   toView(email, size) {
-    if (email !== undefined) {
+    if (email) {
       var size = size || 80;
       var html = '<img class="img-circle" src="https://secure.gravatar.com/avatar/' + CryptoJS.MD5(email.toLowerCase()) + '.jpg?s=' + size + '"/>';
       return html;

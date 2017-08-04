@@ -6,6 +6,7 @@ var SystemSchema = new Schema({
   sid: { type: String, require: true },
   description: { type: String, require: true },
   server: { type: String, require: true },
+  port: { type: Number },
   instance: { type: String, require: true },
   its: { type: String },
   sessions: [{ type: String }],
@@ -21,7 +22,8 @@ var SystemSchema = new Schema({
   notes: { type: String },
   dateModified: { type: Date },
   goldBackup: { type: Boolean },
-  snapShot: { type: Boolean } 
+  snapShot: { type: Boolean },
+  type: { type: String, default: "ERP" } 
 });
 
 SystemSchema.pre('save', function(next){

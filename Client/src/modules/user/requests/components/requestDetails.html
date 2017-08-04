@@ -1,6 +1,7 @@
 <template>
 	<div class="row">
 		<div class="col-lg-12">
+			<h4 class="topMargin"><strong>Request Details</strong></h4>
 			<div class="panel panel-default topMargin">
 				<div class="panel-body leftJustify">
 					<div class="form-group bottomMargin" show.bind="customerActionRequired">
@@ -30,7 +31,14 @@
 								<h5>End Date: <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
 							</div>
 						</div>
-						<div class="topMargin" innerhtml.bind="requests.selectedRequest.comments"></div>
+						<div show.bind="requests.selectedRequest.customerMessage && requests.selectedRequest.customerMessage.length > 0">
+							<label class="topMargin">Requests from the UCC</label>
+							<div class="well" innerhtml.bind="requests.selectedRequest.customerMessage"></div>
+						</div>
+						<div show.bind="requests.selectedRequest.comments && requests.selectedRequest.comments.length > 0">
+							<label class="topMargin">Comments</label>
+							<div innerhtml.bind="requests.selectedRequest.comments"></div>
+						</div>
 					</div>
 				</div>
 			</div>

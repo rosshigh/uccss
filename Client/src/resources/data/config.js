@@ -7,6 +7,9 @@ export class Config {
     CONFIG_SERVICE = 'config';
     SESSIONS_CONFIG_SERVICE = 'semesterConfig';
 
+    token;
+	user;
+
     constructor(data) {
         this.data = data;   
     }

@@ -25,7 +25,18 @@ export class CurrInfo{
         this.config = config;
 
 		this.userObj = JSON.parse(sessionStorage.getItem('user'));
-    }
+	}
+	
+	canActivate(){
+		if(!this.userObj) {
+			this.userObj = this.config.user;
+			this.isUCC = this.userObj.userRole >= this.config.UCC_ROLE;
+			if(!this.userObj) {
+				this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+				this.router.navigate("home");
+			}
+		}
+	}  
 
 	attached() {
 		$('[data-toggle="tooltip"]').tooltip();

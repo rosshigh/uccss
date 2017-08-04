@@ -8,14 +8,14 @@ import {People} from '../../resources/data/people';
 export class ResetPassword {
 
 	constructor( people, router, validation, utils) {
-    this.people = people;
-    this.router = router;
-    this.validation = validation;
-    this.validation.initialize(this);
-    this._setupValidation();
+		this.people = people;
+		this.router = router;
+		this.validation = validation;
+		this.validation.initialize(this);
+		this._setupValidation();
 		this.utils = utils;
 		this.thresholdLength = 6;
-  	this.threshold = 3;
+  		this.threshold = 3;
 		this.showForm = true;
 		this.passwordReset = true;
     };

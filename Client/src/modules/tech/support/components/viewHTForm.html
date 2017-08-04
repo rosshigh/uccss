@@ -129,7 +129,7 @@
                   <div class="form-group col-lg-3">
                     <div class="input-group col-lg-11">
                       <label class=" col-md-offset-1">Type:</label>
-                      <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" change.delegate="dataTable.filterList($event)" class="form-control col-md-offset-1" id="helpTicketType">
+                      <select value.bind="helpTickets.selectedHelpTicket.helpTicketType" class="form-control col-md-offset-1" id="helpTicketType">
                           <option repeat.for="type of helpTickets.helpTicketTypesArray | helpTicketSubtypes" model.bind="type.type">${type.description}</option>
                       </select>
                     </div>

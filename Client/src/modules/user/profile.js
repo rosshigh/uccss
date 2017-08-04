@@ -57,6 +57,16 @@ export class Profile {
         }
     }
 
+    canActivate(){
+        if(!this.userObj) {
+        this.userObj = this.config.user;
+        if(!this.userObj) {
+            this.utils.showNotification("Couldn't find your user information.  Try logging in again or call the UCC.");
+            this.router.navigate("home");
+        }
+        }
+    }
+
     buildAudit(){
         var changes = this.people.isPersonDirty(this.user);
         changes.forEach(item => {

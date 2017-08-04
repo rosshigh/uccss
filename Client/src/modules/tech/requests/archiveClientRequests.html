@@ -1,0 +1,14 @@
+<template>
+	<div class="panel panel-default rightMargin leftMargin">
+      <div class="panel-body">
+        <div class="row">
+            <div show.bind="!requestSelected">
+                <compose view="./components/ArchiveRequestsTable.html"></compose>
+            </div> 
+            <div show.bind="requestSelected" >
+                <compose view="./components/ArchiveRequestsForm.html"></compose>
+            </div>
+        </div> 
+      </div> 
+
+</template>

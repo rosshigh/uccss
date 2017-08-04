@@ -51,6 +51,19 @@ export class ClientRequests {
         }
     }
 
+    async getRequest(id){
+         try {
+            let serverResponse = await this.data.get(this.CLIENT_REQUESTS_SERVICES + "/" + id);
+            if (!serverResponse.error) {
+                this.selectedRequest = serverResponse;
+            } else {
+                this.selectedRequest = null;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     selectRequest(index){
         if (index === undefined) {
             this.selectedRequest = this.emptyRequest();
@@ -154,6 +167,20 @@ export class ClientRequests {
         }
     }
 
+    async saveRequestWithId(){
+        if(!this.selectedRequest){
+            return;
+        }
+
+        var serverResponse = await this.data.saveObject(this.selectedRequest, this.CLIENT_REQUESTS_SERVICES + "/" + this.selectedRequest._id, "put");
+            if(!serverResponse.error){
+                if(this.requestsArray && this.editRequestIndex){
+                    this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
+                }
+            }
+            return serverResponse;
+    }
+
     async saveRequest(email){
         if(!this.selectedRequest){
             return;
@@ -163,11 +190,11 @@ export class ClientRequests {
         if(!this.selectedRequest._id){
             let serverResponse = await this.data.saveObject(this.selectedRequest, url, "post");
             if(!serverResponse.error){
-                if(email.email){
-                    email.clientRequestNo = serverResponse.clientRequestNo;
-                    email.reason = 1;
-                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
-                }
+                // if(email.email){
+                //     email.clientRequestNo = serverResponse.clientRequestNo;
+                //     email.reason = 1;
+                //     this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                // }
                 if(this.requestsArray){
                     this.requestsArray.push(this.selectedRequest);
                 }
@@ -176,16 +203,25 @@ export class ClientRequests {
         } else {
             var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
             if(!serverResponse.error){
-                 if(email.email){
-                    email.requestNo = this.selectedRequest.requestNo;
-                     email.reason = 2;
-                    this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
-                }
+                //  if(email.email){
+                //     email.requestNo = this.selectedRequest.requestNo;
+                //      email.reason = 2;
+                //     this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                // }
                 if(this.requestsArray && this.editRequestIndex){
                     this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
                 }
             }
             return serverResponse;
+        }
+    }
+
+    updateStatuses(updateIds, status){
+        for(let i = 0; i < this.requestsDetailsArray.length; i++){
+           if(updateIds.indexOf(this.requestsDetailsArray[i]._id) > -1){
+               this.requestsDetailsArray[i].requestStatus = status;
+               this.requestsDetailsArray[i].requestId.requestStatus = status;
+           }
         }
     }
 
@@ -221,7 +257,7 @@ export class ClientRequests {
 
     }
 
-     isRequestDirty(obj){
+    isRequestDirty(obj){
       if(this.selectedRequest){
           if(!obj){
               var obj = this.emptyRequest();
@@ -241,6 +277,19 @@ export class ClientRequests {
           }
           return this.selectedRequestDetail;
     }
+
+    async getRequestDetail(id){
+        
+        let serverResponse = await this.data.get(this.CLIENT_REQUEST_DETAILS + "/" + id);
+        if (!serverResponse.error) {
+            this.selectedRequestDetail = serverResponse;
+            
+        } else {
+            this.selectedRequestDetail = null;
+        }
+        return serverResponse;
+    }
+
 
     selectRequestDetailFromId(id){
         this.requestsDetailsArray.forEach((item, index) => {

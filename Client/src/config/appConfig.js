@@ -66,7 +66,7 @@ export class AppConfig {
     REPLIED_REQUEST_CODE = 7;
 
     REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, 
-                      { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: ""  }, 
+                      { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: "assign"  }, 
                       { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "info"  }, 
                       { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning"  },
                       { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: ""  },
@@ -111,6 +111,8 @@ export class AppConfig {
     HELP_TICKET_PRIORITIES = [{priority: "Low", message: "Not time sensitive", status: ""},{priority: "Medium", message: "Time sensitive but doesn't require immediate attention", status: "warning"},{priority: "Critical", message:"Critical, time sensitive issue",status: "danger"}];
 
     REFRESH_KEYWORDS = ["ERPSIM"];
+
+    SYSTEM_TYPES = ["ERP", "HANA", "BO"];
 
     // HELP_TICKET_TYPES = [
     //       {

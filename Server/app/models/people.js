@@ -2,6 +2,18 @@ var Mongoose = require('mongoose'),
   Schema = Mongoose.Schema,
   Bcrypt = require('bcryptjs');
 
+var EmailLogSchema = new Schema({
+    personId: { type: Schema.Types.ObjectId },
+    email: { type: String },
+    subject: { type: String },
+    body: { type: String },
+    from: { type: Schema.Types.ObjectId },
+    date: { type: Date, default: Date.now },
+    topic: { type: String }
+});
+
+module.exports = Mongoose.model('EmailLog', EmailLogSchema);
+
 var PasswordResetSchema = new Schema({
     personId: { type: Schema.Types.ObjectId },
     createdAt: { type: Date, expires: '600s', default: Date.now },
@@ -121,3 +133,4 @@ PersonSchema.virtual('fullName')
   });
 
 module.exports = Mongoose.model('Person',PersonSchema);
+

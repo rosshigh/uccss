@@ -13,7 +13,8 @@ var express = require('express'),
   Promise = require('bluebird'),
   ClientRequestLock = mongoose.model('ClientRequestLock'),
   logger = require('../../config/logger'),
-  ObjectId = require('mongodb').ObjectID;;
+  EmailLog = mongoose.model('EmailLog'),
+  ObjectId = require('mongodb').ObjectID;
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
 
@@ -86,21 +87,25 @@ module.exports = function (app) {
 
   router.get('/api/clientRequests/:id', requireAuth, function(req, res, next){
     logger.log('Get clientRequest' + req.params.id, 'verbose');
-    Model.findById(req.params.id, function(err, object){
-      if (err) {
-        return next(err);
-      } else {
+    Model.findById(req.params.id)
+     .populate({path: 'courseId', model: 'Course', select: 'number name'})
+     .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+     .populate({path: 'requestDetails', model: 'ClientRequestDetail'})
+     .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
+     .exec()
+     .then(object => {
         if(object){
           res.status(200).json(object);
-        } else {
-          res.status(404).json({message: "No requests were found"});
-        }
-      }
-    });
+        } 
+      })
+      .catch(err => {
+        return next(err);
+      })
   });
 
   router.post('/api/clientRequests', requireAuth, function(req, res, next){
     logger.log('Create clientRequest','verbose');  
+
     var clientRequest = new Model(req.body);
     var tasks = new Array();   
 
@@ -114,7 +119,7 @@ module.exports = function (app) {
 
     Promise.all(tasks)
       .then(function(results) {     
-        clientRequest.save(function (err, result) {        
+        clientRequest.save(function (err, result) {         
           if (err) {
             return next(err);
           } else {                                
@@ -129,7 +134,7 @@ module.exports = function (app) {
 
     if(req.body){
        switch(req.body.reason){
-         case 1: //request created
+        case 1: //request created
            var context = {
                       products: req.body.products,
                       numStudents: req.body.numStudents,
@@ -143,6 +148,7 @@ module.exports = function (app) {
           }                                     
 
           requestCreated(mailObj);
+
           break;
         case 2: //request Updated
           var context = {
@@ -155,8 +161,7 @@ module.exports = function (app) {
             email: req.body.email,
             cc: req.body.cc,
             context: context 
-          }                   
-          console.log(mailObj)                  
+          }                                  
           requestUpdated(mailObj);
           break;
         case 3:
@@ -171,7 +176,19 @@ module.exports = function (app) {
           }            
                               
           customerAction(mailObj);
-          break;
+
+          var LogEntry = new EmailLog({
+            personId: req.body.personId,
+            email: req.body.email,
+            body: req.body.customerMessage,
+            from: req.body.from,
+            topic: 'c',
+            subject: req.body.subject
+          });
+    
+          LogEntry.save();
+            
+          break; 
        }
     }
     res.status(201).json({message: "Email sent"});
@@ -211,118 +228,84 @@ module.exports = function (app) {
   });
 
   router.put('/api/clientRequests', requireAuth, function(req, res, next){
-    logger.log('Update clientRequest ' + req.body._id);       
-    let clientRequest = new Model(req.body); 
-    clientRequest.requestDetails = new Array();    
-    let tasks = new Array();     
-    if(req.body.requestDetailsToSave){
-       req.body.requestDetailsToSave.forEach((detail, index) => {
+    logger.log('Update clientRequest ' + req.body._id);     
+    
+    var clientRequest = new Model(req.body); 
+    clientRequest.requestDetails = new Array();
+    if(req.body.requestDetailsToSave){      
+      var updates =req.body.requestDetailsToSave.map(detail => {     
          if(detail._id){
-           if(detail.delete){        
-               tasks.push(ClientRequestDetail.remove({ _id: detail._id }));
-               clientRequest.requestDetails.splice(clientRequest.requestDetails.indexOf(detail._id), 1);
+           if(detail.delete){
+            return { 
+              deleteOne: {
+                  filter: {_id: detail._id}
+              }
+            }          
            } else {
-              tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
-              clientRequest.requestDetails.push(detail._id);   
+            clientRequest.requestDetails.push(detail._id);            
+            return { 
+              updateOne: { 
+                  "filter": { "_id": detail._id },              
+                  "update": detail 
+              } 
+            }   
+            
            }
          } else {
-            let obj = new ClientRequestDetail(detail);
-            clientRequest.requestDetails.push(obj._id);               
-            obj.requestId = clientRequest._id;
-            tasks.push(ClientRequestDetail.create(obj));  
+           var obj = new ClientRequestDetail(detail);
+            obj.requestId = clientRequest._id;    
+            clientRequest.requestDetails.push(obj._id);        
+            return { "insertOne": { "document": obj } }
 
          }
-       });
-    }        
-    Promise.all(tasks)
-        .then(results => {            
-          if(clientRequest.requestDetails.length > 0){           
-            updateRequest(clientRequest, req, res, next);
-          } else {          
-            deleteRequest(clientRequest, req, res, next);
-          }
-        })
-        .catch(error => { //Promise        
-            return next(error);
-        }) 
+       });      
+
+      ClientRequestDetail.bulkWrite(updates, function(err, result) {
+        if(err){
+          return next(error);
+        }     
+        if(clientRequest.requestDetails.length === 0){
+          Model.findOneAndRemove({_id: clientRequest._id}, function(err, request) {
+            if(err) {
+              return next(err);
+            }         
+            res.status(200).json(request);
+          });
+        } else {      
+          Model.findOneAndUpdate({_id: clientRequest._id}, {$set: clientRequest}, function(err, request) {        
+            if (err) {
+              return next(err);
+            }                               
+            res.status(200).json(request);
+          }); 
+        }
+      });
+    }
   });
 
-  router.put('/api/clientRequests/customerAction', requireAuth, function(req, res, next){   
-    if(req.body.customerMessage){    
-      if(req.body.model === 'header'){
-        Model.findById(req.body.id, function(err, request){          
-          if(request){             
-            request.customerMessage = req.body.customerMessage;
-            request.requestStatus = req.body.requestStatus;
-            request.requestDetails.forEach(item => {   
-              ClientRequestDetail.findById(item).exec()
-                .then(detail => {                
-                  if(detail.requestStatus != ASSIGNED_REQUEST_CODE) {
-                    detail.requestStatus = CUSTOMER_ACTION_REQUEST_CODE;                          
-                    detail.save();
-                  }
-                })
-            })
-            if(req.body.audit) request.audit.push(req.body.audit);
-            request.save(function(err, request){
-              if(err) {
-                return next(err);
-              } else {
-                var obj = {
-                  email: req.body.toEmail,
-                  subject: req.body.subject,
-                  context: {
-                    requestNo: req.body.clientRequestNo,
-                    course: req.body.course,
-                    session: req.body.session,
-                    customerMessage: req.body.customerMessage
-                  }
-                };              
-                customerAction(obj)
-                res.status(200).json(request);
-              }
-            })
-          } else {
-              var error = new Error('No request found');
-              error.status = 404;
-              return next(error);
-          }   
-        })
-      } else {
-          ClientRequestDetail.findById(req.body.id, function(err, request){  
-            if(request){
-                request.customerMessage = req.body.customerMessage;     
-                request.requestStatus = req.body.requestStatus;          
-                if(req.body.audit) request.audit.push(req.body.audit);
-                request.save(function(err, request){
-                  if(err) {
-                    return next(err);
-                  } else {
-                    var obj = {
-                      email: req.body.toEmail,
-                      subject: req.body.subject,
-                      context: {
-                        requestNo: req.body.clientRequestNo,
-                        product: req.body.product,
-                        course: req.body.course,
-                        session: req.body.session,
-                        customerMessage: req.body.customerMessage
-                      }
-                    };
-                    customerAction(obj)
-                    res.status(200).json(request);
-                  }
-                })
-              } else {
-                  var error = new Error('No request found');
-                  error.status = 404;
-                  return next(error);
-              }    
-            })     
-      }
-    } else {
-      res.status(404).json({message: "No Message"});
-    }
+  router.put('/api/clientRequests/:id', requireAuth, function(req, res, next){
+    logger.log('Update clientRequest ' + req.params._id);       
+    let clientRequest = new Model(req.body); 
+     Model.findOneAndUpdate({_id: clientRequest._id}, {$set:clientRequest}, {safe:true, new:true, multi:false}, function(error, request){
+        if(error){
+          return next(error);
+        } else { 
+         var updates = req.body.requestDetails.map(function (item) { 
+            return { 
+                "updateOne": { 
+                    "filter": { "_id": item._id } ,              
+                    "update": { audit: item.audit, requestStatus: item.requestStatus.toString()} } 
+                }         
+        });
+        ClientRequestDetail.bulkWrite(updates, function(err, result) {
+          if(err){
+            return next(error);
+          }
+          res.status(200).json(request);
+        });
+         
+        }
+    });
   });
 
   router.delete('/api/clientRequests/:id', requireAuth, function(req, res, next){
@@ -396,8 +379,12 @@ module.exports = function (app) {
 
   router.get('/api/clientRequestsDetails/:id', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');
+    
     ClientRequestDetail.findById(req.params.id)
-      .populate('requestId')
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
+      .populate({ path: "productId", model: "Product", select: "name"})
       .exec()
       .then(object => {
         if(object){
@@ -452,11 +439,19 @@ module.exports = function (app) {
       } else {
         if(request){
           if(request.requestDetails && request.requestDetails.length > 0){      
-            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id),1); 
-            if(request.requestDetails.length === 0) {
-              Model.remove(req.params.requestid);
+            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id),1);           
+            if(request.requestDetails.length === 0) { 
+              Model.findOneAndRemove({_id: request._id}, function(err, request) {
+                if(err) {
+                  return next(err);
+                }                       
+              });            
             } else {
-              request.save();
+              request.save(function(err, request) {
+                if(err) {
+                  return next(err);
+                } 
+              });
             }
           }
         }

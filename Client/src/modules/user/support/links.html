@@ -3,7 +3,7 @@
       <div repeat.for="category of linkArray" class="col-lg-3">
         <h2>${category.category}</h2>
         <div>
-          <a repeat.for="link of category.links" href="${link.url}" class="list-group-item link-shadow" target="_blank">
+          <a repeat.for="link of category.links" href="${link.url}" class="list-group-item link-shadow topMargin" target="_blank">
             <h4 class="list-group-item-heading">${link.title}</h4>
             <p class="list-group-item-text">${link.content}</p>
           </a>

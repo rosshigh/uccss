@@ -47,6 +47,14 @@ export class TechRequests{
             nav: true,
             name: 'clientRequests',
             title: 'Client Requests Analytics'
+        },
+         {
+            route: 'clientRequestsArchive',
+            moduleId: './archiveClientRequests',
+            settings: { auth: true, roles: [] },
+            nav: true,
+            name: 'archiveClientRequests',
+            title: 'Client Requests Archive'
         }
         ]);
 
