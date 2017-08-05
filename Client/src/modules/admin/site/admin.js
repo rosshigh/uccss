@@ -183,6 +183,37 @@ export class Admin {
 		this.dataTable.updateArray(this.uploadedFilesArray);
 	}
 
+	deleteLogFile(file, index, path){	
+		this.deletedFileIndex = index;
+		if(file.indexOf('auth') > -1){
+			var path = "log-auth\\"
+		} else if(file.indexOf('results') > -1) {
+			var path = "log\\";
+		} else {
+			var path = "forever-log\\"
+		}
+		file = path + file + ".log";
+		var msg = "Are you sure you want to delete the file? This cannot be undone.";
+		
+		return this.dialog.showMessage(
+			msg,
+			"Confirm", 
+			['Yes', 'No']
+			).whenClosed(response => {
+				if(!response.wasCancelled){
+					this.deleteALogFile(file);
+				} 
+			});
+	}
+
+	async deleteALogFile(path){
+		let response = await this.admin.deleteFile(path);
+		if(!response.error){
+			this.fileList.splice(this.deletedFileIndex,1);
+			this.utils.showNotification('The file was deleted');
+		}
+	}
+
 	deleteFile(obj){	
 		var type = obj.file.value.split('-');
 		this.deletedFile = obj.file.value;
@@ -192,7 +223,7 @@ export class Admin {
 			msg,
 			"Confirm", 
 			['Yes', 'No']
-			).then(response => {
+			).whenClosed(response => {
 				if(!response.wasCancelled){
 					this.deleteAFile(obj.file.path);
 				} 
@@ -202,9 +233,6 @@ export class Admin {
 	async deleteAFile(path){
 		let response = await this.admin.deleteFile(path);
 		if(!response.error){
-			// this.selectedCategoryFiles.files.splice(index,1);
-			// this.uploadedFilesArray = this.selectedCategoryFiles.files;
-			// this.dataTable.updateArray(this.uploadedFilesArray);
 			this.sliceDeletedFile();
 			this.utils.showNotification('The file was deleted');
 		}
@@ -280,6 +308,45 @@ export class Admin {
 					}
 				}
 				break;
+		}
+	}
+
+	rename(oldFile, index){
+		this.renamedFileIndex = index;
+		var msg = "Enter the new name";
+		var fileObject = {title: "New name:", valueName: ""};
+		
+		return this.dialog.input(
+			"Enter New Name", 
+			fileObject,
+			['Save', 'Cancel']
+			).whenClosed(response => {
+				if(!response.wasCancelled){
+					this.renameAFile(oldFile, response.output.valueName);
+				} 
+			});
+	}
+
+	async renameAFile(oldFile, newFile){
+		let response = await this.admin.renameALogFile(oldFile, newFile);
+		if(!response.error){
+			if(oldFile.indexOf('forever') > -1){
+				var screenToShow = 'forl';
+			} else if(oldFile.indexOf('error') > -1){
+				var screenToShow = 'fore';
+			} else {
+				var screenToShow = 'foro';
+			}
+			this.foreverLog = "";
+			let logResponse = await this.admin.getLogs(this.screenToShow);
+			if(!logResponse.error){
+				this.fileList = this.utils.copyArray(logResponse);
+				for(let i = 0; i < this.fileList.length; i++){
+					this.fileList[i] = this.fileList[i].substring(0,this.fileList[i].indexOf('.log'));
+				};
+				this.fileList.reverse();
+			}
+			this.utils.showNotification('The file was renamed');
 		}
 	}
 

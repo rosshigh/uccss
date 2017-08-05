@@ -110,6 +110,7 @@ export class Assignments {
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
             this.utils.showNotification("The request was updated");
+            this.clientRequests.requestsDetailsArray[this.editIndex] = this.utils.copyObject()
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
             this.filterInAssigned();
             this._cleanUp();
@@ -794,9 +795,11 @@ export class Assignments {
             if(this._buildRequest()){
                 this.clientRequests.setSelectedRequest(this.requestToSave);
                 var email = this._buildEmailObject();
-                let serverResponse = await this.clientRequests.assignRequest(email);
+                let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
                 if (!serverResponse.status) {
                     this.utils.showNotification("The request was updated");
+                    this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+                    this.filterInAssigned();
                     await this.systems.saveSystem();
                     this._cleanUp();
                 }

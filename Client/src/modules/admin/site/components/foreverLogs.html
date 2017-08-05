@@ -13,7 +13,11 @@
 				<label>Files</label>
 				<div class="well well2 overFlow" style="height:600px;">
 					<ul class="list-group">
-						<button click.trigger="fileSelected($index)" type="button" repeat.for="file of fileList" id="${type.code}" class="list-group-item">${file}</button>
+						<button click.trigger="fileSelected($index)" type="button" repeat.for="file of fileList" id="${file}" class="list-group-item">${file}
+							<span class="icon glyphicon glyphicon-pencil pull-right smallMarginRight" click.delegate="rename(file, $index)"></span>
+							<span class="icon glyphicon glyphicon-trash pull-right smallMarginRight" click.delegate="deleteLogFile(file, $index)"></span>
+						</button>
+						
 					</ul>
 				</div>
 			</div>

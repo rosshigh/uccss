@@ -219,9 +219,18 @@ export class AdminData{
 	}
 
 	async deleteFile(file){
-		if(file){
+		if(file){ 
 			file = file.split('\\').join('$@');
 			let response = await this.data.deleteObject(this.FILES_SERVICE + "/" + file);
+			return response
+		}
+	}
+
+	async renameALogFile(oldFile, newFile){
+		if(oldFile && newFile){ 
+			oldFile = oldFile.split('\\').join('$@');
+			newFile = newFile.split('\\').join('$@');			
+			let response = await this.data.saveObject({}, this.FOREVER_SERVICE + "/rename/" + oldFile + "/" + newFile, "put");
 			return response
 		}
 	}

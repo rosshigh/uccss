@@ -7,19 +7,19 @@ import {AppConfig} from '../../config/appConfig';
 @inject(Notification, AppConfig)
 export class Utils{
 
-    constructor(notification, config){
-        this.config = config;
-        this.notification = notification;
-        this.notification.waitForMove = true
-    }
+  constructor(notification, config){
+      this.config = config;
+      this.notification = notification;
+      this.notification.waitForMove = true
+  }
 
-    /*****************************************************************************
-     * Display a notification
-     * msg - the message to display
-     ****************************************************************************/
-    showNotification(msg){
-        this.notification.note(msg);
-    }
+  /*****************************************************************************
+   * Display a notification
+   * msg - the message to display
+   ****************************************************************************/
+  showNotification(msg){
+      this.notification.note(msg);
+  }
 
    /*****************************************************************************
    * Determine users role for authorizations

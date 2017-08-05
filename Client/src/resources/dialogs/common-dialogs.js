@@ -7,6 +7,7 @@ import {EmailDialog} from './email-dialog';
 import {DocumentDialog} from './document-dialog';
 import {PasswordDialog} from './password-dialog';
 import {EventDialog} from './event-dialog';
+import {InputDialog} from './input-dialog';
 
 @inject(DialogService)
 export class CommonDialogs {
@@ -38,6 +39,10 @@ export class CommonDialogs {
 
   showEvent( title = 'Enter Event', event, options){
     return this.dialogService.open({ viewModel: EventDialog, model: { title, event, options } })
+  }
+
+  input( title = 'Enter Value', value, options){
+    return this.dialogService.open({ viewModel: InputDialog, model: { title, value, options } })
   }
 
 }

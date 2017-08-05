@@ -225,7 +225,7 @@ export class ClientRequests {
         }
     }
 
-    async assignRequest(email){
+    async assignRequest(email, index){
         if(!this.selectedRequest){
             return;
         }
@@ -235,9 +235,11 @@ export class ClientRequests {
             if(email.email){
                 this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
             }
-            if(this.requestsArray && this.editRequestIndex){
-                this.requestsArray[this.editRequestIndex]  = this.utils.copyObject(this.selectedRequest);
+            this.selectedRequestDetail = serverResponse;
+            if(!this.selectedRequestDetail.requestId.courseId || this.selectedRequestDetail.requestId.courseId === null){
+              this.selectedRequestDetail.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
             }
+            this.requestsDetailsArray[index]  = this.utils.copyObject(this.selectedRequestDetail);
         }
         return serverResponse;
     }
@@ -304,6 +306,14 @@ export class ClientRequests {
 
     setTheSelectedRequestDetail(request){
       this.selectedRequestDetail = this.utils.copyObject(request);
+      if(this.requestsDetailsArray) {
+          for(let i = 0; i < this.requestsDetailsArray.length; i++){
+              if(this.requestsDetailsArray[i]._id === request._id) {
+                  this.requestDetailIndex = i;
+                   break;
+              }
+          }
+      }
     }
 
     emptyRequestDetail(){
@@ -315,11 +325,15 @@ export class ClientRequests {
     }
 
     async saveRequestDetail(){
-        if(!this.selectedRequestDetail){
+        if(!this.selectedRequestDetail){ 
             return;
         }
         let response = await this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
         if(!response.error){
+            this.selectedRequestDetail = response;
+            if(!this.selectedRequestDetail.requestId.courseId || this.selectedRequestDetail.requestId.courseId === null){
+              this.selectedRequestDetail.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+            }
             this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
             return response;
         }

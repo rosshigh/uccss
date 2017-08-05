@@ -1,0 +1,1 @@
+forever start -l ./forever-log/forever.log -o ./forever-log/out.log -e ./forever-log/err.log index.js

@@ -198,6 +198,7 @@ module.exports = function (app) {
     logger.log('Assign clientRequest ' + req.body._id);          
     
     if(req.body._id){
+      var detailId;
       var query = Model.findById(req.body._id, function(err, clientRequest){
         if(err){
           return next(error);
@@ -205,8 +206,9 @@ module.exports = function (app) {
         clientRequest.requestStatus = req.body.requestStatus;
         let tasks = new Array();   
         if(req.body.requestDetailsToSave){
-          req.body.requestDetailsToSave.forEach((detail, index) => {               
-                tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
+          req.body.requestDetailsToSave.forEach((detail, index) => { 
+            detailId = detail._id;              
+            tasks.push(ClientRequestDetail.findOneAndUpdate({_id: detail._id}, detail, {safe:true, new:true, multi:false, upsert:true }));
           });
         }      
     
@@ -216,7 +218,22 @@ module.exports = function (app) {
                     if(error){
                       return next(error);
                     } else { 
-                      res.status(200).json(request);
+                      ClientRequestDetail.findById(detailId)
+                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+                      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
+                      .populate({ path: "productId", model: "Product", select: "name"})
+                      .exec()
+                      .then(object => {
+                        if(object){
+                          res.status(200).json(object);
+                        } else {
+                          res.status(404).json({message: "No request was found"});
+                        }
+                      })
+                      .catch(err => {
+                        return next(err);
+                      })
                     }
               })
             })
@@ -425,8 +442,23 @@ module.exports = function (app) {
       if(err) return next(err);
         ClientRequestDetail.findOneAndUpdate({_id: req.body._id}, req.body, function(err, requestDetail){
           if(err) return next(err);
+          ClientRequestDetail.findById(requestDetail._id)
+            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+            .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
+            .populate({ path: "productId", model: "Product", select: "name"})
+            .exec()
+            .then(object => {
+              if(object){               
+                res.status(200).json(object);
+              } else {
+                res.status(404).json({message: "No request was found"});
+              }
+            })
+            .catch(err => {
+              return next(err);
+            })
         });
-        res.status(200).json({message: "request updated"});
     }); 
   });
 

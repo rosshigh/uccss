@@ -1,0 +1,19 @@
+<template>
+	<style>
+		ux-dialog-header {
+			color: ${config.SUBMENU_COLOR};
+			background-color:${config.SUBMENU_BACKGROUND}
+		}
+	</style>
+  <ux-dialog style="max-width: 800px">
+    <ux-dialog-header>${model.title}</ux-dialog-header>
+
+    <ux-dialog-body>
+		<input class="form-control" value.bind="model.valueName" ref="valueInput"></input>
+    </ux-dialog-body>
+
+    <ux-dialog-footer> 
+      <button class="btn btn-primary smallMarginRight" repeat.for="option of model.options" click.trigger="selectOption(option)">${option}</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

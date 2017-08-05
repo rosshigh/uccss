@@ -17,6 +17,7 @@ var express = require('express'),
         method : 'GET'
     };
     logger.log(optionsget.path);
+   
     var reqGet = http.request(optionsget, function(res) {
         console.log("statusCode: ", res.statusCode);
         var str = '';
@@ -35,7 +36,13 @@ var express = require('express'),
         });
     
     });
-    reqGet.end();
+     try {
+         reqGet.end();
+    }
+    catch(error){
+        console.log(error)
+    }
+   
     reqGet.on('error', function(e) {
         console.error(e);
     });

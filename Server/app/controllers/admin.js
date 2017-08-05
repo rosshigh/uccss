@@ -160,6 +160,16 @@ module.exports = function (app, config) {
 
 	})
 
+	// router.route('/files/rename/:oldName/:newName').put(function(req, res, next){
+	// 	logger.log("Rename file " + oldName);
+	// 	var oldName = req.params.oldName.split("$@").join('/');
+	// 	var newName = req.params.newName.split("$@").join('/');
+	// 	fs.rename(oldName, newName, function(err) {
+	// 		if ( err ) return next(err);	
+	// 	});
+	// 	res.status(200).json({"message": "File renamed"});
+	// });
+
 	router.route('/foreverLog/fileList/:type').get(function(req, res, next){
 		logger.log('Get forever log files', 'verbose');
 		const fs = require('fs');
@@ -209,6 +219,7 @@ module.exports = function (app, config) {
 		try {
 			let fileName = foreverLogFolder + req.params.file + '.log';
 			let newFileName = foreverLogFolder + req.params.newName + '.log';
+		
 			fs.rename(fileName, newFileName, function(err) {
 				if ( err ) console.log('ERROR: ' + err);
 			});
