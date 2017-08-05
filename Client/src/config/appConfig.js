@@ -5,7 +5,7 @@ import {HttpClient} from 'aurelia-http-client';
 export class AppConfig {
 
 
-    HOST = location.origin;
+    HOST = location.origin; 
 
     DOWNLOAD_URL = this.HOST + '/uploadedFiles'; 
 
