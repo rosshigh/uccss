@@ -15,7 +15,7 @@ var logDir = 'log';
 	transports: [
 		new (winston.transports.Console)({
 			colorize: true,
-			// level: env === 'development' ? 'verbose' : 'info'
+			level: env === 'development' ? 'verbose' : 'info',
 			level: 'verbose'
 		}),
 		new (require('winston-daily-rotate-file'))({
