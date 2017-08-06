@@ -17,7 +17,7 @@ export class Assignments {
 	requestSelected = 'table';
 	title="Tech Staff Client Assignments";
 	spinnerHTML = "";
-    isCheckedAssigned = true;
+    isCheckedAssigned = true; 
     noRequests = true;
 
     constructor( config, validation, dialog, datatable, utils, sessions, products, systems, people, requests) {
@@ -1143,6 +1143,7 @@ export class Assignments {
         this.lastID = 0;
         this.requestSelected = 'table';
         this.customerMessage = false;
+         this.clearFilters();
     }
 
     flag(){

@@ -152,8 +152,8 @@ define('config/appConfig',['exports', 'aurelia-framework', 'aurelia-http-client'
 
             this.HOST = location.origin;
             this.DOWNLOAD_URL = this.HOST + '/uploadedFiles';
-            this.BASE_URL = "http://localhost:5000/api/";
-            this.IMG_DOWNLOAD_URL = "http://localhost:5000/" + '/img/';
+            this.BASE_URL = this.HOST + "/api/";
+            this.IMG_DOWNLOAD_URL = this.HOST + '/img/';
             this.HELPTICKET_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/helpTickets";
             this.PRODUCT_FILE_DOWNLOAD_URL = this.HOST + "/uploadedFiles/productFiles";
             this.DOWNLOAD_FILE_DOWNLOAD_URL = this.HOST + '/uploadedFiles/downloads';
@@ -28377,6 +28377,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
             this.lastID = 0;
             this.requestSelected = 'table';
             this.customerMessage = false;
+            this.clearFilters();
         };
 
         Assignments.prototype.flag = function flag() {
