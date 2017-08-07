@@ -7849,14 +7849,16 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 that = this;
 
                                 sortedArray.forEach(function (item) {
-                                    if (item.requestId.institutionId.name != instID) {
-                                        instID = item.requestId.institutionId.name;
-                                        var obj = that.utils.copyObject(templateObj);
-                                        obj.name = item.requestId.institutionId.name;
-                                        that.analyticsInstitutionResultArray.push(obj);
+                                    if (item.requestId) {
+                                        if (item.requestId.institutionId.name != instID) {
+                                            instID = item.requestId.institutionId.name;
+                                            var obj = that.utils.copyObject(templateObj);
+                                            obj.name = item.requestId.institutionId.name;
+                                            that.analyticsInstitutionResultArray.push(obj);
+                                        }
+                                        that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['total'] += 1;
+                                        that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1][item.requestStatus] += 1;
                                     }
-                                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1]['total'] += 1;
-                                    that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length - 1][item.requestStatus] += 1;
                                 });
 
                             case 11:
