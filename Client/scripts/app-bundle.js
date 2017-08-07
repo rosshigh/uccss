@@ -7896,6 +7896,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                     obj.productId = item.productId;
                     _this4.analyticsProductsResultArray.push(obj);
                 }
+                _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1]['total'] += 1;
                 _this4.analyticsProductsResultArray[_this4.analyticsProductsResultArray.length - 1][item.requestStatus] += 1;
             });
         };
