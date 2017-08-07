@@ -27659,6 +27659,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         Assignments.prototype.processClient = function processClient(index, client, el) {
             this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable);
 
+            if (client.firstAllowableID && client.firstAllowableID > 0) {
+                this.firstID = client.firstAllowableID ? parseInt(client.firstAllowableID) : this.config.FIRST_DEFAULT_ID;
+            } else {
+                this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+            }
+
             this.firstID = client.firstAllowableID ? parseInt(client.firstAllowableID) : this.config.FIRST_DEFAULT_ID;
             this.lastFirstID = this.firstID;
             this.firstAllowableID = this.firstID;
