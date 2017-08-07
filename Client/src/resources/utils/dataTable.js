@@ -224,6 +224,9 @@ export class DataTable{
     this.pageOne();
   }
 
+  applyFilters(){
+    this.filter(this.filterValues);
+  }
 
   filter(filters){
     var keep;
@@ -398,6 +401,33 @@ export class DataTable{
       }
 
       this.buildDisplayArray()
+    }
+  }
+
+  updateArrayMaintainFilters(sourceArray, sortProperty, sortDirection){
+    if(sourceArray) {
+      this.sourceArray = new Array();
+      this.baseArray = new Array();
+      this.active = true;
+      sourceArray.forEach(item => {
+        this.sourceArray.push(item);
+        this.baseArray.push(item);
+      })
+     
+      this.baseArray.forEach(function(item, index){
+        item.baseIndex = index;
+        item.originalIndex = index;
+      });
+
+      if(sortProperty){
+          this.baseArray.sort((a,b) => {
+            let result =  a[sortProperty] - b[sortProperty];
+            return result * sortDirection
+          })
+      }
+
+      this.buildDisplayArray();
+      this.filter(this.filterValues);
     }
   }
 

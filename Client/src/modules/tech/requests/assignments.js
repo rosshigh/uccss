@@ -90,7 +90,7 @@ export class Assignments {
     }
 
 	editRequest(index, request){
-		this.editIndex = this.dataTable.getOriginalIndex(index);
+		this.editIndex = index;
         this.selectedRequestDetail = this.utils.copyObject(request);
         this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
         this.editStartDate = this.selectedRequestDetail.requestId.startDate;
@@ -109,11 +109,9 @@ export class Assignments {
         this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
-            var newRequest = serverResponse;
             this.utils.showNotification("The request was updated");
-             this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
-            // this.clientRequests.requestsDetailsArray[this.editIndex] = this.utils.copyObject(newRequest)
-            // this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+            this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+            this.dataTable.applyFilters();
             this.filterInAssigned();
             this._cleanUp();
         }
@@ -813,10 +811,9 @@ export class Assignments {
                 var email = this._buildEmailObject();
                 let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
                 if (!serverResponse.status) {
-                    var newRequest = serverResponse;
+                  
                     this.utils.showNotification("The request was updated");
-                    // this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
-                    this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
+                    this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                     this.filterInAssigned();
                     await this.systems.saveSystem();
                     this._cleanUp();

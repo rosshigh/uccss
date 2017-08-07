@@ -17219,6 +17219,10 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
       this.pageOne();
     };
 
+    DataTable.prototype.applyFilters = function applyFilters() {
+      this.filter(this.filterValues);
+    };
+
     DataTable.prototype.filter = function filter(filters) {
       var keep;
       var index = 0;
@@ -17383,6 +17387,35 @@ define('resources/utils/dataTable',['exports', 'aurelia-framework', 'moment', '.
         }
 
         this.buildDisplayArray();
+      }
+    };
+
+    DataTable.prototype.updateArrayMaintainFilters = function updateArrayMaintainFilters(sourceArray, sortProperty, sortDirection) {
+      var _this3 = this;
+
+      if (sourceArray) {
+        this.sourceArray = new Array();
+        this.baseArray = new Array();
+        this.active = true;
+        sourceArray.forEach(function (item) {
+          _this3.sourceArray.push(item);
+          _this3.baseArray.push(item);
+        });
+
+        this.baseArray.forEach(function (item, index) {
+          item.baseIndex = index;
+          item.originalIndex = index;
+        });
+
+        if (sortProperty) {
+          this.baseArray.sort(function (a, b) {
+            var result = a[sortProperty] - b[sortProperty];
+            return result * sortDirection;
+          });
+        }
+
+        this.buildDisplayArray();
+        this.filter(this.filterValues);
       }
     };
 
@@ -27376,7 +27409,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
         }();
 
         Assignments.prototype.editRequest = function editRequest(index, request) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.editIndex = index;
             this.selectedRequestDetail = this.utils.copyObject(request);
             this.products.selectedProductFromId(this.selectedRequestDetail.productId._id);
             this.editStartDate = this.selectedRequestDetail.requestId.startDate;
@@ -27391,7 +27424,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.saveEdit = function () {
             var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                var email, serverResponse, newRequest;
+                var email, serverResponse;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -27407,11 +27440,9 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 serverResponse = _context4.sent;
 
                                 if (!serverResponse.error) {
-                                    newRequest = serverResponse;
-
                                     this.utils.showNotification("The request was updated");
-                                    this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
-
+                                    this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                                    this.dataTable.applyFilters();
                                     this.filterInAssigned();
                                     this._cleanUp();
                                 }
@@ -28101,18 +28132,18 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
         Assignments.prototype.save = function () {
             var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-                var email, serverResponse, newRequest;
+                var email, serverResponse;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 if (!this.validation.validate(1)) {
-                                    _context8.next = 15;
+                                    _context8.next = 14;
                                     break;
                                 }
 
                                 if (!this._buildRequest()) {
-                                    _context8.next = 15;
+                                    _context8.next = 14;
                                     break;
                                 }
 
@@ -28125,23 +28156,20 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 serverResponse = _context8.sent;
 
                                 if (serverResponse.status) {
-                                    _context8.next = 15;
+                                    _context8.next = 14;
                                     break;
                                 }
 
-                                newRequest = serverResponse;
-
                                 this.utils.showNotification("The request was updated");
-
-                                this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
+                                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
                                 this.filterInAssigned();
-                                _context8.next = 14;
+                                _context8.next = 13;
                                 return this.systems.saveSystem();
 
-                            case 14:
+                            case 13:
                                 this._cleanUp();
 
-                            case 15:
+                            case 14:
                             case 'end':
                                 return _context8.stop();
                         }
