@@ -27665,7 +27665,6 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
             }
 
-            this.firstID = client.firstAllowableID ? parseInt(client.firstAllowableID) : this.config.FIRST_DEFAULT_ID;
             this.lastFirstID = this.firstID;
             this.firstAllowableID = this.firstID;
             this.firstNumericFacID = this.firstID;
