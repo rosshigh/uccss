@@ -27545,7 +27545,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                 }
             }
 
-            if (this.productSystems.length > 0) {
+            if (this.productSystems && this.productSystems.length > 0) {
                 this.systems.selectedSystemFromId(this.productSystems[0]._id);
 
                 this.selectedSystemId = this.systems.selectedSystem._id;

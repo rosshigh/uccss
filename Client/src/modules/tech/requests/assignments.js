@@ -243,7 +243,7 @@ export class Assignments {
 
          //If the product has a system configured, select the first system on the list
        
-        if(this.productSystems.length > 0) {
+        if(this.productSystems && this.productSystems.length > 0) {
 			this.systems.selectedSystemFromId(this.productSystems[0]._id);
 			//Select the system in the interface
             this.selectedSystemId = this.systems.selectedSystem._id;
