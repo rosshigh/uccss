@@ -119,6 +119,64 @@ export class EditSystem {
 
     }
 
+    updateProduct(client, index){
+        if(client.assignments.length > 1) {
+             this.utils.showNotification("The client has assignments. You must refresh it before changing it's product");
+        } else {
+             if(this.selectedProduct === ""){
+                  this.utils.showNotification("Select a product first");
+             } else {
+                this.systems.selectedSystem.clients[index].productId = this.selectedProduct;
+                this.saveProduct = true;
+                this.products.selectedProductFromId(this.selectedProduct);
+                if(this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+                    this.products.selectedProduct.systems.forEach(item => {
+                        if(item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
+                    })
+                } else {
+                    this.saveProduct = true
+                }
+                if(this.saveProduct){
+                    this.products.selectedProduct.systems.push({systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid} );
+                    
+                }
+             }
+        }
+    }
+
+    updateAllProducts(){
+        if(this.selectedProduct === "") {
+             this.utils.showNotification("Select a product first");
+        } else {
+            return this.dialog.showMessage(
+                "This will only update the products for clients that have no assignments. Continue?", 
+                "Refresh Clients", 
+                ['Yes', 'No']
+                ).whenClosed(response => {
+                    if(!response.wasCancelled){
+                        this.systems.selectedSystem.clients.forEach(item => {
+                            if(item.assignments.length === 0){
+                                item.productId = this.selectedProduct;
+                            }
+                        })
+                        this.saveProduct = true;
+                        this.products.selectedProductFromId(this.selectedProduct);
+                        if(this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+                            this.products.selectedProduct.systems.forEach(item => {
+                                if(item.sid === this.systems.selectedSystem.sid) this.saveProduct = false;
+                            })
+                        } else {
+                            this.saveProduct = true
+                        }
+                        if(this.saveProduct){
+                            this.products.selectedProduct.systems.push({systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid} );
+                            
+                        }
+                    }
+                });
+        }
+    }
+
     refreshClient(index){
         return this.dialog.showMessage(
             "This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", 

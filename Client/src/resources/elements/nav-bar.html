@@ -26,8 +26,8 @@
                     <a if.bind="config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated" class="navbar-brand" href="#/home"><img  src="/img/${config.NAVBAR_LOGO}" ></a>
                 </span>
                  <span>
-                    <a if.bind="!config.NAVBAR_LOGO || config.NAVBAR_LOGO.length===0 && isAuthenticated" class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
-                    <a if.bind="!config.NAVBAR_LOGO || config.NAVBAR_LOGO.length===0 && !isAuthenticated" class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
+                    <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated" class="navbar-brand" href="#/user"><i class="fa fa-home"></i> UCCSS</a>
+                    <a if.bind="(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated" class="navbar-brand" href="#/home"><i class="fa fa-home"></i> UCCSS</a>
                 </span>
               
             </div>
