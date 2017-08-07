@@ -7885,6 +7885,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             var prodID = "";
             var numStatuses = this.config.REQUEST_STATUS.length;
             var templateObj = new Object();
+            templateObj['total'] = 0;
             for (var i = 0; i < numStatuses; i++) {
                 templateObj[this.config.REQUEST_STATUS[i].code] = 0;
             }
