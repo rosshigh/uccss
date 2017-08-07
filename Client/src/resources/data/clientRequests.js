@@ -259,12 +259,12 @@ export class ClientRequests {
 
     }
 
-    isRequestDirty(obj){
+    isRequestDirty(obj, skip){
       if(this.selectedRequest){
           if(!obj){
               var obj = this.emptyRequest();
           }
-            var skip = ['audit'];
+            skip.push('audit');
             return this.utils.objectsEqual(this.selectedRequest, obj, skip);
         }
         return new Array();

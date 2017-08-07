@@ -119,6 +119,7 @@ export class ViewHelpTickets {
         await this.requests.getClientRequestsArray('?filter=[and]personId|eq|' + this.userObj._id + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
         if(this.requests.requestsArray && this.requests.requestsArray.length > 0) {
             this.requests.selectRequest(0);
+            this.originalRequest = this.utils.copyObject(this.requests.selectedRequest);
             this.setDates(false);
             await this._lock();
             this.ILockedIt = true;
@@ -434,13 +435,38 @@ export class ViewHelpTickets {
 
   _buildRequest(){
     if(this.existingRequest && this.userObj._id){
+       let changes = this.requests.isRequestDirty( this.originalRequest, ['personId']);
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
         if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
-      })
+
+      });
+
+       changes.forEach(item => {
+        if(item.property === 'requestDetails'){
+          item.oldValue = "";
+          this.originalRequest.forEach(item => {
+            this.products.selectedProductFromId(item.productId);
+            item.oldValue += this.products.selectedProduct.name + " ";
+          });
+           item.newValue = "";
+          this.this.requests.selectedRequest.forEach(item => {
+            this.products.selectedProductFromId(item.productId);
+            item.newValue += this.products.selectedProduct.name + " ";
+          });
+        }
+        this.requests.selectedRequest.audit.push({
+          personId: this.userObj._id,
+          property: item.property,
+          oldValue: item.oldValue,
+          newValue: item.newValue
+        })
+       })
+
+    } else {
+      this.requests.selectedRequest.audit[0].personId = this.userObj._id; 
     }
 
-    this.requests.selectedRequest.audit[0].personId = this.userObj._id;
     this.requests.selectedRequest.institutionId = this.userObj.institutionId._id;
     this.requests.selectedRequest.sessionId = this.sessionId;
     this.requests.selectedRequest.courseId = this.courseId;
