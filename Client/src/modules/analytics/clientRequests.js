@@ -119,7 +119,6 @@ export class ClientRequestAnalytics {
                     this.totalsInstitutionArray[7] += item[7];
                     
                 });
-
                 this.dataTable.updateArray(this.requests.analyticsInstitutionResultArray);
                 this.institutionChartDataFunction();
             } 
@@ -220,15 +219,15 @@ export class ClientRequestAnalytics {
             await this.requests.getClientRequestsDetailsArrayAnalytics('?filter=sessionId|eq|' + this.selectedSession);
             if (this.requests.requestsDetailsArrayAnalytics && this.requests.requestsDetailsArrayAnalytics.length) {
                 this.requests.groupRequestsByProduct();
-                this.productChartDataFunction();
             } else {
                 this.displayArray = new Array();
             }
         } else {
             this.displayArray = new Array();
         }
-         this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
-
+         
+        this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
+        this.productChartDataFunction();
     }
 
     productChartDataFunction(){

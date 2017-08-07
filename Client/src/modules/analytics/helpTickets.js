@@ -145,6 +145,7 @@ export class HelpTicketAnalytics {
         var categories = new Array();
 
         var sortedArray = this.helpTickets.helpTicketTypeArrayAnalytics.sort((a,b) => {
+            if(!a['description'] || !b['description']) return -1;
             return (a['description'] < b['description']) ? -1 : (a['description'] > b['description']) ? 1 : 0;
         });
 
@@ -187,6 +188,7 @@ export class HelpTicketAnalytics {
         var categories = new Array();
 
         var sortedArray = this.helpTickets.helpTicketCurriculumArrayAnalytics.sort((a,b) => {
+            if(!a['curriculumTitle'] || !b['curriculumTitle']) return -1;
             return (a['curriculumTitle'] < b['curriculumTitle']) ? -1 : (a['curriculumTitle'] > b['curriculumTitle']) ? 1 : 0;
         });
 
@@ -228,6 +230,7 @@ export class HelpTicketAnalytics {
         var categories = new Array();
 
         var sortedArray = this.helpTickets.helpTicketInstitutionArrayAnalytics.sort((a,b) => {
+            if(!a['institution'] || !b['institution']) return -1;
             return (a['institution'] < b['institution']) ? -1 : (a['institution'] > b['institution']) ? 1 : 0;
         });
 
@@ -269,6 +272,7 @@ export class HelpTicketAnalytics {
         var categories = new Array();
 
         var sortedArray = this.helpTickets.helpTicketPeopleArrayAnalytics.sort((a,b) => {
+            if(!a['name'] || !b['name']) return -1;
             return (a['name'] < b['name']) ? -1 : (a['name'] > b['name']) ? 1 : 0;
         });
 
@@ -321,6 +325,7 @@ export class HelpTicketAnalytics {
         var categories = new Array();
 
         var sortedArray = this.helpTickets.helpTicketStatusArrayAnalytics.sort((a,b) => {
+            if(!a['helpTicketStatus'] || !b['helpTicketStatus']) return -1;
             return (a['helpTicketStatus'] < b['helpTicketStatus']) ? -1 : (a['helpTicketStatus'] > b['helpTicketStatus']) ? 1 : 0;
         });
 
