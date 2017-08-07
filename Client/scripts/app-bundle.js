@@ -1264,8 +1264,9 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
 
                                 this.selectedCategory = this.categories[0];
                                 this.selectedSession = this.sessions.sessionsArray[0]._id;
-                                this.getInstitutionRequests();
+
                                 this.getProductsRequests();
+                                this.getInstitutionRequests();
 
                             case 7:
                             case 'end':
@@ -1298,7 +1299,6 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                     break;
                 case 1:
                     this.getProductsRequests();
-                    this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                     this.selectedTab = "products";
                     break;
             }
@@ -1514,6 +1514,9 @@ define('modules/analytics/clientRequests',['exports', 'aurelia-framework', 'aure
                                 this.displayArray = new Array();
 
                             case 9:
+                                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
+
+                            case 10:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -7873,6 +7876,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 return;
             }
             var sortedArray = this.requestsDetailsArrayAnalytics.sort(function (a, b) {
+                if (!a.productId || !b.productId) return -1;
                 var result = a.productId.name < b.productId.name ? -1 : a.productId.name > b.productId.name ? 1 : 0;
                 return result;
             });

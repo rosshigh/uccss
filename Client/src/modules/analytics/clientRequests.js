@@ -59,8 +59,9 @@ export class ClientRequestAnalytics {
         ]);
         this.selectedCategory = this.categories[0];
         this.selectedSession = this.sessions.sessionsArray[0]._id;
-        this.getInstitutionRequests();
+       
         this.getProductsRequests();
+        this.getInstitutionRequests();
     }
 
     typeChanged(category, el){
@@ -79,7 +80,6 @@ export class ClientRequestAnalytics {
                 break;
             case 1:
                 this.getProductsRequests();
-                this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
                 this.selectedTab = "products";
                 break;
         }
@@ -227,6 +227,7 @@ export class ClientRequestAnalytics {
         } else {
             this.displayArray = new Array();
         }
+         this.dataTable.updateArray(this.requests.analyticsProductsResultArray);
 
     }
 

@@ -451,6 +451,7 @@ export class ClientRequests {
         }
         var sortedArray = this.requestsDetailsArrayAnalytics 
             .sort((a, b) => {
+                if(!a.productId || !b.productId) return -1;
                 var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
                 return result;
             });
