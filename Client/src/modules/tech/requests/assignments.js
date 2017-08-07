@@ -109,9 +109,11 @@ export class Assignments {
         this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let serverResponse = await this.clientRequests.saveRequestDetail();
         if (!serverResponse.error) {
+            var newRequest = serverResponse;
             this.utils.showNotification("The request was updated");
-            this.clientRequests.requestsDetailsArray[this.editIndex] = this.utils.copyObject()
-            this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+             this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
+            // this.clientRequests.requestsDetailsArray[this.editIndex] = this.utils.copyObject(newRequest)
+            // this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
             this.filterInAssigned();
             this._cleanUp();
         }
@@ -263,12 +265,12 @@ export class Assignments {
 	
 	clientRequired(){
         //Establish parameters
-        this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable)
-        this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
-        this.lastFirstID = this.firstID;
-        this.firstAllowableID = this.firstID;
-        this.firstNumericFacID = this.firstID;
-        this.lastNumericFacID =  this.firstNumericFacID + this.numberOfFacIDs - 1;
+        // this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable)
+        // this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+        // this.lastFirstID = this.firstID;
+        // this.firstAllowableID = this.firstID;
+        // this.firstNumericFacID = this.firstID;
+        // this.lastNumericFacID =  this.firstNumericFacID + this.numberOfFacIDs - 1;
 		
 		//Parse id templates into an array
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
@@ -383,7 +385,16 @@ export class Assignments {
 		}
 	}
 	
-	processClient(index, client, el){        
+	processClient(index, client, el){      
+        this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable)
+        
+        // this.firstID = this.products.selectedProduct.firstAllowableId ? parseInt(this.products.selectedProduct.firstAllowableId) : this.config.FIRST_DEFAULT_ID;
+        this.firstID = client.firstAllowableID ? parseInt(client.firstAllowableID) : this.config.FIRST_DEFAULT_ID;
+        this.lastFirstID = this.firstID;
+        this.firstAllowableID = this.firstID;
+        this.firstNumericFacID = this.firstID;
+        this.lastNumericFacID =  this.firstNumericFacID + this.numberOfFacIDs - 1;
+
 		//Make sure the client hasn't already been selected
 		let alreadySelected = false;
 		this.assignmentDetails.forEach(item => {
@@ -797,8 +808,10 @@ export class Assignments {
                 var email = this._buildEmailObject();
                 let serverResponse = await this.clientRequests.assignRequest(email, this.editIndex);
                 if (!serverResponse.status) {
+                    var newRequest = serverResponse;
                     this.utils.showNotification("The request was updated");
-                    this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+                    // this.dataTable.updateArray(this.clientRequests.requestsDetailsArray);
+                    this.dataTable.displayArray[this.editIndex] = this.utils.copyObject(newRequest);
                     this.filterInAssigned();
                     await this.systems.saveSystem();
                     this._cleanUp();
@@ -1143,7 +1156,7 @@ export class Assignments {
         this.lastID = 0;
         this.requestSelected = 'table';
         this.customerMessage = false;
-         this.clearFilters();
+        //  this.clearFilters();
     }
 
     flag(){

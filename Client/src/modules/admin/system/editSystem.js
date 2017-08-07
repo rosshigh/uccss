@@ -258,7 +258,7 @@ export class EditSystem {
                 });
         }
         this.saveProduct = true;
-        var result = this.systems.generateClients(start, end, this.editClientStatus, this.selectedProduct, parseInt(this.clientInterval));
+        var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval));
         if (result.error) {
             this.utils.showNotification(result.error);
         } else {
@@ -293,7 +293,8 @@ export class EditSystem {
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE);   
+                    this.products.selectedProductFromId(this.selectedProduct);
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.selectedProduct);   
                 }
             });
     }
@@ -315,19 +316,20 @@ export class EditSystem {
         this.productsToUpdate = new Array();
         var processedProducts = new Array();
         this.systems.selectedSystem.clients.forEach(item => {
-            if(processedProducts.indexOf(item.productId) === -1){
-                processedProducts.push(item.productId);
-                this.products.selectedProductFromId(item.productId);
-                if(this.products.selectedProduct._id){
-                    this.products.selectedProduct.systems.forEach((system, index) => {
-                        if(system.systemId === id) {
-                            this.products.selectedProduct.systems.splice(index, 1);
-                            this.productsToUpdate.push(this.products.selectedProduct);
-                        }
-                    })
+            if(item.productId){
+                if(processedProducts.indexOf(item.productId) === -1){
+                    processedProducts.push(item.productId);
+                    this.products.selectedProductFromId(item.productId);
+                    if(this.products.selectedProduct._id){
+                        this.products.selectedProduct.systems.forEach((system, index) => {
+                            if(system.systemId === id) {
+                                this.products.selectedProduct.systems.splice(index, 1);
+                                this.productsToUpdate.push(this.products.selectedProduct);
+                            }
+                        })
+                    }
                 }
-            }
-           
+            }  
         })
         this.systems.deleteAllClients();
 

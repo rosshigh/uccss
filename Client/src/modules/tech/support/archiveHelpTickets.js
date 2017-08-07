@@ -104,20 +104,21 @@ export class ArchiveHelpTickets {
     }   
   }
 
-  async typeChanged(){
-    this._hideTypes();
+  async typeChanged(type){
+    // this._hideTypes();
+    this.helpTickets.helpTicketTypesArray.forEach(item => {
+      item.subtypes.forEach(item2 => {
+        if(item2.type === this.selectedType){
+          this.selectedSubType = item2;
+        }
+      })
+    })
     var index = parseInt(this.selectedType) - 1;
-    if(index === 3) {
-      this.showAdditionalInfo = false;
-    } else {
-      this.showAdditionalInfo = true;
-       this.config.HELP_TICKET_TYPES[index].show = true;
-      if( this.config.HELP_TICKET_TYPES[index].appsRequired || !this.config.HELP_TICKET_TYPES[index].clientRequired ) {
+      if( this.selectedSubType.appsRequired ) {
           await this.apps.getDownloadsArray(true, '?fields=helpTicketRelevant|eq|true&order=name');
       } else {
           await this.products.getProductsArray('?fields=_id name');
       }
-    }
   }
 
   _hideTypes(){

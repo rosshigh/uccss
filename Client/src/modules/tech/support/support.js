@@ -44,7 +44,6 @@ export class Support{
             name: 'createHelpTickets',
             title: 'Create Help Tickets'
         },
-        /*
         {
             route: 'archiveHelpTickets',
             moduleId: './archiveHelpTickets',
@@ -53,7 +52,6 @@ export class Support{
             name: 'archiveHelpTickets',
             title: 'Help Tickets Archive'
         }
-        */
         ]);
 
         this.router = router;

@@ -467,6 +467,96 @@ export class HelpTickets {
         })
     }
 
+    advancedSearch(searchObj){
+
+         var resultArray = this.utils.copyArray(this.helpTicketsArray);
+
+         if(searchObj.helpTicketNo.length > 0){
+             resultArray = resultArray.filter(item => {
+                 return item.helpTicketNo == searchObj.helpTicketNo;
+             });
+         } else {
+             //Dates
+            if(searchObj.dateRange && searchObj.dateRange.dateFrom !== "" && searchObj.dateRange.dateFrom !== "Invalid date"){
+                if(!searchObj.dateRange.dateTo || searchObj.dateRange.dateTo == "Invalid date"){
+                    resultArray = resultArray.filter(item => {
+                        var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                    return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom);
+                    });
+                } else {
+                    resultArray = resultArray.filter(item => {
+                        var dt = moment(item.createdDate).format('YYYY-MM-DD');
+                    return moment(item.createdDate).isAfter(searchObj.dateRange.dateFrom) && moment(item.createdDate).isBefore(searchObj.dateRange.dateTo);
+                    });
+                }
+            }
+            //Status
+            if(searchObj.status && searchObj.status.length > 0){
+                for(var i = 0; i < searchObj.status.length; i++){
+                    searchObj.status[i] = parseInt(searchObj.status[i]);
+                }
+                resultArray = resultArray.filter(item => {
+                    return searchObj.status.indexOf(item.helpTicketStatus) > -1;
+                });
+            }
+            //Keywords
+            if(searchObj.keyWords && searchObj.keyWords.length > 0){
+                var searchKeyword = searchObj.keyWords.toUpperCase();
+                resultArray = resultArray.filter(item => {
+                    if(item.keyWords){
+                        var htKeyword = item.keyWords.toUpperCase();
+                        return htKeyword.indexOf(searchKeyword) > -1;
+                    } else {
+                        return false;
+                    }
+                    
+                });
+            }
+            //Content
+            if(searchObj.content && searchObj.content.length > 0){
+                var searchContent = searchObj.content.toUpperCase();
+                resultArray = resultArray.filter(item => {
+                    for(var i = 0; i < item.content.length; i++){
+                        if(item.content[i].content.comments.toUpperCase().indexOf(searchContent) > -1){
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }         
+            //Type
+            if(searchObj.type && searchObj.type != -1){
+                resultArray = resultArray.filter(item => {
+                    return searchObj.type == item.helpTicketType;
+                });
+            }   
+
+            //Products
+            if(searchObj.productIds && searchObj.productIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.productIds.indexOf(item.productId) > -1;
+                });
+            }
+
+            //People
+             if(searchObj.peopleIds && searchObj.peopleIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.peopleIds.indexOf(item.personId._id) > -1;
+                });
+            }
+
+             //Instituions
+             if(searchObj.institutionIds && searchObj.institutionIds.length > 0){
+                 resultArray = resultArray.filter(item => {
+                    return searchObj.institutionIds.indexOf(item.institutionId._id) > -1;
+                });
+            }
+         }
+
+         
+         return resultArray;
+    }
+
     lockHelpTicket(obj){
         if(obj.helpTicketId) {
             var response = this.data.saveObject(obj, this.HELP_TICKET_LOCK_SERVICES, "post");

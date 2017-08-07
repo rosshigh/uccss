@@ -31,6 +31,13 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label for="lastID" class="col-lg-2 control-label topMargin">First Allowable ID</label>
+					<div class="col-lg-10">
+						<input value.bind="selectedClient.firstAllowableID" id="lastID" class="form-control topMargin" placeholder="Last ID Allocated"
+						 type="number" />
+					</div>
+				</div>
+				<div class="form-group">
 					<label  class="control-label col-lg-2 topMargin">Product</label>
 					<div class="col-lg-10">
 					<select class="form-control topMargin"  value.bind="selectedClient.productId">

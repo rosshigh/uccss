@@ -46,6 +46,7 @@ export function configure(config) {
     './value-converters/overlap',
     './value-converters/filter-array',
     './value-converters/filter-sessions',
-    './value-converters/session-systems'
+    './value-converters/session-systems',
+    './value-converters/ucc-staff'
   ]);
 }

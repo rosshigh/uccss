@@ -154,9 +154,9 @@ export class Systems{
         }
     }
 
-    refreshClients(status){
+    refreshClients(status, product){
          for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, this.selectedSystem.clients[i].productId );
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, product );
         }
     }
 
@@ -219,7 +219,8 @@ export class Systems{
         obj.lastIdAssigned = 0;
         obj.lastFacIdAssigned = 0;
         obj.firstFacIdAssigned = 0;
-        obj.productId = product ? product : null;
+        obj.productId = product ? product._id : null;
+        obj.firstAllowableID = product.firstAllowableId ? parseInt(product.firstAllowableId) : 1;
         return obj;
     }
 
