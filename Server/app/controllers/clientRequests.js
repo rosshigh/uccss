@@ -43,6 +43,26 @@ module.exports = function (app) {
       })
   });
 
+  router.get('/api/clientRequestsP', requireAuth, function(req, res, next){
+    logger.log('Get clientRequests');
+    var query = buildQuery(req.query, Model.find());
+    query.sort(req.query.order)
+      .populate('requestDetails')
+      .populate({path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'})
+       .populate({ path: 'requestDetails', model: 'ClientRequestDetail', populate: {path: 'productId', model: 'Product', select: 'name'}})
+      .exec()
+      .then(object => {
+        if(object){
+          res.status(200).json(object);
+        } else {
+          res.status(200).json({message: "No requests were found"});
+        }
+      })
+      .catch(err => {
+          return next(err);
+      })
+  });
+
   router.get('/api/clientRequests/current/count', requireAuth, function(req, res, next){
     logger.log('Get helpTicket');
     var query = buildQuery(req.query, ClientRequestDetail.find({ $or:[ {'requestStatus':1}, {'requestStatus':3}, {'requestStatus':4} ]}))

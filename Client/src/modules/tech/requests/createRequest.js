@@ -72,7 +72,7 @@ export class CreateRequestTech {
 	selectProduct(el){
     	if(this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage){
 			if(this.alreadyOnList(el.target.id)){
-				this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.')
+				this.utils.showNotification("You can't add the same product more than once")
 			} else {
 				$("#requestProductsLabel").html("Requested Products");
 					var newObj = this.requests.emptyRequestDetail();
@@ -320,8 +320,8 @@ export class CreateRequestTech {
 		// await this._unLock();
 		if (this.sessionId != -1 && this.courseId != -1) {
 			this.ILockedIt = false;
-			this.existingRequest = false;
-			await this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
+			this.existingRequest = false; 
+			await this.requests.getClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 			if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
 				this.requests.selectRequest(0);
 				 this.setDates(false);

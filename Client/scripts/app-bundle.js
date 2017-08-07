@@ -28834,7 +28834,7 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 		CreateRequestTech.prototype.selectProduct = function selectProduct(el) {
 			if (this.requests.selectedRequest.requestDetails.length < this.config.REQUEST_LIMIT && !this.showLockMessage) {
 				if (this.alreadyOnList(el.target.id)) {
-					this.utils.showNotification('If you need more than one client of a product, add a comment on the next step.');
+					this.utils.showNotification("You can't add the same product more than once");
 				} else {
 					$("#requestProductsLabel").html("Requested Products");
 					var newObj = this.requests.emptyRequestDetail();
@@ -29217,7 +29217,7 @@ define('modules/tech/requests/createRequest',['exports', 'aurelia-framework', 'a
 								this.ILockedIt = false;
 								this.existingRequest = false;
 								_context8.next = 5;
-								return this.requests.getPersonClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
+								return this.requests.getClientRequestsArray('?filter=[and]personId|eq|' + this.selectedPerson + ':sessionId|eq|' + this.sessionId + ':courseId|eq|' + this.courseId, true);
 
 							case 5:
 								if (this.requests.requestsArray && this.requests.requestsArray.length > 0) {
