@@ -89,12 +89,15 @@ export class Documents {
 
     async selectFirstCategory(){
         this.categoryIndex = 0;
-        this.documents.selectCategory(0);
-        await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-        this.dataTable.updateArray(this.documents.documentsArray);
-        this.showDocuments = true;
-        this.showDocumentForm =  false;
-        this.displayTitle = "Documents";
+        if(this.documents.selectCategory && this.documents.selectCategory.length > 0){
+            this.documents.selectCategory(0);
+            await this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+            this.dataTable.updateArray(this.documents.documentsArray);
+            this.showDocuments = true;
+            this.showDocumentForm =  false;
+        }
+         this.displayTitle = "Documents";
+       
     }
 
     async typeChanged(index, el){

@@ -428,13 +428,16 @@ export class HelpTickets {
         var templateObj = new Object({name: "", count: 0});
 
         sortedArray.forEach(item => {
-            if(item.personId.fullName != type){
-                type = item.personId.fullName;
-                var obj = this.utils.copyObject(templateObj);
-                obj.name = item.personId.fullName;
-                this.helpTicketPeopleArrayAnalytics.push(obj);
+            if(item.personId){
+                if(item.personId.fullName != type){
+                    type = item.personId.fullName;
+                    var obj = this.utils.copyObject(templateObj);
+                    obj.name = item.personId.fullName;
+                    this.helpTicketPeopleArrayAnalytics.push(obj);
+                }
+                if(this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1]) this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1].count += 1;
             }
-            if(this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1]) this.helpTicketPeopleArrayAnalytics[this.helpTicketPeopleArrayAnalytics.length-1].count += 1;
+          
         })
     }
 

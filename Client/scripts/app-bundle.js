@@ -11082,13 +11082,15 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             var templateObj = new Object({ name: "", count: 0 });
 
             sortedArray.forEach(function (item) {
-                if (item.personId.fullName != type) {
-                    type = item.personId.fullName;
-                    var obj = _this5.utils.copyObject(templateObj);
-                    obj.name = item.personId.fullName;
-                    _this5.helpTicketPeopleArrayAnalytics.push(obj);
+                if (item.personId) {
+                    if (item.personId.fullName != type) {
+                        type = item.personId.fullName;
+                        var obj = _this5.utils.copyObject(templateObj);
+                        obj.name = item.personId.fullName;
+                        _this5.helpTicketPeopleArrayAnalytics.push(obj);
+                    }
+                    if (_this5.helpTicketPeopleArrayAnalytics[_this5.helpTicketPeopleArrayAnalytics.length - 1]) _this5.helpTicketPeopleArrayAnalytics[_this5.helpTicketPeopleArrayAnalytics.length - 1].count += 1;
                 }
-                if (_this5.helpTicketPeopleArrayAnalytics[_this5.helpTicketPeopleArrayAnalytics.length - 1]) _this5.helpTicketPeopleArrayAnalytics[_this5.helpTicketPeopleArrayAnalytics.length - 1].count += 1;
             });
         };
 
@@ -20747,17 +20749,25 @@ define('modules/admin/documents/documents',['exports', 'aurelia-framework', 'aur
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 this.categoryIndex = 0;
+
+                                if (!(this.documents.selectCategory && this.documents.selectCategory.length > 0)) {
+                                    _context3.next = 8;
+                                    break;
+                                }
+
                                 this.documents.selectCategory(0);
-                                _context3.next = 4;
+                                _context3.next = 5;
                                 return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
 
-                            case 4:
+                            case 5:
                                 this.dataTable.updateArray(this.documents.documentsArray);
                                 this.showDocuments = true;
                                 this.showDocumentForm = false;
-                                this.displayTitle = "Documents";
 
                             case 8:
+                                this.displayTitle = "Documents";
+
+                            case 9:
                             case 'end':
                                 return _context3.stop();
                         }
