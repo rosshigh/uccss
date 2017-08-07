@@ -418,6 +418,7 @@ export class ClientRequests {
         }
         var sortedArray = this.requestsDetailsArrayAnalytics 
             .sort((a, b) => {
+                if(!a['requestId'] || !b['requestId']) return -1;
                 var result = (a['requestId'].institutionId.name < b['requestId'].institutionId.name) ? -1 : (a['requestId'].institutionId.name > b['requestId'].institutionId.name) ? 1 : 0;
                 return result;
             });

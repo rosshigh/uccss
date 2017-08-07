@@ -7823,6 +7823,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
 
                             case 2:
                                 sortedArray = this.requestsDetailsArrayAnalytics.sort(function (a, b) {
+                                    if (!a['requestId'] || !b['requestId']) return -1;
                                     var result = a['requestId'].institutionId.name < b['requestId'].institutionId.name ? -1 : a['requestId'].institutionId.name > b['requestId'].institutionId.name ? 1 : 0;
                                     return result;
                                 });
@@ -11058,6 +11059,7 @@ define('resources/data/helpTickets',['exports', 'aurelia-framework', './dataServ
             }
 
             var sortedArray = this.helpTicketArrayAnalytics.sort(function (a, b) {
+                if (!a['personId'] || !b['personId']) return -1;
                 var result = a.personId.fullName < b.personId.fullName ? -1 : a.personId.fullName > b.personId.fullName ? 1 : 0;
                 return result;
             });

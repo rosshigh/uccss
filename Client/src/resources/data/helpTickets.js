@@ -418,6 +418,7 @@ export class HelpTickets {
 
         var sortedArray = this.helpTicketArrayAnalytics 
             .sort((a, b) => {
+                 if(!a['personId'] || !b['personId']) return -1;
                 var result = (a.personId.fullName < b.personId.fullName) ? -1 : (a.personId.fullName > b.personId.fullName) ? 1 : 0;
                 return result;
             });

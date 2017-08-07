@@ -1,12 +1,15 @@
 'use strict'
 
 var express = require('express'),
+ 	mongoose = require('mongoose'),
   	router = express.Router(),
   	passport = require('passport'),
   	path = require('path'),
 	rootPath = path.normalize(__dirname + '/..'),
   	logger = require('../../config/logger'),
-	dir = require('node-dir');
+	dir = require('node-dir'),
+	HelpTickets = mongoose.model('HelpTicket'),
+	ClientRequests = mongoose.model('ClientRequest');
 
   var requireAuth = passport.authenticate('jwt', { session: false });  
   const authFolder = './log-auth/';
@@ -160,16 +163,6 @@ module.exports = function (app, config) {
 
 	})
 
-	// router.route('/files/rename/:oldName/:newName').put(function(req, res, next){
-	// 	logger.log("Rename file " + oldName);
-	// 	var oldName = req.params.oldName.split("$@").join('/');
-	// 	var newName = req.params.newName.split("$@").join('/');
-	// 	fs.rename(oldName, newName, function(err) {
-	// 		if ( err ) return next(err);	
-	// 	});
-	// 	res.status(200).json({"message": "File renamed"});
-	// });
-
 	router.route('/foreverLog/fileList/:type').get(function(req, res, next){
 		logger.log('Get forever log files', 'verbose');
 		const fs = require('fs');
@@ -228,6 +221,20 @@ module.exports = function (app, config) {
 		catch(err){
 				return next(err);
 		}
+	});
+
+	router.route('/database/stats/:collection').get(function(req, res, next){
+		logger.log('Get stats for collection ' + req.params.collection);
+		switch(req.params.collection){
+			case 'helptickets':
+				var collection = HelpTickets;
+		}
+		HelpTickets.stats(function(err, stats) {
+			if(err) return next(err);
+          console.log(stats)
+
+          res.status(200).json(stats);
+        });
 	});
 
 	router.route('/test/crash').get(function(req, res, next){
