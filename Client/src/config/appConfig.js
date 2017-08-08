@@ -67,7 +67,7 @@ export class AppConfig {
 
     REQUEST_STATUS = [{ code: this.UNASSIGNED_REQUEST_CODE, description: 'Unassigned', status: "" }, 
                       { code: this.ASSIGNED_REQUEST_CODE, description: 'Assigned', status: "assign"  }, 
-                      { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "active"  }, 
+                      { code: this.UPDATED_REQUEST_CODE, description: 'Updated', status: "success"  }, 
                       { code: this.CUSTOMER_ACTION_REQUEST_CODE, description: 'Customer Action', status: "warning"  },
                       { code: this.CANCELLED_REQUEST_CODE, description: 'Cancelled', status: ""  },
                       { code: this.PROVISIONAL_REQUEST_CODE, description: 'Provisional', status: ""  },
