@@ -14,7 +14,9 @@ module.exports = function (app) {
 
   router.get('/api/systems', requireAuth, function(req, res, next){
     logger.log('Get systems',"verbose");
-    var query = buildQuery(req.query, Model.find()).exec()
+    var query = buildQuery(req.query, Model.find())
+    .populate({path: 'clients.assignments.personId', model: 'Person', select: 'firstName lastName fullName'})
+    .exec()
     .then(result => {
       res.status(200).json(result)
     })

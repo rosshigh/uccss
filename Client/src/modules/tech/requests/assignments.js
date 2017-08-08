@@ -772,11 +772,13 @@ export class Assignments {
             }
         }
         this.systems.updateClient(this.proposedClient[index]);
+        this.systems. selectedSystemFromId(this.proposedClient[index].systemId);
+        this.assignment = this.assignmentDetails[index];
         this.assignmentDetails.splice(index, 1);
         if(this.assignmentDetails.length == 0) this.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE
         
         //Construct the object to submit to the server
-        this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+        this.selectedRequestDetail.idsAssigned = parseInt(this.selectedRequestDetail.idsAssigned) - parseInt(this.assignment.idsAssigned);
         this.selectedRequestDetail.assignments = this.assignmentDetails;
         this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
         this.requestToSave.requestDetailsToSave = new Array();
@@ -785,10 +787,13 @@ export class Assignments {
         this.requestToSave.requestDetailsToSave.push(request);
         
         this.clientRequests.setSelectedRequest(this.requestToSave);
-        let serverResponse = await this.clientRequests.saveRequest(); 
+        let serverResponse = await this.clientRequests.deleteAssignment(this.editIndex);  
         if (!serverResponse.status) {
+            this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+            this.filterInAssigned();
             this.utils.showNotification("The assignment was deleted");
-            await this.systems.saveClients(this.proposedClient);
+            await this.systems.saveSystem();
+           
         }
         this.selectedAssignedClient = "";
 	}	
@@ -905,6 +910,7 @@ export class Assignments {
                                 studentIDRange: this.assignmentDetails[i].studentUserIds,
                                 facultyIDRange: this.assignmentDetails[i].facultyUserIds,
                                 institutionId: this.selectedRequestDetail.requestId.institutionId,
+                                personId: this.selectedRequestDetail.requestId.personId._id,
                                 firstID: this.assignmentDetails[i].firstID,
                                 lastID: this.assignmentDetails[i].lastID,  
                             });
@@ -937,6 +943,7 @@ export class Assignments {
                     studentIDRange: this.assignmentDetails[i].studentUserIds,
                     facultyIDRange: this.assignmentDetails[i].facultyUserIds,
                     institutionId: this.selectedRequestDetail.requestId.institutionId,
+                    personId: this.selectedRequestDetail.requestId.personId._id,
                     firstID: this.assignmentDetails[i].firstID,
                     lastID: this.assignmentDetails[i].lastID,   
                     assignedDate: new Date()                 

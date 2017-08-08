@@ -216,6 +216,23 @@ export class ClientRequests {
         }
     }
 
+    async deleteAssignment(index){
+         if(!this.selectedRequest){
+            return;
+        }
+        var url =  this.CLIENT_REQUESTS_SERVICES + "/deleteAssignment";
+        var serverResponse = await this.data.saveObject(this.selectedRequest, url, "put");
+        if(!serverResponse.error){
+            this.selectedRequestDetail = serverResponse;
+            if(!this.selectedRequestDetail.requestId.courseId || this.selectedRequestDetail.requestId.courseId === null){
+                this.selectedRequestDetail.requestId.courseId = {_id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME};
+            }
+            this.requestsDetailsArray[index]  = this.utils.copyObject(this.selectedRequestDetail);
+        }
+        return serverResponse;
+
+    }
+
     updateStatuses(updateIds, status){
         for(let i = 0; i < this.requestsDetailsArray.length; i++){
            if(updateIds.indexOf(this.requestsDetailsArray[i]._id) > -1){

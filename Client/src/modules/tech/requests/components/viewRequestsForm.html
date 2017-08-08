@@ -318,7 +318,14 @@
                   <td>
                     <table class="col-sm-12">
                       <tr repeat.for="assignment of client.assignments">
-                        <td><div class="col-lg-12 list-group-item"><h5 class="list-group-item-heading">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:"_id":"requestNo"}</h5><p class="list-group-item-text"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId.name}</p></div></td>
+                        <td><div class="col-lg-12 list-group-item">
+                          <h5 class="list-group-item-heading">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:"_id":"requestNo"}</h5>
+                          <p class="list-group-item-text"><strong>${assignment.studentIDRange}</strong> <br>
+                            ${assignment.facultyIDRange} <br> 
+                            ${assignment.personId.fullName}</br>
+                            ${assignment.institutionId.name}</p>
+                          </div>
+                            </td>
                       </tr>
                     </table>
                   </td>

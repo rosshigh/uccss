@@ -251,7 +251,7 @@ export class Systems{
         for(var i = 0, x = this.systemsArray.length; i < x; i++){
             if(this.systemsArray[i]._id === client.systemId){
                 for(var j = 0; j < this.systemsArray[i].clients.length; j++){
-                    if(this.systemsArray[i].clients[j]._id === client._id){
+                    if(this.systemsArray[i].clients[j].client == client.client){
                         this.systemsArray[i].clients[j] = this.utils.copyObject(client);
                         break;
                     }

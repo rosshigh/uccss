@@ -7418,17 +7418,8 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
             return saveRequest;
         }();
 
-        ClientRequests.prototype.updateStatuses = function updateStatuses(updateIds, status) {
-            for (var i = 0; i < this.requestsDetailsArray.length; i++) {
-                if (updateIds.indexOf(this.requestsDetailsArray[i]._id) > -1) {
-                    this.requestsDetailsArray[i].requestStatus = status;
-                    this.requestsDetailsArray[i].requestId.requestStatus = status;
-                }
-            }
-        };
-
-        ClientRequests.prototype.assignRequest = function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(email, index) {
+        ClientRequests.prototype.deleteAssignment = function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(index) {
                 var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
@@ -7442,7 +7433,7 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 return _context10.abrupt('return');
 
                             case 2:
-                                url = email ? this.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.CLIENT_REQUESTS_SERVICES + '/assign';
+                                url = this.CLIENT_REQUESTS_SERVICES + "/deleteAssignment";
                                 _context10.next = 5;
                                 return this.data.saveObject(this.selectedRequest, url, "put");
 
@@ -7450,9 +7441,6 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 serverResponse = _context10.sent;
 
                                 if (!serverResponse.error) {
-                                    if (email.email) {
-                                        this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
-                                    }
                                     this.selectedRequestDetail = serverResponse;
                                     if (!this.selectedRequestDetail.requestId.courseId || this.selectedRequestDetail.requestId.courseId === null) {
                                         this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
@@ -7469,21 +7457,30 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee10, this);
             }));
 
-            function assignRequest(_x14, _x15) {
+            function deleteAssignment(_x14) {
                 return _ref10.apply(this, arguments);
             }
 
-            return assignRequest;
+            return deleteAssignment;
         }();
 
-        ClientRequests.prototype.deleteRequest = function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
-                var serverResponse;
+        ClientRequests.prototype.updateStatuses = function updateStatuses(updateIds, status) {
+            for (var i = 0; i < this.requestsDetailsArray.length; i++) {
+                if (updateIds.indexOf(this.requestsDetailsArray[i]._id) > -1) {
+                    this.requestsDetailsArray[i].requestStatus = status;
+                    this.requestsDetailsArray[i].requestId.requestStatus = status;
+                }
+            }
+        };
+
+        ClientRequests.prototype.assignRequest = function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(email, index) {
+                var url, serverResponse;
                 return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
                         switch (_context11.prev = _context11.next) {
                             case 0:
-                                if (this.selectedRequestDetail._id) {
+                                if (this.selectedRequest) {
                                     _context11.next = 2;
                                     break;
                                 }
@@ -7491,24 +7488,26 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                 return _context11.abrupt('return');
 
                             case 2:
-                                _context11.next = 4;
-                                return this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+                                url = email ? this.CLIENT_REQUESTS_SERVICES + '/assign/?email=1' : this.CLIENT_REQUESTS_SERVICES + '/assign';
+                                _context11.next = 5;
+                                return this.data.saveObject(this.selectedRequest, url, "put");
 
-                            case 4:
+                            case 5:
                                 serverResponse = _context11.sent;
 
-                                if (serverResponse.error) {
-                                    _context11.next = 10;
-                                    break;
+                                if (!serverResponse.error) {
+                                    if (email.email) {
+                                        this.data.saveObject(email, this.CLIENT_REQUEST_EMAIL, "post");
+                                    }
+                                    this.selectedRequestDetail = serverResponse;
+                                    if (!this.selectedRequestDetail.requestId.courseId || this.selectedRequestDetail.requestId.courseId === null) {
+                                        this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
+                                    }
+                                    this.requestsDetailsArray[index] = this.utils.copyObject(this.selectedRequestDetail);
                                 }
-
-                                this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
                                 return _context11.abrupt('return', serverResponse);
 
-                            case 10:
-                                return _context11.abrupt('return', undefined);
-
-                            case 11:
+                            case 8:
                             case 'end':
                                 return _context11.stop();
                         }
@@ -7516,8 +7515,55 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee11, this);
             }));
 
-            function deleteRequest() {
+            function assignRequest(_x15, _x16) {
                 return _ref11.apply(this, arguments);
+            }
+
+            return assignRequest;
+        }();
+
+        ClientRequests.prototype.deleteRequest = function () {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
+                            case 0:
+                                if (this.selectedRequestDetail._id) {
+                                    _context12.next = 2;
+                                    break;
+                                }
+
+                                return _context12.abrupt('return');
+
+                            case 2:
+                                _context12.next = 4;
+                                return this.data.deleteObject(this.CLIENT_REQUEST_DETAILS + '/' + this.selectedRequestDetail._id + '/' + this.selectedRequestDetail.requestId._id);
+
+                            case 4:
+                                serverResponse = _context12.sent;
+
+                                if (serverResponse.error) {
+                                    _context12.next = 10;
+                                    break;
+                                }
+
+                                this.requestsDetailsArray.splice(this.requestDetailIndex, 1);
+                                return _context12.abrupt('return', serverResponse);
+
+                            case 10:
+                                return _context12.abrupt('return', undefined);
+
+                            case 11:
+                            case 'end':
+                                return _context12.stop();
+                        }
+                    }
+                }, _callee12, this);
+            }));
+
+            function deleteRequest() {
+                return _ref12.apply(this, arguments);
             }
 
             return deleteRequest;
@@ -7545,35 +7591,35 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getRequestDetail = function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(id) {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(id) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
-                                _context12.next = 2;
+                                _context13.next = 2;
                                 return this.data.get(this.CLIENT_REQUEST_DETAILS + "/" + id);
 
                             case 2:
-                                serverResponse = _context12.sent;
+                                serverResponse = _context13.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedRequestDetail = serverResponse;
                                 } else {
                                     this.selectedRequestDetail = null;
                                 }
-                                return _context12.abrupt('return', serverResponse);
+                                return _context13.abrupt('return', serverResponse);
 
                             case 5:
                             case 'end':
-                                return _context12.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee13, this);
             }));
 
-            function getRequestDetail(_x16) {
-                return _ref12.apply(this, arguments);
+            function getRequestDetail(_x17) {
+                return _ref13.apply(this, arguments);
             }
 
             return getRequestDetail;
@@ -7613,28 +7659,28 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.saveRequestDetail = function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context14.prev = _context14.next) {
                             case 0:
                                 if (this.selectedRequestDetail) {
-                                    _context13.next = 2;
+                                    _context14.next = 2;
                                     break;
                                 }
 
-                                return _context13.abrupt('return');
+                                return _context14.abrupt('return');
 
                             case 2:
-                                _context13.next = 4;
+                                _context14.next = 4;
                                 return this.data.saveObject(this.selectedRequestDetail, this.CLIENT_REQUEST_DETAILS, "put");
 
                             case 4:
-                                response = _context13.sent;
+                                response = _context14.sent;
 
                                 if (response.error) {
-                                    _context13.next = 10;
+                                    _context14.next = 10;
                                     break;
                                 }
 
@@ -7643,18 +7689,18 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                     this.selectedRequestDetail.requestId.courseId = { _id: this.config.SANDBOX_ID, name: this.config.SANDBOX_NAME };
                                 }
                                 this.requestsDetailsArray[this.requestDetailIndex] = this.utils.copyObject(this.selectedRequestDetail);
-                                return _context13.abrupt('return', response);
+                                return _context14.abrupt('return', response);
 
                             case 10:
                             case 'end':
-                                return _context13.stop();
+                                return _context14.stop();
                         }
                     }
-                }, _callee13, this);
+                }, _callee14, this);
             }));
 
             function saveRequestDetail() {
-                return _ref13.apply(this, arguments);
+                return _ref14.apply(this, arguments);
             }
 
             return saveRequestDetail;
@@ -7672,56 +7718,56 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getClientRequest = function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(id) {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(id) {
                 var serverResponse;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                             case 0:
-                                _context14.next = 2;
+                                _context15.next = 2;
                                 return this.data.get(this.CLIENT_REQUEST_DETAILS + '/' + id);
 
                             case 2:
-                                serverResponse = _context14.sent;
+                                serverResponse = _context15.sent;
 
                                 if (!serverResponse.error) {
                                     this.selectedRequest = serverResponse;
                                 }
-                                return _context14.abrupt('return', serverResponse);
+                                return _context15.abrupt('return', serverResponse);
 
                             case 5:
                             case 'end':
-                                return _context14.stop();
+                                return _context15.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee15, this);
             }));
 
-            function getClientRequest(_x17) {
-                return _ref14.apply(this, arguments);
+            function getClientRequest(_x18) {
+                return _ref15.apply(this, arguments);
             }
 
             return getClientRequest;
         }();
 
         ClientRequests.prototype.getSessionCount = function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(sessionArray, numSessions, options, requestStatus) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(sessionArray, numSessions, options, requestStatus) {
                 var url, response, sessions, sessionCount, i;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
                                 url = this.CLIENT_REQUESTS_SERVICES;
 
                                 url += options ? options : "";
-                                _context15.next = 4;
+                                _context16.next = 4;
                                 return this.data.get(url);
 
                             case 4:
-                                response = _context15.sent;
+                                response = _context16.sent;
 
                                 if (response.error) {
-                                    _context15.next = 13;
+                                    _context16.next = 13;
                                     break;
                                 }
 
@@ -7748,39 +7794,9 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                                         }
                                     }
                                 });
-                                return _context15.abrupt('return', sessionCount);
+                                return _context16.abrupt('return', sessionCount);
 
                             case 13:
-                            case 'end':
-                                return _context15.stop();
-                        }
-                    }
-                }, _callee15, this);
-            }));
-
-            function getSessionCount(_x18, _x19, _x20, _x21) {
-                return _ref15.apply(this, arguments);
-            }
-
-            return getSessionCount;
-        }();
-
-        ClientRequests.prototype.sendCustomerMessage = function () {
-            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(message) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee16$(_context16) {
-                    while (1) {
-                        switch (_context16.prev = _context16.next) {
-                            case 0:
-                                console.log(message);
-                                _context16.next = 3;
-                                return this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
-
-                            case 3:
-                                serverResponse = _context16.sent;
-                                return _context16.abrupt('return', serverResponse);
-
-                            case 5:
                             case 'end':
                                 return _context16.stop();
                         }
@@ -7788,8 +7804,38 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee16, this);
             }));
 
-            function sendCustomerMessage(_x22) {
+            function getSessionCount(_x19, _x20, _x21, _x22) {
                 return _ref16.apply(this, arguments);
+            }
+
+            return getSessionCount;
+        }();
+
+        ClientRequests.prototype.sendCustomerMessage = function () {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(message) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                    while (1) {
+                        switch (_context17.prev = _context17.next) {
+                            case 0:
+                                console.log(message);
+                                _context17.next = 3;
+                                return this.data.saveObject(message, this.CLIENT_REQUEST_EMAIL, "post");
+
+                            case 3:
+                                serverResponse = _context17.sent;
+                                return _context17.abrupt('return', serverResponse);
+
+                            case 5:
+                            case 'end':
+                                return _context17.stop();
+                        }
+                    }
+                }, _callee17, this);
+            }));
+
+            function sendCustomerMessage(_x23) {
+                return _ref17.apply(this, arguments);
             }
 
             return sendCustomerMessage;
@@ -7816,18 +7862,18 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.groupRequestsByInstitution = function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
                 var sortedArray, instID, numStatuses, templateObj, i, that;
-                return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
-                        switch (_context17.prev = _context17.next) {
+                        switch (_context18.prev = _context18.next) {
                             case 0:
                                 if (this.requestsDetailsArrayAnalytics) {
-                                    _context17.next = 2;
+                                    _context18.next = 2;
                                     break;
                                 }
 
-                                return _context17.abrupt('return');
+                                return _context18.abrupt('return');
 
                             case 2:
                                 sortedArray = this.requestsDetailsArrayAnalytics.sort(function (a, b) {
@@ -7863,14 +7909,14 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
 
                             case 11:
                             case 'end':
-                                return _context17.stop();
+                                return _context18.stop();
                         }
                     }
-                }, _callee17, this);
+                }, _callee18, this);
             }));
 
             function groupRequestsByInstitution() {
-                return _ref17.apply(this, arguments);
+                return _ref18.apply(this, arguments);
             }
 
             return groupRequestsByInstitution;
@@ -7916,53 +7962,29 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
         };
 
         ClientRequests.prototype.getRequestLock = function () {
-            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(id) {
-                var response;
-                return regeneratorRuntime.wrap(function _callee18$(_context18) {
-                    while (1) {
-                        switch (_context18.prev = _context18.next) {
-                            case 0:
-                                _context18.next = 2;
-                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
-
-                            case 2:
-                                response = _context18.sent;
-
-                                if (response.error) {
-                                    _context18.next = 7;
-                                    break;
-                                }
-
-                                return _context18.abrupt('return', response);
-
-                            case 7:
-                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
-
-                            case 8:
-                            case 'end':
-                                return _context18.stop();
-                        }
-                    }
-                }, _callee18, this);
-            }));
-
-            function getRequestLock(_x23) {
-                return _ref18.apply(this, arguments);
-            }
-
-            return getRequestLock;
-        }();
-
-        ClientRequests.prototype.removeRequestLock = function () {
             var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(id) {
+                var response;
                 return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
                         switch (_context19.prev = _context19.next) {
                             case 0:
                                 _context19.next = 2;
-                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+                                return this.data.get(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
 
                             case 2:
+                                response = _context19.sent;
+
+                                if (response.error) {
+                                    _context19.next = 7;
+                                    break;
+                                }
+
+                                return _context19.abrupt('return', response);
+
+                            case 7:
+                                this.data.processError(response, "There was an error retrieving the help ticket lock.");
+
+                            case 8:
                             case 'end':
                                 return _context19.stop();
                         }
@@ -7970,8 +7992,32 @@ define('resources/data/clientRequests',['exports', 'aurelia-framework', './dataS
                 }, _callee19, this);
             }));
 
-            function removeRequestLock(_x24) {
+            function getRequestLock(_x24) {
                 return _ref19.apply(this, arguments);
+            }
+
+            return getRequestLock;
+        }();
+
+        ClientRequests.prototype.removeRequestLock = function () {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(id) {
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
+                    while (1) {
+                        switch (_context20.prev = _context20.next) {
+                            case 0:
+                                _context20.next = 2;
+                                return this.data.deleteObject(this.CLIENT_REQUEST_LOCK_SERVICES + "/" + id);
+
+                            case 2:
+                            case 'end':
+                                return _context20.stop();
+                        }
+                    }
+                }, _callee20, this);
+            }));
+
+            function removeRequestLock(_x25) {
+                return _ref20.apply(this, arguments);
             }
 
             return removeRequestLock;
@@ -15229,7 +15275,7 @@ define('resources/data/systems',['exports', 'aurelia-framework', './dataServices
             for (var i = 0, x = this.systemsArray.length; i < x; i++) {
                 if (this.systemsArray[i]._id === client.systemId) {
                     for (var j = 0; j < this.systemsArray[i].clients.length; j++) {
-                        if (this.systemsArray[i].clients[j]._id === client._id) {
+                        if (this.systemsArray[i].clients[j].client == client.client) {
                             this.systemsArray[i].clients[j] = this.utils.copyObject(client);
                             break;
                         }
@@ -28068,10 +28114,12 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
 
                             case 12:
                                 this.systems.updateClient(this.proposedClient[index]);
+                                this.systems.selectedSystemFromId(this.proposedClient[index].systemId);
+                                this.assignment = this.assignmentDetails[index];
                                 this.assignmentDetails.splice(index, 1);
                                 if (this.assignmentDetails.length == 0) this.selectedRequestDetail.requestStatus = this.config.UNASSIGNED_REQUEST_CODE;
 
-                                this.selectedRequestDetail.idsAssigned = parseInt(this.totalIdsAssigned);
+                                this.selectedRequestDetail.idsAssigned = parseInt(this.selectedRequestDetail.idsAssigned) - parseInt(this.assignment.idsAssigned);
                                 this.selectedRequestDetail.assignments = this.assignmentDetails;
                                 this.requestToSave = this.utils.copyObject(this.selectedRequestDetail.requestId);
                                 this.requestToSave.requestDetailsToSave = new Array();
@@ -28081,25 +28129,27 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                 this.requestToSave.requestDetailsToSave.push(request);
 
                                 this.clientRequests.setSelectedRequest(this.requestToSave);
-                                _context6.next = 25;
-                                return this.clientRequests.saveRequest();
+                                _context6.next = 27;
+                                return this.clientRequests.deleteAssignment(this.editIndex);
 
-                            case 25:
+                            case 27:
                                 serverResponse = _context6.sent;
 
                                 if (serverResponse.status) {
-                                    _context6.next = 30;
+                                    _context6.next = 34;
                                     break;
                                 }
 
+                                this.dataTable.updateArrayMaintainFilters(this.clientRequests.requestsDetailsArray);
+                                this.filterInAssigned();
                                 this.utils.showNotification("The assignment was deleted");
-                                _context6.next = 30;
-                                return this.systems.saveClients(this.proposedClient);
+                                _context6.next = 34;
+                                return this.systems.saveSystem();
 
-                            case 30:
+                            case 34:
                                 this.selectedAssignedClient = "";
 
-                            case 31:
+                            case 35:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -28269,6 +28319,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                                     studentIDRange: this.assignmentDetails[i].studentUserIds,
                                     facultyIDRange: this.assignmentDetails[i].facultyUserIds,
                                     institutionId: this.selectedRequestDetail.requestId.institutionId,
+                                    personId: this.selectedRequestDetail.requestId.personId._id,
                                     firstID: this.assignmentDetails[i].firstID,
                                     lastID: this.assignmentDetails[i].lastID
                                 });
@@ -28297,6 +28348,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                         studentIDRange: this.assignmentDetails[i].studentUserIds,
                         facultyIDRange: this.assignmentDetails[i].facultyUserIds,
                         institutionId: this.selectedRequestDetail.requestId.institutionId,
+                        personId: this.selectedRequestDetail.requestId.personId._id,
                         firstID: this.assignmentDetails[i].firstID,
                         lastID: this.assignmentDetails[i].lastID,
                         assignedDate: new Date()
@@ -55566,7 +55618,7 @@ define('text!modules/tech/requests/components/editRequestsForm.html', ['module']
 define('text!modules/tech/requests/components/requestDetailDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"col-lg-5\" show.bind=\"showRequest\">\n    <div class=\"panel panel-primary topMargin\">\n      <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">${selectedProductID | lookupValue:products.productsArray:\"_id\":\"name\"}</h3>\n      </div>\n      <div class=\"panel-body\">\n        <h5>Request status: ${selectedRequestDetail.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</h5>\n        <h5>Assigned system: ${selectedRequestDetail.assignment.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\n        <h5>Assigned client: ${selectedRequestDetail.assignment.clientId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h5>\n      </div>\n    </div>\n  </div>\n</template>"; });
 define('text!modules/tech/requests/components/requestDetails.html', ['module'], function(module) { module.exports = "<template>\n     <div class=\"row\">\n        <div class=\"col-lg-12\">\n          <div  class=\"panel panel-default topMargin\">\n            <div class=\"panel-body leftJustify\">\n              <div class=\"bottomMargin\">\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"save()\">Save</button>\n                <button class=\"btn btn-primary btn-fill btn-wd\" click.delegate=\"cancel()\">Cancel</button>\n              </div>\n              <div class=\"form-group\" show.bind=\"requests.selectedRequest.courseId != config.SANDBOX_ID\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                      <h5>Undergraduates: ${requests.selectedRequest.undergradIds}</h5>\n                  </div>\n                  <div class=\"col-lg-6\">\n                      <h5>Graduates: ${requests.selectedRequest.graduateIds}</h5>\n                  </div>\n                </div>\n                 \n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddUnder\" class=\"control-label\">Add Undergraduates</label>\n                            <input value.bind=\"requests.selectedRequest.addUndergraduates\" id=\"editAddUnder\" class=\"form-control input-sm\" placeholder=\"Addiiontal undergraduates\" type=\"number\" />\n                        </div>\n                    </div>\n                              \n                    <div class=\"col-lg-4 col-lg-offset-2\">\n                        <div class=\"form-group\">\n                            <label for=\"editAddGrad\" class=\"control-label\">Add Graduate</label>\n                             <input value.bind=\"requests.selectedRequest.addGraduates\" type=\"number\" id=\"editAddGrad\" class=\"form-control input-sm\" placeholder=\"Addiiontal Graduates\"/>\n                        </div>\n                    </div>\n                  </div>\n                \n                \n                 <label show.bind=\"request.addUndergraduates > 0\">Additional Undergraduates: ${requests.selectedRequest.addUndergraduates}</label>\n                 <label show.bind=\"request.addGraduates > 0\">Additional Graduates: ${requests.selectedRequest.addGraduates}</label>\n              </div>\n              <div class=\"leftJustify\">\n                <div class=\"row\">\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"beginDate\" class=\"leftJustify\">Date the course begins</label>\n                          <input change.trigger=\"changeBeginDate()\" type=\"date\" value.bind=\"requests.selectedRequest.startDate\"\n                                class=\"form-control\" id=\"beginDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                  <div class=\"col-lg-6\">\n                    <div class=\"form-group topMargin\">\n                      <div class=\"input-group\">\n                        <div>\n                          <label for=\"endDate\" class=\"leftJustify\">Date the course ends</label>\n                          <input change.trigger=\"changeEndDate()\" type=\"date\" value.bind=\"requests.selectedRequest.endDate\"\n                                class=\"form-control\" id=\"endDate\">\n                        </div>\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                \n              </div>\n               <textarea  placeholder=\"Additional Comments\" class=\"topMargin col-lg-12\" id=\"comments\"\n                value.bind=\"requests.selectedRequest.comments\" class=\"form-control\" rows=\"10\"></textarea>\n              \n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n</template>\n    "; });
 define('text!modules/tech/requests/components/requestsTable.html', ['module'], function(module) { module.exports = "<template>\n \n   <div class=\"hover\" innerhtml.bind=\"commentShown\"></div>\n    <div class=\"hoverProfile\" >\n      <span  click.delegate=\"hideProfile()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Close\"><i class=\"fa fa-window-close-o\" aria-hidden=\"true\"></i></span>\n      <span  click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Send Email\"><i class=\"fa fa-envelope-o\" aria-hidden=\"true\"></i></span>\n      <hr/>\n      <div class=\"col-md-4\">\n         <div  class=\"topMargin\">\n              <img if.bind=\"profileRequest.requestId.personId.file.fileName\" class=\"circular--square leftMargin\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${profileRequest.requestId.personId.file.fileName}\" height=\"100\">\n          </div>\n          <div if.bind=\"!profileRequest.requestId.personId.file.fileName\" style=\"height:100px;width:100px;\" innerhtml.bind=\"profileRequest.requestId.personId.email | gravatarUrl:100:6\"></div>\n      </div>\n      <div class=\"col-md-8\">\n        <h5>Nickname: ${profileRequest.requestId.personId.nickName}</h5>\n        <h5>Phone: ${profileRequest.requestId.personId.phone | formatPhone}</h5>\n        <h5>Mobile: ${profileRequest.requestId.personId.mobile | formatPhone}</h5>\n        <h5>Email: ${profileRequest.requestId.personId.email}</h5>\n      </div>\n  </div>\n\n  <div class=\"col-lg-12 letMargin rightMargin\">\n      <table id=\"requestsTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <td colspan='7'>\n                <div class=\"checkbox\">\n                    <label>\n                        <input checked.bind=\"isCheckedAssigned\" change.trigger=\"filterInAssigned()\" type=\"checkbox\"> Filter out Assigned Requests\n                    </label>\n                </div>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <compose view=\"../../../../resources/elements/table-navigation-bar.html\"></compose>\n            </td>\n          </tr>\n          <tr>\n            <td colspan='9'>\n              <span click.delegate=\"refresh()\"class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Refresh\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></span>\n              <span click.delegate=\"clearFilters()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Clear Filters\"><i class=\"fa fa-filter\" aria-hidden=\"true\"></i></span>\n              <span class=\"pull-right\" id=\"spinner\" innerhtml.bind=\"spinnerHTML\"></span>\n            </td>\n            <td></td>\n          </tr>\n          <tr>\n           <!-- <th class=\"col-xs-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requestNo'})\">No </span><span><i class=\"fa fa-sort\"></i></span></th> -->\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'requiredDate'})\">Due </span><span><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\" class=\"hidden-sm\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'createdDate'})\">Created </span><span><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customRequestStatusSorter, propertyName: 'requestStatus'})\">Status </span><i class=\"fa fa-sort\"></i></th>   \n            <th class=\"col-xs-1\">IDS Requestd</th>\n            <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {propertyName: 'productId.name'})\">Product </span><span><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customCourseSorter, propertyName: 'requestId.courseId.name'})\">Course </span><span><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-2\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customPersonSorter, propertyName: 'requestId.personId.lastName'})\">Faculty </span><span><i class=\"fa fa-sort\"></i></span></th>\n            <th class=\"col-lg-1\"><span  class=\"sortable\" click.trigger=\"dataTable.sortArray($event, {type: 'custom', sorter: customInstitutionsSorter, propertyName: 'requestId.institutionId'})\">Institution </span><i class=\"fa fa-sort\"></i></th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th>\n              <input type=\"date\" value.bind=\"requiredDateFilterValue\" input.delegate=\"dataTable.filterList(requiredDateFilterValue, {type: 'date', filter: 'requiredDate',  collectionProperty: 'requiredDate', compare: 'after'} )\"  class=\"form-control\" />\n            </th>\n            <th>\n              <input type=\"date\" value.bind=\"createdDateFilterValue\" input.delegate=\"dataTable.filterList(createdDateFilterValue, {type: 'date', filter: 'createdDate',  collectionProperty: 'createdDate', compare: 'after'} )\"  class=\"form-control hidden-sm\" />\n            </th>\n            <th>\n              <select value.bind=\"requestStatusFilter\" input.delegate=\"dataTable.filterList($event, { type: 'value',  filter: 'requestStatusFilter',  collectionProperty: 'requestStatus', displayProperty: 'requestStatus',  compare:'match'} )\" class=\"form-control\">\n                <option value=\"\"></option>\n                <option repeat.for=\"status of config.REQUEST_STATUS\" value=\"${status.code}\">${status.description}</option>\n              </select>\n            </th>\n            <th></th>\n            <th>\n              <input value.bind=\"productFilterValue\" input.delegate=\"dataTable.filterList(productFilterValue, { type: 'custom',  filter: customProductNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\n            </th>\n            <th>\n              <input value.bind=\"courseFilterValue\" input.delegate=\"dataTable.filterList(courseFilterValue, { type: 'custom',  filter: courseCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\n            </th>\n            <th>\n              <input value.bind=\"helpTicketTypeFilterValue\" input.delegate=\"dataTable.filterList(helpTicketTypeFilterValue, { type: 'custom',  filter: customNameFilter,  compare:'custom'} )\"  class=\"form-control\" />\n            </th>\n            <th>\n              <input value.bind=\"institutionFilterValue\" input.delegate=\"dataTable.filterList(institutionFilterValue, { type: 'custom',  filter: institutionCustomFilter, compare:'custom'} )\"  class=\"form-control\" />\n            </th>\n            <th></th>\n          </tr>\n          <tr  repeat.for=\"request of dataTable.displayArray\" class=\"${request.requestStatus | getArrayValue:config.REQUEST_STATUS:'status':-1}\">\n          <!--  <td click.delegate=\"selectARequest($index, $event, request)\" data-title=\"requestNo\">${request.requestNo}</td> -->\n            <td click.delegate=\"selectARequest($index, $event, request)\" data-title=\"requiredDate\">${request.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td click.delegate=\"selectARequest($index, $event, request)\"  class=\"hidden-sm\" data-title=\"dateCreated\">${request.createdDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td click.delegate=\"selectARequest($index, $event, request)\" mouseover.delegate=\"showComment(request, $event)\" mouseout.delegate=\"hideComment()\"   data-title=\"status\">${request.requestStatus | lookupValue:config.REQUEST_STATUS:\"code\":\"description\"}</td>\n            <td click.delegate=\"selectARequest($index, $event, request)\" data-title=\"ids-requested\">${request.requestId | idsRequested}\n            <td click.delegate=\"selectARequest($index, $event, request)\" data-title=\"product\">${request.productId.name}</td>\n            <td click.delegate=\"selectARequest($index, $event, request)\" data-title=\"Course\">${request.requestId.courseId.name}</td>\n            <td class=\"dropbtn\" click.delegate=\"showProfile(request, $event)\" data-title=\"Name\">\n              ${request.requestId.personId.fullName} <i class=\"fa fa-info\" aria-hidden=\"true\"></i>\n            </td>\n            <td click.delegate=\"selectARequest($index, $event, request)\"  data-title=\"Name\">${request.requestId.institutionId.name}</td>\n            <td><span class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit\"><i class=\"fa fa-pencil fa-lg fa-border\" click.delegate=\"editRequest($index, request)\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</template>"; });
-define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div show.bind=\"!facultyDetails\" class=\"well col-lg-12\">\n       <div class=\"col-lg-4\">\n          <div class=\"col-lg-12\">\n            <h5>Request No: ${selectedRequestDetail.requestNo}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n            <h5>Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n              <h5>Product: ${selectedRequestDetail.productId.name}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n            <h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>\n          </div>\n        </div>\n         <div class=\"col-lg-4\">\n            <div class=\"col-lg-12\">\n              <h5>Faculty: ${selectedRequestDetail.requestId.personId.fullName}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | phoneNumber} Mobile: ${selectedRequestDetail.requestId.personId.mobile | phoneNumber}</h5>\n            </div>\n        </div>\n        <div class=\"col-lg-4\">\n          <div class=\"col-lg-12\">\n              <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n          </div>\n            <div class=\"col-lg-12\">\n              <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n          </div>\n            <div class=\"col-lg-12\">\n              <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n          </div>\n        </div>\n    </div>\n    \n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId | lookupValue:people.uccPeople:\"_id\":\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n    \n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table id=\"assignmentTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12 editPanel\">\n                    <div class=\"panel-body\">\n                      <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Template\"><i class=\"fa fa-floppy-o fa-lg\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg\" aria-hidden=\"true\"></i></span>\n                      </div>\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control\"/>\n                        </div>\n                    </div>\n\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input disabled.bind=\"forceManual\" checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input disabled.bind=\"!manualMode\" value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" ref=\"proposedIDRange\"/>\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input  value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\">\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n             <editor value.bind=\"selectedRequestDetail.techComments\" height=\"250\"></editor>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${selectedRequestDetail.productId.name}</h5>\n          <h5 class=\"topMargin\">Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n \n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n \n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.delegate=\"systemSelected()\" class=\"form-control\" value.bind=\"selectedSystemId\">\n                <option  repeat.for='sys of productSystems' model.bind=\"sys._id\">${sys.sid}</option>\n            </select>\n        </div>\n\n        <div  class=\"topMargin\">\n          <div show.bind=\"clientsConfigured\">\n            <table id=\"clientTable\" class=\"table table-striped table-hover\">\n              <thead>\n                <tr>\n                  <th class=\"col-sm-1\">Client</th>\n                  <th class=\"col-sm-1\">Status</th>\n                  <th class=\"col-sm-1\">IDs Available</th>\n                  <th>Product</th>\n                  <th class=\"col-sm-6\">Assignments</th>\n                </tr>\n              </thead>\n              <tbody>\n                <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | \n                    filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:products.selectedProduct._id\">\n                  <td>${client.client}</td>\n                  <td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:\"code\":\"description\"}</td>\n                  <td>${client.idsAvailable}</td>\n                  <td>${products.selectedProduct.name}</td>\n                  <td>\n                    <table class=\"col-sm-12\">\n                      <tr repeat.for=\"assignment of client.assignments\">\n                        <td><div class=\"col-lg-12 list-group-item\"><h5 class=\"list-group-item-heading\">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:\"_id\":\"requestNo\"}</h5><p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>${assignment.facultyIDRange} <br> ${assignment.institutionId.name}</p></div></td>\n                      </tr>\n                    </table>\n                  </td>\n              </tbody>\n            </table>\n          </div>\n          <div show.bind=\"!clientsConfigured\"><h5>There are no clients configured for this product in ${systems.selectedSystem.sid}</h5>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
+define('text!modules/tech/requests/components/viewRequestsForm.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n    <span click.delegate=\"back()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Back\"><i class=\"fa fa-arrow-left fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"customerActionDialog()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Customer Action\"><i class=\"fa fa-paper-plane fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openFacultyDetails()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Details\"><i class=\"fa fa-user fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Settings\"><i class=\"fa fa-cog fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"openAudit()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Audit\"><i class=\"fa fa-history fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"flag()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Flag\"><i class=\"fa fa-flag fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    <span click.delegate=\"delete()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash fa-lg fa-border text-danger\" aria-hidden=\"true\"></i></span>\n  </div>\n  <div class=\"row leftMargin rightMargin\">\n    <div show.bind=\"!facultyDetails\" class=\"well col-lg-12\">\n       <div class=\"col-lg-4\">\n          <div class=\"col-lg-12\">\n            <h5>Request No: ${selectedRequestDetail.requestNo}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n            <h5>Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n              <h5>Product: ${selectedRequestDetail.productId.name}</h5>\n          </div>\n          <div class=\"col-lg-12\">\n            <h5>Course: ${selectedRequestDetail.requestId.courseId.name}</h5>\n          </div>\n        </div>\n         <div class=\"col-lg-4\">\n            <div class=\"col-lg-12\">\n              <h5>Faculty: ${selectedRequestDetail.requestId.personId.fullName}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Email: ${selectedRequestDetail.requestId.personId.email}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Institution: ${selectedRequestDetail.requestId.institutionId.name}</h5>\n            </div>\n            <div class=\"col-lg-12\">\n              <h5>Phone: ${selectedRequestDetail.requestId.personId.phone | phoneNumber} Mobile: ${selectedRequestDetail.requestId.personId.mobile | phoneNumber}</h5>\n            </div>\n        </div>\n        <div class=\"col-lg-4\">\n          <div class=\"col-lg-12\">\n              <h5><strong>IDs Required: ${idsRequired}</strong></h5>\n          </div>\n            <div class=\"col-lg-12\">\n              <h5><strong>IDs Assigned: ${totalIdsAssigned}</strong></h5>\n          </div>\n            <div class=\"col-lg-12\">\n              <h5><strong>IDs Remaining: ${idsRemaining}</strong></h5>\n          </div>\n        </div>\n    </div>\n    \n  </div>\n  <div show.bind=\"showAudit\">\n    <table class=\"table table-striped table-hover\">\n      <thead>\n        <tr>\n          <th>Date</th>\n          <th>Property</th>\n          <th>Old Value</th>\n          <th>New Value</th>\n          <th>Person</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr  repeat.for=\"item of selectedRequestDetail.requestId.audit\">\n          <td>${item.eventDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n          <td>${item.property}</td>\n          <td>${item.oldValue}</td>\n          <td>${item.newValue}</td>\n          <td>${item.personId | lookupValue:people.uccPeople:\"_id\":\"fullName\"}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n    \n  <div show.bind=\"!showAudit\" class=\"row\">\n    <div show.bind=\"showSettings\">\n      <div class=\"panel panel-default leftMargin rightMargin editPanel\">\n        <div class=\"panel-body\">\n          <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n            <span click.delegate=\"saveSettings()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n            <span click.delegate=\"restoreDefaults()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Restore Defaults\"><i class=\"fa fa-refresh fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n          </div>\n          <div class=\"row\">\n            <div class=\"form-group col-lg-3\">\n              <label>Regular ID Buffer</label>\n              <input  value.bind=\"idBuffer\"  id=\"bufferIds\"  class=\"form-control\" type=\"number\" />\n              <label>Added to the number of ids requested.  Default is ${config.REGULAR_ID_BUFFER}</label>\n            </div>\n            <div class=\"form-group col-lg-3\">\n              <label>Number of Sandbox IDs</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of sandbox IDs assigned.  Default is ${config.SANDBOX_ID_COUNT}</label>\n            </div>\n             <div class=\"form-group col-lg-3\">\n              <label>Sandbox ID  Bufffer</label>\n              <input  value.bind=\"sandBoxIDs\"  id=\"sandBoxIDs\"  class=\"form-control\" type=\"number\" />\n              <label>Number of IDs between assignments assigned.  Default is ${config.SANDBOX_ID_BUFFER}</label>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"row leftMargin rightMargin\">\n      <table id=\"assignmentTable\" class=\"table table-striped table-hover\">\n        <thead>\n          <tr>\n            <th class=\"col-sm-1\">System</th>\n            <th class=\"col-sm-1\">Client</th>\n            <th class=\"col-sm-1\">Assigned IDs</th>\n            <th>Student IDs</th>\n            <th>Student Password</th>\n            <th>Faculty IDs</th>\n            <th>Faculty Password</th>\n            <th>Assigned Date</th>\n            <th>Status</th>\n            <th></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr class=\"dropbtn\" click.trigger=\"selectProposedClient($index, $event)\" repeat.for=\"client of assignmentDetails\" class=\"${client.notValid}\">\n            <td>${client.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</td>\n            <td>${client.client}</td>\n            <td>${client.idsAssigned}</td>\n            <td>${client.studentUserIds}</td>\n            <td>${client.studentPassword}</td>\n            <td>${client.facultyUserIds}</td>\n            <td>${client.facultyPassword}</td>\n            <td>${client.assignedDate | dateFormat:config.DATE_FORMAT_TABLE}</td>\n            <td>${client.notValid | overlap}\n            <td><span click.delegate=\"deleteProposedClient($index)\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Delete\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></span></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <span id=\"errorRange\"></span>\n  <div show.bind=\"!showAudit\" class=\"row leftMargin\">\n    <div class=\"panel panel-default col-lg-5 leftMargin\">\n      <div class=\"panel-body\">\n\n        <div class=\"row\">\n          <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input checked.bind=\"provisionalAssignment\" id=\"provisionalCheckBox\" type=\"checkbox\" data-toggle=\"checkbox\"> Provisional\n                        </label>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group row\">\n            <div class=\"col-sm-12\">\n              <label for=\"studentIdTemplate\" class=\"col-sm-6 form-control-label topMargin\">\n                Student ID Template\n                <span class=\"smallLeftMargin\" click.delegate=\"openEditStudentTemplate()\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Edit Template\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></span>\n              </label>\n              <select id=\"studentIdTemplate\" multiple value.bind=\"selectedStudentIDTemplate\" class=\"form-control input-md topMargin\">\n                  <option repeat.for=\"template of studentIDTemplates\" value.bind=\"$index\">${template}</option>\n              </select>\n            </div>\n        </div>\n\n            <div class=\"row\" show.bind=\"showAddStudentTemplate\">\n                <div class=\"panel panel-default col-md-12 editPanel\">\n                    <div class=\"panel-body\">\n                      <div class=\"bottomMargin\">\n                        <span click.delegate=\"saveStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Template\"><i class=\"fa fa-floppy-o fa-lg\" aria-hidden=\"true\"></i></span>\n                        <span click.delegate=\"cancelEditStudentTemplate()\" class=\"smallLeftMargin\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg\" aria-hidden=\"true\"></i></span>\n                      </div>\n                        <div class=\"form-group\">\n                            <input id=\"number\" value.bind=\"products.selectedProduct.defaultStudentIdPrefix\" type=\"text\" placeholder=\"Template\" class=\"form-control\"/>\n                        </div>\n                    </div>\n\n                </div>\n            </div>\n          <div class=\"row\">\n            <div class=\"col-lg-6\">\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label class=\"pull-left\">\n                            <input disabled.bind=\"forceManual\" checked.bind=\"manualMode\" id=\"manualCheckBox\" type=\"checkbox\" change.trigger=\"changeManualMode()\" data-toggle=\"checkbox\"> Manual\n                        </label>\n                    </div>\n                </div>\n            </div>\n\n          </div>\n\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Student IDs</label>\n            <input disabled.bind=\"!manualMode\" value.bind=\"assignmentDetails[assignmentDetailIndex].studentUserIds\" id=\"proposedIDRange\"  placeholder=\"Proposed IDs\" class=\"form-control\" type=\"text\" ref=\"proposedIDRange\"/>\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstID\" change.trigger =\"firstIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"studentIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastID\" change.trigger =\"lastIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n         <fieldset class=\"form-group\">\n            <div class=\"col-lg-6\">\n              <input value.bind=\"assignmentDetails[assignmentDetailIndex].studentPassword\" id=\"proposedStudentPassword\"  placeholder=\"Proposed Password\" class=\"form-control\" type=\"text\"/>\n            </div>\n        </fieldset>\n        </div>\n        <div class=\"row\">\n          <div class=\"form-group col-lg-6\">\n            <label>Faculty IDs</label>\n              <input  value.bind=\"assignmentDetails[assignmentDetailIndex].facultyUserIds\" id=\"proposedFacultyIDRange\"  placeholder=\"Proposed Faculty IDs\" class=\"form-control\" type=\"text\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>First ID</label>\n            <input disabled.bind=\"manualMode\" value.bind=\"firstNumericFacID\" change.trigger =\"firstFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"firstFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n          <div show.bind=\"facultyIDTemplateAvailable\" class=\"form-group col-lg-2\">\n            <label>Last ID</label>\n            <input  disabled.bind=\"manualMode\" value.bind=\"lastNumericFacID\" change.trigger =\"lastFacIDChanged()\" style=\"width:75px;margin-right:10px;\" id=\"lastFacID\"  class=\"form-control input-sm\"\n            type=\"number\" />\n          </div>\n        </div>\n        <div class=\"row\">\n          <fieldset class=\"form-group\">\n              <div class=\"col-lg-6\">\n                <input value.bind=\"assignmentDetails[assignmentDetailIndex].facultyPassword\" id=\"proposedFacultyPassword\"  placeholder=\"Proposed Faculty Password\" class=\"form-control\" type=\"text\"/>\n              </div>\n          </fieldset>\n        </div>\n         <div class=\"row\">\n        <fieldset class=\"form-group\">\n            <div class=\"col-lg-12\">\n             <editor value.bind=\"selectedRequestDetail.techComments\" height=\"250\"></editor>\n            </div>\n        </fieldset>\n        </div>\n\n        <h3>Request Details</h3>\n          <h5 class=\"topMargin\">Product: ${selectedRequestDetail.productId.name}</h5>\n          <h5 class=\"topMargin\">Required Date: ${selectedRequestDetail.requiredDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Undergraduates: ${selectedRequestDetail.requestId.undergradIds}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Graduates: ${selectedRequestDetail.requestId.graduateIds}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Undergraduates: ${selectedRequestDetail.requestId.addUndergraduates}</h5>\n          <h5 show.bind=\"selectedRequestDetail.requestId.courseId != config.SANDBOX_ID\" class=\"topMargin\">Add Graduates: ${selectedRequestDetail.requestId.addGraduates}</h5>\n          <h5 class=\"topMargin\">Begin Date: ${selectedRequestDetail.requestId.startDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <h5 class=\"topMargin\">End Date: ${selectedRequestDetail.requestId.endDate | dateFormat:config.DATE_FORMAT_TABLE}</h5>\n          <div if.bind=\"selectedRequestDetail.requestId.comments.length > 0\" class=\"row topMargin\">\n            <div class=\"col-sm-12\">\n              <div class=\"form-group\">\n                <h5 >Comments:</h5>\n                <div class=\"topMargin\"  innerhtml.bind=\"selectedRequestDetail.requestId.comments\" ></div>\n              </div>\n            </div>\n          </div>\n      </div>\n    </div>\n\n \n    <div  class=\"panel panel-default col-lg-6 rightMargin leftMargin\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n          <div class=\"col-lg-6 pull-right\">\n                <div class=\"col-lg-7\" show.bind=\"!sandBoxOnly\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"unassignedOnly\" id=\"unassignedCheckBox\" type=\"checkbox\" change.trigger=\"changeUnassignedOnly()\" data-toggle=\"checkbox\"> Unassigned only\n                      </label>\n                  </div>\n                </div>\n                <div class=\"col-lg-5 pull-right\">\n                  <div class=\"checkbox\">\n                      <label>\n                          <input checked.bind=\"sandBoxOnly\" id=\"sandBoxOnlyCheckBox\" type=\"checkbox\"  data-toggle=\"checkbox\"> Sandbox only\n                      </label>\n                  </div>\n                </div>\n            </div>\n        </div>\n \n        <div class=\"form-group\">\n            <label class=\"control-label col-sm-3 hideOnPhone\">Systems</label>\n            <select change.delegate=\"systemSelected()\" class=\"form-control\" value.bind=\"selectedSystemId\">\n                <option  repeat.for='sys of productSystems' model.bind=\"sys._id\">${sys.sid}</option>\n            </select>\n        </div>\n\n        <div  class=\"topMargin\">\n          <div show.bind=\"clientsConfigured\">\n            <table id=\"clientTable\" class=\"table table-striped table-hover\">\n              <thead>\n                <tr>\n                  <th class=\"col-sm-1\">Client</th>\n                  <th class=\"col-sm-1\">Status</th>\n                  <th class=\"col-sm-1\">IDs Available</th>\n                  <th>Product</th>\n                  <th class=\"col-sm-6\">Assignments</th>\n                </tr>\n              </thead>\n              <tbody>\n                <tr class=\"dropbtn\" click.trigger=\"selectClient($index, client, $event)\" repeat.for=\"client of systems.selectedSystem.clients | \n                    filterClients:unassignedOnly:config.UNASSIGNED_CLIENT_CODE:sandBoxOnly:config.SANDBOX_CLIENT_CODE:products.selectedProduct._id\">\n                  <td>${client.client}</td>\n                  <td>${client.clientStatus | lookupValue:config.CLIENT_STATUSES:\"code\":\"description\"}</td>\n                  <td>${client.idsAvailable}</td>\n                  <td>${products.selectedProduct.name}</td>\n                  <td>\n                    <table class=\"col-sm-12\">\n                      <tr repeat.for=\"assignment of client.assignments\">\n                        <td><div class=\"col-lg-12 list-group-item\">\n                          <h5 class=\"list-group-item-heading\">Request ${assignment.assignment | lookupValue:requests.requestsDetailsArray:\"_id\":\"requestNo\"}</h5>\n                          <p class=\"list-group-item-text\"><strong>${assignment.studentIDRange}</strong> <br>\n                            ${assignment.facultyIDRange} <br> \n                            ${assignment.personId.fullName}</br>\n                            ${assignment.institutionId.name}</p>\n                          </div>\n                            </td>\n                      </tr>\n                    </table>\n                  </td>\n              </tbody>\n            </table>\n          </div>\n          <div show.bind=\"!clientsConfigured\"><h5>There are no clients configured for this product in ${systems.selectedSystem.sid}</h5>\n        </div>\n      </div>\n    </div>\n  </div>\n  </div>\n</template>\n"; });
 define('text!modules/tech/requests/components/viewRequestsTable.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"row\">\n      <!-- Session Select -->\n      <div class=\"col-lg-4\">\n        <div class=\"form-group topMargin leftMargin\">\n            <select value.bind=\"selectedSession\" change.delegate=\"getRequests()\" id=\"session\" class=\"form-control\">\n              <option repeat.for=\"session of sessions.sessionsArray\"\n                      value.bind=\"session._id\">Session ${session.session} - ${session.year}</option>\n            </select>\n        </div>\n      </div>\n    </div>\n\n      <div show.bind=\"selectedSession\">\n        <div class=\"row\">\n          <div class=\"col-lg-12\">\n            <div show.bind=\"noRequests\" class=\"bottomMargin leftMargin\">\n                <h4>There are no requests for this session</h4>\n            </div>\n            <compose  show.bind=\"!noRequests\" view=\"./requestsTable.html\"></compose>\n          </div>\n      </div>\n  </div>\n\n</template>\n"; });
 define('text!modules/tech/support/components/helpTicketDetails.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"bottomMargin list-group-item leftMargin rightMargin\">\n        <span click.delegate=\"save()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Save Response\"><i class=\"fa fa-floppy-o fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n        <span click.delegate=\"cancel()\" class=\"smallMarginRight\" bootstrap-tooltip data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\"Cancel\"><i class=\"fa fa-ban fa-lg fa-border\" aria-hidden=\"true\"></i></span>\n    </div> \n    \n     <div class=\"col-lg-12 topMargin\">\n          <div id=\"container\" ></div>\n            \n        <!-- Additional Information Panel -->\n        <div class=\"col-lg-12 topMargin\" id=\"descriptionGroup\">\n            <div class=\"form-group\">\n            <label for=\"descriptionID\">Enter a description of the issue. Be as specific as possible and include steps that led up to the issue.</label>\n            <editor value.bind=\"helpTickets.selectedHelpTicketContent.content.comments\" height=\"250\"></editor>\n        </div>\n\n        <div class=\"col-lg-2\">\n            <label class=\"btn btn-primary\">\n                Browse for files&hellip; <input type=\"file\" style=\"display: none;\" change.delegate=\"changeFiles()\"files.bind=\"files\" multiple>\n            </label>\n        </div>\n        <div class=\"col-lg-6\">\n            <ul>\n                <li repeat.for = \"file of filesToUpload\" class=\"list-group-item\">${file.name}<span click.delegate=\"removeFile($index)\" class=\"pull-right\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></span></li>\n            </ul>\n        </div>\n\n\n        <!--\n\n            <div class=\"panel panel-default\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <span class=\"btn btn-primary btn-fill btn-wd btn-file\">\n                        Browse...<input change.delegate=\"changeFiles()\" id=\"uploadFiles\" files.bind=\"files\" type=\"file\" multiple=true>\n                        </span>\n                    </span>\n                    <input type=\"text\" value.bind=\"filesSelected\" class=\"form-control\" readonly/> \n                </div>\n            </div>\n            -->\n        </div>\n    </div>\n</template>"; });
 define('text!modules/tech/support/components/helpTicketType.html', ['module'], function(module) { module.exports = "<template>\n \n    <div class=\"form-group topMargin\" >\n      <select value.bind=\"selectedInstitution\" change.delegate=\"changeInstitution()\" id=\"institution\" class=\"form-control\">\n        <option value=\"\">Select an institution</option>\n        <option repeat.for=\"institution of people.institutionsArray\"\n                value.bind=\"institution._id\">${institution.name}</option>\n      </select>\n    </div>\n\n    <div class=\"form-group\" show.bind=\"selectedInstitution != ''\">\n      <select value.bind=\"selectedPerson\" id=\"person\" change.delegate=\"changePerson()\" class=\"form-control\">\n        <option value=\"\">Select a person</option>\n        <option repeat.for=\"person of people.peopleArray\"\n                value.bind=\"person._id\">${person._id | lookupValue:people.peopleArray:\"_id\":\"fullName\"}</option>\n      </select>\n    </div>\n\n    <div show.bind=\"selectedPerson !== ''\">\n        <div class=\"form-group\">\n          <select show.bind=\"showCategories\" value.bind=\"helpTickets.selectedHelpTicket.helpTicketCategory\" change.delegate=\"categoryChanged()\" id=\"helpTicketCategory\" class=\"form-control\">\n            <option value=\"-1\">Select the category of help ticket</option>\n            <option repeat.for=\"types of helpTickets.helpTicketTypesArray\" \n                    model.bind=\"types.category\">${types.description}</option>\n          </select>\n        </div>\n\n        <div class=\"form-group\">\n          <select show.bind=\"showTypes\" value.bind=\"helpTicketType\" change.delegate=\"typeChanged($event)\" id=\"helpTicketPurpose\"\n            class=\"form-control\">\n            <option value=\"NULL\">Select the type of help ticket</option>\n            <option repeat.for=\"types of helpTickets.helpTicketTypesArray[helpTickets.selectedHelpTicket.helpTicketCategory].subtypes\"\n                    model.bind=\"types.type\">${types.description}</option>\n          </select>\n        </div>\n    </div>\n</template>"; });
