@@ -18,7 +18,7 @@ export class ViewInstitutions {
 
     async activate() {
         let responses = await Promise.all([
-            this.people.getInstitutionsArray('?order=name'),
+            this.people.getInstitutionsArray('?filter=institutionStatus|eq|01&order=name'),
 			this.is4ua.loadIs4ua()
         ]);
 

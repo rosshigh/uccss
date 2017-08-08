@@ -255,11 +255,6 @@
               "attributes/chart-attribute.js"
             ],
             "deps": ["chart.js"]
-          },
-          {
-              "name": "aurelia-google-maps",
-              "path": "../node_modules/aurelia-google-maps/dist/amd",
-              "main": "index"
           }
         ]
       }
