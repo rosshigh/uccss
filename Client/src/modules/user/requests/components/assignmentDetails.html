@@ -3,7 +3,7 @@
       <h4 class="topMargin"><strong>Assignments</strong></h4>
       <div show.bind="requests.selectedRequestDetail.requestStatus == config.ASSIGNED_REQUEST_CODE" class="panel panel-primary topMargin">
         <div class="panel-body">  
-          <ul>
+          <ul style="padding-left:10px;">
 						<li class="list-group-item" repeat.for="assign of requests.selectedRequestDetail.assignments">
              <compose if.bind="systems.selectedSystem.type === 'ERP' || !systems.selectedSystem.type" view="./erp.html"></compose>
              <compose if.bind="systems.selectedSystem.type === 'HANA'" view="./hana.html"></compose>
