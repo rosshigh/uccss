@@ -802,15 +802,28 @@ export class Assignments {
 	* Delete the request
 	 */
 	delete(){
-		return this.dialog.showMessage(
-			"Are you sure you want to delete the request?",
-			"Delete Request",
-			['Yes', 'No']
-		).whenClosed(response => {
-			if (!response.wasCancelled) {
-				this.deleteRequest();
-			}
-		});
+        if(this.selectedRequestDetail.assignments && this.selectedRequestDetail.assignments.length > 0) {
+             return this.dialog.showMessage(
+                "Please delete the assignments before deleting the request",
+                "Delete Request",
+                ['OK']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                  return;
+                }
+            });
+        } else {
+            return this.dialog.showMessage(
+                "Are you sure you want to delete the request?",
+                "Delete Request",
+                ['Yes', 'No']
+            ).whenClosed(response => {
+                if (!response.wasCancelled) {
+                    this.deleteRequest();
+                }
+            });
+        }
+       
     }
 
     async deleteRequest() {
