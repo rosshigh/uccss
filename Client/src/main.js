@@ -27,6 +27,14 @@ export function configure(aurelia) {
         }
       });
     })
+    // .plugin('aurelia-google-maps', config => {
+    //         config.options({
+    //             apiKey: 'AIzaSyAd2fTo7o6KOjL28VN8X1wqy-wRNxsxADA', // use `false` to disable the key
+    //             options: { panControl: true, panControlOptions: { position: 9 } }, //add google.maps.MapOptions on construct (https://developers.google.com/maps/documentation/javascript/3.exp/reference#MapOptions)
+    //             language:'' | 'en', // default: uses browser configuration (recommended). Set this parameter to set another language (https://developers.google.com/maps/documentation/javascript/localization)
+    //             region: '' | 'US' // default: it applies a default bias for application behavior towards the United States. (https://developers.google.com/maps/documentation/javascript/localization)
+    //         });
+    // })
     .feature('resources');
 
   if (environment.debug) {

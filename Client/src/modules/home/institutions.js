@@ -24,6 +24,49 @@ export class ViewInstitutions {
 
         this.dataTable.updateArray(this.people.institutionsArray);
 		this.dataTable.numRowsShown = "50";
-		this.dataTable.updateTake();
+        this.dataTable.updateTake();
+        var inst = this.people.institutionsArray[0]
+        this.institutionAddress = inst.address1 + "," + inst.city + ", " + inst.region + ", " + inst.postalCode;
+
+        this.geocoder = new google.maps.Geocoder();  
     }
+
+    attached(){
+        this.selectedRow = $('#firstRow');
+        var that = this;
+        var map;
+        this.geocoder.geocode({ 'address': this.institutionAddress }, function (results, status) {  
+            if (status == google.maps.GeocoderStatus.OK) {  
+                 that.map = new google.maps.Map(document.getElementById('map'), {
+                    center: results[0].geometry.location,
+                    zoom: 8
+                });
+            }
+        })
+    }
+
+    getAddress(inst, el){
+        this.institutionAddress = inst.address1 + "," + inst.city + ", " + inst.region + ", " + inst.postalCode;
+        if (this.selectedRow) this.selectedRow.children().removeClass('info');
+        this.selectedRow = $(el.target).closest('tr');
+        this.selectedRow.children().addClass('info')
+        this.drawMap();
+    }
+
+    drawMap(){
+        var map = this.map;
+        this.geocoder.geocode({ 'address': this.institutionAddress }, function (results, status) {  
+            if (status == google.maps.GeocoderStatus.OK) {  
+                map.setCenter(results[0].geometry.location);  
+                var marker = new google.maps.Marker({  
+                    map: map,  
+                    position: results[0].geometry.location  
+                });  
+            } else {  
+                alert('Geocode was not successful for the following reason: ' + status);  
+            }  
+        });  
+
+    }
+
 }
