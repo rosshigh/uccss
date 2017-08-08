@@ -24,7 +24,7 @@ module.exports = function (app, config) {
     .populate('personId','email firstName lastName phone mobile nickName file')
     .populate('content.personId','email firstName lastName phone mobile nickName')
     .populate('institutionId', 'name')
-    .populate('owner[0].personId', 'firstName lastName')
+    .populate({path: 'owner.personId', model: 'Person', select: 'firstName lastName'})
     query.exec()
     .then(object => {
       res.status(200).json(object);
