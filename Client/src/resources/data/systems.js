@@ -1,7 +1,9 @@
 import {inject} from 'aurelia-framework';
 import {DataServices} from './dataServices';
+import {Products} from './dataServices';
 import {Utils} from '../utils/utils';
 import {AppConfig} from '../../config/appConfig';
+import { observable } from 'aurelia-framework';
 
 @inject(DataServices, Utils, AppConfig)
 export class Systems{
@@ -154,9 +156,19 @@ export class Systems{
         }
     }
 
-    refreshClients(status, product){
-         for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, product );
+    refreshClients(status, products){
+         for(var i = 0, x = this.selectedSystem.clients.length; i<x; i++){ 
+            var aProduct = {firstAllowableID: 1, _id: null};
+            this.selectedSystem.clients.forEach(item => {
+                if(item.productId !== aProduct._id){
+                    for(let j = 0; j < products.length; j++){
+                        if(products[j]._id === item.productId){
+                            aProduct = products[j]
+                        }
+                    }
+                }
+            })
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct );
         }
     }
 
@@ -219,6 +231,7 @@ export class Systems{
         obj.lastIdAssigned = 0;
         obj.lastFacIdAssigned = 0;
         obj.firstFacIdAssigned = 0;
+        obj.manual = false;
         obj.productId = product ? product._id : null;
         obj.firstAllowableID = product.firstAllowableId ? parseInt(product.firstAllowableId) : 1;
         return obj;

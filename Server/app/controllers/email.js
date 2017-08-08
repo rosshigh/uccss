@@ -430,7 +430,7 @@ if(env === 'development'){
       mailObject.context.ASSIGN_REQUEST = emailConfig.ASSIGN_REQUEST;
       mailObject.context.UCC_PHONE = emailConfig.UCC_PHONE;
       mailObject.context.UCC_EMAIL = emailConfig.UCC_EMAIL;
-      mailObject.context.topMessage = "Your client for the following product request has been assigned"
+      mailObject.context.topMessage = "Your client for the following product request has been updated"
       var mail = {
           from: emailConfig.emailAddress,
           to: mailObject.email,

@@ -435,7 +435,7 @@ export class ViewHelpTickets {
 
   _buildRequest(){
     if(this.existingRequest && this.userObj._id){
-       let changes = this.requests.isRequestDirty( this.originalRequest, ['personId']);
+       let changes = this.requests.isRequestDirty( this.originalRequest, ['personId','requestDetailsToSave']);
       this.requests.selectedRequest.requestDetailsToSave =  this.requests.selectedRequest.requestDetails;
       this.requests.selectedRequest.requestDetailsToSave.forEach((item, index) => {
         if(item.requestStatus != this.config.ASSIGNED_REQUEST_CODE) item.requestStatus = this.config.UPDATED_REQUEST_CODE;
@@ -445,12 +445,12 @@ export class ViewHelpTickets {
        changes.forEach(item => {
         if(item.property === 'requestDetails'){
           item.oldValue = "";
-          this.originalRequest.forEach(item => {
+          this.originalRequest.requestDetails.forEach(item2 => {
             this.products.selectedProductFromId(item.productId);
             item.oldValue += this.products.selectedProduct.name + " ";
           });
            item.newValue = "";
-          this.this.requests.selectedRequest.forEach(item => {
+          this.requests.selectedRequest.requestDetails.forEach(item2 => {
             this.products.selectedProductFromId(item.productId);
             item.newValue += this.products.selectedProduct.name + " ";
           });

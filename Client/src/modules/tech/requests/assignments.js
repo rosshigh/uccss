@@ -205,9 +205,12 @@ export class Assignments {
         this.proposedClient = new Array();
         this.assignmentDetails = new Array();
         this.profileRequest = undefined;
-        
+        this.forceManual = false;
+        this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
+
         //Initiate interface flags
         this.requestSelected = 'form';
+        if(this.manualMode) $(this.proposedIDRange).focus();
 
         // //Retrieve relevant data
         this.editIndex = this.dataTable.getOriginalIndex(index);
@@ -222,7 +225,7 @@ export class Assignments {
              this.utils.showNotification("You need to assign a system to this product before you can assign this request");
         } else {
             let systemConfigured = false;
-            this.session = this.sessions.selectedSession.session.toUpperCase();
+            this.session = this.sessions.selectedSession.session;
             this.productSystems = new Array();
             this.products.selectedProduct.systems.forEach(item => {
                 this.systems.selectedSystemFromId(item.systemId);
@@ -273,6 +276,11 @@ export class Assignments {
 		//Parse id templates into an array
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix ? this.products.selectedProduct.defaultStudentIdPrefix.split(":") : new Array();
         this.facultyIDTemplates = this.products.selectedProduct.defaultFacultyIdPrefix ? this.products.selectedProduct.defaultFacultyIdPrefix.split(":") : new Array();
+
+        if(this.studentIDTemplates.length === 0){
+            this.forceManual = true;
+            this.manualMode = true;
+        }
 		
 		//Booleans to determine whether the id templates exist: they are present, contain a wildcard and, for faculty ids, the request isn't a sandbox
         this.studentIDTemplateAvailable = this.studentIDTemplates.length > 0 && this.products.selectedProduct.defaultStudentIdPrefix.indexOf(this.config.ID_WILDCARD) != -1; 
@@ -354,36 +362,43 @@ export class Assignments {
     selectClient(index, client, el) {
         let message, okToProcess = true;
         //Don't allow a client to be selected if there are no ids to be assigned
-        if (this.idsRemaining > 0) {
-            //Make sure the selected client is compatible with the selected request
-            if (this.selectedRequestDetail.requestId.courseId._id === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
-                message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
-            }
-            if (this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
-                message = "The request is for a regular course and the client is a sandbox client.  Are you sure you want to assign it?";
-            }
-
-            if(message){
-                return this.dialog.showMessage(
-                        message,
-                        "Confirm Assignment",
-                        ['Yes', 'No']
-                    ).whenClosed(response => {                      
-                        if (response.wasCancelled) {
-                            okToProcess = false;
-                        } else {
-                            this.processClient(index, client, el);
-                        }
-                    });
-            } else {
-                this.processClient(index, client, el);
-            }
-        } else {
+        if (!this.idsRemaining > 0) {
 			this.utils.showNotification("There are no more ids required for this request")
 		}
+        //Make sure the selected client is compatible with the selected request
+        if (this.selectedRequestDetail.requestId.courseId._id === this.config.SANDBOX_ID && client.clientStatus != this.config.SANDBOX_CLIENT_CODE) {
+            message = "The request is for a sandbox and the client isn't a sandbox client.  Are you sure you want to assign it?";
+        }
+        if (this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID && client.clientStatus == this.config.SANDBOX_CLIENT_CODE) {
+            message = "The request is for a regular course and the client is a sandbox client.  Are you sure you want to assign it?";
+        }
+
+        if(message){
+            return this.dialog.showMessage(
+                    message,
+                    "Confirm Assignment",
+                    ['Yes', 'No']
+                ).whenClosed(response => {                      
+                    if (response.wasCancelled) {
+                        okToProcess = false;
+                    } else {
+                        this.processClient(index, client, el);
+                    }
+                });
+        } else {
+            this.processClient(index, client, el);
+        } 
 	}
 	
-	processClient(index, client, el){      
+	processClient(index, client, el){     
+        if(client.manual) {
+            this.manualMode = true; 
+            this.forceManual = true;
+        } else {
+            this.forceManual = false;
+            this.manualMode = localStorage.getItem('manualMode')  ? localStorage.getItem('manualMode') == "true" : false;
+        }
+        if(this.manualMode) $(this.proposedIDRange).focus();
         this.lastIDAvailable = this.products.selectedProduct.lastAllowableId ? parseInt(this.products.selectedProduct.lastAllowableId) : parseInt(this.products.selectedProduct.idsAvailable)
         
         if(client.firstAllowableID && client.firstAllowableID > 0){
@@ -412,9 +427,9 @@ export class Assignments {
 		if(client.assignments.length > 0){
 			let maxId = 0;
 			client.assignments.forEach(item => {
-				if(item.lastID > maxId) maxId = item.lastID;
+				if(parseInt(item.lastID) > parseInt(maxId)) maxId = parseInt(item.lastID);
 			});
-			this.firstID = maxId + parseInt(this.idBuffer);
+			this.firstID = parseInt(maxId) + parseInt(this.idBuffer);
 		}
 
 		//Save the first id 
@@ -681,7 +696,7 @@ export class Assignments {
      ****************************************************************************************************/
     selectProposedClient(index, el) {
         //Save the index 
-		// this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
+        // this.assignmentDetailIndex = this.assignmentDetailIndex == -1 ? index : -1;
 		this.assignmentDetailIndex = index;
         if(this.assignmentDetailIndex == -1){
             this.selectedAssignedClient = "";
@@ -699,6 +714,8 @@ export class Assignments {
             this.oldIdsAssigned = parseInt(this.lastID) - parseInt(this.lastID);
             this.oldLastID = this.lastID;
             this.lastFirstID = this.firstID;
+            this.forceManual = this.proposedClient[this.assignmentDetailIndex].manual;
+            this.manualMode = this.proposedClient[this.assignmentDetailIndex].manual;
 
             //Highlight the table row
             if (this.selectedAssignmentRow) this.selectedAssignmentRow.children().removeClass('info');
@@ -725,6 +742,8 @@ export class Assignments {
                     }
                 });               
         } else {
+            if(this.forceManual) this.manualMode = false;
+            this.forceManual = false;
             //Undo the changes made by the assignment
             this.idsRemaining = parseInt(this.idsRemaining) + parseInt(this.assignmentDetails[index].idsAssigned);
             this.totalIdsAssigned = parseInt(this.totalIdsAssigned) - parseInt(this.assignmentDetails[index].idsAssigned);
@@ -868,6 +887,7 @@ export class Assignments {
                                         this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
                                         this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                         this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
+                                        this.proposedClient[j].manual = this.manualMode;
                                         this.systems.updateClient(this.proposedClient[j]);
                                     }
                                 }
@@ -879,6 +899,7 @@ export class Assignments {
                             if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
                             var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                             this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
+                            this.proposedClient[i].manual = this.manualMode;
                             this.proposedClient[i].assignments.push({
                                 assignment: this.selectedRequestDetail._id,
                                 studentIDRange: this.assignmentDetails[i].studentUserIds,
@@ -910,6 +931,7 @@ export class Assignments {
                 if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
                 this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
+                this.proposedClient[i].manual = this.manualMode;
                 this.proposedClient[i].assignments.push({
                     assignment: this.selectedRequestDetail._id,
                     studentIDRange: this.assignmentDetails[i].studentUserIds,
@@ -984,7 +1006,7 @@ export class Assignments {
         this.course = this.clientRequests.selectedRequest.courseId !== null ? this.clientRequests.selectedRequest.courseId.name : this.config.SANDBOX_NAME;
         this.email = this.clientRequests.selectedRequest.personId.email;
         this.personId = this.clientRequests.selectedRequest.personId._id;
-        this.products = this.clientRequests.selectedRequest.requestDetails;
+        this.emailProducts = this.clientRequests.selectedRequest.requestDetails;
         this.productsSelected = new Array();
             
         let subject = "Question about product request " +  this.selectedRequestNo;
@@ -1100,6 +1122,10 @@ export class Assignments {
     async saveStudentTemplate(){
         await this.products.saveProduct();
         this.studentIDTemplates = this.products.selectedProduct.defaultStudentIdPrefix.split(":");
+        if(this.studentIDTemplates.length > 0 &&  ( !this.selectedAssignedClient || !this.selectedAssignedClient.manual)) {
+            this.forceManual = false;
+            this.manualMode = false;
+        }
         this.showAddStudentTemplate = false;
     }
     
@@ -1208,7 +1234,12 @@ export class Assignments {
         } else {
             this.dataTable.updateArray(this.clientRequests.requestsDetailsArray,'requiredDate',-1);
         }
-	}
+    }
+    
+    changeManualMode(){
+        localStorage.setItem('manualMode', this.manualMode);
+        
+    }
 	
 	customNameFilter(value, item, context){
         return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;

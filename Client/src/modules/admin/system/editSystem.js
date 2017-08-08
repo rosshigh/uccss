@@ -293,8 +293,7 @@ export class EditSystem {
             ['Yes', 'No']
             ).whenClosed(response => {
                 if(!response.wasCancelled){
-                    this.products.selectedProductFromId(this.selectedProduct);
-                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.selectedProduct);   
+                    this.systems.refreshClients(this.config.UNASSIGNED_REQUEST_CODE, this.products.productsArray);   
                 }
             });
     }

@@ -12,6 +12,7 @@ var ClientsSchema = new Schema({
   clientStatus: { type: String, require: true },
   productId: {type: Schema.Types.ObjectId },
   firstAllowableID: { type: Number },
+  manual: { type: Boolean, default: false },
   assignments: [{
     assignment: {type: Schema.Types.ObjectId, ref: 'ClientRequestDetail'},
     institutionId: {type: Schema.Types.ObjectId},
