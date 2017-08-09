@@ -213,13 +213,7 @@ module.exports = function (app) {
       })
 
       .on('progress', function(bytesReceived, bytesExpected) {
-          //self.emit('progess', bytesReceived, bytesExpected)
-        // console.log('progress')
-        // console.log(bytesReceived)
-        // console.log(bytesExpected)
-        //   var percent = (bytesReceived / bytesExpected * 100) | 0;
-        socket.broadcast(JSON.stringify(progress));
-         
+
       })
 
       .on('end', function() {

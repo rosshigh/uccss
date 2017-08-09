@@ -45,7 +45,7 @@ export class EditCurriculum {
 
     attached(){
         this.mySubscription = this.ea.subscribe('upload-progress', obj => {
-            var elem = document.getElementById("progressBar");
+            var elem = $("#progressBar");
             elem.style.width = obj.progress/obj.total * 100 + '%'; 
         });
         $('[data-toggle="tooltip"]').tooltip();
