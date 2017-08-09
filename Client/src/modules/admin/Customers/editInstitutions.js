@@ -8,13 +8,15 @@ import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
 import $ from 'jquery';
 
-@inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation)
+@inject(DataTable, AppConfig, People, Utils, is4ua, CommonDialogs, Validation) 
 export class EditInstitutions {
     institutionSelected = false;
     spinnerHTML = "";
 
     tabs = [ {id: 'instAddress', title: 'Address'}, {id: 'instPeople', title: 'People'}, {id: 'instIs4ua', title: "IS4UA"}];
     tabPath = './';
+
+    dateConfig = {wrap: true};
 
     constructor(datatable, config, people, utils, is4ua, dialog, validation) {
         this.dataTable = datatable;

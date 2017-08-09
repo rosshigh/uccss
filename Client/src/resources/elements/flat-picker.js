@@ -20,7 +20,18 @@ export class FlatPickerCustomElement {
 			altInput: true,
 			altFormat: "F j, Y",
 			minDate: this.startdate,
-			maxDate: this.enddate
+            maxDate: this.enddate,
+            wrap: true,
+            onReady: function(dateObj, dateStr, instance) {
+                var $cal = $(instance.calendarContainer);
+                if ($cal.find('.flatpickr-clear').length < 1) {
+                    $cal.append('<div class="flatpickr-clear">Clear</div>');
+                    $cal.find('.flatpickr-clear').on('click', function() {
+                        instance.clear();
+                        instance.close();
+                    });
+                }
+            }
 		};
 
 		this._config = Object.assign({}, defaultConfig, this.config);
@@ -81,6 +92,14 @@ export class FlatPickerCustomElement {
             }
         }
 		this.fireEvent(this.element, 'changeBeginDate', { date: this.value });
+    }
+
+    clear(){
+         if (!this.flatpickr) {
+            return;
+        }
+
+        // this.flatpickr.clear();
     }
 
     valueChanged() {

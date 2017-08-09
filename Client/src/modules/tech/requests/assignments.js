@@ -229,7 +229,7 @@ export class Assignments {
             this.productSystems = new Array();
             this.products.selectedProduct.systems.forEach(item => {
                 this.systems.selectedSystemFromId(item.systemId);
-                if(this.systems.selectedSystem.sessions.indexOf(this.session) > -1) {
+                if(this.systems.selectedSystem && this.systems.selectedSystem.sessions.indexOf(this.session) > -1) {
                     this.systemConfigured = true;
                     this.productSystems.push(this.systems.selectedSystem);
                 }

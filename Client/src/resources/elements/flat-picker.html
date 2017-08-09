@@ -1,4 +1,9 @@
 <template>
     <require from="flatpickr/flatpickr.css"></require>
-    <input style="background-color:white;" id="${controlid}" class="aurelia-flatpickr form-control" type="text" placeholder="Select Date..">
+     <div class="input-group aurelia-flatpickr">
+      <input style="background-color:white;" type="text" class="aurelia-flatpickr form-control" placeholder="Select date" data-input>
+      <span class="input-group-btn">
+        <button style="height:39px;" class="btn btn-default" type="button" data-clear><i class="fa fa-trash fa-border"></i></button>
+      </span>
+  </div>
 </template>
