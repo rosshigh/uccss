@@ -174,6 +174,7 @@ export class DataServices {
 			.withContent(formData)
 			.skipContentProcessing()
             .withProgressCallback(progress => {
+                console.log(progress.loaded)
                 this.eventAggregator.publish('upload-progress', {progress: progress.loaded, total: progress.total});
                 this.progress = progress.loaded / progress.total;
             })

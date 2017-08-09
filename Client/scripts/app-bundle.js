@@ -8346,6 +8346,7 @@ define('resources/data/dataServices',['exports', 'aurelia-framework', 'aurelia-h
             });
 
             return this.http.createRequest(url).asPost().withHeader('Authorization', 'JWT ' + sessionStorage.getItem('token')).withContent(formData).skipContentProcessing().withProgressCallback(function (progress) {
+                console.log(progress.loaded);
                 _this8.eventAggregator.publish('upload-progress', { progress: progress.loaded, total: progress.total });
                 _this8.progress = progress.loaded / progress.total;
             }).send().then(function (response) {
@@ -22466,1618 +22467,6 @@ define('modules/admin/notes/notes',['exports', 'aurelia-framework', 'aurelia-rou
         return Notes;
     }()) || _class);
 });
-define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', '../../../resources/data/documents'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _systems, _products, _is4ua, _commonDialogs, _validation, _documents) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditProducts = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditProducts = exports.EditProducts = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _products.Products, _utils.Utils, _systems.Systems, _is4ua.is4ua, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig, _documents.DocumentsServices), _dec(_class = function () {
-        function EditProducts(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
-            _classCallCheck(this, EditProducts);
-
-            this.productSelected = false;
-            this.filesSelected = "";
-            this.interfaceUpdate = false;
-            this.showDocumentForm = false;
-            this.showDocuments = false;
-            this.removedFiles = new Array();
-            this.spinnerHTML = "";
-            this.tabs = [{ id: 'Assignments' }, { id: 'Systems' }, { id: 'is4ua' }, { id: 'Documents' }, { id: 'Notes' }, { id: 'Description' }];
-            this.tabPath = './';
-            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
-
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.utils = utils;
-            this.products = products;
-            this.systems = systems;
-            this.is4ua = is4ua;
-            this.dialog = dialog;
-            this.config = config;
-            this.documents = documents;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this._setupValidation();
-
-            this.systemChanges = new Array();
-        }
-
-        EditProducts.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditProducts.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.products.getProductsArray('?order=name', true), this.systems.getSystemsArray('?order=sid', true), this.is4ua.loadIs4ua(), this.documents.getDocumentsCategoriesArray(), this.config.getConfig()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.filteredDocumentArray = this.documents.docCatsArray;
-                                this.dataTable.createPageButtons(1);
-
-                            case 6:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditProducts.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.products.getProductsArray('?order=name', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.spinnerHTML = "";
-
-                            case 5:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditProducts.prototype.new = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                this.editIndex = -1;
-                                this.products.selectProduct();
-                                this.editSystemsString = "";
-                                this.newProduct = true;
-                                this.selectedProductSystems = new Array();
-                                if (this.files && this.files.length !== 0) {
-                                    $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
-                                    $("#uploadFiles").unwrap();
-                                    this.files = [];
-                                }
-                                $("#editClientKey").focus();
-                                this.productSelected = true;
-
-                            case 8:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function _new() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return _new;
-        }();
-
-        EditProducts.prototype.edit = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                this.editIndex = this.dataTable.getOriginalIndex(index);
-                                this.products.selectProduct(this.editIndex);
-                                this.newProduct = false;
-
-                                if (!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
-                                if (!this.products.selectedProduct.clientInfo) this.products.selectedProduct.clientInfo = "";
-                                if (!this.products.selectedProduct.productInfo) this.products.selectedProduct.productInfo = "";
-
-                                this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
-
-                                $("#editClientKey").focus();
-
-                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
-                                this.selectedRow = $(el.target).closest('tr');
-                                this.selectedRow.children().addClass('info');
-                                this.productSelected = true;
-
-                            case 12:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function edit(_x, _x2) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return edit;
-        }();
-
-        EditProducts.prototype.cancel = function cancel() {
-            this.products.selectProduct(this.editIndex);
-        };
-
-        EditProducts.prototype.save = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var serverResponse, response;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context5.next = 16;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.products.saveProduct();
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (serverResponse.error) {
-                                    _context5.next = 14;
-                                    break;
-                                }
-
-                                if (!(this.systemChanges.length > 0)) {
-                                    _context5.next = 10;
-                                    break;
-                                }
-
-                                if (this.newProduct) {
-                                    this.systemChanges.forEach(function (item) {
-                                        item.productId = serverResponse._id;
-                                    });
-                                }
-                                _context5.next = 9;
-                                return this.systems.saveProductChanges(this.systemChanges);
-
-                            case 9:
-                                response = _context5.sent;
-
-                            case 10:
-                                this.dataTable.updateArray(this.products.productsArray);
-                                this.utils.showNotification("Product " + serverResponse.name + " was updated");
-                                _context5.next = 15;
-                                break;
-
-                            case 14:
-                                this.utils.showNotification("There was a problem updating the product");
-
-                            case 15:
-                                this._cleanUp();
-
-                            case 16:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function save() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditProducts.prototype.delete = function _delete() {
-            var _this = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this.deleteProduct();
-                }
-            });
-        };
-
-        EditProducts.prototype.deleteProduct = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                var _this2 = this;
-
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                return _context6.abrupt('return', this.dialog.showMessage("Are you sure you want to delete this product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
-                                    if (!response.wasCancelled) {
-                                        _this2.deleteAProduct();
-                                    }
-                                }));
-
-                            case 1:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function deleteProduct() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return deleteProduct;
-        }();
-
-        EditProducts.prototype.deleteAProduct = function () {
-            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                name = this.products.selectedProduct.name;
-                                _context7.next = 3;
-                                return this.products.deleteProduct();
-
-                            case 3:
-                                serverResponse = _context7.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.products.productsArray);
-                                    this.utils.showNotification("Product " + name + " was deleted");
-                                }
-                                this._cleanUp();
-                                this.productSelected = false;
-
-                            case 7:
-                            case 'end':
-                                return _context7.stop();
-                        }
-                    }
-                }, _callee7, this);
-            }));
-
-            function deleteAProduct() {
-                return _ref7.apply(this, arguments);
-            }
-
-            return deleteAProduct;
-        }();
-
-        EditProducts.prototype._cleanUp = function _cleanUp() {
-            this.newProduct = false;
-            this.productSelected = false;
-            this.systemChanges = new Array();
-            this._cleanUpFilters();
-            this.validation.makeAllValid(1);
-        };
-
-        EditProducts.prototype._cleanUpFilters = function _cleanUpFilters() {
-            this.nameFilterValue = "";
-            this.systemFilterValue = "";
-            this.activeFilter = "";
-            this.sapNameFilterValue = "";
-
-            this.dataTable.updateArray(this.products.productsArray);
-        };
-
-        EditProducts.prototype.back = function back() {
-            var _this3 = this;
-
-            if (this.products.isDirty().length) {
-                return this.dialog.showMessage("The product has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        _this3.save();
-                    } else {
-                        _this3.productSelected = false;
-                        _this3._cleanUp();
-                    }
-                });
-            } else {
-                this.productSelected = false;
-                this._cleanUp();
-            }
-        };
-
-        EditProducts.prototype.addDocument = function addDocument(index) {
-            if (!this.products.selectedProduct.documents) this.products.selectedProduct.documents = new Array();
-            for (var i = 0; i < this.products.selectedProduct.documents.length; i++) {
-                if (this.products.selectedProduct.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
-                    return;
-                }
-            }
-            var newDoc = {
-                categoryCode: this.documents.selectedDocument.categoryCode,
-                categoryName: this.documents.selectedDocument.name,
-                fileName: this.documents.selectedDocument.files[index].fileName,
-                default: true
-            };
-            this.products.selectedProduct.documents.push(newDoc);
-        };
-
-        EditProducts.prototype.chooseDocument = function chooseDocument(index, event) {
-            this.documents.selectDocument(index);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(event.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showDocumentForm = true;
-        };
-
-        EditProducts.prototype.toggleDefault = function toggleDefault(index) {
-            this.products.selectedProduct.documents[index].default = !this.products.selectedProduct.documents[index].default;
-        };
-
-        EditProducts.prototype.removeDocument = function removeDocument(index) {
-            this.products.selectedProduct.documents.splice(index, 1);
-        };
-
-        EditProducts.prototype.typeChanged = function () {
-            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(index) {
-                return regeneratorRuntime.wrap(function _callee8$(_context8) {
-                    while (1) {
-                        switch (_context8.prev = _context8.next) {
-                            case 0:
-                                if (!(index >= 0)) {
-                                    _context8.next = 7;
-                                    break;
-                                }
-
-                                this.categoryIndex = index;
-                                this.documents.selectCategory(index);
-                                _context8.next = 5;
-                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
-
-                            case 5:
-                                this.showDocuments = true;
-                                this.showDocumentForm = false;
-
-                            case 7:
-                            case 'end':
-                                return _context8.stop();
-                        }
-                    }
-                }, _callee8, this);
-            }));
-
-            function typeChanged(_x3) {
-                return _ref8.apply(this, arguments);
-            }
-
-            return typeChanged;
-        }();
-
-        EditProducts.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Product name is required", "value": "products.selectedProduct.name" }, { "rule": "custom", "message": "A product with that name already exists",
-                "valFunction": function valFunction(context) {
-                    var found = false;
-                    for (var i = 0; i < context.products.productsArray.length; i++) {
-                        if (context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()) {
-                            if (context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id) {
-                                found = true;
-                            } else if (!context.products.selectedProduct._id) {
-                                found = true;
-                            }
-                        }
-                    }
-                    return !found;
-                } }]);
-        };
-
-        EditProducts.prototype.changeTab = function () {
-            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(el, index) {
-                return regeneratorRuntime.wrap(function _callee9$(_context9) {
-                    while (1) {
-                        switch (_context9.prev = _context9.next) {
-                            case 0:
-                                $("#productListGroup.list-group").children().removeClass('menuButtons');
-                                $("#productListGroup.list-group").children().css("background-color", "");
-                                $("#productListGroup.list-group").children().css("color", "");
-                                $(el.target).parent().css("background-color", this.config.BUTTONS_BACKGROUND);
-                                $(el.target).parent().css("color", this.config.ACTIVE_SUBMENU_COLOR);
-                                $(".in").removeClass('active').removeClass('in');
-                                $("#" + el.target.id + "Tab").addClass('in').addClass('active');
-
-                            case 7:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-
-            function changeTab(_x4, _x5) {
-                return _ref9.apply(this, arguments);
-            }
-
-            return changeTab;
-        }();
-
-        EditProducts.prototype.systemCustomFilter = function systemCustomFilter(value, item, context) {
-            for (var i = 0; i < item.systems.length; i++) {
-                if (item.systems[i].sid.toUpperCase().indexOf(value.toUpperCase()) > -1) return true;
-            }
-            return false;
-        };
-
-        return EditProducts;
-    }()) || _class);
-});
-define('modules/admin/system/editSession',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/config', '../../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _validation, _dataTable, _appConfig, _config, _commonDialogs) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditSessions = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditSessions = exports.EditSessions = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _config.Config, _commonDialogs.CommonDialogs), _dec(_class = function () {
-        function EditSessions(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
-            _classCallCheck(this, EditSessions);
-
-            this.navControl = "sessionNavButtons";
-            this.showScreen = 'sessionTable';
-            this.spinnerHTML = "";
-            this.isChecked = true;
-
-            this.router = router;
-            this.sessions = sessions;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.dialog = dialog;
-            this.siteConfig = siteConfig;
-
-            this._setupValidation();
-        }
-
-        EditSessions.prototype.attached = function attached() {
-            this.toolTips();
-        };
-
-        EditSessions.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.sessions.getSessionsArray('?order=startDate:DSC', true), this.config.getConfig(), this.config.getSessions()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                this.filterOutClosed();
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditSessions.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.sessions.getSessionsArray('?order=startDate', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                this.filterOutClosed();
-                                this.spinnerHTML = "";
-
-                            case 6:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditSessions.prototype.new = function _new() {
-            this.sessions.selectSession();
-            this.showScreen = 'editSession';
-            this.sessionSelected = true;
-            this.editSystem = true;
-            this.newSession = true;
-            $("#editSession").focus();
-            if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
-        };
-
-        EditSessions.prototype.edit = function edit(index, el) {
-            this.showScreen = 'editSession';
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.sessions.selectSession(this.editIndex);
-
-            this.editSession = true;
-            $("#editSession").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-        };
-
-        EditSessions.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context3.next = 5;
-                                    break;
-                                }
-
-                                _context3.next = 3;
-                                return this.sessions.saveSession();
-
-                            case 3:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-                                    this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
-                                    this.showScreen = 'sessionTable';
-                                    this.toolTips();
-                                }
-
-                            case 5:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditSessions.prototype.refreshConfig = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                _context4.next = 2;
-                                return this.config.getSessions(true);
-
-                            case 2:
-                                this.editSessionConfig();
-
-                            case 3:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function refreshConfig() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return refreshConfig;
-        }();
-
-        EditSessions.prototype.editSessionConfig = function editSessionConfig() {
-            var _this = this;
-
-            this.editSessionConfigArray = new Array();
-            this.config.SESSION_PARAMS.forEach(function (item) {
-                _this.editSessionConfigArray.push(_this.utils.copyObject(item));
-            });
-            this.showScreen = 'editConfig';
-        };
-
-        EditSessions.prototype.saveConfig = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var _this2 = this;
-
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                if (!this.editSessionConfigArray) {
-                                    _context5.next = 5;
-                                    break;
-                                }
-
-                                _context5.next = 3;
-                                return this.siteConfig.saveSessions(this.editSessionConfigArray);
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.editSessionConfigArray.forEach(function (item, index) {
-                                        _this2.config.SESSION_PARAMS[index] = item;
-                                    });
-                                    this.utils.showNotification("Session configuration updated");
-                                    this.showScreen = 'sessionTable';
-                                }
-
-                            case 5:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function saveConfig() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return saveConfig;
-        }();
-
-        EditSessions.prototype.updateStatus = function updateStatus(index, session, el) {
-            if (session.sessionStatus === "Closed") return;
-
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.sessions.selectSession(this.editIndex);
-
-            switch (session.sessionStatus) {
-                case "Next":
-                    this.editStatus = "Requests";
-                    break;
-                case "Requests":
-                    this.editStatus = "Active";
-                    break;
-                case "Active":
-                    this.editStatus = "Closed";
-                    break;
-            }
-            this.sessions.selectedSession.sessionStatus = this.editStatus;
-            this.save();
-        };
-
-        EditSessions.prototype.filterOutClosed = function filterOutClosed() {
-            if (this.isChecked) {
-                this.dataTable.filterList("Closed", { type: 'text', filter: 'sessionStatus', collectionProperty: 'sessionStatus', compare: 'not-match' });
-            } else {
-                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
-            }
-            this.toolTips();
-        };
-
-        EditSessions.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editName", { "rule": "required", "message": "Session name is required", "value": "sessions.selectedSession.session" });
-            this.validation.addRule(1, "editYear", { "rule": "required", "message": "Session year is required", "value": "sessions.selectedSession.year" });
-            this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
-            this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
-            this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
-        };
-
-        EditSessions.prototype.cancel = function cancel() {
-            this.sessions.selectSession(this.editIndex);
-        };
-
-        EditSessions.prototype.cancelConfig = function cancelConfig() {
-            var _this3 = this;
-
-            this.editSessionConfigArray = new Array();
-            this.config.SESSION_PARAMS.forEach(function (item) {
-                _this3.editSessionConfigArray.push(_this3.utils.copyObject(item));
-            });
-        };
-
-        EditSessions.prototype.backConfig = function backConfig() {
-            this.showScreen = 'sessionTable';
-        };
-
-        EditSessions.prototype.back = function back() {
-            var _this4 = this;
-
-            if (this.sessions.isDirty().length) {
-                return this.dialog.showMessage("The session has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        _this4.save();
-                    } else {
-                        _this4.showScreen = 'sessionTable';
-                    }
-                });
-            } else {
-                this.showScreen = 'sessionTable';
-            }
-        };
-
-        EditSessions.prototype.toolTips = function toolTips() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        return EditSessions;
-    }()) || _class);
-});
-define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _commonDialogs, _utils, _systems, _sessions, _products, _validation, _dataTable, _appConfig, _moment) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditSystem = undefined;
-
-    var _validation2 = _interopRequireDefault(_validation);
-
-    var _moment2 = _interopRequireDefault(_moment);
-
-    function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : {
-            default: obj
-        };
-    }
-
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
-
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
-    }
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_systems.Systems, _products.Products, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _sessions.Sessions), _dec(_class = function () {
-        function EditSystem(systems, products, validation, utils, datatable, config, dialog, sessions) {
-            _classCallCheck(this, EditSystem);
-
-            this.systemSelected = false;
-            this.editClients = false;
-            this.spinnerHTML = "";
-            this.selectedProduct = "";
-
-            this.systems = systems;
-            this.products = products;
-            this.utils = utils;
-            this.validation = validation;
-            this.validation.initialize(this);
-            this.dataTable = datatable;
-            this.dataTable.initialize(this);
-            this.config = config;
-            this.dialog = dialog;
-            this.sessions = sessions;
-            this._setupValidation();
-        }
-
-        EditSystem.prototype.attached = function attached() {
-            $('[data-toggle="tooltip"]').tooltip();
-        };
-
-        EditSystem.prototype.activate = function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-                var responses;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return Promise.all([this.systems.getSystemsArray('?order=sid'), this.products.getProductsArray('?filter=active|eq|true&order=name'), this.sessions.getSessionsArray(), this.config.getConfig(), this.config.getSessions()]);
-
-                            case 2:
-                                responses = _context.sent;
-
-                                this.dataTable.updateArray(this.systems.systemsArray);
-                                this.clientInterval = this.config.CLIENT_INTERVAL;
-
-                            case 5:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
-
-            function activate() {
-                return _ref.apply(this, arguments);
-            }
-
-            return activate;
-        }();
-
-        EditSystem.prototype.refresh = function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
-                                _context2.next = 3;
-                                return this.systems.getSystemsArray('?order=sid', true);
-
-                            case 3:
-                                this.dataTable.updateArray(this.systems.systemsArray);
-                                this.spinnerHTML = "";
-                                this._cleanUpFilters();
-
-                            case 6:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function refresh() {
-                return _ref2.apply(this, arguments);
-            }
-
-            return refresh;
-        }();
-
-        EditSystem.prototype.new = function _new() {
-            this.editIndex = -1;
-            this.displayIndex = -1;
-            this.systems.selectSystem();
-            this.editStatus = true;
-
-            $("#editSid").focus();
-            this.systemSelected = true;
-            this.newSystem = true;
-        };
-
-        EditSystem.prototype.edit = function edit(index, el) {
-            this.editIndex = this.dataTable.getOriginalIndex(index);
-            this.systems.selectSystem(this.editIndex);
-            this.editSystem = true;
-            this.systemSelected = true;
-            this.newSystem = false;
-            $("#editSid").focus();
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.showTable = false;
-            setTimeout(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            }, 500);
-        };
-
-        EditSystem.prototype.save = function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var _this = this;
-
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                if (!this.validation.validate(1)) {
-                                    _context3.next = 7;
-                                    break;
-                                }
-
-                                this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
-                                this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
-                                _context3.next = 5;
-                                return this.systems.saveSystem();
-
-                            case 5:
-                                serverResponse = _context3.sent;
-
-                                if (!serverResponse.error) {
-                                    if (this.saveProduct) this.products.saveProduct();
-                                    if (this.productsToUpdate && this.productsToUpdate.length > 0) {
-                                        this.productsToUpdate.forEach(function (item) {
-                                            _this.products.selectedProductFromId(item._id);
-                                            _this.products.selectedProduct.systems = item.systems;
-                                            _this.products.saveProduct();
-                                        });
-                                        this.productsToUpdate = new Array();
-                                    }
-                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
-                                    this._cleanUp();
-                                }
-
-                            case 7:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function save() {
-                return _ref3.apply(this, arguments);
-            }
-
-            return save;
-        }();
-
-        EditSystem.prototype.saveBackups = function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(system) {
-                var serverResponse;
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                this.systems.setSelectedSystem(system);
-                                _context4.next = 3;
-                                return this.systems.saveSystem();
-
-                            case 3:
-                                serverResponse = _context4.sent;
-
-                                if (!serverResponse.error) {
-                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
-                                }
-
-                            case 5:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function saveBackups(_x) {
-                return _ref4.apply(this, arguments);
-            }
-
-            return saveBackups;
-        }();
-
-        EditSystem.prototype.toggleSandBox = function toggleSandBox(index) {
-            if (this.systems.selectedSystem.clients[index].assignments.length > 0) {
-                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
-            } else {
-                this.systems.selectedSystem.clients[index].clientStatus = this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
-            }
-        };
-
-        EditSystem.prototype.updateProduct = function updateProduct(client, index) {
-            var _this2 = this;
-
-            if (client.assignments.length > 1) {
-                this.utils.showNotification("The client has assignments. You must refresh it before changing it's product");
-            } else {
-                if (this.selectedProduct === "") {
-                    this.utils.showNotification("Select a product first");
-                } else {
-                    this.systems.selectedSystem.clients[index].productId = this.selectedProduct;
-                    this.saveProduct = true;
-                    this.products.selectedProductFromId(this.selectedProduct);
-                    if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
-                        this.products.selectedProduct.systems.forEach(function (item) {
-                            if (item.sid === _this2.systems.selectedSystem.sid) _this2.saveProduct = false;
-                        });
-                    } else {
-                        this.saveProduct = true;
-                    }
-                    if (this.saveProduct) {
-                        this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
-                    }
-                }
-            }
-        };
-
-        EditSystem.prototype.updateAllProducts = function updateAllProducts() {
-            var _this3 = this;
-
-            if (this.selectedProduct === "") {
-                this.utils.showNotification("Select a product first");
-            } else {
-                return this.dialog.showMessage("This will only update the products for clients that have no assignments. Continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        _this3.systems.selectedSystem.clients.forEach(function (item) {
-                            if (item.assignments.length === 0) {
-                                item.productId = _this3.selectedProduct;
-                            }
-                        });
-                        _this3.saveProduct = true;
-                        _this3.products.selectedProductFromId(_this3.selectedProduct);
-                        if (_this3.products.selectedProduct.systems && _this3.products.selectedProduct.systems.length > 0) {
-                            _this3.products.selectedProduct.systems.forEach(function (item) {
-                                if (item.sid === _this3.systems.selectedSystem.sid) _this3.saveProduct = false;
-                            });
-                        } else {
-                            _this3.saveProduct = true;
-                        }
-                        if (_this3.saveProduct) {
-                            _this3.products.selectedProduct.systems.push({ systemId: _this3.systems.selectedSystem._id, sid: _this3.systems.selectedSystem.sid });
-                        }
-                    }
-                });
-            }
-        };
-
-        EditSystem.prototype.refreshClient = function refreshClient(index) {
-            var _this4 = this;
-
-            return this.dialog.showMessage("This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this4.systems.selectedSystem.clients[index].clientStatus = _this4.config.UNASSIGNED_REQUEST_CODE;
-                    _this4.systems.selectedSystem.clients[index].assignments = new Array();
-                    _this4.systems.selectedSystem.clients[index].idsAvailable = _this4.systems.selectedSystem.idsAvailable;
-                }
-            });
-        };
-
-        EditSystem.prototype.delete = function _delete() {
-            var _this5 = this;
-
-            return this.dialog.showMessage("Are you sure you want to delete the system?", "Delete System", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this5.deleteSystem();
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteSystem = function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var name, serverResponse;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                name = this.systems.selectedSystem.sid;
-                                _context5.next = 3;
-                                return this.systems.deleteSystem();
-
-                            case 3:
-                                serverResponse = _context5.sent;
-
-                                if (!serverResponse.error) {
-                                    this.dataTable.updateArray(this.systems.systemsArray);
-                                    this.utils.showNotification("System " + name + " was deleted");
-                                }
-                                this._cleanUp();
-                                this.systemSelected = false;
-
-                            case 7:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function deleteSystem() {
-                return _ref5.apply(this, arguments);
-            }
-
-            return deleteSystem;
-        }();
-
-        EditSystem.prototype.editClientsButton = function editClientsButton() {
-            this.editClients = !this.editClients;
-        };
-
-        EditSystem.prototype.generateClients = function generateClients() {
-            var _this6 = this;
-
-            if (this.selectedProduct === "") {
-                return this.dialog.showMessage("You must select a product.", "Select a Product", ['OK']).whenClosed(function (response) {
-                    return;
-                });
-            }
-            if (this.idsAvailable === "0") {
-                return this.dialog.showMessage("You must enter the number of IDs available.", "Enter IDS Available", ['OK']).whenClosed(function (response) {
-                    return;
-                });
-            }
-            if (!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3) {
-                return this.dialog.showMessage("Clients must have three digits", "Invalid Client Number", ['OK']).whenClosed(function (response) {
-                    return;
-                });
-            }
-            var start = parseInt(this.editFirstClient);
-            var end = parseInt(this.editLastClient);
-            if (end < start) {
-                return this.dialog.showMessage("The first client number must be less than the last client number.", "Invalid Client Number", ['OK']).whenClosed(function (response) {
-                    return;
-                });
-            }
-            this.saveProduct = true;
-            var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval));
-            if (result.error) {
-                this.utils.showNotification(result.error);
-            } else {
-                this.products.selectedProductFromId(this.selectedProduct);
-                if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
-                    this.products.selectedProduct.systems.forEach(function (item) {
-                        if (item.sid === _this6.systems.selectedSystem.sid) _this6.saveProduct = false;
-                    });
-                } else {
-                    this.saveProduct = true;
-                }
-                if (this.saveProduct) {
-                    this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
-                }
-            }
-        };
-
-        EditSystem.prototype.refreshClients = function refreshClients() {
-            var _this7 = this;
-
-            if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
-                return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).whenClosed(function (response) {
-                    return;
-                });
-            }
-            return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this7.systems.refreshClients(_this7.config.UNASSIGNED_REQUEST_CODE, _this7.products.productsArray);
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteClients = function deleteClients() {
-            var _this8 = this;
-
-            return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).whenClosed(function (response) {
-                if (!response.wasCancelled) {
-                    _this8.deleteAllClients();
-                }
-            });
-        };
-
-        EditSystem.prototype.deleteAllClients = function deleteAllClients() {
-            var _this9 = this;
-
-            var id = this.systems.selectedSystem._id;
-            this.productsToUpdate = new Array();
-            var processedProducts = new Array();
-            this.systems.selectedSystem.clients.forEach(function (item) {
-                if (item.productId) {
-                    if (processedProducts.indexOf(item.productId) === -1) {
-                        processedProducts.push(item.productId);
-                        _this9.products.selectedProductFromId(item.productId);
-                        if (_this9.products.selectedProduct._id) {
-                            _this9.products.selectedProduct.systems.forEach(function (system, index) {
-                                if (system.systemId === id) {
-                                    _this9.products.selectedProduct.systems.splice(index, 1);
-                                    _this9.productsToUpdate.push(_this9.products.selectedProduct);
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-            this.systems.deleteAllClients();
-
-            this.utils.showNotification("You must save the system to complete the deletion");
-        };
-
-        EditSystem.prototype.editAClient = function editAClient(client, index, el) {
-            this.selectedClientIndex = index;
-            this.selectedClient = client;
-            this.systems.selectClient(index);
-
-            if (this.selectedRow) this.selectedRow.children().removeClass('info');
-            this.selectedRow = $(el.target).closest('tr');
-            this.selectedRow.children().addClass('info');
-            this.interfaceUpdate = true;
-        };
-
-        EditSystem.prototype.deleteClient = function deleteClient(index) {
-            var _this10 = this;
-
-            if (!this._okToDeleteClient(this.systems.selectedSystem.clients[index])) {
-                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
-            } else {
-                return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        var productId = _this10.systems.selectedSystem.clients[index].productId;
-                        var id = _this10.systems.selectedSystem._id;
-                        var noUpdates = true;
-                        _this10.productsToUpdate = new Array();
-                        if (_this10.systems.selectedSystem.clients.length > 0) {
-                            for (var i = 0; i < _this10.systems.selectedSystem.clients.length; i++) {
-                                if (_this10.systems.selectedSystem.clients[i].productId === productId) {
-                                    noUpdates = false;
-                                    break;
-                                }
-                            }
-                        }
-                        _this10.systems.selectedSystem.clients.splice(index, 1);
-                        if (!noUpdates) {
-                            _this10.products.selectedProductFromId(productId);
-                            _this10.products.selectedProduct.systems.forEach(function (system, index) {
-                                if (system.systemId === id) {
-                                    _this10.products.selectedProduct.systems.splice(index, 1);
-                                    _this10.productsToUpdate.push(_this10.products.selectedProduct);
-                                }
-                            });
-                        }
-                    }
-                    _this10.utils.showNotification("You must save the system to complete the deletion");
-                });
-            }
-        };
-
-        EditSystem.prototype._okToDeleteClient = function _okToDeleteClient(client) {
-            if (client.assignments.length > 0) return false;
-            var status = client.clientStatus;
-            for (var i = 0; i < this.config.CLIENT_STATUSES.length; i++) {
-                if (this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        EditSystem.prototype.deleteC = function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-                return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                this.systems.deleteClient();
-                                this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
-
-                            case 2:
-                            case 'end':
-                                return _context6.stop();
-                        }
-                    }
-                }, _callee6, this);
-            }));
-
-            function deleteC() {
-                return _ref6.apply(this, arguments);
-            }
-
-            return deleteC;
-        }();
-
-        EditSystem.prototype.selectClient = function selectClient(client, index) {
-            this.selectedClient = this.utils.copyObject(client);
-            this.clientSelected = true;
-            this.selectedClientIndex = index;
-        };
-
-        EditSystem.prototype.backClient = function backClient() {
-            this.clientSelected = false;
-        };
-
-        EditSystem.prototype.saveClient = function saveClient() {
-            this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
-            this.clientSelected = false;
-            this.utils.showNotification("You must save the system for any changes to take effect.");
-        };
-
-        EditSystem.prototype._cleanUp = function _cleanUp() {
-            this.systemSelected = false;
-            this.newSystem = false;
-            this.clientSelected = false;
-            this.editClients = false;
-            this.validation.makeAllValid(1);
-        };
-
-        EditSystem.prototype._cleanUpFilters = function _cleanUpFilters() {
-            this.sidFilterValue = "";
-            this.descriptionFilterValue = "";
-            this.serverFilterValue = "";
-            this.activeFilter = "";
-            this.dataTable.updateArray(this.systems.systemsArray);
-        };
-
-        EditSystem.prototype.back = function back() {
-            var _this11 = this;
-
-            if (this.systems.isDirty().length) {
-                return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
-                    if (!response.wasCancelled) {
-                        _this11.save();
-                    } else {
-                        _this11._cleanUp();
-                    }
-                });
-            } else {
-                this._cleanUp();
-            }
-        };
-
-        EditSystem.prototype.cancel = function cancel() {
-            this.systems.selectSystem(this.editIndex);
-        };
-
-        EditSystem.prototype._setupValidation = function _setupValidation() {
-            this.validation.addRule(1, "editSid", [{ "rule": "required", "message": "SID is required", "value": "systems.selectedSystem.sid" }, { "rule": "custom", "message": "A system with that SID already exists",
-                "valFunction": function valFunction(context) {
-                    if (!context.systems.selectedSystem._id) {
-                        var found = false;
-                        for (var i = 0; i < context.systems.systemsArray.length; i++) {
-                            if (context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()) {
-                                if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
-                                    found = true;
-                                } else if (!context.systems.selectedSystem._id) {
-                                    found = true;
-                                }
-                            }
-                        }
-                        return !found;
-                    }
-                    return true;
-                } }], true);
-            this.validation.addRule(1, "editDesc", [{ "rule": "required", "message": "Description is required", "value": "systems.selectedSystem.description" }]);
-            this.validation.addRule(1, "editServer", [{ "rule": "required", "message": "Server is required", "value": "systems.selectedSystem.server" }, { "rule": "custom", "message": "A system with that server already exists",
-                "valFunction": function valFunction(context) {
-                    if (!context.systems.selectedSystem._id) {
-                        var found = false;
-                        for (var i = 0; i < context.systems.systemsArray.length; i++) {
-                            if (context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()) {
-                                if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
-                                    found = true;
-                                } else if (!context.systems.selectedSystem._id) {
-                                    found = true;
-                                }
-                            }
-                        }
-                        return !found;
-                    }
-                    return true;
-                } }]);
-            this.validation.addRule(1, "editInst", [{ "rule": "required", "message": "Instance is required", "value": "systems.selectedSystem.instance" }]);
-        };
-
-        EditSystem.prototype.selectProduct = function selectProduct() {
-            this.products.selectedProductFromId(this.selectedProduct);
-            if (this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
-        };
-
-        return EditSystem;
-    }()) || _class);
-});
-define('modules/admin/system/system',['exports', 'aurelia-framework', 'aurelia-router', '../../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
-    'use strict';
-
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.EditSystem = undefined;
-
-    function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-        }
-    }
-
-    var _dec, _class;
-
-    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig), _dec(_class = function () {
-        function EditSystem(router, config) {
-            _classCallCheck(this, EditSystem);
-
-            this.title = "System";
-
-            this.router = router;
-            this.config = config;
-        }
-
-        EditSystem.prototype.attached = function attached() {
-            $(".nav a").on("click", function () {
-                $(".nav").find(".active").removeClass("active");
-                $(this).parent().addClass("active");
-            });
-        };
-
-        EditSystem.prototype.activate = function activate() {
-            this.config.getConfig(true);
-        };
-
-        EditSystem.prototype.configureRouter = function configureRouter(config, router) {
-            config.map([{
-                route: ['', 'editSessions'],
-                moduleId: './editSession',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editSessions',
-                title: 'Sessions'
-            }, {
-                route: 'editSystems',
-                moduleId: './editSystem',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editSystems',
-                title: 'Systems'
-            }, {
-                route: 'editProduct',
-                moduleId: './editProduct',
-                settings: { auth: true, roles: [] },
-                nav: true,
-                name: 'editProduct',
-                title: 'Products'
-            }]);
-
-            this.router = router;
-        };
-
-        return EditSystem;
-    }()) || _class);
-});
 define('modules/admin/site/admin',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/admin', '../../../resources/dialogs/common-dialogs', 'aurelia-event-aggregator', 'moment'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _admin, _commonDialogs, _aureliaEventAggregator, _moment) {
 	'use strict';
 
@@ -27058,6 +25447,1618 @@ define('modules/admin/site/site',['exports', 'aurelia-framework', 'aurelia-route
         };
 
         return Site;
+    }()) || _class);
+});
+define('modules/admin/system/editProduct',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/is4ua', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/validation', '../../../resources/data/documents'], function (exports, _aureliaFramework, _dataTable, _appConfig, _utils, _systems, _products, _is4ua, _commonDialogs, _validation, _documents) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditProducts = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditProducts = exports.EditProducts = (_dec = (0, _aureliaFramework.inject)(_dataTable.DataTable, _products.Products, _utils.Utils, _systems.Systems, _is4ua.is4ua, _commonDialogs.CommonDialogs, _validation2.default, _appConfig.AppConfig, _documents.DocumentsServices), _dec(_class = function () {
+        function EditProducts(datatable, products, utils, systems, is4ua, dialog, validation, config, documents) {
+            _classCallCheck(this, EditProducts);
+
+            this.productSelected = false;
+            this.filesSelected = "";
+            this.interfaceUpdate = false;
+            this.showDocumentForm = false;
+            this.showDocuments = false;
+            this.removedFiles = new Array();
+            this.spinnerHTML = "";
+            this.tabs = [{ id: 'Assignments' }, { id: 'Systems' }, { id: 'is4ua' }, { id: 'Documents' }, { id: 'Notes' }, { id: 'Description' }];
+            this.tabPath = './';
+            this.toolbar = [['style', ['style', 'bold', 'italic', 'underline', 'clear']], ['color', ['color']], ['font', ['strikethrough', 'superscript', 'subscript']], ['layout', ['ul', 'ol', 'paragraph']], ['insert', ['link', 'table', 'hello']], ['misc', ['undo', 'redo', 'fullscreen', 'codeview']]];
+
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.utils = utils;
+            this.products = products;
+            this.systems = systems;
+            this.is4ua = is4ua;
+            this.dialog = dialog;
+            this.config = config;
+            this.documents = documents;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this._setupValidation();
+
+            this.systemChanges = new Array();
+        }
+
+        EditProducts.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditProducts.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.products.getProductsArray('?order=name', true), this.systems.getSystemsArray('?order=sid', true), this.is4ua.loadIs4ua(), this.documents.getDocumentsCategoriesArray(), this.config.getConfig()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.products.productsArray);
+                                this.filteredDocumentArray = this.documents.docCatsArray;
+                                this.dataTable.createPageButtons(1);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditProducts.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.products.getProductsArray('?order=name', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.products.productsArray);
+                                this.spinnerHTML = "";
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditProducts.prototype.new = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                this.editIndex = -1;
+                                this.products.selectProduct();
+                                this.editSystemsString = "";
+                                this.newProduct = true;
+                                this.selectedProductSystems = new Array();
+                                if (this.files && this.files.length !== 0) {
+                                    $("#uploadFiles").wrap('<form>').closest('form').get(0).reset();
+                                    $("#uploadFiles").unwrap();
+                                    this.files = [];
+                                }
+                                $("#editClientKey").focus();
+                                this.productSelected = true;
+
+                            case 8:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function _new() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return _new;
+        }();
+
+        EditProducts.prototype.edit = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(index, el) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this.editIndex = this.dataTable.getOriginalIndex(index);
+                                this.products.selectProduct(this.editIndex);
+                                this.newProduct = false;
+
+                                if (!this.products.selectedProduct.systems) this.products.selectedProduct.systems = new Array();
+                                if (!this.products.selectedProduct.clientInfo) this.products.selectedProduct.clientInfo = "";
+                                if (!this.products.selectedProduct.productInfo) this.products.selectedProduct.productInfo = "";
+
+                                this.camelizedProductName = this.utils.toCamelCase(this.products.selectedProduct.name);
+
+                                $("#editClientKey").focus();
+
+                                if (this.selectedRow) this.selectedRow.children().removeClass('info');
+                                this.selectedRow = $(el.target).closest('tr');
+                                this.selectedRow.children().addClass('info');
+                                this.productSelected = true;
+
+                            case 12:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function edit(_x, _x2) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return edit;
+        }();
+
+        EditProducts.prototype.cancel = function cancel() {
+            this.products.selectProduct(this.editIndex);
+        };
+
+        EditProducts.prototype.save = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var serverResponse, response;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context5.next = 16;
+                                    break;
+                                }
+
+                                _context5.next = 3;
+                                return this.products.saveProduct();
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (serverResponse.error) {
+                                    _context5.next = 14;
+                                    break;
+                                }
+
+                                if (!(this.systemChanges.length > 0)) {
+                                    _context5.next = 10;
+                                    break;
+                                }
+
+                                if (this.newProduct) {
+                                    this.systemChanges.forEach(function (item) {
+                                        item.productId = serverResponse._id;
+                                    });
+                                }
+                                _context5.next = 9;
+                                return this.systems.saveProductChanges(this.systemChanges);
+
+                            case 9:
+                                response = _context5.sent;
+
+                            case 10:
+                                this.dataTable.updateArray(this.products.productsArray);
+                                this.utils.showNotification("Product " + serverResponse.name + " was updated");
+                                _context5.next = 15;
+                                break;
+
+                            case 14:
+                                this.utils.showNotification("There was a problem updating the product");
+
+                            case 15:
+                                this._cleanUp();
+
+                            case 16:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function save() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditProducts.prototype.delete = function _delete() {
+            var _this = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this.deleteProduct();
+                }
+            });
+        };
+
+        EditProducts.prototype.deleteProduct = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                var _this2 = this;
+
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                return _context6.abrupt('return', this.dialog.showMessage("Are you sure you want to delete this product?", "Delete Product", ['Yes', 'No']).whenClosed(function (response) {
+                                    if (!response.wasCancelled) {
+                                        _this2.deleteAProduct();
+                                    }
+                                }));
+
+                            case 1:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function deleteProduct() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return deleteProduct;
+        }();
+
+        EditProducts.prototype.deleteAProduct = function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var name, serverResponse;
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                name = this.products.selectedProduct.name;
+                                _context7.next = 3;
+                                return this.products.deleteProduct();
+
+                            case 3:
+                                serverResponse = _context7.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.products.productsArray);
+                                    this.utils.showNotification("Product " + name + " was deleted");
+                                }
+                                this._cleanUp();
+                                this.productSelected = false;
+
+                            case 7:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            }));
+
+            function deleteAProduct() {
+                return _ref7.apply(this, arguments);
+            }
+
+            return deleteAProduct;
+        }();
+
+        EditProducts.prototype._cleanUp = function _cleanUp() {
+            this.newProduct = false;
+            this.productSelected = false;
+            this.systemChanges = new Array();
+            this._cleanUpFilters();
+            this.validation.makeAllValid(1);
+        };
+
+        EditProducts.prototype._cleanUpFilters = function _cleanUpFilters() {
+            this.nameFilterValue = "";
+            this.systemFilterValue = "";
+            this.activeFilter = "";
+            this.sapNameFilterValue = "";
+
+            this.dataTable.updateArray(this.products.productsArray);
+        };
+
+        EditProducts.prototype.back = function back() {
+            var _this3 = this;
+
+            if (this.products.isDirty().length) {
+                return this.dialog.showMessage("The product has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        _this3.save();
+                    } else {
+                        _this3.productSelected = false;
+                        _this3._cleanUp();
+                    }
+                });
+            } else {
+                this.productSelected = false;
+                this._cleanUp();
+            }
+        };
+
+        EditProducts.prototype.addDocument = function addDocument(index) {
+            if (!this.products.selectedProduct.documents) this.products.selectedProduct.documents = new Array();
+            for (var i = 0; i < this.products.selectedProduct.documents.length; i++) {
+                if (this.products.selectedProduct.documents[i].fileName == this.documents.selectedDocument.files[index].fileName) {
+                    return;
+                }
+            }
+            var newDoc = {
+                categoryCode: this.documents.selectedDocument.categoryCode,
+                categoryName: this.documents.selectedDocument.name,
+                fileName: this.documents.selectedDocument.files[index].fileName,
+                default: true
+            };
+            this.products.selectedProduct.documents.push(newDoc);
+        };
+
+        EditProducts.prototype.chooseDocument = function chooseDocument(index, event) {
+            this.documents.selectDocument(index);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(event.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showDocumentForm = true;
+        };
+
+        EditProducts.prototype.toggleDefault = function toggleDefault(index) {
+            this.products.selectedProduct.documents[index].default = !this.products.selectedProduct.documents[index].default;
+        };
+
+        EditProducts.prototype.removeDocument = function removeDocument(index) {
+            this.products.selectedProduct.documents.splice(index, 1);
+        };
+
+        EditProducts.prototype.typeChanged = function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(index) {
+                return regeneratorRuntime.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                if (!(index >= 0)) {
+                                    _context8.next = 7;
+                                    break;
+                                }
+
+                                this.categoryIndex = index;
+                                this.documents.selectCategory(index);
+                                _context8.next = 5;
+                                return this.documents.getDocumentsArray(true, '?filter=categoryCode|eq|' + this.documents.selectedCat.code);
+
+                            case 5:
+                                this.showDocuments = true;
+                                this.showDocumentForm = false;
+
+                            case 7:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, this);
+            }));
+
+            function typeChanged(_x3) {
+                return _ref8.apply(this, arguments);
+            }
+
+            return typeChanged;
+        }();
+
+        EditProducts.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", [{ "rule": "required", "message": "Product name is required", "value": "products.selectedProduct.name" }, { "rule": "custom", "message": "A product with that name already exists",
+                "valFunction": function valFunction(context) {
+                    var found = false;
+                    for (var i = 0; i < context.products.productsArray.length; i++) {
+                        if (context.products.productsArray[i].name.toUpperCase() === context.products.selectedProduct.name.toUpperCase()) {
+                            if (context.products.selectedProduct._id && context.products.selectedProduct._id != context.products.productsArray[i]._id) {
+                                found = true;
+                            } else if (!context.products.selectedProduct._id) {
+                                found = true;
+                            }
+                        }
+                    }
+                    return !found;
+                } }]);
+        };
+
+        EditProducts.prototype.changeTab = function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(el, index) {
+                return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                $("#productListGroup.list-group").children().removeClass('menuButtons');
+                                $("#productListGroup.list-group").children().css("background-color", "");
+                                $("#productListGroup.list-group").children().css("color", "");
+                                $(el.target).parent().css("background-color", this.config.BUTTONS_BACKGROUND);
+                                $(el.target).parent().css("color", this.config.ACTIVE_SUBMENU_COLOR);
+                                $(".in").removeClass('active').removeClass('in');
+                                $("#" + el.target.id + "Tab").addClass('in').addClass('active');
+
+                            case 7:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function changeTab(_x4, _x5) {
+                return _ref9.apply(this, arguments);
+            }
+
+            return changeTab;
+        }();
+
+        EditProducts.prototype.systemCustomFilter = function systemCustomFilter(value, item, context) {
+            for (var i = 0; i < item.systems.length; i++) {
+                if (item.systems[i].sid.toUpperCase().indexOf(value.toUpperCase()) > -1) return true;
+            }
+            return false;
+        };
+
+        return EditProducts;
+    }()) || _class);
+});
+define('modules/admin/system/editSession',['exports', 'aurelia-framework', 'aurelia-router', '../../../resources/utils/utils', '../../../resources/data/sessions', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', '../../../resources/data/config', '../../../resources/dialogs/common-dialogs'], function (exports, _aureliaFramework, _aureliaRouter, _utils, _sessions, _validation, _dataTable, _appConfig, _config, _commonDialogs) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSessions = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSessions = exports.EditSessions = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _sessions.Sessions, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _config.Config, _commonDialogs.CommonDialogs), _dec(_class = function () {
+        function EditSessions(router, sessions, validation, utils, datatable, config, siteConfig, dialog) {
+            _classCallCheck(this, EditSessions);
+
+            this.navControl = "sessionNavButtons";
+            this.showScreen = 'sessionTable';
+            this.spinnerHTML = "";
+            this.isChecked = true;
+
+            this.router = router;
+            this.sessions = sessions;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.siteConfig = siteConfig;
+
+            this._setupValidation();
+        }
+
+        EditSessions.prototype.attached = function attached() {
+            this.toolTips();
+        };
+
+        EditSessions.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.sessions.getSessionsArray('?order=startDate:DSC', true), this.config.getConfig(), this.config.getSessions()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.filterOutClosed();
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSessions.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.sessions.getSessionsArray('?order=startDate', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                this.filterOutClosed();
+                                this.spinnerHTML = "";
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditSessions.prototype.new = function _new() {
+            this.sessions.selectSession();
+            this.showScreen = 'editSession';
+            this.sessionSelected = true;
+            this.editSystem = true;
+            this.newSession = true;
+            $("#editSession").focus();
+            if (this.selectedRow) this.selectedRow.children().removeClass('rowSelected');
+        };
+
+        EditSessions.prototype.edit = function edit(index, el) {
+            this.showScreen = 'editSession';
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            this.editSession = true;
+            $("#editSession").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+        };
+
+        EditSessions.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context3.next = 5;
+                                    break;
+                                }
+
+                                _context3.next = 3;
+                                return this.sessions.saveSession();
+
+                            case 3:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+                                    this.utils.showNotification("Session " + this.sessions.selectedSession.session + " " + this.sessions.selectedSession.year + " was updated");
+                                    this.showScreen = 'sessionTable';
+                                    this.toolTips();
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditSessions.prototype.refreshConfig = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                _context4.next = 2;
+                                return this.config.getSessions(true);
+
+                            case 2:
+                                this.editSessionConfig();
+
+                            case 3:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function refreshConfig() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return refreshConfig;
+        }();
+
+        EditSessions.prototype.editSessionConfig = function editSessionConfig() {
+            var _this = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this.editSessionConfigArray.push(_this.utils.copyObject(item));
+            });
+            this.showScreen = 'editConfig';
+        };
+
+        EditSessions.prototype.saveConfig = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var _this2 = this;
+
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                if (!this.editSessionConfigArray) {
+                                    _context5.next = 5;
+                                    break;
+                                }
+
+                                _context5.next = 3;
+                                return this.siteConfig.saveSessions(this.editSessionConfigArray);
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.editSessionConfigArray.forEach(function (item, index) {
+                                        _this2.config.SESSION_PARAMS[index] = item;
+                                    });
+                                    this.utils.showNotification("Session configuration updated");
+                                    this.showScreen = 'sessionTable';
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function saveConfig() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return saveConfig;
+        }();
+
+        EditSessions.prototype.updateStatus = function updateStatus(index, session, el) {
+            if (session.sessionStatus === "Closed") return;
+
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.sessions.selectSession(this.editIndex);
+
+            switch (session.sessionStatus) {
+                case "Next":
+                    this.editStatus = "Requests";
+                    break;
+                case "Requests":
+                    this.editStatus = "Active";
+                    break;
+                case "Active":
+                    this.editStatus = "Closed";
+                    break;
+            }
+            this.sessions.selectedSession.sessionStatus = this.editStatus;
+            this.save();
+        };
+
+        EditSessions.prototype.filterOutClosed = function filterOutClosed() {
+            if (this.isChecked) {
+                this.dataTable.filterList("Closed", { type: 'text', filter: 'sessionStatus', collectionProperty: 'sessionStatus', compare: 'not-match' });
+            } else {
+                this.dataTable.updateArray(this.sessions.sessionsArray, 'startDate', -1);
+            }
+            this.toolTips();
+        };
+
+        EditSessions.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editName", { "rule": "required", "message": "Session name is required", "value": "sessions.selectedSession.session" });
+            this.validation.addRule(1, "editYear", { "rule": "required", "message": "Session year is required", "value": "sessions.selectedSession.year" });
+            this.validation.addRule(1, "editStartDate", { "rule": "required", "message": "Session start date is required", "value": "sessions.selectedSession.startDate" });
+            this.validation.addRule(1, "editEndDate", { "rule": "required", "message": "Session end date is required", "value": "sessions.selectedSession.endDate" });
+            this.validation.addRule(1, "editRequestsOpenDate", { "rule": "required", "message": "Session requests open date is required", "value": "sessions.selectedSession.requestsOpenDate" });
+        };
+
+        EditSessions.prototype.cancel = function cancel() {
+            this.sessions.selectSession(this.editIndex);
+        };
+
+        EditSessions.prototype.cancelConfig = function cancelConfig() {
+            var _this3 = this;
+
+            this.editSessionConfigArray = new Array();
+            this.config.SESSION_PARAMS.forEach(function (item) {
+                _this3.editSessionConfigArray.push(_this3.utils.copyObject(item));
+            });
+        };
+
+        EditSessions.prototype.backConfig = function backConfig() {
+            this.showScreen = 'sessionTable';
+        };
+
+        EditSessions.prototype.back = function back() {
+            var _this4 = this;
+
+            if (this.sessions.isDirty().length) {
+                return this.dialog.showMessage("The session has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        _this4.save();
+                    } else {
+                        _this4.showScreen = 'sessionTable';
+                    }
+                });
+            } else {
+                this.showScreen = 'sessionTable';
+            }
+        };
+
+        EditSessions.prototype.toolTips = function toolTips() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        return EditSessions;
+    }()) || _class);
+});
+define('modules/admin/system/editSystem',['exports', 'aurelia-framework', '../../../resources/dialogs/common-dialogs', '../../../resources/utils/utils', '../../../resources/data/systems', '../../../resources/data/sessions', '../../../resources/data/products', '../../../resources/utils/validation', '../../../resources/utils/dataTable', '../../../config/appConfig', 'moment'], function (exports, _aureliaFramework, _commonDialogs, _utils, _systems, _sessions, _products, _validation, _dataTable, _appConfig, _moment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSystem = undefined;
+
+    var _validation2 = _interopRequireDefault(_validation);
+
+    var _moment2 = _interopRequireDefault(_moment);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_systems.Systems, _products.Products, _validation2.default, _utils.Utils, _dataTable.DataTable, _appConfig.AppConfig, _commonDialogs.CommonDialogs, _sessions.Sessions), _dec(_class = function () {
+        function EditSystem(systems, products, validation, utils, datatable, config, dialog, sessions) {
+            _classCallCheck(this, EditSystem);
+
+            this.systemSelected = false;
+            this.editClients = false;
+            this.spinnerHTML = "";
+            this.selectedProduct = "";
+
+            this.systems = systems;
+            this.products = products;
+            this.utils = utils;
+            this.validation = validation;
+            this.validation.initialize(this);
+            this.dataTable = datatable;
+            this.dataTable.initialize(this);
+            this.config = config;
+            this.dialog = dialog;
+            this.sessions = sessions;
+            this._setupValidation();
+        }
+
+        EditSystem.prototype.attached = function attached() {
+            $('[data-toggle="tooltip"]').tooltip();
+        };
+
+        EditSystem.prototype.activate = function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var responses;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                _context.next = 2;
+                                return Promise.all([this.systems.getSystemsArray('?order=sid'), this.products.getProductsArray('?filter=active|eq|true&order=name'), this.sessions.getSessionsArray(), this.config.getConfig(), this.config.getSessions()]);
+
+                            case 2:
+                                responses = _context.sent;
+
+                                this.dataTable.updateArray(this.systems.systemsArray);
+                                this.clientInterval = this.config.CLIENT_INTERVAL;
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function activate() {
+                return _ref.apply(this, arguments);
+            }
+
+            return activate;
+        }();
+
+        EditSystem.prototype.refresh = function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                this.spinnerHTML = "<i class='fa fa-spinner fa-spin'></i>";
+                                _context2.next = 3;
+                                return this.systems.getSystemsArray('?order=sid', true);
+
+                            case 3:
+                                this.dataTable.updateArray(this.systems.systemsArray);
+                                this.spinnerHTML = "";
+                                this._cleanUpFilters();
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+
+            function refresh() {
+                return _ref2.apply(this, arguments);
+            }
+
+            return refresh;
+        }();
+
+        EditSystem.prototype.new = function _new() {
+            this.editIndex = -1;
+            this.displayIndex = -1;
+            this.systems.selectSystem();
+            this.editStatus = true;
+
+            $("#editSid").focus();
+            this.systemSelected = true;
+            this.newSystem = true;
+        };
+
+        EditSystem.prototype.edit = function edit(index, el) {
+            this.editIndex = this.dataTable.getOriginalIndex(index);
+            this.systems.selectSystem(this.editIndex);
+            this.editSystem = true;
+            this.systemSelected = true;
+            this.newSystem = false;
+            $("#editSid").focus();
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.showTable = false;
+            setTimeout(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            }, 500);
+        };
+
+        EditSystem.prototype.save = function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+                var _this = this;
+
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                if (!this.validation.validate(1)) {
+                                    _context3.next = 7;
+                                    break;
+                                }
+
+                                this.systems.selectedSystem.sid = this.systems.selectedSystem.sid.toUpperCase();
+                                this.systems.selectedSystem.server = this.systems.selectedSystem.server.toUpperCase();
+                                _context3.next = 5;
+                                return this.systems.saveSystem();
+
+                            case 5:
+                                serverResponse = _context3.sent;
+
+                                if (!serverResponse.error) {
+                                    if (this.saveProduct) this.products.saveProduct();
+                                    if (this.productsToUpdate && this.productsToUpdate.length > 0) {
+                                        this.productsToUpdate.forEach(function (item) {
+                                            _this.products.selectedProductFromId(item._id);
+                                            _this.products.selectedProduct.systems = item.systems;
+                                            _this.products.saveProduct();
+                                        });
+                                        this.productsToUpdate = new Array();
+                                    }
+                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
+                                    this._cleanUp();
+                                }
+
+                            case 7:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function save() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return save;
+        }();
+
+        EditSystem.prototype.saveBackups = function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(system) {
+                var serverResponse;
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                this.systems.setSelectedSystem(system);
+                                _context4.next = 3;
+                                return this.systems.saveSystem();
+
+                            case 3:
+                                serverResponse = _context4.sent;
+
+                                if (!serverResponse.error) {
+                                    this.utils.showNotification("System " + this.systems.selectedSystem.sid + " was updated");
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function saveBackups(_x) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return saveBackups;
+        }();
+
+        EditSystem.prototype.toggleSandBox = function toggleSandBox(index) {
+            if (this.systems.selectedSystem.clients[index].assignments.length > 0) {
+                this.utils.showNotification("The client has assignments. You must refresh it before changing it's status");
+            } else {
+                this.systems.selectedSystem.clients[index].clientStatus = this.systems.selectedSystem.clients[index].clientStatus == this.config.SANDBOX_CLIENT_CODE ? this.config.UNASSIGNED_CLIENT_CODE : this.config.SANDBOX_CLIENT_CODE;
+            }
+        };
+
+        EditSystem.prototype.updateProduct = function updateProduct(client, index) {
+            var _this2 = this;
+
+            if (client.assignments.length > 1) {
+                this.utils.showNotification("The client has assignments. You must refresh it before changing it's product");
+            } else {
+                if (this.selectedProduct === "") {
+                    this.utils.showNotification("Select a product first");
+                } else {
+                    this.systems.selectedSystem.clients[index].productId = this.selectedProduct;
+                    this.saveProduct = true;
+                    this.products.selectedProductFromId(this.selectedProduct);
+                    if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+                        this.products.selectedProduct.systems.forEach(function (item) {
+                            if (item.sid === _this2.systems.selectedSystem.sid) _this2.saveProduct = false;
+                        });
+                    } else {
+                        this.saveProduct = true;
+                    }
+                    if (this.saveProduct) {
+                        this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
+                    }
+                }
+            }
+        };
+
+        EditSystem.prototype.updateAllProducts = function updateAllProducts() {
+            var _this3 = this;
+
+            if (this.selectedProduct === "") {
+                this.utils.showNotification("Select a product first");
+            } else {
+                return this.dialog.showMessage("This will only update the products for clients that have no assignments. Continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        _this3.systems.selectedSystem.clients.forEach(function (item) {
+                            if (item.assignments.length === 0) {
+                                item.productId = _this3.selectedProduct;
+                            }
+                        });
+                        _this3.saveProduct = true;
+                        _this3.products.selectedProductFromId(_this3.selectedProduct);
+                        if (_this3.products.selectedProduct.systems && _this3.products.selectedProduct.systems.length > 0) {
+                            _this3.products.selectedProduct.systems.forEach(function (item) {
+                                if (item.sid === _this3.systems.selectedSystem.sid) _this3.saveProduct = false;
+                            });
+                        } else {
+                            _this3.saveProduct = true;
+                        }
+                        if (_this3.saveProduct) {
+                            _this3.products.selectedProduct.systems.push({ systemId: _this3.systems.selectedSystem._id, sid: _this3.systems.selectedSystem.sid });
+                        }
+                    }
+                });
+            }
+        };
+
+        EditSystem.prototype.refreshClient = function refreshClient(index) {
+            var _this4 = this;
+
+            return this.dialog.showMessage("This will return the client to the initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this4.systems.selectedSystem.clients[index].clientStatus = _this4.config.UNASSIGNED_REQUEST_CODE;
+                    _this4.systems.selectedSystem.clients[index].assignments = new Array();
+                    _this4.systems.selectedSystem.clients[index].idsAvailable = _this4.systems.selectedSystem.idsAvailable;
+                }
+            });
+        };
+
+        EditSystem.prototype.delete = function _delete() {
+            var _this5 = this;
+
+            return this.dialog.showMessage("Are you sure you want to delete the system?", "Delete System", ['Yes', 'No']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this5.deleteSystem();
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteSystem = function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+                var name, serverResponse;
+                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                name = this.systems.selectedSystem.sid;
+                                _context5.next = 3;
+                                return this.systems.deleteSystem();
+
+                            case 3:
+                                serverResponse = _context5.sent;
+
+                                if (!serverResponse.error) {
+                                    this.dataTable.updateArray(this.systems.systemsArray);
+                                    this.utils.showNotification("System " + name + " was deleted");
+                                }
+                                this._cleanUp();
+                                this.systemSelected = false;
+
+                            case 7:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function deleteSystem() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return deleteSystem;
+        }();
+
+        EditSystem.prototype.editClientsButton = function editClientsButton() {
+            this.editClients = !this.editClients;
+        };
+
+        EditSystem.prototype.generateClients = function generateClients() {
+            var _this6 = this;
+
+            if (this.selectedProduct === "") {
+                return this.dialog.showMessage("You must select a product.", "Select a Product", ['OK']).whenClosed(function (response) {
+                    return;
+                });
+            }
+            if (this.idsAvailable === "0") {
+                return this.dialog.showMessage("You must enter the number of IDs available.", "Enter IDS Available", ['OK']).whenClosed(function (response) {
+                    return;
+                });
+            }
+            if (!this.editFirstClient || !this.editLastClient || this.editFirstClient.length != 3 || this.editLastClient.length != 3) {
+                return this.dialog.showMessage("Clients must have three digits", "Invalid Client Number", ['OK']).whenClosed(function (response) {
+                    return;
+                });
+            }
+            var start = parseInt(this.editFirstClient);
+            var end = parseInt(this.editLastClient);
+            if (end < start) {
+                return this.dialog.showMessage("The first client number must be less than the last client number.", "Invalid Client Number", ['OK']).whenClosed(function (response) {
+                    return;
+                });
+            }
+            this.saveProduct = true;
+            var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval));
+            if (result.error) {
+                this.utils.showNotification(result.error);
+            } else {
+                this.products.selectedProductFromId(this.selectedProduct);
+                if (this.products.selectedProduct.systems && this.products.selectedProduct.systems.length > 0) {
+                    this.products.selectedProduct.systems.forEach(function (item) {
+                        if (item.sid === _this6.systems.selectedSystem.sid) _this6.saveProduct = false;
+                    });
+                } else {
+                    this.saveProduct = true;
+                }
+                if (this.saveProduct) {
+                    this.products.selectedProduct.systems.push({ systemId: this.systems.selectedSystem._id, sid: this.systems.selectedSystem.sid });
+                }
+            }
+        };
+
+        EditSystem.prototype.refreshClients = function refreshClients() {
+            var _this7 = this;
+
+            if (!this.systems.selectedSystem.clients || this.systems.selectedSystem.clients.length === 0) {
+                return this.dialog.showMessage("The system doesn't have clients to refresh", "No Clients", ['OK']).whenClosed(function (response) {
+                    return;
+                });
+            }
+            return this.dialog.showMessage("This will return clients to an initial state.  You must save the system for this to take effect. Do you want to continue?", "Refresh Clients", ['Yes', 'No']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this7.systems.refreshClients(_this7.config.UNASSIGNED_REQUEST_CODE, _this7.products.productsArray);
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteClients = function deleteClients() {
+            var _this8 = this;
+
+            return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).whenClosed(function (response) {
+                if (!response.wasCancelled) {
+                    _this8.deleteAllClients();
+                }
+            });
+        };
+
+        EditSystem.prototype.deleteAllClients = function deleteAllClients() {
+            var _this9 = this;
+
+            var id = this.systems.selectedSystem._id;
+            this.productsToUpdate = new Array();
+            var processedProducts = new Array();
+            this.systems.selectedSystem.clients.forEach(function (item) {
+                if (item.productId) {
+                    if (processedProducts.indexOf(item.productId) === -1) {
+                        processedProducts.push(item.productId);
+                        _this9.products.selectedProductFromId(item.productId);
+                        if (_this9.products.selectedProduct._id) {
+                            _this9.products.selectedProduct.systems.forEach(function (system, index) {
+                                if (system.systemId === id) {
+                                    _this9.products.selectedProduct.systems.splice(index, 1);
+                                    _this9.productsToUpdate.push(_this9.products.selectedProduct);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+            this.systems.deleteAllClients();
+
+            this.utils.showNotification("You must save the system to complete the deletion");
+        };
+
+        EditSystem.prototype.editAClient = function editAClient(client, index, el) {
+            this.selectedClientIndex = index;
+            this.selectedClient = client;
+            this.systems.selectClient(index);
+
+            if (this.selectedRow) this.selectedRow.children().removeClass('info');
+            this.selectedRow = $(el.target).closest('tr');
+            this.selectedRow.children().addClass('info');
+            this.interfaceUpdate = true;
+        };
+
+        EditSystem.prototype.deleteClient = function deleteClient(index) {
+            var _this10 = this;
+
+            if (!this._okToDeleteClient(this.systems.selectedSystem.clients[index])) {
+                this.utils.showNotification("The client either has assignments or the status doesn't allow deletion. You must refresh it before deleting it.");
+            } else {
+                return this.dialog.showMessage("Are you sure about this, this action cannot be undone?", "Delete Clients", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        var productId = _this10.systems.selectedSystem.clients[index].productId;
+                        var id = _this10.systems.selectedSystem._id;
+                        var noUpdates = true;
+                        _this10.productsToUpdate = new Array();
+                        if (_this10.systems.selectedSystem.clients.length > 0) {
+                            for (var i = 0; i < _this10.systems.selectedSystem.clients.length; i++) {
+                                if (_this10.systems.selectedSystem.clients[i].productId === productId) {
+                                    noUpdates = false;
+                                    break;
+                                }
+                            }
+                        }
+                        _this10.systems.selectedSystem.clients.splice(index, 1);
+                        if (!noUpdates) {
+                            _this10.products.selectedProductFromId(productId);
+                            _this10.products.selectedProduct.systems.forEach(function (system, index) {
+                                if (system.systemId === id) {
+                                    _this10.products.selectedProduct.systems.splice(index, 1);
+                                    _this10.productsToUpdate.push(_this10.products.selectedProduct);
+                                }
+                            });
+                        }
+                    }
+                    _this10.utils.showNotification("You must save the system to complete the deletion");
+                });
+            }
+        };
+
+        EditSystem.prototype._okToDeleteClient = function _okToDeleteClient(client) {
+            if (client.assignments.length > 0) return false;
+            var status = client.clientStatus;
+            for (var i = 0; i < this.config.CLIENT_STATUSES.length; i++) {
+                if (this.config.CLIENT_STATUSES[i].code == status && this.config.CLIENT_STATUSES[i].OKToDelete) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        EditSystem.prototype.deleteC = function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    while (1) {
+                        switch (_context6.prev = _context6.next) {
+                            case 0:
+                                this.systems.deleteClient();
+                                this.utils.showNotification("The client was deleted but you must save the system to complete the deltion");
+
+                            case 2:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function deleteC() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return deleteC;
+        }();
+
+        EditSystem.prototype.selectClient = function selectClient(client, index) {
+            this.selectedClient = this.utils.copyObject(client);
+            this.clientSelected = true;
+            this.selectedClientIndex = index;
+        };
+
+        EditSystem.prototype.backClient = function backClient() {
+            this.clientSelected = false;
+        };
+
+        EditSystem.prototype.saveClient = function saveClient() {
+            this.systems.selectedSystem.clients[this.selectedClientIndex] = this.selectedClient;
+            this.clientSelected = false;
+            this.utils.showNotification("You must save the system for any changes to take effect.");
+        };
+
+        EditSystem.prototype._cleanUp = function _cleanUp() {
+            this.systemSelected = false;
+            this.newSystem = false;
+            this.clientSelected = false;
+            this.editClients = false;
+            this.validation.makeAllValid(1);
+        };
+
+        EditSystem.prototype._cleanUpFilters = function _cleanUpFilters() {
+            this.sidFilterValue = "";
+            this.descriptionFilterValue = "";
+            this.serverFilterValue = "";
+            this.activeFilter = "";
+            this.dataTable.updateArray(this.systems.systemsArray);
+        };
+
+        EditSystem.prototype.back = function back() {
+            var _this11 = this;
+
+            if (this.systems.isDirty().length) {
+                return this.dialog.showMessage("The system has been changed. Do you want to save your changes?", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                    if (!response.wasCancelled) {
+                        _this11.save();
+                    } else {
+                        _this11._cleanUp();
+                    }
+                });
+            } else {
+                this._cleanUp();
+            }
+        };
+
+        EditSystem.prototype.cancel = function cancel() {
+            this.systems.selectSystem(this.editIndex);
+        };
+
+        EditSystem.prototype._setupValidation = function _setupValidation() {
+            this.validation.addRule(1, "editSid", [{ "rule": "required", "message": "SID is required", "value": "systems.selectedSystem.sid" }, { "rule": "custom", "message": "A system with that SID already exists",
+                "valFunction": function valFunction(context) {
+                    if (!context.systems.selectedSystem._id) {
+                        var found = false;
+                        for (var i = 0; i < context.systems.systemsArray.length; i++) {
+                            if (context.systems.systemsArray[i].sid.toUpperCase() === context.systems.selectedSystem.sid.toUpperCase()) {
+                                if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
+                                    found = true;
+                                } else if (!context.systems.selectedSystem._id) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        return !found;
+                    }
+                    return true;
+                } }], true);
+            this.validation.addRule(1, "editDesc", [{ "rule": "required", "message": "Description is required", "value": "systems.selectedSystem.description" }]);
+            this.validation.addRule(1, "editServer", [{ "rule": "required", "message": "Server is required", "value": "systems.selectedSystem.server" }, { "rule": "custom", "message": "A system with that server already exists",
+                "valFunction": function valFunction(context) {
+                    if (!context.systems.selectedSystem._id) {
+                        var found = false;
+                        for (var i = 0; i < context.systems.systemsArray.length; i++) {
+                            if (context.systems.systemsArray[i].server.toUpperCase() === context.systems.selectedSystem.server.toUpperCase()) {
+                                if (context.systems.selectedSystem._id && context.systems.selectedSystem._id != context.systems.systemsArray[i]._id) {
+                                    found = true;
+                                } else if (!context.systems.selectedSystem._id) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        return !found;
+                    }
+                    return true;
+                } }]);
+            this.validation.addRule(1, "editInst", [{ "rule": "required", "message": "Instance is required", "value": "systems.selectedSystem.instance" }]);
+        };
+
+        EditSystem.prototype.selectProduct = function selectProduct() {
+            this.products.selectedProductFromId(this.selectedProduct);
+            if (this.products.selectedProduct) this.idsAvailable = this.products.selectedProduct.idsAvailable ? this.products.selectedProduct.idsAvailable : 0;
+        };
+
+        return EditSystem;
+    }()) || _class);
+});
+define('modules/admin/system/system',['exports', 'aurelia-framework', 'aurelia-router', '../../../config/appConfig'], function (exports, _aureliaFramework, _aureliaRouter, _appConfig) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.EditSystem = undefined;
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var _dec, _class;
+
+    var EditSystem = exports.EditSystem = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _appConfig.AppConfig), _dec(_class = function () {
+        function EditSystem(router, config) {
+            _classCallCheck(this, EditSystem);
+
+            this.title = "System";
+
+            this.router = router;
+            this.config = config;
+        }
+
+        EditSystem.prototype.attached = function attached() {
+            $(".nav a").on("click", function () {
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+        };
+
+        EditSystem.prototype.activate = function activate() {
+            this.config.getConfig(true);
+        };
+
+        EditSystem.prototype.configureRouter = function configureRouter(config, router) {
+            config.map([{
+                route: ['', 'editSessions'],
+                moduleId: './editSession',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSessions',
+                title: 'Sessions'
+            }, {
+                route: 'editSystems',
+                moduleId: './editSystem',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editSystems',
+                title: 'Systems'
+            }, {
+                route: 'editProduct',
+                moduleId: './editProduct',
+                settings: { auth: true, roles: [] },
+                nav: true,
+                name: 'editProduct',
+                title: 'Products'
+            }]);
+
+            this.router = router;
+        };
+
+        return EditSystem;
     }()) || _class);
 });
 define('modules/tech/requests/archiveClientRequests',['exports', 'aurelia-framework', '../../../resources/utils/dataTable', '../../../resources/data/sessions', '../../../resources/data/systems', '../../../resources/data/products', '../../../resources/data/clientRequests', '../../../config/appConfig', '../../../resources/utils/utils', '../../../resources/data/people', 'moment'], function (exports, _aureliaFramework, _dataTable, _sessions, _systems, _products, _clientRequests, _appConfig, _utils, _people, _moment) {
@@ -55577,8 +55578,6 @@ define('text!resources/dialogs/message-dialog.html', ['module'], function(module
 define('text!resources/dialogs/note-dialog.html', ['module'], function(module) { module.exports = "<template>\n  <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n  <ux-dialog style=\"max-width: 600px\">\n    <ux-dialog-header>${model.title}</ux-dialog-header>\n\n    <ux-dialog-body>\n\t\t<select class=\"form-control\" value.bind=\"model.selectedCategory\">\n\t\t\t<option repeat.for=\"option of model.note.noteCategories\" model.bind=\"$index\">${option}</option>\n\t\t</select>\n      \t<editor value.bind=\"model.note.noteBody\" height=\"250\"></editor>\n    </ux-dialog-body>\n\n    <ux-dialog-footer>\n      <button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n    </ux-dialog-footer>\n  </ux-dialog>\n</template>\n"; });
 define('text!resources/dialogs/password-dialog.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n\t\tux-dialog-header {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t</style>\n\t<ux-dialog style=\"width: 600px;\">\n\t\t<ux-dialog-header>${model.title}</ux-dialog-header>\n\n\t\t<ux-dialog-body style=\"height:300px;\">\n\t\t\t<h6>Password should be at least ${thresholdLength} characters long and should contuxn a combination of the following groups:  </h6>\n\t\t\t\t<ul>\n\t\t\t\t\t<li><h6>lowercase letters</h6></li>\n\t\t\t\t\t<li><h6>uppercase letters</h6></li>\n\t\t\t\t\t<li><h6> digits or special characters</h6></li>\n\t\t\t\t</ul>\n\t\t\t<div class=\"topMargin\" style=\"height:50px;\">\n\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t<label for=\"register_password\" class=\"col-sm-3 control-label\">Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password\" type=\"password\" attach-focus=\"true\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password\"\n\t\t\t\t\t\tblur.trigger=\"passwordComplexity()\" />\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"topMargin\">\n\t\t\t\t<div class=\"form-group topMargin\" >\n\t\t\t\t\t<label for=\"register_password_repeat\" class=\"col-sm-3 control-label\">Repeat Password</label>\n\t\t\t\t\t<div class=\"col-md-8\">\n\t\t\t\t\t\t<input id=\"register_password_repeat\" type=\"password\" placeholder=\"Password\" class=\"form-control input-md\" value.bind=\"password_repeat\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</ux-dialog-body>\n\n\t\t<ux-dialog-footer>\n\t\t\t<button class=\"btn btn-primary smallMarginRight\" repeat.for=\"option of model.options\" click.trigger=\"selectOption(option)\">${option}</button>\n\t\t</ux-dialog-footer>\n\t</ux-dialog>\n</template>\n"; });
 define('text!resources/editor/editor.html', ['module'], function(module) { module.exports = "<template>\n\t<div class=\"summernote-host\" id.bind=\"editorid\" ref=\"editor\"></div>\n</template>"; });
-define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"topMargin\">\n\t\t<img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\n\t</div>\n\n    <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\n\t<div class=\"smart-timeline-time\">\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \n\t</div>\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\n\t\t<div class=\"form-group\">\n\t\t\t<p>${event.personId.fullName}</p>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
-define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"well well-sm topMargin\">\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li>\n            <div class=\"topMargin\">\n                <img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\n            </div>\n\n            <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <div class=\"form-group\">\n                  <p>${helpTickets.selectedHelpTicket.personId.fullName}</p>\n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                      <span class=\"col-sm-11 col-sm-offset-1\" id=\"container\"></span>\n                      <h4 show.bind=\"showCourse\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Course: ${course}</h4>\n                      <div show.bind=\"showRequestDetails\">\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>\n                        <h4  class=\"col-sm-11 col-sm-offset-1\">Assignments</h4>\n                        <table class=\"col-sm-11 col-sm-offset-1\">\n                          <tr>\n                            <th class=\"col-lg-1\">System</th>\n                            <th class=\"col-lg-1\">Client</th>\n                          </tr>\n                          <tr repeat.for=\"assign of helpTickets.selectedHelpTicket.requestId.assignments\">\n                            <td class=\"col-lg-1\"><h4>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h4></td>\n                            <td class=\"col-lg-1\"><h4>${assign.client}</h4></td>\n                          </tr>\n                        </table>\n                          <!--\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                        <h4  class=\"col-sm-11 col-sm-offset-1 \">Client: ${helpTickets.selectedHelpTicket.client}</h4>\n                        -->\n                      </div>\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n                   \n                      <div class=\"form-group topMargin\">\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                              target=\"_blank\"\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n                          </div>\n                      </div>\n                     </div>\n                    <div class=\"col-lg-7\">\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\n                        <hr/>\n                        <h4 >Steps to reproduce the problem</h4>\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\n                      </div>\n                    </div>\n                </div>\n              </div>\n            </div>\n          </li>\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\n            <compose view=\"./response.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n</template>"; });
 define('text!resources/elements/add-systems.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-lg-12\">\n    <form>\n      <div class=\"col-lg-10\">\n\t\t\t\t<div class=\"checkbox\">\n\t\t\t\t<label>\n\t\t\t\t\t<input checked.bind=\"enable\" type=\"checkbox\"> Enable editing\n\t\t\t\t</label>\n\t\t\t\t</div>\n\t\t\t</div>\n      <div class=\"col-md-5 topMargin\">\n        <label>Available Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n            <input class=\"form-control\" value.bind=\"filter\" input.trigger=\"filterList()\" placeholder=\"Filter systems\"/>\n            <ul class=\"list-group\">\n              <button click.trigger=\"selectSystem($event, system)\" type=\"button\" repeat.for=\"system of filteredsystemsarray\" id=\"${system._id}\"\n                      class=\"list-group-item\">${system.sid}</button>\n            </ul>\n        </div>\n      </div>\n      <div class=\"col-md-5 topMargin col-md-offset-1\">\n        <label>Assigned Systems</label>\n        <div class=\"well well2 overFlow\" style=\"height:400px;\">\n          <ul class=\"list-group\">\n            <button click.trigger=\"removeSystem($event, system)\" type=\"button\" repeat.for=\"system of selectedproduct.systems\" id=\"${system._id}\"\n                    class=\"list-group-item\">${system.sid}</button>\n          </ul>\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
 define('text!resources/elements/flat-picker.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"flatpickr/flatpickr.css\"></require>\n     <div class=\"input-group aurelia-flatpickr\">\n      <input style=\"background-color:white;\" type=\"text\" class=\"aurelia-flatpickr form-control\" placeholder=\"Select date\" data-input>\n      <span class=\"input-group-btn\">\n        <button style=\"height:39px;\" class=\"btn btn-default\" type=\"button\" data-clear><i class=\"fa fa-trash fa-border\"></i></button>\n      </span>\n  </div>\n</template>"; });
 define('text!resources/elements/nav-bar.html', ['module'], function(module) { module.exports = "<template>\n    <style>\n        .navbar-default {\n            color: ${config.MENU_COLOR};\n            background-color:${config.MENU_BACKGROUND}\n        }\n        .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {\n            color: ${config.ACTIVE_MENU_COLOR};\n            background-color:${config.MENU_BACKGROUND}\n        }\n    </style>\n    <nav class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container-fluid\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n                    <span class=\"sr-only\">Toggle navigation</span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                    <span class=\"icon-bar\"></span>\n                </button>\n                 \n                <span>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && isAuthenticated\"  class=\"navbar-brand\" href=\"#/user\"><img  src=\"/img/${config.NAVBAR_LOGO}\" ></a>\n                    <a if.bind=\"config.NAVBAR_LOGO && config.NAVBAR_LOGO.length>0 && !isAuthenticated\" class=\"navbar-brand\" href=\"#/home\"><img  src=\"/img/${config.NAVBAR_LOGO}\" ></a>\n                </span>\n                 <span>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && isAuthenticated\" class=\"navbar-brand\" href=\"#/user\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                    <a if.bind=\"(!config.NAVBAR_LOGO.length || config.NAVBAR_LOGO.length===0) && !isAuthenticated\" class=\"navbar-brand\" href=\"#/home\"><i class=\"fa fa-home\"></i> UCCSS</a>\n                </span>\n              \n            </div>\n\n            <!-- Collect the nav links, forms, and other content for toggling -->\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n\n                <form if.bind=\"!isAuthenticated && !passwordReset\" class=\"navbar-form navbar-left\" role=\"search\">\n                    <div class=\"form-group\">\n                        <input value.bind=\"email\" type=\"email\" autofocus class=\"form-control\" id=\"email\" placeholder=\"Email\"></input>\n                    </div>\n                    <div class=\"form-group\">\n                        <input value.bind=\"password\" type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\"></input>\n                    </div>\n                    <button class=\"btn btn-default\" click.delegate='login()'>Login</button>\n                    <button class=\"btn btn-link\" click.delegate=\"requestPasswordReset()\">Forgot password</button>\n                     <label if.bind=\"loginError\" style=\"color:white;\">${loginError}</label>\n                </form>\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Administration <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/system\">System Admin</a></li>\n                            <li><a href=\"#/customers\">Customers</a></li>\n                            <li><a href=\"#/site\">Site</a></li>\n                            <li><a href=\"#/documents\">Documents</a></li>\n                             <li><a href=\"#/inventory\">Inventory</a></li>\n                        </ul>\n                    </li>\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_TECH_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Technical <span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a href=\"#/techRq\">Product Requests</a></li>\n                            <li><a href=\"#/techHt\">Help Tickets</a></li>\n                        </ul>\n                    </li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/social\">Social</a></li>\n                    <li if.bind=\"userObj.userRole >= config.USER_ROLE\"><a href=\"#/facco\">Faculty Coordinator</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/support\">Support</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/clientRequests\">Product Requests</a></li>\n                    <li if.bind=\"isAuthenticated && userObj.userRole >= config.UA_ROLE\"><a href=\"#/analytics\">Analytics</a></li>\n                </ul>\n\n                <ul class=\"nav navbar-nav navbar-right\">\n                     <li class=\"dropdown\">\n                        <a if.bind=\"userObj.userRole >= config.UCC_ROLE\" href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">Notes<span class=\"caret\"></span></a>\n                        <ul class=\"dropdown-menu\">\n                            <li><a click.trigger=\"enterNote()\" href=\"#\">Enter Note</a></li>\n                            <li><a href=\"#/notes\">Notes</a></li>\n                        </ul>\n                    </li>  \n                   \n                    <li if.bind=\"!isAuthenticated\"><a href=\"#/register\">Register</a></li>\n                    <li if.bind=\"isAuthenticated\"><a href=\"#/profile\">Profile</a></li>\n                    <li><a href=\"#/about\">About the UCC</a></li>\n                    <li if.bind=\"isAuthenticated\" click.trigger=\"logout()\"><a href=\"#\">Logout</a></li>\n                </ul>\n            </div>\n        </div>\n    </nav>\n</template>"; });
@@ -55586,6 +55585,8 @@ define('text!resources/elements/rate-it.html', ['module'], function(module) { mo
 define('text!resources/elements/submenu.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n\t\t.navbar-inverse .navbar-brand {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t}\n\t\t.navbar-inverse .navbar-nav>li>a {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t}\n\t\t.navbar-inverse {\n\t\t\tcolor: ${config.SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t\t.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus {\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t\tbackground-color:${config.SUBMENU_BACKGROUND}\n\t\t}\n\t\t.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {\n\t\t\tbackground-color: ${config.HOVER_SUBMENU_BACKGROUND};;\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t}\n\t</style>\n    <div class=\"subMenu-container\">\n        <nav class=\"navbar navbar-inverse subMenu\">\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\">${title}</a>\n            </div>\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n                <ul class=\"nav navbar-nav\">\n                    <li class=\"${row.isActive ? 'active' : ''}\" repeat.for=\"row of router.navigation\"><a href.bind=\"row.href\">${row.title}</a></li>\n                </ul>\n            </div>\n        </nav>\n    </div>\n</template>"; });
 define('text!resources/elements/table-navigation-bar.html', ['module'], function(module) { module.exports = "<template>\n    <div class='row'>\n        <div class=\"col-lg-2\">\n            <label style=\"padding-left:15px;\" class=\"pull-left\">Records ${dataTable.firstVisible} - ${dataTable.lastVisible}/${dataTable.displayLength}</label>\n        </div>\n        <div class=\"col-lg-8 text-center\">\n            <div  class=\"center-block\">\n                <span show.bind=\"dataTable.pageButtons.length > 1\">\n                    <ul class=\"pagination\" id=\"${navControl}\">\n                        <li click.trigger=\"dataTable.backward()\"><a href=\"#!\"><i class=\"fa fa-chevron-left\"></i></a></li>\n                            <li click.trigger=\"dataTable.pageButton($index, $event)\" class=\"hidden-xs hidden-sm waves-effect ${$first ? 'active' : ''}\" repeat.for=\"page of dataTable.pageButtons\"><a>${page}</a></li>\n                        <li click.trigger=\"dataTable.forward()\"><a href=\"#!\"><i class=\"fa fa-chevron-right\"></i></a></li>\n                    </ul>\n                </span>\n            </div>\n        </div>\n        <div class=\"col-lg-2\">\n            <div class=\"input-field col-sm-12 hidden-xs hidden-sm\">\n                <label>Rows</label>\n                <select id=\"rowsShownSelect\" value.bind=\"dataTable.numRowsShown\" change.delegate=\"dataTable.updateTake()\" class=\"pull-right form-control\"\n                    style=\"width:100px;margin-left:5px;\">\n                    <option repeat.for=\"rows of dataTable.rowOptions\" value.bind=\"rows\">${rows}</option>\n                </select>\n            </div>\n        </div>\n    </div>\n</template>"; });
 define('text!resources/elements/tree-node.html', ['module'], function(module) { module.exports = "<template>\n\t<style>\n\t\t.menuButtons {\n\t\t\tcolor: ${config.ACTIVE_SUBMENU_COLOR};\n\t\t\tbackground-color:${config.BUTTONS_BACKGROUND}\n\t\t}\n\t</style>\n\t<require from=\"./tree-node.css\"></require>\n\t<li if.bind=\"visible\" class=\"list-group-item treeview ${selectedNode == data?'menuButtons':''}\" click.delegate=\"clickMe(data)\">\n\t\t<span class=\"indent\" repeat.for=\"i of level\"></span>\n\t\t<span if.bind=\"data.children\" class=\"icon glyphicon ${childrenVisible?'glyphicon-triangle-bottom':'glyphicon-triangle-right'}\" click.delegate=\"toggleExpand(data)\"></span>\n\t\t<span if.bind=\"!data.children\" class=\"icon glyphicon\"></span>\n\t\t${data.name}<span if.bind=\"!childrenVisible && itemCount != 0\" class=\"badge\" click.delegate=\"toggleExpand()\">${itemCount}</span>\n\t\t <span if.bind=\"!data.children\" class=\"icon glyphicon glyphicon-trash pull-right\" click.delegate=\"callback(data)\"></span>\n\t</li>\n\t<tree-node if.bind=\"visible\"  callback.call=\"deleteFile2(node)\" selected-file.bind=\"selectedFile\" repeat.for=\"node of data.children\" data.bind=\"node\" level.bind=\"level + 1\" visible.bind=\"childrenVisible\" max-level.bind=\"maxLevel\" selected-node.bind=\"selectedNode\"></tree-node>\n</template>"; });
+define('text!resources/htTimeline/response.html', ['module'], function(module) { module.exports = "<template>\n\t <div class=\"topMargin\">\n\t\t<img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\n\t</div>\n\n    <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\n\t<div class=\"smart-timeline-time\">\n\t\t<small>${event.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n\t\t<p><span if.bind=\"event.emailSent\"  ><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></span></p>\n    \t<span if.bind=\"event.confidential\"  ><i class=\"fa fa-user-secret\" aria-hidden=\"true\"></i></i></span> \n\t</div>\n\t<div class=\"smart-timeline-content borderTop leftJustify\">\n\t\t<div class=\"form-group\">\n\t\t\t<p>${event.personId.fullName}</p>\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"topMargin bottomMargin\"  innerhtml.bind=\"event.content.comments ? event.content.comments : ' ' \"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"file of event.files\">\n\t\t\t\t<a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\" target=\"_blank\"\n\t\t\t\t\tinnerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"form-group\">\n\t\t\t<div class=\"hover_img\" repeat.for=\"document of event.documents\">\n\t\t\t\t<a href=\"${config.DOCUMENT_FILE_DOWNLOAD_URL}/${document.categoryCode}/${document.categoryName}/${document.fileName}\" target=\"_blank\">${document.fileName}</a>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>"; });
+define('text!resources/htTimeline/timeline.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"well well-sm topMargin\">\n      <div class=\"smart-timeline\">\n        <ul class=\"smart-timeline-list\">\n          <li>\n            <div class=\"topMargin\">\n                <img if.bind=\"helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" src =\"${config.PERSON_IMAGE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.personId.file.fileName}\" height=\"100\">\n            </div>\n\n            <div if.bind=\"!helpTickets.selectedHelpTicket.personId.file.fileName\" class=\"smart-timeline-icon bottomMarginLg\" innerhtml.bind=\"helpTickets.selectedHelpTicket.personId.email | gravatarUrl:100:1\"></div>\n              <div class=\"smart-timeline-time\">\n                <small>${helpTickets.selectedHelpTicket.createdDate | dateFormat:'YYYY-MM-DD':true}</small>\n              </div>\n              <div class=\"smart-timeline-content borderTop leftJustify\">\n                <div class=\"form-group\">\n                  <p>${helpTickets.selectedHelpTicket.personId.fullName}</p>\n                  <div class=\"row\">\n                    <div class=\"col-lg-4\">\n                      <span class=\"col-sm-11 col-sm-offset-1\" id=\"container\"></span>\n                      <h4 show.bind=\"showCourse\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Course: ${course}</h4>\n                      <div show.bind=\"showRequestDetails\">\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">Request: ${helpTickets.selectedHelpTicket.requestId.requestNo}</h4>\n                        <h4  class=\"col-sm-11 col-sm-offset-1\">Assignments</h4>\n                        <table class=\"col-sm-11 col-sm-offset-1\">\n                          <tr>\n                            <th class=\"col-lg-1\">System</th>\n                            <th class=\"col-lg-1\">Client</th>\n                          </tr>\n                          <tr repeat.for=\"assign of helpTickets.selectedHelpTicket.requestId.assignments\">\n                            <td class=\"col-lg-1\"><h4>${assign.systemId | lookupValue:systems.systemsArray:\"_id\":\"sid\"}</h4></td>\n                            <td class=\"col-lg-1\"><h4>${assign.client}</h4></td>\n                          </tr>\n                        </table>\n                          <!--\n                        <h4  class=\"col-sm-11 col-sm-offset-1 topMargin\">System: ${systems.selectedSystem.sid}</h4>\n                        <h4  class=\"col-sm-11 col-sm-offset-1 \">Client: ${helpTickets.selectedHelpTicket.client}</h4>\n                        -->\n                      </div>\n                      <h4 show.bind=\"!showRequestDetails && clientRequired\" class=\"col-sm-11 col-sm-offset-1 topMargin\">Client not assigned</h4>\n                   \n                      <div class=\"form-group topMargin\">\n                          <div class=\"hover_img\" repeat.for=\"file of helpTickets.selectedHelpTicket.content[0].files\">\n                            <a href=\"${config.HELPTICKET_FILE_DOWNLOAD_URL}/${helpTickets.selectedHelpTicket.helpTicketNo}/${file.fileName}\"\n                              target=\"_blank\"\n                              innerhtml.bind=\"file.fileName | fileType:helpTickets.selectedHelpTicket.helpTicketNo:'helpTickets':file.originalFilename\"></a>\n                          </div>\n                      </div>\n                     </div>\n                    <div class=\"col-lg-7\">\n                      <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.comments ? helpTickets.selectedHelpTicket.content[0].content.comments : ' ' \"></div>\n                      <div show.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps\">\n                        <hr/>\n                        <h4 >Steps to reproduce the problem</h4>\n                        <div class=\"topMargin bottomMargin\"  innerhtml.bind=\"helpTickets.selectedHelpTicket.content[0].content.steps ? helpTickets.selectedHelpTicket.content[0].content.steps : ' ' \"></div>\n                      </div>\n                    </div>\n                </div>\n              </div>\n            </div>\n          </li>\n          <li repeat.for=\"event of helpTickets.selectedHelpTicket.content | sortDateTime:'createdDate':'DESC':isUCC:true\">\n            <compose view=\"./response.html\"></compose>\n          </li>\n        </ul>\n      </div>\n    </div>\n</template>"; });
 define('text!modules/admin/Customers/bulkEmails.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n\t\t<compose view=\"./components/selectionForm.html\"></compose>\n\t\t<compose view=\"./components/emailTable.html\"></compose>\n        </div> \n      </div> \n</template>"; });
 define('text!modules/admin/Customers/customers.html', ['module'], function(module) { module.exports = "<template>\n    <compose view='../../../resources/elements/submenu.html'></compose>\n    <div class=\"col-lg-12\">\n        <router-view></router-view>\n    </div>\n</template"; });
 define('text!modules/admin/Customers/editInstitutions.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"panel panel-info\">\n      <div class=\"panel-body\">\n        <div class=\"row\">\n            <div show.bind=\"!institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsTable.html\"></compose>\n            </div> <!-- Table Div -->\n            <div show.bind=\"institutionSelected\" class=\"col-lg-12\">\n                <compose view=\"./components/institutionsForm.html\"></compose>\n            </div> <!-- Form Div -->\n        </div> <!-- Row -->\n      </div> <!-- Panel Body -->\n</template>"; });
