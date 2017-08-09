@@ -187,7 +187,7 @@ module.exports = function (app) {
    router.post('/api/curriculum/uploadForm/:id/:container',  function(req, res, next){
        logger.log('Upload file in ' + req.params.container, "verbose");
     var oldPath, newPath, fileName;
-
+    req.socket.setTimeout(10 * 60 * 1000);
     var form = new formidable.IncomingForm({uploadDir: "c://temp/", keepExtensions: true});
 
     form
