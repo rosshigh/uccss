@@ -6,7 +6,8 @@ var express = require('express'),
   CurriculumCategory = mongoose.model('CurriculumCategory'),
   logger = require('../../config/logger'),
   multer = require('multer'),
-  mkdirp = require('mkdirp');
+  mkdirp = require('mkdirp'),
+  formidable = require('formidable');;
 
   var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -182,6 +183,21 @@ module.exports = function (app) {
       });
     });
   });
+
+   router.post('/api/curriculum/uploadForm/:id/:container',  function(req, res, next){
+   var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+      var oldpath = "c:/temp";
+console.log(files)      
+      var newpath = config.uploads + '/curriculum/' + req.params.container + '/' + files.filetoupload.name;
+console.log(newpath)  
+      fs.rename(oldpath, newpath, function (err) {
+        if (err) throw err;
+        res.write('File uploaded and moved!');
+        res.end();
+      });
+    });
+   });
 
   function extendTimeout (req, res, next) {
      req.socket.setTimeout(10 * 60 * 1000);

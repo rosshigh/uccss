@@ -96,6 +96,7 @@ export class Systems{
         } else {
             var serverResponse = await this.data.saveObject(this.selectedSystem, this.SYSTEMS_SERVICE, "put");
             if(!serverResponse.error){
+                this.selectedSystem = serverResponse;
                 this.systemsArray[this.editIndex] = this.utils.copyObject(this.selectedSystem);
             } else {
                 this.data.processError(serverResponse,"Error updating the system.<br>")
