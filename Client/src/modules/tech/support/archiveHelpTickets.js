@@ -39,6 +39,8 @@ export class ArchiveHelpTickets {
     this.sessions = sessions;
     this.apps = apps;
     this.products = products;
+
+     this.userObj = JSON.parse(sessionStorage.getItem('user'));
   };
 
   async activate() {
@@ -147,6 +149,28 @@ export class ArchiveHelpTickets {
     this.selectedProducts.splice(this.selectedProducts.indexOf(el.target.id),1);
   }
 
+  async save(changes){
+    changes =  changes ?  changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket,["requestId","courseId","personId","institutionId"]);
+     if(changes && changes.length > 0){
+       changes.forEach(item => {
+         this.helpTickets.selectedHelpTicket.audit.push({
+           property: item.property,
+           oldValue: item.oldValue,
+           newValue: item.newValue,
+           eventDate: new  Date(),
+           personId: this.userObj._id
+         })
+       })
+     }
+     var email = {};
+    let serverResponse = await this.helpTickets.saveHelpTicket(email);
+    if (!serverResponse.error) {
+      this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+      this.utils.showNotification("The help ticket was updated");
+    }
+    this._cleanUp();
+  }
+
   filterPeopleList(){
     if(this.peopleFilter){
       var thisFilter = this.peopleFilter
@@ -210,7 +234,7 @@ export class ArchiveHelpTickets {
   async selectHelpTicket(helpTicket, el) {
     //Make the selected help ticket the selected help ticket
      this.helpTickets.selectHelpTicketByID(helpTicket._id);
-
+    this.oroginalHelpTicket = this.utils.copyObject(this.helpTickets.selectedHelpTicket);
     //If the help ticket has a systemId, retrieve the system from the server
     if (this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
       await this.systems.getSystem(this.helpTickets.content.content.systemId);

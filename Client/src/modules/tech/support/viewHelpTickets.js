@@ -303,24 +303,6 @@ export class ViewHelpTickets {
       if (!response.error) {
         if (response.helpTicketId === 0 || response[0].personId === this.userObj._id) {
           var email = new Object();
-          // var lastChange = this.helpTickets.selectedHelpTicket.audit[this.helpTickets.selectedHelpTicket.audit.length -1 ];
-          // if(this.sendEmail){
-          //     email.reason = 2;
-          //     email.fullName = this.helpTickets.selectedHelpTicket.personId.fullName; 
-          //     email.email = this.helpTickets.selectedHelpTicket.personId.email; 
-          //     email.helpTicketNo =  this.helpTickets.selectedHelpTicket.helpTicketNo;
-          //     email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
-          //     if(lastChange.property == 'helpTicketStatus') {
-          //       email.reason = lastChange.newValue;
-          //       email.message =  "The status was changed to " + this.getStatusDescription(lastChange.newValue);
-          //     } else if (lastChange.property == 'priority'){
-          //       email.reason = 2;
-          //       email.message =  "The priority was changed to " + this.config.HELP_TICKET_PRIORITIES[lastChange.newValue].priority;
-          //     } else {
-          //       var email = new Object();
-          //     }
-           
-          // }
           let serverResponse = await this.helpTickets.saveHelpTicket(email);
           if (!serverResponse.error) {
             this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
@@ -374,6 +356,17 @@ export class ViewHelpTickets {
   * Save the response
   *****************************************************************************************/
   async saveResponse(status) {
+    if(status === this.config.CLOSED_HELPTICKET_STATUS){
+      this.dialog.showMessage(
+            "Are you sure you want to close this help ticket",
+            "Save Changes",
+            ['Yes', 'No']
+        ).whenClosed(response => {
+            if (response.wasCancelled) {
+               return;
+            }
+        });
+    }
     this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
     this._createResponse();
     var email = new Object();

@@ -29768,6 +29768,8 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
       this.sessions = sessions;
       this.apps = apps;
       this.products = products;
+
+      this.userObj = JSON.parse(sessionStorage.getItem('user'));
     }
 
     ArchiveHelpTickets.prototype.activate = function () {
@@ -29923,6 +29925,55 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
       this.selectedProducts.splice(this.selectedProducts.indexOf(el.target.id), 1);
     };
 
+    ArchiveHelpTickets.prototype.save = function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(changes) {
+        var _this2 = this;
+
+        var email, serverResponse;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                changes = changes ? changes : this.helpTickets.isHelpTicketDirty(this.oroginalHelpTicket, ["requestId", "courseId", "personId", "institutionId"]);
+                if (changes && changes.length > 0) {
+                  changes.forEach(function (item) {
+                    _this2.helpTickets.selectedHelpTicket.audit.push({
+                      property: item.property,
+                      oldValue: item.oldValue,
+                      newValue: item.newValue,
+                      eventDate: new Date(),
+                      personId: _this2.userObj._id
+                    });
+                  });
+                }
+                email = {};
+                _context3.next = 5;
+                return this.helpTickets.saveHelpTicket(email);
+
+              case 5:
+                serverResponse = _context3.sent;
+
+                if (!serverResponse.error) {
+                  this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
+                  this.utils.showNotification("The help ticket was updated");
+                }
+                this._cleanUp();
+
+              case 8:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function save(_x2) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return save;
+    }();
+
     ArchiveHelpTickets.prototype.filterPeopleList = function filterPeopleList() {
       if (this.peopleFilter) {
         var thisFilter = this.peopleFilter;
@@ -29979,22 +30030,23 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
     };
 
     ArchiveHelpTickets.prototype.selectHelpTicket = function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(helpTicket, el) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(helpTicket, el) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 this.helpTickets.selectHelpTicketByID(helpTicket._id);
+                this.oroginalHelpTicket = this.utils.copyObject(this.helpTickets.selectedHelpTicket);
 
                 if (!this.helpTickets.selectedHelpTicket.content[0].content.systemId) {
-                  _context3.next = 4;
+                  _context4.next = 5;
                   break;
                 }
 
-                _context3.next = 4;
+                _context4.next = 5;
                 return this.systems.getSystem(this.helpTickets.content.content.systemId);
 
-              case 4:
+              case 5:
 
                 if (this.selectedRow) this.selectedRow.children().removeClass('info');
                 this.selectedRow = $(el.target).closest('tr');
@@ -30003,16 +30055,16 @@ define('modules/tech/support/archiveHelpTickets',['exports', 'aurelia-framework'
 
                 this.viewHelpTicketsHeading = "Help Ticket " + this.helpTickets.selectedHelpTicket.helpTicketNo;
 
-              case 9:
+              case 10:
               case 'end':
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
-      function selectHelpTicket(_x2, _x3) {
-        return _ref3.apply(this, arguments);
+      function selectHelpTicket(_x3, _x4) {
+        return _ref4.apply(this, arguments);
       }
 
       return selectHelpTicket;
@@ -31214,6 +31266,13 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
+                if (status === this.config.CLOSED_HELPTICKET_STATUS) {
+                  this.dialog.showMessage("Are you sure you want to close this help ticket", "Save Changes", ['Yes', 'No']).whenClosed(function (response) {
+                    if (response.wasCancelled) {
+                      return;
+                    }
+                  });
+                }
                 this.helpTickets.selectedHelpTicket.helpTicketStatus = status;
                 this._createResponse();
                 email = new Object();
@@ -31226,34 +31285,34 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
                   email.cc = this.config.HELP_TICKET_EMAIL_LIST ? this.config.HELP_TICKET_EMAIL_LIST : "";
                   email.message = status == this.config.CUSTOMER_ACTION_HELPTICKET_STATUS ? this.userObj.fullName + " has asked for more information." : this.userObj.fullName + " has responded to the help ticket.";
                 }
-                _context8.next = 6;
+                _context8.next = 7;
                 return this.helpTickets.saveHelpTicketResponse(email);
 
-              case 6:
+              case 7:
                 serverResponse = _context8.sent;
 
                 if (serverResponse.error) {
-                  _context8.next = 14;
+                  _context8.next = 15;
                   break;
                 }
 
                 if (!(status = this.config.CLOSED_HELPTICKET_STATUS)) {
-                  _context8.next = 11;
+                  _context8.next = 12;
                   break;
                 }
 
-                _context8.next = 11;
+                _context8.next = 12;
                 return this.refresh();
 
-              case 11:
+              case 12:
                 this.dataTable.updateArray(this.helpTickets.helpTicketsArray);
                 this.utils.showNotification("The help ticket was updated");
                 if (this.filesToUpload && this.filesToUpload.length > 0) this.helpTickets.uploadFile(this.filesToUpload, serverResponse._id);
 
-              case 14:
+              case 15:
                 this._cleanUp();
 
-              case 15:
+              case 16:
               case 'end':
                 return _context8.stop();
             }
