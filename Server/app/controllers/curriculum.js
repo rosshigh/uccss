@@ -192,7 +192,8 @@ module.exports = function (app) {
 
     form
       .on('error', function(err) {
-          throw err;
+        console.log(err);
+          
       })
         
       .on('field', function(field, value) {

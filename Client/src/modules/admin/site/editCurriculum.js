@@ -6,10 +6,11 @@ import {Curriculum} from '../../../resources/data/curriculum';
 import {Products} from '../../../resources/data/products';
 import {CommonDialogs} from '../../../resources/dialogs/common-dialogs';
 import Validation from '../../../resources/utils/validation';
-import $ from 'jquery';
+import {EventAggregator} from 'aurelia-event-aggregator';
+
 import moment from 'moment';
 
-@inject(DataTable, Curriculum, Products, AppConfig, Utils, CommonDialogs, Validation)
+@inject(DataTable, Curriculum, Products, AppConfig, Utils, CommonDialogs, Validation, EventAggregator)
 export class EditCurriculum {
     curriculumItemSelected = false;
     spinnerHTML = "";
@@ -29,7 +30,7 @@ export class EditCurriculum {
 		['misc', ['undo', 'redo', 'fullscreen', 'codeview']]
 	];
 
-    constructor(datatable, curriculum, products, config, utils, dialog, validation) {
+    constructor(datatable, curriculum, products, config, utils, dialog, validation, ea) {
         this.dataTable = datatable;
         this.dataTable.initialize(this);
         this.utils = utils;
@@ -39,9 +40,14 @@ export class EditCurriculum {
         this.config = config;
         this.validation = validation;
         this.validation.initialize(this);
+        this.ea = ea;
     }
 
     attached(){
+        this.mySubscription = this.ea.subscribe('upload-progress', obj => {
+            var elem = document.getElementById("progressBar");
+            elem.style.width = obj.progress/obj.total * 100 + '%'; 
+        });
         $('[data-toggle="tooltip"]').tooltip();
 		this._setupValidation();
     }
