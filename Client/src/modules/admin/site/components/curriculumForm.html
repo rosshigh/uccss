@@ -91,7 +91,7 @@
                   <div class="form-group">
                       <label show.bind="curriculum.selectedCurriculum.file.fileName" for="editFile" class="col-sm-2 control-label hideOnPhone topMargin">File</label>
                       <div class="col-sm-3 topMargin" show.bind="curriculum.selectedCurriculum.file.fileName != undefined">
-                          <a href.bind="selectedURL" innerhtml.bind='curriculum.selectedCurriculum.file.fileName' target='_blank'></a>
+                          <a href="${config.DOWNLOAD_URL}/curriculum/${curriculum.selectedCurriculum.category}/${curriculum.selectedCurriculum.file.fileName}" innerhtml.bind='curriculum.selectedCurriculum.file.fileName' target='_blank'></a>
                       </div>
                   </div>
                 </div>

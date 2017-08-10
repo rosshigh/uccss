@@ -159,7 +159,6 @@ module.exports = function (app) {
       if(err){
         console.log(err);
       }
-      console.log('uploaded')
       Model.findById(req.params.id, function(err, download){
         if(err){
           return next(err);
