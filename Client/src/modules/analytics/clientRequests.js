@@ -476,7 +476,7 @@ export class ClientRequestAnalytics {
     customProductDetailSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
 			var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
-			return result * sortDirection;
+			return result * sortDirection; 
 		});
     }
 
