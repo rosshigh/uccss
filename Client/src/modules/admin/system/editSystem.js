@@ -258,7 +258,7 @@ export class EditSystem {
                 });
         }
         this.saveProduct = true;
-        var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval));
+        var result = this.systems.generateClients(start, end, this.editClientStatus, this.products.selectedProduct, parseInt(this.clientInterval), this.idsAvailable);
         if (result.error) {
             this.utils.showNotification(result.error);
         } else {

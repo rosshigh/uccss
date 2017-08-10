@@ -487,12 +487,15 @@ module.exports = function (app) {
   router.get('/api/clientRequestsDetails/:sessionId/:institutionId', requireAuth, function(req, res, next){
     logger.log('Get clientRequests', 'verbose');   
     ClientRequestDetail.find()
-    .populate('requestId')
-    .exec()
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'personId', model: 'Person', select: 'firstName lastName fullName nickName phone mobile email institutionId file'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'institutionId', model: 'Institution', select: 'name'}})
+      .populate({ path: 'requestId', model: 'ClientRequest', populate: {path: 'courseId', model: 'Course', select: 'number name'}})
+      .populate({ path: "productId", model: "Product", select: "name"})
+      .exec()
     .then(results => {   
        if(results){
           var resultArray = results.filter(item => {        
-            return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId == req.params.institutionId;
+            return item.requestId.sessionId == req.params.sessionId && item.requestId.institutionId._id == req.params.institutionId;
           }) 
           res.status(200).json(resultArray);
         } else {

@@ -455,6 +455,7 @@ export class ClientRequests {
                     instID = item.requestId.institutionId.name;
                     var obj = that.utils.copyObject(templateObj);
                     obj.name = item.requestId.institutionId.name;
+                    obj.institutionId = item.requestId.institutionId._id;
                     that.analyticsInstitutionResultArray.push(obj);
                 }
                 that.analyticsInstitutionResultArray[that.analyticsInstitutionResultArray.length-1]['total'] += 1;

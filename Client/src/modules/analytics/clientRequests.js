@@ -16,6 +16,7 @@ import moment from 'moment';
 export class ClientRequestAnalytics {
     chartOptions = { legend: { display: false } };
     summerTable = true;
+    summerInstTable = true;
     categories = [
         {
             code: 0,
@@ -327,7 +328,19 @@ export class ClientRequestAnalytics {
             this.dataTable.updateArray(this.requests.requestsDetailsArray);
             this.selectedProductDetails = product.productId.name;
         } else {
-            this. getProductsRequests();
+            this.getProductsRequests();
+        }
+    }
+
+    async showProductInstitutionDetail(product){
+        this.summerInstTable = !this.summerInstTable;
+        if(!this.summerInstTable){
+            let response = await this.requests.getClientRequestsDetailFaccoArray(this.selectedSession,  product.institutionId);
+            // let response = await this.requests.getClientRequestsDetailsArray('?filter=[and]institutionId|eq|' + product.institution._id + ':sessionId|eq|' + this.selectedSession, true);
+            this.dataTable.updateArray(this.requests.requestsDetailsArray);
+            this.selectedInstitutionDetail = product.requestId.institutionId.name;
+        } else {
+            this.getInstitutionRequests();
         }
     }
 
@@ -460,6 +473,13 @@ export class ClientRequestAnalytics {
 		});
     }
 
+    customProductDetailSorter(sortProperty, sortDirection, sortArray, context){ 
+        return sortArray.sort((a, b) => {
+			var result = (a.productId.name < b.productId.name) ? -1 : (a.productId.name > b.productId.name) ? 1 : 0;
+			return result * sortDirection;
+		});
+    }
+
     customNameFilter(value, item, context){
         return item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
@@ -471,5 +491,9 @@ export class ClientRequestAnalytics {
 
     institutionCustomFilter(value, item, context){
         return item.requestId.institutionId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
+    }
+
+    customProductFilter(value, item, context){
+        return item.productId.name.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }

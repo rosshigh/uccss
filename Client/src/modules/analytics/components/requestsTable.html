@@ -1,4 +1,5 @@
 <template>
+    <div show.bind="summerInstTable">
     <h4 show.bind="dataTable.displayArray.length === 0" class="topMargin leftMargin">There are no items for this session</h4>
     <div class="col-lg-10 col-lg-offset-1">
         <div class='row'  show.bind="dataTable.displayArray.length > 0" >
@@ -36,14 +37,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr repeat.for="stat of dataTable.displayArray">
+                        <tr click.delegate="showProductInstitutionDetail(stat)" repeat.for="stat of dataTable.displayArray">
                             <td data-title="Institution">${stat.name}</td>
                             <td data-title="Total">${stat.total}</td>
                             <td data-title="${config.REQUEST_STATUS[$index].description}" repeat.for="status of config.REQUEST_STATUS">${stat | statValue:config.REQUEST_STATUS:$index}</td>
                         </tr>
                     </tbody>
-                </table>
+                </table> 
             </div>
         </div>
     </div>
+    </div>
+    <compose show.bind="!summerInstTable" view="./institutionRequestsDetail.html"></compose>
 </template>
