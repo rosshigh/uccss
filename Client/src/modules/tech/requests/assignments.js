@@ -985,6 +985,19 @@ export class Assignments {
     }
 
 	back() {
+        if(this.assignmentDetails && this.assignmentDetails.length > 0){
+             return this.dialog.showMessage(
+                    "There is an unsaved assignment. Are you sure you want to leave this page?",
+                    "Confirm Back",
+                    ['Yes', 'No']
+                ).whenClosed(response => {                      
+                    if (response.wasCancelled) {
+                       return;
+                    } else {
+                        this._cleanUp();
+                    }
+                });
+        }
         this._cleanUp();
 	}
 	

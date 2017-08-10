@@ -75,29 +75,19 @@ export class ViewRequests {
         return false;
     }
 
-    customNameSorter(sortProperty, sortDirection, sortArray, context){
-        var sortProperty = 'fullName';
-        sortArray.forEach((item) => {
-          var obj = context.dataTable.findObj(context.people.instutionPeopleArray, '_id', item.requestId.personId);
-          item[sortProperty] = obj ? obj[sortProperty] : null;
-        })
 
+    customPersonSorter(sortProperty, sortDirection, sortArray, context){ 
         return sortArray.sort((a, b) => {
-            var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
+            if(a['requestId']['personId']['lastName'] && b['requestId']['personId']['lastName']){
+                var result = (a['requestId']['personId']['lastName'] < b['requestId']['personId']['lastName']) ? -1 : (a['requestId']['personId']['lastName'] > b['requestId']['personId']['lastName']) ? 1 : 0;
+            } else {
+                var result = -1;
+            }
             return result * sortDirection;
-          });
+        });
     }
 
-    productSorter(sortProperty, sortDirection, sortArray, context){
-        var sortProperty = 'name';
-        sortArray.forEach((item) => {
-          var obj = context.dataTable.findObj(context.products.productsArray, '_id', item.productId);
-          item[sortProperty] = obj ? obj[sortProperty] : null;
-        })
-
-        return sortArray.sort((a, b) => {
-            var result = (a[sortProperty] < b[sortProperty]) ? -1 : (a[sortProperty] > b[sortProperty]) ? 1 : 0;
-            return result * sortDirection;
-          });
+    customNameFilter(value, item, context){
+        return item.requestId && item.requestId.personId.fullName.toUpperCase().indexOf(value.toUpperCase()) > -1;
     }
 }
