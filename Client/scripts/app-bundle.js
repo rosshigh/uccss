@@ -8140,7 +8140,7 @@ define('resources/data/curriculum',['exports', 'aurelia-framework', '../utils/ut
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 _context7.next = 2;
-                                return this.data.uploadFiles(files, this.CURRICULUM_SERVICE + "/uploadForm" + "/" + this.selectedCurriculum._id + '/' + this.selectedCurriculum.category);
+                                return this.data.uploadFiles(files, this.CURRICULUM_SERVICE + "/upload" + "/" + this.selectedCurriculum._id + '/' + this.selectedCurriculum.category);
 
                             case 2:
                                 response = _context7.sent;

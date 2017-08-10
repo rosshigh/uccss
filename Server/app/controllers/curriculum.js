@@ -154,7 +154,7 @@ module.exports = function (app) {
   var upload = multer({ storage: storage }).any();
 
   router.post('/api/curriculum/upload/:id/:container',  function(req, res, next){
-    req.socket.setTimeout(10 * 60 * 1000);
+     req.socket.setTimeout(10 * 60 * 1000);
     upload(req, res, function (err) {
       if(err){
         console.log(err);

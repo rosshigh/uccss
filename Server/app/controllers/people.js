@@ -102,7 +102,7 @@ module.exports = function (app, config) {
 
   router.get('/api/people/emailLog', requireAuth,  function(req, res, next){
     logger.log('Get people email log','verbose');
-console.log(req.query)    
+  
     var query = buildQuery(req.query, EmailLog.find())
     query
       .exec( function(err, object){
@@ -132,7 +132,7 @@ console.log(req.query)
         if (err) {
            return next(err);
         } else {
-          res.status(200).json(object);
+          res.status(200).json(object); 
         }
       });
   });
@@ -175,7 +175,7 @@ console.log(req.query)
 
        welcome(mailObj)
 
-        var facCoordEmail;
+        var facCoordEmail = "";
         people.forEach(item => {
           facCoordEmail += item.email + ',';
         });
