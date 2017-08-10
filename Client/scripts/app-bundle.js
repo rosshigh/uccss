@@ -23428,8 +23428,8 @@ define('modules/admin/site/editCurriculum',['exports', 'aurelia-framework', '../
 
         EditCurriculum.prototype.attached = function attached() {
             this.mySubscription = this.ea.subscribe('upload-progress', function (obj) {
-                var elem = $("#progressBar");
-                elem.style.width = obj.progress / obj.total * 100 + '%';
+                var progress = obj.progress / obj.total * 100 + '%';
+                var elem = $("#progressBar").css('width', progress);
             });
             $('[data-toggle="tooltip"]').tooltip();
             this._setupValidation();
