@@ -6,8 +6,8 @@ var express = require('express'),
   CurriculumCategory = mongoose.model('CurriculumCategory'),
   logger = require('../../config/logger'),
   multer = require('multer'),
-  mkdirp = require('mkdirp'),
-  formidable = require('formidable');;
+  mkdirp = require('mkdirp');
+    // formidable = require('formidable');;
 
   var requireAuth = passport.authenticate('jwt', { session: false });
 
@@ -154,7 +154,7 @@ module.exports = function (app) {
   var upload = multer({ storage: storage }).any();
 
   router.post('/api/curriculum/upload/:id/:container',  function(req, res, next){
-     req.socket.setTimeout(10 * 60 * 1000);
+     req.socket.setTimeout(20 * 60 * 1000);
     upload(req, res, function (err) {
       if(err){
         console.log(err);
@@ -183,69 +183,69 @@ module.exports = function (app) {
     });
   });
 
-   router.post('/api/curriculum/uploadForm/:id/:container',  function(req, res, next){
-       logger.log('Upload file in ' + req.params.container, "verbose");
-    var oldPath, newPath, fileName;
-    req.socket.setTimeout(10 * 60 * 1000);
-    var form = new formidable.IncomingForm({uploadDir: "c://temp/", keepExtensions: true});
+  //  router.post('/api/curriculum/uploadForm/:id/:container',  function(req, res, next){
+  //      logger.log('Upload file in ' + req.params.container, "verbose");
+  //   var oldPath, newPath, fileName;
+  //   req.socket.setTimeout(10 * 60 * 1000);
+  //   var form = new formidable.IncomingForm({uploadDir: "c://temp/", keepExtensions: true});
 
-    form
-      .on('error', function(err) {
-        console.log(err);
+  //   form
+  //     .on('error', function(err) {
+  //       console.log(err);
           
-      })
+  //     })
         
-      .on('field', function(field, value) {
-      })
+  //     .on('field', function(field, value) {
+  //     })
 
-      /* this is where the renaming happens */
-      .on ('fileBegin', function(name, file){
-          //rename the incoming file to the file's name
-          file.path = form.uploadDir + "/" + file.name;
-          newPath =  config.uploads + '/curriculum/' + req.params.container + '/' + file.name;
-          oldPath = file.path;
-          fileName = file.name;
-      })
+  //     /* this is where the renaming happens */
+  //     .on ('fileBegin', function(name, file){
+  //         //rename the incoming file to the file's name
+  //         file.path = form.uploadDir + "/" + file.name;
+  //         newPath =  config.uploads + '/curriculum/' + req.params.container + '/' + file.name;
+  //         oldPath = file.path;
+  //         fileName = file.name;
+  //     })
 
-      .on('file', function(field, file) {
+  //     .on('file', function(field, file) {
 
-      })
+  //     })
 
-      .on('progress', function(bytesReceived, bytesExpected) {
+  //     .on('progress', function(bytesReceived, bytesExpected) {
 
-      })
+  //     })
 
-      .on('end', function() {
-        console.log('end')
+  //     .on('end', function() {
+  //       console.log('end')
          
-        fs.rename(oldPath, newPath, function (err) { 
-          if (err) throw err;
-          Model.findById(req.params.id, function(err, download){
-            if(err){
-              return next(err);
-            } else {
-              var file =  {
-                originalFilename: fileName,
-                fileName: fileName,
-                dateUploaded: new Date()
-              };
-              download.file = file;
-              download.save(function(err, download) {
-                if(err){
-                  return next(err);
-                } else {
-                  res.status(200).json(download);
-                }
-              });
-            }
-          });
-        });
+  //       fs.rename(oldPath, newPath, function (err) { 
+  //         if (err) throw err;
+  //         Model.findById(req.params.id, function(err, download){
+  //           if(err){
+  //             return next(err);
+  //           } else {
+  //             var file =  {
+  //               originalFilename: fileName,
+  //               fileName: fileName,
+  //               dateUploaded: new Date()
+  //             };
+  //             download.file = file;
+  //             download.save(function(err, download) {
+  //               if(err){
+  //                 return next(err);
+  //               } else {
+  //                 res.status(200).json(download);
+  //               }
+  //             });
+  //           }
+  //         });
+  //       });
 
-      });
+  //     });
 
-  form.parse(req);  
+  // form.parse(req);  
 
-   });
+  //  });
 
   function extendTimeout (req, res, next) {
      req.socket.setTimeout(10 * 60 * 1000);

@@ -40,7 +40,7 @@ export class EditCurriculum {
         this.config = config;
         this.validation = validation;
         this.validation.initialize(this);
-        this.ea = ea;
+        this.ea = ea; 
     }
 
     attached(){

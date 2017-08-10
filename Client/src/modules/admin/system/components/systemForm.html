@@ -136,7 +136,7 @@
 				<div class="panel-body">
 					<ul>
 						<li class="list-group-item" repeat.for="client of systems.selectedSystem.clients | sortArray:'client':'ASC'">
-							<div class="row">
+							<div style="overflow:auto;height:800px;" class="row">
 								<span class="col-sm-8">
 									<h5>Client ${client.client} <span class="leftMargin">IDs: ${client.idsAvailable}</span></h5>
 									<h6>Status: ${client.clientStatus | lookupValue:config.CLIENT_STATUSES:"code":"description"}</h6>
