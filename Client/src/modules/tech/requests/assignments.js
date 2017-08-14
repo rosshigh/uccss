@@ -993,7 +993,14 @@ export class Assignments {
         this.clientRequests.setTheSelectedRequestDetail(this.selectedRequestDetail);
         let changes = this.clientRequests.isRequestDetailDirty(this.originalRequestDetail,['requestId','productId','techComments']);
 
-        if(changes.length > 0 || (this.assignmentDetails && this.assignmentDetails.length > 0) ){
+        var newAssignment = false;
+        if(this.assignmentDetails) {
+            this.assignmentDetails.forEach(item => {
+                if(!item.assignedDate) newAssignment = truel
+            })
+        }
+
+        if(changes.length > 0 || newAssignment ){
              return this.dialog.showMessage(
                     "There is an unsaved assignment. Are you sure you want to leave this page?",
                     "Confirm Back",
