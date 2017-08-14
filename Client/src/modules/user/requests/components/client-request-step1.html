@@ -31,19 +31,30 @@
     <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="REGULAR_NUMBER_OF_STUDENTS.content"></div>
     <div class="topMargin col-lg-5">
       <div class="form-group">
-        <label for="undergraduates" class="col-sm-3 control-label">Undergraduates</label>
-        <div class="col-sm-8">
-          <input disabled.bind="existingRequest" id="undergraduates"  type="number" placeholder="Number of Undergraduates"
-                  class="form-control" value.bind="requests.selectedRequest.undergradIds"/>
+        <div show.bind="!existingRequest">
+          <label for="undergraduates" class="col-sm-3 control-label">Undergraduates</label>
+          <div class="col-sm-8">
+            <input disabled.bind="existingRequest" id="undergraduates"  type="number" placeholder="Number of Undergraduates"
+                    class="form-control" value.bind="requests.selectedRequest.undergradIds"/>
+          </div>
         </div>
+        <div show.bind="existingRequest" class="col-lg-5">
+          <h5>Undergrads: <b>${requests.selectedRequest.undergradIds}</b></h5>
+        </div>
+							
       </div>
     </div>
     <div class="topMargin col-lg-5">
       <div class="form-group">
+        <div show.bind="!existingRequest">
             <label for="graduates" class="col-sm-3 control-label">Graduates</label>
             <div class="col-sm-8">
               <input disabled.bind="existingRequest" id="graduates" type="number" placeholder="Number of Graduates"
                     class="form-control" value.bind="requests.selectedRequest.graduateIds"/>
+            </div>
+          </div>
+            <div show.bind="existingRequest" class="col-lg-5">
+                <h5>Graduate: <b>${requests.selectedRequest.graduateIds}</b></h5>
             </div>
       </div>
     </div>
@@ -57,20 +68,30 @@
     <div class="topMargin col-lg-10 leftMargin rightMargin" innerhtml.bind="START_END_DATES.content"></div>
       <div class="col-lg-5">
         <div class="form-group topMargin">
+          <div show.bind="!existingRequest">
            <label class="col-sm-3 form-control-label ">Start Date</label>
-           <div class="col-sm-8">
-            <flat-picker disabled.bind="existingRequest" controlid="startDate" config.bind="configDate" change.delegate="changeBeginDate($event)"  
-                value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
-           <span id='startDateError'></span>
+           <div show.bind="!existingRequest" class="col-sm-8">
+              <flat-picker  controlid="startDate" config.bind="configDate" change.delegate="changeBeginDate($event)"  
+                  value.bind="requests.selectedRequest.startDate" startdate.bind="minStartDate" enddate.bind="maxStartDate"></flat-picker>
+            <span id='startDateError'></span>
            </div>
+          </div>
+          <div show.bind="existingRequest" class="col-sm-8">
+            <h5>Start Date:  <b>${requests.selectedRequest.startDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
+          </div>
         </div>
       </div>
       <div class="col-lg-5">
         <div class="form-group topMargin">
-          <label class="col-sm-3 form-control-label ">End Date</label>
-          <div class="col-sm-8">
-            <flat-picker disabled.bind="existingRequest" controlid="endDate" config.bind="configDate" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
-           <span id='endDateError'></span>
+          <div show.bind="!existingRequest">
+            <label class="col-sm-3 form-control-label ">End Date</label>
+            <div  class="col-sm-8">
+              <flat-picker controlid="endDate" config.bind="configDate" value.bind="requests.selectedRequest.endDate" startdate.bind="minEndDate" enddate.bind="maxEndDate"></flat-picker>
+            <span id='endDateError'></span>
+            </div>
+          </div>
+           <div show.bind="existingRequest" class="col-sm-8">
+            <h5>End Date:  <b>${requests.selectedRequest.endDate | dateFormat:config.DATE_FORMAT_TABLE}</b></h5>
           </div>
         </div>
       </div>

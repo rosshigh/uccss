@@ -223,7 +223,7 @@ module.exports = function (app) {
         if(err){
           return next(error);
         }
-        clientRequest.requestStatus = req.body.requestStatus;
+        if(clientRequest) clientRequest.requestStatus = req.body.requestStatus;
         let tasks = new Array();   
         if(req.body.requestDetailsToSave){
           req.body.requestDetailsToSave.forEach((detail, index) => { 

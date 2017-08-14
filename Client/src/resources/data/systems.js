@@ -180,7 +180,7 @@ export class Systems{
                     }
                 }
             })
-            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct );
+            this.selectedSystem.clients[i] = this.emptyClient(this.selectedSystem.clients[i].client, status, aProduct, this.selectedSystem.clients[i].idsAvailable );
         }
     }
 
@@ -231,7 +231,7 @@ export class Systems{
       }
     }
 
-     selectClientFromNumber(systemId, client){
+    selectClientFromNumber(systemId, client){
         this.selectedClient = null;
         for(var i = 0, x = this.systemsArray.length; i < x; i++){
             if(this.systemsArray[i]._id === systemId){
