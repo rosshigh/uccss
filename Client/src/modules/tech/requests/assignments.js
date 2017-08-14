@@ -894,7 +894,7 @@ export class Assignments {
                     this.proposedClient[j].idsAvailable = this.proposedClient[j].idsAvailable ? parseInt(this.proposedClient[j].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);
                     var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
                     var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                    if(this.assignmentDetails[i].client == this.proposedClient[j].client){
+                    if((this.assignmentDetails[i].client == this.proposedClient[j].client) && (this.assignmentDetails[i].systemId == this.proposedClient[j].systemId)){
                         //If this isn't a new assignment
                         if(this.assignmentDetails[i].assignedDate){
                             //If there are more than one assignment, make the client shared

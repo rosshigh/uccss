@@ -28581,7 +28581,7 @@ define('modules/tech/requests/assignments',['exports', 'aurelia-framework', '../
                         this.proposedClient[j].idsAvailable = this.proposedClient[j].idsAvailable ? parseInt(this.proposedClient[j].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);
                         var oldIdsAssigned = parseInt(this.proposedClient[j].idsAssigned);
                         var oldIdsAvailable = parseInt(this.proposedClient[j].idsAvailable);
-                        if (this.assignmentDetails[i].client == this.proposedClient[j].client) {
+                        if (this.assignmentDetails[i].client == this.proposedClient[j].client && this.assignmentDetails[i].systemId == this.proposedClient[j].systemId) {
                             if (this.assignmentDetails[i].assignedDate) {
                                 if (this.proposedClient[j].assignments) {
                                     for (var k = 0; k < this.proposedClient[j].assignments.length; k++) {
