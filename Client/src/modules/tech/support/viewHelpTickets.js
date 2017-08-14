@@ -188,9 +188,10 @@ export class ViewHelpTickets {
   * el - event object
   * index - index of selected help ticket
   *****************************************************************************************/
-  async selectHelpTicket(el, index) {
+  async selectHelpTicket(el, index) { 
     //Make the selected help ticket the selected help ticket
-    this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+    this.editIndex = this.dataTable.getOriginalIndex(index);
+    // this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
     this.helpTickets.selectHelpTicket(this.editIndex);
     this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
     this.openHelpTicket();

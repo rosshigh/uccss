@@ -31140,7 +31140,8 @@ define('modules/tech/support/viewHelpTickets',['exports', 'aurelia-framework', '
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                this.editIndex = this.dataTable.displayArray[index + parseInt(this.dataTable.startRecord)].baseIndex;
+                this.editIndex = this.dataTable.getOriginalIndex(index);
+
                 this.helpTickets.selectHelpTicket(this.editIndex);
                 this.oroginalHelpTicket = this.helpTickets.selectedHelpTicket;
                 this.openHelpTicket();
