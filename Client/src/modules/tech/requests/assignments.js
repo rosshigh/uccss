@@ -903,7 +903,6 @@ export class Assignments {
                                 for(var k = 0; k<this.proposedClient[j].assignments.length; k++){
                                     if(this.proposedClient[j].assignments[k].assignment == this.selectedRequestDetail._id){
                                         var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                                        // this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? this.proposedClient[i].idsAvailable : 0;
                                         this.proposedClient[j].idsAvailable = parseInt(this.proposedClient[j].idsAvailable) + parseInt(this.oldRequest.assignments[i].idsAssigned) - totalIdsAssigned;
                                         this.proposedClient[j].assignments[k].studentIDRange = this.assignmentDetails[i].studentUserIds;
                                         this.proposedClient[j].assignments[k].facultyIDRange = this.assignmentDetails[i].facultyUserIds;
@@ -921,8 +920,7 @@ export class Assignments {
                             this.selectedRequestDetail.assignedDate = new Date();
                             if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
                             var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                            // this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? this.proposedClient[i].idsAvailable : 0;
-                            this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - (parseInt(totalIdsAssigned) - this.oldIdsAssigned);
+                            this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - parseInt(totalIdsAssigned);
                             this.proposedClient[i].manual = this.manualMode;
                             this.proposedClient[i].assignments.push({
                                 assignment: this.selectedRequestDetail._id,
@@ -956,7 +954,6 @@ export class Assignments {
                 if(this.selectedRequestDetail.requestId.courseId._id != this.config.SANDBOX_ID) this.proposedClient[i].clientStatus = this.config.ASSIGNED_CLIENT_CODE;
                 if(this.proposedClient[i].assignments.length > 1 && this.proposedClient[i].clientStatus != this.config.SANDBOX_CLIENT_CODE) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 var totalIdsAssigned = parseInt(this.assignmentDetails[i].lastID) - parseInt(this.assignmentDetails[i].firstID);
-                // this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? this.proposedClient[i].idsAvailable : 0;
                 this.proposedClient[i].idsAvailable = this.proposedClient[i].idsAvailable ? parseInt(this.proposedClient[i].idsAvailable) : parseInt(this.products.selectedProduct.idsAvailable);
                 this.proposedClient[i].idsAvailable = parseInt(this.proposedClient[i].idsAvailable) - totalIdsAssigned;
                 this.proposedClient[i].manual = this.manualMode;
