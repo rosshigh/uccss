@@ -767,7 +767,7 @@ export class Assignments {
         for(var i = 0; i<this.proposedClient[index].assignments.length; i++){
             if(this.proposedClient[index].assignments[i].assignment == this.selectedRequestDetail._id){
                 this.proposedClient[index].assignments.splice(i,1);
-                if(this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].clientStatus != this.config.SANDBOX_ID ) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
+                if(this.proposedClient[index].assignments.length == 0 && this.proposedClient[index].SANDBOX_CLIENT_CODE != this.config.SANDBOX_ID ) this.proposedClient[index].clientStatus = this.config.UNASSIGNED_CLIENT_CODE;
                 break;
             }
         }
@@ -906,6 +906,7 @@ export class Assignments {
                                         this.proposedClient[j].assignments[k].firstID = this.assignmentDetails[i].firstID;
                                         this.proposedClient[j].assignments[k].lastID = this.assignmentDetails[i].lastID;
                                         this.proposedClient[j].manual = this.manualMode;
+                                        if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                                         this.systems.updateClient(this.proposedClient[j]);
                                     }
                                 }
@@ -927,6 +928,7 @@ export class Assignments {
                                 firstID: this.assignmentDetails[i].firstID,
                                 lastID: this.assignmentDetails[i].lastID,  
                             });
+                            if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                             this.systems.updateClient(this.proposedClient[i]);
                         }
                     }
@@ -961,6 +963,7 @@ export class Assignments {
                     lastID: this.assignmentDetails[i].lastID,   
                     assignedDate: new Date()                 
                 });
+                if(this.proposedClient[i].assignments.length > 1) this.proposedClient[i].clientStatus = this.config.SHARED_CLIENT_CODE;
                 this.systems.updateClient(this.proposedClient[i]);
             };
         }

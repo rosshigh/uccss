@@ -267,13 +267,10 @@ module.exports = function (app) {
   router.put('/api/clientRequests/deleteAssignment', requireAuth, function(req, res, next){
     var detailId;
     var clientRequest = new Model(req.body);   
-
-    clientRequest.requestDetails = new Array();  
     if(req.body.requestDetailsToSave){      
       var updates = req.body.requestDetailsToSave.map(detail => {     
         if(detail._id){
-          detailId = detail._id;
-          clientRequest.requestDetails.push(detail._id);            
+          detailId = detail._id;              
           return { 
             updateOne: { 
                 "filter": { "_id": detail._id },              
@@ -544,8 +541,10 @@ module.exports = function (app) {
         return next(err);
       } else {
         if(request){
+        
           if(request.requestDetails && request.requestDetails.length > 0){      
-            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);           
+            request.requestDetails.splice(request.requestDetails.indexOf(req.params.id), 1);        
+               
             if(request.requestDetails.length === 0) { 
               Model.findOneAndRemove({_id: request._id}, function(err, request) {
                 if(err) {
